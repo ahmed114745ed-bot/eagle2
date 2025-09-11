@@ -192,22 +192,18 @@ class UserRepository extends Repository
     public function getUserWithMedals($userId)
     {
         return User::with([
-            'medals' => fn($q) => $q->userPickProfile(),
-            'userSetting',
-            'ownAgency',
-            'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
-            'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
-            'packs.ware',
-            'country',
-            'manager',
+            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17])
+                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+                ->where('is_used', 1)
+                ->with(['ware']),
+            'UserVip' => fn($q) => $q->with('OVip:id,img'),
+            'receiverLevel:id,img',
+            'senderLevel:id,img',
+            'chargeLevel:id,img,level',
+            'agency.owner',
             'profile',
-            'eligiblePacks.ware',
-            'family.members',
-            'agency',
-            'shippingAgency',
-            'specialId.ware',
-            'images',
-            'UserVip.Ovip.wares',
+            'shippingAgency:id,app_owner_id,name,img',
+            'owner.medals.achievementLevel.achievement'
         ])
             ->find($userId);
     }

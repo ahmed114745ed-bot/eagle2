@@ -353,7 +353,7 @@ class UserController extends Controller
 
     public function my_data(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
         try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (Exception $exception) {
@@ -829,7 +829,7 @@ class UserController extends Controller
             sourceType: 'first_join_reward_invitee',
             amount: $this->getValue('invitation_invitee_reward')
         );
-     
+
         return UserCodeInvitation::create([
             "user_id"    => $parentId,
             "invited_id" => $invitedId,
@@ -1311,7 +1311,7 @@ class UserController extends Controller
             return $this->userService->getEarningsForParent($parentId);
         });
     }
-    
+
     public function invitationsEarningsClaim(Request $request, int $id)
     {
         return TryCatchHelper::handle(function () use ($request, $id) {
@@ -1319,5 +1319,5 @@ class UserController extends Controller
             return $this->userService->claimEarning($parentId, $id);
         });
     }
-    
+
 }
