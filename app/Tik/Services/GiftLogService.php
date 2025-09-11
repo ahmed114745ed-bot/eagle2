@@ -76,7 +76,7 @@ class GiftLogService
 
 
             // Get Room Data
-            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
+            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
