@@ -930,7 +930,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return 0;
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return new \stdClass();
 
@@ -957,7 +957,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -996,7 +996,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1056,7 +1056,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1077,7 +1077,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1100,7 +1100,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
