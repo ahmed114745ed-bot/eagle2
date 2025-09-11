@@ -113,8 +113,13 @@ class MyDataResource extends JsonResource
          * @var Room $ownerRoom*/
 
         $uuid = @$this->uuid;
-
         $wabble = UserPackHelper::getWare($this->resource, 12);
+        $isStopInvitationValid = null;
+
+        if (self::isStopInvitationValid()) {
+            $isStopInvitationValid = true;
+
+        }
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -202,9 +207,7 @@ class MyDataResource extends JsonResource
                 'progress'          =>  0,
             ],
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
-            // @todo check
-//            $this->merge((new MyStoreResource($this->resource))),
-            //
+
             'family_data' => $f,
             'agency' => $agency_joined,
             'Last_seen' => Carbon::createFromTimestamp($this->online_time)->format('d/m/y H:i'),
@@ -237,7 +240,7 @@ class MyDataResource extends JsonResource
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
             'new_gift'          => (bool)$this->new_gift,
-            'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
+            'show_invite_code' => !$isStopInvitationValid && ($this->userSetting?->show_invite_code ?? false),
             'wallet' => $this->wallet?->value ?? 0,
             'user_types' => $this->user_types,
 
@@ -285,5 +288,8 @@ class MyDataResource extends JsonResource
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 
-
+    private static function isStopInvitationValid()
+    {
+        return settings()->get('stop_invite_code');
+    }
 }
