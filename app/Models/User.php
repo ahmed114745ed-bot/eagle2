@@ -1073,13 +1073,6 @@ class User extends Authenticatable
         });
     }
 
-    public function packsWithWare(): HasMany
-    {
-        return $this->hasMany(Pack::class)->with('ware')->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        });
-    }
-
     public function packsUser()
     {
         return $this->hasMany(Pack::class, 'user_id')->whereIn('type', [4, 5, 6, 25])->where('get_type', '!=', 1)->where('is_used', 1)->where(function ($q) {
@@ -1953,14 +1946,16 @@ public function userDataSetting()
 
     public function getVipDataAttribute()
     {
+        $this->loadMissing('Ovip.wareIcon', 'Ovip.privilegs', 'packs.ware');
+
         $vip = $this->Ovip;
         if (!$vip) {
             return new \stdClass();
         }
 
         $vipIcon = $vip->wareIcon;
-        $hasColor = Common::hasInPackV2($this->packsWithWare, 18, true);
-        $color    = Common::hasColorInPackV2($this->packsWithWare, 21, true);
+        $hasColor = Common::hasInPackV2($this->packs, 18, true);
+        $color    = Common::hasColorInPackV2($this->packs, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
