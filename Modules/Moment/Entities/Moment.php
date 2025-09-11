@@ -58,7 +58,7 @@ class Moment extends Model
 
     public function scopeWithUser($query)
     {
-        return $query->with(['user' => fn($q) => $q->select(['id', 'uuid', 'special_id', 'sender_level', 'receiver_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
+        return $query->with(['user' => fn($q) => $q->select(['id', 'uuid','name', 'special_id', 'sender_level', 'received_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
             ->with([
                 'packs' => fn($q) => $q->whereIn('type', [4, 25, 18])
                     ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
