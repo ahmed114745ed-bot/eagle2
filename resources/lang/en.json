@@ -1146,5 +1146,21 @@
 "User": "User",
 "Game": "Game",
   "filters.expired_zero_or_null": "Expired (Zero or Null)",
-  "filters.yes": "Yes"
+  "filters.yes": "Yes",
+  "invitation.earn_percentage": "Referrer Earn Percentage (%)",
+  "invitation.earn_percentage_help": "The percentage the referrer earns from each recharge the invitee makes within one month of the invitation.",
+  "invitation.host_reward": "Referrer Reward (Coins)",
+  "invitation.host_reward_help": "The number of coins the referrer receives immediately when the invitee uses the code.",
+  "invitation.invitee_reward": "Invitee Reward (Coins)",
+  "invitation.invitee_reward_help": "The number of coins the invitee receives when using the invitation code.",
+  "invitation.saved_successfully": "Invitation settings saved successfully",
+  "invitation.validation_failed": "48 hours have passed since the user was created, or the user has already been registered with someone else",
+  "invitation.success": "Added successfully",
+  "invitation.user_not_found": "User not found",
+  "invitation.already_registered": "The user is already registered",
+  "invitation.device_in_use": "This code has already been used with another account on this device",
+  "invitation.stopped": "Sorry, the invitation system is currently disabled"
+
+
+
 }

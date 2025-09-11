@@ -177,7 +177,7 @@ class chargUsersSleemController extends AdminController
         $amount = $data['amount'];
         $chargerId = 1;
 
-        Charge::query()->create([
+        $charge = Charge::query()->create([
             'user_id' => $userId,
             'amount' => $amount,
             'charger_id' => $chargerId,
@@ -187,7 +187,7 @@ class chargUsersSleemController extends AdminController
         ]);
         $user->di += (int)$amount;
         $user->save();
-        UserCommon::UserEarnedInvitation($user->id, $amount);
+        UserCommon::UserEarnedInvitation($user->id, $amount,$charge->id);
     }
 
     public function show($id, Content $content)

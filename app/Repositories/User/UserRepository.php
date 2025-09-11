@@ -10,6 +10,7 @@ use App\Models\Follow;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
 use App\Models\User;
+use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
 use Exception;
@@ -522,6 +523,24 @@ class UserRepository extends Repository
             'profile_frame'    => $user->profile_frame,
             'profile_frame_id' => $user->profile_frame_id,
         ];
+    }
+
+    public function getByParentId(int $parentId)
+    {
+        return UserEarnInvitation::where('parent_id', $parentId)
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    public function claimEarning(int $earningId): ?UserEarnInvitation
+    {
+        $earning = UserEarnInvitation::find($earningId);
+        if (!$earning || $earning->is_claimed) {
+            return null;
+        }
+
+        $earning->update(['is_claimed' => true]);
+        return $earning;
     }
     
     

@@ -694,9 +694,6 @@ class EnteranceController extends Controller
             $errors = implode(',', $validator->errors()->all());
             return Common::apiResponse(0, $errors);
         }
-
-
-
         $user = $request->user();
         try {
             $send = $this->enteranceRoomService->makeRequestInviteRoom($user, $request);

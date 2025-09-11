@@ -2,7 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Enums\UserCoinLogType;
+use App\helper\InvitationEarningHelper;
+use App\helper\InvitationWalletHelper;
 use Illuminate\Support\Facades\Log;
+use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
@@ -160,8 +164,11 @@ class UserCommon
     }
 
 
-    public static function UserEarnedInvitation($userId, $amount)
+    public static function UserEarnedInvitation($userId, $amount, $chargeId = 0)
     {
+        if (self::isStopInvitationValid()) {
+            return;
+        }
         $invitation = self::getInvitation($userId);
         if (!$invitation || !self::isInvitationValid($invitation)) {
             return;
@@ -177,7 +184,7 @@ class UserCommon
             return;
         }
     
-        self::applyEarnings($parent, $invitation, $amount, $percentage);
+        self::applyEarnings($parent, $invitation, $amount, $percentage,$chargeId);
 
     }
     
@@ -185,6 +192,13 @@ class UserCommon
     {
         return UserCodeInvitation::where("invited_id", $userId)->first();
     }
+    private static function isStopInvitationValid()
+    {
+        return settings()->get('stop_invite_code');
+    }
+
+    
+
     
     private static function isInvitationValid($invitation): bool
     {
@@ -200,17 +214,14 @@ class UserCommon
     private static function getPercentage($parent): ?float
     {
         $configEarn = Config::where("name", "earn_from_invitation")->first();
-        $configEarnHost = Config::where("name", "earn_from_invitation_host_agency")->first();
-    
-        if ($parent->shippingAgency || $parent->is_bd ) {
-            return $configEarnHost?->value;
-        }
-    
-        return $configEarn?->value;
+
+        return $configEarn?->value ??  false;
     }
     
-    private static function applyEarnings($parent, $invitation, $amount, $percentage): void
+    private static function applyEarnings($parent, $invitation, $amount, $percentage,$chargeId): void
     {
+        $amountBefore =  Common::getCurrentBalance($parent->id);
+
         $parentWin = ($amount * $percentage) / 100;
     
         $parent->di += $parentWin;
@@ -219,13 +230,26 @@ class UserCommon
         $invitation->invited_charge += $amount;
         $invitation->user_percentage += $parentWin;
         $invitation->save();
-    
-        UserEarnInvitation::create([
-            "parent_id"         => $parent->id,
-            "user_id"           => $invitation->invited_id,
-            "user_charge"       => $amount,
-            "parent_percentage" => $parentWin,
-        ]);
+
+        InvitationWalletHelper::updateInvitationWallet($parentWin);
+
+        UserCoinLogHelper::logByType(
+            $parent->id,
+            $parentWin,
+            $amountBefore,
+            UserCoinLogType::INVITATION_CHARGE_EARNINGS,
+        );
+
+        InvitationEarningHelper::addEarning(
+            parentId:  $parent->id,
+            userId:  $invitation->invited_id,
+            sourceType: 'charge_percentage',
+            amount: $parentWin,
+            userCharge: $amount,
+            parentPercentage: $percentage,
+            chargeId: $chargeId,
+        );
+     
         CustomNotification::UserEarnedInvitation($parent, $parentWin);
 
    

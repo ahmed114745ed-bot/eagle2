@@ -27,7 +27,8 @@ class CoreWalletsSeeder extends Seeder
             'payment_gateways',
             'mall',
             'vip',
-            'ads'
+            'ads',
+            'invitation_code_wallet'
         ];
 
         foreach ($walletNames as $name) {
