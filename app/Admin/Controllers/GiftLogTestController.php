@@ -62,7 +62,7 @@ class GiftLogTestController extends Controller
 
     public function myDataTest(Request $request)
     {
-        $user = User::where('id', 303);
+        $user = User::where('id', 303)->first();
 
         try {
             $userWithMedals = $this->userService->processUserData(
