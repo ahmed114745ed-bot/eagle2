@@ -15,8 +15,8 @@ class LocalOnly
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!app()->environment('local')) {
-            abort(403, 'This route is only available in local environment');
+        if (app()->environment('production')) {
+            abort(403, 'This route is not available in production environment');
         }
 
         return $next($request);
