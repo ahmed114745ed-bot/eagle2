@@ -807,7 +807,7 @@ class User extends Authenticatable
     public function Ovip()
     {
         return $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
-            ->with('privilegs'); 
+            ->with('privilegs');
     }
 
     public function haveVip()
@@ -1069,6 +1069,13 @@ class User extends Authenticatable
     public function packs()
     {
         return $this->hasMany(Pack::class)->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
+    }
+
+    public function packsWithWare(): HasMany
+    {
+        return $this->hasMany(Pack::class)->with('ware')->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
     }
@@ -1952,8 +1959,8 @@ public function userDataSetting()
         }
 
         $vipIcon = $vip->wareIcon;
-        $hasColor = Common::hasInPack($this->id, 18, true);
-        $color    = Common::hasColorInPack($this->id, 21, true);
+        $hasColor = Common::hasInPackV2($this->packsWithWare, 18, true);
+        $color    = Common::hasColorInPackV2($this->packsWithWare, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
@@ -1972,7 +1979,7 @@ public function userDataSetting()
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVip($this->id, 18, 'color') ?? '' : '',
+            'colored_name'   => $hasColor ? Common::wareUserVipV2($this->id, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -1994,7 +2001,7 @@ public function userDataSetting()
         $star_level  = $this->total_received_level ?? 0;
         $gold_level  = $this->total_sender_level ?? 0;
 
-        $vipsData = \Cache::rememberForever('vips_data', fn() => 
+        $vipsData = \Cache::rememberForever('vips_data', fn() =>
             Vip::all()->groupBy('type')
         );
 
