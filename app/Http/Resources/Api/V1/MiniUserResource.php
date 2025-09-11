@@ -29,7 +29,7 @@ class MiniUserResource extends JsonResource
         if (!@$this->id) {
             return;
         }
-        $hasColor = Common::hasInPack(@$this->id, 18, true);
+        $hasColor = Common::hasInPackV2(@$this->packs, 18, true);
 
         $data = [
             'id' => @$this->id,
@@ -42,7 +42,7 @@ class MiniUserResource extends JsonResource
             'frame' => $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
             'frame_id' => @$this->dress_1,
             'has_color_name' => $this->getPackWithTypeV2(18),
-            'colored_name' => $hasColor ? common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? common::wareUserVipV2(@$this->id, 18, 'color') ?? '' : '',
 
         ];
 
