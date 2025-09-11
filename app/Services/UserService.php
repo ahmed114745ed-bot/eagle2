@@ -341,7 +341,7 @@ class UserService
 
         UserFollowHelper::updateCounts( $request->user());
         UserFollowHelper::updateCounts($unFollower);
-        
+
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
     }
@@ -515,7 +515,8 @@ class UserService
     
     private function getUserWithRelations($userId)
     {
-        return  $this->userRepository->findUserData($userId);
+        // return  $this->userRepository->findUserData($userId);
+        return  $this->userRepository->getUserWithMedals($userId);
     }
 
 
