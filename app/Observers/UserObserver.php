@@ -122,7 +122,7 @@ class UserObserver
 //            }
 
 
-            $month_received = $user->monthly_diamond_received;
+//            $month_received = $user->monthly_diamond_received;
         } catch (\Illuminate\Database\QueryException $e) {
         }
     }
