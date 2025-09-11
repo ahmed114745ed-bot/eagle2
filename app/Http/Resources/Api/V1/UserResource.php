@@ -88,7 +88,7 @@ class UserResource extends JsonResource
              'change_room_effect'   => new ShowUserSettingResource($this->userDataSetting),
              'chat_setting'         => new ChatSettingResource($this->chatSetting),
              'manger_type'          => new MangerTypeResource($this->manager),
-             'top_three_support'    => $userHandling->getTopThreeSupport($this->id),
+             'top_three_support'    => [],
              'level' => [
                 'receiver_img' => $this->receiverLevel?->img ?? '',
                 'sender_img'   => $this->senderLevel?->img  ?? '',
