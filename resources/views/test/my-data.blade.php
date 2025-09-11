@@ -31,7 +31,7 @@
         <p style="color: green;">✅ {{ $message }}</p>
         @if(isset($user))
             <pre>
-                {{ print_r($user, true) }}
+                {{ json_encode($user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}
             </pre>
         @endif
     @else
