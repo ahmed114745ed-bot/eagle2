@@ -192,6 +192,7 @@ class UserRepository extends Repository
     public function getUserWithMedals($userId)
     {
         return User::with([
+            'medals' => fn($q) => $q->userPickProfile(),
             'manager',
             'profile',
             'UserVip.Ovip.wares',
