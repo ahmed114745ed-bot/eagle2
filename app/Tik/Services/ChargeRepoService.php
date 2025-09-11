@@ -83,7 +83,7 @@ class ChargeRepoService
 
             \DB::commit();
             (new UserAchievementService())->insertCharging($userResve, $coins);
-            UserCommon::UserEarnedInvitation($userResve->id, $coins);
+            UserCommon::UserEarnedInvitation($userResve->id, $coins,$data->id);
 
             return true; //
         } catch (Exception $e) {
@@ -585,7 +585,7 @@ class ChargeRepoService
             (new UserAchievementService())->insertCharging($receiver, $amount);
         }
 
-        UserCommon::UserEarnedInvitation($receiver->id, $amount);
+        UserCommon::UserEarnedInvitation($receiver->id, $amount );
         UserCommon::addChargeLevel($receiver->id, $amount);
     }
 }

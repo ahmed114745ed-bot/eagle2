@@ -56,6 +56,7 @@ class RoomBoomRewardController extends MainController
     protected function grid()
     {
         $grid = new Grid(new RoomBoomReward());
+        $grid->model()->with(['ware', 'gift']);
 
         $roomBoomLevelId = request('room_boom_level_id');
         $grid->model()->where('room_boom_level_id', $roomBoomLevelId);
@@ -70,21 +71,23 @@ class RoomBoomRewardController extends MainController
             } elseif ($this->target_type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
+            } elseif ($this?->target_type == "coin") {
+                return @$this?->target;
             }
         });
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->target_type == 'ware') {
-                    $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? $ware?->show_img;
+                    $path = @$this->ware->img2 ?? @$this->ware?->show_img;
                 } elseif ($this->target_type == 'gift') {
-                    $gift = Gift::find($this->target);
-                    $path = $gift->show_img ?? $gift?->img;
+                    $path = @$this->gift->show_img ?? @$this->gift?->img;
                 } elseif ($this->target_type == 'achievement') {
                     $value = getDriverUrl() . '/' . @$this?->target;
                     return "<img src='$value' width='80' height='80'>";
-                } else {
+                } elseif ($this?->target_type == "coin") {
                     $path = 'coin.png';
+                } else {
+                    $path = '';
                 }
                 /** @var Gift $this */
                 $url = getImagePath($path);
@@ -113,6 +116,12 @@ class RoomBoomRewardController extends MainController
                 HTML
             );
         });
+
+        \Encore\Admin\Facades\Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
@@ -158,11 +167,22 @@ class RoomBoomRewardController extends MainController
         $form->select('target_type', trans('Target Type'))->options([
             "ware" => __('ware'),
             "gift" => __('gift'),
-            "achievement" => __('achievement')
+            "achievement" => __('achievement'),
+            "coin" => __('coin'),
         ])
-        ->when("ware", fn() => $this->addWareFields($form))
-        ->when("gift", fn() => $this->addGiftFields($form))
-        ->when("achievement", fn() => $this->addAchievementFields($form));
+            ->when("ware", function (Form $form) {
+                $this->addWareFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("gift", function (Form $form) {
+                $this->addGiftFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("achievement", function (Form $form) {
+                $this->addAchievementFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("coin", fn(Form $form) => $this->addcoinField($form));
 
         $form->number('priority', __('priority'))
             ->rules(function () use ($roomBoomLevelId, $form) {
@@ -176,7 +196,6 @@ class RoomBoomRewardController extends MainController
                 ];
             });
         $form->number('quantity', __('Quantity'))->rules('required|integer|min:1');
-        $form->number('expire_days', __('expire'));
 
         $form->saving(function (Form $form) {
             switch ($form->target_type) {
@@ -193,14 +212,16 @@ class RoomBoomRewardController extends MainController
                     $form->model()->target = $url ?? '';
                     $form->target = $url ?? '';
                     break;
+
+                case 'coin':
+                    $form->model()->target = $form->coin_target;
+                    break;
             }
 
             unset($form->ware_target_id);
             unset($form->gift_target_id);
+            unset($form->coin_target);
         });
-
-
-
 
         return $form;
     }
@@ -303,6 +324,16 @@ class RoomBoomRewardController extends MainController
                 return $file;
             })
             ->disk('gcs');
+    }
+
+    protected function addCoinField($form): void
+    {
+        $form->number('coin_target', __('Coin'))
+            ->default(function ($form) {
+                return $form->model()->target_type === 'coin'
+                    ? (int) $form->model()->target
+                    : null;
+            });
     }
 
     public function store()

@@ -451,20 +451,14 @@ trait CalcsTrait
         $diamondSend             = @$user->total_sender_diamonds;
 
         $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
-        //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
         $star_level      = @$user->total_received_level;
 
         $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
-
-
-
-        // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
         $vipsData = DB::table('vips')->get()->groupBy('type');
 
-        // تعريف المتغيرات المطلوبة من المصفوفة المجمعة
         $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
 
 
@@ -1073,6 +1067,7 @@ trait CalcsTrait
         $value = optional($ware)->{$item};
         return ($value === 'NULL' || $value === null) ? '' : $value;
     }
+
 
     public static function wareUserVipV2($user_id, $type, $item, $isLatest = false)
     {

@@ -151,7 +151,7 @@ class ChargesController extends Controller
         //dd($charge);
         $charge->save();
 
-        UserCommon::UserEarnedInvitation($user->id, $amount);
+        UserCommon::UserEarnedInvitation($user->id, $amount,$charge->id);
     }
 
     public function userCharge($id, Request $request)

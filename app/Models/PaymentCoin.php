@@ -6,6 +6,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class PaymentCoin extends Model
 {
@@ -25,5 +26,17 @@ class PaymentCoin extends Model
     public function coins()
     {
         return $this->hasMany(Coin::class, 'payment_gateway_id');
+    }
+
+    public function scopeUniqueTypes($query)
+    {
+        return $query->select('payment_coins.*')
+            ->join(
+                DB::raw('(SELECT MIN(id) as id FROM payment_coins GROUP BY type) as uniq'),
+                'payment_coins.id',
+                '=',
+                'uniq.id'
+            )
+            ->orderByDesc('status');
     }
 }

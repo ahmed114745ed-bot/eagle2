@@ -351,7 +351,7 @@ class UserHandling
             ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
             ->where('receiver_id', $userId)
             ->groupBy('sender_id')
-            ->orderByDesc('total')  // Now 'total' is correctly treated as a numeric type
+            ->orderByDesc('total')  
             ->take(3)
             ->get();
 

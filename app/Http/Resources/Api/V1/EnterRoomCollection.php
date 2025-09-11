@@ -26,7 +26,6 @@ class EnterRoomCollection extends JsonResource
     {
 
         $pks     = $this->getRoomTwoLastPk($this->id);
-        $topUser = $this->getTopUser($this->uid);
 
         request()->type = 1;
         $owner = $this->owner;
@@ -40,45 +39,71 @@ class EnterRoomCollection extends JsonResource
 
         /** @var User $owner*/
         return [
-            "id"                  => $this->id,
+            "id"                  => $this->id, // room id
+            "mode"                => $this->mode, // room mode
+            "owner_id"            => $this->uid, // owner id
+            "uuid"                => $owner?->uuid ?? '', // owner uuid
+            "room_name"           => $this->room_name, // room name
+            "owner_name"          => @$owner->name ?? '', // owner name
+            "room_cover"          => $this->room_cover, // room cover
+            "room_background"     => $this->final_room_image, // room background
+            "owner_image"         => $owner->avatar ?: '', // owner image
+            "giftPrice"           => $this->session_string ?: '', // gift price
+            "password_status"     => !($this->room_pass == ""), // room password state
+            "admins"              => explode(',', $this->room_admin ?? ''), // room admins
+            "pk"                  => (@$pks[0]) && $pks[0]->end_at >= now() ? new PkCollection($pks[0]) : new \stdClass(), // all pk data
+            "room_intro"          => $this->room_intro, // room intro
+            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
+            "cp_indexs"           => $indices, // cp
+            "charisma_status"     => ($this->charizma_status) ? true : false, // isCharisma
+            "is_comment_closed"   => $this->is_comment_closed, // is Comments Closed
+            'is_live' => (bool) ($this->is_live ?? false),
+            "room_rule"           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')), // room rules
+            //////////////////////////////////////////////////////////
+            ///
+            ///
             "room_id_num"         => $this->numid,
-            "mode"                => $this->mode,
-            "owner_id"            => $this->uid,
             "room_status"         => (string)$this->room_status,
-            "room_name"           => $this->room_name,
-            "room_cover"          => $this->room_cover,
+
             "name"                => @$this->name ?? '',
-            "room_intro"          => $this->room_intro,
             "room_pass"           => $this->room_pass,
             'room_type'           =>  app()->getLocale() === 'ar' ? $this->roomCategory?->name  ?? $this->roomCategory?->name_en : $this->roomCategory?->name_en ?? $this->roomCategory?->name,
 
             "hot"                 => '',
-            "room_background"     => $this->final_room_image,
             "microphone"          => $this->microphone,
             "room_welcome"        => $this->room_welcome,
             "session"             => $this->session,
-            "uuid"                => $owner?->uuid ?? '',
             "room_family"         => is_null($this->family) ? new \stdClass() : [
                 'family_id'    => @$this->family->id ?? '',
                 'family_name'  => @$this->family->name ?? '',
                 'family_level' => @$this->family->level ?? [],
             ],
-            "giftPrice"           => $this->session_string ?: '',
-            "pk"                  => (@$pks[0]) && $pks[0]->end_at >= now() ? new PkCollection($pks[0]) : new \stdClass(),
             "is_pk"               => (@$pks[0]) && $pks[0]->end_at >= now() ? $pks[0]->status : 0,
             "show_pk"             => @$this->is_show_pk ?? 0,
-            'top_user'            => $topUser ? (new MiniUserResource($topUser)) : new \stdClass(),
-            'admins'              => explode(',', $this->room_admin ?? ''),
-            'owner_sound'         => $this->getOwnerSound($this->uid, $this->room_sound) ? 2 : 1,
-            'ban_users'           => $this->getBans($this->room_speak ?? ''),
-            'owner_name'          => @$owner->name ?? '',
-            'owner_image'         => $owner->avatar ?: '',
+            'top_user'            => new \stdClass(),
+            'owner_sound'         => 1,
+            'ban_users'           => [],
             'owner_special_id'          => @$owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => @$owner?->color_image,
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
             'owner_vip_img'     => $vip_level_img  ,
-            'vip' => Common::ovip_center(@$owner->id),
+            'vip' => [
+                'id'        => 1,
+                'level'     =>  0,
+                'name'      =>  '',
+                'price'     => 0,
+                'img_old'     =>  '',
+                'img'     =>  '',
+                'image'     => '',
+                'image_from_wares'     => '',
+                'expire'    =>  0,
+                'ware_id' =>  0,
+                'color' =>  '',
+                'vip_gifts' => 0,
+                'vip_upload_gif' => 0,
+                'colored_name' =>  '',
+            ],
             'owner_country'        =>        $owner && $owner->country
                 ? [
                     'id' => $owner->country->id,
@@ -95,20 +120,14 @@ class EnterRoomCollection extends JsonResource
                     'phone_code' => ''
                 ],
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
-            'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
-            'password_status'     => !($this->room_pass == ""),
-            'room_rule'           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')),
             'boxes'               => [],
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",
-            'cp_indexs'         => $indices,
             'stream_type'         =>  $this->type ?? 'audio',
-             'is_live' => (bool) ($this->is_live ?? false),
             'room_keys' => [
                 "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
             ],
             'writing_disabled'    => ($this->writing_disabled) ? true : false,
-            'charisma_status'    => ($this->charizma_status) ? true : false,
             'show_welcom_animation' => settings()->get('show_welcom_enmation') == 'on' ? true : false,
             'private_comment_price' => (Common::getConfig('private_comment_price') ?? 100),
             'game'               =>  $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
@@ -119,7 +138,6 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
-            'is_comment_closed' => $this->is_comment_closed,
         ];
     }
 

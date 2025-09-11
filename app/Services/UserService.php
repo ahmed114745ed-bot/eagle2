@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserFollowHelper;
+use App\Http\Resources\InvitationEarningResource;
 use DB;
 use Cache;
 use Exception;
@@ -284,6 +288,7 @@ class UserService
             return Common::apiResponse(false, 'this user not found', null, 404);
         }
 
+
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
         if (!$follow) {
 
@@ -298,6 +303,9 @@ class UserService
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
+
+        UserFollowHelper::updateCounts( $request->user());
+        UserFollowHelper::updateCounts($receiver);
 
         return Common::apiResponse(true, 'follow done', null, 201);
     }
@@ -491,34 +499,61 @@ class UserService
 
     public function showUser($userId, $auth, $request, $isVisit)
     {
-        $user = $this->userRepository->findOrFail($userId, ['packs' /* => function ($q) {
-            $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5])->where('is_used', 1)->with('ware');
-        } */, 'profile', 'room', 'family']);
-        if (!$user) throw new \Exception('not found');
-        if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
+        $user = $this->getUserWithRelations($userId);
+        $this->ensureUserIsAccessible($user, $auth);
+    
         $request['user_id'] = $userId;
-
-        if ($auth->id != $user->id && $isVisit == true) {
-            if (!Common::checkPackPrev($auth->id, 19)) {
-                $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
-                $user->profileVisits()->syncWithoutDetaching(
-                    [
-                        $auth->id => [
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
-                    ]
-                );
-
-                if (!$previousVisit) {
-                    CustomNotification::visitProfile($user, $auth);
-                    (new UserCounterServices)->eventUser($user, 'visit-profile');
-                }
-            }
+    
+        if ($this->shouldRecordVisit($auth, $user, $isVisit)) {
+            $this->recordVisit($auth, $user);
         }
         $this->packRepository->deleteAllExpiredPacks();
         return $user;
+
     }
+    
+    private function getUserWithRelations($userId)
+    {
+        return  $this->userRepository->findUserData($userId);
+    }
+
+
+    
+    private function ensureUserIsAccessible($user, $auth): void
+    {
+        if (!$user) {
+            throw new Exception('User not found');
+        }
+    
+        if (in_array($user->id, $user?->blacklists->pluck('from_uid')->toArray())) {
+            throw new Exception('User is in blacklist');
+        }
+    }
+    
+    private function shouldRecordVisit($auth, $user, bool $isVisit): bool
+    {
+        return $auth->id !== $user->id
+            && $isVisit
+            && !Common::checkPackPrev($auth->id, 19);
+    }
+    
+    private function recordVisit($auth, $user): void
+    {
+        $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
+    
+        $user->profileVisits()->syncWithoutDetaching([
+            $auth->id => [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+    
+        if (!$previousVisit) {
+            CustomNotification::visitProfile($user, $auth);
+            (new UserCounterServices)->eventUser($user, 'visit-profile');
+        }
+    }
+    
 
     public function vTwoshowUser($userId, $auth, $request, $isVisit)
     {
@@ -1150,5 +1185,59 @@ class UserService
         }
 
         return ['message' => 'Done'];
+    }
+
+
+    public function getUserStats($id)
+    {
+        return $this->userRepository->getStats($id);
+    }
+
+    public function getUserRooms($id)
+    {
+        return $this->userRepository->getRoomsData($id);
+    }
+
+    public function getUserVipLevel($id)
+    {
+        return $this->userRepository->getVipLevelData($id);
+    }
+
+    public function getUserFrames($id)
+    {
+        return $this->userRepository->getFramesData($id);
+    }
+
+    public function getEarningsForParent(int $parentId)
+    {
+        return InvitationEarningResource::collection( $this->userRepository->getByParentId($parentId));
+    }
+
+    public function claimEarning(int $parentId, int $earningId)
+    {
+        return DB::transaction(function () use ($parentId, $earningId) {
+            $earning = $this->userRepository->claimEarning($earningId);
+
+            if (!$earning || $earning->parent_id !== $parentId) {
+                return null;
+            }
+
+            $parent = User::find($parentId);
+            $amountBefore =  Common::getCurrentBalance($parent->id);
+
+            $parent->increment('di', $earning->amount);
+
+            $parent->increment('di', $earning->amount);
+
+            UserCoinLogHelper::logByType(
+                $parent->id,
+                $earning->amount,
+                $amountBefore,
+                UserCoinLogType::INVITATION_CODE,
+            );
+        
+
+            return $earning->refresh();
+        });
     }
 }
