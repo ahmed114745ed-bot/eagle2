@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Helpers\UserFollowHelper;
+use App\helper\UserFollowHelper;
 use App\Http\Resources\InvitationEarningResource;
 use DB;
 use Cache;
@@ -339,7 +339,9 @@ class UserService
         $this->userRepository->update($unFollowStatus, $unFollower->id);
         $this->userRepository->update($userStatus, $auth->id);
 
-
+        UserFollowHelper::updateCounts( $request->user());
+        UserFollowHelper::updateCounts($unFollower);
+        
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
     }

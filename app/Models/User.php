@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Common;
+use App\Helpers\UserPackHelper;
 use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
@@ -100,16 +101,16 @@ class User extends Authenticatable
 //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        'original_uuid',
-        'is_frozen',
-        'total_charge_level',
-        'photo',
-        'org_online_time',
-        'user_types',
-        'vip_data',
-        'level_data',
-        'profile_frame',
-        'profile_frame_id'
+//        'original_uuid',
+//        'is_frozen',
+//        'total_charge_level',
+//        'photo',
+//        'org_online_time',
+//        'user_types',
+//        'vip_data',
+//        'level_data',
+//        'profile_frame',
+//        'profile_frame_id'
 
     ];
 
@@ -1476,7 +1477,7 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
-        if ($this->getPackWithType(20)) {
+        if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
 

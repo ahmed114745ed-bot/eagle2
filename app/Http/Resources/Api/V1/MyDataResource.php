@@ -34,7 +34,7 @@ class MyDataResource extends JsonResource
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'num_of_members' => $family->members_count,
+                'num_of_members' => 0,
                 'level' => $family->level,
                 'top_stars' => [],
 
@@ -124,7 +124,7 @@ class MyDataResource extends JsonResource
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
 
-            'intro' => UserPackHelper::getIntroImage($this->resource),
+            'intro' => UserPackHelper::getIntroFile($this->resource),
             'intro_type' => UserPackHelper::getIntroType($this->resource),
             'intro_id' => UserPackHelper::getIntroId($this->resource),
             //Bubble
@@ -157,7 +157,7 @@ class MyDataResource extends JsonResource
 
             'is_first' => (bool)$this->is_points_first,
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
-            'has_room' => $ownerRoom,
+            'has_room' => (bool)$ownerRoom,
             'google_bind' => (bool)@$this->google_id,
 
             'room' => [
@@ -182,11 +182,10 @@ class MyDataResource extends JsonResource
             'uuid' => $uuid,
             'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',
-            'number_of_fans' => $this->followerss()->count(),
-            'number_of_followings' => $this->following()->count(),
-            'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-
+            'number_of_fans'       => $this->number_of_fans,
+            'number_of_followings' => $this->number_of_followings,
+            'number_of_friends'    => $this->number_of_friends,
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
             'level' => [
                 'receiver_img' => $this->receiverLevel?->img,

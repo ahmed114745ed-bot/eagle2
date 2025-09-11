@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
+use App\Helpers\UserPackHelper;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\ChatSettingResource;
@@ -49,25 +50,28 @@ class UserResource extends JsonResource
              'is_followed'          => $this->is_followed,
              'is_follow'            => $this->is_follow,
              'is_friend'            => $this->isFriends(),
-             'room'                 => !$this->getPackWithType(16) ? new UserDataRoomResource($this->room) : (object)[],
+             'room'                 => ! (bool) $packsByType->get(16)?->firstWhere('is_used', 1) ? new UserDataRoomResource($this->room) : (object)[],
              'now_room'             => $this->formatNowRoom(),
              'agency'               => $this->formatAgency(),
              'family_id'            => $this->family_id,
              'family_data'          => $this->formatFamily(),
              'profile'              => new ProfileResource($this->profile),
              'diamonds'             => $this->total_diamond_received ?: 0,
-             'vip'                  => Common::ovip_center($this),
-             'lang'                 => $this->lang,
-             'country'              => !$this->getPackWithType(13) ? ($this->country ?? (object)[]) : (object)[],
+             'vip' =>  [
+                'vip_img'      => UserPackHelper::getVipIcon($this->resource),
+                'colored_name' => UserPackHelper::getColorName($this->resource),
+            ],  
+            'lang'                 => $this->lang,
+             'country'              => ! (bool) $packsByType->get(13)?->firstWhere('is_used', 1) ? ($this->country ?? (object)[]) : (object)[],
              'have_country'         => !is_null($this->country),
              'medals'               => (object)[],
-             'frame'                => $getPackImage(4,'img2') ?: $getPackImage(4, $this->dress_1, 'img1'),
-             'intro'                => $getPackImage(6, 'img2') ?: $getPackImage(6, $this->dress_3, 'img1'),
-             'intro_type'           => $getPackImage(6, 'image_type'),
-             'bubble'               => $getPackImage(5, 'show_img'),
-             'bubble_id'            => $getPackImage(5, 'id')?: 0,
-             'frame_id'             => $getPackImage(4, 'id') ?: 0,
-             'intro_id'             => $getPackImage(6, 'id') ?: 0,
+             'frame' => UserPackHelper::getFrameImage($this->resource),
+             'frame_id' => UserPackHelper::getFrameId($this->resource),
+             'intro' => UserPackHelper::getIntroImage($this->resource),
+             'intro_type' => UserPackHelper::getIntroType($this->resource),
+             'intro_id' => UserPackHelper::getIntroId($this->resource),
+             'bubble' => UserPackHelper::getBubbleImage($this->resource),
+             'bubble_id' => UserPackHelper::getBubbleId($this->resource),
              'bio'                  => $this->bio ?: '',
              'is_agent'             => $this->is_agent,
              'is_gold_id'           => (bool) $this->color_image,
@@ -85,9 +89,13 @@ class UserResource extends JsonResource
              'chat_setting'         => new ChatSettingResource($this->chatSetting),
              'manger_type'          => new MangerTypeResource($this->manager),
              'top_three_support'    => $userHandling->getTopThreeSupport($this->id),
-             'level'                => Common::level_center(@$this),
+             'level' => [
+                'receiver_img' => $this->receiverLevel?->img ?? '',
+                'sender_img'   => $this->senderLevel?->img  ?? '',
+            ],
+            
              'profile_frame'        => $this->profile_frame,
-             'profile_frame_id'     => $this->profile_frame_id,
+             'profile_frame_id'     => $this->getProfileFrame()?->id ?? '',
              'multi_images'         => $this->images?->pluck("img"),
              'user_types'           => $this->user_types,
              'shipping_agency'      => $this->formatShippingAgency(),
@@ -108,11 +116,6 @@ class UserResource extends JsonResource
      private function formatAgency()
      {
          if (!$this->agency) return null;
- 
-        //  $owner = $this->agency->app_owner_id == $this->id
-        //      ? new \stdClass()
-        //      : new MiniUserResource($this->agency->owner);
- 
          return [
              'id'           => $this->agency->id,
              'name'         => $this->agency->name,
@@ -179,6 +182,34 @@ class UserResource extends JsonResource
          $pack = $this->packsByType->get($type)?->firstWhere('target_id', $dress);
      
          return $pack?->ware?->{$item} ?? '';
+     }
+     
+
+     public function ovip_center_user_data_v2()
+     {
+         $packsByType = $this->packs->groupBy('type');
+     
+         $getPackImage = fn($type, $item) =>
+             $packsByType->get($type)?->firstWhere('is_used', 1)?->ware?->{$item} ?? '';
+     
+         $uvip = $this->UserVip;
+         $vip  = $uvip?->OVip;
+     
+         if (!$vip) {
+             return new \stdClass();
+         }
+     
+         $cacheKey = "ware_icon_{$vip->level}_10";
+         $vipIcon  = Common::getCachedWares($cacheKey, $vip, 10);
+     
+         $hasColor = $packsByType->get(18)?->firstWhere('is_used', 1);
+     
+         return [
+             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
+             'colored_name' => $hasColor
+                 ? $getPackImage(18, 'color')
+                 : '',
+         ];
      }
      
 
