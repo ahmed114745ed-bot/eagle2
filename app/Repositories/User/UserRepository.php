@@ -202,8 +202,7 @@ class UserRepository extends Repository
             'chargeLevel:id,img,level',
             'agency.owner',
             'profile',
-            'shippingAgency:id,app_owner_id,name,img',
-            'owner.medals.achievementLevel.achievement'
+            'shippingAgency:id,app_owner_id,name,img'
         ])
             ->find($userId);
     }

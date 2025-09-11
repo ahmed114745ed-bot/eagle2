@@ -88,13 +88,13 @@ class MyDataResource extends JsonResource
         }
 
         $achievement_images = [];
-        if ($this->medals) {
+        /*if ($this->medals) {
             foreach ($this->medals as $medal) {
                 if ($medal->achievementLevel) {
                     $achievement_images[] = $medal->achievementLevel->valid_image;
                 }
             }
-        }
+        }*/
         $counters = [];
 
         if ($request->show_counter) {
