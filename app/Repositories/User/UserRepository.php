@@ -193,14 +193,15 @@ class UserRepository extends Repository
     {
         return User::with([
             'medals' => fn($q) => $q->userPickProfile(),
+            'userSetting',
+            'ownAgency',
+            'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
+            'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
+//            'packs.ware',
+            'country',
             'manager',
             'profile',
-            'UserVip.Ovip.wares',
-            'agency',
-            'family.members',
-            'shippingAgency',
-            'Ovip.wareIcon',
-            'Ovip.privilegs'
+            'eligiblePacks.ware'
         ])
             ->find($userId);
     }
