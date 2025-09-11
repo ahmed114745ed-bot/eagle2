@@ -114,6 +114,7 @@ class MyDataResource extends JsonResource
 
         $uuid = @$this->uuid;
 
+        $wabble = UserPackHelper::getWare($this->resource, 12);
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -132,7 +133,7 @@ class MyDataResource extends JsonResource
             //endBubble
 
             //wabble
-            'wabble' => new GeneralUserWareResource(UserPackHelper::getWare($this->resource, 12)),
+            'wabble' => $wabble ? new GeneralUserWareResource($wabble) : (object)[],
             'wabble_id' => UserPackHelper::getWabbleId($this->resource),
             //endWabble
 
@@ -188,8 +189,8 @@ class MyDataResource extends JsonResource
 
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
             'level' => [
-                'receiver_img' => $this->receiverLevel->img,
-                'sender_img'   => $this->senderLevel->img,
+                'receiver_img' => $this->receiverLevel?->img,
+                'sender_img'   => $this->senderLevel?->img,
             ],
             'charge_level' =>  [
                 'current_level'  => $this->chargeLevel->level ?? 0,
