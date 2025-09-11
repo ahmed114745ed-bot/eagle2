@@ -30,11 +30,10 @@ class CoreWalletsSeeder extends Seeder
         ];
         
         foreach ($walletNames as $name) {
-            CoreWallets::firstOrCreate(
-                ['name' => $name],
+            CoreWallets::updateOrCreate(
+                ['name' => $name], 
                 [
-                    'name' => $name,
-                    'is_negative' => $name === 'invitation_code_wallet' 
+                    'is_negative' => $name === 'invitation_code_wallet'
                 ]
             );
         }
