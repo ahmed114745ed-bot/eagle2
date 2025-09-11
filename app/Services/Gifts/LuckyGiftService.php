@@ -555,11 +555,12 @@ class LuckyGiftService
             'gift_price'   => @$gift->price,
             'room_name'   => $room->room_name ?: '',
             'room_cover'   => $room->room_cover ?? '',
-            'room_background'   =>$room->final_room_image ?? '', 
+            'room_background'   =>$room->final_room_image ?? '',
             'room_mode'   =>  $room->mode,
             'room_uuid'   => $room->owner?->uuid ?: 0,
             'room_owner_id'   => $room->uid ?: 0,
             'is_password'   =>  (bool)(@$room->room_pass),
+            'room_type'   =>  (@$room->type),
 
         ];
         $this->sendToZegoLuckyGift($zigoData);
@@ -613,7 +614,7 @@ class LuckyGiftService
      */
     public function updateCoreWallet(mixed $diffAppWallet, mixed $diffOwnerWallet): void
     {
- 
+
 
         $sql = '
         UPDATE core_wallets
