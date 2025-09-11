@@ -1466,4 +1466,59 @@ trait CalcsTrait
 
         return $data;
     }
+
+
+    public static function level_center_my_data($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+    
+        $star_level = $user->total_received_level;
+        $gold_level = $user->total_sender_level;
+    
+        $vipsData = Vip::collectionBuilder()->get();
+    
+        $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
+        $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
+    
+        return [
+            'receiver_img' => !is_null($firstVip_type1) ? $firstVip_type1->img : '',
+            'sender_img'   => !is_null($firstVip_type2) ? $firstVip_type2->img : '',
+        ];
+    
+    }
+
+    public static function ovip_center_my_data($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        $uvip = $user->UserVip;
+        if (!$uvip) return new \stdClass();
+
+        $vip = OVip::query()->find($uvip->vip_id);
+        if (!$vip) return new \stdClass();
+
+        $vipIcon = Ware::where('level', $vip->level)
+                    ->where('type', 10)
+                    ->where('get_type', 1)
+                    ->first();
+
+        $hasColor = Common::hasInPack($user->id, 18, true);
+
+        return [
+            'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
+            'colored_name' => $hasColor 
+                                ? Common::wareUserVip($user->id, 18, 'color') ?? '' 
+                                : '',
+        ];
+    }
 }
