@@ -2085,12 +2085,12 @@ public function userDataSetting()
 
     public function getProfileFrameAttribute()
     {
-        return Common::wareUserVip($this, 28, 'img2', true);
+        return Common::wareUserVipV2($this, 28, 'img2', true);
     }
 
     public function getProfileFrameIdAttribute()
     {
-    return Common::wareUserVip($this, 28, 'id', true);
+    return Common::wareUserVipV2($this, 28, 'id', true);
     }
 
 
