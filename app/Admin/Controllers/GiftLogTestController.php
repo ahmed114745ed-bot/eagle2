@@ -3,7 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Models\User;
@@ -79,7 +78,9 @@ class GiftLogTestController extends Controller
 
             $success = true;
             $message = 'User data processed successfully';
-            $data = $userWithMedals;
+
+            $data = (new MyDataResource($userWithMedals))
+                ->resolve();
 
         } catch (\Exception $exception) {
             $success = false;
@@ -90,7 +91,7 @@ class GiftLogTestController extends Controller
         return view('test.my-data', [
             'success' => $success,
             'message' => $message,
-            'user' => $data
+            'user' => $data,
         ]);
     }
 
