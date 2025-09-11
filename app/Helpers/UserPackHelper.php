@@ -42,9 +42,17 @@ class UserPackHelper
 
     public static function getIntroFile(User $user) : string
     {
-        return self::getPacks($user)
+        $intro = self::getPacks($user)
             ->where('type', 6)
-            ->first()?->ware?->img1 ?? '';
+            ->first()?->ware;
+        
+        if (!$intro) {
+            return '';
+        }
+
+        return !empty($intro->img1) && $intro->img1 !== 'NULL'
+            ? $intro->img1
+            : ($intro->img2 ?? '');
     }
     public static function getIntroId(User $user) : string
     {
