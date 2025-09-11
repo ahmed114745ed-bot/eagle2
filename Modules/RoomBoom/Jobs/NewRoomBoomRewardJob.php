@@ -241,14 +241,14 @@ class NewRoomBoomRewardJob implements ShouldQueue
     {
         $user = User::findOrFail($userId);
 
-        $amountBefore = $user->diamonds ?? 0;
+        $amountBefore = $user->di ?? 0;
     
         UserCoinLogHelper::logByType(
             $user->id,
             $amount, 
             $amountBefore,
             UserCoinLogType::ROOM_BOOM,
-            $token 
+            '' 
         );
     
         $user->increment('di', (int)$amount);
