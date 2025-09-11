@@ -28,8 +28,8 @@ class UserResource extends JsonResource
      
          $packsByType = $this->packs->groupBy('type');
 
-         $getPackImage = fn($type, $target_id, $item) => 
-         $packsByType->get($type)?->firstWhere('target_id', $target_id)?->ware?->{$item} ?? '';
+         $getPackImage = fn($type, $item) => 
+         $packsByType->get($type)?->firstWhere('is_used', 1)?->ware?->{$item} ?? '';
 
          
          $data = [
@@ -61,13 +61,13 @@ class UserResource extends JsonResource
              'country'              => !$this->getPackWithType(13) ? ($this->country ?? (object)[]) : (object)[],
              'have_country'         => !is_null($this->country),
              'medals'               => (object)[],
-             'frame'                => $getPackImage(4, $this->dress_1, 'img2') ?: $getPackImage(4, $this->dress_1, 'img1'),
-             'intro'                => $getPackImage(6, $this->dress_3, 'img2') ?: $getPackImage(6, $this->dress_3, 'img1'),
-             'intro_type'           => $getPackImage(6, $this->dress_3, 'image_type'),
-             'bubble'               => $getPackImage(5, $this->dress_2, 'show_img'),
-             'bubble_id'            => $this->dress_2 ?: 0,
-             'frame_id'             => $this->dress_1 ?: 0,
-             'intro_id'             => $this->dress_3 ?: 0,
+             'frame'                => $getPackImage(4,'img2') ?: $getPackImage(4, $this->dress_1, 'img1'),
+             'intro'                => $getPackImage(6, 'img2') ?: $getPackImage(6, $this->dress_3, 'img1'),
+             'intro_type'           => $getPackImage(6, 'image_type'),
+             'bubble'               => $getPackImage(5, 'show_img'),
+             'bubble_id'            => $getPackImage(5, 'id')?: 0,
+             'frame_id'             => $getPackImage(4, 'id') ?: 0,
+             'intro_id'             => $getPackImage(6, 'id') ?: 0,
              'bio'                  => $this->bio ?: '',
              'is_agent'             => $this->is_agent,
              'is_gold_id'           => (bool) $this->color_image,
