@@ -1542,12 +1542,12 @@ trait CalcsTrait
         $cacheKey = "ware_icon_{$vip->level}_10";
         $vipIcon = self::getCachedWares($cacheKey, $vip, 10);
 
-        $hasColor = Common::hasInPack($user->id, 18, true);
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
         return [
             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
             'colored_name' => $hasColor
-                ? (Common::wareUserVipV2($user->id, 18, 'color') ?? '')
+                ? (Common::wareUserVipV2($user, 18, 'color') ?? '')
                 : '',
         ];
     }
