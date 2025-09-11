@@ -675,7 +675,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
             [$user, $token] = $this->userService->anonymous($user, $request);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }

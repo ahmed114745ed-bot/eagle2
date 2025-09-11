@@ -443,7 +443,7 @@ class UserRepository extends Repository
 
     public function findUserData(int $id): Model
     {
-        $targetPackTypes = [4,5,6,15,16,17,18,19,20];
+        $targetPackTypes = [4,5,6,15,16,17,18,19,20,25];
 
         $user = User::with([
                 'packs' => fn($q) => $q->where('is_used', 1)
