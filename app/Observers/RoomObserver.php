@@ -8,7 +8,9 @@ class RoomObserver
 {
     public function creating(Room $room)
     {
-        $room->mode = 3;
+        if($room  == 'audio'){
+            $room->mode = 3;
+        }
         $room->muted_users = '';
     }
 
@@ -16,15 +18,19 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
 
-        $this->changeMode($room);
+        if($room  == 'audio'){
+            $this->changeMode($room);
+        }
         $this->resetRoomSession($room);
     }
 
     public function saving(Room $room)
     {
         if (!$room->enableSaving) return;
-        $this->changeMode($room);
-
+        
+        if($room  == 'audio'){
+            $this->changeMode($room);
+        }
         //        $this->resetRoomSession ($room);
         //        $v = $room->room_visitor;
         //        $av = explode (',',$v);

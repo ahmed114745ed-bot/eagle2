@@ -314,7 +314,7 @@ class UserController extends MainController
         //                 })).append($('<input>', {
         //                     'type': 'hidden',
         //                     'name': '_method',
-        //                     'value': 'POST'  
+        //                     'value': 'POST'
         //                 }));
         //                 form.appendTo('body').submit();
         //             }
@@ -364,7 +364,7 @@ class UserController extends MainController
             if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
-            if ($model->phone = '+201000100010') {
+            if ($model->phone == '+201000100010') {
                 $actions->disableDelete();
             }
 
@@ -499,7 +499,8 @@ class UserController extends MainController
 
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
-        }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
+        }])->orderByDesc('is_used')->latest()->paginate(10, ['*'], 'pack_page');
+
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $hasVip = UserVip::where('user_id', $id)
             ->where('is_used', 1)
@@ -831,12 +832,7 @@ class UserController extends MainController
         return $form;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
+
 
     public function request_invite_code(Request $request)
     {
@@ -845,6 +841,8 @@ class UserController extends MainController
         } else {
             settings()->set("stop_invite_code", "0");
         }
+
+        return true;
     }
 
 

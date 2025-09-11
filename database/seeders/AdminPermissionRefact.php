@@ -283,8 +283,6 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-background', 'except' => [], 'additional' => []],
                     ['key' => 'emoji', 'except' => [], 'additional' => []],
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => []],
-                    ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
-                    ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],
                 ],
             ],
              [
@@ -426,6 +424,15 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'tribe-periods', 'except' => [], 'additional' => []],
                     ['key' => 'tribe-tops', 'except' => [], 'additional' => []],
                     ['key' => 'tribe-rewards', 'except' => [], 'additional' => []],
+                ],
+            ],
+            [
+                'name' => 'Room Boom',
+                'sort' => 35,
+                'permissions' => [
+                    ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
+                    ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],
+                    ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
         ];

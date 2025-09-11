@@ -14,12 +14,14 @@ class HomeCarouselController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $displayAt = request('display_at');
 
-        if ($request->hasHeader('x-notification-id')) {
+        if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->hasHeader('x-notification-id')) {
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
         $items = HomeCarousel::query()->with('user','room','generalRole')
+            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
             ->where('enable', 1)
             ->orderBy('sort')
             ->when($request->type, fn($q) => $q->where('type', $request->type))

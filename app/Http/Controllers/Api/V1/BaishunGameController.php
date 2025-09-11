@@ -127,16 +127,6 @@ class BaishunGameController extends Controller
 
         dispatch(new GameWalletJop($request->currency_diff));
 
-
-        $responseArray = [
-            'code' => 0,
-            'message' => 'succeed',
-            'unique_id' => (string) $id,
-            'data' => [
-                'currency_balance' => floatval($userDi)
-            ]
-        ];
-
         if ($type && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
             $user = User::with(['profile', 'nowGame'])->find($id);
             $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
@@ -156,6 +146,15 @@ class BaishunGameController extends Controller
             $json = json_encode($d);
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         }
+
+        $responseArray = [
+            'code' => 0,
+            'message' => 'succeed',
+            'unique_id' => (string) $id,
+            'data' => [
+                'currency_balance' => (float) User::where('id', $id)->value('di')
+            ]
+        ];
 
         return response()->json($responseArray);
     }

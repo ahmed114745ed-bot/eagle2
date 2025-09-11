@@ -202,15 +202,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
+                Route::get('/mine', [RoomController::class, 'mine']);
+                Route::get('/user/{id}', [RoomController::class, 'userRoom']);
                 Route::get('/', [RoomController::class, 'index']);
+                Route::get('/live-rooms', [RoomController::class, 'getAllLiveRooms']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
                 Route::post('/create', [RoomController::class, 'store']);
+                Route::get('/{id}', [RoomController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
                 Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-                Route::get('/{id}', [RoomController::class, 'show']);
                 Route::post('/{id}/edit', [EnteranceController::class, 'update']);
                 Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
                 Route::post('admins', [RoomController::class, 'getAdmins']);
@@ -277,6 +280,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
                 Route::get('/data', [UserController::class, 'dataUser']);
+
+                Route::get('/stats/{id?}', [UserController::class, 'stats']);
+                Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
+                Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
+                Route::get('/frames/{id?}', [UserController::class, 'frames']);
+
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -412,6 +421,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-earn-from-invitation', [UserController::class, 'UserEarnFromInvitation']);
             Route::get('create-code-invitation', [UserController::class, 'CreateCodeInvitation']);
             Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
+            Route::get('/invitations/earnings', [UserController::class, 'invitationsEarnings']);
+            Route::post('/invitations/earnings/{id}/claim', [UserController::class, 'invitationsEarningsClaim']);
+        
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
@@ -691,5 +703,7 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
 
 

@@ -160,6 +160,7 @@ class BoxService
                 "room_cover" => $room->room_cover ?? '',
                 "room_background" => $room->final_room_image ?? '',
                 "room_mode" => $room->mode,
+                "room_type" => $room->type,
             ],
             "sender" => [
                 "id" => $user->id,

@@ -36,7 +36,8 @@ class RoomResource extends JsonResource
             //            'owner_uuid' => $this->owner?->uuid ?: 0,
             'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'owner_name' => $this->owner?->name ?: '',
-            'owner_image' => $this->owner?->profile->avatar ?: '',
+            'room_name' => $this->owner?->name ?: '',
+            'owner_image' => $this->owner?->profile?->avatar ?: '',
             'room_id' => (string)($this->id ?: 0),
             'owner_special_id'          => $this->owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => $this->owner?->color_image,
@@ -106,7 +107,7 @@ class RoomResource extends JsonResource
                 'created_at' => $this->created_at,
             ]);
         }
-        return $data;
+        return $data ;
     }
 
 

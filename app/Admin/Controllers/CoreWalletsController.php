@@ -51,7 +51,9 @@ class CoreWalletsController extends MainController
             'payment_gateways' => 'fa-solid fa-credit-card',
             'mall' => 'fa-solid fa-store',
             'vip' => 'fa-solid fa-crown',
-            'ads' => 'fa-solid fa-rectangle-ad'
+            'ads' => 'fa-solid fa-rectangle-ad',
+            'invitation_code_wallet' => 'fa-solid fa-user-plus',
+
         ];
 
         $canTransfer = Admin::user()->can('*') || Admin::user()->can('transfer-switch-app-wallet');
@@ -92,9 +94,25 @@ class CoreWalletsController extends MainController
         }
         $fromWallet->coins -= $request->amount;
         $fromWallet->save();
-        $ToWallet = CoreWallets::find($request->to_wallet_id);
-        $ToWallet->coins += $request->amount;
-        $ToWallet->save();
+
+        $toWallet = CoreWallets::find($request->to_wallet_id);
+
+        if ($toWallet->is_negative) {
+            if ($toWallet->coins < $request->amount) {
+                $allowed = $toWallet->coins;
+
+                throw new \Exception(
+                    __('wallet.insufficient_balance', ['amount' => $allowed])
+                );
+            }
+            $toWallet->coins -= $request->amount;
+        } else {
+            $toWallet->coins += $request->amount;
+        }
+
+        $toWallet->save();
+        
+       
 
         CoreWalletTransaction::create([
             'from_wallet' => $request->from_wallet_id,

@@ -96,7 +96,7 @@ class UserHandling
         $this->resetUserAgencyData($user);
 
     }
-    
+
     private function resetUserAgencyData(User &$user)
     {
         $user->total_diamond_received -= $user->monthly_diamond_received;
@@ -105,10 +105,10 @@ class UserHandling
         $user->type_user = User::TYPE_REGULAR;
         $user->monthly_days = 0;
         $user->save();
-    
+
         uploadMonthlyDiamondReceive($user->id, 0);
     }
-    
+
     private function handleUserSalaries(User $user)
     {
         $agencyId = $user->agency_id;
@@ -118,12 +118,12 @@ class UserHandling
             ->latest()
             ->take(2)
             ->get();
-    
+
         if ($userSalaries->isEmpty()) return;
-    
+
         $currentMonth = now()->month;
         $currentYear = now()->year;
-    
+
         $currentSalary = $userSalaries[0];
         if ($currentSalary->month == $currentMonth && $currentSalary->year == $currentYear) {
             if (isset($userSalaries[1]) && $currentSalary->cut_amount >= $currentSalary->sallary) {
@@ -134,7 +134,7 @@ class UserHandling
             $currentSalary->update(['is_finished' => 1]);
         }
     }
-    
+
     private function clearUserAgencyLogs(User $user)
     {
         $agencyId = $user->agency_id;
@@ -142,7 +142,7 @@ class UserHandling
         ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
-    
+
     private function updateUserJoinedAgency(User $user, $isApp)
     {
         $agencyId = $user->agency_id;
@@ -151,9 +151,9 @@ class UserHandling
             'agency_id' =>  $agencyId,
             'type' => 2,
         ])->whereNull('leave_date')->first();
-    
+
         if (!$joined) return;
-    
+
         $joined->leave_date = now();
         $joined->status = 'kick off';
         if ($isApp) {
@@ -319,7 +319,7 @@ class UserHandling
 
     public function chickLevelToPlay(User $user, $configValue = null): int
     {
-        $configValue = $configValue ?? (Common::getConf('min_level_to_play') ?? 10);
+        $configValue = $configValue ?? (Common::getConfig('min_level_to_play') ?? 10);
 
         $levelSub = $user->total_sender_level;
 
@@ -351,7 +351,7 @@ class UserHandling
             ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
             ->where('receiver_id', $userId)
             ->groupBy('sender_id')
-            ->orderByDesc('total')  // Now 'total' is correctly treated as a numeric type
+            ->orderByDesc('total')  
             ->take(3)
             ->get();
 

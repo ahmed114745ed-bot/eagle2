@@ -476,10 +476,12 @@ class Common
         if ($key === 'enable_vip_auto') {
             return "true";
         }
-        if ($conf = Config::query()->where('name', $key)->first()) {
-            return $conf->value;
-        }
-        return null;
+
+        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
+            return Config::query()->pluck('value', 'name')->toArray();
+        });
+
+        return $configs[$key] ?? null;
     }
 
     public static function getSettingValue($key)
@@ -548,8 +550,16 @@ class Common
         if (!$name) {
             return '';
         }
-        $val = DB::table('configs')->where('name', $name)->value('value');
-        return $val;
+
+        if ($name === 'enable_vip_auto') {
+            return "true";
+        }
+
+        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
+            return DB::table('configs')->pluck('value', 'name')->toArray();
+        });
+
+        return $configs[$name] ?? null;
     }
 
     public static function timeZone()
@@ -1066,8 +1076,8 @@ class Common
         return $result;
     }
 
-   
- 
+
+
 
 
 
@@ -1298,6 +1308,20 @@ class Common
 
         return $pack?->ware?->color ?? '';
     }
+
+    public static function hasColorInPackV2($userPacks, $type, $use_status = false)
+    {
+        $ch = self::checkPackV2($userPacks, $type);
+
+        if ($use_status) {
+            $ch = $ch->where('is_used', 1);
+        }
+
+        $pack = $ch->first();
+
+        return $pack?->ware?->color ?? '';
+    }
+
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
         $ch =  self::checkPackV2($userPacks, $type);
@@ -1305,7 +1329,7 @@ class Common
             $ch = $ch->where('is_used', 1);
         }
 
-        return $ch;
+        return $ch->isNotEmpty();
     }
     public static function hasProfileFramePack($user_id, $type, $use_status = false)
     {
@@ -1984,8 +2008,6 @@ class Common
     public static function getCurrentBalance(int $userId): int
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
-
-
         return $balance;
     }
 

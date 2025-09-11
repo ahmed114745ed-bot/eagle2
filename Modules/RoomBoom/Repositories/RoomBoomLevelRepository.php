@@ -13,14 +13,16 @@ class RoomBoomLevelRepository
         $tz = getTimezone();
         $today = Carbon::today($tz);
 
-        return RoomBoomLevel::with(['roomBoomRewards' => function ($query) {
+        return RoomBoomLevel::with([
+            'roomBoomRewards' => function ($query) {
             $query->orderBy('priority');
-        },  'roomBooms' => function ($query) use ($roomId, $today) {
-            $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
-                $q->where('room_id', $roomId);
-            })
+        },
+            'roomBooms' => function ($query) use ($roomId, $today) {
+                $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
+                    $q->where('room_id', $roomId);
+                })
                 ->whereDate('started_at', $today);
-        }
+        },
         ])->orderBy('level')->get();
     }
 

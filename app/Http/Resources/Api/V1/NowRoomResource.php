@@ -21,6 +21,12 @@ class NowRoomResource extends JsonResource
                 $pass_status = true;
             }
         }
+
+        if (!@$now_room->is_live &&  @$now_room->type  == 'live') {
+            return [];
+        }
+
+
         return [
             'is_in_room'      => @$this->now_room_uid != 0,
             'uid'             => @(int)$this->now_room_uid,
@@ -36,17 +42,5 @@ class NowRoomResource extends JsonResource
             'is_live'       => (boolean)@$now_room->is_live ?? 0,
         ];
 
-        // return [
-        //     'is_in_room'      => $this->now_room_uid != 0,
-        //     'uid'             => (int) $this->now_room_uid,
-        //     'is_mine'         => $this->id == $this->now_room_uid,
-        //     'password_status' => $this->password_status,
-        //     "id"              => $this->id,
-        //     "room_name"       => $this->room_name,
-        //     "room_cover"      => $this->room_cover,
-        //     "room_background" => $this->final_room_image,
-        //     "mode"            => $this->mode,
-        //     'giftPrice'       => $this->session_string,
-        // ];
     }
 }
