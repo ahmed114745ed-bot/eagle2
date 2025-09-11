@@ -888,7 +888,7 @@ trait CalcsTrait
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
             'color' => '',
-            'colored_name' => $hasColor ? common::wareUserVipV2($user_id, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? common::wareUserVipV2($user, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -1476,20 +1476,20 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-    
+
         $star_level = $user->total_received_level;
         $gold_level = $user->total_sender_level;
-    
+
         $vipsData = Vip::collectionBuilder()->get();
-    
+
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
         $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
-    
+
         return [
             'receiver_img' => !is_null($firstVip_type1) ? $firstVip_type1->img : '',
             'sender_img'   => !is_null($firstVip_type2) ? $firstVip_type2->img : '',
         ];
-    
+
     }
 
     public static function ovip_center_my_data($user_id)
@@ -1516,9 +1516,39 @@ trait CalcsTrait
 
         return [
             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
-            'colored_name' => $hasColor 
-                                ? Common::wareUserVip($user->id, 18, 'color') ?? '' 
+            'colored_name' => $hasColor
+                                ? Common::wareUserVip($user->id, 18, 'color') ?? ''
                                 : '',
+        ];
+    }
+
+    public static function ovip_center_my_data_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        if (!isset($user->UserVip)) return '';
+        $uvip = $user->UserVip;
+        $vip  = $uvip->OVip;
+
+        if (!$vip) {
+            return new \stdClass();
+        }
+
+        $cacheKey = "ware_icon_{$vip->level}_10";
+        $vipIcon = self::getCachedWares($cacheKey, $vip, 10);
+
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
+
+        return [
+            'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
+            'colored_name' => $hasColor
+                ? (Common::wareUserVipV2($user, 18, 'color') ?? '')
+                : '',
         ];
     }
 }

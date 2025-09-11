@@ -1073,13 +1073,6 @@ class User extends Authenticatable
         });
     }
 
-    public function packsWithWare(): HasMany
-    {
-        return $this->hasMany(Pack::class)->with('ware')->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        });
-    }
-
     public function packsUser()
     {
         return $this->hasMany(Pack::class, 'user_id')->whereIn('type', [4, 5, 6, 25])->where('get_type', '!=', 1)->where('is_used', 1)->where(function ($q) {
@@ -1959,8 +1952,8 @@ public function userDataSetting()
         }
 
         $vipIcon = $vip->wareIcon;
-        $hasColor = Common::hasInPackV2($this->packsWithWare, 18, true);
-        $color    = Common::hasColorInPackV2($this->packsWithWare, 21, true);
+        $hasColor = Common::hasInPackV2($this->packs, 18, true);
+        $color    = Common::hasColorInPackV2($this->packs, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
@@ -1979,7 +1972,7 @@ public function userDataSetting()
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVipV2($this->id, 18, 'color') ?? '' : '',
+            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -2092,12 +2085,12 @@ public function userDataSetting()
 
     public function getProfileFrameAttribute()
     {
-        return Common::wareUserVip($this, 28, 'img2', true);
+        return Common::wareUserVipV2($this, 28, 'img2', true);
     }
 
     public function getProfileFrameIdAttribute()
     {
-    return Common::wareUserVip($this, 28, 'id', true);
+    return Common::wareUserVipV2($this, 28, 'id', true);
     }
 
 

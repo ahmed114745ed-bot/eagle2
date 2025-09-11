@@ -30,7 +30,9 @@
     @if ($success)
         <p style="color: green;">✅ {{ $message }}</p>
         @if(isset($user))
-            <pre>{{ json_encode($user->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</pre>
+            <pre>
+                {{ json_encode($user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}
+            </pre>
         @endif
     @else
         <p style="color: red;">❌ {{ $message }}</p>

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Resources\Api\V1;
+namespace App\Http\Resources\Api\V1;
 
 use App\Models\Pk;
 use App\Models\Pack;
@@ -234,7 +235,7 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-            'vip' => Common::ovip_center_my_data($this),
+            'vip' => Common::ovip_center_my_data_v2($this),
             'image' => @$this->UserVip->OVip->img,
             'family_id' => $f == null ? null : @$this->family_id,
             'uuid' => @$this->uuid,
