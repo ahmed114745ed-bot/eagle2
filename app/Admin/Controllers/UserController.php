@@ -834,12 +834,7 @@ class UserController extends MainController
         return $form;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
+
 
     public function request_invite_code(Request $request)
     {
@@ -848,6 +843,8 @@ class UserController extends MainController
         } else {
             settings()->set("stop_invite_code", "0");
         }
+
+        return true;
     }
 
 

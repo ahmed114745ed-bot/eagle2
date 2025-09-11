@@ -5,6 +5,7 @@ namespace App\Bd\Controllers;
 use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserCommon;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Admin;
@@ -410,7 +411,9 @@ class WalletController extends MainController
                 'user_charger_type' => 'bd'
             ];
 
-            Charge::create($data);
+            $charge =  Charge::create($data);
+          
+            UserCommon::UserEarnedInvitation($receiver->id, $coins ,$charge->id);
 
             DB::commit();
             return true;

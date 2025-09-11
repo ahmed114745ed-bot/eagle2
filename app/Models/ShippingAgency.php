@@ -372,4 +372,9 @@ class ShippingAgency extends Model
             }
         });
     }
+
+    public function coinLogs()
+    {
+        return $this->morphMany(CoinLog::class, 'owner', 'user_type', 'user_id');
+    }
 }

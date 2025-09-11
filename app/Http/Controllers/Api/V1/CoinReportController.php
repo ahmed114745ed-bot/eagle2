@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Models\PaymentCoin;
+use App\Models\ShippingAgency;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EventCoinsReportResource;
@@ -35,7 +37,7 @@ class CoinReportController extends Controller
                 default    => [],
             };
         } elseif ($class === 'shipping') {
-            $data = $this->rechargeCoins();
+            $data = $this->rechargeShippingCoins();
         } else {
             $data = [];
         }
@@ -72,12 +74,14 @@ class CoinReportController extends Controller
         return RecevingReportResource::collection($data);
     }
 
+
     public function rechargeCoins()
     {
         $user = auth()->user();
         $paymentCoins = PaymentCoin::orderBy('type')->pluck('type')->toArray();
         $data = CoinLog::where("user_id", $user->id)
             ->where('status', 1)
+            ->where('user_type', User::class)
             ->whereIn('method', $paymentCoins)
             ->when(request("start_date") && request("end_date"), function ($q) {
                 $q->whereDate("created_at", ">=", request("start_date"))
@@ -87,6 +91,28 @@ class CoinReportController extends Controller
             ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
+    public function rechargeShippingCoins()
+    {
+        $shippingAgency = auth()->user()->shippingAgency;
+        if (!$shippingAgency) {
+            return  [];
+        }
+        
+        $paymentCoins = PaymentCoin::orderBy('type')->pluck('type')->toArray();
+        $data = CoinLog::where("user_id", $shippingAgency->id)
+            ->where('status', 1)
+            ->where('user_type', ShippingAgency::class) 
+            ->whereIn('method', $paymentCoins)
+            ->when(request("start_date") && request("end_date"), function ($q) {
+                $q->whereDate("created_at", ">=", request("start_date"))
+                    ->whereDate("created_at", "<=", request("end_date"));
+            })
+            ->orderBy("created_at", "desc")
+            ->paginate(10);
+        return RechargeCoinsReportResource::collection($data);
+    }
+
+
 
     public function eventCoins()
     {

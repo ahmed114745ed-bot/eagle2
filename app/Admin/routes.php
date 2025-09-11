@@ -2,6 +2,9 @@
 
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\GiftLogController;
+use App\Admin\Controllers\GiftLogTestController;
+use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
@@ -554,6 +557,8 @@ Route::group(
         Route::resource('report-moments', ReportMomentController::class);
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
+        Route::resource('invitation-code/settings', InvitationSettingsController::class);
+
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
@@ -616,7 +621,14 @@ Route::group(
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
 
-});
+        Route::group(['middleware' => 'local'], function (){
+            Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
+            Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
+
+            Route::get('/my-data-test', [GiftLogTestController::class, 'myDataTest']);
+            Route::post('/my-data-test', [GiftLogTestController::class, 'mydataTest']);
+        });
+    });
 
 
 Route::group([

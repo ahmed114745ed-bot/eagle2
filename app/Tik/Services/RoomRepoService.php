@@ -50,6 +50,24 @@ class RoomRepoService
         return $this->repository->all($request);
     }
 
+    public function getAllMine($request ,$user_id)
+    {
+        return $this->repository->mine($request ,$user_id);
+    }
+
+    public function getUserRooms($request ,$user_id)
+    {
+        return $this->repository->getUserRooms($request ,$user_id);
+    }
+
+
+    
+    public function getAllLiveRooms($request)
+    {
+        return $this->repository->liveRooms($request);
+    }
+    
+
     /**
      * @throws \Exception
      */
@@ -84,7 +102,7 @@ class RoomRepoService
 
         if ($request->type) {
             $room->type = $request->type;
-            if ($request->type == 'single_live' || $request->type == 'multi_live') {
+            if ($request->type == 'live') {
                 $room->is_live = true;
             }
         }
@@ -109,6 +127,12 @@ class RoomRepoService
         return $this->repository->findRoomUser($userId);
     }
 
+    public function findRoomUserByType($userId ,$type)
+    {
+        return $this->repository->findRoomUserByType($userId,$type);
+    }
+
+    
     public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
     {
         return $this->repository->createPrivetMessage($fromUserId, $toUserId, $message, $price);

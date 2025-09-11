@@ -1308,6 +1308,20 @@ class Common
 
         return $pack?->ware?->color ?? '';
     }
+
+    public static function hasColorInPackV2($userPacks, $type, $use_status = false)
+    {
+        $ch = self::checkPackV2($userPacks, $type);
+
+        if ($use_status) {
+            $ch = $ch->where('is_used', 1);
+        }
+
+        $pack = $ch->first();
+
+        return $pack?->ware?->color ?? '';
+    }
+
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
         $ch =  self::checkPackV2($userPacks, $type);
@@ -1994,8 +2008,6 @@ class Common
     public static function getCurrentBalance(int $userId): int
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
-
-
         return $balance;
     }
 

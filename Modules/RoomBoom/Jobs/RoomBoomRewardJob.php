@@ -96,7 +96,6 @@ class RoomBoomRewardJob implements ShouldQueue
             $reward = $this->getNextAvailableReward($rewardItems);
             if (!$reward) break;
 
-            info('distributeTopContributors', $reward);
             $this->distributeBoomRewards($userId, $reward);
             $this->assignWinnerData($userId, $reward);
         }
@@ -124,7 +123,6 @@ class RoomBoomRewardJob implements ShouldQueue
                     ];
                 }
 
-                info('distributeLastTriggerSender', $chosenReward);
                 $this->distributeBoomRewards($lastTriggerSenderId, $chosenReward);
                 $this->assignWinnerData($lastTriggerSenderId, $chosenReward);
             }
@@ -146,7 +144,6 @@ class RoomBoomRewardJob implements ShouldQueue
             $reward = $this->getNextAvailableReward($rewardItems);
             if (!$reward) break;
 
-            info('distributeVisitorRewards', $reward);
             $this->distributeBoomRewards($visitorId, $reward);
 
             $this->assignWinnerData($visitorId, $reward);

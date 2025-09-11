@@ -100,4 +100,11 @@ class OVip extends Model
         static::preventDeleteByDeveloper();
     }
 
+    public function wareIcon10()
+    {
+        return $this->hasOne(Ware::class, 'level', 'level')
+            ->where('type', 10)
+            ->where('get_type', 1);
+    }
+
 }

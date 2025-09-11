@@ -6,6 +6,7 @@ use App\Admin\Controllers\BdController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Jobs\UpdateUserFollowCountsJob;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -129,6 +130,16 @@ Route::get('/clear', function () {
     }
 
     return "Cleared!";
+});
+
+Route::get('/clear-opcache', function () {
+
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        return "OPcache cleared!";
+    }
+
+    return "OPcache not enabled.";
 });
 
 Route::get('/clear-config', function () {
@@ -451,8 +462,8 @@ use App\Models\CoinGameUserAll;
 
 Route::get('/archive-old-coin-games', function () {
     $now = Carbon::now();
-    $start = $now->copy()->subMonth(); 
-    $end = $now->copy()->subYears(2); 
+    $start = $now->copy()->subMonth();
+    $end = $now->copy()->subYears(2);
 
     $current = $start->copy();
 
@@ -472,6 +483,20 @@ Route::get('/archive-old-coin-games', function () {
 
     return "✅ Archiving finished!";
 });
+
+
+
+
+
+Route::get('/update-user-follow-counts', function () {
+    UpdateUserFollowCountsJob::dispatch()
+    ->onQueue('follow_counts');
+    return response()->json([
+        'success' => true,
+        'message' => 'done'
+    ]);
+});
+
 
 
 
