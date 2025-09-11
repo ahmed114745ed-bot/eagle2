@@ -47,6 +47,7 @@ class EndBoomPusherJob implements ShouldQueue
             'roomBoomLevel'     => $this->currentLevel->level,
             'duration'          => 30,
             'user_image'        => $user->profile->avatar ?? '',
+            'room_type'        => $this->room->type,
         ];
 
         event(new EndRoomBoomEvent($gift_data));

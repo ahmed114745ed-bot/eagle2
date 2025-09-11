@@ -54,6 +54,7 @@ class RoomComments
                             'id' => @$room->owner->id ?? 0,
                             'uuid' => @$room->owner->uuid ?? 0,
                         ],
+                        'room_type' => $room->type
                     ],
                 ]
             ];

@@ -18,7 +18,7 @@ trait WinLuckyGift
     public function sendToZegoLuckyGift($zigoData)
     {
         Log::info($zigoData);
-        $d     = [ 
+        $d     = [
             "messageContent" => [
                 "msg"     => "SHBL",
                 'event' => 'win.lucky.gift.event',
@@ -35,11 +35,12 @@ trait WinLuckyGift
                 'room_id'   => @$zigoData['room_id'],
                 'room_name'   => @$zigoData['room_name'],
                 'room_cover'   =>  @$zigoData['room_cover'],
-                'room_background'   => @$zigoData['room_background'], 
+                'room_background'   => @$zigoData['room_background'],
                 'room_mode'   =>  @$zigoData['room_mode'],
                 'room_uuid'   =>  @$zigoData['room_uuid'],
                 'room_owner_id'   =>  @$zigoData['room_owner_id'],
                 'is_password'   =>   @$zigoData['is_password'],
+                'room_type'   =>   @$zigoData['room_type'],
             ]
         ];
         $json  = json_encode($d);
