@@ -1100,7 +1100,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return new \stdClass();
+        if (!isset($user->UserVip)) return  '';
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1551,4 +1551,7 @@ trait CalcsTrait
                 : '',
         ];
     }
+
+
+
 }
