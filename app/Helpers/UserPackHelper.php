@@ -78,6 +78,11 @@ class UserPackHelper
     {
         return self::hasPack($user, 15);
     }
+
+    public static function hasHideOnlineTime(User $user) : bool
+    {
+        return self::hasPack($user, 20);
+    }
     public static function hasHideCountry(User $user) : bool
     {
         return self::hasPack($user, 17);

@@ -354,12 +354,12 @@ class UserController extends Controller
     public function my_data(Request $request)
     {
         $user = Auth::user();
-//        try {
+        try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
-        /*} catch (Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }*/
+        }
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->first()?->img;
 
         $data = new MyDataResource($userWithMedals);

@@ -34,7 +34,7 @@ class MyDataResource extends JsonResource
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'num_of_members' => $family->members_count,
+                'num_of_members' => 0,
                 'level' => $family->level,
                 'top_stars' => [],
 
