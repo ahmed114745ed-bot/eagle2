@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Helpers\UserFollowHelper;
+use App\helper\UserFollowHelper;
 use App\Http\Resources\InvitationEarningResource;
 use DB;
 use Cache;
