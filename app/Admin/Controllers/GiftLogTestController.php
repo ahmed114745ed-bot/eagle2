@@ -72,8 +72,6 @@ class GiftLogTestController extends Controller
                 $request->input('lat'),
                 $request->input('long')
             );
-
-            LogHelper::info('this user ',$userWithMedals);
             request()->default_background = \DB::table('backgrounds')
                 ->where('enable', 1)
                 ->orderBy('id', 'asc')
