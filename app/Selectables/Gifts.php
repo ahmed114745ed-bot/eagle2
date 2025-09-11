@@ -19,11 +19,17 @@ class Gifts extends Selectable
         $this->column('id');
         $this->column('name');
         $this->column('img',__('Image'))->image();
-        $this->column('img', __('Image'))->display(function ($path) {
+        $this->column('price', __('price'))->display(function ($coin) {
+            $path = 'coin.png';
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 10, 10);
+
+            $media = handleShowImageWithTypes($this->id, $url, 25, 25);
+
+            return "<div style='display:flex; align-items:center; gap:8px;'>
+                $media
+                <span style='font-weight:bold; font-size:14px; color:#333;'>{$coin}</span>
+            </div>";
         });
-        $this->column('price', __('Price'));
 
         $this->filter(function (Filter $filter) {
             $filter->like('name');
