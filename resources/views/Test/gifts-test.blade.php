@@ -9,7 +9,6 @@
 <form method="POST" action="{{ url('admin/send-test') }}">
     @csrf
 
-    <!-- Static hidden values -->
     <input type="hidden" name="id" value="463">
     <input type="hidden" name="owner_id" value="303">
     <input type="hidden" name="toUid" value="1206">

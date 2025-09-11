@@ -618,8 +618,13 @@ Route::group(
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
 
-        Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm'])->middleware('local');
-        Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view'])->middleware('local');
+        Route::group(['middleware' => 'local'], function (){
+            Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
+            Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
+
+            Route::get('/my-data-test', [GiftLogTestController::class, 'myDataTest']);
+            Route::post('/my-data-test', [GiftLogTestController::class, 'mydataTest']);
+        });
     });
 
 
