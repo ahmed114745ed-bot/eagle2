@@ -1531,7 +1531,7 @@ trait CalcsTrait
             $user = $user_id;
         }
 
-        if (!isset($user->UserVip)) return new \stdClass();;
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user->UserVip;
         $vip  = $uvip->OVip;
 
