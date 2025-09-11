@@ -1952,8 +1952,8 @@ public function userDataSetting()
         }
 
         $vipIcon = $vip->wareIcon;
-        $hasColor = Common::hasInPack($this->id, 18, true);
-        $color    = Common::hasColorInPack($this->id, 21, true);
+        $hasColor = Common::hasInPackV2($this->packs, 18, true);
+        $color    = Common::hasColorInPackV2($this->packs, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
@@ -1972,7 +1972,7 @@ public function userDataSetting()
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVip($this->id, 18, 'color') ?? '' : '',
+            'colored_name'   => $hasColor ? Common::wareUserVipV2($this->id, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -2085,12 +2085,12 @@ public function userDataSetting()
 
     public function getProfileFrameAttribute()
     {
-        return Common::wareUserVip($this, 28, 'img2', true);
+        return Common::wareUserVipV2($this, 28, 'img2', true);
     }
 
     public function getProfileFrameIdAttribute()
     {
-    return Common::wareUserVip($this, 28, 'id', true);
+    return Common::wareUserVipV2($this, 28, 'id', true);
     }
 
 
