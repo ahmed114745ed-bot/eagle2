@@ -192,16 +192,13 @@ class UserRepository extends Repository
     public function getUserWithMedals($userId)
     {
         return User::with([
-            'medals' => fn($q) => $q->userPickProfile(),
-            'userSetting',
-            'ownAgency',
-            'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
-            'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
-//            'packs.ware',
-            'country',
             'manager',
             'profile',
-            'eligiblePacks.ware'
+            'UserVip.Ovip.wares',
+            'agency',
+            'family.members',
+            'shippingAgency',
+            'Ovip.wareIcon',
         ])
             ->find($userId);
     }
@@ -466,7 +463,7 @@ class UserRepository extends Repository
 
             return $user;
     }
-    
+
 
 
     public function getStats($id)
@@ -491,12 +488,12 @@ class UserRepository extends Repository
             'family.members',
             'shippingAgency.charges'
         ])->find($id);
-        
+
         if (!$user) {
             return (object)[];
         }
-        
-    
+
+
         return [
             'room'            => !$user->getPackWithType(16) ? new UserDataRoomResource($user) : [],
             'now_room'        => UserDataHelper::formatNowRoom($user) ?? [],
@@ -506,7 +503,7 @@ class UserRepository extends Repository
             'family_data'     => UserDataHelper::formatFamily($user) ?? [],
         ];
     }
-    
+
     public function getVipLevelData($id)
     {
         $user = User::with(['UserVip.vip.wares', 'Ovip.wareIcon'])->findOrFail($id);
@@ -542,7 +539,7 @@ class UserRepository extends Repository
         $earning->update(['is_claimed' => true]);
         return $earning;
     }
-    
-    
+
+
 
 }
