@@ -182,11 +182,10 @@ class MyDataResource extends JsonResource
             'uuid' => $uuid,
             'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',
-            'number_of_fans' => $this->followerss()->count(),
-            'number_of_followings' => $this->following()->count(),
-            'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-
+            'number_of_fans'       => $this->number_of_fans,
+            'number_of_followings' => $this->number_of_followings,
+            'number_of_friends'    => $this->number_of_friends,
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
             'level' => [
                 'receiver_img' => $this->receiverLevel?->img,
