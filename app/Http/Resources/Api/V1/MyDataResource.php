@@ -234,7 +234,7 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-            // 'vip' => Common::ovip_center($this),
+            'vip' => Common::ovip_center_my_data($this),
             'image' => @$this->UserVip->OVip->img,
             'family_id' => $f == null ? null : @$this->family_id,
             'uuid' => @$this->uuid,
@@ -246,7 +246,7 @@ class MyDataResource extends JsonResource
             'profile_visitors' => $this->profileVisits()->count(),
 
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
-            // 'level' => Common::level_center_v2(@$this),
+            'level' => Common::level_center_my_data(@$this),
             'charge_level' => Common::chargeLevel(@$this),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
             $this->merge((new MyStoreResource($this->resource))),
@@ -255,7 +255,6 @@ class MyDataResource extends JsonResource
             'Last_seen' => @$time_log->time ?? 0,
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
-            ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
             'has_color_name'       => Common::hasInPackV2($this->packs, 18, true),
             'has_anti_ban'       => Common::hasInPackV2($this->packs, 15, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
