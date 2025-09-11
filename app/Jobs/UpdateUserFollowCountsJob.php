@@ -27,19 +27,21 @@ class UpdateUserFollowCountsJob implements ShouldQueue
     public function handle(): void
     {
         $updatedCount = 0;
-
-        User::withCount(['followers', 'followeds', 'friends'])
+    
+        User::withCount(['followers', 'followeds', 'friendRelations'])
             ->chunk(200, function ($users) use (&$updatedCount) {
                 foreach ($users as $user) {
                     $user->number_of_fans       = $user->followers_count;
-                    $user->number_of_followings = $user->followeds_count; // غالبًا هذا الصحيح بدل followings_count
-                    $user->number_of_friends    = $user->friends_count;
+                    $user->number_of_followings = $user->followeds_count; 
+                    $user->number_of_friends    = $user->friend_relations_count; 
                     $user->save();
     
                     $updatedCount++;
                 }
             });
     
-            \Log::info("Updated user ID: {$updatedCount}");
-        }
+        \Log::info("Updated users count: {$updatedCount}");
+    }
+    
+    
 }

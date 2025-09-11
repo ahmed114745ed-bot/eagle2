@@ -3768,7 +3768,9 @@
   "invitation.success": "تمت الإضافة بنجاح",
   "invitation.already_registered": "المستخدم مسجل من قبل",
   "invitation.device_in_use": "لقد تم استخدام هذا الكود  من قبل مع حساب آخر لهذا الجهاز",
-  "invitation.stopped": "عذراً، نظام الدعوات متوقف حالياً"
+  "invitation.stopped": "عذراً، نظام الدعوات متوقف حالياً",
+  "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount."
+
 
 
 
