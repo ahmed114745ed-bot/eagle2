@@ -56,7 +56,7 @@ class Moment extends Model
     }
 
 
-    public function scopeWithUser($query, $userId)
+    public function scopeWithUser($query)
     {
         return $query->with(['user' => fn($q) => $q->select(['id', 'uuid', 'special_id', 'sender_level', 'receiver_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
             ->with([
