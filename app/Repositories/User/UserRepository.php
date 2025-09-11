@@ -200,6 +200,7 @@ class UserRepository extends Repository
             'family.members',
             'shippingAgency',
             'Ovip.wareIcon',
+            'Ovip.privilegs'
         ])
             ->find($userId);
     }

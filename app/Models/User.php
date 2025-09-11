@@ -1946,8 +1946,6 @@ public function userDataSetting()
 
     public function getVipDataAttribute()
     {
-        $this->loadMissing('Ovip.wareIcon', 'Ovip.privilegs', 'packs.ware');
-
         $vip = $this->Ovip;
         if (!$vip) {
             return new \stdClass();
