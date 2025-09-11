@@ -39,6 +39,13 @@ class UserPackHelper
             ->where('type', 6)
             ->first()?->ware?->show_img ?? '';
     }
+
+    public static function getIntroFile(User $user) : string
+    {
+        return self::getPacks($user)
+            ->where('type', 6)
+            ->first()?->ware?->img1 ?? '';
+    }
     public static function getIntroId(User $user) : string
     {
         return self::getPacks($user)

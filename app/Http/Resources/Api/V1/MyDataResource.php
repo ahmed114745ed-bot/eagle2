@@ -124,7 +124,7 @@ class MyDataResource extends JsonResource
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
 
-            'intro' => UserPackHelper::getIntroImage($this->resource),
+            'intro' => UserPackHelper::getIntroFile($this->resource),
             'intro_type' => UserPackHelper::getIntroType($this->resource),
             'intro_id' => UserPackHelper::getIntroId($this->resource),
             //Bubble
