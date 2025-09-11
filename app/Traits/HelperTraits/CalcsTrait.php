@@ -1531,6 +1531,7 @@ trait CalcsTrait
             $user = $user_id;
         }
 
+        if (!isset($user->UserVip)) return '';
         $uvip = $user->UserVip;
         $vip  = $uvip->OVip;
 
