@@ -14,7 +14,7 @@ class WaresByType extends Selectable
 
     public function make()
     {
-  
+
 
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
@@ -30,6 +30,7 @@ class WaresByType extends Selectable
             28 => __('profile frame'),
 
         ]);
+        $this->column('price', __('Price'));
 
         $this->filter(function (Filter $filter) {
             $filter->like('name', __('Name'));
