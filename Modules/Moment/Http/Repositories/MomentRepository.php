@@ -131,7 +131,7 @@ class MomentRepository
         return Moment::withUser()->likeExists($userId)
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with(['user', 'gifts' => function ($query) {
+            ->with([ 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
