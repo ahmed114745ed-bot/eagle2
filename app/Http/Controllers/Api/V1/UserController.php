@@ -7,6 +7,7 @@ use App\helper\InvitationWalletHelper;
 use App\helper\TryCatchHelper;
 use App\helper\InvitationEarningHelper;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserPackHelper;
 use App\Services\FilterChargeService;
 use Auth;
 use Exception;
@@ -631,7 +632,7 @@ class UserController extends Controller
                 'total_diff' => $totalDiff,
                 'frame'      => $frame,
                 'frame_id'   => $frame ? $dressId : 0,
-                'colored_name'   => UserCommon::getColoredName($sender),
+                'colored_name'   => UserPackHelper::getColorName($sender),
             ];
         })->filter()->values()->all(); // filter to remove nulls
 
