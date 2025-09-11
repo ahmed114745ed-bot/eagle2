@@ -228,6 +228,29 @@ class WareTabController extends MainController
     {
         $request = request();
 
+        if ($request->ajax() && $request->has('_editable')) {
+            $field = $request->input('name');
+            $value = $request->input('value');
+
+            $allowedFields = ['name', 'price'];
+
+            if (in_array($field, $allowedFields)) {
+                $model = Ware::findOrFail($id);
+                $model->$field = $value;
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully'),
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('Field not allowed to be edited.'),
+                ]);
+            }
+        }
+
         $toggleFields = ['enable', 'is_active_for_vip'];
 
         $editableField = collect($request->except(['_token', '_method', '_edit_inline']))->keys()->first();
