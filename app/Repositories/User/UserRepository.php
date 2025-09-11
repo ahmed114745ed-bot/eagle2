@@ -201,7 +201,11 @@ class UserRepository extends Repository
             'country',
             'manager',
             'profile',
-            'eligiblePacks.ware'
+            'UserVip.Ovip.wares',
+            'agency',
+            'family.members',
+            'shippingAgency',
+            'Ovip.wareIcon',
         ])
             ->find($userId);
     }
