@@ -200,10 +200,9 @@ class UserRepository extends Repository
             'receiverLevel:id,img',
             'senderLevel:id,img',
             'chargeLevel:id,img,level',
-            'agency.owner',
+            'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
-            
             'shippingAgency:id,app_owner_id,name,img'
         ])
             ->find($userId);

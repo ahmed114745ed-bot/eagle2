@@ -157,7 +157,7 @@ class MyDataResource extends JsonResource
 
             'is_first' => (bool)$this->is_points_first,
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
-            'has_room' => $ownerRoom,
+            'has_room' => (bool)$ownerRoom,
             'google_bind' => (bool)@$this->google_id,
 
             'room' => [

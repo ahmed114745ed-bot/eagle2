@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Models\User;
@@ -63,6 +64,7 @@ class GiftLogTestController extends Controller
     {
         $user = User::where('id', 303)->first();
 
+
         try {
             $userWithMedals = $this->userService->processUserData(
                 $user,
@@ -71,6 +73,7 @@ class GiftLogTestController extends Controller
                 $request->input('long')
             );
 
+            LogHelper::info('this user ',$userWithMedals);
             request()->default_background = \DB::table('backgrounds')
                 ->where('enable', 1)
                 ->orderBy('id', 'asc')
