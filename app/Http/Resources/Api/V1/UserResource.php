@@ -25,7 +25,6 @@ class UserResource extends JsonResource
 
      public function toArray($request)
      {
-         $userHandling = new \App\Classes\UserHandling();
      
          $packsByType = $this->packs->groupBy('type');
 
