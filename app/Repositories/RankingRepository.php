@@ -108,7 +108,7 @@ class RankingRepository
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
 
-        return $query->take(100)->get();
+        return $query->take($perPage)->get();
     }
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
     {
