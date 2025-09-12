@@ -125,9 +125,12 @@ class RankingService
         }
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
+        if(in_array($class, [1, 2])){
+            return new UserRankingCollection($data, $user, $keywords);
+        }
 
          $this->transformData3($data, $class, $keywords, $rel);
-    //  return new UserRankingCollection($data, $user, $keywords);
+    //
           return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
 
