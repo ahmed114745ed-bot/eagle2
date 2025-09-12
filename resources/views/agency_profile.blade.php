@@ -912,7 +912,7 @@
             .card-target-filter-phone .col-md-7 {
                 float: none;
             }
-           
+
             .card-target-filter-phone .form-control {
                 display: block;
                 width: 89%;
@@ -1057,7 +1057,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('admin.users.show', $user?->id);
                                     $exp = number_format($log->exp);
                             @endphp
 
@@ -1097,7 +1097,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('admin.users.show', $user?->id);
                             @endphp
 
                             <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }}">
@@ -1926,7 +1926,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('admin.users.show', $user?->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 
@@ -1965,7 +1965,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('admin.users.show', $user?->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 
