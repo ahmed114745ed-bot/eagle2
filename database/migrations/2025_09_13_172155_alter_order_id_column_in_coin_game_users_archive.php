@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('coin_game_users_archive', function (Blueprint $table) {
-            $table->string('order_id', 191)->nullable()->change();
+            $table->string('order_id')->nullable()->change();
 
         });
     }
