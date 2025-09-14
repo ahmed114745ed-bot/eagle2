@@ -20,7 +20,6 @@ class PkEventController extends Controller
     public function topUsersPKEvent(Request $request)
     {
         $pkEvent = PkEvent::currentEvent()->first();
-        $pkEvent = PkEvent::first();
 
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
