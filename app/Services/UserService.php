@@ -425,17 +425,20 @@ class UserService
             'ware',
             'UserVip',
             'manager',
+            'packs',
+            'country',
+            'color_image',
+            'eligiblePacks',
+            'friends',
         ];
 
         if ($type == 1) {
-            // following in app
             $users = $this->followRepository->getFollowing($user, $with, $keyword);
         } elseif ($type == 2) {
             $users = $this->followRepository->getFollowers($user, $with, $keyword);
         } elseif ($type == 3) {
             $users = $this->followRepository->getFriends($user, $with, $keyword);
         } elseif ($type == 6) {
-            // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
         } else {
             $users = collect([]);

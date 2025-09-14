@@ -29,9 +29,9 @@
 @isset($message)
     @if ($success)
         <p style="color: green;">✅ {{ $message }}</p>
-        @if(isset($user))
+        @if(isset($data))
             <pre>
-                {{ json_encode($user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}
+                {{ json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}
             </pre>
         @endif
     @else
