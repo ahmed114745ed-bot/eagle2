@@ -69,42 +69,53 @@ class RankingRepository
             });
     }
 
-
+    private function rankerRelations(string $role): array
+    {
+        $relations = [
+            'packs' => fn($q) => $q->select(['user_id', 'target_id', 'type'])
+                ->whereIn('type', [4, 18, 10, 25])
+                ->where('is_used', true)
+                ->with('ware:id,name,img1,img2,show_img,color,value'),
+    
+            'mangerType:id,name_ar,name_en,img',
+            'UserVip:id,user_id,expire,level,is_used',
+            'senderLevel:id,level,type,img',
+            'receiverLevel:id,level,type,img',
+            'country:id,name,iso,flag',
+            'profile:user_id,avatar,birthday',
+    
+            'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image', 'user_id'])
+                ->where('picked', true)
+                ->with([
+                    'achievementLevel' => fn($q) => $q->select(['id', 'valid_image'])
+                        ->with('achievement:id,name,type')
+                        ->whereHas('achievement', fn($q) => $q->where('type', '!=', AchievementType::ROOM_TARGET->value))
+                ])
+                ->limit(5),
+        ];
+    
+        if ($role === 'roomOwner') {
+            $relations['ownerRoom'] = fn($q) => $q->select(['id', 'name', 'owner_id']); // مثال
+        }
+    
+        return $relations;
+    }
+    
 
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
-        GiftRanking::query()
-        ->whereHasMorph('ranker', [User::class], function ($q) use ($role) {
-            $q->with([
-                'packs' => fn($q) => $q->select(['user_id', 'target_id', 'type'])
-                    ->whereIn('type', [4, 18, 10, 25])
-                    ->where('is_used', true)
-                    ->with('ware:id,name,img1,img2,show_img,color,value'),
-                'mangerType:id,name_ar,name_en,img',
-                'UserVip:id,user_id,expire,level,is_used',
-                'senderLevel:id,level,type,img',
-                'receiverLevel:id,level,type,img',
-                'country:id,name,iso,flag',
-                'profile:user_id,avatar,birthday',
-                'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image', 'user_id'])
-                    ->where('picked', true)
-                    ->with([
-                        'achievementLevel' => fn($q) => $q->select(['id', 'valid_image'])
-                            ->with('achievement:id,name,type')
-                            ->whereHas('achievement', fn($q) =>
-                                $q->where('type', '!=', AchievementType::ROOM_TARGET->value)
-                            )
-                    ])
-                    ->limit(5),
-            ]);
-        })
-        ->where('role', $role)
-        ->where('ranker_type', User::class)
-        ->where('type', $rankingType)
-        ->orderByDesc('total_gifts')
-        ->take($perPage)
-        ->get();
-    
+        return GiftRanking::query()
+            ->whereHas('ranker')
+            ->with([
+                'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+            ])
+
+            ->where('role', $role)
+            ->where('ranker_type', User::class)
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts')
+            ->take($perPage)
+            ->get();
     }
 
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
