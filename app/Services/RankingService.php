@@ -197,7 +197,7 @@ class RankingService
             ['path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'page']
         );
     
-        $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+        $otherResources = $otherUsers->map(fn($item) => new TopUserResource($item));
     
         return [
             'user'  => $currentUser,
