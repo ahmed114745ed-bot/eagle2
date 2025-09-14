@@ -417,19 +417,19 @@ class UserService
         $userId = $user->id;
 
         $with = [
-            'room' => function ($query) {
-                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-            },
+//            'room' => function ($query) {
+//                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+//            },
             'followPacks',
             'profile:id,user_id,avatar',
             'ware',
             'UserVip',
-            'manager',
+//            'manager',
             'packs',
 //            'country',
             'color_image',
-            'eligiblePacks',
-            'friends',
+//            'eligiblePacks',
+//            'friends',
         ];
 
         if ($type == 1) {
