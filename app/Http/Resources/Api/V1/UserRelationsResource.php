@@ -60,6 +60,7 @@ class UserRelationsResource extends JsonResource
             'followers' => @$this->follower,
             'following' => @$this->following,
             'friends' => @$this->friend,
+
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
