@@ -79,16 +79,16 @@ class UserRelationsResource extends JsonResource
             //     'is_mine'         => @$this->id == $this->now_room_uid,
             //     'password_status' => $pass_status
             // ]
-//            'vip'            => [
-//                'level' => @$this->UserVip->level,
-//                 'img' => Common::ovip_center_rank_img_v2($this),
-//            ],
-//            'level'          => [
-//                'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
-//                'sender_img'   => $imageSender ? @$imageSender->img : '',
-//                'sender_level'  =>@$this->total_sender_level ?? 0,
-//                'reciver_level' =>@$this->total_received_level ?? 0
-//            ],
+            'vip'            => [
+                'level' => @$this->UserVip->level,
+                 'img' => Common::ovip_center_rank_img_v2($this),
+            ],
+            'level'          => [
+                'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
+                'sender_img'   => $imageSender ? @$imageSender->img : '',
+                'sender_level'  =>@$this->total_sender_level ?? 0,
+                'reciver_level' =>@$this->total_received_level ?? 0
+            ],
 //            'online_time'    => @$this->online_time ? date("Y-m-d H:i:s", @$this->online_time) : '',
 //            'has_color_name' => count(@$this->followPacks->where('type', 18)) > 0,
 //            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => @$this->id])->first() != null ? true : false,

@@ -1130,7 +1130,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = $uvip->OVip;
 
         if (!$vip) return '';
         $cacheKey = "ware_{$vip->level}_{$type}";
