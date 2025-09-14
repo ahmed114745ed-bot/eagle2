@@ -3,13 +3,19 @@
 namespace App\Admin\Controllers;
 
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
+use App\Repositories\FollowRepository;
 use App\Services\UserService;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
 use Illuminate\Http\Request;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class GiftLogTestController extends Controller
 {
@@ -95,5 +101,30 @@ class GiftLogTestController extends Controller
             'user' => $data,
         ]);
     }
+
+    public function showRelations()
+    {
+        return view('test.relations');
+    }
+
+    public function userFriend(Request $request)
+    {
+        $user = User::whereId(303)
+            ->with('country')
+            ->first();
+        $keyword = $request->keywords ?? '';
+
+        $response = $this->userService->handleUserRelations($user, 3, $keyword);
+
+        $original = $response->getData(true);
+
+        return view('test.relations', [
+            'success' => $original['success'] ?? false,
+            'message' => $original['message'] ?? '',
+            'data'    => $original['data'] ?? [],
+            'user'    => $user,
+        ]);
+    }
+
 
 }
