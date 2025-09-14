@@ -49,7 +49,7 @@ class PkEventController extends Controller
             ->orderByDesc('totalGiftNum');
 
         // Eager load relation based on type
-        if ($type === 2) {
+        if ($type === 3) {
             $query->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover']);
         } else {
             $query->with([$relation => function ($q) {
