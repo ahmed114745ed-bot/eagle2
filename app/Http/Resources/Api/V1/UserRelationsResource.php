@@ -79,10 +79,10 @@ class UserRelationsResource extends JsonResource
             //     'is_mine'         => @$this->id == $this->now_room_uid,
             //     'password_status' => $pass_status
             // ]
-//            'vip'            => [
-//                'level' => @$this->UserVip->level,
-//                 'img' => Common::ovip_center_rank_img_v2($this),
-//            ],
+            'vip'            => [
+                'level' => @$this->UserVip->level,
+                 'img' => Common::ovip_center_rank_img_v2($this),
+            ],
 //            'level'          => [
 //                'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
 //                'sender_img'   => $imageSender ? @$imageSender->img : '',
