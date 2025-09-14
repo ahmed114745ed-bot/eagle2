@@ -167,7 +167,6 @@ class RankingService
     
         $this->transformData3($data, $class, $keywords, $rel);
     
-        $dataArray = $data->toArray();
     
         $currentUser = new RankingUserV2Resource([
             'user'    => $user,
@@ -180,39 +179,37 @@ class RankingService
         $topUsers = $data->take(3); 
         $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
         
-        \Log::info("Top users resources:", ['topUsers' => $topResources]);
+       
+    $otherUsers = $data->slice(3);
 
-        $otherUsers = $data->slice(3); // slice على Collection بدل array
+    $perPage = request('per_page', 10);
+    $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+    $currentItems = $otherUsers->forPage($currentPage, $perPage);
 
-        \Log::info("Top users resources:", ['otherUsers' => $otherUsers]);
+    $paginatedOther = new LengthAwarePaginator(
+        $currentItems->values(),
+        $otherUsers->count(),
+        $perPage,
+        $currentPage,
+        ['path' => LengthAwarePaginator::resolveCurrentPath()]
+    );
 
-        $perPage = request('per_page', 10);
-        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-        $currentItems = $otherUsers->forPage($currentPage, $perPage);    
-        $paginatedOther = new LengthAwarePaginator(
-            $currentItems,
-            count($otherUsers),
-            $perPage,
-            $currentPage,
-            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'page']
-        );
-    
-        $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
-    
-        return [
-            'user'  => $currentUser,
-            'top'   => $topResources,
-            'other' => $otherResources,
-            'others_pagination' => [
-                'total'        => $paginatedOther->total(),
-                'per_page'     => $paginatedOther->perPage(),
-                'current_page' => $paginatedOther->currentPage(),
-                'last_page'    => $paginatedOther->lastPage(),
-                'next_page'    => $paginatedOther->nextPageUrl(),
-                'prev_page'    => $paginatedOther->previousPageUrl(),
-            ]
-        ];
-    }
+    $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+
+    return [
+        'user'  => $currentUser,
+        'top'   => $topResources,
+        'other' => $otherResources,
+        'others_pagination' => [
+            'total'        => $paginatedOther->total(),
+            'per_page'     => $paginatedOther->perPage(),
+            'current_page' => $paginatedOther->currentPage(),
+            'last_page'    => $paginatedOther->lastPage(),
+            'next_page'    => $paginatedOther->nextPageUrl(),
+            'prev_page'    => $paginatedOther->previousPageUrl(),
+        ]
+    ];
+}
     
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {

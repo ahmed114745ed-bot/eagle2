@@ -50,10 +50,10 @@ class TopUserResource extends JsonResource
              'country'           => $this->country ?? null,
              'age'               => $this->age ?? null,
              'achievement_images'=> $this->achievement_images ?? [],
-             'room'              => $this->room ?? null,
-             'ranker'            => $this->ranker ?? null,
-             'packs'             => $this->packs ?? [],
-             'user_vip'          => $this->user_vip ?? null,
+             'room'              => null,
+             'ranker'            =>  null,
+             'packs'             =>  [],
+             'user_vip'          => null,
              'profile'           => $this->profile ?? null,
          ];
      }
