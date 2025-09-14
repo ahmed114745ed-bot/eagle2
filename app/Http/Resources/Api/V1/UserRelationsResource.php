@@ -55,14 +55,14 @@ class UserRelationsResource extends JsonResource
 //        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
-            'uuid'           => @$this->uuid,
+//            'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
-            'followers' => @$this->follower,
-            'following' => @$this->following,
-            'friends' => @$this->friend,
+//            'followers' => @$this->follower,
+//            'following' => @$this->following,
+//            'friends' => @$this->friend,
 
-            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
-            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+//            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+//            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
                 'age'    => Carbon::parse(@$this->profile->birthday)->age,
