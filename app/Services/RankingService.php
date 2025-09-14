@@ -167,7 +167,6 @@ class RankingService
     
         $this->transformData3($data, $class, $keywords, $rel);
     
-        $dataArray = $data->toArray();
     
         $currentUser = new RankingUserV2Resource([
             'user'    => $user,

@@ -27,6 +27,7 @@ class TopUserResource extends JsonResource
              'total_gifts'       => $this->total_gifts,
              'last_calculated_at'=> $this->last_calculated_at,
              'created_at'        => $this->created_at,
+             'updated_at'        => $this->updated_at,
              'exp_diff'          => $this->exp_diff ?? 0,
              'user_id'           => $this->user_id,
              'color_name'        => $this->color_name ?? null,
@@ -51,10 +52,10 @@ class TopUserResource extends JsonResource
              'country'           => $this->country ?? null,
              'age'               => $this->age ?? null,
              'achievement_images'=> $this->achievement_images ?? [],
-             'room'              =>  null,
-             'ranker'            => null,
+             'room'              => $this->room ?? null,
+             'ranker'            => $this->ranker ?? null,
              'packs'             =>  [],
-             'user_vip'          => [],
+             'user_vip'          => null,
              'profile'           => $this->profile ?? null,
          ];
      }
