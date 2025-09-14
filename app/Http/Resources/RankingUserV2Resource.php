@@ -94,7 +94,7 @@ class RankingUserV2Resource extends JsonResource
         return [
             'user_id'           => $user->id,
             'uuid'              => $user->uuid,
-            'exp'               => ($userExp != null) ? (@$userExp->total_gifts ?? '0') : (@$userData['total_gifts'] ?? '0'),
+            'exp'               => $userExp ?: ($userData['total_gifts'] ?? '0'),
             'name'              => $user->name,
             'avatar'            => $user->relationLoaded('profile') ? $user->profile?->avatar : null,
             'frame'             => $user->frame,
