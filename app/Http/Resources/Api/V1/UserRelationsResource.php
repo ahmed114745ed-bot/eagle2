@@ -61,8 +61,8 @@ class UserRelationsResource extends JsonResource
 //            'following' => @$this->following,
 //            'friends' => @$this->friend,
 
-            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
-            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+//            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+//            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
                 'age'    => Carbon::parse(@$this->profile->birthday)->age,
