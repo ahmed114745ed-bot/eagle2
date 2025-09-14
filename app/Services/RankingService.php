@@ -177,17 +177,18 @@ class RankingService
             'class'   => $class,
         ]);
     
-        $topUsers = array_slice($dataArray, 0, 3);
-        $topResources = collect($topUsers)->map(fn($item) => new TopUserResource($item));
+        $topUsers = $data->take(3); 
+        $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
+        
         \Log::info("Top users resources:", ['topUsers' => $topResources]);
 
-        $otherUsers = array_slice($dataArray, 3);
+        $otherUsers = $data->slice(3); // slice على Collection بدل array
+
         \Log::info("Top users resources:", ['otherUsers' => $otherUsers]);
 
         $perPage = request('per_page', 10);
         $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-        $currentItems = array_slice($otherUsers, ($currentPage - 1) * $perPage, $perPage);
-    
+        $currentItems = $otherUsers->forPage($currentPage, $perPage);    
         $paginatedOther = new LengthAwarePaginator(
             $currentItems,
             count($otherUsers),

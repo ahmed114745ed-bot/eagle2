@@ -244,7 +244,7 @@
     <div class="settings-content">
         <div id="AppFeature" class="settings-section active">
             <h2>{{ __('Agency Feature') }}</h2>
-            <form id="agencyFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="agencyFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -277,7 +277,7 @@
 
         <div id="ReelSettings" class="settings-section">
             <h2>{{ __('Reel Settings') }}</h2>
-            <form id="reelFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="reelFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
