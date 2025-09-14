@@ -20,7 +20,8 @@ class PkEventController extends Controller
     public function topUsersPKEvent(Request $request)
     {
         $pkEvent = PkEvent::currentEvent()->first();
-       
+        $pkEvent = PkEvent::first();
+
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
@@ -31,9 +32,9 @@ class PkEventController extends Controller
 
         // Determine column and relation based on type
         $typeMap = [
-            1 => ['column' => 'sender_id', 'relation' => 'sender'],
-            2 => ['column' => 'roomowner_id', 'relation' => 'roomOwner.ownerRoom'],
-            3 => ['column' => 'receiver_id', 'relation' => 'receiver'],
+            2 => ['column' => 'sender_id', 'relation' => 'sender'],
+            3 => ['column' => 'roomowner_id', 'relation' => 'roomOwner.ownerRoom'],
+            1 => ['column' => 'receiver_id', 'relation' => 'receiver'],
         ];
 
         $columnInfo = $typeMap[$type] ?? $typeMap[1];
@@ -53,7 +54,7 @@ class PkEventController extends Controller
             $query->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover']);
         } else {
             $query->with([$relation => function ($q) {
-                $q->select('id', 'name','uuid')->with('profile');
+                $q->select('id', 'name', 'uuid')->with('profile');
             }]);
         }
 
@@ -78,7 +79,6 @@ class PkEventController extends Controller
                 $item->unsetRelation($rel);
             }
         });
-
         return Common::apiResponse(1, '', [
             'top' => PkEventTopResource::collection($top20),
             'user' => $userExists ? null : new UserWeeklyStar($user, $userData),
@@ -89,7 +89,7 @@ class PkEventController extends Controller
     public function topDetails()
     {
         $nowDate = Carbon::now();
-        $pkEvent = PkEvent::currentEvent()->with(['rewards']) ->first();
+        $pkEvent = PkEvent::currentEvent()->with(['rewards'])->first();
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
