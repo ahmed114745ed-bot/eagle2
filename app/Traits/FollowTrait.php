@@ -90,7 +90,7 @@ trait FollowTrait
         })
         ->orderBy('follows.created_at', 'desc');
     }
-    
+
 
     public function friendsFollowedId()
     {
@@ -107,13 +107,13 @@ trait FollowTrait
         })
         ->wherePivot('status', 1)
         ->pluck('followed_user_id'); // استخراج معرفات الأصدقاء
-    
+
         $followedIds = Follow::where('user_id', $this->id)
             ->pluck('followed_user_id'); // استخراج معرفات المستخدمين الذين يتابعهم
-    
+
         return $friendsIds->merge($followedIds)->unique(); // دمج النتائج وإزالة التكرارات
     }
-    
+
     // Assume we have a relationship to check if the user is being followed
     public function followedByAuthUser()
     {

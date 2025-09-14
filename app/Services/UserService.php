@@ -428,6 +428,8 @@ class UserService
             'packs',
 //            'country',
             'color_image',
+            'followedByAuthUser',
+            'followerByAuthUser'
 //            'eligiblePacks',
 //            'friends',
         ];
