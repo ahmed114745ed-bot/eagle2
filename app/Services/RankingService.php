@@ -156,7 +156,11 @@ class RankingService
             3 => 'monthly',
         ];
     
-        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);    
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit); 
+        \Log::info('Data retrieved from rankingRepo', [
+            'data_count' => $data?->count(),
+            'data'       => $data,
+        ]);   
         $userExp = $data->firstWhere('user_id', $user->id)['exp_int'] ?? 0;
     
         $key = $types[$type] . '_' . $class;
