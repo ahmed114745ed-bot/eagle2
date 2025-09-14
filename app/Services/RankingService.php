@@ -5,6 +5,7 @@ namespace App\Services;
 use App\helper\RankingHelper;
 use App\Http\Resources\RankingGameCollectionResource;
 use App\Http\Resources\RankingUserV2Resource;
+use App\Http\Resources\TopUserResource;
 use App\Models\Pk;;
 
 use App\Models\User;
@@ -146,6 +147,8 @@ class RankingService
         return $this->rankingRepo->getAgencyRanking('agency', $types[$type], $limit);
     }
 
+ 
+
     protected function handleUserRanking(int $class, int $type, int $limit, $user)
     {
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
@@ -156,27 +159,56 @@ class RankingService
             3 => 'monthly',
         ];
     
-        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit); 
-        \Log::info('Data retrieved from rankingRepo', [
-            'data'       => $data,
-        ]);   
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+    
         $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
-
-        \Log::info('Data userExp', [
-            'userExp'       => $userExp,
-        ]); 
     
         $key = $types[$type] . '_' . $class;
+    
         $this->transformData3($data, $class, $keywords, $rel);
-
-
-        return new RankingUserV2Resource([
+    
+        $dataArray = $data->toArray();
+    
+        $currentUser = new RankingUserV2Resource([
             'user'    => $user,
             'data'    => $data,
             'userExp' => $userExp,
             'key'     => $key,
             'class'   => $class,
         ]);
+    
+        $topUsers = array_slice($dataArray, 0, 3);
+        $topResources = collect($topUsers)->map(fn($item) => new TopUserResource($item));
+    
+        $otherUsers = array_slice($dataArray, 3);
+    
+        $perPage = request('per_page', 10);
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+        $currentItems = array_slice($otherUsers, ($currentPage - 1) * $perPage, $perPage);
+    
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems,
+            count($otherUsers),
+            $perPage,
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'page']
+        );
+    
+        $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+    
+        return [
+            'user'  => $currentUser,
+            'top'   => $topResources,
+            'other' => $otherResources,
+            'others_pagination' => [
+                'total'        => $paginatedOther->total(),
+                'per_page'     => $paginatedOther->perPage(),
+                'current_page' => $paginatedOther->currentPage(),
+                'last_page'    => $paginatedOther->lastPage(),
+                'next_page'    => $paginatedOther->nextPageUrl(),
+                'prev_page'    => $paginatedOther->previousPageUrl(),
+            ]
+        ];
     }
     
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
