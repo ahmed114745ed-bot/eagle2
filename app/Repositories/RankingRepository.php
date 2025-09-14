@@ -94,9 +94,7 @@ class RankingRepository
                 ->limit(5),
         ];
     
-        if ($role === 'roomOwner') {
-            // $relations['ownerRoom'] = fn($q) => $q->with('ownerRoom');
-        }
+      
     
         return $relations;
     }
