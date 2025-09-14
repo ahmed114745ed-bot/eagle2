@@ -204,7 +204,7 @@ class RankingService
             $v->remaining_int = ceil($value2);
 
             $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
-            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile?->avatar;
             $v->frame = UserPackHelper::getFrameImage($user);
             $v->frame_id = UserPackHelper::getFrameId($user);
 
