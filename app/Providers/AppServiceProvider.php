@@ -84,9 +84,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Schema::defaultStringLength(191);
+//        Schema::defaultStringLength(191);
 
-        $this->setupAppSettings();
+//        $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
