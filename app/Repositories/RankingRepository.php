@@ -105,6 +105,7 @@ class RankingRepository
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
         return GiftRanking::query()
+           ->select('gift_rankings.*', 'ranker_id as user_id')
             ->whereHas('ranker')
             ->with([
                 'ranker' => fn($q) => $q->with($this->rankerRelations($role))
