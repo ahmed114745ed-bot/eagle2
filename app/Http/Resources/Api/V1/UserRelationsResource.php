@@ -65,9 +65,9 @@ class UserRelationsResource extends JsonResource
 //            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
-                'age'    => Carbon::parse(@$this->profile->birthday)->age,
-                'gender' => @$this->profile->gender ?? 1,
-                'country'=> @$this->profile->country?:'',
+//                'age'    => Carbon::parse(@$this->profile->birthday)->age,
+//                'gender' => @$this->profile->gender ?? 1,
+//                'country'=> @$this->profile->country?:'',
             ],
             'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
