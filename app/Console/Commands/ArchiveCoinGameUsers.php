@@ -9,18 +9,19 @@ use Carbon\Carbon;
 
 class ArchiveCoinGameUsers extends Command
 {
-    protected $signature = 'coin_game:archive {year?} {month?}';
-    protected $description = 'Archive coin_game_users to coin_game_users_archive at month end';
+    protected $signature = 'coin_game:archive {date?}';
+    protected $description = 'Archive coin_game_users to coin_game_users_archive day by day';
 
     public function handle()
     {
-        $this->info('Starting archive process...');
+        $this->info('Starting daily archive process...');
 
-        $year = $this->argument('year') ?? Carbon::now()->subMonth()->year;
-        $month = $this->argument('month') ?? Carbon::now()->subMonth()->month;
+        $date = $this->argument('date')
+            ? Carbon::parse($this->argument('date'))
+            : Carbon::yesterday();
 
-        $ym = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT));
-        $partitionName = 'p' . $ym;
+        $ymd = (int) $date->format('Ymd');
+        $partitionName = 'p' . $ymd;
 
         $partitions = DB::select("
             SELECT PARTITION_NAME, PARTITION_DESCRIPTION
@@ -28,6 +29,7 @@ class ArchiveCoinGameUsers extends Command
             WHERE TABLE_SCHEMA = DATABASE()
               AND TABLE_NAME = 'coin_game_users_archive'
         ");
+
         $partitionExists = collect($partitions)->pluck('PARTITION_NAME')->contains($partitionName);
 
         if (!$partitionExists) {
@@ -36,7 +38,7 @@ class ArchiveCoinGameUsers extends Command
                 ->sortBy('PARTITION_DESCRIPTION')
                 ->last();
 
-            $newPartitionValue = $ym;
+            $newPartitionValue = $ymd;
             if ($lastPartition && $lastPartition->PARTITION_DESCRIPTION >= $newPartitionValue) {
                 $newPartitionValue = $lastPartition->PARTITION_DESCRIPTION + 1;
             }
@@ -58,14 +60,12 @@ class ArchiveCoinGameUsers extends Command
             $this->info("Partition {$partitionName} already exists.");
         }
 
-        // ✅ get the last ID for this year/month
         $lastId = DB::table('coin_game_users')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereDate('created_at', $date->toDateString())
             ->max('id');
 
         if (!$lastId) {
-            $this->info("No records found for {$year}-{$month}, nothing to archive.");
+            $this->info("No records found for {$date->toDateString()}, nothing to archive.");
             return;
         }
 
@@ -76,22 +76,20 @@ class ArchiveCoinGameUsers extends Command
                 (id, user_id, coins, type, game_id, round_id, order_id, app_profit_coins, created_at, updated_at, created_ym)
                 SELECT
                     id, user_id, coins, type, game_id, round_id, order_id, app_profit_coins, created_at, updated_at,
-                    YEAR(created_at)*100 + MONTH(created_at)
+                    YEAR(created_at)*10000 + MONTH(created_at)*100 + DAY(created_at)
                 FROM coin_game_users
                 WHERE id <= {$lastId}
-                  AND YEAR(created_at) = {$year}
-                  AND MONTH(created_at) = {$month}
+                  AND DATE(created_at) = '{$date->toDateString()}'
             ");
 
             DB::statement("
                 DELETE FROM coin_game_users
-                 WHERE id <= {$lastId}
-                  AND YEAR(created_at) = {$year}
-                  AND MONTH(created_at) = {$month}
+                WHERE id <= {$lastId}
+                  AND DATE(created_at) = '{$date->toDateString()}'
             ");
 
             DB::commit();
-            $this->info('Archive completed successfully.');
+            $this->info("Archive for {$date->toDateString()} completed successfully.");
         } catch (\Exception $e) {
             DB::rollBack();
             $this->error('Archive failed: ' . $e->getMessage());
