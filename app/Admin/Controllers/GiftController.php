@@ -145,7 +145,7 @@ class GiftController extends MainController
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 
-        if ($category->type == 'vip') {
+        if ( $category && $category->type == 'vip') {
             $grid->column('level', trans('vip'))->display(function () {
                 $defaultImage = asset("images/image.png");
                 $path = getImagePath($this?->vip?->img);
@@ -243,116 +243,169 @@ class GiftController extends MainController
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
-        $locale = app()->getLocale(); // أو auth()->user()->locale مثلاً
+
         $categories = GiftCategory::all();
 
-        $tabs = [];
-        foreach ($categories as $category) {
-            $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-            $tabs[$category->id] = $title;
-        }
 
-        $form->select('gift_category_id', __('Gift Category'))->options($tabs);
-        $form->select('type', __('type'))->options(
-            translate(TYPE_GIFT)
-        )
 
-            ->when(6, function () use ($form) {
 
-                $type = old('type', $form->model()->type ?? null);
-                $form->number('luckyGift.win_probability', __('win probability'))
-                    ->min(1)->max(100)
-                    ->placeholder(__('Enter win probability'))
-                    ->attribute(['id' => 'win_probability']);
 
-                $probabilityTimes1 = \Cache::get('probability_times_1', []);
-                $probabilityTimes2 = \Cache::get('probability_times_2', []);
-                $probabilityTimes3 = \Cache::get('probability_times_3', []);
+        // Build Gift Category options
+        // $locale = App::getLocale();
+        // $tabs = [];
 
-                $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-                    ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
-                    ->rules('min:0|max:100')
-                    ->default(0)
-                    ->required();
+        // foreach ($categories as $category) {
+        //     $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+        //     $tabs[$category->id] = $title;
+        // }
 
-                $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-                    ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
-                    ->rules('min:0|max:100')
-                    ->default(0)
-                    ->required();
+        // // Replace type with gift_category_id
+        // $form->select('gift_category_id', __('Gift Category'))
+        //     ->options($tabs)
+        //     ->when(function ($value) {
+        //         // Get the category type from DB
+        //         $category = GiftCategory::find($value);
+        //         return $category?->type == 'lucky_gift';
+        //     }, function () use ($form) {
+        //         // Lucky Gift extra fields
+        //         $form->number('luckyGift.win_probability', __('win probability'))
+        //             ->min(1)->max(100)
+        //             ->placeholder(__('Enter win probability'))
+        //             ->attribute(['id' => 'win_probability']);
 
-                $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-                    ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
-                    ->rules('min:0|max:100')
-                    ->default(0)
-                    ->required();
-                if ($type == 6 || !$form->isEditing()) {
+        //         $probabilityTimes1 = \Cache::get('probability_times_1', []);
+        //         $probabilityTimes2 = \Cache::get('probability_times_2', []);
+        //         $probabilityTimes3 = \Cache::get('probability_times_3', []);
 
-                    $form->html(<<<'HTML'
-                    <script>
+        //         $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
+        //             ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') . '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
 
-                        (function () {
-                            const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
+        //         $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
+        //             ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . '] - ' . __('scope for multiplies') . '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
 
-                            function getVal(field) {
-                                return parseFloat($(`input[name="luckyGift[${field}]"]`).val()) || 0;
-                            }
+        //         $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
+        //             ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') . '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
+        //     })
+        //     ->when(function ($value) {
+        //         $category = GiftCategory::find($value);
+        //         return $category?->type == 'vip';
+        //     }, function () use ($form) {
+        //         // VIP Level field
+        //         $form->number('vip_level', __('vip_level'))
+        //             ->min(0)
+        //             ->placeholder(__('less than 256'))
+        //             ->attribute(['id' => 'vip_level']);
+        //     });
 
-                            function setVal(field, val) {
-                                val = Math.max(0, Math.min(100, val));
-                                $(`input[name="luckyGift[${field}]"]`).val(val.toFixed(2));
-                            }
+        //  $form->select('type', __('type'))->options(
+        // translate(TYPE_GIFT)
+        // )
 
-                            function updateDisplays() {
-                                // $('#min_percent_display').text('🔹 النسبة الحالية: ' + getVal('min_percentag') + '%');
-                                // $('#mid_percent_display').text('🔸 النسبة الحالية: ' + getVal('mid_percentag') + '%');
-                                // $('#max_percent_display').text('🟣 النسبة الحالية: ' + getVal('max_percentag') + '%');
-                            }
+        //     ->when(6, function () use ($form) {
 
-                            function enforceLimit(changed) {
-                                const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
-                                if (total > 100) {
-                                    let current = getVal(changed);
-                                    let overflow = total - 100;
-                                    setVal(changed, current - overflow);
-                                }
-                            }
-                            window.percent_error_message = ' . json_encode(trans('admin.percent_error')) . ';
+        //         $type = old('type', $form->model()->type ?? null);
+        //         $form->number('luckyGift.win_probability', __('win probability'))
+        //             ->min(1)->max(100)
+        //             ->placeholder(__('Enter win probability'))
+        //             ->attribute(['id' => 'win_probability']);
 
-                            function checkBeforeSubmit(e) {
-                                const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
-                                if (Math.round(total) !== 100) {
-                                    alert(window.percent_error_message + total.toFixed(2) + '%');
-                                    e.preventDefault();
-                                    return false;
-                                }
-                            }
+        //         $probabilityTimes1 = \Cache::get('probability_times_1', []);
+        //         $probabilityTimes2 = \Cache::get('probability_times_2', []);
+        //         $probabilityTimes3 = \Cache::get('probability_times_3', []);
 
-                            $(document).ready(function () {
-                                fields.forEach(function(field) {
-                                    $(document).on('input', `input[name="luckyGift[${field}]"]`, function () {
-                                        let val = parseFloat($(this).val()) || 0;
-                                        if (val < 0) val = 0;
-                                        if (val > 100) val = 100;
-                                        $(this).val(val.toFixed(2));
+        //         $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
+        //             ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
 
-                                        enforceLimit(field);
-                                        updateDisplays();
-                                    });
-                                });
+        //         $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
+        //             ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
 
-                                $('form').on('submit', checkBeforeSubmit);
-                                updateDisplays();
-                            });
-                        })();
-                        </script>
+        //         $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
+        //             ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
+        //             ->rules('min:0|max:100')
+        //             ->default(0)
+        //             ->required();
+        //         if ($type == 6 || !$form->isEditing()) {
 
-                    HTML);
-                }
-            })
-            ->when(9, function () use ($form) {
-                $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
-            });
+        //             $form->html(<<<'HTML'
+        //             <script>
+
+        //                 (function () {
+        //                     const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
+
+        //                     function getVal(field) {
+        //                         return parseFloat($(`input[name="luckyGift[${field}]"]`).val()) || 0;
+        //                     }
+
+        //                     function setVal(field, val) {
+        //                         val = Math.max(0, Math.min(100, val));
+        //                         $(`input[name="luckyGift[${field}]"]`).val(val.toFixed(2));
+        //                     }
+
+        //                     function updateDisplays() {
+        //                         // $('#min_percent_display').text('🔹 النسبة الحالية: ' + getVal('min_percentag') + '%');
+        //                         // $('#mid_percent_display').text('🔸 النسبة الحالية: ' + getVal('mid_percentag') + '%');
+        //                         // $('#max_percent_display').text('🟣 النسبة الحالية: ' + getVal('max_percentag') + '%');
+        //                     }
+
+        //                     function enforceLimit(changed) {
+        //                         const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
+        //                         if (total > 100) {
+        //                             let current = getVal(changed);
+        //                             let overflow = total - 100;
+        //                             setVal(changed, current - overflow);
+        //                         }
+        //                     }
+        //                     window.percent_error_message = ' . json_encode(trans('admin.percent_error')) . ';
+
+        //                     function checkBeforeSubmit(e) {
+        //                         const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
+        //                         if (Math.round(total) !== 100) {
+        //                             alert(window.percent_error_message + total.toFixed(2) + '%');
+        //                             e.preventDefault();
+        //                             return false;
+        //                         }
+        //                     }
+
+        //                     $(document).ready(function () {
+        //                         fields.forEach(function(field) {
+        //                             $(document).on('input', `input[name="luckyGift[${field}]"]`, function () {
+        //                                 let val = parseFloat($(this).val()) || 0;
+        //                                 if (val < 0) val = 0;
+        //                                 if (val > 100) val = 100;
+        //                                 $(this).val(val.toFixed(2));
+
+        //                                 enforceLimit(field);
+        //                                 updateDisplays();
+        //                             });
+        //                         });
+
+        //                         $('form').on('submit', checkBeforeSubmit);
+        //                         updateDisplays();
+        //                     });
+        //                 })();
+        //                 </script>
+
+        //             HTML);
+        //         }
+        //     })
+        //     ->when(9, function () use ($form) {
+        //         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
+        //     });
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
