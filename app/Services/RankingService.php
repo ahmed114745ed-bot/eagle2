@@ -160,15 +160,17 @@ class RankingService
         \Log::info('Data retrieved from rankingRepo', [
             'data'       => $data,
         ]);   
-        $userExp = $data->where($keywords, $user->id)->first();
-        $this->transformData3($data, $class, $keywords, $rel);
+        $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
 
         \Log::info('Data userExp', [
             'userExp'       => $userExp,
         ]); 
     
         $key = $types[$type] . '_' . $class;
-    
+        $this->transformData3($data, $class, $keywords, $rel);
+
+        return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+
         return new RankingUserV2Resource([
             'user'    => $user,
             'data'    => $data,
@@ -178,6 +180,101 @@ class RankingService
         ]);
     }
     
+    protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
+    {
+        $achievement_images = [];
+
+        $kong['user_id']    = 0;
+        $kong['uuid']       = '';
+        $kong['exp']        = '0';
+        $kong['exp_int']        = 0;
+        $kong['remaining']        = '0';
+        $kong['remaining_int']        = 0;
+        $kong['name']       = '';
+        $kong['avatar']     = '';
+        $kong['frame']      = '';
+        $kong['frame_id']   = 0;
+        $kong['sender_img'] = '';
+        $kong['reseverimg'] = '';
+        $kong['vip_level']  =  0;
+        $kong['sender_level'] = 0;
+        $kong['reciver_level'] = 0;
+
+        $kong['vip_level_img'] = '';
+        $kong['sender_level_img'] = '';
+        $kong['reciver_level_img'] = '';
+        $kong['age'] = 0;
+
+        $kong['type_user'] = 0;
+        $kong['manger_type'] = null;
+        $kong['achievement_images'] = [];
+        $kong['color_name'] = '';
+
+        if ($data->count() > 0) {
+            $data[0] = $data[0] ?? $kong;
+            $data[1] = $data[1] ?? $kong;
+            $data[2] = $data[2] ?? $kong;
+        }
+
+        $user->sort = $this->getUserSortValue($data, $userId);
+        $user->user_id = $user->id;
+
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
+
+        $userData = $data->where($key, $user->id)->first();
+
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->total_gifts ?? '0') : (@$userData->total_gifts ?? '0');
+        $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
+        $arr['user']['vip_level']  = $user->UserVip?->level;
+        $arr['user']['sender_level']  = $user->total_sender_level ?? '';
+        $arr['user']['reciver_level']  = $user->total_received_level ?? '';
+        $arr['user']['vip_level_img']  = UserPackHelper::getVipIcon($user);
+        $arr['user']['sender_level_img']  = UserLevelHelper::getSenderImage($user);
+        $arr['user']['reciver_level_img']  = UserLevelHelper::getReceiverImage($user);
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
+        $arr['user']['country'] =  @$user->country;
+        $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['age'] = @$user->profile?->age ?? '';
+        $arr['user']['color_name'] = UserPackHelper::getColorName($user);
+        $arr['user']['achievement_images'] = $achievement_images;
+
+        $dataArray = $data->toArray();
+        $countData = count($dataArray);
+
+        $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
+
+        $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
+
+        $perPage = request('per_page', 10);
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+
+        $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
+
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems,
+            count($otherData),
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+
+        $arr['other'] = $paginatedOther->items();
+        $arr['others_pagination'] = [
+            'total'        => $paginatedOther->total(),
+            'per_page'     => $paginatedOther->perPage(),
+            'current_page' => $paginatedOther->currentPage(),
+            'last_page'    => $paginatedOther->lastPage(),
+            'next_page'    => $paginatedOther->nextPageUrl(),
+            'prev_page'    => $paginatedOther->previousPageUrl(),
+        ];
+//        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
+
+        return $arr;
+    }
+
 
 
     public function getRanking66($class, $type, $user, $limit)
