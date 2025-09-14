@@ -160,7 +160,7 @@ class RankingService
         \Log::info('Data retrieved from rankingRepo', [
             'data'       => $data,
         ]);   
-        $userExp = $data->firstWhere('user_id', $user->id)?->total_gifts ?? 0;
+        $userExp = $data->where($keywords, $user->id)->first();
 
         \Log::info('Data userExp', [
             'userExp'       => $userExp,
