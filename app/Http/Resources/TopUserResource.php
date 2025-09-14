@@ -17,7 +17,7 @@ class TopUserResource extends JsonResource
      */
   
      public function toArray(Request $request): array
-     {
+     { return [];
         //  return [
         //      'id'                => $this->id,
         //      'type'              => $this->type,
