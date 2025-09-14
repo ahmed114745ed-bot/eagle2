@@ -86,10 +86,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        $this->setupAppSettings();
+      /*  $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
-        $this->cacheLuckyGiftProbabilities();
+        $this->cacheLuckyGiftProbabilities();*/
     }
 
     protected function defineCarbonMacros(): void
