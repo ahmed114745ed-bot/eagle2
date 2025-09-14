@@ -15,6 +15,8 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use App\Models\GiftCategory;
+use Illuminate\Support\Facades\App;
 
 class GiftController extends MainController
 {
@@ -99,21 +101,35 @@ class GiftController extends MainController
         $grid = new Grid(new Gift);
 
         $filterType = request('filter', 'all');
+        $category  = [];
+        if (request('filter') != 'all') {
+            $category = GiftCategory::find(request('filter'));
+        }
 
         $grid->model()
             ->with('vip')
             ->where('type', '!=', 8)
-            ->when($filterType !== 'all', fn($q) => $q->where('type', $filterType))
+            ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             ->orderBy('use_count', 'desc')
             ->orderBy('type')
             ->orderByRaw('ISNULL(`sort`), `sort`')
             ->orderBy('price');
 
         $grid->paginate(20);
-
-
         $grid->header(function () use ($filterType) {
-            $tabs = ['all' => __('All')] + translate(TYPE_GIFT);
+            $locale = App::getLocale();
+
+            // الأساس
+            $tabs = ['all' => __('All')];
+
+            // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
+            $categories = GiftCategory::all();
+            foreach ($categories as $category) {
+                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+                $tabs[$category->id] = $title;
+            }
+
+            // بناء HTML
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
                 $active = $filterType === (string)$key ? 'active' : '';
@@ -121,13 +137,15 @@ class GiftController extends MainController
                 $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
             }
             $html .= '</ul></div>';
+
             return $html;
         });
+
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 
-        if ($filterType == 9) {
+        if ($category->type == 'vip') {
             $grid->column('level', trans('vip'))->display(function () {
                 $defaultImage = asset("images/image.png");
                 $path = getImagePath($this?->vip?->img);
@@ -225,10 +243,20 @@ class GiftController extends MainController
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
+        $locale = app()->getLocale(); // أو auth()->user()->locale مثلاً
+        $categories = GiftCategory::all();
 
+        $tabs = [];
+        foreach ($categories as $category) {
+            $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+            $tabs[$category->id] = $title;
+        }
+
+        $form->select('gift_category_id', __('Gift Category'))->options($tabs);
         $form->select('type', __('type'))->options(
             translate(TYPE_GIFT)
         )
+
             ->when(6, function () use ($form) {
 
                 $type = old('type', $form->model()->type ?? null);
@@ -258,9 +286,9 @@ class GiftController extends MainController
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
-            if ($type == 6 || !$form->isEditing()) {
+                if ($type == 6 || !$form->isEditing()) {
 
-                $form->html(<<<'HTML'
+                    $form->html(<<<'HTML'
                     <script>
 
                         (function () {
@@ -320,7 +348,7 @@ class GiftController extends MainController
                         </script>
 
                     HTML);
-                    }
+                }
             })
             ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);

@@ -1,23 +1,20 @@
 <?php
 
-use App\Admin\Controllers\AgencySettingsController;
-use App\Events\PublicTestEvent;
-use App\Http\Controllers\AppFeatureController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\RoomSettingController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\PayPalService;
 use Illuminate\Http\Request;
+use App\Events\PublicTestEvent;
+use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -26,6 +23,9 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\RoomSettingController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
+use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
@@ -49,6 +50,7 @@ use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
+use App\Http\Controllers\Api\V1\GiftCategoryController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
@@ -61,7 +63,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -285,7 +286,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
                 Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
                 Route::get('/frames/{id?}', [UserController::class, 'frames']);
-
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -356,6 +356,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
+            Route::prefix('gift-categories')->group(function () {
+                Route::get('/', [GiftCategoryController::class, 'index']);
+                
+            });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
 
@@ -423,7 +427,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
             Route::get('/invitations/earnings', [UserController::class, 'invitationsEarnings']);
             Route::post('/invitations/earnings/{id}/claim', [UserController::class, 'invitationsEarningsClaim']);
-        
+
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
@@ -703,7 +707,3 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
-
-
-
-
