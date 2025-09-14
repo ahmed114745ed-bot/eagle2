@@ -95,7 +95,7 @@ class RankingRepository
         ];
     
         if ($role === 'roomOwner') {
-            $relations['ownerRoom'] = fn($q) => $q->select(['id', 'name', 'owner_id']); 
+            $relations['ownerRoom'] = fn($q) => $q->with('ownerRoom');
         }
     
         return $relations;

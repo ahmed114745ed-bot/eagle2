@@ -167,7 +167,6 @@ class RankingService
     
         $this->transformData3($data, $class, $keywords, $rel);
     
-        $dataArray = $data->toArray();
     
         $currentUser = new RankingUserV2Resource([
             'user'    => $user,
@@ -177,39 +176,40 @@ class RankingService
             'class'   => $class,
         ]);
     
-        $topUsers = array_slice($dataArray, 0, 3);
-        $topResources = collect($topUsers)->map(fn($item) => new TopUserResource($item));
-    
-        $otherUsers = array_slice($dataArray, 3);
-    
-        $perPage = request('per_page', 10);
-        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-        $currentItems = array_slice($otherUsers, ($currentPage - 1) * $perPage, $perPage);
-    
-        $paginatedOther = new LengthAwarePaginator(
-            $currentItems,
-            count($otherUsers),
-            $perPage,
-            $currentPage,
-            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'page']
-        );
-    
-        $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
-    
-        return [
-            'user'  => $currentUser,
-            'top'   => $topResources,
-            'other' => $otherResources,
-            'others_pagination' => [
-                'total'        => $paginatedOther->total(),
-                'per_page'     => $paginatedOther->perPage(),
-                'current_page' => $paginatedOther->currentPage(),
-                'last_page'    => $paginatedOther->lastPage(),
-                'next_page'    => $paginatedOther->nextPageUrl(),
-                'prev_page'    => $paginatedOther->previousPageUrl(),
-            ]
-        ];
-    }
+        $topUsers = $data->take(3); 
+        $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
+        
+       
+    $otherUsers = $data->slice(3);
+
+    $perPage = request('per_page', 10);
+    $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+    $currentItems = $otherUsers->forPage($currentPage, $perPage);
+
+    $paginatedOther = new LengthAwarePaginator(
+        $currentItems->values(),
+        $otherUsers->count(),
+        $perPage,
+        $currentPage,
+        ['path' => LengthAwarePaginator::resolveCurrentPath()]
+    );
+
+    $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+
+    return [
+        'user'  => $currentUser,
+        'top'   => $topResources,
+        'other' => $otherResources,
+        'others_pagination' => [
+            'total'        => $paginatedOther->total(),
+            'per_page'     => $paginatedOther->perPage(),
+            'current_page' => $paginatedOther->currentPage(),
+            'last_page'    => $paginatedOther->lastPage(),
+            'next_page'    => $paginatedOther->nextPageUrl(),
+            'prev_page'    => $paginatedOther->previousPageUrl(),
+        ]
+    ];
+}
     
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
