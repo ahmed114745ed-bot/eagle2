@@ -108,9 +108,9 @@ class GiftLogTestController extends Controller
 
     public function handleUserRelations($user, $type, $keyword)
     {
-        $user = User::whereId(361)->first();
-
+        $user = User::whereId(303)->first();
         $type = 3;
+
         switch ($type) {
             case '1':
             case '2':
