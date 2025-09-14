@@ -169,7 +169,7 @@ class RankingService
         $key = $types[$type] . '_' . $class;
         $this->transformData3($data, $class, $keywords, $rel);
 
-        return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+        // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
 
         return new RankingUserV2Resource([
             'user'    => $user,
