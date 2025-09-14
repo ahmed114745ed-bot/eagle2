@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\helper\TryCatchHelper;
 use App\Helpers\Common;
 use App\helper\RankingHelper;
 use App\Services\UserService;
@@ -47,21 +48,24 @@ class RankingController extends Controller
 
     public function ranking2(Request $request)
     {
-        $class = (int) ($request->class ?? 1);
-        $type  = (int) ($request->type ?? 1);
+
+        return TryCatchHelper::handle(function () use ($request) {
     
-        if ($error = RankingHelper::validateParams($class, $type)) {
-            return $error;
-        }
+            $class = (int) ($request->class ?? 1);
+            $type  = (int) ($request->type ?? 1);
     
-        $limit = RankingHelper::getLimit((bool) $request->is_home);
+            if ($error = RankingHelper::validateParams($class, $type)) {
+                return $error; 
+            }
     
-      
-        $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
+            $limit = RankingHelper::getLimit((bool) $request->is_home);
     
-        $data = RankingHelper::transformData($class, $data);
+            $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
     
-        return Common::apiResponse(1, '', $data);
+            $data = RankingHelper::transformData($class, $data);
+    
+            return $data; 
+        });
     }
 
     public function ranking3(Request $request)
