@@ -161,7 +161,6 @@ class RankingService
             'data'       => $data,
         ]);   
         $userExp = $data->where($keywords, $user->id)->first();
-        $this->transformData3($data, $class, $keywords, $rel);
 
         \Log::info('Data userExp', [
             'userExp'       => $userExp,

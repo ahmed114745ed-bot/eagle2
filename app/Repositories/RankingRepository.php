@@ -95,7 +95,7 @@ class RankingRepository
         ];
     
         if ($role === 'roomOwner') {
-            $relations['ownerRoom'] = fn($q) => $q->select(['id', 'name', 'owner_id']); // مثال
+            $relations['ownerRoom'] = fn($q) => $q->select(['id', 'name', 'owner_id']); 
         }
     
         return $relations;
@@ -105,7 +105,6 @@ class RankingRepository
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
         return GiftRanking::query()
-           ->select('gift_rankings.*', 'ranker_id as user_id')
             ->whereHas('ranker')
             ->with([
                 'ranker' => fn($q) => $q->with($this->rankerRelations($role))
