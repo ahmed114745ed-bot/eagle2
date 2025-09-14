@@ -27,7 +27,7 @@ class UserRelationsResource extends JsonResource
     {
 
         $pass_status = false;
-        $isHideCountry = $this->getPackWithTypeV2(13);
+//        $isHideCountry = $this->getPackWithTypeV2(13);
 
         $now_room = @$this->room;
 
@@ -69,17 +69,16 @@ class UserRelationsResource extends JsonResource
 //                'gender' => @$this->profile->gender ?? 1,
 //                'country'=> @$this->profile->country?:'',
             ],
-            'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
+//            'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
-            'now_room'             =>  new NowRoomResource($this)
+//            'now_room'             =>  new NowRoomResource($this),
                         // [
             //     'is_in_room'      => @$this->now_room_uid != 0,
             //     'uid'             => @$this->now_room_uid,
             //     'is_mine'         => @$this->id == $this->now_room_uid,
             //     'password_status' => $pass_status
             // ]
-            ,
             'vip'            => [
                 'level' => @$this->UserVip->level,
                  'img' => Common::ovip_center_rank_img_v2($this),
