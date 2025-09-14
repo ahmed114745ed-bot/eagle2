@@ -86,8 +86,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        $this->setupAppSettings();
-//        $this->setupLanguages();
+//        $this->setupAppSettings();
+        $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
     }
