@@ -28,7 +28,6 @@ class RankingUserV2Resource extends JsonResource
     
             $this->loadUserRelations($user);
     
-            // 👇 هنا نستدعي الميثود الجديدة
             return $this->prepareResponse3(
                 $data,
                 $user,
@@ -45,11 +44,15 @@ class RankingUserV2Resource extends JsonResource
         {
             $user->load([
                 'packs' => fn($q) => $q
-                    ->where('type', 25)
+                    ->whereIn('type', [10, 25 ,18,4])
                     ->where('is_used', true)
                     ->with('ware'),
+        
+                'senderLevel:id,level,type,img',
+                'receiverLevel:id,level,type,img',
             ]);
         }
+        
     
         protected function prepareResponse3($data, $user, $type, $key, $userId, $class, $limit, $userExp = null): array
         {
