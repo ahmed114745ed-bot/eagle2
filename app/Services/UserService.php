@@ -424,7 +424,8 @@ class UserService
             'profile',
             'ware',
             'UserVip',
-            'manager'
+            'manager',
+            'country'
         ];
 
         if ($type == 1) {
