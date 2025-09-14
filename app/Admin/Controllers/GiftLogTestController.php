@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
+use App\Repositories\FollowRepository;
 use App\Services\UserService;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
@@ -106,44 +107,22 @@ class GiftLogTestController extends Controller
         return view('test.relations');
     }
 
-    public function handleUserRelations($user, $type, $keyword)
+    public function userFriend(Request $request)
     {
-        $user = User::whereId(303)->first();
-        $type = 3;
+        $user = User::whereId(361)->first();
+        $keyword = $request->keywords ?? '';
 
-        switch ($type) {
-            case '1':
-            case '2':
-            case '3':
-            case '6':
-                (new UserCounterServices)->UpgradeDateForType($user, 'friend');
-                $data = $this->getData2($user, $type, $keyword);
-                break;
+        $response = $this->userService->handleUserRelations($user, 3, $keyword);
 
-            case '4':
-                (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
-                $data = UserRelationsResource::collection(
-                    (new UserRepository())->getFolloweds($user)
-                )->resolve();
-                break;
+        $original = $response->getData(true);
 
-            case '5':
-                $followRooms = (new UserRepository())->getFollowRooms($user->id);
-                $data = RoomResource::collection($followRooms)->resolve();
-                break;
-
-            default:
-                $success = false;
-                $message = 'please select type';
-                break;
-        }
         return view('test.relations', [
-            'success' => $success,
-            'message' => $message,
+            'success' => $original['success'] ?? false,
+            'message' => $original['message'] ?? '',
+            'data'    => $original['data'] ?? [],
             'user'    => $user,
-            'data'    => $data,
-            'type'    => $type,
         ]);
     }
+
 
 }

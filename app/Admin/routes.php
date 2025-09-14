@@ -630,7 +630,7 @@ Route::group(
             Route::post('/my-data-test', [GiftLogTestController::class, 'mydataTest']);
 
             Route::get('/relations-test', [GiftLogTestController::class, 'showRelations']);
-            Route::post('/relations-test', [GiftLogTestController::class, 'handleUserRelations']);
+            Route::post('/relations-test', [GiftLogTestController::class, 'userFriend']);
         });
     });
 
