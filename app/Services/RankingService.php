@@ -160,8 +160,10 @@ class RankingService
         \Log::info('Data retrieved from rankingRepo', [
             'data'       => $data,
         ]);   
-        $userExp = $data->firstWhere('user_id', $user->id)['exp_int'] ?? 0;
-    
+        $userExp = $data->firstWhere('ranker_id', $user->id)?->exp_int ?? 0;
+        \Log::info('Data userExp', [
+            'userExp'       => $userExp,
+        ]); 
         $key = $types[$type] . '_' . $class;
     
         return new RankingUserV2Resource([
