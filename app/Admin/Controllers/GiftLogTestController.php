@@ -8,8 +8,10 @@ use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Models\User;
 use App\Repositories\FollowRepository;
+use App\Services\ProfileService;
 use App\Services\UserService;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
@@ -22,6 +24,7 @@ class GiftLogTestController extends Controller
     public function __construct(
         private readonly GiftLogService $giftLogService,
         private readonly UserService $userService,
+        private readonly ProfileService $profileService,
     )
     {
     }
@@ -122,5 +125,29 @@ class GiftLogTestController extends Controller
         ]);
     }
 
+    public function showVisitors()
+    {
+        return view('test.visitors');
+    }
 
+    public function visitorsList(Request $request)
+    {
+        $user = User::whereId(303)->select(['id', 'name'])->first();
+        $keyword = $request->keywords ?? '';
+
+        [$profileVisitors, $userFollowers, $senderLevels, $receivedImage] = $this->profileService->getProfileVisitorsList($user, $keyword);
+        UserVisitorResource::initializeData($senderLevels, $receivedImage, $userFollowers);
+
+        $visitors = UserVisitorResource::collection($profileVisitors);
+
+        UserVisitorResource::clear();
+
+        $original = $visitors->response()->getData(true);
+
+        return view('test.visitors', [
+            'success' => true,
+            'message' => '',
+            'data'    => $original['data'] ?? [],
+        ]);
+    }
 }

@@ -10,7 +10,7 @@ use App\Repositories\User\UserRepository;
 
 class ProfileRelationService
 {
-  
+
     public function getHelperArrays(User $user, $data): array
     {
         $userFollowers      = Follow::query()->where('user_id',$user->id)->pluck('followed_user_id')->toArray();
@@ -34,7 +34,9 @@ class ProfileRelationService
 
     public function getLevel($levelsList, $type = 1)
     {
-        return Vip::query()->whereIn('level', $levelsList)
-                  ->where('type', $type)->select('img', 'level')->get();
+        return Vip::collectionBuilder()->whereIn("level", $levelsList)->where('type', $type)->get();
+
+//        return Vip::query()->whereIn('level', $levelsList)
+//                  ->where('type', $type)->select('img', 'level')->get();
     }
 }

@@ -631,6 +631,9 @@ Route::group(
 
             Route::get('/relations-test', [GiftLogTestController::class, 'showRelations']);
             Route::post('/relations-test', [GiftLogTestController::class, 'userFriend']);
+
+            Route::get('/visitors-test', [GiftLogTestController::class, 'showVisitors']);
+            Route::post('/visitors-test', [GiftLogTestController::class, 'visitorsList']);
         });
     });
 
