@@ -341,7 +341,7 @@ class UserService
 
         UserFollowHelper::updateCounts( $request->user());
         UserFollowHelper::updateCounts($unFollower);
-        
+
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
     }
@@ -502,9 +502,9 @@ class UserService
     {
         $user = $this->getUserWithRelations($userId);
         $this->ensureUserIsAccessible($user, $auth);
-    
+
         $request['user_id'] = $userId;
-    
+
         if ($this->shouldRecordVisit($auth, $user, $isVisit)) {
             $this->recordVisit($auth, $user);
         }
@@ -512,49 +512,49 @@ class UserService
         return $user;
 
     }
-    
+
     private function getUserWithRelations($userId)
     {
         return  $this->userRepository->findUserData($userId);
     }
 
 
-    
+
     private function ensureUserIsAccessible($user, $auth): void
     {
         if (!$user) {
             throw new Exception('User not found');
         }
-    
+
         if (in_array($user->id, $user?->blacklists->pluck('from_uid')->toArray())) {
             throw new Exception('User is in blacklist');
         }
     }
-    
+
     private function shouldRecordVisit($auth, $user, bool $isVisit): bool
     {
         return $auth->id !== $user->id
             && $isVisit
             && !Common::checkPackPrev($auth->id, 19);
     }
-    
+
     private function recordVisit($auth, $user): void
     {
         $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
-    
+
         $user->profileVisits()->syncWithoutDetaching([
             $auth->id => [
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
         ]);
-    
+
         if (!$previousVisit) {
             CustomNotification::visitProfile($user, $auth);
             (new UserCounterServices)->eventUser($user, 'visit-profile');
         }
     }
-    
+
 
     public function vTwoshowUser($userId, $auth, $request, $isVisit)
     {
@@ -1236,7 +1236,7 @@ class UserService
                 $amountBefore,
                 UserCoinLogType::INVITATION_CODE,
             );
-        
+
 
             return $earning->refresh();
         });

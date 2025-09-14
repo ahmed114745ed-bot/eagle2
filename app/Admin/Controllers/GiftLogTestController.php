@@ -3,13 +3,18 @@
 namespace App\Admin\Controllers;
 
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
 use App\Services\UserService;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
 use Illuminate\Http\Request;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class GiftLogTestController extends Controller
 {
@@ -93,6 +98,51 @@ class GiftLogTestController extends Controller
             'success' => $success,
             'message' => $message,
             'user' => $data,
+        ]);
+    }
+
+    public function showRelations()
+    {
+        return view('test.relations');
+    }
+
+    public function handleUserRelations($user, $type, $keyword)
+    {
+        $user = User::whereId(361)->first();
+
+        $type = 3;
+        switch ($type) {
+            case '1':
+            case '2':
+            case '3':
+            case '6':
+                (new UserCounterServices)->UpgradeDateForType($user, 'friend');
+                $data = $this->getData2($user, $type, $keyword);
+                break;
+
+            case '4':
+                (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
+                $data = UserRelationsResource::collection(
+                    (new UserRepository())->getFolloweds($user)
+                )->resolve();
+                break;
+
+            case '5':
+                $followRooms = (new UserRepository())->getFollowRooms($user->id);
+                $data = RoomResource::collection($followRooms)->resolve();
+                break;
+
+            default:
+                $success = false;
+                $message = 'please select type';
+                break;
+        }
+        return view('test.relations', [
+            'success' => $success,
+            'message' => $message,
+            'user'    => $user,
+            'data'    => $data,
+            'type'    => $type,
         ]);
     }
 
