@@ -1009,9 +1009,18 @@ trait CalcsTrait
         $vip = $uvip->OVip;
 
         if (!$vip) return '';
-        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
 
-        return @$vipIcon->show_img ?? '';
+        $type = 10;
+
+        $cacheKey = "ware_{$vip->level}_{$type}";
+
+        $ware = Common::getCachedWares($cacheKey, $vip, $type);
+
+        if (!$ware) return '';
+
+        $value = optional($ware)->show_img;
+
+        return ($value === 'NULL' || $value === null) ? '' : $value;
     }
 
 

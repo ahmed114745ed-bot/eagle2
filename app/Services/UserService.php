@@ -473,7 +473,8 @@ class UserService
     }
     public function getLevel($levelsList, $type = 1)
     {
-        return $this->vipRepository->getByLevels($levelsList, $type);
+//        return $this->vipRepository->getByLevels($levelsList, $type);
+        return $this->vipRepository->getByLevelsV2($levelsList, $type);
     }
 
     public function myStore($user, $request)
