@@ -20,7 +20,7 @@ class PkEventController extends Controller
     public function topUsersPKEvent(Request $request)
     {
         $pkEvent = PkEvent::currentEvent()->first();
-
+       
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
@@ -53,7 +53,7 @@ class PkEventController extends Controller
             $query->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover']);
         } else {
             $query->with([$relation => function ($q) {
-                $q->select('id', 'name')->with('profile');
+                $q->select('id', 'name','uuid')->with('profile');
             }]);
         }
 
