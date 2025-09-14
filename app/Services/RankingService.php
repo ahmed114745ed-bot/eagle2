@@ -158,7 +158,6 @@ class RankingService
     
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit); 
         \Log::info('Data retrieved from rankingRepo', [
-            'data_count' => $data?->count(),
             'data'       => $data,
         ]);   
         $userExp = $data->firstWhere('user_id', $user->id)['exp_int'] ?? 0;
