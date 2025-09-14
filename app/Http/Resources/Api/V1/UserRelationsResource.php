@@ -37,12 +37,12 @@ class UserRelationsResource extends JsonResource
             }
         }
 
-        if(self::$userFollowers != null && count(self::$userFollowers) > 0){
-            $isFollow = in_array(@$this->id, self::$userFollowers);
-        }else{
-            $isFollow = @(bool)Common::IsFollow(@$request->user()->id, @$this->id);
-
-        }
+//        if(self::$userFollowers != null && count(self::$userFollowers) > 0){
+//            $isFollow = in_array(@$this->id, self::$userFollowers);
+//        }else{
+//            $isFollow = @(bool)Common::IsFollow(@$request->user()->id, @$this->id);
+//
+//        }
 
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
             $imageReceiver = @$this->getImageReceiverOrSender('receiver_id', 1);
