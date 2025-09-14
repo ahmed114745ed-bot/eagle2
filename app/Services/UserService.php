@@ -421,7 +421,7 @@ class UserService
                 return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
             },
             'followPacks',
-            'profile',
+            'profile:id,user_id,avatar',
             'ware',
             'UserVip',
             'manager',

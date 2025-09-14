@@ -8,7 +8,6 @@ use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomResource;
-use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
 use App\Repositories\FollowRepository;
 use App\Services\UserService;
@@ -109,7 +108,7 @@ class GiftLogTestController extends Controller
 
     public function userFriend(Request $request)
     {
-        $user = User::whereId(303)->first();
+        $user = User::whereId(303)->select(['id', 'name'])->first();
         $keyword = $request->keywords ?? '';
 
         $response = $this->userService->handleUserRelations($user, 3, $keyword);
