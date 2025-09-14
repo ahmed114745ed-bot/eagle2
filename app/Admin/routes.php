@@ -528,7 +528,7 @@ Route::group(
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');
-        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');
@@ -589,11 +589,12 @@ Route::group(
 
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
-        Route::resource('settings', SettingController::class)->except(['update']);
+        Route::resource('settings', SettingController::class)
+        ->except(['update'])
+        ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::resource('badges', BadgeController::class);
-
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);

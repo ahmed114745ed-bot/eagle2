@@ -2,8 +2,10 @@
 
 namespace Modules\RoomBoom\Jobs;
 
+use App\Enums\UserCoinLogType;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Gift;
 use App\Models\GiftLog;
@@ -237,7 +239,20 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
     public function coinRewards($amount, $userId, $token = null): void
     {
-        User::where('id', $userId)->increment('di', (int)$amount);
+        $user = User::findOrFail($userId);
+
+        $amountBefore = $user->di ?? 0;
+    
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $amount, 
+            $amountBefore,
+            UserCoinLogType::ROOM_BOOM,
+            '' 
+        );
+    
+        $user->increment('di', (int)$amount);
+
 
         $this->coinNotifications['users'][$userId] = ($this->coinNotifications['users'][$userId] ?? 0) + (int)$amount;
         if ($token) {

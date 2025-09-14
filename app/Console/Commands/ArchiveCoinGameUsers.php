@@ -23,9 +23,9 @@ class ArchiveCoinGameUsers extends Command
         $partitionName = 'p' . $ym;
 
         $partitions = DB::select("
-            SELECT PARTITION_NAME, PARTITION_DESCRIPTION 
-            FROM INFORMATION_SCHEMA.PARTITIONS 
-            WHERE TABLE_SCHEMA = DATABASE() 
+            SELECT PARTITION_NAME, PARTITION_DESCRIPTION
+            FROM INFORMATION_SCHEMA.PARTITIONS
+            WHERE TABLE_SCHEMA = DATABASE()
               AND TABLE_NAME = 'coin_game_users_archive'
         ");
         $partitionExists = collect($partitions)->pluck('PARTITION_NAME')->contains($partitionName);
@@ -58,23 +58,36 @@ class ArchiveCoinGameUsers extends Command
             $this->info("Partition {$partitionName} already exists.");
         }
 
+        // ✅ get the last ID for this year/month
+        $lastId = DB::table('coin_game_users')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->max('id');
+
+        if (!$lastId) {
+            $this->info("No records found for {$year}-{$month}, nothing to archive.");
+            return;
+        }
+
         DB::beginTransaction();
         try {
             DB::statement("
                 INSERT INTO coin_game_users_archive
                 (id, user_id, coins, type, game_id, round_id, order_id, app_profit_coins, created_at, updated_at, created_ym)
-                SELECT 
+                SELECT
                     id, user_id, coins, type, game_id, round_id, order_id, app_profit_coins, created_at, updated_at,
                     YEAR(created_at)*100 + MONTH(created_at)
                 FROM coin_game_users
-                WHERE MONTH(created_at) = {$month} 
+                WHERE id <= {$lastId}
                   AND YEAR(created_at) = {$year}
+                  AND MONTH(created_at) = {$month}
             ");
 
             DB::statement("
                 DELETE FROM coin_game_users
-                WHERE MONTH(created_at) = {$month} 
+                 WHERE id <= {$lastId}
                   AND YEAR(created_at) = {$year}
+                  AND MONTH(created_at) = {$month}
             ");
 
             DB::commit();

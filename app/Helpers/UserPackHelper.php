@@ -42,10 +42,8 @@ class UserPackHelper
 
     public static function getIntroFile(User $user) : string
     {
-        $intro = self::getPacks($user)
-            ->where('type', 6)
-            ->first()?->ware;
-        
+        $intro = self::getWare($user, 6);
+
         if (!$intro) {
             return '';
         }

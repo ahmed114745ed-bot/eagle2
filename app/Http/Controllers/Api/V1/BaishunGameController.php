@@ -70,14 +70,14 @@ class BaishunGameController extends Controller
 
                 $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
 
-                UserCoinLogHelper::logByType(
+                /*UserCoinLogHelper::logByType(
                     $user->id,
                     $request->currency_diff,
                     $amountBefore,
                     UserCoinLogType::COIN_GAME,
                     null,
                     $helperAmount
-                );
+                );*/
 
 
                 DB::table('users')->where('id', $id)->update([

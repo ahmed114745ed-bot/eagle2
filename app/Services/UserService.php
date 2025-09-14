@@ -515,7 +515,8 @@ class UserService
 
     private function getUserWithRelations($userId)
     {
-        return  $this->userRepository->findUserData($userId);
+        // return  $this->userRepository->findUserData($userId);
+        return  $this->userRepository->getUserWithMedals($userId);
     }
 
 

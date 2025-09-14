@@ -35,25 +35,25 @@ class RoomRepository extends AbstractRepository
         if ($withoutAppends) {
             $model = $model->withoutAppends();
         }
-    
+
         switch ($type) {
             case 'audio':
                 return $model->where('uid', $userId)
                     ->where('type', 'audio')
                     ->with(['owner', 'roomCategory', 'family'])
                     ->first();
-    
+
             case 'live':
                 return $model->where('uid', $userId)
                     ->where('type', 'live')
                     ->with(['owner', 'roomCategory', 'family'])
-                    ->first();     
-    
+                    ->first();
+
             default:
-                return null; 
+                return null;
         }
     }
-    
+
 
     public function findRoomAdmins($userId, $withoutAppends = true)
     {
@@ -316,63 +316,63 @@ class RoomRepository extends AbstractRepository
 
     public function mine($req, $id)
     {
-        $user     = User::find($id);    
+        $user     = User::find($id);
         $query = $this->baseRoomQueryMine($user);
-    
+
 
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->first();
-    
+
         return [
             'audio' => $audio
                 ? new RoomResource($audio)
-                : (object)[],   
-    
+                : (object)[],
+
             'live'  => $live
                 ? new RoomResource($live)
-                : (object)[],   
+                : (object)[],
         ];
-        
+
     }
 
     public function getUserRooms($req, $id)
     {
-        $user     = User::find($id);    
+        $user     = User::find($id);
         $query = $this->baseRoomQueryMine($user);
 
-        
+
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->where('is_live' , true)->first();
         $nowRooms  = $this->getNowRooms( $user);
-    
+
         return [
             'audio' => $audio
                 ? new RoomResource($audio)
-                : (object)[],   
-    
+                : (object)[],
+
             'live'  => $live
                 ? new RoomResource($live)
-                : (object)[], 
+                : (object)[],
             'now_room'  => $nowRooms
                 ? $nowRooms
-                : (object)[],   
+                : (object)[],
         ];
-        
+
     }
     private function getNowRooms($user)
     {
 
         if (!$user->now_room_uid) return (object)[];
-     
+
         $nowRoomOwner = $user->nowRoomOwner;
-    
+
         if (!$nowRoomOwner) return (object)[];
-    
+
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
-    
+
         return new NowRoomResource($user) ?? (object)[];
-    
-    }  
+
+    }
 
     private function getBlockedUserIds()
     {
@@ -578,7 +578,7 @@ class RoomRepository extends AbstractRepository
             $query->whereIn('uid', $ids);
         }
         return RoomResource::collection(
-            $query->where('type', 'live')->get()
+            $query->where('type', 'live')->paginate()
         );
     }
 
