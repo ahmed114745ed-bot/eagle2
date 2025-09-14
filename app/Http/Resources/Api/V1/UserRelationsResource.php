@@ -27,7 +27,7 @@ class UserRelationsResource extends JsonResource
     {
 
         $pass_status = false;
-        $isHideCountry = $this->getPackWithType(13);
+        $isHideCountry = $this->getPackWithTypeV2(13);
 
         $now_room = @$this->room;
 
@@ -52,14 +52,14 @@ class UserRelationsResource extends JsonResource
             $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', @$this->total_sender_level)->first() : null;
         }
         $frameAbility = @$this->followPacks->where('type', 4)->first();
-        $user = User::where('id', @$this->id)->first();
+//        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
             'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
-            'followers' => @$user->follower,
-            'following' => @$user->following,
-            'friends' => @$user->friend,
+            'followers' => @$this->follower,
+            'following' => @$this->following,
+            'friends' => @$this->friend,
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
@@ -68,7 +68,7 @@ class UserRelationsResource extends JsonResource
                 'gender' => @$this->profile->gender ?? 1,
                 'country'=> @$this->profile->country?:'',
             ],
-            'country'              => !$isHideCountry ? (new CountryResource(@$this->resource) ?? (object)[]) : (object)[],
+            'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
             'now_room'             =>  new NowRoomResource($this)
@@ -81,7 +81,7 @@ class UserRelationsResource extends JsonResource
             ,
             'vip'            => [
                 'level' => @$this->UserVip->level,
-                 'img' => Common::ovip_center_rank_img($this->id),
+                 'img' => Common::ovip_center_rank_img_v2($this),
             ],
             'level'          => [
                 'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
@@ -104,7 +104,7 @@ class UserRelationsResource extends JsonResource
                 "bio" => @$this->bio,
             ],
             'image_color'          => @$this->color_image,
-            'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
+            'color_name'   => common::wareUserVipColorV2($this, 18) ?? '',
         ];
 
         return $data;

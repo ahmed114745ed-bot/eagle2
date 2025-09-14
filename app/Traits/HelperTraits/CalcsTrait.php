@@ -7,6 +7,7 @@ use App\Models\Family;
 use App\Models\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserLevelLog;
@@ -985,17 +986,22 @@ trait CalcsTrait
     {
         if (is_object($user_id)) {
             if (isset($user_id->userId)) {
-                $user_id = $user_id->userId;
+                $user = User::query()->find($user_id->userId);
+            } elseif ($user_id instanceof User) {
+                $user = $user_id;
+            } elseif ($user_id instanceof JsonResource) {
+                $user = $user_id->resource;
             } else {
                 return '';
             }
-        }
-        if (gettype($user_id) == 'integer') {
-            $user = User::query()->find($user_id);
-            if (!$user) return '';
+        } elseif (is_numeric($user_id)) {
+            $user = User::query()->find((int)$user_id);
         } else {
-            $user = $user_id;
+            return '';
         }
+
+        if (!$user) return '';
+
         if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
@@ -1104,7 +1110,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = $uvip->OVip;
 
         if (!$vip) return '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
@@ -1112,6 +1118,31 @@ trait CalcsTrait
         return @$ware?->color ?? '';
     }
 
+    public static function wareUserVipColorV2($user_id, $type)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return '';
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return  '';
+        $uvip = $user?->UserVip;
+        if (!$uvip) return '';
+
+        $vip = OVip::query()->find($uvip->vip_id);
+
+        if (!$vip) return '';
+        $cacheKey = "ware_{$vip->level}_{$type}";
+
+        $ware = Common::getCachedWares($cacheKey, $vip, $type);
+
+        if (!$ware) return '';
+
+        $value = optional($ware)->color;
+
+        return ($value === 'NULL' || $value === null) ? '' : $value;
+    }
 
     public static function ovip_centerforFaml($user_id)
     {

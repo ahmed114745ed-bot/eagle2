@@ -109,9 +109,7 @@ class GiftLogTestController extends Controller
 
     public function userFriend(Request $request)
     {
-        $user = User::whereId(303)
-            ->with('country')
-            ->first();
+        $user = User::whereId(303)->first();
         $keyword = $request->keywords ?? '';
 
         $response = $this->userService->handleUserRelations($user, 3, $keyword);
@@ -122,7 +120,6 @@ class GiftLogTestController extends Controller
             'success' => $original['success'] ?? false,
             'message' => $original['message'] ?? '',
             'data'    => $original['data'] ?? [],
-            'user'    => $user,
         ]);
     }
 
