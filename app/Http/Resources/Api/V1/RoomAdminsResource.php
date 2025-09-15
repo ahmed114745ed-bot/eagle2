@@ -27,24 +27,24 @@ class RoomAdminsResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'uuid' => $this->uuid,
+//            'uuid' => $this->uuid,
             'name' => $this->name ?: 'user #' . $this->uuid,
-            'nick_name' => $this->nick_name,
-            'agency' => $this->formatAgency($agency),
-            'family_data' => $this->formatFamily($family),
+//            'nick_name' => $this->nick_name,
+//            'agency' => $this->formatAgency($agency),
+//            'family_data' => $this->formatFamily($family),
             'profile' => $profile ? new ProfileResource($profile) : null,
-            'online_time' => $this->formatOnlineTime(),
-            'diamonds' => $this->total_diamond_received ?? 0,
+//            'online_time' => $this->formatOnlineTime(),
+//            'diamonds' => $this->total_diamond_received ?? 0,
             'vip' => $this->getVip(),
-            'frame' => $this->getUserDress(4, $this->dress_1),
-            'bubble' => $this->getUserDress(5, $this->dress_2, 'show_img'),
-            'intro' => $this->getUserDress(6, $this->dress_3),
-            'intro_type' => $this->getUserDress(6, $this->dress_3, 'image_type'),
-            'chat_setting' => $chatSetting ? new ChatSettingResource($chatSetting) : null,
-            'change_room_effect' => $userSetting ? new ShowUserSettingResource($userSetting) : null,
-            'my_agency' => $ownAgency ? $ownAgency->only(['id','name','status','img','phone','url','contents']) : null,
-            'level' => $this->preloaded_level ,
-            'user_types' => $this->user_types2 ?? [0],
+//            'frame' => $this->getUserDress(4, $this->dress_1),
+//            'bubble' => $this->getUserDress(5, $this->dress_2, 'show_img'),
+//            'intro' => $this->getUserDress(6, $this->dress_3),
+//            'intro_type' => $this->getUserDress(6, $this->dress_3, 'image_type'),
+//            'chat_setting' => $chatSetting ? new ChatSettingResource($chatSetting) : null,
+//            'change_room_effect' => $userSetting ? new ShowUserSettingResource($userSetting) : null,
+//            'my_agency' => $ownAgency ? $ownAgency->only(['id','name','status','img','phone','url','contents']) : null,
+//            'level' => $this->preloaded_level ,
+//            'user_types' => $this->user_types2 ?? [0],
         ];
     }
 
@@ -79,7 +79,7 @@ class RoomAdminsResource extends JsonResource
         if ($this->relationLoaded('activePack20') && $this->activePack20) {
             return null;
         }
-    
+
         return $this->org_online_time ? Carbon::createFromTimestamp($this->org_online_time)->diffForHumans() : null;
     }
 
@@ -93,7 +93,7 @@ class RoomAdminsResource extends JsonResource
     {
         static $vip = null;
         if ($vip === null) {
-            $vip = Common::ovip_center($this->id);
+            $vip = Common::ovip_center_v2($this);
         }
         return $vip;
     }
