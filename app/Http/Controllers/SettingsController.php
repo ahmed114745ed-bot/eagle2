@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use Log;
 use Cache;
 use Carbon\Carbon;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Config;
 use App\Models\Target;
 use App\Helpers\Common;
-use App\Models\BrandImage;
-use App\Models\MonthlyDiamondReceive;
 use App\Models\Setting;
 use App\Models\Timezone;
+use App\Models\BrandImage;
 use App\Models\PaymentCoin;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\File;
+use App\Models\MonthlyDiamondReceive;
 use App\Models\NotificationTranslation;
 
 class SettingsController extends Controller
@@ -198,6 +199,11 @@ class SettingsController extends Controller
                     Cache::put($key, $value);
                 }
             }
+            
+            if ($request->youtube_status == 0) {
+               
+                Room::where('mode', 5)->update(['mode' => 1]);
+            }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -361,7 +367,7 @@ class SettingsController extends Controller
         $hasActiveTargets = false;
 
         if ($target) {
-            $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month',now()->month)->where('year',now()->year)->get();
+            $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month', now()->month)->where('year', now()->year)->get();
             $hasActiveTargets = $users->count() > 0;
         }
 

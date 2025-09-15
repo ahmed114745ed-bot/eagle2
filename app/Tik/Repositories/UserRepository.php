@@ -125,37 +125,37 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->query()->with(['agency', 'profile', 'family'])
         ->whereIn('id', $ids)->get();
-        
+
     }
 
     public function getAdmins($ids)
     {
         if (empty($ids)) return collect();
-    
+
         $vipsData = DB::table('vips')->get()->groupBy('type');
         $expPercentages = config('exp_percentages', [
             'exp_received_percentage' => 1,
             'exp_sender_percentage' => 1
         ]);
-    
-        $admins = $this->model->with([
-            'agency.owner',
-            'agency.mempers',
-            'profile',
-            'family',
-            'packs.ware',
-            'ownAgency',
-            'userSetting',
-            'activePack20'
+
+        $admins = $this->model->select(['id', 'name'])->with([
+//            'agency.owner',
+//            'agency.mempers',
+            'profile:id,user_id,avatar',
+//            'family',
+            'packs:id,user_id',
+//            'ownAgency',
+//            'userSetting',
+//            'activePack20'
         ])->whereIn('id', $ids)->get();
-    
+
         $admins->each(function ($user) use ($vipsData, $expPercentages) {
             $user->user_types2 = $this->computeUserTypes($user);
             $user->preloaded_uuid = $this->computeUuid($user);
             $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
 
         });
-    
+
         return $admins;
     }
 
@@ -217,7 +217,7 @@ class UserRepository extends AbstractRepository
     }
 
 
-  
+
 
     public function getUsersWithPaginate($ids, $paginate)
     {
