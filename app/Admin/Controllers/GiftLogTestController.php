@@ -162,7 +162,7 @@ class GiftLogTestController extends Controller
 
     public function getAdmins(Request $request)
     {
-        $admins = $this->roomService->roomAdmins(303);
+        $admins = $this->roomService->roomAdmins(1206);
 
         $data = RoomAdminsResource::collection($admins);
 
