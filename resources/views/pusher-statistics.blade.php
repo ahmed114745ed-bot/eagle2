@@ -43,4 +43,8 @@
     .label {
         font-size: 100%;
     }
+
+    .box {
+        filter: none;
+    }
 </style>
