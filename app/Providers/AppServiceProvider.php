@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Admin\Fields\Image;
 use App\Admin\Fields\ImagePath;
 use App\Classes\UserHandling;
+use App\Helpers\CacheHelper;
 use App\Helpers\CustomNotification;
 use App\Helpers\ManagerHelper;
 use App\Helpers\RoomHelper;
@@ -116,9 +117,8 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $settings = Cache::rememberForever('all_settings', function () {
-            return Setting::get();
-        });
+        $settings = CacheHelper::cacheSettings();
+
         /** @var Collection $rememberForever*/
         if (gettype($settings) !== 'array'){
             $settings = $settings->pluck('value', 'key')->toArray();
