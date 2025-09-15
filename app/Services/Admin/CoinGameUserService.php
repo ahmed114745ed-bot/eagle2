@@ -70,14 +70,16 @@ class CoinGameUserService
     /**
      * Calculate totals from aggregated view.
      */
-    public function calculateTotals($query): object
+    public function calculateTotals($query, $filters): object
     {
-        return $query->selectRaw("
+        $query = $this->applyFilters($query, $filters); // فلترة قبل التجميع
+        $totals = $query->selectRaw("
             SUM(total_played) as total_played,
             SUM(total_loss) as total_loss,
             SUM(total_win) as total_win,
             SUM(app_profit) as app_profit
         ")->first();
+        return $totals;
     }
 
     /**

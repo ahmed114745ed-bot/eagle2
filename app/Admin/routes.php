@@ -636,6 +636,9 @@ Route::group(
 
             Route::get('/visitors-test', [GiftLogTestController::class, 'showVisitors']);
             Route::post('/visitors-test', [GiftLogTestController::class, 'visitorsList']);
+
+            Route::get('/room-admins-test', [GiftLogTestController::class, 'showRoomAdmin']);
+            Route::post('/room-admins-test', [GiftLogTestController::class, 'getAdmins']);
         });
     });
 

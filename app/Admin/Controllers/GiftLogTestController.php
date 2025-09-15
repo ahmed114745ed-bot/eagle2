@@ -7,14 +7,17 @@ use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Models\User;
 use App\Repositories\FollowRepository;
 use App\Services\ProfileService;
+use App\Services\RoomService;
 use App\Services\UserService;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
+use App\Tik\Services\RoomRepoService;
 use Illuminate\Http\Request;
 use Modules\Public\Http\Services\UserCounterServices;
 
@@ -25,6 +28,7 @@ class GiftLogTestController extends Controller
         private readonly GiftLogService $giftLogService,
         private readonly UserService $userService,
         private readonly ProfileService $profileService,
+        private readonly RoomRepoService $roomService,
     )
     {
     }
@@ -148,6 +152,24 @@ class GiftLogTestController extends Controller
             'success' => true,
             'message' => '',
             'data'    => $original['data'] ?? [],
+        ]);
+    }
+
+    public function showRoomAdmin()
+    {
+        return view('test.room_admins');
+    }
+
+    public function getAdmins(Request $request)
+    {
+        $admins = $this->roomService->roomAdmins(1206);
+
+        $data = RoomAdminsResource::collection($admins);
+
+        return view('test.room_admins', [
+            'success' => true,
+            'message' => '',
+            'data'    => $data,
         ]);
     }
 }

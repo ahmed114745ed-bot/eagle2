@@ -62,8 +62,8 @@ class RoomRepository extends AbstractRepository
         if ($withoutAppends) {
             $query = $query->withoutAppends();
         }
-        $query = $query->select('id', 'uid', 'room_admin');
-        $query = $query->with(['family:id,user_id,name,image']);
+        $query = $query->select(['id', 'uid', 'room_admin']);
+//        $query = $query->with(['family:id,user_id,name,image']);
         return $query->where('uid', $userId)->first();
     }
 
