@@ -9,15 +9,18 @@ class PusherStatisticsController extends  Controller
 {
     public function index()
     {
-        info('pushhhhhher');
-        $appId = env('PUSHER_APP_ID');
-        $cluster = env('PUSHER_APP_CLUSTER');
-        $key = env('PUSHER_APP_KEY');
-        $secret = env('PUSHER_APP_SECRET');
+        $key = config('broadcasting.connections.pusher.key') ?? env('PUSHER_APP_KEY');
+        $secret = config('broadcasting.connections.pusher.secret') ?? env('PUSHER_APP_SECRET');
+        $appId = config('broadcasting.connections.pusher.app_id') ?? env('PUSHER_APP_ID');
+        $cluster = config('broadcasting.connections.pusher.options.cluster') ?? env('PUSHER_APP_CLUSTER');
+
+        if (!$key || !$secret) {
+            return back()->withErrors(['pusher' => 'Missing Pusher credentials']);
+        }
 
         $url = "https://api-{$cluster}.pusher.com/apps/{$appId}/channels";
 
-        $response = Http::withBasicAuth($key, $secret)->get($url, [
+        $response = \Http::withBasicAuth($key, $secret)->get($url, [
             'info' => 'subscription_count,user_count'
         ]);
 
