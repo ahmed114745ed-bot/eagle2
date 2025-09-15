@@ -19,6 +19,7 @@ class GiftCategoryController extends MainController
      * @var string
      */
     protected $title = 'GiftCategory';
+    public $permission_name = 'gift-categories';
 
 
 
@@ -123,7 +124,7 @@ class GiftCategoryController extends MainController
         // Type field
         $form->select('type', __('Type'))->options([
             'normal'     => __('Normal'),
-            'lucky_gift' => __('Lucky gift'),
+            'lucky_gift' => __('Lucky gifts'),
             'cp'         => __('CP'),
             'vip'        => __('VIP'),
         ])->required();

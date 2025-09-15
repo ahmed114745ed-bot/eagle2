@@ -2,21 +2,22 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Forms\TabsFrom;
 use App\Models\Gift;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\LuckyGift;
 //use Encore\Admin\Admin;
 use Illuminate\Support\Str;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 use App\Models\GiftCategory;
+use Encore\Admin\Layout\Row;
+use App\Admin\Forms\TabsFrom;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class GiftController extends MainController
 {
@@ -73,7 +74,7 @@ class GiftController extends MainController
 
         return parent::edit($id, $content
             ->title(trans('Gifts'))
-            ->body($this->form()->edit($id)));
+            ->body($this->form($id)->edit($id)));
     }
 
     /**
@@ -145,7 +146,7 @@ class GiftController extends MainController
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 
-        if ( $category && $category->type == 'vip') {
+        if ($category && $category->type == 'vip') {
             $grid->column('level', trans('vip'))->display(function () {
                 $defaultImage = asset("images/image.png");
                 $path = getImagePath($this?->vip?->img);
@@ -235,7 +236,7 @@ class GiftController extends MainController
      *
      * @return Form
      */
-    protected function form()
+    protected function form($id = null)
     {
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
@@ -244,67 +245,21 @@ class GiftController extends MainController
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
-        $categories = GiftCategory::all();
-
-
-
-
 
         // Build Gift Category options
-        // $locale = App::getLocale();
-        // $tabs = [];
+        $categories = GiftCategory::all();
+        $locale = App::getLocale();
 
-        // foreach ($categories as $category) {
-        //     $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-        //     $tabs[$category->id] = $title;
-        // }
+        $form->html(view('admin.gift_type', [
+            'categories' => $categories,
+            'locale' => $locale,
+            'model' => $id ? Gift::find($id) : [],
+        ]));
 
-        // // Replace type with gift_category_id
-        // $form->select('gift_category_id', __('Gift Category'))
-        //     ->options($tabs)
-        //     ->when(function ($value) {
-        //         // Get the category type from DB
-        //         $category = GiftCategory::find($value);
-        //         return $category?->type == 'lucky_gift';
-        //     }, function () use ($form) {
-        //         // Lucky Gift extra fields
-        //         $form->number('luckyGift.win_probability', __('win probability'))
-        //             ->min(1)->max(100)
-        //             ->placeholder(__('Enter win probability'))
-        //             ->attribute(['id' => 'win_probability']);
 
-        //         $probabilityTimes1 = \Cache::get('probability_times_1', []);
-        //         $probabilityTimes2 = \Cache::get('probability_times_2', []);
-        //         $probabilityTimes3 = \Cache::get('probability_times_3', []);
 
-        //         $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-        //             ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') . '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
 
-        //         $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-        //             ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . '] - ' . __('scope for multiplies') . '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
 
-        //         $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-        //             ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') . '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
-        //     })
-        //     ->when(function ($value) {
-        //         $category = GiftCategory::find($value);
-        //         return $category?->type == 'vip';
-        //     }, function () use ($form) {
-        //         // VIP Level field
-        //         $form->number('vip_level', __('vip_level'))
-        //             ->min(0)
-        //             ->placeholder(__('less than 256'))
-        //             ->attribute(['id' => 'vip_level']);
-        //     });
 
         //  $form->select('type', __('type'))->options(
         // translate(TYPE_GIFT)
@@ -410,7 +365,7 @@ class GiftController extends MainController
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-        $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
+        //  $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
 
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {
@@ -427,27 +382,61 @@ class GiftController extends MainController
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
 
+        // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
-            if (request()->has('_edit_inline')) {
-                return;
-            }
-            if ($form->model()->type == 6 || request()->type == 6) {
-                $type = $form->input('type');
-                $win_probability = $form->input('luckyGift.win_probability');
-                $min_percentag = $form->input('luckyGift.min_percentag');
-                $mid_percentage = $form->input('luckyGift.mid_percentag');
-                $max_percentage = $form->input('luckyGift.max_percentag');
-                $total = $min_percentag + $mid_percentage + $max_percentage;
-                if (($min_percentag + $mid_percentage + $max_percentage) != 100) {
+
+            if (request()->has('_edit_inline')) return;
+
+            $categoryId = $form->input('gift_category_id');
+            $category = GiftCategory::find($categoryId);
+            $type = $category?->type;
+
+            $form->model()->gift_category_id = $categoryId;
+
+            if ($type === 'lucky_gift') {
+
+                $minPercentag = (float) ($form->input('luckyGift.min_percentag') ?? 0);
+                $midPercentag = (float) ($form->input('luckyGift.mid_percentag') ?? 0);
+                $maxPercentag = (float) ($form->input('luckyGift.max_percentag') ?? 0);
+                $total = $minPercentag + $midPercentag + $maxPercentag;
+
+                if ($total != 100) {
                     $error = new \Illuminate\Support\MessageBag([
                         'title' => 'Error',
                         'message' => trans('admin.percent_total_error', ['total' => $total]),
                     ]);
-
                     return back()->with(compact('error'))->withInput();
                 }
+
+                // Save these to the form instance for use in saved()
+                $form->winProbability = $form->input('luckyGift.win_probability') ?? 0;
+                $form->percentagesString = implode(',', [$minPercentag, $midPercentag, $maxPercentag]);
+            }
+
+            if ($type === 'vip') {
+                $form->model()->vip_level = $form->input('vip_level') ?? null;
             }
         });
+
+        // After saving, create or update LuckyGift
+        $form->saved(function (Form $form) {
+            $categoryId = $form->model()->gift_category_id;
+            $category = GiftCategory::find($categoryId);
+            $type = $category?->type;
+
+            if ($type === 'lucky_gift') {
+
+                LuckyGift::updateOrCreate(
+                    ['gift_id' => $form->model()->id],
+                    [
+                        'win_probability' => $form->winProbability,
+                        'min_percentage' => $form->percentagesString,
+                    ]
+                );
+            }
+        });
+
+
         return $form;
     }
 }

@@ -29,7 +29,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 1)->update(['gift_category_id'=> $normal->id]);
+        Gift::where('type', 1)->update(['gift_category_id' => $normal->id]);
         $hot  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -40,7 +40,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 2)->update(['gift_category_id'=> $hot->id]);
+        Gift::where('type', 2)->update(['gift_category_id' => $hot->id]);
         $country  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -51,7 +51,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 3)->update(['gift_category_id'=> $country->id]);
+        Gift::where('type', 3)->update(['gift_category_id' => $country->id]);
         $moment  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -62,7 +62,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 4)->update(['gift_category_id'=>$moment->id]);
+        Gift::where('type', 4)->update(['gift_category_id' => $moment->id]);
         $vip  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -73,7 +73,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 9)->update(['gift_category_id'=> $vip->id]);
+        Gift::where('type', 9)->update(['gift_category_id' => $vip->id]);
         $event  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -84,19 +84,19 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 7)->update(['gift_category_id'=> $event->id]);
+        Gift::where('type', 7)->update(['gift_category_id' => $event->id]);
         $lucky  = GiftCategory::create([
 
             "type" => 'lucky_gift',
-            "title" => [
-                'en' => 'Lucky gifts',
-                'ar' => 'لحظة',
-                'hi' => 'पल',
-                'ur' => 'لمحہ',
+            'title' => [
+                'en' => 'Lucky gifts',        // English
+                'ar' => 'هدايا محظوظة',       // Arabic
+                'hi' => 'भाग्यशाली उपहार',    // Hindi
+                'ur' => 'نصیب والے تحفے',     // Urdu
             ],
 
         ]);
-        Gift::where('type', 6)->update(['gift_category_id'=> $lucky->id]);
+        Gift::where('type', 6)->update(['gift_category_id' => $lucky->id]);
         $famous  = GiftCategory::create([
             "type" => 'normal',
             "title" => [
@@ -107,7 +107,7 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 5)->update(['gift_category_id'=> $famous->id]);
+        Gift::where('type', 5)->update(['gift_category_id' => $famous->id]);
         $cp  = GiftCategory::create([
             "type" => 'cp',
             "title" => [
@@ -118,6 +118,6 @@ class GiftCategorySeeder extends Seeder
             ],
 
         ]);
-        Gift::where('type', 10)->update(['gift_category_id'=> $cp->id]);
+        Gift::where('type', 10)->update(['gift_category_id' => $cp->id]);
     }
 }
