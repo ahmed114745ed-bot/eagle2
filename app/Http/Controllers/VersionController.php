@@ -49,7 +49,8 @@ class VersionController extends Controller
         $isColorSettingUpdated = $this->isUpdated('color_setting_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
-        $reelSettings = Setting::where('key', 'reel_status')->first();
+        $settings = Setting::whereIn('key', ['reel_status', 'youtube_status', 'live_status'])
+            ->pluck('value', 'key');
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
@@ -77,7 +78,9 @@ class VersionController extends Controller
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",
-            'reel_status' => (bool)($reelSettings?->value ?? true),
+            'reel_status'    => (bool) ($settings['reel_status'] ?? true),
+            'youtube_status' => (bool) ($settings['youtube_status'] ?? true),
+            'live_status'    => (bool) ($settings['live_status'] ?? true),
         ];
 
         //update current version for user

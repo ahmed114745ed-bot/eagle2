@@ -238,6 +238,14 @@
                     style="text-align: right;">
                 {{ __('Reel Settings') }}
             </button>
+             <button onclick="showSection('YouTubeSettings')"
+                    style="text-align: right;">
+                {{ __('YouTube Settings') }}
+            </button>
+                         <button onclick="showSection('LiveSettings')"
+                    style="text-align: right;">
+                {{ __('Live Settings') }}
+            </button>
         </div>
     </div>
 
@@ -296,6 +304,70 @@
                             <span class="slider round"></span>
                         </label>
                         <input type="hidden" name="reel_status" id="host_reel_value" value="{{ $reelSettings ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="YouTubeSettings" class="settings-section">
+            <h2>{{ __('YouTube Settings') }}</h2>
+            <form id="YouTubeFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable youtube Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="youtube_toggle" {{ $youtubeSettings ? 'checked' : '' }}
+                            onchange="document.getElementById('host_youtube_value').value = this.checked ? '1' : '0';
+                                document.getElementById('YouTubeFeatureForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="youtube_status" id="host_youtube_value" value="{{ $youtubeSettings ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="LiveSettings" class="settings-section">
+            <h2>{{ __('Live Settings') }}</h2>
+            <form id="liveFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable live Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="live_toggle" {{ $liveSettings ? 'checked' : '' }}
+                            onchange="document.getElementById('host_live_value').value = this.checked ? '1' : '0';
+                                document.getElementById('liveFeatureForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="live_status" id="host_live_value" value="{{ $liveSettings ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -366,6 +438,10 @@
 
         var reelHiddenValue = document.getElementById('host_reel_value').value;
         document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');
+        var youtubeHiddenValue = document.getElementById('host_youtube_value').value;
+        document.getElementById('youtube_toggle').checked = (youtubeHiddenValue === '1')
+        var liveHiddenValue = document.getElementById('host_live_value').value;
+        document.getElementById('live_toggle').checked = (liveHiddenValue === '1')
     });
 </script>
 </body>
