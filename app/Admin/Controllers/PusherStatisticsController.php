@@ -20,10 +20,11 @@ class PusherStatisticsController extends  Controller
 
         $url = "https://api-{$cluster}.pusher.com/apps/{$appId}/channels";
 
-        info('before');
         $response = \Http::withBasicAuth($key, $secret)->get($url, [
             'info' => 'subscription_count,user_count'
         ]);
+
+        info($response);
 
         if ($response->failed()) {
             return back()->withErrors(['pusher' => 'Failed to fetch channels: ' . $response->body()]);
