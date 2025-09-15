@@ -141,9 +141,9 @@ class UserRepository extends AbstractRepository
         $admins = $this->model->select(['id', 'name'])->with([
 //            'agency.owner',
 //            'agency.mempers',
-            'profile',
+            'profile:id,user_id,avatar',
 //            'family',
-            'packs',
+            'packs:id,user_id',
 //            'ownAgency',
 //            'userSetting',
 //            'activePack20'
