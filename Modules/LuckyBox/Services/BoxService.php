@@ -174,7 +174,10 @@ class BoxService
             "ownerBoxAL"  => $user->UserVip?->level ?? 0,
             // ]
         ];
-        event(new SuperLuckyBox($d2));
+        try {
+            event(new SuperLuckyBox($d2));
+        } catch (\Exception $e) {
+        }
         // $json2 = json_encode($d2);
         // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
         return $boxUser;
