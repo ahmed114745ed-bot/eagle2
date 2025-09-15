@@ -35,12 +35,17 @@ class RankingRepository
 
     public function getUserGameCoins($type, $limit)
     {
+        $role = '' ;
         $query = CoinGameUserAll::query();
         $this->applyDateFilters($query, $type);
         return   $query->select(
             'user_id',
             DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
-        )->groupBy('user_id')->with('user')->whereHas('user')->orderByRaw("exp desc")->limit($limit)->get();
+        )->groupBy('user_id')->whereHas('user') ->with([
+            'user' => function ($q) use ($role) {
+                $q->with($this->rankerRelations($role));
+            }
+        ])->orderByRaw("exp desc")->limit($limit)->get();
     }
 
     public function getUserGameCoinsV2($type, $limit)
