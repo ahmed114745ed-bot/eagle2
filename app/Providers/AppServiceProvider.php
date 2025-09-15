@@ -116,11 +116,13 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $rememberForever = Cache::rememberForever('all_settings', function () {
+        $settings = Cache::rememberForever('all_settings', function () {
             return Setting::get();
         });
         /** @var Collection $rememberForever*/
-        $settings = $rememberForever->pluck('value', 'key')->toArray();
+        if (gettype($rememberForever) !== 'array'){
+            $settings = $rememberForever->pluck('value', 'key')->toArray();
+        }
 
         Config::set([
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
