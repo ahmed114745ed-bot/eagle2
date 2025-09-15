@@ -8,9 +8,7 @@ use Illuminate\Database\Seeder;
 
 class CoreWalletsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+ 
     public function run(): void
     {
         $walletNames = [
@@ -30,11 +28,13 @@ class CoreWalletsSeeder extends Seeder
             'ads',
             'invitation_code_wallet'
         ];
-
+        
         foreach ($walletNames as $name) {
-            CoreWallets::firstOrCreate(
-                ['name' => $name],
-                ['name' => $name]
+            CoreWallets::updateOrCreate(
+                ['name' => $name], 
+                [
+                    'is_negative' => $name === 'invitation_code_wallet'
+                ]
             );
         }
     }

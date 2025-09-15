@@ -21,6 +21,10 @@
     "Badges" : "rozetler",
     "this room has been banned.": "Bu oda yasaklandı.",
     "Owner uuid": "Sahip Kimlik Numarası",
+    "YouTube Settings": "YouTube Ayarları",
+    "Live Settings": "Canlı Yayın Ayarları",
+    "Enable youtube Feature": "YouTube Özelliğini Etkinleştir",
+    "Enable live Feature": "Canlı Yayın Özelliğini Etkinleştir",
     "Roles": "Roller",
     "Agency wallet": "Ajans cüzdanı",
     "Supporter" : "Destekçi",
@@ -3333,7 +3337,11 @@
   "invitation.host_reward_help": "Davetli kodu kullandığında davet edenin hemen aldığı coin sayısı.",
   "invitation.invitee_reward": "Davetli Ödülü (Coins)",
   "invitation.invitee_reward_help": "Davetli, davet kodunu kullandığında aldığı coin sayısı.",
-  "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi"
+  "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi",
+    "Show Image": "Resmi Göster",
+    "Alternative Image": "Alternatif Resim",
+  "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+
 
 
 

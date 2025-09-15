@@ -430,8 +430,7 @@ class EnteranceRoomServices
                     $remainingTime = ['remaining_time' => "$h:$m:$s"];
 
                     return Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
-                    // return [$messageBlack,$remainingTime];
-                    // ['remaining_time' => "$h:$m:$s"]
+                 
                 }
 
                 if ($sjc >= $arr[2]) {
@@ -449,13 +448,6 @@ class EnteranceRoomServices
         }
 
 
-        /*if (!$request->is_update){
-            if ($request->sendToZego != 'no') {
-                dispatch(new EnterRoomZigoRequest($user, $room->id, $request->have_vip))->onQueue('enterRoomQueue');
-            }
-        }*/
-        //        $this->getRoomTwoLastPk($room->id);
-
         if ($user->id == $owner_id) {
             $room->is_afk = 1;
             $room->save();
@@ -465,19 +457,12 @@ class EnteranceRoomServices
         }
         $room_info = (new EnterRoomCollection($room,$user->id));
 
-//        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
         $room_info = $room_info->toArray($request);
-        // $room_info['zego_keys'] = $keys->mapWithKeys(function ($item){
-        //     return [$item['name'] => (($item['name'] == 'zego_app_id') ? (integer)$item['value'] :$item['value'])];
-        // });
-
+  
 
         $this->updateRoom($user->id, $owner_id, $room);
         $this->enterTheRoomCreateOrUpdate($user->id, $owner_id, $room->id);
        // $this->updateRoomVisitor($user_id, $owner_id, $room);
-
-
-        //$this->updateRoomVisitor($user_id, $owner_id, $room);
 
         //send to zego
         $user->enableSaving = false;
@@ -747,6 +732,8 @@ class EnteranceRoomServices
 
 
 }
+
+
 
 
 

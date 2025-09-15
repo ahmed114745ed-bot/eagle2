@@ -16,9 +16,7 @@ class HomeCarouselController extends Controller
         $user = Auth::user();
         $displayAt = request('display_at');
 
-        info($displayAt);
-
-        if ($request->hasHeader('x-notification-id')) {
+        if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->hasHeader('x-notification-id')) {
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 

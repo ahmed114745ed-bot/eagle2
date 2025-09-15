@@ -56,7 +56,7 @@ class EnterRoomCollection extends JsonResource
             "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
             "cp_indexs"           => $indices, // cp
             "charisma_status"     => ($this->charizma_status) ? true : false, // isCharisma
-            "is_comment_closed"   => $this->is_comment_closed, // is Comments Closed
+            "is_comment_closed"   => $this->is_comment_closed ,
             'is_live' => (bool) ($this->is_live ?? false),
             "room_rule"           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')), // room rules
             //////////////////////////////////////////////////////////

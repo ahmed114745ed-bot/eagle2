@@ -202,15 +202,16 @@ class RoomBoomRewardController extends MainController
                 case 'ware':
                     $form->model()->target = $form->ware_target_id;
                     break;
+
                 case 'gift':
                     $form->model()->target = $form->gift_target_id;
                     break;
+
                 case 'achievement':
                     if ($form->achievement_target instanceof UploadedFile) {
                         $url = Common::upload('roomBoom', $form->achievement_target);
+                        $form->model()->target = $url;
                     }
-                    $form->model()->target = $url ?? '';
-                    $form->target = $url ?? '';
                     break;
 
                 case 'coin':
@@ -218,20 +219,16 @@ class RoomBoomRewardController extends MainController
                     break;
             }
 
-            unset($form->ware_target_id);
-            unset($form->gift_target_id);
-            unset($form->coin_target);
+            unset($form->ware_target_id, $form->gift_target_id, $form->coin_target);
         });
 
         return $form;
     }
 
-
-    protected function addWareFields($form ,$prefix = 'ware_')
+    protected function addWareFields($form)
     {
-        $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target')
-                ->select('id', __('wares'))
+        $form->belongsTo('ware_target_id', WaresByType::class, __('Ware'), function ($form) {
+            $form->select('id', __('Wares'))
                 ->options(function ($id) {
                     if (!$id) return [];
                     $ware = Ware::find($id);
@@ -241,37 +238,61 @@ class RoomBoomRewardController extends MainController
                     'data-image-select' => 1,
                     'data-load-url' => admin_url('wares-by-id')
                 ]);
-
-            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-
-            $this->addWareJs();
+        })->default(function ($form) {
+            return $form->model()->target_type === 'ware'
+                ? $form->model()->target
+                : null;
         });
 
+        $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
     }
-    protected function addGiftFields($form, $prefix = 'gift_'): void
+
+    protected function addGiftFields($form)
     {
-        $fieldName = $prefix . 'id';
-
-        $form->select('target', __('Gift'))
-            ->options(function ($id) {
-                $query = Gift::query()->pluck('name', 'id');
-
-                if ($id) {
+        $form->belongsTo('gift_target_id', Gifts::class, __('Gift'), function ($form) {
+            $form->select('id', __('Gifts'))
+                ->options(function ($id) {
+                    if (!$id) return [];
                     $gift = Gift::find($id);
-                    if ($gift && !$query->has($gift->id)) {
-                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
-                    }
-                }
-                return Gift::pluck('name', 'id');
-            })
-            ->attribute([
-                'data-image-select' => 1,
-                'data-load-url'     => admin_url('gifts-by-id'),
-            ]);
-        $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
+                    return $gift ? [$gift->id => "{$gift->name}_{$gift->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url'     => admin_url('gifts-by-id')
+                ]);
+        })->default(function ($form) {
+            return $form->model()->target_type === 'gift'
+                ? $form->model()->target
+                : null;
+        });
 
-        $this->addGiftJs($fieldName, 'gift-image-preview');
+        $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
     }
+
+//    protected function addGiftFields($form, $prefix = 'gift_'): void
+//    {
+//        $fieldName = $prefix . 'id';
+//
+//        $form->select('target', __('Gift'))
+//            ->options(function ($id) {
+//                $query = Gift::query()->pluck('name', 'id');
+//
+//                if ($id) {
+//                    $gift = Gift::find($id);
+//                    if ($gift && !$query->has($gift->id)) {
+//                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
+//                    }
+//                }
+//                return Gift::pluck('name', 'id');
+//            })
+//            ->attribute([
+//                'data-image-select' => 1,
+//                'data-load-url'     => admin_url('gifts-by-id'),
+//            ]);
+//        $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
+//
+//        $this->addGiftJs($fieldName, 'gift-image-preview');
+//    }
 
 
     protected function addGiftJs(string $fieldName = 'gift_id', string $previewId = 'gift-image-preview'): void

@@ -27,21 +27,20 @@ class UserRelationsResource extends JsonResource
     {
 
         $pass_status = false;
-        $isHideCountry = $this->getPackWithType(13);
+//        $isHideCountry = $this->getPackWithTypeV2(13);
 
-        $now_room = @$this->room;
-
-        if ($now_room) {
-            if ($now_room->room_pass != null && $now_room->room_pass != '') {
-                $pass_status = true;
-            }
-        }
+//        $now_room = @$this->room;
+//
+//        if ($now_room) {
+//            if ($now_room->room_pass != null && $now_room->room_pass != '') {
+//                $pass_status = true;
+//            }
+//        }
 
         if(self::$userFollowers != null && count(self::$userFollowers) > 0){
             $isFollow = in_array(@$this->id, self::$userFollowers);
         }else{
             $isFollow = @(bool)Common::IsFollow(@$request->user()->id, @$this->id);
-
         }
 
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
@@ -52,36 +51,36 @@ class UserRelationsResource extends JsonResource
             $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', @$this->total_sender_level)->first() : null;
         }
         $frameAbility = @$this->followPacks->where('type', 4)->first();
-        $user = User::where('id', @$this->id)->first();
+//        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
-            'uuid'           => @$this->uuid,
+//            'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
-            'followers' => @$user->follower,
-            'following' => @$user->following,
-            'friends' => @$user->friend,
-            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
-            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+//            'followers' => @$this->follower,
+//            'following' => @$this->following,
+//            'friends' => @$this->friend,
+
+//            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+//            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
-                'age'    => Carbon::parse(@$this->profile->birthday)->age,
-                'gender' => @$this->profile->gender ?? 1,
-                'country'=> @$this->profile->country?:'',
+//                'age'    => Carbon::parse(@$this->profile->birthday)->age,
+//                'gender' => @$this->profile->gender ?? 1,
+//                'country'=> @$this->profile->country?:'',
             ],
-            'country'              => !$isHideCountry ? (new CountryResource(@$this->resource) ?? (object)[]) : (object)[],
+//            'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
-            'now_room'             =>  new NowRoomResource($this)
+//            'now_room'             =>  new NowRoomResource($this),
                         // [
             //     'is_in_room'      => @$this->now_room_uid != 0,
             //     'uid'             => @$this->now_room_uid,
             //     'is_mine'         => @$this->id == $this->now_room_uid,
             //     'password_status' => $pass_status
             // ]
-            ,
             'vip'            => [
                 'level' => @$this->UserVip->level,
-                 'img' => Common::ovip_center_rank_img($this->id),
+                 'img' => Common::ovip_center_rank_img_v2($this),
             ],
             'level'          => [
                 'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
@@ -89,22 +88,24 @@ class UserRelationsResource extends JsonResource
                 'sender_level'  =>@$this->total_sender_level ?? 0,
                 'reciver_level' =>@$this->total_received_level ?? 0
             ],
-            'online_time'    => @$this->online_time ? date("Y-m-d H:i:s", @$this->online_time) : '',
-            'has_color_name' => count(@$this->followPacks->where('type', 18)) > 0,
-            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => @$this->id])->first() != null ? true : false,
-            'is_follow'      => $isFollow,
-            "is_gold_id" => (bool)$this->is_gold_id,
-            'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->manager),
-            "multi_images"          => $this->images?->select("img"),
-            "statistic"     => [
-                "visitors" => count(@$this->profileVisits),
-                "licked" => count(@$this->likes),
-                "followers" => count(@$this->followers),
-                "bio" => @$this->bio,
-            ],
+//            'online_time'    => @$this->online_time ? date("Y-m-d H:i:s", @$this->online_time) : '',
+//            'has_color_name' => count(@$this->followPacks->where('type', 18)) > 0,
+//            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => @$this->id])->first() != null ? true : false,
+//            'is_follow'      => $isFollow,
+            'is_followed'          => $this->followedByAuthUser !== null,
+            'is_follow'            => $this->followerByAuthUser !== null,
+//            "is_gold_id" => (bool)$this->is_gold_id,
+//            'type_user'            => intval(@$this->type_user) ?: 0, // both
+//            "manger_type"          =>new MangerTypeResource(@$this->manager),
+//            "multi_images"          => $this->images?->select("img"),
+//            "statistic"     => [
+//                "visitors" => count(@$this->profileVisits),
+//                "licked" => count(@$this->likes),
+//                "followers" => count(@$this->followers),
+//                "bio" => @$this->bio,
+//            ],
             'image_color'          => @$this->color_image,
-            'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
+            'color_name'   => common::wareUserVipColorV2($this, 18) ?? '',
         ];
 
         return $data;
@@ -112,26 +113,26 @@ class UserRelationsResource extends JsonResource
 
     public function additional(array $data)
     {
-        return parent::additional($data); // T-18 Change the autogenerated stub
+        return parent::additional($data);
     }
 
-    /**
-     * @return array
-     */
-    public function getAdditional(): array
-    {
-
-        return $this->additional;
-    }
-
-    /**
-     * @param array $additional
-     */
-    public function setAdditional(array $additional): void
-    {
-
-        $this->additional = $additional;
-    }
+//    /**
+//     * @return array
+//     */
+//    public function getAdditional(): array
+//    {
+//
+//        return $this->additional;
+//    }
+//
+//    /**
+//     * @param array $additional
+//     */
+//    public function setAdditional(array $additional): void
+//    {
+//
+//        $this->additional = $additional;
+//    }
 
     public static function initializeData($vipsReceivedImages, $vipsSenderImages, $userFollowers)
     {
@@ -145,9 +146,6 @@ class UserRelationsResource extends JsonResource
         self::$vipsSenderImages = null;
         self::$vipsReceivedImages = null;
         self::$userFollowers = null;
-
-
     }
-
 
 }

@@ -77,7 +77,7 @@ class GiftLogService
 
 
             // Get Room Data
-            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
+            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
@@ -127,10 +127,6 @@ class GiftLogService
             $fromName = $user->name;
             $sendGiftServices = new SendGiftService();
 
-            $jsonSendGiftData =
-                $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
-            //send to zego if pk not null
-            $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
             $cpId =  Cp::where(function ($query) use ($user) {
                 $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
@@ -177,7 +173,7 @@ class GiftLogService
                         $q->withoutAppends();
                     }]);
 
-                $fUser = $topUser?->user;
+              /*  $fUser = $topUser?->user;
                 if ($room->top_user_id != $userId) {
                     $room->top_user_id = $fUser->id;
                     $room->save();
@@ -197,17 +193,13 @@ class GiftLogService
                     $json = json_encode($ms1);
 
                     Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                }
+                }*/
             }
             // (new RoomAchievementTargetService)->roomTarget($room);
 
             // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
             $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
-            try {
-                Utils::unwrap($promises);
-            } catch (BadResponseException $e) {
-            }
 
             $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
@@ -434,7 +426,6 @@ class GiftLogService
             "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
             'room_session'      => $room->session_string,
             'is_password'       => (bool)(@$room->room_pass),
-            'room_id'           => $room->id,
             'room_owner_id'     => $room->uid ?: 0,
             'room_uuid'         => $room->owner?->uuid ?: 0,
             'room_id'           => (string)($room->id ?: 0),
@@ -459,6 +450,7 @@ class GiftLogService
             'r_image'           => @$receivedUser->profile->avatar ?? '',
             'r_sender_level'    => @$receivedUser->total_received_level,
             'r_receiver_level'  => @$receivedUser->total_sender_level,
+            'room_type'  => @$room->type,
         ];
 
         event(new GiftBannerEvent($gift_data));
@@ -484,6 +476,7 @@ class GiftLogService
                 'number'           => $number,
                 'coins'            => $user->coins_string,
                 'gift_image_type'            => $gift->image_type,
+                'room_type'            => $room->type ?? 'audio',
 
             ]
         );

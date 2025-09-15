@@ -7,6 +7,7 @@ use App\helper\InvitationWalletHelper;
 use App\helper\TryCatchHelper;
 use App\helper\InvitationEarningHelper;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserPackHelper;
 use App\Services\FilterChargeService;
 use Auth;
 use Exception;
@@ -353,7 +354,7 @@ class UserController extends Controller
 
     public function my_data(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
         try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (Exception $exception) {
@@ -631,7 +632,7 @@ class UserController extends Controller
                 'total_diff' => $totalDiff,
                 'frame'      => $frame,
                 'frame_id'   => $frame ? $dressId : 0,
-                'colored_name'   => UserCommon::getColoredName($sender),
+                'colored_name'   => UserPackHelper::getColorName($sender),
             ];
         })->filter()->values()->all(); // filter to remove nulls
 
@@ -675,7 +676,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
             [$user, $token] = $this->userService->anonymous($user, $request);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -829,7 +830,7 @@ class UserController extends Controller
             sourceType: 'first_join_reward_invitee',
             amount: $this->getValue('invitation_invitee_reward')
         );
-     
+
         return UserCodeInvitation::create([
             "user_id"    => $parentId,
             "invited_id" => $invitedId,
@@ -1311,7 +1312,7 @@ class UserController extends Controller
             return $this->userService->getEarningsForParent($parentId);
         });
     }
-    
+
     public function invitationsEarningsClaim(Request $request, int $id)
     {
         return TryCatchHelper::handle(function () use ($request, $id) {
@@ -1319,5 +1320,5 @@ class UserController extends Controller
             return $this->userService->claimEarning($parentId, $id);
         });
     }
-    
+
 }

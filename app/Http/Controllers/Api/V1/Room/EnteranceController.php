@@ -236,7 +236,6 @@ class EnteranceController extends Controller
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');
-        $type     = $request->input('type', 'audio') ;
 
         if (!$roomId) {
             return $this->errorResponse(__('Please provide a room_id.'), 422);
@@ -254,6 +253,8 @@ class EnteranceController extends Controller
                 ['ban' => true]
             );
         }
+        $type  =  $room->type;
+
 
         $this->setDefaultBackground();
 

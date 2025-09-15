@@ -389,6 +389,7 @@ class AdminPermissionRefact extends Seeder
                 'permissions' => [
                     ['key' => 'updates', 'except' => [], 'additional' => []],
                     ['key' => 'config', 'except' => [], 'additional' => []],
+                    ['key' => 'pusher-statistics', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
             [

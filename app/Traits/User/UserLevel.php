@@ -3,6 +3,7 @@
 namespace App\Traits\User;
 
 
+use App\Models\User;
 use Modules\Vip\Entities\Vip;
 
 trait UserLevel
@@ -18,6 +19,12 @@ trait UserLevel
     {
         return $this->belongsTo(Vip::class, 'received_level', 'level')
             ->where('type', 1);
+    }
+
+    public function chargeLevel()
+    {
+        return $this->belongsTo(Vip::class, 'charge_level', 'level')
+            ->where('type', 4);
     }
 
 }

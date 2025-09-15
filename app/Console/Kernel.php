@@ -125,7 +125,7 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         $schedule->command('coin_game:archive')
-            ->monthlyOn(1, '00:30')
+            ->dailyAt('07:00')
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->runInBackground();

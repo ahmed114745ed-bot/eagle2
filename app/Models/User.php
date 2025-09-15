@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Common;
+use App\Helpers\UserPackHelper;
 use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
@@ -100,16 +101,16 @@ class User extends Authenticatable
 //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        'original_uuid',
-        'is_frozen',
-        'total_charge_level',
-        'photo',
-        'org_online_time',
-        'user_types',
-        'vip_data',
-        'level_data',
-        'profile_frame',
-        'profile_frame_id'
+//        'original_uuid',
+//        'is_frozen',
+//        'total_charge_level',
+//        'photo',
+//        'org_online_time',
+//        'user_types',
+//        'vip_data',
+//        'level_data',
+//        'profile_frame',
+//        'profile_frame_id'
 
     ];
 
@@ -807,7 +808,7 @@ class User extends Authenticatable
     public function Ovip()
     {
         return $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
-            ->with('privilegs'); 
+            ->with('privilegs');
     }
 
     public function haveVip()
@@ -1428,12 +1429,14 @@ class User extends Authenticatable
     public function getUuidAttribute($value)
     {
         if ($this->relationLoaded('packs')) {
+           
             $pack = $this->packs
                 ->where('type', 25)
                 ->where('is_used', true)
                 ->where('ware.value', $this->special_id)
                 ->first();
         } else {
+            
             $pack = $this->packs()
                 ->with('ware')
                 ->where('type', 25)
@@ -1476,7 +1479,7 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
-        if ($this->getPackWithType(20)) {
+        if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
 
@@ -1952,8 +1955,8 @@ public function userDataSetting()
         }
 
         $vipIcon = $vip->wareIcon;
-        $hasColor = Common::hasInPack($this->id, 18, true);
-        $color    = Common::hasColorInPack($this->id, 21, true);
+        $hasColor = Common::hasInPackV2($this->packs, 18, true);
+        $color    = Common::hasColorInPackV2($this->packs, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
@@ -1972,7 +1975,7 @@ public function userDataSetting()
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVip($this->id, 18, 'color') ?? '' : '',
+            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -1994,7 +1997,7 @@ public function userDataSetting()
         $star_level  = $this->total_received_level ?? 0;
         $gold_level  = $this->total_sender_level ?? 0;
 
-        $vipsData = \Cache::rememberForever('vips_data', fn() => 
+        $vipsData = \Cache::rememberForever('vips_data', fn() =>
             Vip::all()->groupBy('type')
         );
 
@@ -2085,12 +2088,12 @@ public function userDataSetting()
 
     public function getProfileFrameAttribute()
     {
-        return Common::wareUserVip($this, 28, 'img2', true);
+        return Common::wareUserVipV2($this, 28, 'img2', true);
     }
 
     public function getProfileFrameIdAttribute()
     {
-    return Common::wareUserVip($this, 28, 'id', true);
+    return Common::wareUserVipV2($this, 28, 'id', true);
     }
 
 

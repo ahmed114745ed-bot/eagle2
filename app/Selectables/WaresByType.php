@@ -14,6 +14,8 @@ class WaresByType extends Selectable
 
     public function make()
     {
+
+
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
         $this->column('show_img', __('Show Image'))->image('', 30);
@@ -28,6 +30,17 @@ class WaresByType extends Selectable
             28 => __('profile frame'),
 
         ]);
+        $this->column('price', __('price'))->display(function ($coin) {
+            $path = 'coin.png';
+            $url = getImagePath($path);
+
+            $media = handleShowImageWithTypes($this->id, $url, 25, 25);
+
+            return "<div style='display:flex; align-items:center; gap:8px;'>
+                $media
+                <span style='font-weight:bold; font-size:14px; color:#333;'>{$coin}</span>
+            </div>";
+        });
 
         $this->filter(function (Filter $filter) {
             $filter->like('name', __('Name'));

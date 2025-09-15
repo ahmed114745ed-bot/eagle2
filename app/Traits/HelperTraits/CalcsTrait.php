@@ -7,6 +7,7 @@ use App\Models\Family;
 use App\Models\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserLevelLog;
@@ -888,7 +889,7 @@ trait CalcsTrait
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
             'color' => '',
-            'colored_name' => $hasColor ? common::wareUserVipV2($user_id, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? common::wareUserVipV2($user, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -930,7 +931,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return 0;
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return new \stdClass();
 
@@ -957,7 +958,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -985,27 +986,41 @@ trait CalcsTrait
     {
         if (is_object($user_id)) {
             if (isset($user_id->userId)) {
-                $user_id = $user_id->userId;
+                $user = User::query()->find($user_id->userId);
+            } elseif ($user_id instanceof User) {
+                $user = $user_id;
+            } elseif ($user_id instanceof JsonResource) {
+                $user = $user_id->resource;
             } else {
                 return '';
             }
-        }
-        if (gettype($user_id) == 'integer') {
-            $user = User::query()->find($user_id);
-            if (!$user) return '';
+        } elseif (is_numeric($user_id)) {
+            $user = User::query()->find((int)$user_id);
         } else {
-            $user = $user_id;
+            return '';
         }
-        if (!isset($user->UserVip)) return '';
+
+        if (!$user) return '';
+
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
         $vip = $uvip->OVip;
 
         if (!$vip) return '';
-        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
 
-        return @$vipIcon->show_img ?? '';
+        $type = 10;
+
+        $cacheKey = "ware_{$vip->level}_{$type}";
+
+        $ware = Common::getCachedWares($cacheKey, $vip, $type);
+
+        if (!$ware) return '';
+
+        $value = optional($ware)->show_img;
+
+        return ($value === 'NULL' || $value === null) ? '' : $value;
     }
 
 
@@ -1056,7 +1071,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1077,7 +1092,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return new \stdClass();
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
@@ -1100,11 +1115,11 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return '';
+        if (!isset($user->UserVip)) return  '';
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = $uvip->OVip;
 
         if (!$vip) return '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
@@ -1112,6 +1127,31 @@ trait CalcsTrait
         return @$ware?->color ?? '';
     }
 
+    public static function wareUserVipColorV2($user_id, $type)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return '';
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return  '';
+        $uvip = $user?->UserVip;
+        if (!$uvip) return '';
+
+        $vip = $uvip->OVip;
+
+        if (!$vip) return '';
+        $cacheKey = "ware_{$vip->level}_{$type}";
+
+        $ware = Common::getCachedWares($cacheKey, $vip, $type);
+
+        if (!$ware) return '';
+
+        $value = optional($ware)->color;
+
+        return ($value === 'NULL' || $value === null) ? '' : $value;
+    }
 
     public static function ovip_centerforFaml($user_id)
     {
@@ -1466,4 +1506,92 @@ trait CalcsTrait
 
         return $data;
     }
+
+
+    public static function level_center_my_data($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        $star_level = $user->total_received_level;
+        $gold_level = $user->total_sender_level;
+
+        $vipsData = Vip::collectionBuilder()->get();
+
+        $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
+        $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
+
+        return [
+            'receiver_img' => !is_null($firstVip_type1) ? $firstVip_type1->img : '',
+            'sender_img'   => !is_null($firstVip_type2) ? $firstVip_type2->img : '',
+        ];
+
+    }
+
+    public static function ovip_center_my_data($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        $uvip = $user->UserVip;
+        if (!$uvip) return new \stdClass();
+
+        $vip = OVip::query()->find($uvip->vip_id);
+        if (!$vip) return new \stdClass();
+
+        $vipIcon = Ware::where('level', $vip->level)
+                    ->where('type', 10)
+                    ->where('get_type', 1)
+                    ->first();
+
+        $hasColor = Common::hasInPack($user->id, 18, true);
+
+        return [
+            'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
+            'colored_name' => $hasColor
+                                ? Common::wareUserVip($user->id, 18, 'color') ?? ''
+                                : '',
+        ];
+    }
+
+    public static function ovip_center_my_data_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        if (!isset($user->UserVip)) return new \stdClass();
+        $uvip = $user->UserVip;
+        $vip  = $uvip->OVip;
+
+        if (!$vip) {
+            return new \stdClass();
+        }
+
+        $cacheKey = "ware_icon_{$vip->level}_10";
+        $vipIcon = self::getCachedWares($cacheKey, $vip, 10);
+
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
+
+        return [
+            'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
+            'colored_name' => $hasColor
+                ? (Common::wareUserVipV2($user, 18, 'color') ?? '')
+                : '',
+        ];
+    }
+
+
+
 }
