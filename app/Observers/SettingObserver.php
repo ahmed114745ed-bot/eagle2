@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Helpers\CacheHelper;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -22,8 +23,6 @@ class SettingObserver
     {
         Cache::forget('all_settings');
 
-        Cache::rememberForever('all_settings', function () {
-            return DB::table('settings')->pluck('value', 'key')->toArray();
-        });
+        CacheHelper::cacheSettings();
     }
 }

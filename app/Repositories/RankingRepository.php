@@ -6,6 +6,7 @@ use App\helper\RankingHelper;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
 use App\Models\CoinGameUserMerged;
+use App\Models\CoinGameUserMergedMonthly;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -35,61 +36,90 @@ class RankingRepository
             });
     }
 
-    public function getUserGameCoins($type, $limit)
+    public function getUserGameCoins(int $type, int $limit)
     {
         [$from, $to] = $this->getDateRange($type);
-    
-        return CoinGameUserMerged::query()
+
+        switch ($type) {
+            case 0: 
+                $model = CoinGameUser::class;
+                break;
+
+            case 1: 
+            case 2: 
+                $model = CoinGameUserMerged::class;
+                break;
+
+            case 3: 
+                $model = CoinGameUserMergedMonthly::class;
+                break;
+
+            default:
+                $model = CoinGameUserMerged::class;
+                break;
+        }
+
+        return $this->getCoinsForModel($model, $from, $to, $limit);
+    }
+
+
+    protected function getCoinsForModel(string $model, $from, $to, int $limit)
+    {
+        return $model::query()
             ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as exp"))
             ->whereBetween('date', [$from, $to])
+            ->whereHas('user')
+            ->with($this->userRelations())
             ->groupBy('user_id')
-            ->whereHas('user') 
-            ->with([
-                'user:id,name,email,country_id',
-                'user.country:id,name,iso,flag',
-                'user.profile:user_id,avatar,birthday',
-                'user.mangerType:id,name_ar,name_en,img',
-                'user.UserVip:id,user_id,expire,level,is_used',
-            ])
             ->orderByDesc('exp')
             ->limit($limit)
             ->get();
     }
-    
-    
 
-    protected function getDateRange(int $type): array
-{
-    switch ($type) {
-        case 0: // الساعة الحالية
-            $from = Carbon::now()->startOfHour();
-            $to   = Carbon::now()->endOfHour();
-            break;
-
-        case 1: // اليوم الحالي
-            $from = Carbon::now()->startOfDay();
-            $to   = Carbon::now()->endOfDay();
-            break;
-
-        case 2: // الأسبوع الحالي
-            $from = Carbon::now()->startOfWeek();
-            $to   = Carbon::now()->endOfWeek();
-            break;
-
-        case 3: // الشهر الحالي
-            $from = Carbon::now()->startOfMonth();
-            $to   = Carbon::now()->endOfMonth();
-            break;
-
-        default:
-            // fallback: يوم كامل
-            $from = Carbon::now()->startOfDay();
-            $to   = Carbon::now()->endOfDay();
-            break;
+  
+    protected function userRelations(): array
+    {
+        return [
+            'user:id,name,email,country_id',
+            'user.country:id,name,iso,flag',
+            'user.profile:user_id,avatar,birthday',
+            'user.mangerType:id,name_ar,name_en,img',
+            'user.UserVip:id,user_id,expire,level,is_used',
+        ];
     }
 
-    return [$from, $to];
-}
+
+    protected function getDateRange(int $type): array
+    {
+        switch ($type) {
+            case 0: 
+                $from = Carbon::now()->startOfHour();
+                $to   = Carbon::now()->endOfHour();
+                break;
+
+            case 1: 
+                $from = Carbon::now()->startOfDay();
+                $to   = Carbon::now()->endOfDay();
+                break;
+
+            case 2: 
+                $from = Carbon::now()->startOfWeek();
+                $to   = Carbon::now()->endOfWeek();
+                break;
+
+            case 3: 
+                $from = Carbon::now()->startOfMonth();
+                $to   = Carbon::now()->endOfMonth();
+                break;
+
+            default: 
+                $from = Carbon::now()->startOfDay();
+                $to   = Carbon::now()->endOfDay();
+                break;
+        }
+
+        return [$from, $to];
+    }
 
 
     public function getUserGameCoinsV2($type, $limit)

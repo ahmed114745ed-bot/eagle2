@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Admin\Fields\Image;
 use App\Admin\Fields\ImagePath;
 use App\Classes\UserHandling;
+use App\Helpers\CacheHelper;
 use App\Helpers\CustomNotification;
 use App\Helpers\ManagerHelper;
 use App\Helpers\RoomHelper;
@@ -21,6 +22,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\SettingObserver;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
@@ -115,9 +117,12 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $settings = Cache::rememberForever('all_settings', function () {
-            return Setting::pluck('value', 'key')->toArray();
-        });
+        $settings = CacheHelper::cacheSettings();
+
+        /** @var Collection $rememberForever*/
+        if (gettype($settings) !== 'array'){
+            $settings = $settings->pluck('value', 'key')->toArray();
+        }
 
         Config::set([
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
