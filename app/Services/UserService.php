@@ -417,25 +417,30 @@ class UserService
         $userId = $user->id;
 
         $with = [
-            'room' => function ($query) {
-                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-            },
+//            'room' => function ($query) {
+//                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+//            },
             'followPacks',
-            'profile',
+            'profile:id,user_id,avatar',
             'ware',
             'UserVip',
-            'manager'
+//            'manager',
+            'packs',
+//            'country',
+            'color_image',
+            'followedByAuthUser',
+            'followerByAuthUser'
+//            'eligiblePacks',
+//            'friends',
         ];
 
         if ($type == 1) {
-            // following in app
             $users = $this->followRepository->getFollowing($user, $with, $keyword);
         } elseif ($type == 2) {
             $users = $this->followRepository->getFollowers($user, $with, $keyword);
         } elseif ($type == 3) {
             $users = $this->followRepository->getFriends($user, $with, $keyword);
         } elseif ($type == 6) {
-            // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
         } else {
             $users = collect([]);
@@ -470,7 +475,8 @@ class UserService
     }
     public function getLevel($levelsList, $type = 1)
     {
-        return $this->vipRepository->getByLevels($levelsList, $type);
+//        return $this->vipRepository->getByLevels($levelsList, $type);
+        return $this->vipRepository->getByLevelsV2($levelsList, $type);
     }
 
     public function myStore($user, $request)
@@ -502,9 +508,9 @@ class UserService
     {
         $user = $this->getUserWithRelations($userId);
         $this->ensureUserIsAccessible($user, $auth);
-    
+
         $request['user_id'] = $userId;
-    
+
         if ($this->shouldRecordVisit($auth, $user, $isVisit)) {
             $this->recordVisit($auth, $user);
         }
@@ -512,7 +518,7 @@ class UserService
         return $user;
 
     }
-    
+
     private function getUserWithRelations($userId)
     {
         // return  $this->userRepository->findUserData($userId);
@@ -520,42 +526,42 @@ class UserService
     }
 
 
-    
+
     private function ensureUserIsAccessible($user, $auth): void
     {
         if (!$user) {
             throw new Exception('User not found');
         }
-    
+
         if (in_array($user->id, $user?->blacklists->pluck('from_uid')->toArray())) {
             throw new Exception('User is in blacklist');
         }
     }
-    
+
     private function shouldRecordVisit($auth, $user, bool $isVisit): bool
     {
         return $auth->id !== $user->id
             && $isVisit
             && !Common::checkPackPrev($auth->id, 19);
     }
-    
+
     private function recordVisit($auth, $user): void
     {
         $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
-    
+
         $user->profileVisits()->syncWithoutDetaching([
             $auth->id => [
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
         ]);
-    
+
         if (!$previousVisit) {
             CustomNotification::visitProfile($user, $auth);
             (new UserCounterServices)->eventUser($user, 'visit-profile');
         }
     }
-    
+
 
     public function vTwoshowUser($userId, $auth, $request, $isVisit)
     {
@@ -1237,7 +1243,7 @@ class UserService
                 $amountBefore,
                 UserCoinLogType::INVITATION_CODE,
             );
-        
+
 
             return $earning->refresh();
         });

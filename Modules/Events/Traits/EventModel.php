@@ -49,6 +49,11 @@ trait EventModel
         return Carbon::parse($this->attributes['end_date'])->toDateString();
     }
 
+    public function setStartDateLocalAttribute($value)
+    {
+        $this->attributes['start_date'] = $value;
+    }
+
 
     public static function convertArabicNumbers($string)
     {
@@ -98,12 +103,12 @@ trait EventModel
     }
 
 
-//    public function scopePreviousEvent(Builder $query)
-//    {
-//        return $query
-//            ->whereDate('end_date', '<', now(getTimezone())->toDateString())
-//            ->orderByDesc('end_date');
-//    }
+    //    public function scopePreviousEvent(Builder $query)
+    //    {
+    //        return $query
+    //            ->whereDate('end_date', '<', now(getTimezone())->toDateString())
+    //            ->orderByDesc('end_date');
+    //    }
 
     public function scopeEndToday(Builder $query)
     {
@@ -122,6 +127,5 @@ trait EventModel
         $nowDate  = Carbon::now($timezone)->toDateString();
 
         return $query->whereDate('end_date', $nowDate);
-
     }
 }

@@ -477,7 +477,7 @@ class Common
             return "true";
         }
 
-        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
+        $configs = Cache::rememberForever('all_configs', function () {
             return Config::query()->pluck('value', 'name')->toArray();
         });
 
@@ -1797,7 +1797,6 @@ class Common
             case 'agency':
                 $agency = $resource->senderShippingAgency;
                 $owner = $agency->owner ?? null;
-                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
 
                 return [
                     'name' => $agency->name ?? '',
@@ -1808,7 +1807,7 @@ class Common
                     'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
                     'image_color' => $owner->color_image ?? null,
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' =>  '',
                 ];
 
             case 'host_agency':
@@ -1879,7 +1878,7 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-                    $hasColor = Common::hasInPack(@$resource->receiveragency?->owner->id, 18, true),
+                   
 
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
@@ -1889,7 +1888,7 @@ class Common
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiveragency->owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' =>  '' ,
 
                 ];
             case 'user':

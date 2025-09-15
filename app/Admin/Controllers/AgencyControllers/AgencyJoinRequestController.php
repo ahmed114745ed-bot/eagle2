@@ -207,7 +207,7 @@ class AgencyJoinRequestController extends MainController
                 }
                 return back()->with(compact('error'));
 
-                UserCommon::userVip($user,'agency-join-form-dash');
+                // UserCommon::userVip($user,'agency-join-form-dash');
                 $checkAgencyUser = UsersJoinedAgency::where([
                     'user_id' => $user_id,
                     'agency_id' => $form->model()->agency_id,
