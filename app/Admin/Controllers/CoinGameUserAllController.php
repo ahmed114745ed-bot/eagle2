@@ -37,7 +37,7 @@ class CoinGameUserAllController extends AdminController
         $filters = $this->service->normalizeFilters(request()->all());
         $query = CoinGameUserAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
-        $totals = $this->service->calculateTotals($query);
+        $totals = $this->service->calculateTotals($query ,$filters);
 
 
         return $content

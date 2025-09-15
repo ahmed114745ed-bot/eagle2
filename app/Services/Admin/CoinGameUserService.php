@@ -70,14 +70,16 @@ class CoinGameUserService
     /**
      * Calculate totals from aggregated view.
      */
-    public function calculateTotals($query): object
+    public function calculateTotals($query, $filters): object
     {
-        return $query->selectRaw("
+        $query = $this->applyFilters($query, $filters); // فلترة قبل التجميع
+        $totals = $query->selectRaw("
             SUM(total_played) as total_played,
             SUM(total_loss) as total_loss,
             SUM(total_win) as total_win,
             SUM(app_profit) as app_profit
         ")->first();
+        return $totals;
     }
 
     /**
@@ -169,7 +171,7 @@ class CoinGameUserService
         });
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
-        $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
+        $grid->column('app_profit', __('App Profit'))->display(fn($v) =>  number_format($this->total_loss - $this->total_win  ));
         if ( Admin::user()->can('details-switch-coin-game-users-report') || Admin::user()->can('*')) {
 
             $grid->column('details', __('Details'))->display(function () {
