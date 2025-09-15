@@ -120,7 +120,7 @@ class AppServiceProvider extends ServiceProvider
             return Setting::get();
         });
         /** @var Collection $rememberForever*/
-        if (gettype($rememberForever) !== 'array'){
+        if (gettype($settings) !== 'array'){
             $settings = $rememberForever->pluck('value', 'key')->toArray();
         }
 
