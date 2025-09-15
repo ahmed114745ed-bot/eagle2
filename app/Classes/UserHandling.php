@@ -169,7 +169,6 @@ class UserHandling
         $agencyId = $agency->id;
     
         $users = User::where('agency_id', $agencyId)
-            ->select('id', 'monthly_diamond_received', 'total_diamond_received')
             ->get();
     
         if ($users->isEmpty()) {
@@ -181,22 +180,7 @@ class UserHandling
             foreach ($users as $user) {
                 self::kickUserFromAgency($user, 0);
             }
-    
-            foreach ($users as $user) {
-                $newTotal = max(0, $user->total_diamond_received - (int)$user->monthly_diamond_received);
-    
-                DB::table('users')
-                    ->where('id', $user->id)
-                    ->update([
-                        'total_diamond_received' => $newTotal,
-                        'is_host' => 0,
-                        'agency_id' => 0,
-                        'monthly_days' => 0,
-                        'type_user' => 0,
-                    ]);
-    
-                uploadMonthlyDiamondReceive($user->id, 0);
-            }
+
     
             DB::table('agency_sallaries')->where('agency_id', $agencyId)->delete();
         });
