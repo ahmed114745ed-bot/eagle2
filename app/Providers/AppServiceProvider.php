@@ -21,6 +21,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\SettingObserver;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
@@ -115,9 +116,11 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $settings = Cache::rememberForever('all_settings', function () {
-            return Setting::all();
-        })->pluck('value', 'key')->toArray();
+        $rememberForever = Cache::rememberForever('all_settings', function () {
+            return Setting::get();
+        });
+        /** @var Collection $rememberForever*/
+        $settings = $rememberForever->pluck('value', 'key')->toArray();
 
         Config::set([
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
