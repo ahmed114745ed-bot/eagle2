@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,8 @@ class VersionController extends Controller
         $isColorSettingUpdated = $this->isUpdated('color_setting_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
-        $settings = Cache::get('all_settings');
+        $settings = $this->getSettingsArray();
+        
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
@@ -73,7 +75,7 @@ class VersionController extends Controller
                 'wapple' => $wapple ?? false,
                 'colors' =>  $colorsUpdate,
                 'background' => $ground,
-                'host_agency' => (bool) $settings['host_agency'],
+                'host_agency' => (bool) ($settings['host_agency'] ?? true),
                 'color_time'  => $isColorSettingUpdated,
                 //intro - frames - extradata - emoji
             ],
@@ -171,6 +173,14 @@ class VersionController extends Controller
         if (settings()->get($requiredKey) == 1 && $version < settings()->get($currentKey)) $isForce = true;
 
         return $isForce;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSettingsArray()
+    {
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool
