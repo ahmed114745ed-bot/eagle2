@@ -83,6 +83,7 @@ class UserVisitorResource extends JsonResource
                 'sender_level'  => @$this->total_sender_level ?? 0,
                 'reciver_level' => @$this->total_received_level ?? 0
             ],
+            'is_follow'            => $this->followerByAuthUser !== null,
 //            'is_follow'      => $isFollow,
 //            "manger_type"          => new MangerTypeResource(@$this->mangerType),
             'type_user' => @$this->type_user ?? 0,
