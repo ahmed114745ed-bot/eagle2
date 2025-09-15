@@ -16,18 +16,12 @@ use Encore\Admin\Auth\Permission;
 
 class CanPlaySwitchAction extends RowAction
 {
-
-
-    public $name;
-    public $canPlay;
-    public function __construct($canPlay)
+    public function name()
     {
-        $this->canPlay = $canPlay;
-        $this->name = $this->canPlay == 2 ? __('Disable Can Play')
+        return $this->row->can_play == 2
+            ? __('Disable Can Play')
             : __('Enable Can Play');
-        parent::__construct();
     }
-
 
     public function handle(Model $model)
     {
