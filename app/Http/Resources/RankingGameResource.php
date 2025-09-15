@@ -18,7 +18,7 @@ class RankingGameResource extends JsonResource
             'exp_int' => $this->exp_int,
             'remaining' => $this->remaining,
             'remaining_int' => $this->remaining_int,
-            $this->merge(new RankingUserGameResource($this->user))
+            $this->mergeWhen($this->relationLoaded('user'), new RankingUserGameResource($this->user))
         ];
     }
 }
