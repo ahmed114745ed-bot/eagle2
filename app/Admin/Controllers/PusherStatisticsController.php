@@ -14,6 +14,10 @@ class PusherStatisticsController extends  Controller
         $appId = config('broadcasting.connections.pusher.app_id') ?? env('PUSHER_APP_ID');
         $cluster = config('broadcasting.connections.pusher.options.cluster') ?? env('PUSHER_APP_CLUSTER');
 
+        info($key);
+        info($secret);
+        info($appId);
+        info($cluster);
         if (!$key || !$secret) {
             return back()->withErrors(['pusher' => 'Missing Pusher credentials']);
         }
