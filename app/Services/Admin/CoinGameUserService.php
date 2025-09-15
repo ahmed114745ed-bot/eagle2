@@ -70,7 +70,7 @@ class CoinGameUserService
     /**
      * Calculate totals from aggregated view.
      */
-    public function calculateTotals($query): object
+    public function calculateTotals($query, $filters): object
     {
         $query = $this->applyFilters($query, $filters); // فلترة قبل التجميع
         $totals = $query->selectRaw("
@@ -79,7 +79,7 @@ class CoinGameUserService
             SUM(total_win) as total_win,
             SUM(app_profit) as app_profit
         ")->first();
-        return $totals
+        return $totals;
     }
 
     /**
