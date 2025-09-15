@@ -5,6 +5,7 @@ use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\InvitationSettingsController;
+use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
@@ -621,6 +622,7 @@ Route::group(
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
+        Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
         Route::group(['middleware' => 'local'], function (){
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);

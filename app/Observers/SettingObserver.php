@@ -23,7 +23,7 @@ class SettingObserver
         Cache::forget('all_settings');
 
         Cache::rememberForever('all_settings', function () {
-            return DB::table('settings')->pluck('value', 'key')->toArray();
+            return Setting::pluck('value', 'key')->toArray();
         });
     }
 }
