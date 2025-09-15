@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\helper\RankingHelper;
 use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserArchive;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -35,14 +36,13 @@ class RankingRepository
 
     public function getUserGameCoins($type, $limit)
     {
-        $role = '' ;
-        $query = CoinGameUserAll::query();
+        $query = CoinGameUserArchive::query();
         $this->applyDateFilters($query, $type);
         return   $query->select(
             'user_id',
             DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
         )->groupBy('user_id')->whereHas('user') ->with([
-            'user' => function ($q) use ($role) {
+            'user' => function ($q)  {
                 $q->with(
                     'mangerType:id,name_ar,name_en,img',
                     'UserVip:id,user_id,expire,level,is_used',
