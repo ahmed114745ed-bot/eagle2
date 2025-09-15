@@ -143,7 +143,7 @@ class UserRepository extends AbstractRepository
 //            'agency.mempers',
             'profile:id,user_id,avatar',
 //            'family',
-            'packs',
+            'packs:id,user_id',
 //            'ownAgency',
 //            'userSetting',
 //            'activePack20'
