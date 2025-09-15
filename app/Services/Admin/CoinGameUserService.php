@@ -79,11 +79,12 @@ class CoinGameUserService
     public function calculateTotals($query)
     {
         return $query->selectRaw("
-            SUM(coins) as total_played,
-            SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
-            SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-            (SUM(coins) - SUM(CASE WHEN type = 1 THEN coins ELSE 0 END)) as app_profit
-        ")->first();
+               SUM(total_played) as total_played,
+                SUM(total_loss) as total_loss,
+                SUM(total_win) as total_win,
+                SUM(app_profit) as app_profit
+            ")->first();
+
     }
 
     /**
@@ -207,7 +208,7 @@ class CoinGameUserService
      */
     public function buildShowAllGrid($userId, $gameId): Grid
     {
-        $grid = new Grid(new CoinGameUserAll());
+        $grid = new Grid(new CoinGameUserAggregated());
 
         $createdAt = request('created_at', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
