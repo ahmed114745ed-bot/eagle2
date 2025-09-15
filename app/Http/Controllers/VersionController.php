@@ -52,7 +52,7 @@ class VersionController extends Controller
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
         $settings = $this->getSettingsArray();
-        
+
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);

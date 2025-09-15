@@ -528,7 +528,7 @@ class AppearChargerAgencyController extends MainController
                     $charges->with($relations);
                 }
 
-                $charges = $charges->latest()->paginate(2, ['*'], 'charges_page');
+                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
                 break;
 
             case 'resived':
