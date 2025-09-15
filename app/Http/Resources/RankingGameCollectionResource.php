@@ -19,8 +19,8 @@ class RankingGameCollectionResource extends JsonResource
     
             return [
                 'user'  => $this->user ?? new \stdClass(),
-                'top'   => RankingResource::collection($data->take(3)),
-                'other' => RankingResource::collection($data->slice(3)->values()),
+                'top'   => RankingGameResource::collection($data->take(3)),
+                'other' => RankingGameResource::collection($data->slice(3)->values()),
             ];
         
     }
