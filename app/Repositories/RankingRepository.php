@@ -41,7 +41,7 @@ class RankingRepository
     
         return CoinGameUserMerged::query()
             ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as exp"))
-            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('date', [$from, $to])
             ->groupBy('user_id')
             ->whereHas('user') 
             ->with([

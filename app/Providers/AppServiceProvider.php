@@ -74,11 +74,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
         $this->app->bind(UserRepoInterface::class, UserRepo::class);
-        $this->app->bind('RedisService', fn ($app) => new RedisService());
-        $this->app->bind('UserHandling', fn ($app) => new UserHandling());
-        $this->app->bind('CustomNotification', fn ($app) => new CustomNotification());
-        $this->app->bind('RoomHelper', fn ($app) => new RoomHelper());
-        $this->app->bind('ManagerHelper', fn ($app) => new ManagerHelper());
+        $this->app->bind('RedisService', fn($app) => new RedisService());
+        $this->app->bind('UserHandling', fn($app) => new UserHandling());
+        $this->app->bind('CustomNotification', fn($app) => new CustomNotification());
+        $this->app->bind('RoomHelper', fn($app) => new RoomHelper());
+        $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
         $this->defineCarbonMacros();
@@ -98,8 +98,8 @@ class AppServiceProvider extends ServiceProvider
             $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
 
             return [
-                 $firstDay->copy()->setTimezone('UTC'),
-                 $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
+                $firstDay->copy()->setTimezone('UTC'),
+                $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
             ];
         });
     }
@@ -238,7 +238,7 @@ class AppServiceProvider extends ServiceProvider
         $probabilities = app(LuckyGiftService::class)->getProbabilityTimes();
 
         foreach ($probabilities as $index => $value) {
-            Cache::put('probability_times_'.($index + 1), $value, now()->addMinutes(60));
+            Cache::put('probability_times_' . ($index + 1), $value, now()->addMinutes(60));
         }
     }
 }
