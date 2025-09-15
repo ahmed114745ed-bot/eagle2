@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Admin\Widgets\CustomInfoBox;
+use App\Models\CoinGameUserAggregated;
 use App\Models\CoinGameUserAll;
 use App\Models\User;
 use App\Models\AllGame;
@@ -44,26 +45,20 @@ class CoinGameUserService
     }
 
     /**
-     * Apply filters to query.
+     * Apply filters to aggregated query (الفيو).
      */
     public function applyFilters($query, array $filters)
     {
         if (!empty($filters['user'])) {
-            $user = $filters['user'];
-            $query->whereHas('user', function ($q) use ($user) {
-                $q->where('name', 'like', "%{$user}%")
-                    ->orWhere('uuid', 'like', "%{$user}%")
-                    ->orWhere('id', 'like', "%{$user}%");
-            });
+            $query->where('user_id', $filters['user']);
         }
 
         if (!empty($filters['game'])) {
-            $game = $filters['game'];
-            $query->whereHas('game', fn($q) => $q->where('name', 'like', "%{$game}%"));
+            $query->where('game_id', $filters['game']);
         }
 
         if (!empty($filters['created_at']['start']) && !empty($filters['created_at']['end'])) {
-            $query->whereBetween('created_at', [
+            $query->whereBetween('date', [
                 $filters['created_at']['start'],
                 $filters['created_at']['end']
             ]);
@@ -73,15 +68,15 @@ class CoinGameUserService
     }
 
     /**
-     * Calculate totals.
+     * Calculate totals from aggregated view.
      */
-    public function calculateTotals($query)
+    public function calculateTotals($query): object
     {
         return $query->selectRaw("
-            SUM(coins) as total_played,
-            SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
-            SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-            (SUM(coins) - SUM(CASE WHEN type = 1 THEN coins ELSE 0 END)) as app_profit
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(app_profit) as app_profit
         ")->first();
     }
 
@@ -90,10 +85,6 @@ class CoinGameUserService
      */
     public function renderInfoBoxes(Row $row, $totals): void
     {
-        //     $row->column(6, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', number_format($totals->total_played ?? 0, 2) ) );
-        //     $row->column(6, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', number_format($totals->total_loss ?? 0, 2)));
-        //     $row->column(6, new InfoBox(__('Total Win'), 'trophy', 'orange', '', number_format($totals->total_win ?? 0, 2)));
-        //     $row->column(6, new InfoBox(__('App Profit'), 'dollar', 'green', '', number_format($totals->app_profit ?? 0, 2)));
         $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
         $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
         $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
@@ -136,25 +127,12 @@ class CoinGameUserService
      */
     public function buildGrid(): Grid
     {
-        $grid = new Grid(new CoinGameUserAll());
+        $grid = new Grid(new CoinGameUserAggregated());
 
         $grid->model()
-            ->with([
-                'user:id,name,uuid',
-                'user.profile:id,user_id,avatar',
-                'user.packs',
-                'game'
-            ])
-            ->selectRaw("
-                user_id,
-                game_id,
-                SUM(coins) as total_played,
-                SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
-                SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-                (SUM(coins) - SUM(CASE WHEN type = 1 THEN coins ELSE 0 END)) as app_profit
-            ")
-            ->groupBy('user_id', 'game_id')
+            ->with(['user:id,name,uuid', 'game'])
             ->orderByDesc('total_played');
+        
 
         $this->applyGridFilters($grid);
 
@@ -218,7 +196,7 @@ class CoinGameUserService
      */
     public function buildShowAllGrid($userId, $gameId): Grid
     {
-        $grid = new Grid(new CoinGameUserAll());
+        $grid = new Grid(new CoinGameUserAggregated());
 
         $createdAt = request('created_at', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
