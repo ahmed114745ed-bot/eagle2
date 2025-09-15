@@ -43,6 +43,7 @@ class RankingRepository
             ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as exp"))
             ->whereBetween('created_at', [$from, $to])
             ->groupBy('user_id')
+            ->whereHas('user') 
             ->with([
                 'user:id,name,email,country_id',
                 'user.country:id,name,iso,flag',
