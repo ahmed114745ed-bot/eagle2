@@ -5,12 +5,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CoinGameUserAll extends Model
+class CoinGameUserAggregated extends Model
 {
-    protected $table = 'coin_game_users_all';
+    protected $table = 'coin_game_users_aggregated';
     public $timestamps = false;
 
-    
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
