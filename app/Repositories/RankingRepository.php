@@ -43,7 +43,8 @@ class RankingRepository
             DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
         )->groupBy('user_id')->whereHas('user') ->with([
             'user' => function ($q) use ($role) {
-                $q->with($this->rankerRelations($role));
+                $q->with( 'senderLevel:id,level,type,img',
+                          'receiverLevel:id,level,type,img');
             }
         ])->orderByRaw("exp desc")->limit($limit)->get();
     }
