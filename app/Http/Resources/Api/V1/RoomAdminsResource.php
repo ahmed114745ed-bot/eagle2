@@ -32,7 +32,7 @@ class RoomAdminsResource extends JsonResource
 //            'nick_name' => $this->nick_name,
 //            'agency' => $this->formatAgency($agency),
 //            'family_data' => $this->formatFamily($family),
-//            'profile' => $profile ? new ProfileResource($profile) : null,
+            'profile' => $profile ? new ProfileResource($profile) : null,
 //            'online_time' => $this->formatOnlineTime(),
 //            'diamonds' => $this->total_diamond_received ?? 0,
             'vip' => $this->getVip(),
