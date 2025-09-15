@@ -49,21 +49,33 @@ class CoinGameUserService
      */
     public function applyFilters($query, array $filters)
     {
-        if (!empty($filters['user'])) {
-            $query->where('user_id', $filters['user']);
+        if (!empty($filters['user_uuid'])) {
+            $userId = $filters['user_uuid'];
+    
+          
+  
+            $query->whereHas('user', function ($q) use ($userId) {
+                $q->where('name', 'like', "%{$userId}%")
+                  ->orWhere('uuid', 'like', "%{$userId}%");
+            });
+        
         }
-
-        if (!empty($filters['game'])) {
-            $query->where('game_id', $filters['game']);
+    
+        if (!empty($filters['game_id'])) {
+            $gameId = $filters['game_id'];
+            $query->whereHas('game', function ($q) use ($gameId) {
+                $q->where('name', 'like', "%{$gameId}%")
+                  ->orWhere('id', $gameId);
+            });
         }
-
+    
         if (!empty($filters['created_at']['start']) && !empty($filters['created_at']['end'])) {
             $query->whereBetween('date', [
                 $filters['created_at']['start'],
                 $filters['created_at']['end']
             ]);
         }
-
+    
         return $query;
     }
 
@@ -72,7 +84,7 @@ class CoinGameUserService
      */
     public function calculateTotals($query, $filters): object
     {
-        $query = $this->applyFilters($query, $filters); // فلترة قبل التجميع
+        $query = $this->applyFilters($query, $filters); 
         $totals = $query->selectRaw("
             SUM(total_played) as total_played,
             SUM(total_loss) as total_loss,
@@ -99,29 +111,19 @@ class CoinGameUserService
     public function applyGridFilters(Grid $grid)
     {
         $grid->filter(function (Grid\Filter $filter) {
+
             $filter->expand();
             $filter->disableIdFilter();
-
-            $filter->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', "%{$this->input}%")
-                        ->orWhere('uuid', 'like', "%{$this->input}%")
-                        ->orWhere('id', 'like', "%{$this->input}%");
-                });
-            }, __('user'))->placeholder(__('UUID'));
-
-            $filter->where(function ($query) {
-                $query->whereHas('game', function ($q) {
-                    $q->where('name', 'like', "%{$this->input}%")
-                        ->orWhere('id', 'like', "%{$this->input}%");
-                });
-            }, __('game'))->placeholder(__('name') . __('---') . __('id'));
-
-            $filter->between('created_at', __('Created At'))->datetime([
+        
+            $filter->like('user_uuid', 'User')->placeholder('UUID');
+            $filter->like('game_id', 'Game')->placeholder('Name or ID');
+            // فلتر التاريخ
+            $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
             ]);
         });
+        
     }
 
     /**
