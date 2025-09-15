@@ -20,6 +20,7 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
+use App\Observers\SettingObserver;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
@@ -114,7 +115,9 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $settings = DB::table('settings')->pluck('value', 'key')->toArray();
+        $settings = Cache::rememberForever('all_settings', function () {
+            return DB::table('settings')->pluck('value', 'key')->toArray();
+        });
 
         Config::set([
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
@@ -224,6 +227,7 @@ class AppServiceProvider extends ServiceProvider
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
+        Setting::observe(SettingObserver::class);
     }
 
     protected function cacheLuckyGiftProbabilities(): void
