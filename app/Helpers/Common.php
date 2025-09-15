@@ -477,7 +477,7 @@ class Common
             return "true";
         }
 
-        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
+        $configs = Cache::rememberForever('all_configs', function () {
             return Config::query()->pluck('value', 'name')->toArray();
         });
 
