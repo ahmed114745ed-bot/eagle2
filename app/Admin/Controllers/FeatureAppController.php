@@ -19,12 +19,36 @@ class FeatureAppController extends MainController
      */
     protected $title = 'App Feature';
 
-    public function index(Content $content){
-        $hostAgencySetting = Setting::where('key', 'host_agency')->first();
-        $reelSettings = Setting::where('key', 'reel_status')->first();
-        $hostAgencyStatus = ($hostAgencySetting && $hostAgencySetting->value == 1);
-        $reelSettings = ($reelSettings && $reelSettings->value == 1);
-        return parent::index($content
-        ->view('app_feature',compact(['hostAgencyStatus', 'reelSettings'])));
+    // public function index(Content $content)
+    // {
+    //     $hostAgencySetting = Setting::where('key', 'host_agency')->first();
+    //     $reelSettings = Setting::where('key', 'reel_status')->first();
+    //     $youtubeSettings = Setting::where('key', 'youtube_status')->first();
+    //     $liveSettings = Setting::where('key', 'live_status')->first();
+    //     $hostAgencyStatus = ($hostAgencySetting && $hostAgencySetting->value == 1);
+    //     $reelSettings = ($reelSettings && $reelSettings->value == 1);
+    //     $youtubeSettings = ($youtubeSettings && $youtubeSettings->value == 1);
+    //     $liveSettings = ($liveSettings && $liveSettings->value == 1);
+    //     return parent::index($content
+    //         ->view('app_feature', compact(['hostAgencyStatus', 'reelSettings', 'youtubeSettings', 'liveSettings'])));
+    // }
+
+
+    public function index(Content $content)
+    {
+        $keys = ['host_agency', 'reel_status', 'youtube_status', 'live_status'];
+
+        $settings = Setting::whereIn('key', $keys)
+            ->pluck('value', 'key')
+            ->map(fn($value) => $value == 1);
+
+        return parent::index(
+            $content->view('app_feature', [
+                'hostAgencyStatus' => $settings['host_agency'] ?? false,
+                'reelSettings'     => $settings['reel_status'] ?? 1,
+                'youtubeSettings'  => $settings['youtube_status'] ?? 1,
+                'liveSettings'     => $settings['live_status'] ?? 1,
+            ])
+        );
     }
 }
