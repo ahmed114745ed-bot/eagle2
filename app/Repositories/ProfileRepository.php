@@ -84,7 +84,9 @@ class ProfileRepository
             'followPacks',
             'profile',
             'ware',
-            'UserVip'
+            'UserVip',
+            'color_image',
+            'followerByAuthUser'
         ])->fitterByUuid($keyword)->paginate(15);
     }
 

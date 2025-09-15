@@ -3,7 +3,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserAggregated;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Controllers\AdminController;
@@ -33,10 +33,13 @@ class CoinGameUserAllController extends AdminController
      */
     public function index(Content $content)
     {
-        $filters = $this->service->normalizeFilters(request()->all());
-        $query = $this->service->applyFilters(CoinGameUserAll::query(), $filters);
-        $totals = $this->service->calculateTotals($query);
+    
+        $filters = request()->all();
+        $query = CoinGameUserAggregated::query();
+        $query = $this->service->applyFilters($query, $filters);
+        $totals = $this->service->calculateTotals($query ,$filters);
 
+    //   dd( $totals );
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))

@@ -81,7 +81,7 @@ class FollowRepository
     // Get paginated list of mutual followers (friends)
     public function getFriends(User $user, array $with = [], $keyword)
     {
-        return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(12);
+        return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(10);
     }
 
     public function getByFollower($userId)

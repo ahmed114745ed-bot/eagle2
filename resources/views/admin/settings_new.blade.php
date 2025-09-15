@@ -7,7 +7,7 @@
     </head>  -->
 <!--
 <body>
-    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('POST')
         @php
@@ -553,7 +553,7 @@ use Modules\Vip\Entities\Vip;
 
                 <h3> {{ __('Brand settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
 
@@ -612,7 +612,7 @@ use Modules\Vip\Entities\Vip;
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST"
+                <form id="themeSettingsForm" action="{{ route('admin.app.settings.update') }}" method="POST"
                     enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
@@ -755,7 +755,7 @@ use Modules\Vip\Entities\Vip;
 
             <div id="timeSettings" class="settings-section">
                 <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
+                <form action="{{ route('admin.app.settings.update') }}" method="POST">
                     @csrf
                     <div class="form">
 
@@ -1450,7 +1450,7 @@ use Modules\Vip\Entities\Vip;
                     <div class="row mt-4">
                         <!-- android link -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                 <div class="card exp-card-cont p-3 shadow" style="">
@@ -1482,7 +1482,7 @@ use Modules\Vip\Entities\Vip;
 
                         <!-- ios link -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                <div class="card exp-card-cont p-3 shadow" style="">
@@ -1514,7 +1514,7 @@ use Modules\Vip\Entities\Vip;
 
                         <!-- huawei  link -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                 <div class="card exp-card-cont p-3 shadow" style="">
@@ -1556,7 +1556,7 @@ use Modules\Vip\Entities\Vip;
                         <!-- dynamic Fields -->
                         @foreach ($paymentCoins as $coin)
                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST"
+                                <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="card p-3 shadow" style="height: 580px;">
@@ -2825,7 +2825,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                            <!-- Fawry Fields --> --}}
                         {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
@@ -2913,7 +2913,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                            <!-- skyPay Fields --> --}}
                         {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
@@ -2994,7 +2994,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                            <!-- stripe Fields --> --}}
                         {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
@@ -3080,7 +3080,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                            <!-- opay Fields --> --}}
                         {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
@@ -3182,7 +3182,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                            <!-- Cash free Fields --> --}}
                         {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
@@ -3268,7 +3268,7 @@ use Modules\Vip\Entities\Vip;
 
                         {{--                             <!-- Apple Pay Fields --> --}}
                         {{--                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.settings.update') }}" method="POST"> --}}
+                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
                         {{--                                    @csrf --}}
                         {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
                         {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}

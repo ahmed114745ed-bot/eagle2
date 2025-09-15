@@ -10,7 +10,7 @@ class CoinGameUserAll extends Model
     protected $table = 'coin_game_users_all';
     public $timestamps = false;
 
-
+    
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

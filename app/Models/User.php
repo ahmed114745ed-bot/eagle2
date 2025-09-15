@@ -1430,12 +1430,14 @@ class User extends Authenticatable
     public function getUuidAttribute($value)
     {
         if ($this->relationLoaded('packs')) {
+           
             $pack = $this->packs
                 ->where('type', 25)
                 ->where('is_used', true)
                 ->where('ware.value', $this->special_id)
                 ->first();
         } else {
+            
             $pack = $this->packs()
                 ->with('ware')
                 ->where('type', 25)

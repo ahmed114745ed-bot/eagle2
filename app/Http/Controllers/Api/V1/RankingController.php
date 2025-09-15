@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\helper\TryCatchHelper;
 use App\Helpers\Common;
+use App\helper\RankingHelper;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Services\RankingService;
@@ -15,10 +18,13 @@ class RankingController extends Controller
 {
 
     protected $rankingService;
+    protected $userService;
 
-    public function __construct(RankingService $rankingService)
+    public function __construct(RankingService $rankingService, UserService $userService)
     {
         $this->rankingService = $rankingService;
+        $this->userService = $userService;
+        
     }
 
     public function ranking(Request $request)
@@ -44,29 +50,24 @@ class RankingController extends Controller
 
     public function ranking2(Request $request)
     {
-        $class = $request->class ?: 1;
-        $type = $request->type !== null ? $request->type : 1;
 
-        if (!in_array($class, [1, 2, 3, 4, 5, 6]) || !in_array($type, [0, 1, 2, 3, 4])) {
-            return Common::apiResponse(0, 'Parameter error', null, 422);
-        }
-
-        $limit = $request->is_home ? 3 : 10;
-
-        $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
-
-        if ($class == 5) {
-            $data =   NewAgencyRankingResource::collection($data);
-        }
-
-
-        // if ($class != 5 && $class != 4 && $class != 6) {
-        //     // Extract pagination from the 'other' key if it exists
-        //     $payload   = $data->toArray($request);                   // array with 'user', 'top', 'other' (items only)
-        //     $paginates = ['other' => $data->getOtherPaginator()];    // give apiResponse the paginator to build meta
-        //     return Common::apiResponse(true, '', $payload, 200, $paginates);
-        // }
-        return Common::apiResponse(1, '', $data);
+        return TryCatchHelper::handle(function () use ($request) {
+    
+            $class = (int) ($request->class ?? 1);
+            $type  = (int) ($request->type ?? 1);
+    
+            if ($error = RankingHelper::validateParams($class, $type)) {
+                return $error; 
+            }
+    
+            $limit = RankingHelper::getLimit((bool) $request->is_home);
+    
+            $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
+    
+            $data = RankingHelper::transformData($class, $data);
+    
+            return $data; 
+        });
     }
 
     public function ranking3(Request $request)

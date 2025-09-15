@@ -263,7 +263,7 @@ Route::group(
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
-        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 

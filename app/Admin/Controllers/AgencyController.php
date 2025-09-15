@@ -1074,7 +1074,7 @@ class AgencyController extends MainController
             UsersJoinedAgency::create($joinAgencyData);
         }
         // add vip to user
-        UserCommon::userVip($user,'acceptJoin');
+        // UserCommon::userVip($user,'acceptJoin');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
