@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\helper\RankingHelper;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
+use App\Models\CoinGameUserMerged;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -36,24 +37,59 @@ class RankingRepository
 
     public function getUserGameCoins($type, $limit)
     {
-        $query = CoinGameUserArchive::query();
-        $this->applyDateFilters($query, $type);
-        return   $query->select(
-            'user_id',
-            DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
-        )->groupBy('user_id')->whereHas('user') ->with([
-            'user' => function ($q)  {
-                $q->with(
-                    'mangerType:id,name_ar,name_en,img',
-                    'UserVip:id,user_id,expire,level,is_used',
-                    'senderLevel:id,level,type,img',
-                    'receiverLevel:id,level,type,img',
-                    'country:id,name,iso,flag',
-                    'profile:user_id,avatar,birthday',
-                );
-            }
-        ])->orderByRaw("exp desc")->limit($limit)->get();
+        [$from, $to] = $this->getDateRange($type);
+    
+        return CoinGameUserMerged::query()
+            ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as exp"))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy('user_id')
+            ->with([
+                'user:id,name,email,country_id',
+                'user.country:id,name,iso,flag',
+                'user.profile:user_id,avatar,birthday',
+                'user.mangerType:id,name_ar,name_en,img',
+                'user.UserVip:id,user_id,expire,level,is_used',
+            ])
+            ->orderByDesc('exp')
+            ->limit($limit)
+            ->get();
     }
+    
+    
+
+    protected function getDateRange(int $type): array
+{
+    switch ($type) {
+        case 0: // الساعة الحالية
+            $from = Carbon::now()->startOfHour();
+            $to   = Carbon::now()->endOfHour();
+            break;
+
+        case 1: // اليوم الحالي
+            $from = Carbon::now()->startOfDay();
+            $to   = Carbon::now()->endOfDay();
+            break;
+
+        case 2: // الأسبوع الحالي
+            $from = Carbon::now()->startOfWeek();
+            $to   = Carbon::now()->endOfWeek();
+            break;
+
+        case 3: // الشهر الحالي
+            $from = Carbon::now()->startOfMonth();
+            $to   = Carbon::now()->endOfMonth();
+            break;
+
+        default:
+            // fallback: يوم كامل
+            $from = Carbon::now()->startOfDay();
+            $to   = Carbon::now()->endOfDay();
+            break;
+    }
+
+    return [$from, $to];
+}
+
 
     public function getUserGameCoinsV2($type, $limit)
     {
