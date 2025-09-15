@@ -476,10 +476,12 @@ class Common
         if ($key === 'enable_vip_auto') {
             return "true";
         }
-        if ($conf = Config::query()->where('name', $key)->first()) {
-            return $conf->value;
-        }
-        return null;
+
+        $configs = Cache::rememberForever('all_configs', function () {
+            return Config::query()->pluck('value', 'name')->toArray();
+        });
+
+        return $configs[$key] ?? null;
     }
 
     public static function getSettingValue($key)
@@ -548,8 +550,16 @@ class Common
         if (!$name) {
             return '';
         }
-        $val = DB::table('configs')->where('name', $name)->value('value');
-        return $val;
+
+        if ($name === 'enable_vip_auto') {
+            return "true";
+        }
+
+        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
+            return DB::table('configs')->pluck('value', 'name')->toArray();
+        });
+
+        return $configs[$name] ?? null;
     }
 
     public static function timeZone()
@@ -1066,8 +1076,8 @@ class Common
         return $result;
     }
 
-   
- 
+
+
 
 
 
@@ -1298,6 +1308,20 @@ class Common
 
         return $pack?->ware?->color ?? '';
     }
+
+    public static function hasColorInPackV2($userPacks, $type, $use_status = false)
+    {
+        $ch = self::checkPackV2($userPacks, $type);
+
+        if ($use_status) {
+            $ch = $ch->where('is_used', 1);
+        }
+
+        $pack = $ch->first();
+
+        return $pack?->ware?->color ?? '';
+    }
+
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
         $ch =  self::checkPackV2($userPacks, $type);
@@ -1305,7 +1329,7 @@ class Common
             $ch = $ch->where('is_used', 1);
         }
 
-        return $ch;
+        return $ch->isNotEmpty();
     }
     public static function hasProfileFramePack($user_id, $type, $use_status = false)
     {
@@ -1773,7 +1797,6 @@ class Common
             case 'agency':
                 $agency = $resource->senderShippingAgency;
                 $owner = $agency->owner ?? null;
-                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
 
                 return [
                     'name' => $agency->name ?? '',
@@ -1784,7 +1807,7 @@ class Common
                     'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
                     'image_color' => $owner->color_image ?? null,
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' =>  '',
                 ];
 
             case 'host_agency':
@@ -1855,7 +1878,7 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-                    $hasColor = Common::hasInPack(@$resource->receiveragency?->owner->id, 18, true),
+                   
 
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
@@ -1865,7 +1888,7 @@ class Common
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiveragency->owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' =>  '' ,
 
                 ];
             case 'user':
@@ -1984,8 +2007,6 @@ class Common
     public static function getCurrentBalance(int $userId): int
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
-
-
         return $balance;
     }
 

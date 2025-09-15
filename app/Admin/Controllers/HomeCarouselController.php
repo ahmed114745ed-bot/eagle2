@@ -11,6 +11,7 @@ use App\Helpers\Common;
 use App\Models\HomeCarousel;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
+use Illuminate\Validation\Rule;
 
 class HomeCarouselController extends MainController
 {
@@ -139,6 +140,15 @@ class HomeCarouselController extends MainController
                     $form->url('url', trans('url'));
                 });
             });
+
+        $form->select('display_at', __('Display At'))
+            ->options([
+                'discover' => __('Discover'),
+                'home_top' => __('Home Top'),
+                'home_middle' => __('Home Middle'),
+                'live' => __('Live')
+            ])
+            ->default('discover')->rules(['required', Rule::in(['home_top', 'home_middle', 'discover','live'])]);
 
         $form->saving(function (Form $form) {
             /*if (request()->hasFile('img')) {

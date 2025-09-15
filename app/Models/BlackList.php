@@ -28,4 +28,10 @@ class BlackList extends Model
         return $query->where('user_id', $userId)->where('from_uid', $otherUserId)
             ->orwhere('user_id', $otherUserId)->where('from_uid', $userId);
     }
+
+
+    public function fromUser()
+    {
+        return $this->belongsTo(User::class, 'from_uid');
+    }
 }

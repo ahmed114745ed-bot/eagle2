@@ -75,6 +75,13 @@ class RoomBoomReward extends Model
 //                    }
                     unset($model->achievement_target);
                     break;
+
+                case 'coin':
+                    if (isset($model->coin_target)) {
+                        $model->target = $model->coin_target;
+                        unset($model->coin_target);
+                    }
+                    break;
             }
         });
         self::creating(function ($model) {
@@ -89,12 +96,13 @@ class RoomBoomReward extends Model
                 $model->target = $url ?? '';
             } elseif ($model->target_type == 'gift') {
                 $model->target = request('target5', $model->target);
+            } elseif ($model->target_type == 'coin') {
+                $model->target = request('target6', $model->target);
             }
             unset($model->target1);
             unset($model->target4);
             unset($model->target5);
-
-
+            unset($model->target6);
         });
 
         self::updating(function ($model) {
@@ -109,10 +117,13 @@ class RoomBoomReward extends Model
                 $model->target = $url ?? '';
             } elseif ($model->target_type == 'gift') {
                 $model->target = request('target5', $model->target);
+            } elseif ($model->target_type == 'coin') {
+                $model->target = request('target6', $model->target);
             }
             unset($model->target1);
             unset($model->target4);
             unset($model->target5);
+            unset($model->target6);
         });
     }
 }

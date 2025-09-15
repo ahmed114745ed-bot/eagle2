@@ -488,7 +488,7 @@
 
             <!-- <h3> {{ __('Percentage target') }}</h3> -->
 
-            <form id="target-percentage-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="target-percentage-form" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;

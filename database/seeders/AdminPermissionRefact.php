@@ -389,6 +389,7 @@ class AdminPermissionRefact extends Seeder
                 'permissions' => [
                     ['key' => 'updates', 'except' => [], 'additional' => []],
                     ['key' => 'config', 'except' => [], 'additional' => []],
+                    ['key' => 'pusher-statistics', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
             [
@@ -432,9 +433,9 @@ class AdminPermissionRefact extends Seeder
                 'permissions' => [
                     ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
                     ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],
+                    ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
-
         ];
 
 

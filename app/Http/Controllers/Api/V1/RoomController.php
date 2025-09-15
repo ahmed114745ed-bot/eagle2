@@ -102,6 +102,33 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
 
+
+
+    public function mine(Request $request)
+    {
+        $user_id = request('user_id') ?? Auth::user()->id ;
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getAllMine($request ,$user_id);
+        return Common::apiResponse(true, '', $rooms, 200);
+    }
+
+    public function userRoom($id ,Request $request)
+    {
+        
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getUserRooms($request ,$id);
+        return Common::apiResponse(true, '', $rooms, 200);
+    }
+
+
+    
+
+    public function getAllLiveRooms(Request $request)
+    {
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getAllLiveRooms($request);
+        return Common::apiResponse(true, '', $rooms, 200);
+    }
     public function room_countries()
     {
         $data = $this->roomService->index2();
@@ -115,22 +142,25 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
+
         $request['show']  = true;
         $request['numid'] = rand(111111, 999999);
         $user = $request->user();
 
         try {
-
-    
-        
-            $room = $this->roomService->findRoomUser($user->id);
-            if ($room) {
-                return Common::apiResponse(true, 'you are already have a room', new RoomResource($room), 200);
+            if (!$request->has('type')) {
+                return Common::apiResponse(false, 'Room type is required', null, 400);
             }
-        
+
+            $room = $this->roomService->findRoomUserByType($user->id, $request->type);
+            if ($room) {
+                return Common::apiResponse(true, "You already have a room of type {$request->type}", new RoomResource($room), 200);
+            }
 
             $room = $this->roomService->create($request, $user);
+
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
+
         } catch (Exception $exception) {
             Log::error("Failed to create room", [
                 'user_id' => $user->id,
@@ -140,7 +170,6 @@ class RoomController extends Controller
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
-
     private function getTimezone(): string
     {
         $tz = request()->header('tz', Common::timeZone());
