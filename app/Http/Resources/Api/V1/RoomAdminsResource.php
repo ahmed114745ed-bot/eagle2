@@ -16,14 +16,14 @@ class RoomAdminsResource extends JsonResource
 
     public function toArray($request)
     {
-        $this->userDresses = $this->packs->where('is_used', 1)->keyBy(fn($p) => $p->type . '_' . $p->target_id);
+//        $this->userDresses = $this->packs->where('is_used', 1)->keyBy(fn($p) => $p->type . '_' . $p->target_id);
 
-        $agency = $this->whenLoaded('agency');
-        $family = $this->whenLoaded('family');
+//        $agency = $this->whenLoaded('agency');
+//        $family = $this->whenLoaded('family');
         $profile = $this->whenLoaded('profile');
-        $chatSetting = $this->whenLoaded('chatSetting');
-        $userSetting = $this->whenLoaded('userSetting');
-        $ownAgency = $this->whenLoaded('ownAgency');
+//        $chatSetting = $this->whenLoaded('chatSetting');
+//        $userSetting = $this->whenLoaded('userSetting');
+//        $ownAgency = $this->whenLoaded('ownAgency');
 
         return [
             'id' => $this->id,
@@ -48,46 +48,46 @@ class RoomAdminsResource extends JsonResource
         ];
     }
 
-    private function formatAgency($agency)
-    {
-        if (!$agency) return null;
+//    private function formatAgency($agency)
+//    {
+//        if (!$agency) return null;
+//
+//        $owner = $agency->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency->owner);
+//
+//        return [
+//            'id' => $agency->id,
+//            'name' => $agency->name,
+//            'status' => $agency->status,
+//            'image' => $agency->img,
+//            'member_count' => $agency->mempers->count() ?? 0,
+//            'owner' => $owner,
+//        ];
+//    }
 
-        $owner = $agency->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency->owner);
+//    private function formatFamily($family)
+//    {
+//        return $family ? [
+//            'owner_id' => $family->user_id,
+//            'family_name' => $family->name,
+//            'img' => $family->image,
+//            'num_of_members' => $family->members_count,
+//        ] : null;
+//    }
+//
+//    private function formatOnlineTime()
+//    {
+//        if ($this->relationLoaded('activePack20') && $this->activePack20) {
+//            return null;
+//        }
+//
+//        return $this->org_online_time ? Carbon::createFromTimestamp($this->org_online_time)->diffForHumans() : null;
+//    }
 
-        return [
-            'id' => $agency->id,
-            'name' => $agency->name,
-            'status' => $agency->status,
-            'image' => $agency->img,
-            'member_count' => $agency->mempers->count() ?? 0,
-            'owner' => $owner,
-        ];
-    }
-
-    private function formatFamily($family)
-    {
-        return $family ? [
-            'owner_id' => $family->user_id,
-            'family_name' => $family->name,
-            'img' => $family->image,
-            'num_of_members' => $family->members_count,
-        ] : null;
-    }
-
-    private function formatOnlineTime()
-    {
-        if ($this->relationLoaded('activePack20') && $this->activePack20) {
-            return null;
-        }
-
-        return $this->org_online_time ? Carbon::createFromTimestamp($this->org_online_time)->diffForHumans() : null;
-    }
-
-    private function getUserDress($type, $dress, $item = 'img1')
-    {
-        $key = $type . '_' . $dress;
-        return $this->userDresses[$key]?->ware->{$item} ?? '';
-    }
+//    private function getUserDress($type, $dress, $item = 'img1')
+//    {
+//        $key = $type . '_' . $dress;
+//        return $this->userDresses[$key]?->ware->{$item} ?? '';
+//    }
 
     private function getVip()
     {
@@ -98,13 +98,13 @@ class RoomAdminsResource extends JsonResource
         return $vip;
     }
 
-    private function getLevel()
-    {
-        static $level = null;
-        if ($level === null) {
-            $level = Common::level_center($this->id);
-        }
-        return $level;
-    }
+//    private function getLevel()
+//    {
+//        static $level = null;
+//        if ($level === null) {
+//            $level = Common::level_center($this->id);
+//        }
+//        return $level;
+//    }
 }
 
