@@ -47,14 +47,6 @@ class AgencyCharge implements FromView
         return view('admin.excel.chargeAgency', compact('charges', 'agency'));
    
    
-        //     $agencyId = $this->agency_id;
-    //     $agency = Agency::find($agencyId);
-    //     $charges = Charge::where(function ($query) use ($agencyId) {
-    //         $query->where('user_id', $agencyId)->where('user_type', 'agency');
-    //     })->orWhere(function ($query) use ($agencyId) {
-    //         $query->where('charger_id', $agencyId)->where('charger_type', 'agency');
-    //     })->orderByDesc('id')->get();
-
-        // return view('admin.excel.chargeAgency', compact('charges','agency'));
+      
     }
 }

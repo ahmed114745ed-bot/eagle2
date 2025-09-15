@@ -166,62 +166,42 @@ class UserHandling
 
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
     {
-        $agency_id = $agency->id;
-
-        $usersIds = User::query()->where('agency_id', $agency_id)->pluck('id');
-        // update in user_sallaries table
-        foreach ($usersIds as $user_id) {
-            // set user salary this month to zero
-            $values = [
-                'sallary'        => 0,
-                'cut_amount'     => 0,
-
-            ];
-
-            $user_sallaries = UserSallary::query()->where(['user_id' => $user_id])->orderBy('id', 'desc')->take(2)->get();
-            if (count($user_sallaries) > 0) {
-                if (count($user_sallaries) >= 2 && $user_sallaries[0]->month == now()->month && $user_sallaries[0]->year == now()->year) {
-                    $user_salary_this_month = $user_sallaries[0];
-                    $user_salary_befor_month = $user_sallaries[1];
-                    if ($user_salary_this_month->cut_amount >= $user_salary_this_month->sallary) {
-                        $user_salary_befor_month->cut_amount += ($user_salary_this_month->cut_amount - $user_salary_this_month->sallary);
-                        $user_salary_befor_month->save();
-                    }
-                    $user_salary_this_month->update($values);
-                } elseif (count($user_sallaries) < 2 && $user_sallaries[0]->month == now()->month && $user_sallaries[0]->year == now()->year) {
-                    $user_sallaries[0]->update($values);
-                }
+        $agencyId = $agency->id;
+    
+        $users = User::where('agency_id', $agencyId)
+            ->select('id', 'monthly_diamond_received', 'total_diamond_received')
+            ->get();
+    
+        if ($users->isEmpty()) {
+            return; 
+        }
+    
+        DB::transaction(function () use ($users, $agencyId) {
+    
+            foreach ($users as $user) {
+                self::kickUserFromAgency($user, 0);
             }
-        }
-
-        $users = User::where('agency_id', $agency_id)->get();
-        $users = User::where('agency_id', $agency_id)->get();
-
-        foreach ($users as $user) {
-
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'total_diamond_received' => DB::raw('CASE WHEN total_diamond_received < 0 THEN 0 ELSE total_diamond_received - ' . (int) $user->monthly_diamond_received . ' END'),
-                    'is_host' => 0,
-                    'agency_id' => 0,
-                    'monthly_days' => 0,
-                    'type_user' => 0,
-                ]);
-
-            uploadMonthlyDiamondReceive($user->id, 0);
-        }
-
-
-
-        DB::table('live_times')->whereIn('uid', $usersIds)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->delete();
-
-        DB::table('agency_sallaries')->where('agency_id', $agency_id)->delete();
-
-        AgencyUserJob::where(['agency_id' => $agency_id])->delete();
-        $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $agency->id])->get();
-        if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
+    
+            foreach ($users as $user) {
+                $newTotal = max(0, $user->total_diamond_received - (int)$user->monthly_diamond_received);
+    
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update([
+                        'total_diamond_received' => $newTotal,
+                        'is_host' => 0,
+                        'agency_id' => 0,
+                        'monthly_days' => 0,
+                        'type_user' => 0,
+                    ]);
+    
+                uploadMonthlyDiamondReceive($user->id, 0);
+            }
+    
+            DB::table('agency_sallaries')->where('agency_id', $agencyId)->delete();
+        });
     }
+    
 
 
     public static function checkIfUserOwnerOfAgency(User $user): bool
