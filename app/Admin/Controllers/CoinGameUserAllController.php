@@ -34,12 +34,12 @@ class CoinGameUserAllController extends AdminController
     public function index(Content $content)
     {
     
-        $filters = $this->service->normalizeFilters(request()->all());
+        $filters = request()->all();
         $query = CoinGameUserAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
         $totals = $this->service->calculateTotals($query ,$filters);
 
-
+    //   dd( $totals );
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
