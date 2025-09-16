@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\InfoBox;
 use App\Admin\Services\UserGameService;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Carbon;
 
 
 class CoinGameUserService
@@ -51,27 +52,19 @@ class CoinGameUserService
     {
         if (!empty($filters['user_uuid'])) {
             $userId = $filters['user_uuid'];
-    
-          
-  
-            $query->whereHas('user', function ($q) use ($userId) {
-                $q->where('name', 'like', "%{$userId}%")
-                  ->orWhere('uuid', 'like', "%{$userId}%");
-            });
-        
+            $query->Where('user_uuid', 'like', "%{$userId}%");
+ 
         }
     
         if (!empty($filters['game_id'])) {
             $gameId = $filters['game_id'];
-            $query->whereHas('game', function ($q) use ($gameId) {
-                $q->where('name', 'like', "%{$gameId}%")
-                  ->orWhere('id', $gameId);
-            });
+            $query->Where('game_id', $gameId);
+        
         }
     
         if (!empty($filters['date']['start']) && !empty($filters['date']['end'])) {
-            $start = \Carbon::parse($filters['date']['start'])->startOfDay();
-            $end   = \Carbon::parse($filters['date']['end'])->endOfDay();
+            $start = Carbon::parse($filters['date']['start'])->startOfDay();
+            $end   = Carbon::parse($filters['date']['end'])->endOfDay();
         
             $query->whereBetween('date', [$start, $end]);
         }
@@ -84,10 +77,7 @@ class CoinGameUserService
      */
     public function calculateTotals($query ,$filters): object
     {
-        $query = CoinGameUserAggregated::query()
-            ->join('users', 'users.id', '=', 'coin_game_users_aggregated.user_id')
-            ->join('all_games', 'all_games.id', '=', 'coin_game_users_aggregated.game_id');
-
+ 
         $query = $this->applyFilters($query, $filters);
 
         return $query->selectRaw("
@@ -120,7 +110,7 @@ class CoinGameUserService
             $filter->disableIdFilter();
         
             $filter->like('user_uuid', 'User')->placeholder('UUID');
-            $filter->like('game_id', 'Game')->placeholder('Name or ID');
+            $filter->like('game_id', 'Game')->placeholder(' ID');
             // فلتر التاريخ
             $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
@@ -144,7 +134,7 @@ class CoinGameUserService
             $filter->disableIdFilter();
     
             $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
-            $filter->like('game_name', 'Game')->placeholder('Name or ID');
+            $filter->like('game_id', 'Game')->placeholder('ID');
             $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
@@ -196,7 +186,7 @@ class CoinGameUserService
     
         $grid->column('details', __('Details'))->display(function () {
 
-            $filters = request()->only(['created_at', 'user_id', 'game_id']);
+            $filters = request()->only(['date', 'user_id', 'game_id']);
             $queryString = http_build_query($filters);
             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
@@ -220,7 +210,7 @@ class CoinGameUserService
     {
         $grid = new Grid(new CoinGameUserAll());
 
-        $createdAt = request('created_at', []);
+        $createdAt = request('date', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
         }

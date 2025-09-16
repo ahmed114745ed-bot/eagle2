@@ -4,22 +4,25 @@ namespace App\Admin\Controllers;
 
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\Common;
-use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\RoomSearchResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
+use App\Http\Resources\Api\V1\UserResourceSerchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
+use App\Models\Room;
 use App\Models\User;
-use App\Repositories\FollowRepository;
+use App\Repositories\Community\SearchRepository;
 use App\Services\ProfileService;
-use App\Services\RoomService;
 use App\Services\UserService;
-use App\Tik\Repositories\UserRepository;
 use App\Tik\Services\GiftLogService;
 use App\Tik\Services\RoomRepoService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Modules\Public\Http\Services\UserCounterServices;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class GiftLogTestController extends Controller
 {
@@ -190,5 +193,122 @@ class GiftLogTestController extends Controller
             'message' => '',
             'data'    => $data,
         ]);
+    }
+
+    public function showSearch()
+    {
+        return view('test.search');
+    }
+
+    public function merge_search(Request $request)
+    {
+        $keywords = 55;
+        $user_id = 303;
+
+        if (!$keywords || !$user_id) {
+            return Common::apiResponse(0, 'Missing parameters');
+        }
+
+        (new SearchRepository())->saveSearchHistory($user_id, $keywords);
+
+        $result = ['user' => UserResourceSerchV2::collection($this->userSearchHand($user_id, $keywords)),
+//            'rooms' => RoomSearchResource::collection($this->searchRooms($user_id, $keywords)),
+            ];
+
+        return view('test.search', [
+            'success' => true,
+            'message' => '',
+            'data'    => $result,
+        ]);
+    }
+
+    public function userSearchHand(int $userId, string $keywords, int $page = 1)
+    {
+        if (!$userId || !$keywords) {
+            return [];
+        }
+
+        $whereOr = ['uuid' => $keywords];
+
+        $user = User::with(['blockedUsers:id,from_uid', 'blockedMe:id,user_id'])->find(303);
+        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
+
+        $users = User::query()
+            ->select([
+                '*',
+                DB::raw("
+            CASE
+                WHEN special_id = '{$keywords}' THEN 1000
+                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
+                WHEN uuid = '{$keywords}' THEN 800
+                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE '%{$keywords}%' THEN 600
+                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                ELSE 0
+            END AS total_score
+        ")
+            ])
+            ->with([
+                'profile:id,user_id,avatar',
+                'color_image',
+                'packs',
+                'eligiblePacks.ware',
+                'specialId.ware',
+                'ownAgency'
+            ])
+            ->where(function ($query) use ($keywords) {
+                $query->where('special_id', 'like', "%{$keywords}%")
+                    ->orWhere('uuid', 'like', "%{$keywords}%");
+            })
+            ->whereNotIn('id', $blockedUserIds)
+            ->where('status', 1)
+            ->having('total_score', '>', 0)
+            ->orderByDesc('total_score')
+            ->paginate(10, ['*'], 'page', $page);
+
+        return $users;
+    }
+
+    public function searchRooms(int $userId, string $keywords, int $page = 1): array|Collection
+    {
+        $user = User::with(['blockedUsers:id,from_uid', 'blockedMe:id,user_id'])->find(303);
+        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
+
+        $user = User::query()
+            ->fitterByUuid($keywords)
+            ->with(['packs' => function ($q) {
+                $q->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                            ->orWhere('expire', '>=', now()->timestamp);
+                    });
+            }])
+            ->addSelect([
+                '*',
+                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+            ])
+            ->orderByDesc('matching_percentage')
+            ->first();
+
+        if (!$user || $user?->packs->isNotEmpty()) {
+            return [];
+        }
+
+        $keywords = $user->id;
+
+        return Room::with('owner')
+            ->whereHas('owner', function ($query) {
+                $query->where('status', 1);
+            })
+            ->where('uid', 'like',  $keywords . '%')
+            ->whereNotIn('uid', $blockedUserIds)
+            ->orderBy('hot', 'desc')
+            ->take(2)
+            ->get();
     }
 }
