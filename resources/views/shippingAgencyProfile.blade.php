@@ -957,7 +957,7 @@
                     </div> -->
                 </div>
             </div>
-             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency?->id) }}">
+             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency-transactions/' . $agency?->id) }}">
             {{ __('Export to Excel') }}
         </a>
            <button class="btn-back" onclick="window.location.href='{{ url('admin/charge-agencies') }}'">
