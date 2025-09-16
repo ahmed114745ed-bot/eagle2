@@ -20,6 +20,7 @@ class ChangeCinemaModeJob implements ShouldQueue
 
     public function handle(): void
     {
+          \Log::info("123456");
         $rooms = Room::where('mode', 5)->get();
         foreach ($rooms as $room) {
             $room->mode = 1;
