@@ -89,7 +89,7 @@ class DailyGiftController extends Controller
 
             $type = $dailyGift->gift_type;
             $target = $dailyGift->target;
-            $expire = $dailyGift->expir;
+            $expire = $dailyGift->expire;
             logger("🎁 User {$user->id} received type {$type}. Expire: {$expire}");
 
             $this->assignGiftToUser($type, $user, $target, $expire);
