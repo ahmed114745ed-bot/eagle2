@@ -10,7 +10,7 @@ use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\RoomSearchResource;
 use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Http\Resources\Api\V1\UserResourceSerchV2;
+use App\Http\Resources\Api\V1\UserResourceSearchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Models\Room;
 use App\Models\User;
@@ -211,7 +211,8 @@ class GiftLogTestController extends Controller
 
         (new SearchRepository())->saveSearchHistory($user_id, $keywords);
 
-        $result = ['user' => UserResourceSerchV2::collection($this->userSearchHand($user_id, $keywords)),
+        $result = [
+            'user' => UserResourceSearchV2::collection($this->userSearchHand($user_id, $keywords)),
 //            'rooms' => RoomSearchResource::collection($this->searchRooms($user_id, $keywords)),
             ];
 
