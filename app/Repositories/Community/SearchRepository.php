@@ -9,6 +9,7 @@ use App\Models\OfficialMessage;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -89,6 +90,45 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
     }
 
+    public function searchRoomsV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): array|Collection
+    {
+        $user = User::query()
+            ->fitterByUuid($keywords)
+            ->with(['packs' => function ($q) {
+                $q->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                            ->orWhere('expire', '>=', now()->timestamp);
+                    });
+            }])
+            ->addSelect([
+                '*',
+                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+            ])
+            ->orderByDesc('matching_percentage')
+            ->first();
+
+        if (!$user || $user?->packs->isNotEmpty()) {
+            return [];
+        }
+
+        $keywords = $user->id;
+
+        return Room::with([
+            'owner',
+            'owner.packs'
+        ])
+            ->whereHas('owner', function ($query) {
+                $query->where('status', 1);
+            })
+            ->where('uid', 'like',  $keywords . '%')
+            ->whereNotIn('uid', $blockedUserIds)
+            ->orderBy('hot', 'desc')
+            ->take(2)
+            ->get();
+    }
+
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
     {
         if (!$userId || !$keywords) {
@@ -144,6 +184,48 @@ class SearchRepository implements SearchRepositoryInterface
             ->paginate(10, ['*'], 'page', $page);
 
 
+
+        return $users;
+    }
+
+    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): LengthAwarePaginator|array
+    {
+        if (!$userId || !$keywords) {
+            return [];
+        }
+
+        $users = User::query()
+            ->select([
+                '*',
+                DB::raw("
+            CASE
+                WHEN special_id = '{$keywords}' THEN 1000
+                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
+                WHEN uuid = '{$keywords}' THEN 800
+                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE '%{$keywords}%' THEN 600
+                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                ELSE 0
+            END AS total_score
+        ")
+            ])
+            ->with([
+                'profile:id,user_id,avatar',
+                'color_image',
+                'packs',
+                'eligiblePacks.ware',
+                'specialId.ware',
+                'ownAgency'
+            ])
+            ->where(function ($query) use ($keywords) {
+                $query->where('special_id', 'like', "%{$keywords}%")
+                    ->orWhere('uuid', 'like', "%{$keywords}%");
+            })
+            ->whereNotIn('id', $blockedUserIds)
+            ->where('status', 1)
+            ->having('total_score', '>', 0)
+            ->orderByDesc('total_score')
+            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
