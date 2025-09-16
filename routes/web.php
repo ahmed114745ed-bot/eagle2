@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\BdController;
+use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -151,6 +152,10 @@ Route::get('/clear-config', function () {
 
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
     return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
+});
+Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId) {
+    
+    return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
 

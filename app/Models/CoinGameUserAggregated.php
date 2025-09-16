@@ -19,4 +19,20 @@ class CoinGameUserAggregated extends Model
     {
         return $this->belongsTo(AllGame::class, 'game_id');
     }
+
+    public function getUserSearchAttribute()
+    {
+        if ($this->user) {
+            return "{$this->user->id} - {$this->user->uuid} - {$this->user->name}";
+        }
+        return '';
+    }
+
+    public function getGameSearchAttribute()
+    {
+        if ($this->game) {
+            return "{$this->game->id} - {$this->game->name}";
+        }
+        return '';
+    }
 }
