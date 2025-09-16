@@ -684,8 +684,8 @@ if (!function_exists('getTimezone')) {
     }
 }
 
-if (!function_exists('getCashSetting')) {
-    function getCashSetting($key)
+if (!function_exists('getSettingCash')) {
+    function getSettingCash($key)
     {
         return \Cache::rememberForever($key, function () use ($key) {
             $setting = \App\Models\Setting::where('key', $key)->first();
