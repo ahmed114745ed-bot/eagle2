@@ -5,12 +5,12 @@ namespace Modules\CP\Http\Services;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Modules\Chat\Events\Chat;
 use App\Enums\UserCoinLogType;
 use Modules\CP\Enums\CpStatus;
 use Modules\Chat\Events\OpenChat;
 use App\Helpers\UserCoinLogHelper;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
@@ -21,6 +21,7 @@ use Modules\CP\Transformers\CpListResource;
 use Modules\CP\Transformers\RankingResource;
 use Modules\CP\Http\Resources\CpsUserResource;
 use Modules\CP\Transformers\RequestCpResource;
+use Modules\CP\Http\Resources\CpsUserResourceV2;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -48,7 +49,7 @@ class CpserviceCo
             }
         }
 
-        if ($cpRelation ) {
+        if ($cpRelation) {
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
@@ -56,7 +57,6 @@ class CpserviceCo
 
                 return Common::apiResponse(0, __('You have already sent/received a CP request before.'));
             }
-
         }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
@@ -232,7 +232,7 @@ class CpserviceCo
 
         if ($cp?->relation?->type == 'solution') {
             if ($request->status == 1) {
-                DB::transaction(function () use ($cp){
+                DB::transaction(function () use ($cp) {
                     $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id);
                     $cpBetweenUsers->status = 3;
                     $cpBetweenUsers->save();
@@ -306,10 +306,20 @@ class CpserviceCo
         $first = $data->take(3);
         $second = $data->skip(3);
         $user = request()->user();
+        $user->with([
+            'profile:id,user_id,avatar',
+            'cpsAsOne.cpRelation',
+            'cpsAsTwo.cpRelation',
+            'receiverLevel:id,img',
+            'senderLevel:id,img',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ]);
+
+
         $result = [
             "firstThree" => RankingResource::collection($first),
             "remain" => RankingResource::collection($second),
-            'user' => new CpsUserResource($user, $relationType),
+            'user' => new CpsUserResourceV2($user, $relationType),
         ];
 
         return Common::apiResponse(1, '', $result);
@@ -327,6 +337,4 @@ class CpserviceCo
         $data = $this->cpRepository->cpUserList($userId, true);
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }
-
-
 }
