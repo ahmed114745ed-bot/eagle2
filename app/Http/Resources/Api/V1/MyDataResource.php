@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Helpers\UserPackHelper;
 use App\Models\Pk;
 use App\Models\Pack;
 use App\Models\Room;
@@ -13,6 +14,7 @@ use App\Models\FamilyUser;
 use App\Models\FamilyLevel;
 use App\Models\UserSetting;
 use App\Facades\UserHandling;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,80 +28,37 @@ class MyDataResource extends JsonResource
 
         if ($family) {
 
-            $starsImagesFamily = GiftLog::selectRaw("SUM(giftPrice) as exp, receiver_id")
-                ->with(['receiver.profile'])
-                ->whereHas('receiver', function ($query) use ($family) {
-                    $query->where('family_id', $family->id)->whereHas('profile');
-                })
-                ->groupBy('receiver_id')
-                ->orderByDesc('exp')
-                ->take(3)
-                ->get()
-                ->map(function ($log) {
-                    return optional($log->receiver->profile)->avatar;
-                })
-                ->filter()
-                ->values()
-                ->toArray();
 
             $f = [
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'num_of_members' => $family->members_count,
+                'num_of_members' => 0,
                 'level' => $family->level,
-                'top_stars' => $starsImagesFamily,
+                'top_stars' => [],
 
             ];
         }
 
-        // $user_id = $this->id;
-
-        // $pack = $this->packs
-        //     ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
-        //     ->where('is_used', 1);
-
-        $time_log = $this->timeLog()->latest()->first();
-
 
         $agency_joined = $this->agency;
-        // if ($agency_joined) {
-        //     $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
-        //     $agency_joined = [
-        //         'id' => $agency_joined->id,
-        //         'name' => $agency_joined->name,
-        //         'status' => $agency_joined->status,
-        //         'owner' => $owner,
-        //     ];
-        // }
 
         if ($agency_joined) {
 
-            $starsImages = GiftLog::where('agency_id', $agency_joined->id)
-                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
-                ->with(['receiver.profile'])
-                ->whereHas('receiver.profile')
-                ->groupBy('receiver_id')
-                ->orderByDesc('exp')
-                ->take(3)
-                ->get()
-                ->pluck('receiver.profile.avatar')
-                ->filter()
-                ->values();
 
             $owner = $agency_joined->app_owner_id == $this->id
                 ? new \stdClass()
-                : new MiniUserResource($agency_joined->owner);
+                : new ShortUserResource($agency_joined->owner);
 
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
                 'image' => $agency_joined->img,
-                'member_count' => count($agency_joined->mempers),
+                'member_count' => 0,
                 'owner' => $owner,
-                'top_stars' => $starsImages,
+                'top_stars' => [],
             ];
         } else {
             $agency_joined = (object)[];
@@ -114,25 +73,9 @@ class MyDataResource extends JsonResource
         $admin = $this->agencyUserJob;
         $owner = $this->ownAgency;
 
-        $dress_1_data = $this->getUserDress(4, $this->dress_1, 'img2');
-        // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
-        $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
-        // Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
-        $frame = $dress_1_data ?: $dress_1_fallback;
-
-        $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
-        // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
-
-        $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
-        // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
-        $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
 
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
-        $intro = $dress_3_data ?: $dress_3_fallback;
-        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
-
-        $isHideCountry = $this->getPackWithType(13);
 
         $show_user_setting = $this->userSetting;
         if ($show_user_setting == null) {
@@ -140,76 +83,91 @@ class MyDataResource extends JsonResource
                 'show_git' => 1,
                 'show_intro' => 1,
                 'show_banner' => 1,
+                'show_invite_code' => 1,
             ]);
         }
 
         $achievement_images = [];
-        if ($this->medals) {
+        /*if ($this->medals) {
             foreach ($this->medals as $medal) {
                 if ($medal->achievementLevel) {
                     $achievement_images[] = $medal->achievementLevel->valid_image;
                 }
             }
-        }
+        }*/
         $counters = [];
-        if ($request->show_counter == true) {
+
+        if ($request->show_counter) {
             $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-            $user = User::find(@$this->id);
+
             $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
-            $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
-                return [$item => $userCounterServices->getUserCounts($user, $item)];
-            });
-            $counters['message'] = $userCounterServices->getCountByType($user, 'message');
+            $counters = $userCounterServices->getUserCountsV2($this->resource, $types);
+
+            $counters['message'] = $userCounterServices->getCountByType($this->resource, 'message');
         }
 
-
-        $ownerRoom = $this->ownerRoom;
+        $ownerRoom = $this->ownerAudioRoom;
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
-        $starsImagesShippingAgency = [];
 
-        if ($this->shippingAgency && $this->shippingAgency->id) {
-            $giftLogs = GiftLog::where('agency_id', $this->shippingAgency->id)
-                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
-                ->with(['receiver.profile'])
-                ->whereHas('receiver.profile')
-                ->groupBy('receiver_id')
-                ->orderByDesc('exp')
-                ->take(3)
-                ->get();
+        $uuid = @$this->uuid;
+        $wabble = UserPackHelper::getWare($this->resource, 12);
+        $isStopInvitationValid = null;
 
-            $starsImagesShippingAgency = $giftLogs
-                ->map(function ($log) {
-                    return optional($log->receiver->profile)->avatar;
-                })
-                ->filter()
-                ->values()
-                ->toArray();
+        if (self::isStopInvitationValid()) {
+            $isStopInvitationValid = true;
+
         }
-
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
-            'name' => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
+            'name' => @$this->name ?: 'user' . ' ' . '#' . $uuid,
             'phone' => (string)@$this->phone ?: '',
             //'manger' => new MangerTypeResource(@$this->manager),
-            'frame' => $frame,
-            'intro' => $intro,
-            'intro_type' => $intro !== '' ? ($introType !== '' ? $introType : 'svga') : '',
-            'bubble' => $bubble,
-            'bubble_id' => @$bubble ? $this->dress_2 : 0,
-            'frame_id' => $frame ? @$this->dress_1 : 0,
-            'intro_id' => $intro ? @$this->dress_3 : 0,
+            'frame' => UserPackHelper::getFrameImage($this->resource),
+            'frame_id' => UserPackHelper::getFrameId($this->resource),
+
+            'intro' => UserPackHelper::getIntroFile($this->resource),
+            'intro_type' => UserPackHelper::getIntroType($this->resource),
+            'intro_id' => UserPackHelper::getIntroId($this->resource),
+            //Bubble
+            'bubble' => UserPackHelper::getBubbleImage($this->resource),
+            'bubble_id' => UserPackHelper::getBubbleId($this->resource),
+            //endBubble
+
+            //wabble
+            'wabble' => $wabble ? new GeneralUserWareResource($wabble) : (object)[],
+            'wabble_id' => UserPackHelper::getWabbleId($this->resource),
+            //endWabble
+
+            //ColorName
+            'has_color_name'       => (bool)UserPackHelper::getColorName($this->resource),
+            'vip' =>  [
+                'vip_img'      => UserPackHelper::getVipIcon($this->resource),
+                'colored_name' => UserPackHelper::getColorName($this->resource),
+            ],
+            //EndColorName
+            //AntiBan
+            'has_anti_ban'       => UserPackHelper::hasAntBan($this->resource),
+            //EndAntiBan
+
+            //Anonymous
+            'anonymous' => $this->packs->where('type', 17)->count() >= 1,
+            //EndAnonymous
+
+            'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
+            'country_hidden' => UserPackHelper::hasHideCountry($this->resource),
+
             'is_first' => (bool)$this->is_points_first,
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
-            'has_room' => $this->hasRoom(),
+            'has_room' => (bool)$ownerRoom,
             'google_bind' => (bool)@$this->google_id,
 
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
-                "owner_uuid" => @$this->uuid,
+                "owner_uuid" => $uuid,
                 "room_name" => @$ownerRoom->room_name ?? '',
                 "room_cover" => @$ownerRoom->room_cover ?? '',
                 "room_background" => @$ownerRoom->final_room_image ?? '',
@@ -223,31 +181,39 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-            'vip' => Common::ovip_center($this),
+
             'image' => @$this->UserVip->OVip->img,
             'family_id' => $f == null ? null : @$this->family_id,
-            'uuid' => @$this->uuid,
+            'uuid' => $uuid,
             'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',
-            'number_of_fans' => $this->followerss()->count(),
-            'number_of_followings' => $this->following()->count(),
-            'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-
+            'number_of_fans'       => $this->number_of_fans,
+            'number_of_followings' => $this->number_of_followings,
+            'number_of_friends'    => $this->number_of_friends,
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
-            'level' => Common::level_center(@$this),
-            'charge_level' => Common::chargeLevel(@$this->id),
+            'level' => [
+                'receiver_img' => $this->receiverLevel?->img,
+                'sender_img'   => $this->senderLevel?->img,
+            ],
+            'charge_level' =>  [
+                'current_level'  => $this->chargeLevel->level ?? 0,
+                'current_exp'    => $this->chargeLevel->exp ?? 0,
+                'current_img'    => $this->chargeLevel->img ?? '',
+                'next_level'     =>  0,
+                'next_exp'       =>  0,
+                'next_img'       =>  '',
+                'remaining'         =>  0,
+                'progress'          =>  0,
+            ],
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
-            $this->merge((new MyStoreResource($this->resource))),
+
             'family_data' => $f,
             'agency' => $agency_joined,
-            'Last_seen' => @$time_log->time ?? 0,
+            'Last_seen' => Carbon::createFromTimestamp($this->online_time)->format('d/m/y H:i'),
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
-            ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
-            'has_color_name'       => Common::hasInPack($this->id, 18, true),
-            'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
-            'anonymous' => $this->packs->where('type', 17)->count() >= 1,
+
             //            'country' => $this->country ?? null,
             'country' => $this->country ? [
                 'id' => $this->country->id,
@@ -258,8 +224,7 @@ class MyDataResource extends JsonResource
                 'phone_code' => $this->country->phone_code,
                 'iso' => substr($this->country->iso, 0, 2),
             ] : null,
-            'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
-            'country_hidden' => $isHideCountry,
+
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
@@ -275,17 +240,16 @@ class MyDataResource extends JsonResource
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
             'new_gift'          => (bool)$this->new_gift,
-            'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
+            'show_invite_code' => !$isStopInvitationValid && ($this->userSetting?->show_invite_code ?? false),
             'wallet' => $this->wallet?->value ?? 0,
             'user_types' => $this->user_types,
-            'wabble' => $this->getUesdUserPack(12),
-            'wabble_id' => $this->getUesdUserPackId(12),
+
             "shipping-agency" => $this->shippingAgency ? [
                 "id" => $this->shippingAgency->id,
                 "name" => $this->shippingAgency->name ?? '',
                 "image" => $this->shippingAgency->img ?? '',
-                "complete-transactions" => $this->shippingAgency->charges?->count() ?? 0,
-                "top_stars" => $starsImagesShippingAgency ?? (object)[],
+                "complete-transactions" =>  0,
+                "top_stars" => (object)[],
 
             ] : null,
 
@@ -324,37 +288,8 @@ class MyDataResource extends JsonResource
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 
-    public function getUserPack($type)
+    private static function isStopInvitationValid()
     {
-        $pack = $this->packs->where('type', $type)->first();
-        return $pack ?  new GeneralUserPackResource($pack) : [
-            'id'   =>  0,
-            'image_type' => 'png',
-            'key' => '',
-            'image' => 'wappel.png',
-        ];
-    }
-
-    public function getUesdUserPack($type)
-    {
-        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
-
-
-        return $pack ?  new GeneralUserPackResource($pack) : [
-            'id'   =>  0,
-            'image_type' => 'png',
-            'key' => '',
-            'image' => 'wappel.png',
-        ];
-    }
-    public function getUesdUserPackId($type)
-    {
-        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
-        return $pack ? @$pack?->ware->id : 0;
-    }
-    public function getUserPackId($type)
-    {
-        $pack = $this->packs->where('type', $type)->first();
-        return $pack ? @$pack?->ware->id : 0;
+        return settings()->get('stop_invite_code');
     }
 }

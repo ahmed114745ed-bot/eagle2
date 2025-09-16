@@ -2,6 +2,10 @@
 
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\GiftLogController;
+use App\Admin\Controllers\GiftLogTestController;
+use App\Admin\Controllers\InvitationSettingsController;
+use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
@@ -263,6 +267,9 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::resource('live-rooms', 'LiveRoomController');
+
+
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
@@ -525,7 +532,7 @@ Route::group(
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');
-        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');
@@ -554,6 +561,8 @@ Route::group(
         Route::resource('report-moments', ReportMomentController::class);
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
+        Route::resource('invitation-code/settings', InvitationSettingsController::class);
+
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
@@ -584,11 +593,12 @@ Route::group(
 
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
-        Route::resource('settings', SettingController::class)->except(['update']);
+        Route::resource('settings', SettingController::class)
+        ->except(['update'])
+        ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::resource('badges', BadgeController::class);
-
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
@@ -615,8 +625,31 @@ Route::group(
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
+        Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-});
+        Route::group(['middleware' => 'local'], function (){
+            Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
+            Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
+
+            Route::get('/my-data-test', [GiftLogTestController::class, 'myDataTest']);
+            Route::post('/my-data-test', [GiftLogTestController::class, 'mydataTest']);
+
+            Route::get('/relations-test', [GiftLogTestController::class, 'showRelations']);
+            Route::post('/relations-test', [GiftLogTestController::class, 'userFriend']);
+
+            Route::get('/visitors-test', [GiftLogTestController::class, 'showVisitors']);
+            Route::post('/visitors-test', [GiftLogTestController::class, 'visitorsList']);
+
+            Route::get('/room-admins-test', [GiftLogTestController::class, 'showRoomAdmin']);
+            Route::post('/room-admins-test', [GiftLogTestController::class, 'getAdmins']);
+
+            Route::get('/rooms-test', [GiftLogTestController::class, 'showRooms']);
+            Route::post('/rooms-test', [GiftLogTestController::class, 'rooms']);
+
+            Route::get('/search-test', [GiftLogTestController::class, 'showSearch']);
+            Route::post('/search-test', [GiftLogTestController::class, 'merge_search']);
+        });
+    });
 
 
 Route::group([

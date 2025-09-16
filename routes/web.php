@@ -1,9 +1,11 @@
 <?php
 
 use App\Admin\Controllers\BdController;
+use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Jobs\UpdateUserFollowCountsJob;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -129,6 +131,16 @@ Route::get('/clear', function () {
     return "Cleared!";
 });
 
+Route::get('/clear-opcache', function () {
+
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        return "OPcache cleared!";
+    }
+
+    return "OPcache not enabled.";
+});
+
 Route::get('/clear-config', function () {
 
     Artisan::call('config:clear');
@@ -140,6 +152,10 @@ Route::get('/clear-config', function () {
 
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
     return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
+});
+Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId) {
+    
+    return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
 
@@ -250,7 +266,7 @@ Route::group(
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
-        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
@@ -449,8 +465,8 @@ use App\Models\CoinGameUserAll;
 
 Route::get('/archive-old-coin-games', function () {
     $now = Carbon::now();
-    $start = $now->copy()->subMonth(); 
-    $end = $now->copy()->subYears(2); 
+    $start = $now->copy()->subMonth();
+    $end = $now->copy()->subYears(2);
 
     $current = $start->copy();
 
@@ -470,6 +486,20 @@ Route::get('/archive-old-coin-games', function () {
 
     return "✅ Archiving finished!";
 });
+
+
+
+
+
+Route::get('/update-user-follow-counts', function () {
+    UpdateUserFollowCountsJob::dispatch()
+    ->onQueue('follow_counts');
+    return response()->json([
+        'success' => true,
+        'message' => 'done'
+    ]);
+});
+
 
 
 

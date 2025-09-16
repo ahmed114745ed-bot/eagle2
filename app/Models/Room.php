@@ -289,12 +289,16 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-        //  dd($this->backgroundImage?->img);
-        $var = /*$this->mode == '3' ?
-            'custom_image/back-black.png' :*/
-            ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));
-
-        return $var;
+    
+        return $this->backgroundImage?->img
+            ?? $this->background?->img
+            ?? $this->defaultBackground?->img
+            ?? request()->default_background;
+    }
+    
+    public function defaultBackground()
+    {
+        return $this->hasOne(Background::class, 'id')->where('enable', 1)->orderBy('id');
     }
 
     public function getModeAttribute($value)

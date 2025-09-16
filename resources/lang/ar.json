@@ -31,6 +31,10 @@
 "Delete weekly cp": "حذف CP أسبوعي",
 "Edit weekly cp": "تعديل CP أسبوعي",
 "certificate":"شهادة",
+"YouTube Settings": "إعدادات يوتيوب",
+"Live Settings": "إعدادات البث المباشر",
+"Enable youtube Feature": "تفعيل ميزة يوتيوب",
+"Enable live Feature": "تفعيل ميزة البث المباشر",
 
 
     "This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.": "تم إغلاق هذة الغرفة ولن تستطيع الدخول حتي يتم الغاء الحظر عن هذه الغرفة من خلال مشرفين الغرفة",    "action": "عمليات",
@@ -3666,6 +3670,8 @@
 "Room Boom Reward": "مكافأة روم بوم",
 "Edit Room Boom Reward": "تعديل مكافأة روم بوم",
 "Create Room Boom Reward": "إنشاء مكافأة روم بوم",
+    "Room Boom Winners": "الفائزون في روم بوم",
+    "Browse room boom winners": "تصفح الفائزين في روم بوم",
 "target type": "نوع الهدف",
 "You can only have a maximum of 7 gifts for this Room Boom Level.": "يمكنك إضافة 7 هدايا كحد أقصى لهذا المستوى من روم بوم.",
 "Created successfully": "تم الإنشاء بنجاح",
@@ -3741,6 +3747,37 @@
   "User": "المستخدم",
   "Game": "اللعبة",
     "filters.expired_zero_or_null": "منتهي (صفر أو فارغ)",
-  "filters.yes": "نعم"
+    "Display At": "عرض في",
+    "Home Top": "أعلى الصفحة الرئيسية",
+    "Home Middle": "وسط الصفحة الرئيسية",
+    "Discover": "اكتشف",
+    "Represents the stage or rank of the Room Boom.": "يمثل المرحلة أو الرتبة في خاصية الروم بوم",
+    "The minimum required gifts to activate the Boom Room at this level.": "الحد الأدنى المطلوب من الهدايا لتفعيل الروم البوم عند هذا المستوى.",
+    "The full target that must be achieved to complete the Room Boom at this level.": "الهدف الكامل الذي يجب تحقيقه لإكمال الروم بوم عند هذا المستوى.",
+    "The special video for this level, displayed after completion. Each level has its own unique video.": "الفيديو الخاص المخصص لهذا المستوى، والذي يتم عرضه بعد إكمال المستوى. كل مستوى له فيديو مميز خاص به.",
+  "filters.yes": "نعم",
+  "Live-rooms":"الغرف المباشرة",
+  "Live Rooms":"الغرف المباشرة",
+  "live rooms":"الغرف المباشرة",
+  "live-rooms":"الغرف المباشرة",
+  "invitation.earn_percentage": "نسبة أرباح الداعي (%)",
+  "invitation.earn_percentage_help": "النسبة المئوية التي يحصل عليها الداعي من كل شحنة يقوم بها المدعو خلال شهر من الدعوة.",
+  "invitation.host_reward": "جائزة الداعي (كوينز)",
+  "invitation.host_reward_help": "عدد الكوينزات التي يحصل عليها الداعي مباشرة بعد إدخال المدعو للكود.",
+  "invitation.invitee_reward": "جائزة المدعو (كوينز)",
+  "invitation.invitee_reward_help": "عدد الكوينزات التي يحصل عليها المدعو عند استخدام الكود.",
+  "invitation.saved_successfully": "تم حفظ إعدادات كود الدعوة بنجاح",
+  "invitation.user_not_found": "لم يتم العثور علي المستخدم",
+  "invitation.validation_failed": "لقد مر علي المستخدم 48 ساعة من تاريخ انشائه أو المستخدم مسجل من قبل لدي شخص آخر",
+  "invitation.success": "تمت الإضافة بنجاح",
+  "invitation.already_registered": "المستخدم مسجل من قبل",
+  "invitation.device_in_use": "لقد تم استخدام هذا الكود  من قبل مع حساب آخر لهذا الجهاز",
+  "invitation.stopped": "عذراً، نظام الدعوات متوقف حالياً",
+    "Show Image": "عرض الصورة",
+    "Alternative Image": "صورة بديلة",
+  "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount."
+
+
+
 
 }

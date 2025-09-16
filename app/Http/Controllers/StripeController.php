@@ -9,6 +9,7 @@ use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
 use App\Models\Setting;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Services\StripeService;
 use App\Traits\User\PaymentTrait;
@@ -178,14 +179,24 @@ class StripeController extends Controller
         if ($this->isAlreadyProcessed($coinLog)) return;
     
         $this->updateCoinLogAsPaid($coinLog, $trxId);
-    
-        $user = $coinLog->user;
-        if (!$user) {
-            return  $this->handleMissingUser($coinLog);
-        }
-    
-        $this->processUserPayment($user, $coinLog);
+        $this->resolveCoinLogOwner($coinLog);
+
         return   $this->finalizeResponse($coinLog);
+    }
+
+    private function resolveCoinLogOwner(CoinLog $coinLog)
+    {
+        $owner = $coinLog->owner;
+
+        if ($owner instanceof User) {
+            return $this->processUserPayment($owner, $coinLog);
+        }
+
+        if ($owner instanceof ShippingAgency) {
+            return $this->processAgencyPayment($owner, $coinLog);
+        }
+
+        return null;
     }
 
     private function findCoinLog(?string $orderId, ?string $trxId): ?CoinLog
@@ -255,6 +266,12 @@ class StripeController extends Controller
     
         Log::info("Stripe Webhook: User {$user->id} credited with {$coinLog->obtained_coins} coins");
     }
+
+    private function processAgencyPayment(ShippingAgency $agency, CoinLog $coinLog): void
+    {
+        $agency->increment('coins', $coinLog->obtained_coins);
+        Log::info("Stripe Webhook: User {$agency->id} credited with {$coinLog->obtained_coins} coins");
+    }
     
     private function finalizeResponse(CoinLog $coinLog)
     {
@@ -291,9 +308,14 @@ class StripeController extends Controller
         }
     }
 
-    public function cancel()
+    public function cancel(Request $request)
     {
-        return response()->json(['status' => 'cancelled', 'message' => 'Payment cancelled.',]);
+
+        return response()->json([
+            'status'  => false,
+            'trx'     => '',
+            'message' => 'Transaction cancelled.',
+        ], 500);
     }
 
 }

@@ -10,7 +10,13 @@ class UserEarnInvitation extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['id', 'parent_id', 'user_id', 'user_charge', 'parent_percentage'];
+    protected $fillable = ['id', 'parent_id', 'user_id', 'user_charge', 'parent_percentage',
+                            'source_type',
+                            'amount',
+                            'charge_id',
+                            'is_claimed',
+                            'meta',
+                        ];
 
     public function user()
     {

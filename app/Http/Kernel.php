@@ -88,12 +88,12 @@ class Kernel extends HttpKernel
         'adminGeneralBan'=>AdminGeneralBanMiddleware::class,
         'checkLatestToken' => \App\Http\Middleware\CheckLatestToken::class,
         'userBan'=>UserBanMiddleware::class,
-        'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
+//        'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
         'checkCpu' => \App\Http\Middleware\CheckCpu::class,
         'configM' => ConfigMiddleware::class,
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
-        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
+//        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
         'auth.redirect' => CheckLoginAdmin::class,
@@ -102,11 +102,12 @@ class Kernel extends HttpKernel
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
-        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
+//        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
         'web-agency-feature' => WebAgencyFeatureEnable::class,
         'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
+        'local' => \App\Http\Middleware\LocalOnly::class,
 
     ];
 }

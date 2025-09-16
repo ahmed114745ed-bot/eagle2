@@ -51,11 +51,11 @@ class MomentRepository
 
     public function getUserMoments($userId, $page)
     {
-        return Moment::where('user_id', $userId)
+        return Moment::withUser()->where('user_id', $userId)
             ->whereHas('user')->with('images')
             ->likeExists($userId)
             ->withCount(['likes', 'comments'])
-            ->with(['user', 'gifts' => function ($query) {
+            ->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
@@ -70,7 +70,6 @@ class MomentRepository
     public function getLikedMoments($userId, $page)
     {
         return MomentLikes::with([
-            'moment.user',
             'moment' => function ($query) use ($userId) {
                 $query->likeExists($userId)->with('images')
                     ->withCount(['likes', 'comments'])
@@ -112,10 +111,10 @@ class MomentRepository
 
     public function getAllMoments($userId, $page)
     {
-        return Moment::likeExists($userId)
+        return Moment::withUser()->likeExists($userId)
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with(['user', 'gifts' => function ($query) {
+            ->with([ 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
@@ -129,10 +128,10 @@ class MomentRepository
 
     public function getNewMoments($userId)
     {
-        return Moment::likeExists($userId)
+        return Moment::withUser()->likeExists($userId)
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with(['user', 'gifts' => function ($query) {
+            ->with([ 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])

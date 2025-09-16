@@ -160,7 +160,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','huawei_version','android_version','ios_version', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -353,7 +353,9 @@ class UserController extends MainController
             }
             if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new CanPlaySwitchAction());
+                $row = $actions->row; // force load
+
+                $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
             }
             if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
@@ -499,7 +501,8 @@ class UserController extends MainController
 
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
-        }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
+        }])->orderByDesc('is_used')->latest()->paginate(10, ['*'], 'pack_page');
+
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $hasVip = UserVip::where('user_id', $id)
             ->where('is_used', 1)
@@ -831,12 +834,7 @@ class UserController extends MainController
         return $form;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
+
 
     public function request_invite_code(Request $request)
     {
@@ -845,6 +843,8 @@ class UserController extends MainController
         } else {
             settings()->set("stop_invite_code", "0");
         }
+
+        return true;
     }
 
 
