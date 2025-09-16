@@ -155,6 +155,7 @@ class RoomRepository extends AbstractRepository
                 'boxUse',
                 'owner' => [
                     'enabledMedals',
+//                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
                     'country',
                     'color_image',
                     'specialId.ware',
