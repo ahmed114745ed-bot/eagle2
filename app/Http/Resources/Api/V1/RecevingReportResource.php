@@ -35,6 +35,8 @@ class RecevingReportResource extends JsonResource
             'created_at'    => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
             'name'          => $charger['name'] ?? '',
             'image'         => $charger['image'] ?? '',
+            'color_name'    => common::wareUserVipV2($charger['id'], 18, 'color') ?? ''
+
         ];
     }
 }

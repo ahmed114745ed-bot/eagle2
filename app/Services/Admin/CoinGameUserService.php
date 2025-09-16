@@ -4,13 +4,12 @@ namespace App\Services\Admin;
 
 use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAggregated;
-use App\Models\CoinGameUserAll;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\InfoBox;
-use App\Admin\Services\UserService;
+use App\Admin\Services\UserGameService;
 use Encore\Admin\Facades\Admin;
 
 
@@ -18,7 +17,7 @@ class CoinGameUserService
 {
     protected $userService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserGameService $userService)
     {
         $this->userService = $userService;
     }
@@ -47,7 +46,7 @@ class CoinGameUserService
     /**
      * Apply filters to aggregated query (الفيو).
      */
-    public function applyFilters($query, array $filters)
+    public function applyFilters($query,  array $filters)
     {
         if (!empty($filters['user_uuid'])) {
             $userId = $filters['user_uuid'];
@@ -69,11 +68,11 @@ class CoinGameUserService
             });
         }
     
-        if (!empty($filters['created_at']['start']) && !empty($filters['created_at']['end'])) {
-            $query->whereBetween('date', [
-                $filters['created_at']['start'],
-                $filters['created_at']['end']
-            ]);
+        if (!empty($filters['date']['start']) && !empty($filters['date']['end'])) {
+            $start = \Carbon::parse($filters['date']['start'])->startOfDay();
+            $end   = \Carbon::parse($filters['date']['end'])->endOfDay();
+        
+            $query->whereBetween('date', [$start, $end]);
         }
     
         return $query;
@@ -82,16 +81,20 @@ class CoinGameUserService
     /**
      * Calculate totals from aggregated view.
      */
-    public function calculateTotals($query, $filters): object
+    public function calculateTotals($query ,$filters): object
     {
-        $query = $this->applyFilters($query, $filters); 
-        $totals = $query->selectRaw("
+        $query = CoinGameUserAggregated::query()
+            ->join('users', 'users.id', '=', 'coin_game_users_aggregated.user_id')
+            ->join('all_games', 'all_games.id', '=', 'coin_game_users_aggregated.game_id');
+
+        $query = $this->applyFilters($query, $filters);
+
+        return $query->selectRaw("
             SUM(total_played) as total_played,
             SUM(total_loss) as total_loss,
             SUM(total_win) as total_win,
-            SUM(app_profit) as app_profit
+            SUM(total_loss - total_win) as app_profit
         ")->first();
-        return $totals;
     }
 
     /**
@@ -128,72 +131,77 @@ class CoinGameUserService
 
     /**
      * Build main grid.
-     */
+     */ 
     public function buildGrid(): Grid
     {
         $grid = new Grid(new CoinGameUserAggregated());
-
-        $grid->model()
-            ->with(['user:id,name,uuid', 'game'])
-            ->orderByDesc('total_played');
-        
-
-        $this->applyGridFilters($grid);
-
-        $grid->column('user_id', __('user'))->display(function () {
-            $user = $this->user;
-            if (!$user) return __('No User');
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+    
+        $grid->model()->orderByDesc('total_played');
+    
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+    
+            $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
+            $filter->like('game_name', 'Game')->placeholder('Name or ID');
+            $filter->between('date', __('Created At'))->datetime([
+                'format' => 'YYYY-MM-DD HH:mm:ss',
+                'locale' => 'en'
+            ]);
         });
-
+    
+        $userService = $this->userService;
+    
+        // عرض المستخدم
+        $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
+            return $userService->adminUserAvatar((object)[
+                'id'     => $this->user_id,
+                'uuid'   => $this->user_uuid,
+                'name'   => $this->user_name,
+                'avatar' => $this->user_avatar,
+            ], withoutLevels: true);
+        });
+    
+        // عرض اللعبة
         $grid->column('game_id', __('Game'))->display(function () {
-            $game = $this->game; // لم يعد يحتاج find()
-            if (!$game) return '-';
-
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($game->image) ?? $defaultImage;
+            $url = getImagePath($this->game_image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
-
-            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50, 0);
-            $gameIdHtml = "game-{$game->id}";
-            $urlLink = admin_url("all-games/{$game->id}");
-
+    
+            $uniqueId = $this->game_id ?? 'game-unknown';
+            $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
+            
+            $gameIdHtml = "game-{$this->game_id}";
+            $urlLink = admin_url("all-games/{$this->game_id}");
+    
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
                 $imageTag
                 <div>
-                    <strong style="font-size:16px;">{$game->name}</strong><br>
+                    <strong style="font-size:16px;">{$this->game_name}</strong><br>
                     <span style="font-size:13px;">
-                        ID: <span id="{$gameIdHtml}">{$game->id}</span>
+                        ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
                         <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')" style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;" title="Copy ID">📝</button>
                     </span>
                 </div>
             </a>
         HTML;
         });
+    
+        // أعمدة الأرقام
+        $grid->column('total_played', __('Total Played'))->display(fn($v) => number_format($v));
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
-        $grid->column('app_profit', __('App Profit'))->display(fn($v) =>  number_format($this->total_loss - $this->total_win  ));
-        if ( Admin::user()->can('details-switch-coin-game-users-report') || Admin::user()->can('*')) {
-
-            $grid->column('details', __('Details'))->display(function () {
-
-                $filters = request()->only(['created_at', 'user_id', 'game_id']);
-                $queryString = http_build_query($filters);
-                $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
-                return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                        <i class='fa fa-eye'></i> " . __('round_details') . "
-                    </a>";
-            });
-        }
-
-
+        $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
+    
+        // تعطيل الأدوات
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
-
+    
         return $grid;
     }
+
 
     /**
      * Build detailed grid for a user/game.
