@@ -110,7 +110,7 @@ class CoinGameUserService
             $filter->disableIdFilter();
         
             $filter->like('user_uuid', 'User')->placeholder('UUID');
-            $filter->like('game_id', 'Game')->placeholder('Name or ID');
+            $filter->like('game_id', 'Game')->placeholder(' ID');
             // فلتر التاريخ
             $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
