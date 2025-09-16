@@ -385,9 +385,7 @@ class RoomRepoService
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
-        $settings = Setting::where('key', 'youtube_status')->first();
-        $youtubeStatus = $settings ? (bool)$settings->value : true;
-
+        $youtubeStatus =  (bool)(getCashSetting('youtube_status') ?? true);
         if ($currentMode == 5 && $youtubeStatus === false) return Common::apiResponse(0, __('this feature stopped'), null, 404);
         //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
