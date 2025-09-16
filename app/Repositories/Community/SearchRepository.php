@@ -2,15 +2,10 @@
 
 namespace App\Repositories\Community;
 
-use App\Helpers\Common;
 use App\Http\Resources\Api\V1\CommunityResource;
-use App\Models\BlackList;
 use App\Models\OfficialMessage;
-use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -188,7 +183,7 @@ class SearchRepository implements SearchRepositoryInterface
         return $users;
     }
 
-    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): LengthAwarePaginator|array
+    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
             return [];
