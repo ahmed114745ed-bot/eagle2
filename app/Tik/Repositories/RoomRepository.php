@@ -154,7 +154,7 @@ class RoomRepository extends AbstractRepository
                 'roomVisitors',
                 'boxUse',
                 'owner' => [
-//                    'enabledMedals',
+                    'enabledMedals',
                     'country',
                     'color_image',
                     'specialId.ware',
