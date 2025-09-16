@@ -43,8 +43,14 @@ class RoomAdminsResource extends JsonResource
 //            'chat_setting' => $chatSetting ? new ChatSettingResource($chatSetting) : null,
 //            'change_room_effect' => $userSetting ? new ShowUserSettingResource($userSetting) : null,
 //            'my_agency' => $ownAgency ? $ownAgency->only(['id','name','status','img','phone','url','contents']) : null,
+            'level' => Common::level_center_search(@$this),
 //            'level' => $this->preloaded_level ,
 //            'user_types' => $this->user_types2 ?? [0],
+            'special_color'    => @$this->color_id ??'',
+            'has_color_name' => $this->getPackWithTypeV2(18), // both
+            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            'image_color'          => @$this->color_image,
         ];
     }
 
