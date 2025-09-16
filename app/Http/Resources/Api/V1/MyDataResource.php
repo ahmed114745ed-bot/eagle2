@@ -107,7 +107,7 @@ class MyDataResource extends JsonResource
             $counters['message'] = $userCounterServices->getCountByType($this->resource, 'message');
         }
 
-        $ownerRoom = $this->ownerRoom;
+        $ownerRoom = $this->ownerAudioRoom;
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/

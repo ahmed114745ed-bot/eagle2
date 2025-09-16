@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
+
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 
@@ -683,8 +684,18 @@ if (!function_exists('getTimezone')) {
     }
 }
 
+if (!function_exists('getSettingCash')) {
+    function getSettingCash($key)
+    {
+        return \Cache::rememberForever($key, function () use ($key) {
+            $setting = \App\Models\Setting::where('key', $key)->first();
+            return $setting?->value;
+        });
+    }
+}
+
 if (! function_exists('getFavIcon')) {
-    function getFavIcon() : ?string
+    function getFavIcon(): ?string
     {
         return \Cache::rememberForever('favicon', function () {
             $favIcon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');

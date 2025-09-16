@@ -24,7 +24,6 @@ return new class extends Migration
             $table->index('type', 'idx_cgua_type');
         });
 
-        // إنشاء الـ view المجمع
         DB::statement("
             CREATE OR REPLACE VIEW coin_game_users_merged AS
             SELECT 
