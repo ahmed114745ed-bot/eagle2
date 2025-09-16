@@ -259,8 +259,16 @@ class CpRepository
             ->get();
     }
 
+
+
+
+
     // public function getCpRanking($relationType, $type)
     // {
+    //     $t = is_numeric($type) ? (int) $type : null;
+    //     $timezone = getTimezone();
+    //     $now = \Carbon\Carbon::now($timezone);
+
     //     return GiftLog::query()
     //         ->selectRaw('
     //         cps.id as cp_id,
@@ -276,15 +284,39 @@ class CpRepository
     //         ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
     //         ->whereNotNull('gift_logs.cp_id')
     //         ->where('cp_relations.type', $relationType)
-    //         ->when($type, function ($query) use ($type) {
-    //             return match ($type) {
-    //                 1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
-    //                 2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-    //                 3 => $query->whereMonth('gift_logs.created_at', now()->month)
-    //                     ->whereYear('gift_logs.created_at', now()->year),
-    //                 default => $query
-    //             };
-    //         })
+
+    //         // Today
+    //         ->when(
+    //             $t === 1,
+    //             function ($q) use ($now) {
+    //                 // debugging stops here
+    //                 return $q->whereBetween('gift_logs.created_at', [
+    //                     $now->copy()->startOfDay()->toDateTimeString(),
+    //                     $now->copy()->endOfDay()->toDateTimeString(),
+    //                 ]);
+    //             }
+    //         )
+
+    //         // This week (Saturday–Friday in your code)
+    //         ->when(
+    //             $t === 2,
+    //             fn($q) =>
+    //             $q->whereBetween('gift_logs.created_at', [
+    //                 $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->startOfDay()->toDateTimeString(),
+    //                 $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->addDays(6)->endOfDay()->toDateTimeString(),
+    //             ])
+    //         )
+
+    //         // This month
+    //         ->when(
+    //             $t === 3,
+    //             fn($q) =>
+    //             $q->whereBetween('gift_logs.created_at', [
+    //                 $now->copy()->startOfMonth()->startOfDay()->toDateTimeString(),
+    //                 $now->copy()->endOfMonth()->endOfDay()->toDateTimeString(),
+    //             ])
+    //         )
+
     //         ->groupBy(
     //             'cps.id',
     //             'cps.di',
@@ -299,14 +331,10 @@ class CpRepository
     //         ->get()
     //         ->map(function ($row) {
     //             $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
-    //             if ($cp) {
-    //                 $cp->total_gifts = $row->total_gifts;
-    //             }
+    //             if ($cp) $cp->total_gifts = $row->total_gifts;
     //             return $cp;
     //         });
     // }
-
-
 
     public function getCpRanking($relationType, $type)
     {
@@ -314,9 +342,9 @@ class CpRepository
         $timezone = getTimezone();
         $now = \Carbon\Carbon::now($timezone);
 
-        return GiftLog::query()
+        $query = GiftLog::query()
             ->selectRaw('
-            cps.id as cp_id,
+            cps.id,
             cps.di,
             cps.level_id,
             cps.user_one_id,
@@ -328,40 +356,37 @@ class CpRepository
             ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
             ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
             ->whereNotNull('gift_logs.cp_id')
-            ->where('cp_relations.type', $relationType)
+            ->where('cp_relations.type', $relationType);
 
-            // Today
-            ->when(
-                $t === 1,
-                function ($q) use ($now) {
-                    // debugging stops here
-                    return $q->whereBetween('gift_logs.created_at', [
-                        $now->copy()->startOfDay()->toDateTimeString(),
-                        $now->copy()->endOfDay()->toDateTimeString(),
-                    ]);
-                }
-            )
+        // Apply date filter
+        $query->when(
+            $t === 1,
+            fn($q) =>
+            $q->whereBetween('gift_logs.created_at', [
+                $now->copy()->startOfDay()->toDateTimeString(),
+                $now->copy()->endOfDay()->toDateTimeString(),
+            ])
+        );
 
-            // This week (Saturday–Friday in your code)
-            ->when(
-                $t === 2,
-                fn($q) =>
-                $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->startOfDay()->toDateTimeString(),
-                    $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->addDays(6)->endOfDay()->toDateTimeString(),
-                ])
-            )
+        $query->when(
+            $t === 2,
+            fn($q) =>
+            $q->whereBetween('gift_logs.created_at', [
+                $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY),
+                $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->addDays(6)->endOfDay(),
+            ])
+        );
 
-            // This month
-            ->when(
-                $t === 3,
-                fn($q) =>
-                $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfMonth()->startOfDay()->toDateTimeString(),
-                    $now->copy()->endOfMonth()->endOfDay()->toDateTimeString(),
-                ])
-            )
+        $query->when(
+            $t === 3,
+            fn($q) =>
+            $q->whereBetween('gift_logs.created_at', [
+                $now->copy()->startOfMonth(),
+                $now->copy()->endOfMonth(),
+            ])
+        );
 
+        $rows = $query
             ->groupBy(
                 'cps.id',
                 'cps.di',
@@ -373,13 +398,26 @@ class CpRepository
             )
             ->orderByDesc('total_gifts')
             ->limit(20)
+            ->get();
+
+        // preload CPs with relations in one query
+        $cpIds = $rows->pluck('id');
+        $cps = \App\Models\Cp::with(['level:id,img', 'fromUser.profile:id,user_id,avatar,gender', 'toUser.profile:id,user_id,avatar,gender', 'fromUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'), 'toUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])
+            ->whereIn('id', $cpIds)
             ->get()
-            ->map(function ($row) {
-                $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
-                if ($cp) $cp->total_gifts = $row->total_gifts;
+            ->keyBy('id');
+
+        // merge totals into the Cp models
+        return $rows->map(function ($row) use ($cps) {
+            if ($cps->has($row->id)) {
+                $cp = $cps[$row->id];
+                $cp->total_gifts = (int) $row->total_gifts;
                 return $cp;
-            });
+            }
+            return null;
+        })->filter();
     }
+
 
 
     public function getCpRankingWithOutRelation(int $type)
