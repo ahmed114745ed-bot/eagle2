@@ -771,6 +771,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'id');
     }
 
+    public function ownerAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'id')->where('type' , 'audio');
+    }
+
     public function familyType()
     {
         return $this->hasOne(FamilyUser::class, 'user_id', 'id');
