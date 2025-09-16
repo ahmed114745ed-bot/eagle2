@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\InfoBox;
 use App\Admin\Services\UserGameService;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Carbon;
 
 
 class CoinGameUserService
@@ -70,8 +71,8 @@ class CoinGameUserService
         }
     
         if (!empty($filters['date']['start']) && !empty($filters['date']['end'])) {
-            $start = \Carbon::parse($filters['date']['start'])->startOfDay();
-            $end   = \Carbon::parse($filters['date']['end'])->endOfDay();
+            $start = Carbon::parse($filters['date']['start'])->startOfDay();
+            $end   = Carbon::parse($filters['date']['end'])->endOfDay();
         
             $query->whereBetween('date', [$start, $end]);
         }
@@ -196,7 +197,7 @@ class CoinGameUserService
     
         $grid->column('details', __('Details'))->display(function () {
 
-            $filters = request()->only(['created_at', 'user_id', 'game_id']);
+            $filters = request()->only(['date', 'user_id', 'game_id']);
             $queryString = http_build_query($filters);
             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
@@ -220,7 +221,7 @@ class CoinGameUserService
     {
         $grid = new Grid(new CoinGameUserAll());
 
-        $createdAt = request('created_at', []);
+        $createdAt = request('date', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
         }
