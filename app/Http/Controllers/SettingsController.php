@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
+use App\Jobs\ChangeCinemaModeJob;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\File;
 use App\Models\MonthlyDiamondReceive;
@@ -199,10 +200,11 @@ class SettingsController extends Controller
                     Cache::put($key, $value);
                 }
             }
-            
+
             if ($request->youtube_status == 0) {
-               
-                Room::where('mode', 5)->update(['mode' => 1]);
+                dispatch(new ChangeCinemaModeJob());
+
+                // Room::where('mode', 5)->update(['mode' => 1]);
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
