@@ -225,7 +225,9 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('status', 1)
             ->having('total_score', '>', 0)
             ->orderByDesc('total_score')
-            ->paginate(10, ['*'], 'page', $page);
+            ->take(10)
+            ->get();
+//            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
