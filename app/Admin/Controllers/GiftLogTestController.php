@@ -211,9 +211,14 @@ class GiftLogTestController extends Controller
 
         (new SearchRepository())->saveSearchHistory($user_id, $keywords);
 
+        $user = User::with(['blockedUsers:id,from_uid', 'blockedMe:id,user_id'])->find(303);
+        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
+
         $result = [
-            'user' => UserResourceSearchV2::collection($this->userSearchHand($user_id, $keywords)),
-//            'rooms' => RoomSearchResource::collection($this->searchRooms($user_id, $keywords)),
+            'user' => UserResourceSearchV2::collection($this->userSearchHand($user_id, $keywords, $blockedUserIds)),
+            'rooms' => RoomSearchResource::collection($this->searchRooms($user_id, $keywords, $blockedUserIds)),
             ];
 
         return view('test.search', [
@@ -223,18 +228,11 @@ class GiftLogTestController extends Controller
         ]);
     }
 
-    public function userSearchHand(int $userId, string $keywords, int $page = 1)
+    public function userSearchHand(int $userId, string $keywords, $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
             return [];
         }
-
-        $whereOr = ['uuid' => $keywords];
-
-        $user = User::with(['blockedUsers:id,from_uid', 'blockedMe:id,user_id'])->find(303);
-        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
-        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
-        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
         $users = User::query()
             ->select([
@@ -267,18 +265,15 @@ class GiftLogTestController extends Controller
             ->where('status', 1)
             ->having('total_score', '>', 0)
             ->orderByDesc('total_score')
-            ->paginate(10, ['*'], 'page', $page);
+            ->take(10)
+            ->get();
+//            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
 
-    public function searchRooms(int $userId, string $keywords, int $page = 1): array|Collection
+    public function searchRooms(int $userId, string $keywords, $blockedUserIds, int $page = 1): array|Collection
     {
-        $user = User::with(['blockedUsers:id,from_uid', 'blockedMe:id,user_id'])->find(303);
-        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
-        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
-        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
-
         $user = User::query()
             ->fitterByUuid($keywords)
             ->with(['packs' => function ($q) {
@@ -302,7 +297,10 @@ class GiftLogTestController extends Controller
 
         $keywords = $user->id;
 
-        return Room::with('owner')
+        return Room::with([
+            'owner',
+            'owner.packs'
+        ])
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
