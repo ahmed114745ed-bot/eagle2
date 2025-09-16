@@ -52,22 +52,14 @@ class CoinGameUserService
     {
         if (!empty($filters['user_uuid'])) {
             $userId = $filters['user_uuid'];
-    
-          
-  
-            $query->whereHas('user', function ($q) use ($userId) {
-                $q->where('name', 'like', "%{$userId}%")
-                  ->orWhere('uuid', 'like', "%{$userId}%");
-            });
-        
+            $query->Where('user_uuid', 'like', "%{$userId}%");
+ 
         }
     
         if (!empty($filters['game_id'])) {
             $gameId = $filters['game_id'];
-            $query->whereHas('game', function ($q) use ($gameId) {
-                $q->where('name', 'like', "%{$gameId}%")
-                  ->orWhere('id', $gameId);
-            });
+            $query->Where('game_id', $gameId);
+        
         }
     
         if (!empty($filters['date']['start']) && !empty($filters['date']['end'])) {
@@ -85,10 +77,7 @@ class CoinGameUserService
      */
     public function calculateTotals($query ,$filters): object
     {
-        $query = CoinGameUserAggregated::query()
-            ->join('users', 'users.id', '=', 'coin_game_users_aggregated.user_id')
-            ->join('all_games', 'all_games.id', '=', 'coin_game_users_aggregated.game_id');
-
+ 
         $query = $this->applyFilters($query, $filters);
 
         return $query->selectRaw("
@@ -145,7 +134,7 @@ class CoinGameUserService
             $filter->disableIdFilter();
     
             $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
-            $filter->like('game_name', 'Game')->placeholder('Name or ID');
+            $filter->like('game_id', 'Game')->placeholder('ID');
             $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
