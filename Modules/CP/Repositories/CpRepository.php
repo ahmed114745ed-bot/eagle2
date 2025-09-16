@@ -80,10 +80,9 @@ class CpRepository
                     $query->where("user_two_id", $userId)
                         ->where("user_one_id", $otherUserId);
                 });
-
         })->whereHas("cpRelation", function ($q) {
-                $q->where('type', '!=', 'solution');
-            })
+            $q->where('type', '!=', 'solution');
+        })
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
@@ -334,11 +333,13 @@ class CpRepository
             // Today
             ->when(
                 $t === 1,
-                fn($q) =>
-                $q->whereBetween('gift_logs.created_at', [
-                    $now->startOfDay(),
-                    $now->endOfDay(),
-                ])
+                function ($q) use ($now) {
+                    // debugging stops here
+                    return $q->whereBetween('gift_logs.created_at', [
+                        $now->copy()->startOfDay()->toDateTimeString(),
+                        $now->copy()->endOfDay()->toDateTimeString(),
+                    ]);
+                }
             )
 
             // This week (Saturday–Friday in your code)
@@ -413,8 +414,8 @@ class CpRepository
                     ->with(['relation:id,type']);
             }])
             ->get();
-            // ->groupBy('cp.relation.type') // just grouping final small set
-            // ->map(fn($group) => $group->first()); // pick top 1 per type
+        // ->groupBy('cp.relation.type') // just grouping final small set
+        // ->map(fn($group) => $group->first()); // pick top 1 per type
 
         return $result;
     }
