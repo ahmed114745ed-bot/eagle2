@@ -172,4 +172,23 @@ class GiftLogTestController extends Controller
             'data'    => $data,
         ]);
     }
+
+    public function showRooms()
+    {
+        return view('test.rooms');
+    }
+
+    public function rooms(Request $request)
+    {
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getAllRooms($request);
+
+        $data = RoomResource::collection($rooms);
+
+        return view('test.rooms', [
+            'success' => true,
+            'message' => '',
+            'data'    => $data,
+        ]);
+    }
 }
