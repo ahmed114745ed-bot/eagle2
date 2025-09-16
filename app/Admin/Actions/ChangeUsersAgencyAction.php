@@ -94,31 +94,27 @@ class ChangeUsersAgencyAction extends RowAction
      */
     private function handleUserSalaries(User $user)
     {
+   
         $agencyId = $user->agency_id;
+        $timezone = getTimezone();
+        $currentMonth = now( $timezone)->month;
+        $currentYear = now( $timezone)->year;
 
         $userSalaries = UserSallary::query()
             ->where('user_id', $user->id)
             ->where('user_agency_id', $agencyId)
-            ->latest()
-            ->take(2)
-            ->get();
-
-        if ($userSalaries->isEmpty()) return;
-
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
-
-        $currentSalary = $userSalaries[0];
-
-        if ($currentSalary->month == $currentMonth && $currentSalary->year == $currentYear) {
-            if (isset($userSalaries[1]) && $currentSalary->cut_amount >= $currentSalary->sallary) {
-                $prevSalary = $userSalaries[1];
-                $prevSalary->cut_amount += ($currentSalary->cut_amount - $currentSalary->sallary);
-                $prevSalary->save();
-            }
-
-            $currentSalary->update(['is_finished' => 1]);
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->where('is_finished', 0)
+            ->first();
+         
+        if (!$userSalaries) return;
+       
+        if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
+          
+            $userSalaries->update(['is_finished' => 1]);
         }
+    
     }
 
 
