@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAggregated;
+use App\Models\CoinGameUserAll;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Grid;
@@ -189,10 +190,19 @@ class CoinGameUserService
         });
     
         // أعمدة الأرقام
-        $grid->column('total_played', __('Total Played'))->display(fn($v) => number_format($v));
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
         $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
+    
+        $grid->column('details', __('Details'))->display(function () {
+
+            $filters = request()->only(['created_at', 'user_id', 'game_id']);
+            $queryString = http_build_query($filters);
+            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
+            return "<a href='{$url}' class='btn btn-sm btn-primary'>
+                    <i class='fa fa-eye'></i> " . __('round_details') . "
+                </a>";
+        });
     
         // تعطيل الأدوات
         $grid->disableCreateButton();
@@ -208,7 +218,7 @@ class CoinGameUserService
      */
     public function buildShowAllGrid($userId, $gameId): Grid
     {
-        $grid = new Grid(new CoinGameUserAggregated());
+        $grid = new Grid(new CoinGameUserAll());
 
         $createdAt = request('created_at', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
