@@ -793,6 +793,22 @@ trait CalcsTrait
         return $data;
     }
 
+    public static function level_centerSerchV2($user_id)
+    {
+        $user = User::query()->find($user_id);
+
+        $star_level_img      = self::getLevel($user_id, 1, true);
+
+        $gold_level_img      = self::getLevel($user_id, 2, true);
+
+        $data['receiver_img']        = $star_level_img;
+        $data['sender_img']          = $gold_level_img;
+
+        $data['sender_level'] = @$user->total_sender_level;
+        $data['reciver_level'] = @$user->total_received_level;
+
+        return $data;
+    }
     //مركز الأعضاء
     public static function vip_center($user_id, $level = null)
     {
