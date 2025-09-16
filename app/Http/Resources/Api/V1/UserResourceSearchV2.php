@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
-class UserResourceSerchV2 extends JsonResource
+class UserResourceSearchV2 extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -66,7 +66,7 @@ class UserResourceSerchV2 extends JsonResource
 //            ], // user data
 
             'profile'=>new ProfileResource(@$this->profile), // both       ------- img type   oge    contry   reqouerd
-//            'level'=>Common::level_centerSerchV2(@$this->id), // both     ---- resever img   , sendr img  req
+            'level'=>Common::level_center_search(@$this), // both     ---- resever img   , sendr img  req
 //            'vip'=>@Common::ovip_center_v2($this->resource), // both
             'is_agent'=>$this->ownAgency !== null, // both
             'has_color_name' => $this->getPackWithTypeV2(18), // both
