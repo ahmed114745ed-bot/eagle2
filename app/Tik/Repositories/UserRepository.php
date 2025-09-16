@@ -138,7 +138,9 @@ class UserRepository extends AbstractRepository
 //            'exp_sender_percentage' => 1
 //        ]);
 
-        $admins = $this->model->select(['id', 'name'])->with([
+        $admins = $this->model->select([
+            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id'
+        ])->with([
 //            'agency.owner',
 //            'agency.mempers',
             'profile:id,user_id,avatar',
@@ -153,7 +155,7 @@ class UserRepository extends AbstractRepository
 
         $admins->each(function ($user) {
             $user->user_types2 = $this->computeUserTypes($user);
-            $user->preloaded_uuid = $this->computeUuid($user);
+//            $user->preloaded_uuid = $this->computeUuid($user);
 //            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
         });
 

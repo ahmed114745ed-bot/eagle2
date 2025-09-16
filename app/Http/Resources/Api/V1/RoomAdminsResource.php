@@ -27,7 +27,7 @@ class RoomAdminsResource extends JsonResource
 
         return [
             'id' => $this->id,
-//            'uuid' => $this->uuid,
+            'uuid' => $this->uuid,
             'name' => $this->name ?: 'user #' . $this->uuid,
 //            'nick_name' => $this->nick_name,
 //            'agency' => $this->formatAgency($agency),
