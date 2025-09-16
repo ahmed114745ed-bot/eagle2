@@ -2115,4 +2115,14 @@ public function userDataSetting()
     }
 
 
+    public function agencyJobs()
+    {
+        return $this->hasMany(AgencyUserJob::class, 'user_id');
+    }
+
+    public function getIsAdminInAgencyAttribute()
+    {
+        return $this->agencyJobs()->where('type', 'requestManger')->exists();
+    }
+
 }

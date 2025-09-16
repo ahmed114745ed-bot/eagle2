@@ -117,6 +117,7 @@ class AgencyUsersTargetResource extends JsonResource
             'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
             'is_host' => $this->is_host,
+            'is_admin' => $this->is_admin_in_agency,
             'image_color'          => @$this->color_image,
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'salary' => (float) $agencySallary ?? 0,
