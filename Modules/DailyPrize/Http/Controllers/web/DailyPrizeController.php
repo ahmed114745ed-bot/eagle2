@@ -330,7 +330,7 @@ class DailyPrizeController extends MainController
             'order' => $data['order'],
             'gift_type' => $data['gift_type'],
             'target' => $data['target'],
-            'expire' => $data['expire'] ?? null,
+            'expir' => $data['expire'] ?? null,
         ]);
 
         admin_toastr(__('admin.save_succeeded'));
