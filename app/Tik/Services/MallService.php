@@ -113,11 +113,12 @@ class MallService
                 'num'       => 1, 
                 'expire'    => null,
                 'days'      => $ware->expire,
+                'sender_id'      => $auth->id,
                 'is_read'   => 1,
                 'use_num'   => $ware->num,
                 'price'     => $totalPrice,
                 'receive_type' => 'send-ware',
-
+                
             ];
             $this->packRepository->create($data);
 
