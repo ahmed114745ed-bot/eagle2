@@ -555,9 +555,7 @@ class Common
             return "true";
         }
 
-        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
-            return DB::table('configs')->pluck('value', 'name')->toArray();
-        });
+        $configs = Cache::get('all_configs');
 
         return $configs[$name] ?? null;
     }
@@ -1878,7 +1876,7 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-                   
+
 
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',

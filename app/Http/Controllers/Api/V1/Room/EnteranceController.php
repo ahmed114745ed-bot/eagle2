@@ -63,8 +63,12 @@ class EnteranceController extends Controller
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
-        $library = Common::getConfig('library');
+        $library = Common::getConfig('video_library');
+        $liveLibrary = Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+
+        $libraries = ['agora', 'zego', 'tencent'];
+        $liveTypes = ['rtc', 'cdn', 'l3'];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -73,9 +77,9 @@ class EnteranceController extends Controller
                 'app_id' => $zego_app_id,
                 'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
-                'live_type' => 'RTC', // CDN, L3
+                'live_type' => $liveTypes[$liveLibrary]
             ],
-            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
+            'library' => $libraries[$library],
 
         ];
         return Common::apiResponse(1, '', $data);

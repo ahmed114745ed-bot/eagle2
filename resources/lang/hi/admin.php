@@ -424,6 +424,8 @@ return [
     "days" => 'दिन',
     "reals" => 'रील्स',
     "moments" => 'क्षण',
-
+    "RTC"=> "RTC",
+    "CDN"=> "CDN",
+    "L3"=> "L3",
     "charge_level" => "चार्ज स्तर",
 ];

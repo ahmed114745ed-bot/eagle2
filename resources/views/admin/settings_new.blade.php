@@ -783,7 +783,7 @@ use Modules\Vip\Entities\Vip;
                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
                                 @csrf
-                               
+
                             </form>
                              <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
@@ -849,7 +849,7 @@ use Modules\Vip\Entities\Vip;
                                                 <label for="zegoRadio" class="switch"></label>
                                             </div> --}}
 
-                                   
+
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -896,14 +896,14 @@ use Modules\Vip\Entities\Vip;
 
                                                     $(document).ready(initZegoSwitch);
                                                     $(document).on('pjax:success', initZegoSwitch);
-                                                </script>  
+                                                </script>
                                         </div>
                                         <button type="submit"
                                             class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
                                 </div>
                             </form>
-                                  
+
                              <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
                                 @csrf
@@ -912,7 +912,7 @@ use Modules\Vip\Entities\Vip;
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center  ">
                                             <h4 class="m-0">{{ __('admin.Agora') }}</h4>
-                                            
+
                                         </div>
                                         <br>
                                         <div class="row">
@@ -938,7 +938,7 @@ use Modules\Vip\Entities\Vip;
                                     </div>
                                 </div>
                             </form>
-                           
+
 
                         </div>
                         {{-- <div class="row">
@@ -1049,6 +1049,54 @@ use Modules\Vip\Entities\Vip;
                                             class="custom-radio libraryRealTime" name="video_library" value="2"
                                             {{ $videoLibrary == '2' ? 'checked' : '' }}>
                                         <label for="tencentVideoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Live System Setting:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- RTC Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.RTC') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="rtcLiveRadio"
+                                               class="custom-radio libraryRealTime" name="live_library" value="0"
+                                            {{ $liveLibrary == '0' ? 'checked' : '' }}>
+                                        <label for="rtcLiveRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CDN Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.CDN') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="cdnLiveRadio"
+                                               class="custom-radio libraryRealTime" name="live_library" value="1"
+                                            {{ $liveLibrary == '1' ? 'checked' : '' }}>
+                                        <label for="cdnLiveRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- L3 Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.L3') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="l3LiveRadio"
+                                               class="custom-radio libraryRealTime" name="live_library" value="2"
+                                            {{ $liveLibrary == '2' ? 'checked' : '' }}>
+                                        <label for="l3LiveRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -3953,7 +4001,7 @@ use Modules\Vip\Entities\Vip;
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');
-                   
+
                     let resetApColorSettingpButton = document.getElementById('resetAppColorsSettings');
 
                     if (resetApColorSettingpButton) {
@@ -3968,7 +4016,7 @@ use Modules\Vip\Entities\Vip;
                             document.getElementById('inactive_color').value = "#D1CECE";        // Grey
                             document.getElementById('text_header_color').value = "#000000";     // Black
                             document.getElementById('button_text_color').value = "#FFFFFF";     // White
-                            
+
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });

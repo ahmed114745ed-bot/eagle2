@@ -139,7 +139,7 @@ class UserRepository extends AbstractRepository
 //        ]);
 
         $admins = $this->model->select([
-            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id'
+            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id', 'sender_level', 'received_level'
         ])->with([
 //            'agency.owner',
 //            'agency.mempers',

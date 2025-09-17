@@ -648,6 +648,9 @@ Route::group(
 
             Route::get('/search-test', [GiftLogTestController::class, 'showSearch']);
             Route::post('/search-test', [GiftLogTestController::class, 'merge_search']);
+
+            Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
+            Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
         });
     });
 
