@@ -3,6 +3,7 @@
 namespace Modules\RoleRewards\Http\Controllers\web;
 
 use Modules\Achievement\Entities\Achievement;
+use Modules\Badge\Entities\Badge;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use Modules\Vip\Entities\OVip;
@@ -19,7 +20,6 @@ use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Entities\RewardTarget;
 use Encore\Admin\Controllers\HasResourceActions;
 
-use App\Models\Badge;
 class RoleRewardsController extends MainController
 {
     use HasResourceActions;
@@ -190,8 +190,8 @@ class RoleRewardsController extends MainController
 
                 break;
             case 'badge':
-                $form->rewardable_type = \App\Models\Badge::class;
-                $form->model()->rewardable_type = \App\Models\Badge::class;
+                $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
+                $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
                 break;
             case 'achievement':
                 $form->rewardable_id = 0;
