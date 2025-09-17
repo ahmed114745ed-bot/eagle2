@@ -44,7 +44,7 @@ class UserRoleRewardHelper
 
    
     public static function revokeRoleRewards(User $user, int $roleId , $slug = null): void
-    {
+    {  
         $rewards = UserHistoryReward::where('user_id', $user->id)
             ->where('receive_type', "Role:$slug:$roleId")
             ->get();
@@ -131,6 +131,7 @@ class UserRoleRewardHelper
     
         $appIds = $dashboardUsers->pluck('app_id')->filter()->unique();
     
+       
         if ($appIds->isEmpty()) {
             return;
         }

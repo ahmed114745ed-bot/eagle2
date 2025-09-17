@@ -3,6 +3,7 @@
 namespace Modules\RoleRewards\Http\Controllers\web;
 
 use Modules\Achievement\Entities\Achievement;
+use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
@@ -80,7 +81,7 @@ class RoleRewardsController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'))->label();
 
-        $grid->column('reward_id', __('Reward'))->display(function () {
+        $grid->column('reward_id', __('Rewards'))->display(function () {
             if ($this->type === "ware") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "vip") {
@@ -116,7 +117,6 @@ class RoleRewardsController extends MainController
 
         // $grid->column('created_at', __('Created at'));
 
-        // الأدوات (أزرار فوق الجدول)
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/auth/roles');
             $back = __('Back');
@@ -128,9 +128,10 @@ class RoleRewardsController extends MainController
             $tools->append($customButtonHTML);
         });
 
-        // تعطيل view
         $grid->actions(function ($actions) {
             $actions->disableView();
+            $actions->disableDelete();
+            $actions->add(new DeleteRoleReward());
         });
 
         Admin::script("
@@ -142,52 +143,72 @@ class RoleRewardsController extends MainController
         return $grid;
     }
 
+
+
     protected function form()
-    {
-        $form = new Form(new RoleReward());
-        $this->disableFormTools($form);
-    
-        $form->hidden('role_id')->value(request('role_id'));
-    
-        $form->select('type', __('Type'))->options([
-            "ware"        => __('Ware'),
-            "vip"         => __('Vip'),
-            "achievement" => __('Achievement'),
-            "badge"       => __('Badge'),
-        ])->when("ware", function (Form $form) {
-           
-                $form->belongsTo('rewardable_id', Wares::class, trans('wares'))->rules('required');
+{
+    $form = new Form(new RoleReward());
+    $this->disableFormTools($form);
 
-        })->when("vip", function (Form $form) {
-            $form->select('rewardable_id', __('Vip'))
-                ->options(OVip::pluck('name', 'id'))
-                ->rules('required');
-        })->when("achievement", function (Form $form) {
-                $form->image("reward_achievement", __('image'))->name(function ($file) {
-                     return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
-        })->when("badge", function (Form $form) {
-            $form->select('rewardable_id', __('Badge'))
-                ->options(Badge::pluck('name', 'id'))
-                ->rules('required');
-        });
-    
-        $form->number('expire', __('expire'))->default(1);
-    
+    $this->addHiddenFields($form);
+    $this->addTypeSelector($form);
+    $this->addExpireField($form);
+    $this->handleSaving($form);
+    $this->handleSaved($form);
+    $this->handleDeleted($form);
 
+    return $form;
+}
+
+
+protected function addHiddenFields(Form $form)
+{
+    $form->hidden('role_id')->value(request('role_id'));
+}
+
+
+protected function addTypeSelector(Form $form)
+{
+    $form->select('type', __('Type'))->options([
+        "ware"        => __('Ware'),
+        "vip"         => __('Vip'),
+        "achievement" => __('Achievement'),
+        "badge"       => __('Badge'),
+    ])->when("ware", function (Form $form) {
+        $form->belongsTo('rewardable_id', Wares::class, trans('wares'))->rules('required');
+    })->when("vip", function (Form $form) {
+        $form->select('rewardable_id', __('Vip'))
+            ->options(OVip::pluck('name', 'id'))
+            ->rules('required');
+    })->when("achievement", function (Form $form) {
+        $form->image("reward_achievement", __('image'))->name(function ($file) {
+            return now()->timestamp . '.' . $file->guessExtension();
+        })->disk('gcs');
+    })->when("badge", function (Form $form) {
+        $form->select('rewardable_id', __('Badge'))
+            ->options(Badge::pluck('name', 'id'))
+            ->rules('required');
+    });
+}
+
+
+protected function addExpireField(Form $form)
+{
+    $form->number('expire', __('expire'))->default(1);
+}
+
+
+protected function handleSaving(Form $form)
+{
     $form->saving(function (Form $form) {
-       
         switch ($form->type) {
-          
             case 'ware':
                 $form->rewardable_type = \App\Models\Ware::class;
                 $form->model()->rewardable_type = \App\Models\Ware::class;
-
                 break;
             case 'vip':
                 $form->rewardable_type = \Modules\Vip\Entities\OVip::class;
                 $form->model()->rewardable_type = \Modules\Vip\Entities\OVip::class;
-
                 break;
             case 'badge':
                 $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
@@ -196,52 +217,61 @@ class RoleRewardsController extends MainController
             case 'achievement':
                 $form->rewardable_id = 0;
                 $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                $form->model()->rewardable_type=\Modules\Achievement\Entities\Achievement::class;
+                $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
                 break;
         }
-       
     });
+}
 
 
+protected function handleSaved(Form $form)
+{
     $form->saved(function (Form $form) {
-        $roleReward = $form->model();
-    
-        $role = \Encore\Admin\Auth\Database\Role::find($roleReward->role_id);
-    
-        if (! $role) {
-            return;
-        }
-    
-        $slug = $role->slug;
-    
-        UserRoleRewardHelper::revokeRewardsFromAllUsersForRole(
-            $roleReward->role_id,
-            $slug
-        );
-    
-        UserRoleRewardHelper::syncRewardsForRole(
-            $roleReward->role_id,
-            
-            $slug
-        );
+        $this->syncRewards($form->model());
     });
-        return $form;
-    }
+}
 
 
-    public function destroyBulk($id, $targets)
-    {
-        $targetIds = explode(',', $targets);
+protected function handleDeleted(Form $form)
+{
+    // $form->deleted(function (Form $form) {
+    //     $this->syncRewards($form->model());
+    // });
+}
 
-        RewardTarget::where('charge_event_id', $id) 
-            ->whereIn('id', $targetIds)
-            ->delete();
 
-        return response()->json([
-            'status'  => true,
-            'message' => __('deleted_success'),
-        ]);
-    }
+protected function syncRewards(RoleReward $roleReward)
+{
+    $role = \Encore\Admin\Auth\Database\Role::find($roleReward->role_id);
+    if (! $role) return;
+
+    $slug = $role->slug;
+
+    UserRoleRewardHelper::revokeRewardsFromAllUsersForRole(
+        $roleReward->role_id,
+        $slug
+    );
+
+    UserRoleRewardHelper::syncRewardsForRole(
+        $roleReward->role_id,
+        $slug
+    );
+}
+
+
+
+    
+
+// public function destroy($id)
+// {
+
+//     $roleRewards = RoleReward::findOrFail($id);
+
+//      $this->syncRewards($roleRewards);
+//     dd($roleRewards);
+//     return parent::destroy($id); 
+// }
+  
 
 }
 
