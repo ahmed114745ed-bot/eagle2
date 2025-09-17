@@ -67,7 +67,6 @@ class EnteranceController extends Controller
         $liveLibrary = Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
 
-        info('yes');
         $libraries = ['agora', 'zego', 'tencent'];
         $liveTypes = ['rtc', 'cdn', 'l3'];
 
