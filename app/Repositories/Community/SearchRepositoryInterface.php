@@ -16,6 +16,6 @@ interface SearchRepositoryInterface
     public function getUserFriends(int $userId, string $keywords = null, int $perPage = 10, int $currentPage = 1): \Illuminate\Pagination\LengthAwarePaginator;
     public function getSearchList(int $userId): array;
     public function clearUserSearchHistory(int $userId): bool;
-    public function getOfficialMessages(int $userId, int $page = 1): array;
+    public function getOfficialMessages(int $userId, int $type, int $page = 1);
 
 }

@@ -280,30 +280,14 @@ class SearchRepository implements SearchRepositoryInterface
             ->delete();
     }
 
-    public function getOfficialMessages(int $userId, int $page = 1): array
+    public function getOfficialMessages(int $userId, int $type, int $page = 1)
     {
-        $sys = OfficialMessage::query()
+        $messages = OfficialMessage::query()
             ->whereIn('user_id', [0, $userId])
-            ->where('type', 1)
+            ->where('type', $type)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
-        $official = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
-            ->where('type', 2)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $agency = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
-            ->where('type', 0)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return [
-            'sys' => CommunityResource::collection($sys),
-            'official' => CommunityResource::collection($official),
-            'agency' => CommunityResource::collection($agency),
-        ];
+        return CommunityResource::collection($messages);
     }
 }

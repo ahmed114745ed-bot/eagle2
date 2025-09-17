@@ -100,11 +100,16 @@ class CommunityController extends Controller
     // official message
     public function officialMessages(Request $request)
     {
+        // 0 => 'agency', 1 => 'sys', 2 => 'official',
+        $data = $request->validate([
+            'type' => 'required|integer|in:0,1,2',
+        ]);
+
         $userId = $request->user()->id;
         if (!$userId) return Common::apiResponse(0, 'un_auth');
 
         $page = $request->page ?: 1;
-        $data = $this->searchRepository->getOfficialMessages($userId, $page);
+        $data = $this->searchRepository->getOfficialMessages($userId,$data['type'], $page);
 
         // Update user counters
         (new UserCounterServices)->UpgradeDateForType($request->user(), 'official_message');

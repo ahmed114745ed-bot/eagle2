@@ -27,6 +27,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class GiftLogTestController extends Controller
 {
@@ -232,28 +233,28 @@ class GiftLogTestController extends Controller
         ]);
     }
 
-    public function showUserData()
+    public function showNotifications()
     {
-        return view('test.user-data');
+        return view('test.notifications');
     }
 
-    public function dataUser(Request $request, $id = 303)
+    public function officialMessages(Request $request)
     {
-        $isVisit = @$request->is_visit == 'true' ? true : false;
-        $auth   = User::whereId(303)->first();
-        try {
+        $userId = 303;
+        $user = User::whereId(303)->first();
+        if (!$userId) return Common::apiResponse(0, 'un_auth');
 
-            $user = $this->userService->showUser($id, $auth, $request, $isVisit);
-        } catch (Exception $e) {
-            return Common::apiResponse(false, $e->getMessage(), null, 407);
-        }
+        $page = $request->page ?: 1;
+        $data = (new SearchRepository())->getOfficialMessages($userId, $page);
 
-        $userResource = new UserResource($user);
+        // Update user counters
+        (new UserCounterServices)->UpgradeDateForType($user, 'official_message');
+        (new UserCounterServices)->UpgradeDateForType($user, 'system_message');
 
-        return view('test.user-data', [
+        return view('test.notifications', [
             'success' => true,
             'message' => '',
-            'data'    => $userResource,
+            'data'    => $data,
         ]);
     }
 
