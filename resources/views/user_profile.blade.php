@@ -1473,6 +1473,22 @@
                                                     </span>
                                                 </a>
                                             @endif
+                                            @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
+                                                @php
+                                                    $name = @$userVip->admin->name ?? 'Unknown Admin';
+                                                    $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        sender:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                     
