@@ -1311,7 +1311,7 @@
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
-                                        @if ($admin)
+                                        @if ($admin && @$pack->receive_type == 'wares-dash-dedicate')
                                             <a href="{{ $url ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
