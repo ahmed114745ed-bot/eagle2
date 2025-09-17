@@ -247,10 +247,7 @@ protected function syncRewards(RoleReward $roleReward)
 
     $slug = $role->slug;
 
-    UserRoleRewardHelper::revokeRewardsFromAllUsersForRole(
-        $roleReward->role_id,
-        $slug
-    );
+
 
     UserRoleRewardHelper::syncRewardsForRole(
         $roleReward->role_id,
