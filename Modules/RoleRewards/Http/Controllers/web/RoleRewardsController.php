@@ -118,7 +118,7 @@ class RoleRewardsController extends MainController
 
         // الأدوات (أزرار فوق الجدول)
         $grid->tools(function (Grid\Tools $tools) {
-            $url = url('admin/roles');
+            $url = url('admin/auth/roles');
             $back = __('Back');
             $customButtonHTML = <<<HTML
                 <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
