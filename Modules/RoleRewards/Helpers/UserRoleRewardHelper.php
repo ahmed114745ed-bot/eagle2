@@ -159,7 +159,6 @@ class UserRoleRewardHelper
         $users = User::whereIn('id', $appIds)->get();
 
         foreach ($users as $user) {
-            // self::revokeRoleRewards($user, $roleId, $slug);
             self::giveRoleRewards($user, $roleId, $slug);
         }
     }
