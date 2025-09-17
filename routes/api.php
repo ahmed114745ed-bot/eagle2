@@ -315,6 +315,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
+                Route::get('notifications', [CommunityController::class, 'notifications']);
             });
 
             Route::prefix('home_carousels')->group(function () {

@@ -7,6 +7,7 @@ use App\Models\OfficialMessage;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -280,7 +281,34 @@ class SearchRepository implements SearchRepositoryInterface
             ->delete();
     }
 
-    public function getOfficialMessages(int $userId, int $type, int $page = 1)
+    public function getOfficialMessages(int $userId, int $page = 1): array
+    {
+        $sys = OfficialMessage::query()
+            ->whereIn('user_id', [0, $userId])
+            ->where('type', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $official = OfficialMessage::query()
+            ->whereIn('user_id', [0, $userId])
+            ->where('type', 2)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $agency = OfficialMessage::query()
+            ->whereIn('user_id', [0, $userId])
+            ->where('type', 0)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return [
+            'sys' => CommunityResource::collection($sys),
+            'official' => CommunityResource::collection($official),
+            'agency' => CommunityResource::collection($agency),
+        ];
+    }
+
+    public function getOfficialNotifications(int $userId, int $type): AnonymousResourceCollection
     {
         $messages = OfficialMessage::query()
             ->whereIn('user_id', [0, $userId])
