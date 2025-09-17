@@ -598,7 +598,6 @@ Route::group(
         ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
-        Route::resource('badges', BadgeController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);

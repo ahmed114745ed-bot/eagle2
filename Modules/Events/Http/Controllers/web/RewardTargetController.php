@@ -2,18 +2,20 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Admin;
+use App\Selectables\Wares;
+use App\Selectables\Badges;
 
+use Modules\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
-use Modules\Events\Entities\ChargeTargetEvent;
+use App\Admin\Controllers\MainController;
 use Modules\Events\Entities\RewardTarget;
+use Modules\Events\Entities\ChargeTargetEvent;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RewardTargetController extends MainController
@@ -158,6 +160,8 @@ class RewardTargetController extends MainController
                     }
                     return $ops;
                 })->rules('required');
+            })->when("badge", function () use ($form) {
+                $this->addBadgeField($form);
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"))->rules('required');
@@ -169,6 +173,29 @@ class RewardTargetController extends MainController
         $form->number('expire', __('expire'))->default(1);
         return $form;
     }
+
+    protected function addBadgeField(Form $form)
+    {
+        $prefix = 'badges';
+        $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target5')
+                ->select('id', __('badges'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Badge::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id')
+                ]);
+
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+            $this->addWareJs();
+        });
+    }
+
 
 
     public function destroyBulk($id, $targets)

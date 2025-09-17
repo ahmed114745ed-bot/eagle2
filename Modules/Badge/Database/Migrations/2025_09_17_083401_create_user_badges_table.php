@@ -18,6 +18,7 @@ class CreateUserBadgesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('badge_id');
             $table->unsignedInteger('expire')->nullable();
+            $table->string('receive_type');
             $table->timestamps();
         });
     }

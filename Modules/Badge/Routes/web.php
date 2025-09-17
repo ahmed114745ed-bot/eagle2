@@ -11,6 +11,28 @@
 |
 */
 
-Route::prefix('badge')->group(function() {
-    Route::get('/', 'BadgeController@index');
-});
+use Illuminate\Support\Facades\Route;
+use Modules\Badge\Http\Controllers\web\BadgeController;
+use Modules\Badge\Http\Controllers\web\DedicateBadgeController;
+
+
+
+Route::group(
+    [
+        'prefix'     => config('admin.route.prefix'),
+        'namespace'  => 'web',
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+            'appFeatureEnable:achievement',
+        ],
+        'as'         => config('admin.route.prefix') . '.',
+    ],
+    function () {
+        Route::resource('badges', BadgeController::class);
+         Route::resource('dedicate-badges', DedicateBadgeController::class);
+    }
+);
