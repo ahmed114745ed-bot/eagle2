@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\DataUserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -22,6 +23,7 @@ use App\Tik\Services\RoomRepoService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class GiftLogTestController extends Controller
@@ -228,6 +230,45 @@ class GiftLogTestController extends Controller
         ]);
     }
 
+    public function showUserData()
+    {
+        return view('test.user-data');
+    }
+
+    public function dataUser(Request $request)
+    {
+        $id = 303;
+        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+//        $data = $this->userService->dataUser($id);
+        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
+            $user = $this->userService->dataUser($id);
+            return new DataUserResource($user);
+        });
+
+        request()->merge(['user_id' => $id]);
+
+        return view('test.user-data', [
+            'success' => true,
+            'message' => '',
+            'data'    => $data,
+        ]);
+    }
+
+//    public function dataUser(Request $request)
+//    {
+//        $id = 303;
+//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+//        $data = $this->userService->dataUser($id);
+//        request()->merge(['user_id' => $id]);
+//
+//        $resource = new DataUserResource($data);
+//
+//        return view('test.user-data', [
+//            'success' => true,
+//            'message' => '',
+//            'data'    => $resource,
+//        ]);
+//    }
     public function userSearchHand(int $userId, string $keywords, $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
