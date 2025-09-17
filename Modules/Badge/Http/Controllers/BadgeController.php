@@ -15,6 +15,14 @@ class BadgeController extends Controller
     public function index($id)
     {
         $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
-        return Common::apiResponse(1, ' successfully', UserBadgeResource::collection($userBadges), 200);
+        $data = [
+            'top' => UserBadgeResource::collection(
+                $userBadges->filter(fn($ub) => $ub->badge && $ub->badge->type === 'top')
+            ),
+            'regular' => UserBadgeResource::collection(
+                $userBadges->filter(fn($ub) => $ub->badge && $ub->badge->type === 'regular')
+            ),
+        ];
+        return Common::apiResponse(1, ' successfully',  $data, 200);
     }
 }
