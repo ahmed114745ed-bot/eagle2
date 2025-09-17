@@ -19,7 +19,7 @@ class VipCommon
             DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType) {
                 $vipp = UserVip::create([
                     'type'      => 1,
-                    'sender_id' => $senderId,
+                    'sender_id' => $senderId ,
                     'user_id'   => $user->id,
                     'vip_id'    => $vip->id,
                     'level'     => $vip->level,

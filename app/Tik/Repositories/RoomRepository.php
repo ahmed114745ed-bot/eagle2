@@ -566,7 +566,7 @@ class RoomRepository extends AbstractRepository
     public function liveRooms($req, $ids = [])
     {
         $user     = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        $topRooms =  false;
 
         $blockedUserIds = $this->getBlockedUserIds();
 
@@ -578,7 +578,7 @@ class RoomRepository extends AbstractRepository
             $this->applyCountryFilter($query, $req->country_id);
         }
 
-        $this->applyFilter($query, $req->filter, $user);
+//        $this->applyFilter($query, $req->filter, $user);
 
         if (!empty($ids)) {
             $query->whereIn('uid', $ids);
