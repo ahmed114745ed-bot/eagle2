@@ -21,6 +21,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
 
     
-    Route::get('/user-badges', [BadgeController::class,'index']);
+    Route::get('/badges/users/{id}', [BadgeController::class,'index']);
 
 });
