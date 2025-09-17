@@ -11,10 +11,9 @@ use Illuminate\Contracts\Support\Renderable;
 class BadgeController extends Controller
 {
 
-    public function index(Request $request)
+    public function index($id)
     {
-        $userId = $request->user()->id;
-        $userBadges = UserBadge::where('user_id', $userId)->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
         return Common::apiResponse(1, ' successfully', $userBadges, 200);
     }
 }

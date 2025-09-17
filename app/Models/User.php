@@ -37,6 +37,7 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\Badge\Entities\Badge;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 
 /**
@@ -180,6 +181,13 @@ class User extends Authenticatable
     public function cpsAsOne()
     {
         return $this->hasMany(Cp::class, 'user_one_id');
+    }
+
+    public function userBadges()
+    {
+        return $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
     }
 
     public function cpsAsTwo()
