@@ -327,6 +327,7 @@ class RoomController extends MainController
     protected function setupBaseModel(Grid $grid, $user): void
     {
         $grid->model()
+            ->audio()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
                 CASE room_status
                     WHEN 1 THEN 100
