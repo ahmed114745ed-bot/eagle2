@@ -107,8 +107,8 @@ class RoleRewardsController extends MainController
                 $path = 'coin.png';
             }
 
-            // $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $path, 50, 50);
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('expire', __('expire'))->display(function ($expire) {
             return $expire ?: '-';
