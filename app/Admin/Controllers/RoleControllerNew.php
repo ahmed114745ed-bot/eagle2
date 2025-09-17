@@ -9,6 +9,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Models\Role;
 use Illuminate\Support\Str;
+use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
 class RoleControllerNew extends MainController
 {
@@ -88,7 +89,15 @@ class RoleControllerNew extends MainController
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 
+        $grid->column('rewards', 'rewards')->display(function () {
+            $url = admin_url("role-rewards/{$this->id}");
+            return '<a href="' . $url . '" class="btn btn-sm btn-info">
+                        <i class="fa fa-gift"></i> rewards
+                    </a>';
+        });
+    
         $grid->actions(function (Grid\Displayers\Actions $actions) {
+            
             if (
                 $actions->row->slug == 'administrator' ||
                 $actions->row->slug == 'admin' ||
@@ -105,6 +114,9 @@ class RoleControllerNew extends MainController
                 $actions->disableDelete();
             });
         });
+
+        
+        
         $grid->disableExport();
         $this->extendGrid($grid);
         return $grid;
@@ -272,5 +284,15 @@ class RoleControllerNew extends MainController
         });
 
         return response()->json(['permissions' => $data]);
+    }
+
+
+    public function destroy($id)
+    {
+        $role = Role::findOrFail($id);
+
+        UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
+
+        return parent::destroy($id); 
     }
 }

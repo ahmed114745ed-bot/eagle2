@@ -26,5 +26,6 @@
     "TribeReward": true,
     "Vip": true,
     "RoomBoom": true,
-    "Badge": true
+    "Badge": true,
+    "RoleRewards": true
 }
