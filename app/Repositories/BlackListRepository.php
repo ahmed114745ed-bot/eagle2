@@ -39,7 +39,7 @@ class BlackListRepository
         return \Cache::remember(
             $cacheKey,
             now()->addMinutes(5),
-            fn() => BlackList::where(fn($q) => $q->where('user_id', $authId)->orWhere('from_id', $userId))
+            fn() => BlackList::where(fn($q) => $q->where('user_id', $authId)->orWhere('from_uid', $userId))
                 ->orWhere(fn($q) => $q->where('user_id', $userId)->orWhere('from_id', $authId))
                 ->exists()
         );
