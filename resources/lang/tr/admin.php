@@ -427,6 +427,8 @@ return [
     "days" => 'Günler',
     "reals" => 'reels',
     "moments" => 'anlar',
-
+    "RTC"=> "RTC",
+    "CDN"=> "CDN",
+    "L3"=> "L3",
     "charge_level" => "şarj seviyesi",
 ];

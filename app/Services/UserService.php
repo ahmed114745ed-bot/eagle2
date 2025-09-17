@@ -6,6 +6,8 @@ use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\helper\UserFollowHelper;
 use App\Http\Resources\InvitationEarningResource;
+use App\Jobs\UserVisitJob;
+use App\Models\BlackList;
 use DB;
 use Cache;
 use Exception;
@@ -53,10 +55,6 @@ use Illuminate\Support\Facades\Config;
 
 class UserService
 {
-    protected $userRepository;
-    protected $packRepository;
-    protected $followRepository;
-    protected $blackListRepository;
 
     public function __construct(
         private readonly VipRepository $vipRepository,
@@ -69,21 +67,16 @@ class UserService
         private readonly UserTargetRepository $userTargetRepository,
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
-        private readonly ProfileRepository $profileRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
         private readonly CpRepository $cpRepository,
         private readonly WareRepository $wareRepository,
-        UserRepository $userRepository,
-        PackRepository $packRepository,
-        FollowRepository $followRepository,
-        BlackListRepository $blackListRepository,
+        private readonly UserRepository $userRepository,
+        private readonly PackRepository $packRepository,
+        private readonly FollowRepository $followRepository,
+        private readonly BlackListRepository $blackListRepository,
 
     ) {
-        $this->userRepository = $userRepository;
-        $this->packRepository = $packRepository;
-        $this->followRepository = $followRepository;
-        $this->blackListRepository = $blackListRepository;
     }
 
     public function searchUsers($key, $family)
@@ -504,19 +497,27 @@ class UserService
         return $user;
     }
 
-    public function showUser($userId, $auth, $request, $isVisit)
+    public function showUserCheck( int $userId, bool $isVisit)
     {
-        $user = $this->getUserWithRelations($userId);
-        $this->ensureUserIsAccessible($user, $auth);
-
-        $request['user_id'] = $userId;
-
-        if ($this->shouldRecordVisit($auth, $user, $isVisit)) {
-            $this->recordVisit($auth, $user);
+        if (!$this->userRepository->exists($userId)) {
+            throw new Exception('User not founded');
         }
-        $this->packRepository->deleteAllExpiredPacks();
-        return $user;
 
+        $authId = \Auth::id();
+
+        if ($this->blackListRepository->exists($authId, $userId)){
+            throw new Exception('User is in blacklist');
+        }
+
+        if ($this->shouldRecordVisit($authId, $userId, $isVisit)) {
+            $this->recordVisit($authId, $userId);
+        }
+    }
+
+    public function showUser($userId)
+    {
+        return  $this->userRepository->getUserWithMedals($userId);
+//        $this->packRepository->deleteAllExpiredPacks();
     }
 
     private function getUserWithRelations($userId)
@@ -533,32 +534,23 @@ class UserService
             throw new Exception('User not found');
         }
 
-        if (in_array($user->id, $user?->blacklists->pluck('from_uid')->toArray())) {
+        if (in_array($user->id, $user?->blacklists->pluck('from_uid')->toArray() ?? [])) {
             throw new Exception('User is in blacklist');
         }
     }
 
-    private function shouldRecordVisit($auth, $user, bool $isVisit): bool
+    private function shouldRecordVisit($authId, $userId, bool $isVisit): bool
     {
-        return $auth->id !== $user->id
-            && $isVisit
-            && !Common::checkPackPrev($auth->id, 19);
+        return $authId !== $userId && $isVisit;
     }
 
-    private function recordVisit($auth, $user): void
+    private function recordVisit(int $authId, int $userId): void
     {
-        $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
-
-        $user->profileVisits()->syncWithoutDetaching([
-            $auth->id => [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
+        $previousVisit = $this->ProfileVisitorRepository->checkVisit($authId, $userId);
 
         if (!$previousVisit) {
-            CustomNotification::visitProfile($user, $auth);
-            (new UserCounterServices)->eventUser($user, 'visit-profile');
+
+            dispatch(new UserVisitJob($authId, $userId));
         }
     }
 
@@ -1173,7 +1165,7 @@ class UserService
 
     public function dataUser($userId)
     {
-        return  $this->userRepository->findOrFail($userId, ['family', 'medals']);
+        return $this->userRepository->findOrFail($userId, ['family', 'medals.achievementLevel.achievement']);
     }
 
     public function syncBDUsers()

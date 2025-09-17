@@ -68,6 +68,8 @@ class Pack extends Model
                 return __('purchase');
             case 5:
                 return __('background addition');
+            case 6:
+                return __('limited time purchase');
             default:
                 return '-';
         }

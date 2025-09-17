@@ -69,7 +69,7 @@ class CoinReportController extends Controller
         ->with(Common::chargerRelationsQuery())
         ->orderBy("created_at", "desc")
 
-        ->paginate(10);//->get();
+        ->paginate(10);
 
         return RecevingReportResource::collection($data);
     }

@@ -143,21 +143,27 @@ class RoomRepository extends AbstractRepository
         $result = $this->model->withLuckyBoxFlag($user->id)
             ->select(['id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
-            'backgroundImage:request_background_images.id,owner_room_id,img',
-            'lastPk:id,room_id',
-            'background:id',
-            'roomVisitorUsers' => fn($q) => $q->limit(5),
-            'myClass',
-            'roomCategory:id,type',
-            'myType',
-            'roomVisitors.user.packs',
-            'owner.enabledMedals',
-            'owner.country',
-            'owner.eligiblePacks.ware',
-            'owner.profile',
-            'owner.medals.achievementLevel.achievement',
-            'boxUse',
-        ])
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'defaultBackground:id,img',
+                'lastPk:id,room_id',
+                'background:id',
+                'roomVisitorUsers' => fn($q) => $q->with('profile')->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors',
+                'boxUse',
+                'owner' => [
+                    'enabledMedals',
+//                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
+                    'country',
+                    'color_image',
+                    'specialId.ware',
+                    'eligiblePacks.ware',
+                    'profile',
+                    'medals.achievementLevel.achievement'
+                ],
+            ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
         ->whereNotIn('uid', $blockedUserIds)
@@ -560,7 +566,7 @@ class RoomRepository extends AbstractRepository
     public function liveRooms($req, $ids = [])
     {
         $user     = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        $topRooms =  false;
 
         $blockedUserIds = $this->getBlockedUserIds();
 
@@ -572,7 +578,7 @@ class RoomRepository extends AbstractRepository
             $this->applyCountryFilter($query, $req->country_id);
         }
 
-        $this->applyFilter($query, $req->filter, $user);
+//        $this->applyFilter($query, $req->filter, $user);
 
         if (!empty($ids)) {
             $query->whereIn('uid', $ids);

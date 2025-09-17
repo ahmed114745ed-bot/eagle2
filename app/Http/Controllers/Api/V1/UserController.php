@@ -427,14 +427,25 @@ class UserController extends Controller
     public function show(Request $request, $id)
     {
         $isVisit = @$request->is_visit == 'true' ? true : false;
-        $auth   = $request->user();
-        try {
 
-            $user = $this->userService->showUser($id, $auth, $request, $isVisit);
+        try {
+            $this->userService->showUserCheck($id, $isVisit);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        return Common::apiResponse(true, '', new UserResource($user), 200);
+
+        $cacheKey = "user_response_{$id}";
+
+        $response = \Cache::remember(
+            $cacheKey,
+            now()->addMinutes(30),
+            function () use ($id) {
+                $user = $this->userService->showUser($id);
+                return (new UserResource($user))->toArray(request());
+            }
+        );
+
+        return Common::apiResponse(true, '', $response, 200);
     }
 
     public function vTwoshow(Request $request, $id)
@@ -1259,13 +1270,30 @@ class UserController extends Controller
         return Common::apiResponse(true, 'success', $data);
     }
 
+//    public function dataUser(Request $request)
+//    {
+//        $id = $request->id;
+//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+////        $data = $this->userService->dataUser($id);
+//        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
+//            $user = $this->userService->dataUser($id);
+//            return new DataUserResource($user);
+//        });
+//
+//        request()->merge(['user_id' => $id]);
+//        return Common::apiResponse(true, 'done', $data);
+//    }
+
     public function dataUser(Request $request)
     {
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-        $data = $this->userService->dataUser($id);
-        request()->merge(['user_id' => $id]);
-        return Common::apiResponse(true, 'done', new DataUserResource($data));
+
+        return Cache::remember("data_user_{$id}",600, function () use ($id) {
+            $data = $this->userService->dataUser($id);
+            request()->merge(['user_id' => $id]);
+            return Common::apiResponse(true, 'done', new DataUserResource($data));
+        });
     }
 
     public function syncBD()
