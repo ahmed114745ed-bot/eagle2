@@ -13,6 +13,14 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/badge', function (Request $request) {
-    return $request->user();
+
+use Illuminate\Support\Facades\Route;
+use Modules\Badge\Http\Controllers\BadgeController;
+use Modules\Achievement\Http\Services\AchievementLevelsService;
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+
+    
+    Route::get('/badges/users/{id}', [BadgeController::class,'index']);
+
 });

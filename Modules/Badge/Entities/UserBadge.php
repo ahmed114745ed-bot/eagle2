@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class UserBadge extends Model
 {
     protected $guarded = [];
+
+    public function badge()
+    {
+        return $this->belongsTo(Badge::class, 'badge_id');
+    }
+    
     public function scopeActive($query)
     {
         return $query->where(function ($q) {

@@ -2,78 +2,18 @@
 
 namespace Modules\Badge\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Badge\Entities\UserBadge;
+use Illuminate\Contracts\Support\Renderable;
 
 class BadgeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
-    {
-        return view('badge::index');
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function index($id)
     {
-        return view('badge::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('badge::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('badge::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
+        return Common::apiResponse(1, ' successfully', $userBadges, 200);
     }
 }
