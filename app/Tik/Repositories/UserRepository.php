@@ -549,4 +549,14 @@ class UserRepository extends AbstractRepository
             $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
         }])->paginate($perPage, ['*'], 'page', $page);
     }
+
+
+    public function exists(int $id): bool
+    {
+        return \Cache::remember(
+            "user_exists_{$id}",
+            now()->addMinutes(10),
+            fn() => $this->model->where('id', $id)->exists()
+        );
+    }
 }
