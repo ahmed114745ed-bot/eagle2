@@ -3,6 +3,7 @@
 namespace Modules\CP\Transformers;
 
 use App\Helpers\Common;
+use App\Helpers\UserPackHelper;
 use App\Models\User;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
@@ -22,30 +23,28 @@ class CpListResource extends JsonResource
         } else {
             $user = $this->fromUser;
         }
+        
+        $frame = UserPackHelper::getFrameImage($user);
 
-        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'show_img');
-        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'show_img');
-        $frame = $dress_1_data ?: $dress_1_fallback;
- 
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
 
         $ratio = 0;
-    
+
         if (
             ($currentLevel || $currentLevel === 0) &&
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
-          
+
             $nextExp = $nextLevel->exp;
-        
-            $progress = max(0, $this->di - $currentExp); 
-            $required = $nextExp - $currentExp;      
-        
-            $ratio = round(min(($progress / $required) * 100, 100), 2);                    
+
+            $progress = max(0, $this->di - $currentExp);
+            $required = $nextExp - $currentExp;
+
+            $ratio = round(min(($progress / $required) * 100, 100), 2);
         } else {
             $ratio = 100;
         }
