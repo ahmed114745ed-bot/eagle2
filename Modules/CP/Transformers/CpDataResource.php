@@ -17,59 +17,57 @@ class CpDataResource extends JsonResource
 {
     public function toArray($request)
     {
-        return Cache::remember("cp_data_resource_{$this->id}",600, function () {
-            $loginUserId = request('id') ?? Auth::id();
-            if ($this->user_one_id == $loginUserId) {
-                $user = $this->toUser;
-            } else {
-                $user = $this->fromUser;
-            }
+        $loginUserId = request('id') ?? Auth::id();
+        if ($this->user_one_id == $loginUserId) {
+            $user = $this->toUser;
+        } else {
+            $user = $this->fromUser;
+        }
 
-            $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
-            $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
-            $frame = $dress_1_data ?: $dress_1_fallback;
+        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
+        $frame = $dress_1_data ?: $dress_1_fallback;
 
-            $currentLevel = CpLevel::find($this->level_id);
-            $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
-            $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
+        $currentLevel = CpLevel::find($this->level_id);
+        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
-            $ratio = 0;
+        $ratio = 0;
 
-            if (
-                ($currentLevel || $currentLevel === 0) &&
-                $nextLevel &&
-                $nextLevel->exp > $currentExp
-            ) {
+        if (
+            ($currentLevel || $currentLevel === 0) &&
+            $nextLevel &&
+            $nextLevel->exp > $currentExp
+        ) {
 
-                $nextExp = $nextLevel->exp;
+            $nextExp = $nextLevel->exp;
 
-                $progress = max(0, $this->di - $currentExp);
-                $required = $nextExp - $currentExp;
+            $progress = max(0, $this->di - $currentExp);
+            $required = $nextExp - $currentExp;
 
-                $ratio = round(min(($progress / $required) * 100, 100), 2);
-            } else {
-                $ratio = 100;
-            }
+            $ratio = round(min(($progress / $required) * 100, 100), 2);
+        } else {
+            $ratio = 100;
+        }
 
-            return [
-                'id'        => $this->id,
-                'level'     => $currentLevel?->level ?? 0,
-                'next_level'     =>  $nextLevel?->level ?? 0,
-                'di'        => $this->di,
-                'ratio' => $ratio,
-                "user"      => [
-                    "id"        => $user?->id,
-                    "uid"       => $user?->uuid,
-                    "name"      => $user?->name,
-                    "image"     => $user?->avatar,
-                    "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
-                    'frame' => $frame,
-                ],
-                "relation" => $this->relation,
+        return [
+            'id'        => $this->id,
+            'level'     => $currentLevel?->level ?? 0,
+            'next_level'     =>  $nextLevel?->level ?? 0,
+            'di'        => $this->di,
+            'ratio' => $ratio,
+            "user"      => [
+                "id"        => $user?->id,
+                "uid"       => $user?->uuid,
+                "name"      => $user?->name,
+                "image"     => $user?->avatar,
+                "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
                 'frame' => $frame,
+            ],
+            "relation" => $this->relation,
+            'frame' => $frame,
 
-            ];
-        });
+        ];
     }
     public function getUserDress($user, $type, $dress, $item = 'img1')
     {

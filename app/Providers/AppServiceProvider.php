@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\SettingObserver;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;

@@ -20,8 +20,9 @@ class UserBanMiddleware
     public function handle(Request $request, Closure $next)
     {
         $user = $request->user();
+        $user->loadMissing('packs');
 
-        $message = UserHandling::getUserBanType($user->original_uuid, $request);
+        $message = UserHandling::getUserBanType($user->uuid, $request);
 
         if ($message) {
             return  Common::apiResponse(0, $message, null, 377);
