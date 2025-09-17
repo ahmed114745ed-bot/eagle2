@@ -102,7 +102,7 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 1);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-       $grid->column('gift_id', __('gifts'))->display(function () {
+        $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
                 return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
@@ -176,7 +176,7 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-       $grid->column('gift_id', __('gifts'))->display(function () {
+        $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
                 return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
@@ -249,7 +249,7 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 3);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-       $grid->column('gift_id', __('gifts'))->display(function () {
+        $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
                 return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
@@ -399,7 +399,7 @@ class PkEventGiftController extends MainController
         });
         return $form;
     }
-    
+
     protected function addBadgeField(Form $form)
     {
         $prefix = 'badges';

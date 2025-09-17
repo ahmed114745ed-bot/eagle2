@@ -2,18 +2,19 @@
 
 namespace Modules\Events\Console;
 
-use App\Enums\UserCoinLogType;
-use App\Helpers\UserCommon;
-use App\Models\GiftLog;
-use Modules\Vip\Entities\OVip;
-use App\Models\Ware;
 use Carbon\Carbon;
+use App\Models\Ware;
+use App\Helpers\Common;
+use App\Models\GiftLog;
+use App\Helpers\UserCommon;
+use App\Enums\UserCoinLogType;
+use Modules\Vip\Entities\OVip;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\Events\Entities\Winner;
 use App\Helpers\UserCoinLogHelper;
+use Illuminate\Support\Facades\DB;
+use Modules\Events\Entities\Winner;
+use Modules\Events\Entities\WeeklyStar;
+use Modules\Achievement\Entities\UserAchievementLevel;
 
 class WeeklyStarWinner extends Command
 {
@@ -23,10 +24,10 @@ class WeeklyStarWinner extends Command
 
     public function handle()
     {
-        $weeklyEvent = WeeklyStar::endToday()->where('type','weekly_star')
-                                 ->with('gifts', 'rewards')
-                                 ->latest()
-                                 ->first();
+        $weeklyEvent = WeeklyStar::endToday()->where('type', 'weekly_star')
+            ->with('gifts', 'rewards')
+            ->latest()
+            ->first();
 
         if (!$weeklyEvent) {
             return '';
@@ -34,34 +35,34 @@ class WeeklyStarWinner extends Command
 
         $giftIds = $weeklyEvent->gifts->pluck('id');
         $leaderboard = GiftLog::whereIn('giftId', $giftIds)
-                              ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
-                              ->with('sender')
-                              ->select(DB::raw('SUM(giftPrice) AS total_gift_num'), 'sender_id')
-                              ->groupBy('sender_id')
-                              ->orderByDesc('total_gift_num')
-                              ->take(3)
-                              ->get();
+            ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+            ->with('sender')
+            ->select(DB::raw('SUM(giftPrice) AS total_gift_num'), 'sender_id')
+            ->groupBy('sender_id')
+            ->orderByDesc('total_gift_num')
+            ->take(3)
+            ->get();
 
 
 
         foreach ($leaderboard as $index => $entry) {
             $alreadyWinner = Winner::where([
-                                               'weekly_star_id' => $weeklyEvent->id,
-                                               'user_id' => $entry->sender_id
-                                           ])->exists();
+                'weekly_star_id' => $weeklyEvent->id,
+                'user_id' => $entry->sender_id
+            ])->exists();
 
             if (!$alreadyWinner) {
                 $winner = Winner::create([
-                        'weekly_star_id' => $weeklyEvent->id,
-                        'user_id' => $entry->sender_id,
-                        'level' => $index + 1,
-                    ]);
-                $rewardIds = $weeklyEvent->rewards->where('level',$index + 1);
-                if (count($rewardIds) > 0){
-                    foreach ($rewardIds as $reward){
+                    'weekly_star_id' => $weeklyEvent->id,
+                    'user_id' => $entry->sender_id,
+                    'level' => $index + 1,
+                ]);
+                $rewardIds = $weeklyEvent->rewards->where('level', $index + 1);
+                if (count($rewardIds) > 0) {
+                    foreach ($rewardIds as $reward) {
 
                         $expiredAt = now()->addDays($reward->expire);
-                        if ($reward->type == "coins"){
+                        if ($reward->type == "coins") {
 
                             $amountBefore = $entry?->sender?->di;
                             UserCoinLogHelper::logByType(
@@ -71,17 +72,15 @@ class WeeklyStarWinner extends Command
                                 UserCoinLogType::WEEKLY_STAR,
                             );
 
-                            $entry->sender->di+=$reward->target;
+                            $entry->sender->di += $reward->target;
                             $entry->sender->save();
-
-                        }elseif ($reward->type == "vip"){
-                            $vip=OVip::query()->find($reward->target);
-                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire,null,'weekly-star');
-
-                        }elseif ($reward->type == "ware"){
-                            $ware=Ware::query()->find($reward->target);
-                            UserCommon::addWareToUser($entry->sender,$ware,$reward->expire ,null ,'weekly-star');
-                        }elseif ($reward->type == "achievement"){
+                        } elseif ($reward->type == "vip") {
+                            $vip = OVip::query()->find($reward->target);
+                            UserCommon::addVipToUser($entry->sender, $vip, $reward->expire, null, 'weekly-star');
+                        } elseif ($reward->type == "ware") {
+                            $ware = Ware::query()->find($reward->target);
+                            UserCommon::addWareToUser($entry->sender, $ware, $reward->expire, null, 'weekly-star');
+                        } elseif ($reward->type == "achievement") {
                             $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
@@ -90,11 +89,13 @@ class WeeklyStarWinner extends Command
                             ];
 
                             UserAchievementLevel::create($attributes);
-                        }else{
+                        } elseif ($reward->type == 'badge') {
+                            Common::userBadge($entry->sender_id, $reward->target,$reward->expire, 'weekly-star');
+                        } else {
                             continue;
                         }
 
-                        $data= [
+                        $data = [
                             'winner_id' => $entry->sender_id,
                             'reward_id' => $reward->id,
                             'expaired_at' => $expiredAt,
@@ -104,9 +105,8 @@ class WeeklyStarWinner extends Command
                         DB::table('winner_rewards')->insert($data);
                     }
                 }
-
             }
         }
-//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }
