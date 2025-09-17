@@ -2,12 +2,14 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
-use App\Selectables\WaresByType;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use App\Selectables\Badges;
+use Modules\Vip\Entities\OVip;
+use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
 use Modules\CP\Entities\WeeklyCpGift;
 use Modules\Events\Entities\WeeklyStar;
@@ -84,7 +86,7 @@ class WeeklyCpGiftController extends MainController
         $type = 1;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
-         $grid->disableRowSelector();
+        $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
@@ -126,7 +128,7 @@ class WeeklyCpGiftController extends MainController
         $type = 2;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
-         $grid->disableRowSelector();
+        $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
@@ -168,7 +170,7 @@ class WeeklyCpGiftController extends MainController
         $type = 3;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
-         $grid->disableRowSelector();
+        $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
@@ -214,10 +216,10 @@ class WeeklyCpGiftController extends MainController
         $this->addExpireField($form);
         $this->addGenderField($form);
         $this->addSavedRedirect($form);
-    
+
         return $form;
     }
-    
+
     /**
      * Hidden fields
      */
@@ -226,7 +228,7 @@ class WeeklyCpGiftController extends MainController
         $form->hidden('weekly_cp_id')->value(request('weekly_cp_id'));
         $form->hidden('level')->value(request('level'));
     }
-    
+
     /**
      * Type field and dependent fields
      */
@@ -235,10 +237,13 @@ class WeeklyCpGiftController extends MainController
         $form->select('type', trans('type'))->options([
             "ware" => __('ware'),
             "vip" => __('vip'),
+            "badge" => __('badge'),
             "coins" => __('coins'),
             "achievement" => __('achievement')
         ])->when('ware', function () use ($form) {
             $this->addWareField($form);
+        })->when("badge", function () use ($form) {
+            $this->addBadgeField($form);
         })->when('vip', function () use ($form) {
             $this->addVipField($form);
         })->when('coins', function () use ($form) {
@@ -247,7 +252,29 @@ class WeeklyCpGiftController extends MainController
             $this->addAchievementField($form);
         });
     }
-    
+
+    protected function addBadgeField(Form $form)
+    {
+        $prefix = 'badges';
+        $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target5')
+                ->select('id', __('badges'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Badge::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id')
+                ]);
+
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+            $this->addWareJs();
+        });
+    }
+
     /**
      * Ware field
      */
@@ -273,7 +300,7 @@ class WeeklyCpGiftController extends MainController
         });
         $form->hidden('sub_type');
     }
-    
+
     /**
      * VIP field
      */
@@ -288,7 +315,7 @@ class WeeklyCpGiftController extends MainController
             return $ops;
         });
     }
-    
+
     /**
      * Coins field
      */
@@ -296,7 +323,7 @@ class WeeklyCpGiftController extends MainController
     {
         $form->number("target3", __("coins"));
     }
-    
+
     /**
      * Achievement field
      */
@@ -306,7 +333,7 @@ class WeeklyCpGiftController extends MainController
             return now()->timestamp . '.' . $file->guessExtension();
         })->disk('gcs');
     }
-    
+
     /**
      * Expire field
      */
@@ -314,7 +341,7 @@ class WeeklyCpGiftController extends MainController
     {
         $form->number('expire', __('expire'))->required();
     }
-    
+
     /**
      * Gender field
      */
@@ -326,7 +353,7 @@ class WeeklyCpGiftController extends MainController
             'female' => __('Female')
         ])->required();
     }
-    
+
     /**
      * Redirect after saved
      */
@@ -337,5 +364,4 @@ class WeeklyCpGiftController extends MainController
             return redirect($route);
         });
     }
-    
 }

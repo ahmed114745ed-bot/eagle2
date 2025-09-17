@@ -75,29 +75,33 @@ class RewardTargetController extends MainController
         $grid->column('type', __('Type'));
 
         if (!request()->filled('_export_')) { 
-            $grid->column('gift_id', __('gifts'))->display(function () {
-                if ($this->type == "ware") {
-                    return @$this->ware->name;
-                } elseif ($this->type == "vip") {
-                    return @$this->vip->name;
-                } elseif ($this->type == "coins") {
-                    return @$this->target;
-                } elseif ($this->type == "achievement") {
-                    $value = getDriverUrl() . '/' . @$this->target;
-                    return "<img src='$value' width='80' height='80'>";
-                }
-            });
-        }
-        if (!request()->filled('_export_')) { 
+             $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name ?? '';
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name ?? '';
+            } elseif ($this->type == "badge") {
+                return @$this->badge->name ?? '';
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+  
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? $ware?->show_img;
+                    $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
                     $vips = OVip::find($this->target);
-                    $path = $vips?->img;
+                    $path = $vips->img ?? '';
+                } elseif ($this->type == 'badge') {
+                    // $vips = Badge::find($this->target);
+                    $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this?->target;
+                    $path = $this->target;
                 } else {
                     $path = 'coin.png';
                 }
@@ -106,6 +110,7 @@ class RewardTargetController extends MainController
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
+        
         }
         $grid->column('expire', __('expire'))->display(function ($expire) {
             if ($this->type == 'coins') {
@@ -148,7 +153,7 @@ class RewardTargetController extends MainController
         $this->disableFormTools($form);
 
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+        $form->select('type', trans('type'))->options(["ware" => __('ware'),"badge"=>__('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })
