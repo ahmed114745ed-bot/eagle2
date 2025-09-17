@@ -308,7 +308,7 @@ class SearchRepository implements SearchRepositoryInterface
         ];
     }
 
-    public function getOfficialNotifications(int $userId, int $type): AnonymousResourceCollection
+    public function getNotifications(int $userId, int $type): AnonymousResourceCollection
     {
         $messages = OfficialMessage::query()
             ->whereIn('user_id', [0, $userId])
