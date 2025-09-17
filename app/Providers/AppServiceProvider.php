@@ -21,6 +21,7 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
+use App\Observers\ConfigObserver;
 use App\Observers\SettingObserver;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -234,6 +235,7 @@ class AppServiceProvider extends ServiceProvider
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
         Setting::observe(SettingObserver::class);
+        \App\Models\Config::observe(ConfigObserver::class);
     }
 
     protected function cacheLuckyGiftProbabilities(): void
