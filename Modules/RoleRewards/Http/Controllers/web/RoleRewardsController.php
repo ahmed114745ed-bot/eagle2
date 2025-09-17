@@ -100,7 +100,7 @@ class RoleRewardsController extends MainController
             } elseif ($this->type === "vip") {
                 $path = $this->rewardable?->img;
             } elseif ($this->type === "achievement") {
-                $path = $this->rewardable?->icon;
+                $path = $this?->reward_achievement;
             } elseif ($this->type === "badge") {
                 $path = $this->rewardable?->icon;
             } else {
