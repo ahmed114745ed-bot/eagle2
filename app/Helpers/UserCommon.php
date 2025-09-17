@@ -393,6 +393,20 @@ class UserCommon
         // Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
+    public static function removeVipFromUser(User $user, $id, $receiveType)
+    {
+        VipCommon::removeVipFromUser($user ,$id ,$receiveType);
+    }
+
+    public static function removeEventsWareFromUser(User $user, $id, $receiveType)
+    {
+     
+        Pack::where('receive_type', $receiveType)
+                    ->where('user_id', $user->id)
+                    ->where('target_id',  $id)->delete();
+    }
+    
+    
     public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null , $receiveType = null )
     {
         $receiveType = $receiveType ?? 'not-sending';

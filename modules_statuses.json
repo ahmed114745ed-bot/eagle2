@@ -25,5 +25,7 @@
     "LuckyBox": true,
     "TribeReward": true,
     "Vip": true,
-    "RoomBoom": true
+    "RoomBoom": true,
+    "Badge": true,
+    "RoleRewards": true
 }

@@ -598,7 +598,6 @@ Route::group(
         ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
-        Route::resource('badges', BadgeController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
@@ -648,6 +647,9 @@ Route::group(
 
             Route::get('/search-test', [GiftLogTestController::class, 'showSearch']);
             Route::post('/search-test', [GiftLogTestController::class, 'merge_search']);
+
+            Route::get('/user-data-test', [GiftLogTestController::class, 'showUserData']);
+            Route::post('/user-data-test', [GiftLogTestController::class, 'dataUser']);
         });
     });
 
