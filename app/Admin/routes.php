@@ -267,6 +267,9 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::resource('live-rooms', 'LiveRoomController');
+
+
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
@@ -639,6 +642,12 @@ Route::group(
 
             Route::get('/room-admins-test', [GiftLogTestController::class, 'showRoomAdmin']);
             Route::post('/room-admins-test', [GiftLogTestController::class, 'getAdmins']);
+
+            Route::get('/rooms-test', [GiftLogTestController::class, 'showRooms']);
+            Route::post('/rooms-test', [GiftLogTestController::class, 'rooms']);
+
+            Route::get('/search-test', [GiftLogTestController::class, 'showSearch']);
+            Route::post('/search-test', [GiftLogTestController::class, 'merge_search']);
         });
     });
 

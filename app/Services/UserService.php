@@ -1174,7 +1174,11 @@ class UserService
 
     public function dataUser($userId)
     {
-        return  $this->userRepository->findOrFail($userId, ['family', 'medals']);
+        $cacheKey = "user_{$userId}";
+
+        return Cache::remember($cacheKey, 60 * 10, function () use ($userId) {
+            return $this->userRepository->findOrFail($userId, ['family', 'medals']);
+        });
     }
 
     public function syncBDUsers()

@@ -709,7 +709,7 @@ class EnteranceRoomServices
 
     private function prepareRoomInfo(Room $room, $user, Request $request): array
     {
-        $roomInfo = (new EnterRoomLiveCollection($room, $user->id))->toArray($request);
+        $roomInfo = (new EnterRoomCollection($room, $user->id))->toArray($request);
         return $roomInfo;
     }
 

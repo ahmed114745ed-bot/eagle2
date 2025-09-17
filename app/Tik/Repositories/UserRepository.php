@@ -132,28 +132,31 @@ class UserRepository extends AbstractRepository
     {
         if (empty($ids)) return collect();
 
-        $vipsData = DB::table('vips')->get()->groupBy('type');
-        $expPercentages = config('exp_percentages', [
-            'exp_received_percentage' => 1,
-            'exp_sender_percentage' => 1
-        ]);
+//        $vipsData = DB::table('vips')->get()->groupBy('type');
+//        $expPercentages = config('exp_percentages', [
+//            'exp_received_percentage' => 1,
+//            'exp_sender_percentage' => 1
+//        ]);
 
-        $admins = $this->model->select(['id', 'name'])->with([
+        $admins = $this->model->select([
+            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id'
+        ])->with([
 //            'agency.owner',
 //            'agency.mempers',
             'profile:id,user_id,avatar',
 //            'family',
             'packs:id,user_id',
+            'eligiblePacks',
 //            'ownAgency',
 //            'userSetting',
 //            'activePack20'
+            'specialId.ware',
         ])->whereIn('id', $ids)->get();
 
-        $admins->each(function ($user) use ($vipsData, $expPercentages) {
+        $admins->each(function ($user) {
             $user->user_types2 = $this->computeUserTypes($user);
-            $user->preloaded_uuid = $this->computeUuid($user);
-            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
-
+//            $user->preloaded_uuid = $this->computeUuid($user);
+//            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
         });
 
         return $admins;
