@@ -45,6 +45,7 @@ class DailyGiftController extends Controller
 
         $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
         $data = [
+            'total_days'    => $currentDay,
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
             'gift'          => $this->getWeekGifts($currentDay),
             'is_received'   => $check_received != null ? true : false,
@@ -80,7 +81,7 @@ class DailyGiftController extends Controller
         if (!$dailyGift) {
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
-       
+
         $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
         if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
             return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
@@ -131,7 +132,7 @@ class DailyGiftController extends Controller
     }
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
-    
+
         if ($type == "coins") {
 
             $amountBefore =  Common::getCurrentBalance($user->id);
