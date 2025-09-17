@@ -17,6 +17,7 @@ class UserBadgeResource extends JsonResource
     {
         return [
             'image' => $this->badge->image,
+            'image_type' => @$this->badge->image_type ?? '',
 
         ];
     }
