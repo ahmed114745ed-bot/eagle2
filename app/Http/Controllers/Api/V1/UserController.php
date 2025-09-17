@@ -426,15 +426,16 @@ class UserController extends Controller
 
     public function show(Request $request, $id)
     {
-        $isVisit = @$request->is_visit == 'true' ? true : false;
-        $auth   = $request->user();
-        try {
-
-            $user = $this->userService->showUser($id, $auth, $request, $isVisit);
-        } catch (Exception $e) {
-            return Common::apiResponse(false, $e->getMessage(), null, 407);
-        }
-        return Common::apiResponse(true, '', new UserResource($user), 200);
+        return Cache::remember("show_user_{$id}",600, function () use ($request, $id) {
+            $isVisit = @$request->is_visit == 'true' ? true : false;
+            $auth   = $request->user();
+            try {
+                $user = $this->userService->showUser($id, $auth, $request, $isVisit);
+            } catch (Exception $e) {
+                return Common::apiResponse(false, $e->getMessage(), null, 407);
+            }
+            return Common::apiResponse(true, '', new UserResource($user), 200);
+        });
     }
 
     public function vTwoshow(Request $request, $id)

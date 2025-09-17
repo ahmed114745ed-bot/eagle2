@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\RoomSearchResource;
+use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserResourceSearchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
@@ -20,6 +21,7 @@ use App\Services\ProfileService;
 use App\Services\UserService;
 use App\Tik\Services\GiftLogService;
 use App\Tik\Services\RoomRepoService;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +58,7 @@ class GiftLogTestController extends Controller
 
         try {
             $message = $this->giftLogService->sendTestGift($request, $updateUserWhenSendGift);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('test.gifts-test', [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -100,7 +102,7 @@ class GiftLogTestController extends Controller
             $data = (new MyDataResource($userWithMedals))
                 ->resolve();
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $success = false;
             $message = $exception->getMessage();
             $data = null;
@@ -235,40 +237,26 @@ class GiftLogTestController extends Controller
         return view('test.user-data');
     }
 
-    public function dataUser(Request $request)
+    public function dataUser(Request $request, $id = 303)
     {
-        $id = 303;
-        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-//        $data = $this->userService->dataUser($id);
-        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
-            $user = $this->userService->dataUser($id);
-            return new DataUserResource($user);
-        });
+        $isVisit = @$request->is_visit == 'true' ? true : false;
+        $auth   = User::whereId(303)->first();
+        try {
 
-        request()->merge(['user_id' => $id]);
+            $user = $this->userService->showUser($id, $auth, $request, $isVisit);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+
+        $userResource = new UserResource($user);
 
         return view('test.user-data', [
             'success' => true,
             'message' => '',
-            'data'    => $data,
+            'data'    => $userResource,
         ]);
     }
 
-//    public function dataUser(Request $request)
-//    {
-//        $id = 303;
-//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-//        $data = $this->userService->dataUser($id);
-//        request()->merge(['user_id' => $id]);
-//
-//        $resource = new DataUserResource($data);
-//
-//        return view('test.user-data', [
-//            'success' => true,
-//            'message' => '',
-//            'data'    => $resource,
-//        ]);
-//    }
     public function userSearchHand(int $userId, string $keywords, $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
