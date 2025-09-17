@@ -1069,7 +1069,7 @@ use Modules\Vip\Entities\Vip;
                                     <div class="d-flex align-items-center">
                                         <input type="radio" id="rtcLiveRadio"
                                                class="custom-radio libraryRealTime" name="live_library" value="0"
-                                            {{ $videoLibrary == '0' ? 'checked' : '' }}>
+                                            {{ $liveLibrary == '0' ? 'checked' : '' }}>
                                         <label for="rtcLiveRadio" class="switch"></label>
                                     </div>
                                 </div>
@@ -1082,7 +1082,7 @@ use Modules\Vip\Entities\Vip;
                                     <div class="d-flex align-items-center">
                                         <input type="radio" id="cdnLiveRadio"
                                                class="custom-radio libraryRealTime" name="live_library" value="1"
-                                            {{ $videoLibrary == '1' ? 'checked' : '' }}>
+                                            {{ $liveLibrary == '1' ? 'checked' : '' }}>
                                         <label for="cdnLiveRadio" class="switch"></label>
                                     </div>
                                 </div>
@@ -1095,7 +1095,7 @@ use Modules\Vip\Entities\Vip;
                                     <div class="d-flex align-items-center">
                                         <input type="radio" id="l3LiveRadio"
                                                class="custom-radio libraryRealTime" name="live_library" value="2"
-                                            {{ $videoLibrary == '2' ? 'checked' : '' }}>
+                                            {{ $liveLibrary == '2' ? 'checked' : '' }}>
                                         <label for="l3LiveRadio" class="switch"></label>
                                     </div>
                                 </div>

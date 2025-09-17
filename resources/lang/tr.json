@@ -3340,7 +3340,8 @@
   "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi",
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
-  "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "Live System Setting:": "Canlı Sistem Ayarı",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
 
 
 
