@@ -130,7 +130,7 @@ class RoleRewardsController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableDelete();
-            $actions->disableEdit();
+            // $actions->disableEdit();
             $actions->add(new DeleteRoleReward());
         });
 
@@ -146,19 +146,23 @@ class RoleRewardsController extends MainController
 
 
     protected function form()
-{
-    $form = new Form(new RoleReward());
-    $this->disableFormTools($form);
-
-    $this->addHiddenFields($form);
-    $this->addTypeSelector($form);
-    $this->addExpireField($form);
-    $this->handleSaving($form);
-    $this->handleSaved($form);
-    $this->handleDeleted($form);
-
-    return $form;
-}
+    {
+        $form = new Form(new RoleReward());
+        $this->disableFormTools($form);
+    
+        if (!$form->isEditing()) {
+            $this->addHiddenFields($form);
+            $this->addTypeSelector($form);
+        }
+    
+        $this->addExpireField($form);
+    
+        $this->handleSaving($form);
+        $this->handleSaved($form);
+        $this->handleDeleted($form);
+    
+        return $form;
+    }
 
 
 protected function addHiddenFields(Form $form)
