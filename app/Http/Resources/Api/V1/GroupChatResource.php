@@ -44,8 +44,8 @@ class GroupChatResource extends JsonResource
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],
             'level' => [
-                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id', 1)->img,
-                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id', 2)->img,
+                'receiver_img' => $this->user?->receiverLevel?->img,
+                'sender_img'   => $this->user?->senderLevel?->img,
             ],
             'has_color_name' => Common::hasInPack(@$this->user->id, 18),
             'message_id' => @$this->id,
