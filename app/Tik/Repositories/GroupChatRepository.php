@@ -25,7 +25,7 @@ class GroupChatRepository extends AbstractRepository
     public function getWithPaginate()
     {
         return $this->model->whereHas('user')->with([
-            'user.profile:id,user_id,avatar,birthday,gender',
+            'user.profile:id,user_id,avatar',
             'user.UserVip',
             'user.receiverLevel',
             'user.senderLevel',
@@ -33,7 +33,7 @@ class GroupChatRepository extends AbstractRepository
 
             // 'parent',
             'user.packs'  => fn($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
-            'parent.user.profile:id,user_id,avatar,birthday,gender',
+            'parent.user.profile:id,user_id,avatar',
             'parent.user.UserVip',
             'parent.user.receiverLevel',
             'parent.user.senderLevel',
