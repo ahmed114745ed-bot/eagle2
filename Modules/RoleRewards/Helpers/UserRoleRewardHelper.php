@@ -161,4 +161,43 @@ class UserRoleRewardHelper
             self::giveRoleRewards($user, $roleId, $slug);
         }
     }
+
+
+    public static function revokeSpecificRewardFromAllUsers(
+        int $roleId,
+        string $slug,
+        int $rewardId,
+        string $rewardableType,
+        int $rewardableId
+    ): void {
+        $dashboardUsers = \Encore\Admin\Auth\Database\Administrator::whereHas('roles', function ($q) use ($roleId) {
+            $q->where('id', $roleId);
+        })->get();
+    
+        $appIds = $dashboardUsers->pluck('app_id')->filter()->unique();
+    
+        if ($appIds->isEmpty()) {
+            return;
+        }
+    
+        $users = User::whereIn('id', $appIds)->get();
+    
+        foreach ($users as $user) {
+            self::revokeOneReward($user, $roleId, $slug, $rewardableType, $rewardableId);
+        }
+    }
+    
+    protected static function revokeOneReward($user, int $roleId, string $slug, string $rewardableType, int $rewardableId): void
+    {
+        $rewards = UserHistoryReward::where('user_id', $user->id)
+            ->where('receive_type', "Role:$slug:$roleId")
+            ->where('rewardable_type', $rewardableType)
+            ->where('rewardable_id', $rewardableId)
+            ->get();
+    
+        foreach ($rewards as $reward) {
+            self::removeReward($user, $reward);
+            $reward->delete();
+        }
+    }
 }

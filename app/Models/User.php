@@ -1674,6 +1674,7 @@ class User extends Authenticatable
     //     $html = '<div class="user-type-badges">';
     //     foreach ($userBadges as $badge) {
     //         $url = getImagePath($badge->badge->image);
+    //         handleShowImageWithTypes($this->id, $url, 50, 50);
     //         if ($url) {
     //             $html .= '<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
     //         }

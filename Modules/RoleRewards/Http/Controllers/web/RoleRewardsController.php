@@ -94,7 +94,6 @@ class RoleRewardsController extends MainController
             return "-";
         });
         
-        // صورة الـ reward
         $grid->column('image', __('Image'))->display(function () {
             if ($this->type === "ware") {
                 $path = $this->rewardable?->img2 ?? $this->rewardable?->show_img;
@@ -131,6 +130,7 @@ class RoleRewardsController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableDelete();
+            $actions->disableEdit();
             $actions->add(new DeleteRoleReward());
         });
 
@@ -195,6 +195,7 @@ protected function addTypeSelector(Form $form)
 protected function addExpireField(Form $form)
 {
     $form->number('expire', __('expire'))->default(1);
+
 }
 
 
@@ -259,15 +260,6 @@ protected function syncRewards(RoleReward $roleReward)
 
     
 
-// public function destroy($id)
-// {
-
-//     $roleRewards = RoleReward::findOrFail($id);
-
-//      $this->syncRewards($roleRewards);
-//     dd($roleRewards);
-//     return parent::destroy($id); 
-// }
   
 
 }
