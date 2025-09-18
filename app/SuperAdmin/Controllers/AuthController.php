@@ -103,11 +103,13 @@ class AuthController extends BaseAuthController
         switch ($user->type) {
             case 'superadmin':
                 return redirect()->route('superadmin.home');
-            case 'admin':
-            case null:
             default:
-                info('admin.home');
-                return redirect()->route('admin.home');
+                $this->guard()->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withInput()->withErrors([
+                    $this->username() => $this->getFailedLoginMessage(),
+                ]);
         }
     }
 

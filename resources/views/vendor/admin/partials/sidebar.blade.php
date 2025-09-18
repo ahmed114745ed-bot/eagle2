@@ -106,9 +106,6 @@
                     @php
                         $superadminLinks = [
                             ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard')],
-                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Manage Users')],
-                            ['uri' => '/roles', 'icon' => 'fa-lock', 'title' => __('Roles & Permissions')],
-                            ['uri' => '/settings', 'icon' => 'fa-cogs', 'title' => __('System Settings')],
                         ];
                     @endphp
 
