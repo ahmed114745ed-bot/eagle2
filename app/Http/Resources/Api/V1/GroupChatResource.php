@@ -30,9 +30,9 @@ class GroupChatResource extends JsonResource
         // $frame  =
         //     (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
         $framePack = $this->user?->packs
-    ->firstWhere(fn($p) => $p->type == 4 && $p->target_id == $this->user->dress_1);
+            ->firstWhere(fn($p) => $p->type == 4 && $p->target_id == $this->user->dress_1);
 
-$frame = $framePack?->ware?->img2 ?? $framePack?->ware?->img1 ?? '';
+        $frame = $framePack?->ware?->img2 ?? $framePack?->ware?->img1 ?? '';
         $data = [
             'id' => (int)(@$this->user?->id ?? 0),
             'uuid' => @$this->user?->uuid ?? '',
