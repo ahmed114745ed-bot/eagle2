@@ -1666,25 +1666,26 @@ class User extends Authenticatable
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
 
-    // public function userBadge()
-    // {
+    public function userBadge()
+    {
 
-    //     $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
 
-    //     $html = '<div class="user-type-badges">';
-    //     foreach ($userBadges as $badge) {
-    //         $url = getImagePath($badge->badge->image);
-    //         handleShowImageWithTypes($this->id, $url, 50, 50);
-    //         if ($url) {
-    //             $html .= '<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
-    //         }
-    //     }
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
 
-    //     $html .= '</div>';
+            if ($url) {
+                $html .= handleShowImageWithTypes($this->id, $url, 100, 100, 4,'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
 
 
-    //     return $html;
-    // }
+        return $html;
+    }
 
     public function wallet()
     {
