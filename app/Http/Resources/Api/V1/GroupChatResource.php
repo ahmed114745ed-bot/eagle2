@@ -34,7 +34,7 @@ class GroupChatResource extends JsonResource
             'uuid' => @$this->user?->uuid ?? '',
             'name' => @$this->user?->name ?? '',
             'profile' => [
-                'image' => @$this->user->profile->avatar,
+                'image' => @$this->user->profile->avatar ?? '',
                 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
                 'gender' => $this->user?->gender ?? 0,
             ],
@@ -44,13 +44,13 @@ class GroupChatResource extends JsonResource
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],
             'level' => [
-                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id', 1)->img,
-                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id', 2)->img,
+                'receiver_img' => $this->user?->receiverLevel?->img ?? '',
+                'sender_img'   => $this->user?->senderLevel?->img ?? '',
             ],
             'has_color_name' => Common::hasInPack(@$this->user->id, 18),
             'message_id' => @$this->id,
             'group_message' => @$this->text ?? '',
-            'group_image' => $this->image,
+            'group_image' => $this->image ?? '',
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'replay' => $this->parent ? new ReplayGroupChatResource(@$this->parent) : null,
         ];

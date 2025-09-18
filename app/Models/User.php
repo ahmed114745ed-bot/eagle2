@@ -840,7 +840,6 @@ class User extends Authenticatable
     {
         $amount =
             $type === 2 ? $this->sender_level + $this->sub_sender_level : $this->received_level + $this->sub_receiver_level;
-
         $level = Vip::collectionBuilder()->where('type', $type)->where('level', $amount)->orderByDesc('exp')->first();
 
         return $level;
