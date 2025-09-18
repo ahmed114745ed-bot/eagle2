@@ -77,7 +77,7 @@ class EnteranceController extends Controller
                 'app_id' => $zego_app_id,
                 'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
-                'live_type' => $liveTypes[$liveLibrary]
+                'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
 
