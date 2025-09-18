@@ -805,3 +805,22 @@ if (!function_exists('bd_url')) {
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
     }
 }
+
+if (!function_exists('superadmin_url')) {
+    function superadmin_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
+        }
+
+        $base = trim(config('superadmin.route.prefix', 'superadmin'), '/');
+
+        $secure = $secure ?? (config('superadmin.https') || config('superadmin.secure'));
+
+        if (app()->environment(['production', 'Production'])) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        }
+
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}

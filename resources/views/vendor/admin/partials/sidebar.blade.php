@@ -40,8 +40,16 @@
 
                     @endif
 
+                        @if (Admin::user()->type == 'superadmin')
 
-                    @if (Admin::user()->type != 'bd')
+                            @foreach(Admin::menuLinks() as $link)
+                                <li>
+                                    <a href="{{ superadmin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                                </li>
+                            @endforeach
+                        @endif
+
+                    @if (Admin::user()->type != 'bd' || Admin::user()->type != 'superadmin')
 
                         @foreach(Admin::menuLinks() as $link)
                             <li>
@@ -73,7 +81,7 @@
                 <li class="header">{{ trans('admin.menu') }}</li>
 
                 @if (Admin::user()->type == 'bd')
-  
+
                 @php
                     $bdLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Home')],
@@ -93,7 +101,30 @@
                     </li>
                 @endforeach
                 @endif
-                @each('admin::partials.menu', $filteredMenu, 'item')
+
+                @if (Admin::user()->type == 'superadmin')
+                    @php
+                        $superadminLinks = [
+                            ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard')],
+                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Manage Users')],
+                            ['uri' => '/roles', 'icon' => 'fa-lock', 'title' => __('Roles & Permissions')],
+                            ['uri' => '/settings', 'icon' => 'fa-cogs', 'title' => __('System Settings')],
+                        ];
+                    @endphp
+
+                    @foreach($superadminLinks as $link)
+                        <li>
+                            <a href="{{ superadmin_url($link['uri']) }}">
+                                <i class="fa {{ $link['icon'] }}"></i>
+                                <span>{{ $link['title'] }}</span>
+                            </a>
+                        </li>
+                    @endforeach
+                @endif
+
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin')
+                    @each('admin::partials.menu', $filteredMenu, 'item')
+                @endif
             </ul>
 
 

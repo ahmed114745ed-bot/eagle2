@@ -17,22 +17,27 @@ class AuthenticateWeb
      * @return mixed
      */
     public function handle($request, Closure $next)
-    { 
+    {
         \config(['auth.defaults.guard' => 'admin']);
-        $uri = $request->path(); 
-        
-        $user = Admin::user(); 
+        $uri = $request->path();
+
+        $user = Admin::user();
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
-    
+        $superadminLogin = 'superadmin/login';
+
         if ($user) {
-            if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd') {
-                return redirect('/admin'); 
+            if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd' && $user?->type !== 'superadmin') {
+                return redirect('/admin');
             }
-    
+
             if (Str::contains($uri, $bdLogin) && $user?->type == 'bd') {
-                return redirect('/bd'); 
+                return redirect('/bd');
+            }
+
+            if (Str::contains($uri, $superadminLogin) && $user?->type == 'superadmin') {
+                return redirect('/superadmin');
             }
         }
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
@@ -41,12 +46,16 @@ class AuthenticateWeb
             $redirectTo = '/bd/login';
         }
 
+        if (Str::contains($uri, 'superadmin')) {
+            $redirectTo = '/superadmin/login';
+        }
+
         // If the user is not authenticated, redirect to login and pass the $test variable as a query parameter
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {
             return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
-        
+
         // if (
         //     (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
         //     (Str::contains($uri, 'admin') && $user?->type == 'bd')
@@ -66,12 +75,14 @@ class AuthenticateWeb
         // }
 
         if (
-            (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
-            (Str::contains($uri, 'admin') && $user?->type == 'bd')
+            (Str::contains($uri, 'bd') && $user?->type !== 'bd') ||
+            (Str::contains($uri, 'admin') && $user?->type === 'bd') ||
+            (Str::contains($uri, 'superadmin') && $user?->type !== 'superadmin')
         ) {
-            // تحديد رابط العودة حسب نوع المستخدم
             if ($user->type === 'bd') {
                 return redirect('/bd');
+            } elseif ($user->type === 'superadmin') {
+                return redirect('/superadmin');
             } else {
                 return redirect('/admin');
             }
@@ -79,8 +90,8 @@ class AuthenticateWeb
 
 
 
-        
-        
+
+
         return $next($request);
     }
 
