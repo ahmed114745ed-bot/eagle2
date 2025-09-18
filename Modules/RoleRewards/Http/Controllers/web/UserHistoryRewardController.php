@@ -7,6 +7,10 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\RoleRewards\Entities\UserHistoryReward;
+use Encore\Admin\Facades\Admin;
+use App\Admin\Services\UserService;
+use Encore\Admin\Layout\Content;
+
 
 class UserHistoryRewardController extends AdminController
 {
@@ -15,118 +19,82 @@ class UserHistoryRewardController extends AdminController
      *
      * @var string
      */
-    protected $title = 'UserHistoryReward';
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+    public function index(Content $content )
+    {
+      
+        return parent::index($content
+            ->header(__('User history rewards'))
+            ->description(__('User history rewards'))
+            // ->body($this->grid())
+        );
+    }
+  
 
      protected function grid()
      {
          $grid = new Grid(new UserHistoryReward());
+         $grid->model()->orderByDesc('id');
      
          $grid->column('id', __('ID'))->sortable();
-         $grid->column('user.name', __('User'))->display(function ($name) {
-            $uid = $this->user?->uuid ?? '-';
-            $path = $this->user?->profile?->avatar ?? null;
-        
-            $defaultImage = asset('images/businessman-icon.jpg');
-        
-            $url = $path ? getImagePath($path) : $defaultImage;
-        
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
+
+         $grid->column('user_id', __('User'))->display(function ($name) {
+            $user = $this->user;
+            if (! $user) {
+                return __('No User');
             }
-        
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
-            $safeName = $name ?: __('N/A');
-        
-            return <<<HTML
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    {$image}
-                    <div>
-                       <a href="{$showUrl}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
-                         <span style="text-decoration: underline; cursor: pointer;">{$safeName}</span>
-                        </a>
-                        <br>
-                        <span style="font-size: smaller; color: #666;">UUID: {$uid}</span>
-                    </div>
-                </div>
-            HTML;
+
+            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
         });
+      
         
-         $grid->column('receive_type', __('receive_type'));
+        // $grid->column('receive_name', __('Receive_type'));
      
          $grid->column('reward', __('Rewards'))->display(function () {
-            $reward = $this->rewardable; 
-            if (!$reward) return 'N/A';
-        
-            $name = $reward->name ?? 'Unnamed';
             
-            $path = 'coin.png'; 
-            if ($this->rewardable_type === \App\Models\User::class) {
+            $reward = $this->rewardable; 
+            if (in_array($this->rewardable_type, [\App\Models\User::class, \Modules\Achievement\Entities\Achievement::class])) {
                 $extra = $reward->extra ?? '';
+                $data = is_array($extra) ? $extra : json_decode($extra, true);
+                if (!$data) return $extra ?: 'N/A';
         
-                if (is_array($extra)) {
-                    $data = $extra;
-                } else {
-                    $data = json_decode($extra, true);
+                if ($this->rewardable_type === \App\Models\User::class) {
+                    $data = $data['coins'] ?? $data;
                 }
-        
-                if (!$data) {
-                    return $extra ?: 'N/A';
+                
+                if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+                    $data = $data['reward_achievement'] ?? $data;
                 }
         
                 return '<pre style="white-space: pre-wrap;">' .
                     json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
                     '</pre>';
             }
-            switch ($this->rewardable_type) {
-                case \App\Models\Ware::class:
-                    $path = $reward->img2 ?? $reward->show_img ?? '';
-                    break;
-                case \Modules\Vip\Entities\OVip::class:
-                    $path = $reward->img ?? '';
-                    break;
-                case \Modules\Achievement\Entities\Achievement::class:
-                    $path = $this->reward_achievement ?? '';
-                    break;
-                case \Modules\Badge\Entities\Badge::class:
-                    $path = $reward?->img ??' ';
-                    break;
-            }
-
+        
+            $name = $reward->name ?? 'Unnamed';
+            $path = match ($this->rewardable_type) {
+                \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
+                \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
+                \Modules\Badge\Entities\Badge::class => $reward?->img ?? '',
+                default => 'coin.png',
+            };
+        
             $url = getImagePath($path);
             $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
             return $imgTag . $name;
         });
         
      
-         $grid->column('extra', __('Extra'))->display(function ($extra) {
-            if (!$extra) return '';
-        
-            if (is_array($extra)) {
-                $data = $extra;
-            } else {
-                $data = json_decode($extra, true);
-                if (!$data) return $extra; 
-            }
-        
-            return '<pre style="white-space: pre-wrap;">' . json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
-        });
         
      
          $grid->column('created_at', __('Created At'))->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
      
-         $grid->column('sub_type', __('Sub Type'));
+        //  $grid->column('sub_type', __('Sub Type'));
      
          $grid->filter(function ($filter) {
-             $filter->equal('sub_type', 'Sub Type')->select([
-                 'role' => 'roles',
-                 'reward' => 'milestons',
+             $filter->equal('sub_type', __('Sub Type'))->select([
+                 'role' => __('Roles'),
+                 'reward' => __('Milestone'),
              ]);
          });
      
@@ -135,8 +103,14 @@ class UserHistoryRewardController extends AdminController
          $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableDelete();
             $actions->disableEdit();
+            $actions->disableView();
         });
-        
+        $grid->disableActions();
+        Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
         return $grid;
      }
      

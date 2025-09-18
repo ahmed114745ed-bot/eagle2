@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Badge\Entities\Badge;
@@ -21,18 +22,18 @@ class MilestoneRewardController
 
     public function index(Content $content, $milestoneId = null)
     {
-       
+        $milestone = Milestone::find($milestoneId);
         return $content
-            ->header(__('Milestone Rewards'))
-            ->description(__('Rewards for milestone'))
+            ->header(__('Milestone rewards') . '-:-' .$milestone->name)
+            ->description(__('id') . '-:-' .$milestone->id)
             ->body($this->grid($milestoneId));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->header(__('Create Reward'))
-            ->description(__('Add a new reward to milestone'))
+            ->header(__('create'))
+            // ->description(__('Add a new reward to milestone'))
             ->body($this->form());
     }
 
@@ -209,7 +210,7 @@ class MilestoneRewardController
 
         $show->field('id', __('ID'));
         $show->field('type', __('Type'));
-        $show->field('rewardable_type', __('Rewardable Type'));
+        // $show->field('rewardable_type', __('Rewardable_type'));
         $show->field('expire', __('Expire'));
         $show->field('created_at', __('Created At'));
         $show->field('updated_at', __('Updated At'));

@@ -20,7 +20,6 @@ class MilestoneController extends AdminController
 
     public function index(Content $content)
     {
-       
         return $content
             ->header(__('Milestone'))
             ->description(__('Milestone'))
@@ -33,22 +32,27 @@ class MilestoneController extends AdminController
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('Name'));
-        $grid->column('slug', __('type'));
         $grid->column('rewards', __('rewards'))->display(function () {
             $url =  admin_url("milestone-rewards/". $this->id);
             return "<a href='{$url}' class='btn btn-xs btn-info'>
                         <i class='fa fa-eye'></i> ".__('rewards')."
                     </a>";
         });
-        $grid->column('created_at', __('Created at'))->display(function ($created_at) {
-            return \Carbon\Carbon::parse($created_at)->format('Y-m-d');
-        });
+     
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->equal('type', __('Type'));
         });
 
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            $actions->disableDelete();
+            // $actions->disableEdit();
+            // $actions->disableView();
+        });
+        $grid->disableCreateButton();
+        $grid->disableActions();
+        $grid->disableRowSelector();
         return $grid;
     }
 

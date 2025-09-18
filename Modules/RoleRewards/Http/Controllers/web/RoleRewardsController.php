@@ -2,6 +2,7 @@
 
 namespace Modules\RoleRewards\Http\Controllers\web;
 
+use App\Models\Role;
 use Modules\Achievement\Entities\Achievement;
 use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
@@ -31,10 +32,11 @@ class RoleRewardsController extends MainController
     }
     public function index(Content $content ,$roleId = null)
     {
+        $role = Role::find($roleId);
       
         return parent::index($content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->header(__('Role') . '-:-'. $role->name)
+            ->description(trans('id') . $role->id)
             ->body($this->grid($roleId)));
     }
     public function create(Content $content)
@@ -149,9 +151,9 @@ class RoleRewardsController extends MainController
     {
         $form = new Form(new RoleReward());
         $this->disableFormTools($form);
-    
-        if (!$form->isEditing()) {
-            $this->addHiddenFields($form);
+        $this->addHiddenFields($form);
+
+        if ($form->isEditing()) {
             $this->addTypeSelector($form);
         }
     
