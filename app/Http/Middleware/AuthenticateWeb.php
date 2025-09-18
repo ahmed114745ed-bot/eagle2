@@ -28,15 +28,15 @@ class AuthenticateWeb
         $superadminLogin = 'superadmin/login';
 
         if ($user) {
-            if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd' && $user?->type !== 'superadmin') {
+            if (Str::is($uri, $adminLogin) && $user?->type !== 'bd' && $user?->type !== 'superadmin') {
                 return redirect('/admin');
             }
 
-            if (Str::contains($uri, $bdLogin) && $user?->type == 'bd') {
+            if (Str::is($uri, $bdLogin) && $user?->type == 'bd') {
                 return redirect('/bd');
             }
 
-            if (Str::contains($uri, $superadminLogin) && $user?->type == 'superadmin') {
+            if (Str::is($uri, $superadminLogin) && $user?->type == 'superadmin') {
                 return redirect('/superadmin');
             }
         }
@@ -75,18 +75,20 @@ class AuthenticateWeb
         // }
 
         if (
-            (Str::contains($uri, 'bd') && $user?->type !== 'bd') ||
-            (Str::contains($uri, 'admin') && $user?->type === 'bd') ||
-            (Str::contains($uri, 'superadmin') && $user?->type !== 'superadmin')
+            (Str::startsWith($uri, 'bd') && $user?->type !== 'bd') ||
+            (Str::startsWith($uri, 'superadmin') && $user?->type !== 'superadmin') ||
+            (Str::startsWith($uri, 'admin') && $user?->type !== 'admin')
         ) {
-            if ($user->type === 'bd') {
+            $userType = $user->type;
+            if ($userType === 'bd') {
                 return redirect('/bd');
-            } elseif ($user->type === 'superadmin') {
+            } elseif ($userType === 'superadmin') {
                 return redirect('/superadmin');
             } else {
                 return redirect('/admin');
             }
         }
+
 
 
 

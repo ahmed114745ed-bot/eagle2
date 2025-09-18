@@ -92,17 +92,23 @@ class AuthController extends BaseAuthController
 
         $request->session()->regenerate();
 
-        if ($this->guard()->user()->type !== 'superadmin') {
+        $user = $this->guard()->user();
+
+        if (!$user) {
             return back()->withInput()->withErrors([
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
 
-        if ($this->guard()->user()->type === 'superadmin') {
-            return redirect()->route('superadmin.home');
+        switch ($user->type) {
+            case 'superadmin':
+                return redirect()->route('superadmin.home');
+            case 'admin':
+            case null:
+            default:
+                info('admin.home');
+                return redirect()->route('admin.home');
         }
-
-        return redirect()->intended($request->url??$this->redirectPath());
     }
 
     public function logout(Request $request)
