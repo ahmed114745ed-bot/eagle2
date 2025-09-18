@@ -32,6 +32,7 @@ class UserRoleRewardHelper
             if (! $exists) {
                 UserHistoryReward::create([
                     'user_id'         => $user->id,
+                    'sub_type'         => 'roles',
                     'receive_type'    => "Role:$slug:$roleId",
                     'rewardable_id'   => $reward->rewardable_id,
                     'rewardable_type' => $reward->rewardable_type,
