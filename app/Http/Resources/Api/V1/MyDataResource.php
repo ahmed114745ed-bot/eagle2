@@ -160,6 +160,8 @@ class MyDataResource extends JsonResource
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => UserPackHelper::hasHideCountry($this->resource),
 
+            'profile_frame_id' => UserPackHelper::getProfileFrameId($this->resource),
+
             'is_first' => (bool)$this->is_points_first,
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => (bool)$ownerRoom,
@@ -235,7 +237,6 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame_id' => $this->getProfileFrame()?->id ?? '',
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
