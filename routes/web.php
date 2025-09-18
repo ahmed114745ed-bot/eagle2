@@ -126,7 +126,7 @@ Route::get('/clear', function () {
     Artisan::call('config:cache');
     Artisan::call('view:cache');
 
-    if (config('app.env') == 'production') {
+    if (strtolower(config('app.env')) == 'production') {
         Artisan::call('route:cache');
     }
 

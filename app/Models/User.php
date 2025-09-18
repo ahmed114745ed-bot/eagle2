@@ -841,7 +841,6 @@ class User extends Authenticatable
     {
         $amount =
             $type === 2 ? $this->sender_level + $this->sub_sender_level : $this->received_level + $this->sub_receiver_level;
-
         $level = Vip::collectionBuilder()->where('type', $type)->where('level', $amount)->orderByDesc('exp')->first();
 
         return $level;
@@ -1100,6 +1099,30 @@ class User extends Authenticatable
         return $this->hasMany(Pack::class, 'user_id')->whereIn('type', [4, 5, 6, 25])->where('get_type', '!=', 1)->where('is_used', 1)->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
+    }
+    // public function hasPackOfType(int $type, bool $onlyUsed = false): bool
+    // {
+    //     return $this->packs()
+    //         ->where('type', $type)
+    //         ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+    //         ->exists();
+    // }
+
+    public function hasPackOfType(int $type, bool $onlyUsed = false): bool
+    {
+        // if packs relation already loaded, filter in-memory
+        if ($this->relationLoaded('packs')) {
+            return $this->packs
+                ->where('type', $type)
+                ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+                ->isNotEmpty();
+        }
+
+        // fallback: query database
+        return $this->packs()
+            ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+            ->where('type', $type)
+            ->exists();
     }
 
     public function sendPacks()

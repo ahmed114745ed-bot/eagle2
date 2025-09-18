@@ -27,34 +27,39 @@ class ReplayGroupChatResource extends JsonResource
     public function toArray($request)
     {
 
-        $frame  =
-            (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
+        // $frame  =
+        //     (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
+        $framePack = $this->user?->packs
+            ->firstWhere(fn($p) => $p->type == 4 && $p->target_id == $this->user->dress_1);
+
+        $frame = $framePack?->ware?->img2 ?? $framePack?->ware?->img1 ?? '';
         $data = [
-            'id'=>(int)(@$this->user?->id ?? 0),
-            'uuid'=>@$this->user?->uuid ?? '',
-            'name'=>@$this->user?->name??'',
-            'profile'=> [
-                'image' => @$this->user->profile->avatar,
-                'age' => Carbon::parse (@$this->user->profile->birthday)->age,
-                'gender'=>$this->user?->gender ?? 0,
+            'id' => (int)(@$this->user?->id ?? 0),
+            'uuid' => @$this->user?->uuid ?? '',
+            'name' => @$this->user?->name ?? '',
+            'profile' => [
+                'image' => @$this->user->profile->avatar ?? '',
+                // 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
+                // 'gender' => $this->user?->gender ?? 0,
             ],
-            'frame'=> $frame,
-            'frame_id'=>$frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
-            'vip'=> [
+            'frame' => $frame,
+            'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
+            'vip' => [
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],
-            'level'=> [
-                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
-                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
+
+            'level' => [
+                'receiver_img' => @$this->user?->receiverLevel?->img ?? '',
+                'sender_img'   => @$this->user?->senderLevel?->img ?? '',
             ],
-            'has_color_name'=>Common::hasInPack (@$this->user->id,18),
+            // 'has_color_name' => Common::hasInPack(@$this->user->id, 18),
+            'has_color_name' => $this->user->hasPackOfType(18),
             'message_id' => @$this->id,
             'group_message' => $this->text,
-            'group_image' => $this->image,
+            'group_image' => @$this->image ?? '',
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
         ];
 
         return $data;
     }
-
 }

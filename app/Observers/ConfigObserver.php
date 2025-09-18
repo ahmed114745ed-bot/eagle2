@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Helpers\CacheHelper;
 use App\Models\Config;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -22,8 +23,6 @@ class ConfigObserver
     {
         Cache::forget('all_configs');
 
-        cache()->rememberForever('all_configs', function () {
-            return DB::table('configs')->pluck('value', 'name')->toArray();
-        });
+        CacheHelper::cacheConfig();
     }
 }
