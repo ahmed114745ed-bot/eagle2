@@ -513,36 +513,21 @@ if (!function_exists('getFileExtension')) {
         return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
     }
 }
-// if (!function_exists('handleShowImageWithTypes')) {
-//     function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50,$objectFit): string
-//     {
-//         $imageType = getFileExtension($url);
-//         if ($imageType == 'svga' || $imageType == 'zz') {
-//             $model = showSvgaImage($url, $uniqueId);
-
-//             return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
-//         } elseif ($imageType == 'mp4') {
-//             return "
-//                 <video width='$width' height='$height' controls autoplay muted loop>
-//                     <source src='$url' type='video/mp4'>
-//                     <source src='$url' type='video/webm'>
-
-//                     Your browser does not support the video tag.
-//                  </video>
-//                 ";
-//         }
-
-//         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$borderRadius}contain;margin-right: 4px;' alt='' />";
-//     }
-// }
-
-if (!function_exists('handleShowImage')) {
-    function handleShowImage(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50): string
+if (!function_exists('handleShowImageWithTypes')) {
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
-
+            if ($objectFit !== 'cover') {
+                return "<div class='rtlSvga' id='$model' 
+            style='width: {$width}px; 
+                   height: {$height}px; 
+                   object-fit: {$objectFit}; 
+                   border-radius: {$borderRadius}px; 
+                   margin-right: 4px;'>
+             </div>";
+            }
             return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
@@ -553,11 +538,16 @@ if (!function_exists('handleShowImage')) {
                     Your browser does not support the video tag.
                  </video>
                 ";
+        } elseif ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
         }
 
-        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: contain margin-right: 4px;' alt='' />";
+
+
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
 }
+
 if (!function_exists('userType')) {
     function userType($type)
     {
