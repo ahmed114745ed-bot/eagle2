@@ -27,5 +27,6 @@
     "Vip": true,
     "RoomBoom": true,
     "Badge": true,
-    "RoleRewards": true
+    "RoleRewards": true,
+    "Milestones": true
 }
