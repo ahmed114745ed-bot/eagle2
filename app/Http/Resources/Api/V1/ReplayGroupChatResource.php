@@ -29,15 +29,10 @@ class ReplayGroupChatResource extends JsonResource
 
         // $frame  =
         //     (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
-        $frame = $this->user?->packs
-            ->where('type', 4)
-            ->where('target_id', $this->user->dress_1)
-            ->first()?->ware?->img2
-            ?? $this->user?->packs
-            ->where('type', 4)
-            ->where('target_id', $this->user->dress_1)
-            ->first()?->ware?->img1
-            ?? '';
+        $framePack = $this->user?->packs
+            ->firstWhere(fn($p) => $p->type == 4 && $p->target_id == $this->user->dress_1);
+
+        $frame = $framePack?->ware?->img2 ?? $framePack?->ware?->img1 ?? '';
         $data = [
             'id' => (int)(@$this->user?->id ?? 0),
             'uuid' => @$this->user?->uuid ?? '',
