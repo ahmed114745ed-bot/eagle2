@@ -27,16 +27,25 @@ class GroupChatResource extends JsonResource
     public function toArray($request)
     {
 
-        $frame  =
-            (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
+        // $frame  =
+        //     (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
+        $frame = $this->user?->packs
+            ->where('type', 4)
+            ->where('target_id', $this->user->dress_1)
+            ->first()?->ware?->img2
+            ?? $this->user?->packs
+            ->where('type', 4)
+            ->where('target_id', $this->user->dress_1)
+            ->first()?->ware?->img1
+            ?? '';
         $data = [
             'id' => (int)(@$this->user?->id ?? 0),
             'uuid' => @$this->user?->uuid ?? '',
             'name' => @$this->user?->name ?? '',
             'profile' => [
                 'image' => @$this->user->profile->avatar ?? '',
-                'age' => Carbon::parse(@$this->user->profile->birthday)->age,
-                'gender' => $this->user?->gender ?? 0,
+                // 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
+                // 'gender' => $this->user?->gender ?? 0,
             ],
             'frame' => $frame,
             'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
@@ -47,7 +56,8 @@ class GroupChatResource extends JsonResource
                 'receiver_img' => $this->user?->receiverLevel?->img ?? '',
                 'sender_img'   => $this->user?->senderLevel?->img ?? '',
             ],
-            'has_color_name' => Common::hasInPack(@$this->user->id, 18),
+            'has_color_name' => $this->user->hasPackOfType(18),
+            //Common::hasInPack(@$this->user->id, 18),
             'message_id' => @$this->id,
             'group_message' => @$this->text ?? '',
             'group_image' => $this->image ?? '',

@@ -1099,6 +1099,13 @@ class User extends Authenticatable
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
     }
+    public function hasPackOfType(int $type, bool $onlyUsed = false): bool
+    {
+        return $this->packs()
+            ->where('type', $type)
+            ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+            ->exists();
+    }
 
     public function sendPacks()
     {
