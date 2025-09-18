@@ -130,6 +130,7 @@ class RoleRewardsController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableDelete();
+            $actions->disableEdit();
             $actions->add(new DeleteRoleReward());
         });
 
@@ -194,6 +195,7 @@ protected function addTypeSelector(Form $form)
 protected function addExpireField(Form $form)
 {
     $form->number('expire', __('expire'))->default(1);
+
 }
 
 
