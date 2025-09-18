@@ -43,10 +43,10 @@ class ReplayGroupChatResource extends JsonResource
             'vip'=> [
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],
-            // 'level'=> [
-            //     'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
-            //     'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
-            // ],
+            'level'=> [
+                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
+                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
+            ],
             // 'level' => [
             //     'receiver_img' => $this->receiverLevel?->img ?? '',
             //     'sender_img'   => $this->senderLevel?->img  ?? '',
