@@ -14,6 +14,8 @@ class UserHistoryReward extends Model
         'rewardable_id',
         'rewardable_type',
         'extra',
+        'sub_type',
+
     ];
 
     protected $casts = [

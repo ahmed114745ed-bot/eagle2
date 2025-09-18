@@ -9,6 +9,8 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Models\Role;
 use Illuminate\Support\Str;
+use Modules\RoleRewards\Actions\DeleteRole;
+use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
 class RoleControllerNew extends MainController
@@ -95,18 +97,17 @@ class RoleControllerNew extends MainController
                         <i class="fa fa-gift"></i> rewards
                     </a>';
         });
-    
+
+
         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            
-            if (
-                $actions->row->slug == 'administrator' ||
-                $actions->row->slug == 'admin' ||
-                $actions->row->slug == 'developer' ||
-                $actions->row->slug == 'agency' ||
-                $actions->row->slug == 'charger'
-            ) {
+            // $protectedSlugs = ['administrator', 'admin', 'developer', 'agency', 'charger'];
+        
+            // if (in_array($actions->row->slug, $protectedSlugs)) {
+            //     $actions->disableDelete(); 
+            // } else {
                 $actions->disableDelete();
-            }
+                $actions->add(new DeleteRole());
+            // }
         });
 
         $grid->tools(function (Grid\Tools $tools) {
@@ -116,6 +117,7 @@ class RoleControllerNew extends MainController
         });
 
         
+      
         
         $grid->disableExport();
         $this->extendGrid($grid);
