@@ -15,11 +15,13 @@ use App\Helpers\UserPackHelper;
 use Modules\Reals\Entities\Real;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Badge\Entities\Badge;
 use Modules\Vip\Entities\UserVip;
 use App\Traits\PaymentGetWayTrait;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Config as ConfigModel;
+use Modules\Badge\Entities\UserBadge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
@@ -37,7 +39,6 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Modules\Badge\Entities\Badge;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 
 /**
@@ -1663,6 +1664,25 @@ class User extends Authenticatable
 
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
+    }
+
+    public function userBadge()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+            if ($url) {
+                $html .= '<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
     }
 
     public function wallet()
