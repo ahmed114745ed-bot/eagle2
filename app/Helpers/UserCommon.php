@@ -55,6 +55,7 @@ use App\Models\CoinTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
 use App\Facades\CustomNotification;
+use Modules\Badge\Entities\UserBadge;
 
 class UserCommon
 {
@@ -404,6 +405,14 @@ class UserCommon
         Pack::where('receive_type', $receiveType)
                     ->where('user_id', $user->id)
                     ->where('target_id',  $id)->delete();
+    }
+
+    public static function removeBadgeFromUser(User $user, $id, $receiveType)
+    {
+     
+        UserBadge::where('receive_type', $receiveType)
+                    ->where('user_id', $user->id)
+                    ->where('badge_id',  $id)->delete();
     }
     
     
