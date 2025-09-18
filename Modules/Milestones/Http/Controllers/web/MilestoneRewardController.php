@@ -65,8 +65,10 @@ class MilestoneRewardController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('type', __('Type'))->label();
 
-        $grid->column('reward_id', __('Reward'))->display(function () {
-            if ($this->type === "ware") {
+        $grid->column('reward_id', __('Rewards'))->display(function () {
+            if ($this->type === "coins") {
+                return $this?->reward ?? "-";
+            }elseif ($this->type === "ware") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "vip") {
                 return $this->rewardable?->name ?? "-";
@@ -80,7 +82,7 @@ class MilestoneRewardController
 
         $grid->column('image', __('Image'))->display(function () {
             if ($this->type === "coins") {
-                return  $this->reward;
+                $path = 'coin.png';
             }elseif ($this->type === "ware") {
                 $path = $this->rewardable?->img2 ?? $this->rewardable?->show_img;
             } elseif ($this->type === "vip") {
@@ -124,69 +126,82 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-
+    
         $form->hidden('milestone_id')->value(request('milestone_id'));
-
+    
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
-            "ware"        => __('Ware'),
-            "vip"         => __('Vip'),
-            "achievement" => __('Achievement'),
-            "badge"       => __('Badge'),
-        ])->when("ware", function (Form $form) {
+            "ware"         => __('Wares'),
+            "vip"          => __('Vip'),
+            "achievement"  => __('Achievement'),
+            "badge"        => __('Badge'),
+        ])
+        ->when("ware", function (Form $form) {
             $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
-        })->when("vip", function (Form $form) {
+        })
+        ->when("vip", function (Form $form) {
             $form->select('rewardable_id', __('Vip'))
                 ->options(OVip::pluck('name', 'id'))
                 ->rules('required');
-        })->when("achievement", function (Form $form) {
-            $form->image("reward", __('Image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            });
-        })->when("badge", function (Form $form) {
+        })
+        ->when("achievement", function (Form $form) {
+            $form->image("reward_image", __('Image'))
+                ->uniqueName() 
+                ->removable();
+        })
+        ->when("badge", function (Form $form) {
             $form->select('rewardable_id', __('Badge'))
-                ->options(Badge::pluck('name', 'id'))
+                ->options(\Modules\Badge\Entities\Badge::pluck('name', 'id'))
                 ->rules('required');
-        })->when("coins", function (Form $form) {
+        })
+        ->when("coins", function (Form $form) {
             $form->number("reward", __('Coins'))->rules('required|integer|min:1');
         });
-
+    
         $form->number('expire', __('Expire'))->default(1);
-
+    
         $form->saving(function (Form $form) {
             switch ($form->type) {
                 case 'ware':
                     $form->rewardable_type = \App\Models\Ware::class;
                     $form->model()->rewardable_type = \App\Models\Ware::class;
                     break;
+    
                 case 'vip':
                     $form->rewardable_type = \Modules\Vip\Entities\OVip::class;
                     $form->model()->rewardable_type = \Modules\Vip\Entities\OVip::class;
                     break;
+    
                 case 'badge':
                     $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     break;
+    
                 case 'achievement':
                     $form->rewardable_id = 0;
+                    $form->model()->rewardable_id = 0;
                     $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
                     $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
+                    if ($form->reward_image) {
+                        $form->reward = $form->reward_image;
+                        $form->model()->reward = $form->reward_image;
+                    }
+                   
                     break;
+    
                 case 'coins':
                     $form->rewardable_id = 0;
-                    $form->rewardable_type = \App\Models\User::class;
-                    $form->model()->rewardable_type =\App\Models\User::class;
-                    $form->reward = (int) $form->reward; 
-                    $form->model()->reward =$form->reward;
-        
-                    break;    
+                    $form->model()->rewardable_id = 0;
+                    $form->model()->rewardable_type = \App\Models\User::class;
+                    $form->reward = (int) $form->reward;
+                    $form->model()->reward = $form->reward;
+                    break;
             }
         });
-
-        
-
+    
         return $form;
     }
+    
 
     protected function detail($id)
     {
