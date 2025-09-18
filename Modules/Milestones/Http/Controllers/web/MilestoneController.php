@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\Milestones\Entities\Milestone;
+use Encore\Admin\Layout\Content;
 
 class MilestoneController extends AdminController
 {
@@ -15,28 +16,33 @@ class MilestoneController extends AdminController
      *
      * @var string
      */
-    protected $title = 'Milestone';
+    // protected $title = 'Milestone';
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+    public function index(Content $content)
+    {
+       
+        return $content
+            ->header(__('Milestone'))
+            ->description(__('Milestone'))
+            ->body($this->grid());
+    }
+
     protected function grid()
     {
         $grid = new Grid(new Milestone());
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('Name'));
-        $grid->column('slug', __('slug'));
+        $grid->column('slug', __('type'));
         $grid->column('rewards', __('rewards'))->display(function () {
             $url =  admin_url("milestone-rewards/". $this->id);
             return "<a href='{$url}' class='btn btn-xs btn-info'>
                         <i class='fa fa-eye'></i> ".__('rewards')."
                     </a>";
         });
-        $grid->column('created_at', __('Created at'))->sortable();
-
+        $grid->column('created_at', __('Created at'))->display(function ($created_at) {
+            return \Carbon\Carbon::parse($created_at)->format('Y-m-d');
+        });
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));

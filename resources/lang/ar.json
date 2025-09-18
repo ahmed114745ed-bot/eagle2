@@ -3773,11 +3773,21 @@
   "invitation.already_registered": "المستخدم مسجل من قبل",
   "invitation.device_in_use": "لقد تم استخدام هذا الكود  من قبل مع حساب آخر لهذا الجهاز",
   "invitation.stopped": "عذراً، نظام الدعوات متوقف حالياً",
-    "Show Image": "عرض الصورة",
-    "Alternative Image": "صورة بديلة",
+  "Show Image": "عرض الصورة",
+  "Alternative Image": "صورة بديلة",
   "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
   "badges":"شارات",
-  "regular": "عادي"
+  "regular": "عادي",
+  "Milestone":"الانجازات",
+  "milestone":"الانجازات",
+  "Milestone-rewards" : " مكافآت الانجازات",
+  "milestone-rewards" : " مكافآت الانجازات",
+  "Milestone rewards" : " مكافآت الانجازات",
+  "milestone rewards" : " مكافآت الانجازات",
+  "User-history-rewards" : "سجل استلام الهدايا",
+  "user-history-rewards" : "سجل استلام الهدايا",
+  "User history rewards" : "سجل استلام الهدايا",
+  "UserHistoryReward" : "سجل استلام الهدايا"
 
 
 

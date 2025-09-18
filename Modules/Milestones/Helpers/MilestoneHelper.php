@@ -88,7 +88,7 @@ class MilestoneHelper
         UserHistoryReward::create([
             'user_id'        => $user->id,
             'receive_type'   => $receiveType,
-            'sub_type'       => 'milestone',
+            'sub_type'       => 'milestons',
             'rewardable_id'  => $mr->rewardable_id,
             'rewardable_type'=> $mr->rewardable_type,
             'extra'          => json_encode([
