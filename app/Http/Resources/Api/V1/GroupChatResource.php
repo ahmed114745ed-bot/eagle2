@@ -38,11 +38,11 @@ class GroupChatResource extends JsonResource
                 // 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
                 // 'gender' => $this->user?->gender ?? 0,
             ],
-            // 'frame' => $frame,
-            // 'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
-            // 'vip' => [
-            //     'level' => @$this->user?->UserVip?->level ?? 0,
-            // ],
+            'frame' => $frame,
+            'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
+            'vip' => [
+                'level' => @$this->user?->UserVip?->level ?? 0,
+            ],
             'level' => [
                 'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id', 1)->img,
                 'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id', 2)->img,
