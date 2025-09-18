@@ -519,15 +519,15 @@ if (!function_exists('handleShowImageWithTypes')) {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
-            // if ($objectFit !== 'cover') {
-            //     return "<div class='rtlSvga' id='$model' 
-            // style='width: {$width}px; 
-            //        height: {$height}px; 
-            //        object-fit: {$objectFit}; 
-            //        border-radius: {$borderRadius}px; 
-            //        margin-right: 4px;'>
-            //  </div>";
-            // }
+            if ($objectFit !== 'cover') {
+                return "<div class='rtlSvga' id='$model' 
+            style='width: {$width}px; 
+                   height: {$height}px; 
+                   object-fit: {$objectFit}; 
+                   border-radius: {$borderRadius}px; 
+                   margin-right: 4px;'>
+             </div>";
+            }
             return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
@@ -539,9 +539,9 @@ if (!function_exists('handleShowImageWithTypes')) {
                  </video>
                 ";
         } 
-        // elseif ($objectFit !== 'cover') {
-        //     return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
-        // }
+        elseif ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+        }
 
 
 
