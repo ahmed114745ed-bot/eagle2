@@ -98,6 +98,8 @@ class WeeklyCpGiftController extends MainController
                 return @$this->vip->name;
             } elseif (@$this->type == "coins") {
                 return @$this->target;
+            }  elseif ($this->type == "badge") {
+                return @$this->badge->name ?? '';
             } elseif (@$this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
@@ -138,6 +140,8 @@ class WeeklyCpGiftController extends MainController
                 return @$this->ware->name;
             } elseif ($this->type == "vip") {
                 return @$this->vip->name;
+             } elseif ($this->type == "badge") {
+                return @$this->badge->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -180,6 +184,8 @@ class WeeklyCpGiftController extends MainController
                 return @$this->ware->name;
             } elseif ($this->type == "vip") {
                 return @$this->vip->name;
+            }elseif ($this->type == "badge") {
+                return @$this->badge->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {

@@ -244,7 +244,7 @@ class DailyPrizeController extends MainController
                 $form->number('expire', __('expire'));
             })
             ->when("badge", function () use ($form) {
-                $this->addBadgeField($form);
+                $form->belongsTo('target5', Badges::class, trans('Badges'));
                 $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
@@ -298,27 +298,6 @@ class DailyPrizeController extends MainController
         return $form;
     }
 
-    protected function addBadgeField(Form $form)
-    {
-        $prefix = 'badges';
-        $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
-                ->select('id', __('badges'))
-                ->options(function ($id) {
-                    if (!$id) return [];
-                    $ware = Badge::find($id);
-                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
-                })
-                ->attribute([
-                    'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
-                ]);
-
-            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-
-            $this->addWareJs();
-        });
-    }
 
     public function store()
     {
@@ -356,7 +335,7 @@ class DailyPrizeController extends MainController
         $validated = validator($data, [
             'type' => 'required|string',
             'order' => 'required|unique:daily_gifts,order,NULL,id,type,' . $type,
-            'gift_type' => 'required|in:ware,vip,coins,achievement',
+            'gift_type' => 'required|in:ware,vip,coins,achievement,badge',
             'target' => 'required',
         ])->validate();
 
