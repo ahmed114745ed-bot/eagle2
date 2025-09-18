@@ -16,7 +16,7 @@ class RoomAdminsResource extends JsonResource
 
     public function toArray($request)
     {
-//        $this->userDresses = $this->packs->where('is_used', 1)->keyBy(fn($p) => $p->type . '_' . $p->target_id);
+        $this->userDresses = $this->packs->where('is_used', 1)->keyBy(fn($p) => $p->type . '_' . $p->target_id);
 
 //        $agency = $this->whenLoaded('agency');
 //        $family = $this->whenLoaded('family');
@@ -27,7 +27,7 @@ class RoomAdminsResource extends JsonResource
 
         return [
             'id' => $this->id,
-//            'uuid' => $this->uuid,
+            'uuid' => $this->uuid,
             'name' => $this->name ?: 'user #' . $this->uuid,
 //            'nick_name' => $this->nick_name,
 //            'agency' => $this->formatAgency($agency),
@@ -36,15 +36,21 @@ class RoomAdminsResource extends JsonResource
 //            'online_time' => $this->formatOnlineTime(),
 //            'diamonds' => $this->total_diamond_received ?? 0,
             'vip' => $this->getVip(),
-//            'frame' => $this->getUserDress(4, $this->dress_1),
+            'frame' => $this->getUserDress(4, $this->dress_1),
 //            'bubble' => $this->getUserDress(5, $this->dress_2, 'show_img'),
 //            'intro' => $this->getUserDress(6, $this->dress_3),
 //            'intro_type' => $this->getUserDress(6, $this->dress_3, 'image_type'),
 //            'chat_setting' => $chatSetting ? new ChatSettingResource($chatSetting) : null,
 //            'change_room_effect' => $userSetting ? new ShowUserSettingResource($userSetting) : null,
 //            'my_agency' => $ownAgency ? $ownAgency->only(['id','name','status','img','phone','url','contents']) : null,
+            'level' => Common::level_center_search(@$this),
 //            'level' => $this->preloaded_level ,
 //            'user_types' => $this->user_types2 ?? [0],
+            'special_color'    => @$this->color_id ??'',
+            'has_color_name' => $this->getPackWithTypeV2(18), // both
+            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            'image_color'          => @$this->color_image,
         ];
     }
 
@@ -83,11 +89,11 @@ class RoomAdminsResource extends JsonResource
 //        return $this->org_online_time ? Carbon::createFromTimestamp($this->org_online_time)->diffForHumans() : null;
 //    }
 
-//    private function getUserDress($type, $dress, $item = 'img1')
-//    {
-//        $key = $type . '_' . $dress;
-//        return $this->userDresses[$key]?->ware->{$item} ?? '';
-//    }
+    private function getUserDress($type, $dress, $item = 'img1')
+    {
+        $key = $type . '_' . $dress;
+        return $this->userDresses[$key]?->ware->{$item} ?? '';
+    }
 
     private function getVip()
     {

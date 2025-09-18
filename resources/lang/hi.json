@@ -2920,7 +2920,8 @@
   "invitation.invitee_reward_help": "कॉइन की संख्या जो आमंत्रित व्यक्ति कोड का उपयोग करने पर प्राप्त करता है।",
     "Show Image": "छवि दिखाएँ",
     "Alternative Image": "वैकल्पिक छवि",
-  "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
+    "Live System Setting:": "लाइव सिस्टम सेटिंग",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
 
 
 

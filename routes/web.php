@@ -3,6 +3,7 @@
 
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\BdController;
+use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -154,6 +155,10 @@ Route::get('/clear-config', function () {
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
     return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
 });
+Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId) {
+
+    return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
+});
 
 
 Route::get('/clear_clear', function () {
@@ -261,7 +266,6 @@ Route::group(
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
         Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
-        Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');

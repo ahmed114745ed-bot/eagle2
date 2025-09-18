@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Models\GiftLog;
 
+use Illuminate\Support\Facades\Cache;
 use Modules\CP\Entities\Cp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,6 @@ class DataUserResource extends JsonResource
 
     public function toArray($request)
     {
-
         $family = $this->family;
         $f = null;
 
@@ -56,7 +56,13 @@ class DataUserResource extends JsonResource
             ->with('gift')->take(3)
             ->get();
 
-        $data =    Cp::with('relation:id,title,type', 'toUser', 'fromUser')
+        $data = Cp::with([
+            'relation:id,title,type',
+            'toUser.profile',
+            'fromUser.profile',
+            'toUser.packs',
+            'fromUser.packs',
+        ])
             ->whereHas("cpRelation", function ($q) {
                 $q->where('type', "!=", 'solution');
             })
@@ -67,8 +73,8 @@ class DataUserResource extends JsonResource
             ->whereIn('status', [1, 4])
             ->orderByDesc('di')->get();
 
-            $mainCp = $data->firstWhere('relation.type', 'lovely');
-                
+        $mainCp = $data->firstWhere('relation.type', 'lovely');
+
         return [
             'family_data'          => @$f,
             'achievement_images' => $achievement_images,

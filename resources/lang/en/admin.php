@@ -446,7 +446,9 @@ return [
     "days" => "Days",
     "reals" => 'reals',
     "moments" => 'moments',
-
+    "RTC"=> "RTC",
+    "CDN"=> "CDN",
+    "L3"=> "L3",
     'creator' => 'admin',
     'custom_img_image' => 'The file must be an image.',
     'custom_img_mimes' => 'Only jpeg, png, jpg images are allowed.',

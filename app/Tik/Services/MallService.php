@@ -110,13 +110,15 @@ class MallService
                 'type'      => $ware->type,
                 'get_type'  => $ware->get_type,
                 'target_id' => $ware->id,
-                'num'       => 1, //$qty,
+                'num'       => 1, 
                 'expire'    => null,
+                'days'      => $ware->expire,
+                'sender_id'      => $auth->id,
                 'is_read'   => 1,
                 'use_num'   => $ware->num,
                 'price'     => $totalPrice,
                 'receive_type' => 'send-ware',
-
+                
             ];
             $this->packRepository->create($data);
 

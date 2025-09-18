@@ -27,7 +27,7 @@ class RoomResource extends JsonResource
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse->where("is_closed",0);
-        $isHideCountry = $this?->owner?->getPackWithType(13);
+        $isHideCountry = $this?->owner?->getPackWithTypeV2(13);
 
         /**@var Room $this*/
         $data = [
@@ -46,8 +46,8 @@ class RoomResource extends JsonResource
             //            'visitors_count' => $this->count_room_socket,
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
-            'class' => $this->myClass ?: new \stdClass(),
-            'type' => $this->myType ?: new \stdClass(),
+//            'class' => $this->myClass ?: new \stdClass(),
+//            'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,
             'session' => $this->session_string,
             'giftPrice' => $this->session_string,

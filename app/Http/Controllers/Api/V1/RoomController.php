@@ -114,14 +114,14 @@ class RoomController extends Controller
 
     public function userRoom($id ,Request $request)
     {
-        
+
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         $rooms = $this->roomService->getUserRooms($request ,$id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
 
-    
+
 
     public function getAllLiveRooms(Request $request)
     {
@@ -148,13 +148,15 @@ class RoomController extends Controller
         $user = $request->user();
 
         try {
-            if (!$request->has('type')) {
-                return Common::apiResponse(false, 'Room type is required', null, 400);
+            $roomType = $request->type ?? 'audio';
+
+            if (!in_array($roomType, ['audio', 'live'])) {
+                return Common::apiResponse(false, 'Room type not matched', null, 400);
             }
 
-            $room = $this->roomService->findRoomUserByType($user->id, $request->type);
+            $room = $this->roomService->findRoomUserByType($user->id, $roomType);
             if ($room) {
-                return Common::apiResponse(true, "You already have a room of type {$request->type}", new RoomResource($room), 200);
+                return Common::apiResponse(true, "You already have a room of type {$roomType}", new RoomResource($room), 200);
             }
 
             $room = $this->roomService->create($request, $user);

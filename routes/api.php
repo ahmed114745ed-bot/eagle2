@@ -304,7 +304,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('search')->group(function () {
-                Route::get('/', [CommunityController::class, 'merge_search']);
+//                Route::get('/', [CommunityController::class, 'merge_search']);
+                Route::get('/', [CommunityController::class, 'mergeSearchV2']);
                 Route::get('user-friends', [CommunityController::class, 'user_friends']);
                 Route::get('/history', [CommunityController::class, 'searchList']);
                 Route::get('/clean_search_history', [CommunityController::class, 'cleanSearchList']);
@@ -316,6 +317,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
+                Route::get('notifications', [CommunityController::class, 'notifications']);
             });
 
             Route::prefix('home_carousels')->group(function () {
@@ -425,7 +427,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
             Route::get('/invitations/earnings', [UserController::class, 'invitationsEarnings']);
             Route::post('/invitations/earnings/{id}/claim', [UserController::class, 'invitationsEarningsClaim']);
-        
+
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 

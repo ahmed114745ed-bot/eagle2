@@ -31,6 +31,7 @@ class SettingController extends MainController
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
         $videoLibrary = Common::getConfig('video_library');
+        $liveLibrary = Common::getConfig('live_library');
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::with('settings')->uniqueTypes()->orderByDesc('status')->get();
@@ -73,6 +74,7 @@ class SettingController extends MainController
                 'tencent_server_secret',
                 'soundLibrary',
                 'videoLibrary',
+                'liveLibrary',
                 'gamesLibrary',
                 'agora_app_certificate',
                 'zego_filter_enabled'

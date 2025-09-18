@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use App\Traits\FollowTrait;
@@ -11,33 +12,33 @@ use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use App\Traits\TimestampsWithTimezone;
 use App\Traits\User\UserLevel;
 use DB;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens;
 use Log;
-use Modules\Achievement\Http\Traits\AchievementUser;
-use Modules\AgencyApp\Entities\AdditionalInfo;
-use Modules\Chat\Traits\ChatUserTrait;
-use Modules\Moment\Entities\Moment;
-use Modules\Moment\Entities\MomentUserGift;
-use Modules\Reals\Entities\Real;
-use Modules\Reals\Traits\RealRelationshipTrait;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
-use Modules\SalaryTransaction\Traits\UserTransferTrait;
-use Modules\SpecialId\Traits\SpecialId;
-use App\Models\Config as ConfigModel;
-use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\UserVip;
+use Modules\CP\Entities\Cp;
 use Modules\Vip\Entities\Vip;
+use Modules\Vip\Entities\OVip;
+use Modules\Reals\Entities\Real;
+use Illuminate\Http\UploadedFile;
+use Laravel\Sanctum\HasApiTokens;
+use Modules\Vip\Entities\UserVip;
+use Modules\Moment\Entities\Moment;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Config as ConfigModel;
+use Illuminate\Support\Facades\Config;
+use Modules\Chat\Traits\ChatUserTrait;
+use Illuminate\Support\Facades\Storage;
+use Modules\SpecialId\Traits\SpecialId;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Moment\Entities\MomentUserGift;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AgencyApp\Entities\AdditionalInfo;
+use Modules\Reals\Traits\RealRelationshipTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Achievement\Http\Traits\AchievementUser;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\SalaryTransaction\Traits\UserTransferTrait;
 
 /**
  * @method static withoutAppends()
@@ -99,19 +100,19 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-//        'user_diamond',
+        //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-//        'original_uuid',
-//        'is_frozen',
-//        'total_charge_level',
-//        'photo',
-//        'org_online_time',
-//        'user_types',
-//        'vip_data',
-//        'level_data',
-//        'profile_frame',
-//        'profile_frame_id'
+        //        'original_uuid',
+        //        'is_frozen',
+        //        'total_charge_level',
+        //        'photo',
+        //        'org_online_time',
+        //        'user_types',
+        //        'vip_data',
+        //        'level_data',
+        //        'profile_frame',
+        //        'profile_frame_id'
 
     ];
 
@@ -177,6 +178,20 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function cpsAsOne()
+    {
+        return $this->hasMany(Cp::class, 'user_one_id');
+    }
+
+    public function cpsAsTwo()
+    {
+        return $this->hasMany(Cp::class, 'user_two_id');
+    }
+
+    public function allCps()
+    {
+        return $this->cpsAsOne()->union($this->cpsAsTwo());
+    }
     public function agencyUserJob()
     {
         return $this->hasOne(AgencyUserJob::class, 'user_id', 'id');
@@ -770,6 +785,11 @@ class User extends Authenticatable
     public function ownerRoom()
     {
         return $this->hasOne(Room::class, 'uid', 'id');
+    }
+
+    public function ownerAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
     }
 
     public function familyType()
@@ -1430,14 +1450,14 @@ class User extends Authenticatable
     public function getUuidAttribute($value)
     {
         if ($this->relationLoaded('packs')) {
-           
+
             $pack = $this->packs
                 ->where('type', 25)
                 ->where('is_used', true)
                 ->where('ware.value', $this->special_id)
                 ->first();
         } else {
-            
+
             $pack = $this->packs()
                 ->with('ware')
                 ->where('type', 25)
@@ -1522,9 +1542,9 @@ class User extends Authenticatable
                 ->isNotEmpty();
         }
         return $this->packs()
-        ->where('is_used', 1)
-        ->where('type', $type)
-        ->exists();
+            ->where('is_used', 1)
+            ->where('type', $type)
+            ->exists();
     }
 
     public function nowGame()
@@ -1903,48 +1923,48 @@ class User extends Authenticatable
     public function activePack20()
     {
         return $this->hasOne(Pack::class)
-                    ->where('is_used', 1)
-                    ->where('type', 20)
-                    ->where(function($q) {
-                        $q->where('expire', 0)
-                        ->orWhere('expire', '>=', now()->timestamp);
-                    });
-}
+            ->where('is_used', 1)
+            ->where('type', 20)
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                    ->orWhere('expire', '>=', now()->timestamp);
+            });
+    }
 
 
 
-public function giftLogs()
-{
-    return $this->hasMany(GiftLog::class, 'receiver_id');
-}
+    public function giftLogs()
+    {
+        return $this->hasMany(GiftLog::class, 'receiver_id');
+    }
 
 
 
-public function blacklists()
-{
-    return $this->hasMany(BlackList::class, 'user_id', 'id')
-                ->where('status', 1);
-}
+    public function blacklists()
+    {
+        return $this->hasMany(BlackList::class, 'user_id', 'id')
+            ->where('status', 1);
+    }
 
 
-public function chatSetting()
-{
-    return $this->hasOne(\App\Models\ChatSetting::class, 'user_id')
-        ->withDefault([
-            'chat_with_friends' => 1,
-            'chat_with_all' => 0,
-        ]);
-}
+    public function chatSetting()
+    {
+        return $this->hasOne(\App\Models\ChatSetting::class, 'user_id')
+            ->withDefault([
+                'chat_with_friends' => 1,
+                'chat_with_all' => 0,
+            ]);
+    }
 
-public function userDataSetting()
-{
-    return $this->hasOne(\App\Models\UserSetting::class, 'user_id')
-        ->withDefault([
-            'show_git'   => 1,
-            'show_intro' => 1,
-            'show_banner'=> 1,
-        ]);
-}
+    public function userDataSetting()
+    {
+        return $this->hasOne(\App\Models\UserSetting::class, 'user_id')
+            ->withDefault([
+                'show_git'   => 1,
+                'show_intro' => 1,
+                'show_banner' => 1,
+            ]);
+    }
 
 
 
@@ -1998,7 +2018,9 @@ public function userDataSetting()
         $star_level  = $this->total_received_level ?? 0;
         $gold_level  = $this->total_sender_level ?? 0;
 
-        $vipsData = \Cache::rememberForever('vips_data', fn() =>
+        $vipsData = \Cache::rememberForever(
+            'vips_data',
+            fn() =>
             Vip::all()->groupBy('type')
         );
 
@@ -2034,7 +2056,7 @@ public function userDataSetting()
             'next_sender_level'   => $next_gold_level ?: 0,
             'prev_receiver_num'   => $current_star_num ?: 0,
             'prev_sender_num'     => $current_gold_num ?: 0,
-            'current_receiver_num'=> $current_star_num,
+            'current_receiver_num' => $current_star_num,
             'current_sender_num'  => $current_gold_num,
             'exp-sender'          => $expPercentages['exp_sender_percentage'] ?? 1,
             'exp-receiver'        => $expPercentages['exp_received_percentage'] ?? 1,
@@ -2094,7 +2116,7 @@ public function userDataSetting()
 
     public function getProfileFrameIdAttribute()
     {
-    return Common::wareUserVipV2($this, 28, 'id', true);
+        return Common::wareUserVipV2($this, 28, 'id', true);
     }
 
 
@@ -2111,4 +2133,13 @@ public function userDataSetting()
     }
 
 
+    public function agencyJobs()
+    {
+        return $this->hasMany(AgencyUserJob::class, 'user_id');
+    }
+
+    public function getIsAdminInAgencyAttribute()
+    {
+        return $this->agencyJobs()->where('type', 'requestManger')->exists();
+    }
 }
