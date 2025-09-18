@@ -3776,7 +3776,8 @@
     "Show Image": "عرض الصورة",
     "Alternative Image": "صورة بديلة",
   "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
-  "badges":"شارات"
+  "badges":"شارات",
+  "regular": "عادي"
 
 
 

@@ -2082,7 +2082,7 @@ class Common
             $badgeUser->expire += (($days) * 86400);
             $badgeUser->receive_type = $type;
             $badgeUser->save();
-        } elseif ($badgeUser) {
+        } elseif (!$badgeUser) {
             $data = [
                 'user_id' => $userId,
                 'badge_id' => $badgeId,
