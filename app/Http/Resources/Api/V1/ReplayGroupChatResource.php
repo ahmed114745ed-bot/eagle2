@@ -35,18 +35,22 @@ class ReplayGroupChatResource extends JsonResource
             'name'=>@$this->user?->name??'',
             'profile'=> [
                 'image' => @$this->user->profile->avatar,
-                'age' => Carbon::parse (@$this->user->profile->birthday)->age,
-                'gender'=>$this->user?->gender ?? 0,
+                // 'age' => Carbon::parse (@$this->user->profile->birthday)->age,
+                // 'gender'=>$this->user?->gender ?? 0,
             ],
-            'frame'=> $frame,
-            'frame_id'=>$frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
-            'vip'=> [
-                'level' => @$this->user?->UserVip?->level ?? 0,
-            ],
-            'level'=> [
-                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
-                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
-            ],
+            // 'frame'=> $frame,
+            // 'frame_id'=>$frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
+            // 'vip'=> [
+            //     'level' => @$this->user?->UserVip?->level ?? 0,
+            // ],
+            // 'level'=> [
+            //     'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
+            //     'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
+            // ],
+            // 'level' => [
+            //     'receiver_img' => $this->receiverLevel?->img ?? '',
+            //     'sender_img'   => $this->senderLevel?->img  ?? '',
+            // ],
             'has_color_name'=>Common::hasInPack (@$this->user->id,18),
             'message_id' => @$this->id,
             'group_message' => $this->text,
