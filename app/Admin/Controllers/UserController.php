@@ -584,7 +584,7 @@ class UserController extends MainController
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
 
-        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
+       // $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
         $countries = $this->countries();
         $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
