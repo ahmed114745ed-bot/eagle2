@@ -24,9 +24,9 @@ class GroupChatRepository extends AbstractRepository
             // 'user.UserVip',
 
             // 'parent',
-            'user.packs'  => fn($q) => $q->whereIn('type', [25, 18])->where('is_used', true)->with('ware:id,value'),
+            'user.packs'  => fn($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
             'parent.user.profile:id,user_id,avatar',
-            'parent.user.packs' => fn($q) => $q->whereIn('type', [25, 18])->where('is_used', true)->with('ware:id,value'),
+            'parent.user.packs' => fn($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
         ])->orderBy('created_at', 'DESC')->paginate(10);
     }
 }
