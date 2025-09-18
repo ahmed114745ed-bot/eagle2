@@ -86,7 +86,7 @@ class BadgeController extends MainController
 
         $form->text('name', __('name'));
 
-        $form->image('image', __('Default Image'))->name(function ($file) {
+        $form->file('image', __('Default Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required();
         $form->select('type', __('type'))
