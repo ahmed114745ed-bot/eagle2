@@ -49,9 +49,9 @@ class GroupChatResource extends JsonResource
             ],
             'frame' => $frame,
             'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
-            // 'vip' => [
-            //     'level' => @$this->user?->UserVip?->level ?? 0,
-            // ],
+            'vip' => [
+                'level' => @$this->user?->UserVip?->level ?? 0,
+            ],
             'level' => [
                 'receiver_img' => $this->user?->receiverLevel?->img ?? '',
                 'sender_img'   => $this->user?->senderLevel?->img ?? '',
