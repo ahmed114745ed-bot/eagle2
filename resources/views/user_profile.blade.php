@@ -1172,14 +1172,14 @@
 
             </div>
 
-            <div class="agency-meta">
+            {{-- <div class="agency-meta">
                  <div class="meta-item">
                         <span class="meta-label">{{__('badges')}}:</span>
                         <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
                    {!! @$user->userBadge() !!}
                     </div>
 
-            </div>
+            </div> --}}
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
