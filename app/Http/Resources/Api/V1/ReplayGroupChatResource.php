@@ -47,10 +47,6 @@ class ReplayGroupChatResource extends JsonResource
                 'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
                 'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
             ],
-            // 'level' => [
-            //     'receiver_img' => $this->receiverLevel?->img ?? '',
-            //     'sender_img'   => $this->senderLevel?->img  ?? '',
-            // ],
             'has_color_name'=>Common::hasInPack (@$this->user->id,18),
             'message_id' => @$this->id,
             'group_message' => $this->text,
