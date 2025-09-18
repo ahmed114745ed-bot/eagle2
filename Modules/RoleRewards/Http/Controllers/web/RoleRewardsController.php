@@ -94,7 +94,6 @@ class RoleRewardsController extends MainController
             return "-";
         });
         
-        // صورة الـ reward
         $grid->column('image', __('Image'))->display(function () {
             if ($this->type === "ware") {
                 $path = $this->rewardable?->img2 ?? $this->rewardable?->show_img;
@@ -259,15 +258,6 @@ protected function syncRewards(RoleReward $roleReward)
 
     
 
-// public function destroy($id)
-// {
-
-//     $roleRewards = RoleReward::findOrFail($id);
-
-//      $this->syncRewards($roleRewards);
-//     dd($roleRewards);
-//     return parent::destroy($id); 
-// }
   
 
 }
