@@ -68,7 +68,6 @@ class UserHistoryRewardController extends AdminController
             // Achievement
             if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
         
-        
                 $path =  $this?->reward ?? 'achievement.png';
       
                 $url = getImagePath($path);
@@ -90,7 +89,7 @@ class UserHistoryRewardController extends AdminController
     
             $url = getImagePath($path);
             $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
-            return $imgTag . $name;
+            return "<div>{$imgTag}</div><div>{$name}</div>";
         });
     
         $grid->column('created_at', __('Created At'))
