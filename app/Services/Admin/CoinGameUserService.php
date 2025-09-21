@@ -234,7 +234,30 @@ class CoinGameUserService
             ]);
         });
 
-        $grid->column('game_name', __('game name'))->sortable();
+        $grid->column('game_name', __('Game'))->display(function () {
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($this->game_image) ?? $defaultImage;
+            if (!isImageExists($url)) $url = $defaultImage;
+    
+            $uniqueId = $this->game_id ?? 'game-unknown';
+            $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
+            
+            $gameIdHtml = "game-{$this->game_id}";
+            $urlLink = admin_url("all-games/{$this->game_id}");
+    
+            return <<<HTML
+            <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
+                $imageTag
+                <div>
+                    <strong style="font-size:16px;">{$this->game_name}</strong><br>
+                    <span style="font-size:13px;">
+                        ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
+                        <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')" style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;" title="Copy ID">📝</button>
+                    </span>
+                </div>
+            </a>
+        HTML;
+        });
         $grid->column('round_id', __('Round ID'))->sortable();
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
