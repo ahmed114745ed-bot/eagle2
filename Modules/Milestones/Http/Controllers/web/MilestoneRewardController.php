@@ -2,6 +2,8 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
+use App\Selectables\Badges;
+use App\Selectables\OVips;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -133,7 +135,7 @@ class MilestoneRewardController
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),
-            "vip"          => __('Vip'),
+            "vip"          => __('vip'),
             "achievement"  => __('Achievement'),
             "badge"        => __('Badge'),
         ])
@@ -141,19 +143,17 @@ class MilestoneRewardController
             $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
         })
         ->when("vip", function (Form $form) {
-            $form->select('rewardable_id', __('Vip'))
-                ->options(OVip::pluck('name', 'id'))
-                ->rules('required');
+                $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
+        
+            
         })
         ->when("achievement", function (Form $form) {
-            $form->image("reward_image", __('Image'))
+            $form->image("reward", __('Image'))
                 ->uniqueName() 
                 ->removable();
         })
-        ->when("badge", function (Form $form) {
-            $form->select('rewardable_id', __('Badge'))
-                ->options(\Modules\Badge\Entities\Badge::pluck('name', 'id'))
-                ->rules('required');
+        ->when("badge", function () use ($form) {
+            $this->addBadgeField($form);
         })
         ->when("coins", function (Form $form) {
             $form->number("reward", __('Coins'))->rules('required|integer|min:1');
@@ -217,4 +217,27 @@ class MilestoneRewardController
 
         return $show;
     }
+
+    protected function addBadgeField(Form $form)
+{
+    $prefix = 'badges';
+    $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
+        $form
+            ->select('id', __('badges'))
+            ->options(function ($id) {
+                if (!$id) return [];
+                $ware = Badge::find($id);
+                return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+            })
+            ->attribute([
+                'data-image-select' => 1,
+                'data-load-url' => admin_url('wares-by-id')
+            ]);
+
+        $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+        $this->addWareJs();
+    });
+}
+
 }
