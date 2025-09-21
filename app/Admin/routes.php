@@ -621,6 +621,9 @@ Route::group(
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
+    ->name('coin-game-users.ajax');
+
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 

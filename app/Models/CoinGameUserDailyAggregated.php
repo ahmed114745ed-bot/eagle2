@@ -22,5 +22,14 @@ class CoinGameUserDailyAggregated extends Model
         'app_profit',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+       public function game()
+    {
+        return $this->belongsTo(Game::class, 'game_id', 'id'); 
+    }
 
 }
