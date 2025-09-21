@@ -55,7 +55,7 @@ class UserHistoryRewardController extends AdminController
             return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
         });
     
-        $grid->column('receive_name', __('Receive'));
+        $grid->column('receive_name', __('receive_type'));
     
         $grid->column('reward', __('Rewards'))->display(function () {
             $reward = $this->rewardable;
