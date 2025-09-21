@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAggregated;
 use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserDailyAggregated;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Grid;
@@ -27,23 +28,7 @@ class CoinGameUserService
     /**
      * Normalize request filters.
      */
-    public function normalizeFilters(array $filters): array
-    {
-        $mapping = [
-            '696042db2ff29ffcb1c5eee90445cad6' => 'user',
-            '91de9d78d4edb6f3e2bdd00e5db2e8a3' => 'game',
-            'created_at' => 'created_at',
-        ];
 
-        $normalized = [];
-        foreach ($filters as $key => $value) {
-            if (isset($mapping[$key])) {
-                $normalized[$mapping[$key]] = $value;
-            }
-        }
-
-        return $normalized;
-    }
 
     /**
      * Apply filters to aggregated query (الفيو).
@@ -125,9 +110,21 @@ class CoinGameUserService
      */ 
     public function buildGrid(): Grid
     {
-        $grid = new Grid(new CoinGameUserAggregated());
+        $grid = new Grid(new CoinGameUserDailyAggregated());
+        $grid->model()
+        ->selectRaw("
+            coin_game_users_daily_aggregated.*,
+            u.uuid as user_uuid,
+            u.name as user_name,
+            up.avatar as user_avatar,
+            g.name as game_name,
+            g.image as game_image
+        ")
+        ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
+        ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
+        ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
+        ->orderByDesc('coin_game_users_daily_aggregated.total_played');
     
-        $grid->model()->orderByDesc('total_played');
     
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -139,6 +136,7 @@ class CoinGameUserService
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
             ]);
+            
         });
     
         $userService = $this->userService;
@@ -194,7 +192,7 @@ class CoinGameUserService
                 </a>";
         });
     
-        // تعطيل الأدوات
+       
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();

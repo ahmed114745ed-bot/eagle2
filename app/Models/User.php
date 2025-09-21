@@ -83,6 +83,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'salary',
     ];
 
     /**
@@ -115,6 +116,7 @@ class User extends Authenticatable
         //        'profile_frame_id'
 
     ];
+
 
 
     /* protected $appends = [
