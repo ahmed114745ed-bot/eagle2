@@ -280,14 +280,18 @@ class VipCommon
             ->where('user_id', $user->id)
             ->where('vip_id', $id)
             ->first();
-
-        if ($vip) {
+            if (!$vip) {
+                return; 
+            }
+        
+            $vipReceiveType = $receive_type . '-' . $vip->level;
+        
             Pack::where('vip_user_id', $id)
-                ->where('receive_type', $receive_type)
+                ->where('receive_type', $vipReceiveType)
                 ->where('user_id', $user->id)
                 ->delete();
+        
             $vip->delete();
-        }
     }
 }
 
