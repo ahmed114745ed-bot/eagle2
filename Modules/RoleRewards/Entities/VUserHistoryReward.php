@@ -35,48 +35,35 @@ class VUserHistoryReward extends Model
 
     public $timestamps = false;
 
-    public function getRewardPreviewAttribute()
-{
-    $reward = $this->rewardable;
+    // public function getRewardPreviewAttribute()
+    // {
+    //     $reward = $this->rewardable;
 
-    if ($this->rewardable_type === \App\Models\User::class) {
-        // لو مرتبط بـ user نعرض الـ id مثلاً
-        return '<div style="text-align:center;">' .
-            '<span>' . ($this->rewardable_id ?? 0) . '</span>' .
-            '</div>';
-    }
+    //     if ($this->rewardable_type === \App\Models\User::class) {
+    //         return $this->rewardable_id ?? 0;
+    //     }
 
-    if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-        $path = $this?->reward ?? 'achievement.png';
-        $url = getImagePath($path);
-        return '<div style="text-align:center;">' .
-            handleShowImageWithTypes($this->id, $url, 50, 50) .
-            '<br><span>Achievement</span>' .
-            '</div>';
-    }
+    //     if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+    //         $path = $reward->valid_image ?? 'achievement.png'; 
+    //         $url = getImagePath($path);
+    //         return handleShowImageWithTypes($this->id, $url, 50, 50);
+    //     }
 
-    if (! $reward) {
-        return 'N/A';
-    }
+    //     if (!$reward) {
+    //         return 'N/A';
+    //     }
 
-    $name = $reward->name ?? 'Unnamed';
-    $path = match ($this->rewardable_type) {
-        \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
-        \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
-        \Modules\Badge\Entities\Badge::class => $reward->image ?? '',
-        default => 'coin.png',
-    };
+    //     $name = $reward->name ?? 'Unnamed';
+    //     $path = match ($this->rewardable_type) {
+    //         \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
+    //         \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
+    //         \Modules\Badge\Entities\Badge::class => $reward->image ?? '',
+    //         default => 'coin.png',
+    //     };
 
-    $url = getImagePath($path);
-
-    // صورة + الاسم
-    return '<div style="text-align:center;">' .
-        handleShowImageWithTypes($this->id, $url, 50, 50) .
-        '<br><span>' . e($name) . '</span>' .
-        '</div>';
-}
-
-
+    //     $url = getImagePath($path);
+    //     return handleShowImageWithTypes($this->id, $url, 50, 50) . $name;
+    // }
 
 
 
