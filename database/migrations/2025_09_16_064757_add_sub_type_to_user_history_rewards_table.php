@@ -10,7 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_history_rewards', function (Blueprint $table) {
-            $table->string('sub_type')->nullable()->comment('Sub type of the reward');
+            if (!Schema::hasColumn('user_history_rewards', 'sub_type')) {
+                $table->string('sub_type')->nullable()->comment('Sub type of the reward');
+            }
+
         });
     }
 
