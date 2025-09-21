@@ -55,12 +55,11 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new ShippingAgency());
         $grid->model()->with([
-            'owner' => fn($q) => $q
-                ->withSum('userSalaries as total_user_salary', \DB::raw('sallary - cut_amount'))
-                ->withSum('roomSalaries as total_room_salary', \DB::raw('salary - cut_amount')),
+            'owner:id,name,uuid',
             'owner.profile:id,user_id,avatar',
             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ]);
+        ])->withSum('owner.userSalaries as total_user_salary', \DB::raw('sallary - cut_amount'))
+            ->withSum('owner.roomSalaries as total_room_salary', \DB::raw('salary - cut_amount'));
         $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {
