@@ -4,6 +4,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\CoinGameUserAggregated;
+use App\Models\CoinGameUserDailyAggregated;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Controllers\AdminController;
@@ -35,15 +36,15 @@ class CoinGameUserAllController extends AdminController
     {
     
         $filters = request()->all();
-        $query = CoinGameUserAggregated::query();
+        $query = CoinGameUserDailyAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
-        // $totals = $this->service->calculateTotals($query ,$filters);
+        $totals = $this->service->calculateTotals($query ,$filters);
 
     //   dd( $totals );
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
-            // ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
+            ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
             ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
     }
 

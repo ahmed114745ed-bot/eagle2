@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAggregated;
 use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserDailyAggregated;
 use App\Models\User;
 use App\Models\AllGame;
 use Encore\Admin\Grid;
@@ -27,23 +28,7 @@ class CoinGameUserService
     /**
      * Normalize request filters.
      */
-    public function normalizeFilters(array $filters): array
-    {
-        $mapping = [
-            '696042db2ff29ffcb1c5eee90445cad6' => 'user',
-            '91de9d78d4edb6f3e2bdd00e5db2e8a3' => 'game',
-            'created_at' => 'created_at',
-        ];
 
-        $normalized = [];
-        foreach ($filters as $key => $value) {
-            if (isset($mapping[$key])) {
-                $normalized[$mapping[$key]] = $value;
-            }
-        }
-
-        return $normalized;
-    }
 
     /**
      * Apply filters to aggregated query (الفيو).
@@ -80,12 +65,12 @@ class CoinGameUserService
  
         $query = $this->applyFilters($query, $filters);
 
-        // return $query->selectRaw("
-        //     SUM(total_played) as total_played,
-        //     SUM(total_loss) as total_loss,
-        //     SUM(total_win) as total_win,
-        //     SUM(total_loss - total_win) as app_profit
-        // ")->first();
+        return $query->selectRaw("
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(total_loss - total_win) as app_profit
+        ")->first();
     }
 
     /**
@@ -93,10 +78,10 @@ class CoinGameUserService
      */
     public function renderInfoBoxes(Row $row, $totals): void
     {
-        // $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2), '50px'));
     }
 
     /**
@@ -125,11 +110,22 @@ class CoinGameUserService
      */ 
     public function buildGrid(): Grid
     {
-        $grid = new Grid(new CoinGameUserAggregated());
+        $grid = new Grid(new CoinGameUserDailyAggregated());
+        $grid->model()
+        ->selectRaw("
+            coin_game_users_daily_aggregated.*,
+            u.uuid as user_uuid,
+            u.name as user_name,
+            up.avatar as user_avatar,
+            g.name as game_name,
+            g.image as game_image
+        ")
+        ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
+        ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
+        ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
+        ->orderByDesc('coin_game_users_daily_aggregated.total_played');
     
-        $grid->model()->orderByDesc('total_played');
-        $grid->model()->limit(10);
-
+    
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
