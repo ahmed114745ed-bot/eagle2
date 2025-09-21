@@ -148,7 +148,8 @@ class MilestoneRewardController
             
         })
         ->when("achievement", function (Form $form) {
-            $form->image("reward", __('Image'))
+
+            $form->image("reward1", __('Image'))
                 ->uniqueName() 
                 ->removable();
         })
@@ -156,7 +157,7 @@ class MilestoneRewardController
             $this->addBadgeField($form);
         })
         ->when("coins", function (Form $form) {
-            $form->number("reward", __('Coins'))->rules('required|integer|min:1');
+            $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
         });
     
         $form->number('expire', __('Expire'))->default(1);
