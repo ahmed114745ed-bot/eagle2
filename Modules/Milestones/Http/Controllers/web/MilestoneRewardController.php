@@ -50,6 +50,7 @@ class MilestoneRewardController
 
     public function edit($id, Content $content)
     {
+        $id = request('id') ;
         return $content
             ->header(__('Edit Reward'))
             ->description(__('Edit milestone reward'))
