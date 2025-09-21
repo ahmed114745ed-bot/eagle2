@@ -52,7 +52,6 @@ class CoinGameUserAllController extends AdminController
     public function index(Content $content)
     {
 
-        // Inject your custom JS for AJAX
         Admin::script($this->ajaxScript());
 
         return $content
@@ -95,15 +94,14 @@ class CoinGameUserAllController extends AdminController
 
     protected function ajaxScript()
     {
-        $url = admin_url('coin-game-users/ajax'); // route for ajaxTotals
+        $url = admin_url('coin-game-users/ajax'); 
 
         return <<<JS
     function loadInfoBoxes() {
-        // get current query string from the URL
         let filters = window.location.search; 
 
         $.ajax({
-            url: "$url" + filters, // append filters
+            url: "$url" + filters, 
             type: "GET",
             success: function(res) {
                 $("#info-boxes").html(res.html);
@@ -118,7 +116,6 @@ class CoinGameUserAllController extends AdminController
     $(function() {
         loadInfoBoxes();
 
-        // 🔥 Reload after grid filters or pagination (pjax reload)
         $(document).on("pjax:end", function() {
             loadInfoBoxes();
         });

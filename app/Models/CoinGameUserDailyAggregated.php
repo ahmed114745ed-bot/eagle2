@@ -27,5 +27,9 @@ class CoinGameUserDailyAggregated extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
+       public function game()
+    {
+        return $this->belongsTo(Game::class, 'game_id', 'id'); 
+    }
 
 }

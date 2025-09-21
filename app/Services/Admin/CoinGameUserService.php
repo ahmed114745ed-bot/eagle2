@@ -36,13 +36,20 @@ class CoinGameUserService
      */
     public function applyFilters($query,  array $filters)
     {
-        if (!empty($filters['user.uuid'])) {
-            $userId = $filters['user.uuid'];
+        
+        if (!empty($filters['user']['uuid'])) {
+            $userUuid = $filters['user']['uuid'];
+            $query->whereHas('user', function ($q) use ($userUuid) {
+                $q->where('uuid', $userUuid);
+            });
+        }
+
+        if (!empty($filters['user_id'])) {
+            $userId = $filters['user_id'];
             $query->whereHas('user', function ($q) use ($userId) {
                 $q->where('uuid', $userId);
             });
         }
-
         if (!empty($filters['game_id'])) {
             $gameId = $filters['game_id'];
             $query->Where('game_id', $gameId);
@@ -95,7 +102,6 @@ class CoinGameUserService
 
             $filter->like('user_uuid', 'User')->placeholder('UUID');
             $filter->like('game_id', 'Game')->placeholder(' ID');
-            // فلتر التاريخ
             $filter->between('date', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
@@ -110,33 +116,10 @@ class CoinGameUserService
     public function buildGrid(): Grid
     {
         $grid = new Grid(new CoinGameUserDailyAggregated());
-
-        // ✅ Query أخف - تحديد الأعمدة المطلوبة فقط
-        // $grid->model()
-        //     ->select([
-        //         'coin_game_users_daily_aggregated.id',
-        //         'coin_game_users_daily_aggregated.user_id',
-        //         'coin_game_users_daily_aggregated.game_id',
-        //         'coin_game_users_daily_aggregated.date',
-        //         'coin_game_users_daily_aggregated.total_played',
-        //         'coin_game_users_daily_aggregated.total_loss',
-        //         'coin_game_users_daily_aggregated.total_win',
-        //         'coin_game_users_daily_aggregated.app_profit',
-        //         'u.uuid as user_uuid',
-        //         'u.name as user_name',
-        //         'up.avatar as user_avatar',
-        //         'g.name as game_name',
-        //         'g.image as game_image',
-        //     ])
-        //     ->from('coin_game_users_daily_aggregated')
-        //     ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
-        //     ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-        //     ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
-        //     ->orderByDesc('coin_game_users_daily_aggregated.total_played');
-
         $grid->model()
             ->select([
                 'coin_game_users_daily_aggregated.user_id',
+                'coin_game_users_daily_aggregated.game_id',
                 'u.uuid as user_uuid',
                 'u.name as user_name',
                 'up.avatar as user_avatar',
@@ -148,19 +131,18 @@ class CoinGameUserService
             ->from('coin_game_users_daily_aggregated')
             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
             ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-            ->groupBy('coin_game_users_daily_aggregated.user_id', 'u.uuid', 'u.name', 'up.avatar')
+            ->groupBy('coin_game_users_daily_aggregated.user_id','coin_game_users_daily_aggregated.game_id' , 'u.uuid', 'u.name', 'up.avatar')
             ->orderByDesc(DB::raw('SUM(coin_game_users_daily_aggregated.total_played)'));
 
 
-        // ✅ فلترة محسنة
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
 
-            $filter->equal('user.uuid', 'User UUID')->placeholder('UUID');
+            $filter->like('user.uuid', 'User UUID')->placeholder('UUID');
             $filter->where(function ($query) {
                 $query->where('coin_game_users_daily_aggregated.game_id', $this->input);
-            }, 'Game ID')->placeholder('ID');
+            }, 'Game');
 
             $filter->between('date', __('Created At'))
                 ->datetime([
@@ -171,7 +153,6 @@ class CoinGameUserService
 
         $userService = $this->userService;
 
-        // ✅ عرض المستخدم
         $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
             return $userService->adminUserAvatar((object)[
                 'id'     => $this->user_id,
@@ -209,19 +190,22 @@ class CoinGameUserService
 
 
 
-    /**
-     * Build detailed grid for a user/game.
-     */
+ 
     public function buildShowAllGrid($userId, $gameId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
 
         $createdAt = request('date', []);
+        $game_id = request('game_id', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
         }
+        if (!empty($game_id)) {
+            $grid->model()->where('game_id', $game_id);
+        }
         $grid->model()
             ->selectRaw("
+                game_name,
                 round_id,
                 SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
                 SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
@@ -229,8 +213,7 @@ class CoinGameUserService
                 MAX(created_at) as last_played     -- أو آخر وقت للروند
             ")
             ->where('user_id', $userId)
-            ->where('game_id', $gameId)
-            ->groupBy('round_id')
+            ->groupBy('game_name', 'round_id')
             ->orderByDesc('round_id');
 
         $grid->filter(function ($filter) {
@@ -240,12 +223,18 @@ class CoinGameUserService
                 $q->where('round_id', 'like', "%{$input}%");
             }, __('Round ID'))->placeholder(__('Round ID'));
 
+            $filter->where(function ($q) {
+                $input = $this->input;
+                $q->where('game_id', 'like', "%{$input}%");
+            }, __('game id'))->placeholder(__('Game ID'));
+
             $filter->between('created_at', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
             ]);
         });
 
+        $grid->column('game_name', __('game name'))->sortable();
         $grid->column('round_id', __('Round ID'))->sortable();
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
