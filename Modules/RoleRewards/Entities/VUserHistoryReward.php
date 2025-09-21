@@ -39,14 +39,23 @@ class VUserHistoryReward extends Model
     {
         $reward = $this->rewardable;
 
-        if ($this->rewardable_type === \App\Models\User::class) {
-            return $this->rewardable_id ?? 0;
-        }
+        if (in_array($this->rewardable_type, [\App\Models\User::class, \Modules\Achievement\Entities\Achievement::class])) {
+            $extra = $this->extra ?? '';
+            $data = is_array($extra) ? $extra : json_decode($extra, true);
 
-        if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-            $path = $reward->valid_image ?? 'achievement.png'; 
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            if (!$data) {
+                return $extra ?: 'N/A';
+            }
+
+            if ($this->rewardable_type === \App\Models\User::class) {
+                return $data['reward'] ?? 0;
+            }
+
+            if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+                $path = $data['reward'] ?? 'achievement.png';
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            }
         }
 
         if (!$reward) {
@@ -64,6 +73,7 @@ class VUserHistoryReward extends Model
         $url = getImagePath($path);
         return handleShowImageWithTypes($this->id, $url, 50, 50) . $name;
     }
+
 
 
 
