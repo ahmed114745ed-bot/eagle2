@@ -40,10 +40,6 @@ class ChargeController extends MainController
         return $content
             ->title(trans('charges'))
             ->body($this->grid());
-        // ->row(function ($row) {
-        //     $row->column(10, $this->grid());
-        //     $row->column(2, view('admin.grid.users.actions'));
-        // });
     }
 
 
@@ -58,6 +54,11 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
+        $grid->model()->with([
+            'owner',
+            'owner.profile:id,user_id,avatar',
+            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ]);
         $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {
