@@ -4,10 +4,12 @@ namespace Modules\RoleRewards\Entities;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserHistoryReward extends Model
 {
-    
+    use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'receive_type',
@@ -18,6 +20,8 @@ class UserHistoryReward extends Model
         'is_deleted'
 
     ];
+    protected $dates = ['deleted_at'];
+
 
     protected $casts = [
         'extra' => 'array',
