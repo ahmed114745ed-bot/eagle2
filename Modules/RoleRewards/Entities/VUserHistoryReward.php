@@ -44,7 +44,7 @@ class VUserHistoryReward extends Model
         }
 
         if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-            $path = $reward->image ?? 'achievement.png'; 
+            $path = $reward->valid_image ?? 'achievement.png'; 
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         }
