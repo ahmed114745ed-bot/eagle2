@@ -48,7 +48,6 @@ return new class extends Migration
         Schema::table('user_history_rewards', function (Blueprint $table) {
             $table->dropUnique('uniq_user_rewards');
 
-            // إعادة المفتاح القديم بدون is_deleted
             $table->unique([
                 'user_id',
                 'sub_type',
