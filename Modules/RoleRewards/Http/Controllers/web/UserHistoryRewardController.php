@@ -34,85 +34,62 @@ class UserHistoryRewardController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new VUserHistoryReward());
-    
+
         $grid->model()->with([
             'user' => function ($query) {
                 $query->select(['id', 'name', 'uuid'])
-                      ->with([
-                          'profile:id,user_id,avatar',
-                          'packs',
-                      ]);
-            }
+                    ->with([
+                        'profile:id,user_id,avatar',
+                        'packs',
+                    ]);
+            },
+            'rewardable' => function ($morphTo) {
+                $morphTo->morphWith([
+                    \App\Models\Ware::class => fn($q) => $q->select(['id', 'img2', 'show_img', 'name']),
+                    \Modules\Vip\Entities\OVip::class => fn($q) => $q->select(['id', 'img', 'name']),
+                    \Modules\Badge\Entities\Badge::class => fn($q) => $q->select(['id', 'image', 'name']),
+                    \Modules\Achievement\Entities\Achievement::class => fn($q) => $q->select(['id', 'title']),
+                    \App\Models\User::class => fn($q) => $q->select(['id', 'name']),
+                ]);
+            },
         ])
         ->orderByDesc('id');            
-    
+
         $grid->column('id', __('ID'))->sortable();
-    
+
         $grid->column('user_id', __('User'))->display(function () {
             if (! $this->user) {
                 return __('No User');
             }
             return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
         });
-    
-        $grid->column('receive_name', __('receive_type'));
-    
-        $grid->column('reward', __('Rewards'))->display(function () {
-            $reward = $this->rewardable;
 
-            if ($this->rewardable_type === \App\Models\User::class) {
-            
-                return $this?->reward ?? 0 ;
-            }
-        
-            // Achievement
-            if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-        
-                $path =  $this?->reward ?? 'achievement.png';
-      
-                $url = getImagePath($path);
-                $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
-        
-                return $imgTag ;
-            }
-        
-         
-            if (!$reward) return 'N/A';
-    
-            $name = $reward->name ?? 'Unnamed';
-            $path = match ($this->rewardable_type) {
-                \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
-                \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
-                \Modules\Badge\Entities\Badge::class => $reward?->image ?? '',
-                default => 'coin.png',
-            };
-    
-            $url = getImagePath($path);
-            $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
-            return "<div>{$imgTag}</div><div>{$name}</div>";
-        });
-    
+        $grid->column('receive_name', __('receive_type'));
+
+        $grid->column('reward_preview', __('Rewards'));
+
         $grid->column('created_at', __('Created At'))
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
-    
+
         $grid->filter(function ($filter) {
             $filter->equal('receive_category', __('Receive Type'))->select([
                 'Role' => __('Role'),
                 'Milestone' => __('Milestone'),
             ]);
         });
-    
+
         $grid->disableCreateButton();
         $grid->disableActions();
-    
+
         Admin::script("
             if (window.innerWidth >= 1024) {
                 $('.table-responsive').removeClass('table-responsive');
             }
         ");
-    
+
         return $grid;
     }
+
     
      
 
