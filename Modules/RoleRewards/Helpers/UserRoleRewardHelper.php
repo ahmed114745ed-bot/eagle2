@@ -27,7 +27,6 @@ class UserRoleRewardHelper
                 'receive_type'    => "Role:$roleId",
                 'rewardable_id'   => $reward->rewardable_id,
                 'rewardable_type' => $reward->rewardable_type,
-                'is_deleted' =>  0,
             ])->exists();
 
             if (! $exists) {
@@ -54,7 +53,7 @@ class UserRoleRewardHelper
 
         foreach ($rewards as $reward) {
             self::removeReward($user, $reward);
-            $reward->update(['is_deleted' => 1]);
+            $reward->delete();
         }
     }
 
