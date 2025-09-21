@@ -35,7 +35,8 @@ class VUserHistoryReward extends Model
 
     public $timestamps = false;
 
-   
+
+
 
 
 
