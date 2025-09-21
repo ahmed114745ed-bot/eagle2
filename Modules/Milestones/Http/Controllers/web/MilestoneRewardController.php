@@ -50,6 +50,7 @@ class MilestoneRewardController
 
     public function edit($id, Content $content)
     {
+        $id = request('id') ;
         return $content
             ->header(__('Edit Reward'))
             ->description(__('Edit milestone reward'))
@@ -155,7 +156,8 @@ class MilestoneRewardController
             $form->image("reward1", __('Image'))
             ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
             ->disk('gcs');
-                $form->number('expire', __('Expire'))->default(1);
+            
+            $form->number('expire', __('Expire'))->default(1);
 
         })
         ->when("badge", function () use ($form) {
@@ -190,10 +192,7 @@ class MilestoneRewardController
                     $form->model()->rewardable_id = 0;
                     $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
                     $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                    if ($form->reward_image) {
-                        $form->reward = $form->reward_image;
-                        $form->model()->reward = $form->reward_image;
-                    }
+                   
                    
                     break;
     
@@ -201,8 +200,8 @@ class MilestoneRewardController
                     $form->rewardable_id = 0;
                     $form->model()->rewardable_id = 0;
                     $form->model()->rewardable_type = \App\Models\User::class;
-                    $form->reward = (int) $form->reward;
-                    $form->model()->reward = $form->reward;
+                    $form->reward = (int) $form->reward2;
+                    $form->model()->reward = $form->reward2;
                     break;
             }
         });
