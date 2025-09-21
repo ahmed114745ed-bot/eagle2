@@ -2,12 +2,15 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
+use App\Selectables\Badges;
+use App\Selectables\OVips;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Badge\Entities\Badge;
@@ -21,18 +24,18 @@ class MilestoneRewardController
 
     public function index(Content $content, $milestoneId = null)
     {
-       
+        $milestone = Milestone::find($milestoneId);
         return $content
-            ->header(__('Milestone Rewards'))
-            ->description(__('Rewards for milestone'))
+            ->header(__('Milestone rewards') . '-:-' .$milestone->name)
+            ->description(__('id') . '-:-' .$milestone->id)
             ->body($this->grid($milestoneId));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->header(__('Create Reward'))
-            ->description(__('Add a new reward to milestone'))
+            ->header(__('create'))
+            // ->description(__('Add a new reward to milestone'))
             ->body($this->form());
     }
 
@@ -132,7 +135,7 @@ class MilestoneRewardController
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),
-            "vip"          => __('Vip'),
+            "vip"          => __('vip'),
             "achievement"  => __('Achievement'),
             "badge"        => __('Badge'),
         ])
@@ -140,19 +143,17 @@ class MilestoneRewardController
             $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
         })
         ->when("vip", function (Form $form) {
-            $form->select('rewardable_id', __('Vip'))
-                ->options(OVip::pluck('name', 'id'))
-                ->rules('required');
+                $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
+        
+            
         })
         ->when("achievement", function (Form $form) {
-            $form->image("reward_image", __('Image'))
+            $form->image("reward", __('Image'))
                 ->uniqueName() 
                 ->removable();
         })
-        ->when("badge", function (Form $form) {
-            $form->select('rewardable_id', __('Badge'))
-                ->options(\Modules\Badge\Entities\Badge::pluck('name', 'id'))
-                ->rules('required');
+        ->when("badge", function () use ($form) {
+            $this->addBadgeField($form);
         })
         ->when("coins", function (Form $form) {
             $form->number("reward", __('Coins'))->rules('required|integer|min:1');
@@ -209,11 +210,34 @@ class MilestoneRewardController
 
         $show->field('id', __('ID'));
         $show->field('type', __('Type'));
-        $show->field('rewardable_type', __('Rewardable Type'));
+        // $show->field('rewardable_type', __('Rewardable_type'));
         $show->field('expire', __('Expire'));
         $show->field('created_at', __('Created At'));
         $show->field('updated_at', __('Updated At'));
 
         return $show;
     }
+
+    protected function addBadgeField(Form $form)
+{
+    $prefix = 'badges';
+    $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
+        $form
+            ->select('id', __('badges'))
+            ->options(function ($id) {
+                if (!$id) return [];
+                $ware = Badge::find($id);
+                return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+            })
+            ->attribute([
+                'data-image-select' => 1,
+                'data-load-url' => admin_url('wares-by-id')
+            ]);
+
+        $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+        $this->addWareJs();
+    });
+}
+
 }

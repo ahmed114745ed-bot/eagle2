@@ -74,7 +74,9 @@ class RoleControllerNew extends MainController
         $grid = new Grid(new $roleModel());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
+
         $grid->column('name', trans('admin.name'));
+
         $grid->column('preview', trans('admin.preview'))->display(function () {
             $id = $this->id; // Assuming 'id' is the record ID field
             return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">
@@ -82,6 +84,12 @@ class RoleControllerNew extends MainController
             </a>';
         });
 
+        $grid->column('rewards', __('Rewards'))->display(function () {
+            $url = admin_url("role-rewards/{$this->id}");
+            return '<a href="' . $url . '" class="btn btn-sm btn-info">
+                        <i class="fa fa-gift"></i> ' . __('rewards') . '
+                    </a>';
+        });
         // $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
         $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
             return collect($permissions)->pluck('name')->take(7)->map(function ($name) {
@@ -91,12 +99,7 @@ class RoleControllerNew extends MainController
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 
-        $grid->column('rewards', 'rewards')->display(function () {
-            $url = admin_url("role-rewards/{$this->id}");
-            return '<a href="' . $url . '" class="btn btn-sm btn-info">
-                        <i class="fa fa-gift"></i> rewards
-                    </a>';
-        });
+  
 
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
@@ -179,7 +182,7 @@ class RoleControllerNew extends MainController
 
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
-        $form->image('image', __('Image'))->help('Image will appear beside user in app') ->rules('required|image|mimes:jpeg,png,jpg');
+        $form->image('image', __('Image'))->help('');
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');

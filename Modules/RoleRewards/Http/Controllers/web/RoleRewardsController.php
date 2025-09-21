@@ -2,6 +2,8 @@
 
 namespace Modules\RoleRewards\Http\Controllers\web;
 
+use App\Models\Role;
+use App\Selectables\OVips;
 use Modules\Achievement\Entities\Achievement;
 use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
@@ -13,6 +15,7 @@ use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Admin;
+use App\Selectables\Badges;
 
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
@@ -31,10 +34,11 @@ class RoleRewardsController extends MainController
     }
     public function index(Content $content ,$roleId = null)
     {
+        $role = Role::find($roleId);
       
         return parent::index($content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->header(__('Role') . '-:-'. $role->name)
+            ->description(trans('id') . $role->id)
             ->body($this->grid($roleId)));
     }
     public function create(Content $content)
@@ -149,9 +153,9 @@ class RoleRewardsController extends MainController
     {
         $form = new Form(new RoleReward());
         $this->disableFormTools($form);
-    
+        $this->addHiddenFields($form);
+
         if (!$form->isEditing()) {
-            $this->addHiddenFields($form);
             $this->addTypeSelector($form);
         }
     
@@ -173,27 +177,52 @@ protected function addHiddenFields(Form $form)
 
 protected function addTypeSelector(Form $form)
 {
+    if (!$form->isEditing()) {
+
     $form->select('type', __('Type'))->options([
-        "ware"        => __('Ware'),
-        "vip"         => __('Vip'),
+        "ware"        => __('ware'),
+        "vip"         => __('vip'),
         "achievement" => __('Achievement'),
         "badge"       => __('Badge'),
     ])->when("ware", function (Form $form) {
-        $form->belongsTo('rewardable_id', Wares::class, trans('wares'))->rules('required');
-    })->when("vip", function (Form $form) {
-        $form->select('rewardable_id', __('Vip'))
-            ->options(OVip::pluck('name', 'id'))
-            ->rules('required');
+        $form->belongsTo('rewardable_id', Wares::class, trans('wares'));
+    })->when("vip", function () use ($form) {
+        $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
+
     })->when("achievement", function (Form $form) {
         $form->image("reward_achievement", __('image'))->name(function ($file) {
             return now()->timestamp . '.' . $file->guessExtension();
         })->disk('gcs');
-    })->when("badge", function (Form $form) {
-        $form->select('rewardable_id', __('Badge'))
-            ->options(Badge::pluck('name', 'id'))
-            ->rules('required');
+    })
+    ->when("badge", function () use ($form) {
+        $this->addBadgeField($form);
+    });
+
+}
+}
+
+protected function addBadgeField(Form $form)
+{
+    $prefix = 'badges';
+    $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
+        $form->setElementName($prefix . 'target5')
+            ->select('id', __('badges'))
+            ->options(function ($id) {
+                if (!$id) return [];
+                $ware = Badge::find($id);
+                return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+            })
+            ->attribute([
+                'data-image-select' => 1,
+                'data-load-url' => admin_url('wares-by-id')
+            ]);
+
+        $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+        $this->addWareJs();
     });
 }
+
 
 
 protected function addExpireField(Form $form)

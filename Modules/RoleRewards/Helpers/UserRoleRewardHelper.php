@@ -24,7 +24,7 @@ class UserRoleRewardHelper
         foreach ($rewards as $reward) {
             $exists = UserHistoryReward::where([
                 'user_id'         => $user->id,
-                'receive_type'    => "Role:$slug:$roleId",
+                'receive_type'    => "Role:$roleId",
                 'rewardable_id'   => $reward->rewardable_id,
                 'rewardable_type' => $reward->rewardable_type,
             ])->exists();
@@ -33,13 +33,13 @@ class UserRoleRewardHelper
                 UserHistoryReward::create([
                     'user_id'         => $user->id,
                     'sub_type'         => 'roles',
-                    'receive_type'    => "Role:$slug:$roleId",
+                    'receive_type'    => "Role:$roleId",
                     'rewardable_id'   => $reward->rewardable_id,
                     'rewardable_type' => $reward->rewardable_type,
                     'extra'           => ['expire' => $reward->expire],
                 ]);
 
-                self::applyReward($user, $reward, "Role:$slug:$roleId");
+                self::applyReward($user, $reward, "Role:$roleId");
             }
         }
     }
@@ -48,12 +48,12 @@ class UserRoleRewardHelper
     public static function revokeRoleRewards(User $user, int $roleId, $slug = null): void
     {
         $rewards = UserHistoryReward::where('user_id', $user->id)
-            ->where('receive_type', "Role:$slug:$roleId")
+            ->where('receive_type', "Role:$roleId")
             ->get();
 
         foreach ($rewards as $reward) {
             self::removeReward($user, $reward);
-            $reward->delete();
+            $reward->update(['is_deleted' => 1]);
         }
     }
 

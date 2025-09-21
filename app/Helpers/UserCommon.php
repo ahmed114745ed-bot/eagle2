@@ -491,6 +491,9 @@ class UserCommon
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1;
             $arr['is_read']   = 1;
+            $arr['use_num']   = 1;
+            $arr['using']     = 1;
+            $arr['is_read']   = 1;
             $arr['days']      = $expir;
             $arr['receive_type']      = $receiveType;
 
