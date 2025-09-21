@@ -59,25 +59,21 @@ class UserHistoryRewardController extends AdminController
     
         $grid->column('reward', __('Rewards'))->display(function () {
             if ($this->reward_value) {
-
                 if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-                    $path = $this->reward_img ?? 'achievement.png';
+                    $path = $this->reward_value ?? 'achievement.png';
                     $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
                     return $imgTag ;
                 }
-                
-                return $this->reward_value;
-              
+                return $this->reward_value;  
             }
         
-            if ($this->reward_name) {
-                $path = $this->reward_value ?? 'coin.png';
+         
+                $path = $this->reward_img ?? 'coin.png';
                 $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
              
                 return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
-            }
-        
-            return 'N/A';
+            
+    
         });
         
     
