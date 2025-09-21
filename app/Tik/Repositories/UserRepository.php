@@ -533,7 +533,7 @@ class UserRepository extends AbstractRepository
 
     public function allUsersPlay()
     {
-        return $this->model->whereNotNull('game_id')->with(['profile', 'mangerType', 'country','senderLevel','specialId.ware','receiverLevel','agency', 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])->where('online', 1)->with('nowGame')->paginate(10);
+        return $this->model->whereNotNull('game_id')->with(['profile:id,user_id,avatar'])->where('online', 1)->with('nowGame')->paginate(10);
     }
 
     public function friends(): LengthAwarePaginator
