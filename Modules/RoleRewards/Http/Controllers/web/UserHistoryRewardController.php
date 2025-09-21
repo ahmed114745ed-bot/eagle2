@@ -58,26 +58,26 @@ class UserHistoryRewardController extends AdminController
         $grid->column('receive_name', __('Receive'));
     
         $grid->column('reward', __('Rewards'))->display(function () {
-        
-    
-            if (in_array($this->rewardable_type, [\App\Models\User::class, \Modules\Achievement\Entities\Achievement::class])) {
-                $extra = $reward->extra ?? '';
-                $data = is_array($extra) ? $extra : json_decode($extra, true);
-                if (!$data) return $extra ?: 'N/A';
-    
-                if ($this->rewardable_type === \App\Models\User::class) {
-                    $data = $data['reward'] ?? $data;
-                }
-    
-                if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-                    $data = $data['reward'] ?? $data;
-                }
-    
-                return '<pre style="white-space: pre-wrap;">' .
-                    json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
-                    '</pre>';
+            $reward = $this->rewardable;
+
+            if ($this->rewardable_type === \App\Models\User::class) {
+            
+                return $this?->reward ?? 0 ;
             }
-            $reward = $this->rewardable; 
+        
+            // Achievement
+            if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+        
+        
+                $path =  $this?->reward ?? 'achievement.png';
+      
+                $url = getImagePath($path);
+                $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
+        
+                return $imgTag ;
+            }
+        
+         
             if (!$reward) return 'N/A';
     
             $name = $reward->name ?? 'Unnamed';
