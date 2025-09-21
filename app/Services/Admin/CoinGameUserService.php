@@ -35,9 +35,11 @@ class CoinGameUserService
      */
     public function applyFilters($query,  array $filters)
     {
-        if (!empty($filters['user_uuid'])) {
-            $userId = $filters['user_uuid'];
-            $query->Where('user_uuid', 'like', "%{$userId}%");
+        if (!empty($filters['user.uuid'])) {
+            $userId = $filters['user.uuid'];
+            $query->whereHas('user', function ($q) use ($userId) {
+                $q->where('uuid', $userId);
+            });
         }
 
         if (!empty($filters['game_id'])) {
@@ -60,8 +62,6 @@ class CoinGameUserService
      */
     public function calculateTotals($query, $filters): object
     {
-
-        $query = $this->applyFilters($query, $filters);
 
         return $query->selectRaw("
             SUM(total_played) as total_played,
@@ -254,34 +254,34 @@ class CoinGameUserService
         });
 
         // ✅ عرض اللعبة
-        $grid->column('game_id', __('Game'))->display(function () {
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+        //         $grid->column('game_id', __('Game'))->display(function () {
+        //             $defaultImage = asset('images/businessman-icon.jpg');
+        //             $url = getImagePath($this->game_image) ?? $defaultImage;
+        //             if (!isImageExists($url)) {
+        //                 $url = $defaultImage;
+        //             }
 
-            $uniqueId = $this->game_id ?? 'game-unknown';
-            $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
+        //             $uniqueId = $this->game_id ?? 'game-unknown';
+        //             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
 
-            $gameIdHtml = "game-{$this->game_id}";
-            $urlLink = admin_url("all-games/{$this->game_id}");
+        //             $gameIdHtml = "game-{$this->game_id}";
+        //             $urlLink = admin_url("all-games/{$this->game_id}");
 
-            return <<<HTML
-        <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
-            $imageTag
-            <div>
-                <strong style="font-size:16px;">{$this->game_name}</strong><br>
-                <span style="font-size:13px;">
-                    ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
-                    <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')"
-                        style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
-                        title="Copy ID">📝</button>
-                </span>
-            </div>
-        </a>
-HTML;
-        });
+        //             return <<<HTML
+        //         <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
+        //             $imageTag
+        //             <div>
+        //                 <strong style="font-size:16px;">{$this->game_name}</strong><br>
+        //                 <span style="font-size:13px;">
+        //                     ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
+        //                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')"
+        //                         style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
+        //                         title="Copy ID">📝</button>
+        //                 </span>
+        //             </div>
+        //         </a>
+        // HTML;
+        //         });
 
         // ✅ أعمدة الأرقام (باستخدام Loop)
         foreach (['total_loss', 'total_win', 'app_profit'] as $field) {

@@ -83,6 +83,7 @@ class CoinGameUserAllController extends AdminController
     public function ajaxTotals(Request $request)
     {
         $filters = $request->all();
+       
         $query = CoinGameUserDailyAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
         $totals = $this->service->calculateTotals($query, $filters);
@@ -94,13 +95,16 @@ class CoinGameUserAllController extends AdminController
 
     protected function ajaxScript()
     {
-        $url = admin_url('coin-game-users/ajax'); // your AJAX route
+        $url = admin_url('coin-game-users/ajax'); // route for ajaxTotals
 
         return <<<JS
-    function loadInfoBoxes(filters = {}) {
+    function loadInfoBoxes() {
+        // get current query string from the URL
+        let filters = window.location.search; 
+
         $.ajax({
-            url: "$url",
-            data: filters,
+            url: "$url" + filters, // append filters
+            type: "GET",
             success: function(res) {
                 $("#info-boxes").html(res.html);
             },
@@ -113,6 +117,11 @@ class CoinGameUserAllController extends AdminController
     // auto-load on page load
     $(function() {
         loadInfoBoxes();
+
+        // 🔥 Reload after grid filters or pagination (pjax reload)
+        $(document).on("pjax:end", function() {
+            loadInfoBoxes();
+        });
     });
     JS;
     }
