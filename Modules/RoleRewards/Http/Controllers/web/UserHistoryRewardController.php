@@ -83,7 +83,7 @@ class UserHistoryRewardController extends AdminController
             $path = match ($this->rewardable_type) {
                 \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
                 \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
-                \Modules\Badge\Entities\Badge::class => $reward?->img ?? '',
+                \Modules\Badge\Entities\Badge::class => $reward?->image ?? '',
                 default => 'coin.png',
             };
     
