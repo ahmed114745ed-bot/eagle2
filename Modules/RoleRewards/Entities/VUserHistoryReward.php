@@ -40,7 +40,7 @@ class VUserHistoryReward extends Model
         $reward = $this->rewardable;
 
         if ($this->rewardable_type === \App\Models\User::class) {
-            return $this?->reward ?? 0;
+            return $this->rewardable_id ?? 0;
         }
 
         if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
