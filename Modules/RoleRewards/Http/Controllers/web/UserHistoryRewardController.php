@@ -10,6 +10,7 @@ use Modules\RoleRewards\Entities\UserHistoryReward;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Services\UserService;
 use Encore\Admin\Layout\Content;
+use Modules\RoleRewards\Entities\VUserHistoryReward;
 
 
 class UserHistoryRewardController extends AdminController
@@ -30,47 +31,54 @@ class UserHistoryRewardController extends AdminController
         );
     }
   
-
-     protected function grid()
-     {
-         $grid = new Grid(new UserHistoryReward());
-         $grid->model()->orderByDesc('id');
-     
-         $grid->column('id', __('ID'))->sortable();
-
-         $grid->column('user_id', __('User'))->display(function ($name) {
-            $user = $this->user;
-            if (! $user) {
+    protected function grid()
+    {
+        $grid = new Grid(new VUserHistoryReward());
+    
+        $grid->model()->with([
+            'user' => function ($query) {
+                $query->select(['id', 'name', 'uuid'])
+                      ->with([
+                          'profile:id,user_id,avatar',
+                          'packs',
+                      ]);
+            }
+        ])
+        ->orderByDesc('id');            
+    
+        $grid->column('id', __('ID'))->sortable();
+    
+        $grid->column('user_id', __('User'))->display(function () {
+            if (! $this->user) {
                 return __('No User');
             }
-
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+            return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
         });
-      
-        
-        // $grid->column('receive_name', __('Receive_type'));
-     
-         $grid->column('reward', __('Rewards'))->display(function () {
-            
+    
+        $grid->column('receive_name', __('Receive'));
+    
+        $grid->column('reward', __('Rewards'))->display(function () {
             $reward = $this->rewardable; 
+            if (!$reward) return 'N/A';
+    
             if (in_array($this->rewardable_type, [\App\Models\User::class, \Modules\Achievement\Entities\Achievement::class])) {
                 $extra = $reward->extra ?? '';
                 $data = is_array($extra) ? $extra : json_decode($extra, true);
                 if (!$data) return $extra ?: 'N/A';
-        
+    
                 if ($this->rewardable_type === \App\Models\User::class) {
                     $data = $data['coins'] ?? $data;
                 }
-                
+    
                 if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
                     $data = $data['reward_achievement'] ?? $data;
                 }
-        
+    
                 return '<pre style="white-space: pre-wrap;">' .
                     json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
                     '</pre>';
             }
-        
+    
             $name = $reward->name ?? 'Unnamed';
             $path = match ($this->rewardable_type) {
                 \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
@@ -78,41 +86,34 @@ class UserHistoryRewardController extends AdminController
                 \Modules\Badge\Entities\Badge::class => $reward?->img ?? '',
                 default => 'coin.png',
             };
-        
+    
             $url = getImagePath($path);
             $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
             return $imgTag . $name;
         });
-        
-     
-        
-     
-         $grid->column('created_at', __('Created At'))->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
-     
-        //  $grid->column('sub_type', __('Sub Type'));
-     
-         $grid->filter(function ($filter) {
-             $filter->equal('sub_type', __('Sub Type'))->select([
-                 'role' => __('Roles'),
-                 'reward' => __('Milestone'),
-             ]);
-         });
-     
-         $grid->disableCreateButton();
-
-         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
+    
+        $grid->column('created_at', __('Created At'))
+            ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
+    
+        $grid->filter(function ($filter) {
+            $filter->equal('receive_category', __('Receive Type'))->select([
+                'Role' => __('Role'),
+                'Milestone' => __('Milestone'),
+            ]);
         });
+    
+        $grid->disableCreateButton();
         $grid->disableActions();
+    
         Admin::script("
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
-        }
-    ");
+            if (window.innerWidth >= 1024) {
+                $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
+    
         return $grid;
-     }
+    }
+    
      
 
     /**
