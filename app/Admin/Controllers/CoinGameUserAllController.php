@@ -37,13 +37,13 @@ class CoinGameUserAllController extends AdminController
         $filters = request()->all();
         $query = CoinGameUserAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
-        // $totals = $this->service->calculateTotals($query ,$filters);
+        $totals = $this->service->calculateTotals($query ,$filters);
 
     //   dd( $totals );
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
-            // ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
+            ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
             ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
     }
 

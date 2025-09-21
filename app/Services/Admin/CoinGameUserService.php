@@ -78,14 +78,14 @@ class CoinGameUserService
     public function calculateTotals($query ,$filters): object
     {
  
-        // $query = $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
-        // return $query->selectRaw("
-        //     SUM(total_played) as total_played,
-        //     SUM(total_loss) as total_loss,
-        //     SUM(total_win) as total_win,
-        //     SUM(total_loss - total_win) as app_profit
-        // ")->first();
+        return $query->selectRaw("
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(total_loss - total_win) as app_profit
+        ")->first();
     }
 
     /**
@@ -93,10 +93,10 @@ class CoinGameUserService
      */
     public function renderInfoBoxes(Row $row, $totals): void
     {
-        // $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
-        // $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2), '50px'));
     }
 
     /**
