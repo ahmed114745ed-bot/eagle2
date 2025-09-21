@@ -53,7 +53,7 @@ class UserRoleRewardHelper
 
         foreach ($rewards as $reward) {
             self::removeReward($user, $reward);
-            $reward->delete();
+            $reward->update(['is_deleted' => 1]);
         }
     }
 
