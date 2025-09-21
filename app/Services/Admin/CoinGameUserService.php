@@ -197,114 +197,114 @@ class CoinGameUserService
         return $grid;
     }
 
-    public function buildGrid(): Grid
-    {
-        $grid = new Grid(new CoinGameUserDailyAggregated());
+//     public function buildGrid(): Grid
+//     {
+//         $grid = new Grid(new CoinGameUserDailyAggregated());
 
-        // ✅ Query أخف - تحديد الأعمدة المطلوبة فقط
-        $grid->model()
-            ->select([
-                'coin_game_users_daily_aggregated.id',
-                'coin_game_users_daily_aggregated.user_id',
-                'coin_game_users_daily_aggregated.game_id',
-                'coin_game_users_daily_aggregated.date',
-                'coin_game_users_daily_aggregated.total_played',
-                'coin_game_users_daily_aggregated.total_loss',
-                'coin_game_users_daily_aggregated.total_win',
-                'coin_game_users_daily_aggregated.app_profit',
-                'u.uuid as user_uuid',
-                'u.name as user_name',
-                'up.avatar as user_avatar',
-                'g.name as game_name',
-                'g.image as game_image',
-            ])
-            ->from('coin_game_users_daily_aggregated')
-            ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
-            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-            ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
-            ->orderByDesc('coin_game_users_daily_aggregated.total_played');
+//         // ✅ Query أخف - تحديد الأعمدة المطلوبة فقط
+//         $grid->model()
+//             ->select([
+//                 'coin_game_users_daily_aggregated.id',
+//                 'coin_game_users_daily_aggregated.user_id',
+//                 'coin_game_users_daily_aggregated.game_id',
+//                 'coin_game_users_daily_aggregated.date',
+//                 'coin_game_users_daily_aggregated.total_played',
+//                 'coin_game_users_daily_aggregated.total_loss',
+//                 'coin_game_users_daily_aggregated.total_win',
+//                 'coin_game_users_daily_aggregated.app_profit',
+//                 'u.uuid as user_uuid',
+//                 'u.name as user_name',
+//                 'up.avatar as user_avatar',
+//                 'g.name as game_name',
+//                 'g.image as game_image',
+//             ])
+//             ->from('coin_game_users_daily_aggregated')
+//             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
+//             ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
+//             ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
+//             ->orderByDesc('coin_game_users_daily_aggregated.total_played');
 
-        // ✅ فلترة محسنة
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->disableIdFilter();
+//         // ✅ فلترة محسنة
+//         $grid->filter(function (Grid\Filter $filter) {
+//             $filter->expand();
+//             $filter->disableIdFilter();
 
-            $filter->equal('u.uuid', 'User UUID')->placeholder('UUID');
-            $filter->equal('coin_game_users_daily_aggregated.game_id', 'Game ID')->placeholder('ID');
+//             $filter->equal('u.uuid', 'User UUID')->placeholder('UUID');
+//             $filter->equal('coin_game_users_daily_aggregated.game_id', 'Game ID')->placeholder('ID');
 
-            $filter->between('coin_game_users_daily_aggregated.date', __('Created At'))
-                ->datetime([
-                    'format' => 'YYYY-MM-DD HH:mm:ss',
-                    'locale' => 'en',
-                ]);
-        });
+//             $filter->between('coin_game_users_daily_aggregated.date', __('Created At'))
+//                 ->datetime([
+//                     'format' => 'YYYY-MM-DD HH:mm:ss',
+//                     'locale' => 'en',
+//                 ]);
+//         });
 
-        $userService = $this->userService;
+//         $userService = $this->userService;
 
-        // ✅ عرض المستخدم
-        $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
-            return $userService->adminUserAvatar((object)[
-                'id'     => $this->user_id,
-                'uuid'   => $this->user_uuid,
-                'name'   => $this->user_name,
-                'avatar' => $this->user_avatar,
-            ], withoutLevels: true);
-        });
+//         // ✅ عرض المستخدم
+//         $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
+//             return $userService->adminUserAvatar((object)[
+//                 'id'     => $this->user_id,
+//                 'uuid'   => $this->user_uuid,
+//                 'name'   => $this->user_name,
+//                 'avatar' => $this->user_avatar,
+//             ], withoutLevels: true);
+//         });
 
-        // ✅ عرض اللعبة
-        $grid->column('game_id', __('Game'))->display(function () {
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+//         // ✅ عرض اللعبة
+//         $grid->column('game_id', __('Game'))->display(function () {
+//             $defaultImage = asset('images/businessman-icon.jpg');
+//             $url = getImagePath($this->game_image) ?? $defaultImage;
+//             if (!isImageExists($url)) {
+//                 $url = $defaultImage;
+//             }
 
-            $uniqueId = $this->game_id ?? 'game-unknown';
-            $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
+//             $uniqueId = $this->game_id ?? 'game-unknown';
+//             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
 
-            $gameIdHtml = "game-{$this->game_id}";
-            $urlLink = admin_url("all-games/{$this->game_id}");
+//             $gameIdHtml = "game-{$this->game_id}";
+//             $urlLink = admin_url("all-games/{$this->game_id}");
 
-            return <<<HTML
-        <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
-            $imageTag
-            <div>
-                <strong style="font-size:16px;">{$this->game_name}</strong><br>
-                <span style="font-size:13px;">
-                    ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
-                    <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')"
-                        style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
-                        title="Copy ID">📝</button>
-                </span>
-            </div>
-        </a>
-HTML;
-        });
+//             return <<<HTML
+//         <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
+//             $imageTag
+//             <div>
+//                 <strong style="font-size:16px;">{$this->game_name}</strong><br>
+//                 <span style="font-size:13px;">
+//                     ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
+//                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')"
+//                         style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
+//                         title="Copy ID">📝</button>
+//                 </span>
+//             </div>
+//         </a>
+// HTML;
+//         });
 
-        // ✅ أعمدة الأرقام (باستخدام Loop)
-        foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
-            $grid->column($field, __(ucwords(str_replace('_', ' ', $field))))
-                ->display(fn($v) => number_format($v));
-        }
+//         // ✅ أعمدة الأرقام (باستخدام Loop)
+//         foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
+//             $grid->column($field, __(ucwords(str_replace('_', ' ', $field))))
+//                 ->display(fn($v) => number_format($v));
+//         }
 
-        // ✅ التفاصيل
-        $grid->column('details', __('Details'))->display(function () {
-            $filters = request()->only(['date', 'user_id', 'game_id']);
-            $queryString = http_build_query($filters);
+//         // ✅ التفاصيل
+//         $grid->column('details', __('Details'))->display(function () {
+//             $filters = request()->only(['date', 'user_id', 'game_id']);
+//             $queryString = http_build_query($filters);
 
-            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
-            return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                <i class='fa fa-eye'></i> " . __('round_details') . "
-            </a>";
-        });
+//             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
+//             return "<a href='{$url}' class='btn btn-sm btn-primary'>
+//                 <i class='fa fa-eye'></i> " . __('round_details') . "
+//             </a>";
+//         });
 
-        // ✅ تعطيل الأزرار الغير لازمة
-        $grid->disableCreateButton();
-        $grid->disableActions();
-        $grid->disableExport();
+//         // ✅ تعطيل الأزرار الغير لازمة
+//         $grid->disableCreateButton();
+//         $grid->disableActions();
+//         $grid->disableExport();
 
-        return $grid;
-    }
+//         return $grid;
+//     }
 
 
 
