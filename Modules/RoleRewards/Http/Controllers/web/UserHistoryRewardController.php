@@ -66,7 +66,9 @@ class UserHistoryRewardController extends AdminController
 
         $grid->column('receive_name', __('receive_type'));
 
-        $grid->column('reward_preview', __('Rewards'));
+       $grid->column('reward_preview', __('Rewards'))->display(function ($value) {
+        return $value; // عشان يطبع الـ HTML زي ما هو
+    });
 
         $grid->column('created_at', __('Created At'))
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
