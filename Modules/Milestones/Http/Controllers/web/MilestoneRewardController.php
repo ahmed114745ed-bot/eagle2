@@ -153,8 +153,8 @@ class MilestoneRewardController
         ->when("achievement", function (Form $form) {
 
             $form->image("reward1", __('Image'))
-                ->uniqueName() 
-                ->removable();
+            ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+            ->disk('gcs');
                 $form->number('expire', __('Expire'))->default(1);
 
         })
