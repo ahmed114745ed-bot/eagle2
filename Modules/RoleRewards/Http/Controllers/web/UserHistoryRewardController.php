@@ -58,8 +58,7 @@ class UserHistoryRewardController extends AdminController
         $grid->column('receive_name', __('Receive'));
     
         $grid->column('reward', __('Rewards'))->display(function () {
-            $reward = $this->rewardable; 
-            if (!$reward) return 'N/A';
+        
     
             if (in_array($this->rewardable_type, [\App\Models\User::class, \Modules\Achievement\Entities\Achievement::class])) {
                 $extra = $reward->extra ?? '';
@@ -78,6 +77,8 @@ class UserHistoryRewardController extends AdminController
                     json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
                     '</pre>';
             }
+            $reward = $this->rewardable; 
+            if (!$reward) return 'N/A';
     
             $name = $reward->name ?? 'Unnamed';
             $path = match ($this->rewardable_type) {
