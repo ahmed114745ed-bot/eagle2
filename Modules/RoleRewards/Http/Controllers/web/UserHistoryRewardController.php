@@ -43,15 +43,6 @@ class UserHistoryRewardController extends AdminController
                         'packs',
                     ]);
             },
-            'rewardable' => function ($morphTo) {
-                $morphTo->morphWith([
-                    \App\Models\Ware::class => fn($q) => $q->select(['id', 'img2', 'show_img', 'name']),
-                    \Modules\Vip\Entities\OVip::class => fn($q) => $q->select(['id', 'img', 'name']),
-                    \Modules\Badge\Entities\Badge::class => fn($q) => $q->select(['id', 'image', 'name']),
-                    \Modules\Achievement\Entities\Achievement::class => fn($q) => $q->select(['id', 'title']),
-                    \App\Models\User::class => fn($q) => $q->select(['id', 'name']),
-                ]);
-            },
         ])
         ->orderByDesc('id');            
 
