@@ -2,18 +2,19 @@
 
 namespace App\Services\Admin;
 
+use App\Models\User;
+use Encore\Admin\Grid;
+use App\Models\AllGame;
+use Encore\Admin\Layout\Row;
+use Illuminate\Support\Carbon;
+use App\Models\CoinGameUserAll;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Support\Facades\DB;
 use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAggregated;
-use App\Models\CoinGameUserAll;
-use App\Models\CoinGameUserDailyAggregated;
-use App\Models\User;
-use App\Models\AllGame;
-use Encore\Admin\Grid;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\InfoBox;
 use App\Admin\Services\UserGameService;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Support\Carbon;
+use App\Models\CoinGameUserDailyAggregated;
 
 
 class CoinGameUserService
@@ -105,124 +106,51 @@ class CoinGameUserService
     /**
      * Build main grid.
      */
-    // public function buildGrid(): Grid
-    // {
-    //     $grid = new Grid(new CoinGameUserDailyAggregated());
-    //     $grid->model()
-    //     ->selectRaw("
-    //         coin_game_users_daily_aggregated.*,
-    //         u.uuid as user_uuid,
-    //         u.name as user_name,
-    //         up.avatar as user_avatar,
-    //         g.name as game_name,
-    //         g.image as game_image
-    //     ")
-    //     ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
-    //     ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-    //     ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
-    //     ->orderByDesc('coin_game_users_daily_aggregated.total_played');
-
-
-    //     $grid->filter(function (Grid\Filter $filter) {
-    //         $filter->expand();
-    //         $filter->disableIdFilter();
-
-    //         $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
-    //         $filter->like('game_id', 'Game')->placeholder('ID');
-    //         $filter->between('date', __('Created At'))->datetime([
-    //             'format' => 'YYYY-MM-DD HH:mm:ss',
-    //             'locale' => 'en'
-    //         ]);
-
-    //     });
-
-    //     $userService = $this->userService;
-
-    //     // عرض المستخدم
-    //     $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
-    //         return $userService->adminUserAvatar((object)[
-    //             'id'     => $this->user_id,
-    //             'uuid'   => $this->user_uuid,
-    //             'name'   => $this->user_name,
-    //             'avatar' => $this->user_avatar,
-    //         ], withoutLevels: true);
-    //     });
-
-    //     // عرض اللعبة
-    //     $grid->column('game_id', __('Game'))->display(function () {
-    //         $defaultImage = asset('images/businessman-icon.jpg');
-    //         $url = getImagePath($this->game_image) ?? $defaultImage;
-    //         if (!isImageExists($url)) $url = $defaultImage;
-
-    //         $uniqueId = $this->game_id ?? 'game-unknown';
-    //         $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-
-    //         $gameIdHtml = "game-{$this->game_id}";
-    //         $urlLink = admin_url("all-games/{$this->game_id}");
-
-    //         return <<<HTML
-    //         <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
-    //             $imageTag
-    //             <div>
-    //                 <strong style="font-size:16px;">{$this->game_name}</strong><br>
-    //                 <span style="font-size:13px;">
-    //                     ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
-    //                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')" style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;" title="Copy ID">📝</button>
-    //                 </span>
-    //             </div>
-    //         </a>
-    //     HTML;
-    //     });
-
-    //     // أعمدة الأرقام
-    //     $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
-    //     $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
-    //     $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
-
-    //     $grid->column('details', __('Details'))->display(function () {
-
-    //         $filters = request()->only(['date', 'user_id', 'game_id']);
-    //         $queryString = http_build_query($filters);
-    //         $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
-    //         return "<a href='{$url}' class='btn btn-sm btn-primary'>
-    //                 <i class='fa fa-eye'></i> " . __('round_details') . "
-    //             </a>";
-    //     });
-
-
-    //     $grid->disableCreateButton();
-    //     $grid->disableActions();
-    //     $grid->disableExport();
-
-    //     return $grid;
-    // }
 
     public function buildGrid(): Grid
     {
         $grid = new Grid(new CoinGameUserDailyAggregated());
 
         // ✅ Query أخف - تحديد الأعمدة المطلوبة فقط
+        // $grid->model()
+        //     ->select([
+        //         'coin_game_users_daily_aggregated.id',
+        //         'coin_game_users_daily_aggregated.user_id',
+        //         'coin_game_users_daily_aggregated.game_id',
+        //         'coin_game_users_daily_aggregated.date',
+        //         'coin_game_users_daily_aggregated.total_played',
+        //         'coin_game_users_daily_aggregated.total_loss',
+        //         'coin_game_users_daily_aggregated.total_win',
+        //         'coin_game_users_daily_aggregated.app_profit',
+        //         'u.uuid as user_uuid',
+        //         'u.name as user_name',
+        //         'up.avatar as user_avatar',
+        //         'g.name as game_name',
+        //         'g.image as game_image',
+        //     ])
+        //     ->from('coin_game_users_daily_aggregated')
+        //     ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
+        //     ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
+        //     ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
+        //     ->orderByDesc('coin_game_users_daily_aggregated.total_played');
+
         $grid->model()
             ->select([
-                'coin_game_users_daily_aggregated.id',
                 'coin_game_users_daily_aggregated.user_id',
-                'coin_game_users_daily_aggregated.game_id',
-                'coin_game_users_daily_aggregated.date',
-                'coin_game_users_daily_aggregated.total_played',
-                'coin_game_users_daily_aggregated.total_loss',
-                'coin_game_users_daily_aggregated.total_win',
-                'coin_game_users_daily_aggregated.app_profit',
                 'u.uuid as user_uuid',
                 'u.name as user_name',
                 'up.avatar as user_avatar',
-                'g.name as game_name',
-                'g.image as game_image',
+                DB::raw('SUM(coin_game_users_daily_aggregated.total_played) as total_played'),
+                DB::raw('SUM(coin_game_users_daily_aggregated.total_loss) as total_loss'),
+                DB::raw('SUM(coin_game_users_daily_aggregated.total_win) as total_win'),
+                DB::raw('SUM(coin_game_users_daily_aggregated.app_profit) as app_profit'),
             ])
             ->from('coin_game_users_daily_aggregated')
             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
             ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-            ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_daily_aggregated.game_id')
-            ->orderByDesc('coin_game_users_daily_aggregated.total_played');
+            ->groupBy('coin_game_users_daily_aggregated.user_id', 'u.uuid', 'u.name', 'up.avatar')
+            ->orderByDesc(DB::raw('SUM(coin_game_users_daily_aggregated.total_played)'));
+
 
         // ✅ فلترة محسنة
         $grid->filter(function (Grid\Filter $filter) {
@@ -253,35 +181,6 @@ class CoinGameUserService
             ], withoutLevels: true);
         });
 
-        // ✅ عرض اللعبة
-        //         $grid->column('game_id', __('Game'))->display(function () {
-        //             $defaultImage = asset('images/businessman-icon.jpg');
-        //             $url = getImagePath($this->game_image) ?? $defaultImage;
-        //             if (!isImageExists($url)) {
-        //                 $url = $defaultImage;
-        //             }
-
-        //             $uniqueId = $this->game_id ?? 'game-unknown';
-        //             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-
-        //             $gameIdHtml = "game-{$this->game_id}";
-        //             $urlLink = admin_url("all-games/{$this->game_id}");
-
-        //             return <<<HTML
-        //         <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
-        //             $imageTag
-        //             <div>
-        //                 <strong style="font-size:16px;">{$this->game_name}</strong><br>
-        //                 <span style="font-size:13px;">
-        //                     ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
-        //                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')"
-        //                         style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
-        //                         title="Copy ID">📝</button>
-        //                 </span>
-        //             </div>
-        //         </a>
-        // HTML;
-        //         });
 
         // ✅ أعمدة الأرقام (باستخدام Loop)
         foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
