@@ -206,6 +206,8 @@ class CoinGameUserService
         $grid->model()
             ->selectRaw("
                 game_name,
+                game_image,
+                game_id,
                 round_id,
                 SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
                 SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
@@ -213,7 +215,7 @@ class CoinGameUserService
                 MAX(created_at) as last_played     -- أو آخر وقت للروند
             ")
             ->where('user_id', $userId)
-            ->groupBy('game_name', 'round_id')
+            ->groupBy('game_name', 'round_id' , 'game_image' ,'game_id')
             ->orderByDesc('round_id');
 
         $grid->filter(function ($filter) {
