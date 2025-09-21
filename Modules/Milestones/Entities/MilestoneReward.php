@@ -38,10 +38,10 @@ class MilestoneReward extends Model
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
             }
             elseif ($model->type === 'achievement') {
-                $model->rewardable_id = request('reward1', $model->reward);
+                $model->reward = request('reward1', $model->reward);
             }
             elseif ($model->type === 'coins') {
-                $model->rewardable_id = request('reward2', $model->reward);
+                $model->reward = request('reward2', $model->reward);
             }
             unset($model->rewardable_id2);
             unset($model->rewardable_id3);
@@ -59,10 +59,10 @@ class MilestoneReward extends Model
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
             } 
             elseif ($model->type === 'achievement') {
-                $model->rewardable_id = request('reward1', $model->reward);
+                $model->reward = request('reward1', $model->reward);
             } 
             elseif ($model->type === 'coins') {
-                $model->rewardable_id = request('reward2', $model->reward);
+                $model->reward = request('reward2', $model->reward);
             }
             unset($model->rewardable_id2);
             unset($model->rewardable_id3);
