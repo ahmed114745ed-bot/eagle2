@@ -55,7 +55,7 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new ShippingAgency());
         $grid->model()->with([
-            'owner',
+            'owner:id,name,uuid',
             'owner.profile:id,user_id,avatar',
             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ]);
@@ -97,16 +97,16 @@ class ChargeController extends MainController
                 $profileUrl = url("admin/shipping-agencies/profile/{$id}");
 
                 return "
-        <div style='display: flex; align-items: center; gap: 10px;'>
-            $image
-            <a href='{$profileUrl}' target='_blank' style='text-decoration: none; color: inherit;'>
-                <div>
-                    <div>$name</div>
-                    <small style='color: #888;'>ID: {$id}</small>
-                </div>
-            </a>
-        </div>
-    ";
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <a href='{$profileUrl}' target='_blank' style='text-decoration: none; color: inherit;'>
+                                <div>
+                                    <div>$name</div>
+                                    <small style='color: #888;'>ID: {$id}</small>
+                                </div>
+                            </a>
+                        </div>
+                    ";
             });
 
 
@@ -145,10 +145,7 @@ class ChargeController extends MainController
             ";
         });
         $grid->column('usd', __('usd'))->display(function ($coin) {
-            $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-                $setting =   Setting::where('key', 'shipping_coins')->first();
-                return $setting?->value;
-            });
+            $shippingCoins = getSettingCash('shipping_coins');
 
             if ($shippingCoins) {
                 $dollars = $this->coins / $shippingCoins;
