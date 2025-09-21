@@ -291,10 +291,7 @@ class VipCommon
          
         
             $vipReceiveType = $receive_type . '-' . $vip->level;
-            \Log::info("Deleted Packs", [
-                'vip_user_id' => $vip->id,
-                'count_deleted' => $vipReceiveType,
-            ]);
+         
             Pack::where('vip_user_id',  $vip->id)
                 ->where('receive_type', $vipReceiveType)
                 ->where('user_id', $user->id)
