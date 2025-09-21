@@ -119,7 +119,6 @@ class CoinGameUserService
         $grid->model()
             ->select([
                 'coin_game_users_daily_aggregated.user_id',
-                'coin_game_users_daily_aggregated.game_id',
                 'u.uuid as user_uuid',
                 'u.name as user_name',
                 'up.avatar as user_avatar',
@@ -130,10 +129,17 @@ class CoinGameUserService
             ])
             ->from('coin_game_users_daily_aggregated')
             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
-            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-            ->groupBy('coin_game_users_daily_aggregated.user_id','coin_game_users_daily_aggregated.game_id' , 'u.uuid', 'u.name', 'up.avatar')
-            ->orderByDesc(DB::raw('SUM(coin_game_users_daily_aggregated.total_played)'));
-
+            ->leftJoin('profiles as up', function ($join) {
+                $join->on('up.user_id', '=', 'u.id')
+                    ->where('up.is_primary', '=', 1); // افتراض وجود عمود يحدد الملف الأساسي
+            })
+            ->groupBy(
+                'coin_game_users_daily_aggregated.user_id', 
+                'u.uuid', 
+                'u.name', 
+                'up.avatar'
+            )
+            ->orderByDesc('total_played');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -162,16 +168,15 @@ class CoinGameUserService
             ], withoutLevels: true);
         });
 
-
         // ✅ أعمدة الأرقام (باستخدام Loop)
-        foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
+        foreach (['total_played', 'total_loss', 'total_win', 'app_profit'] as $field) {
             $grid->column($field, __(ucwords(str_replace('_', ' ', $field))))
                 ->display(fn($v) => number_format($v));
         }
 
         // ✅ التفاصيل
         $grid->column('details', __('Details'))->display(function () {
-            $filters = request()->only(['date', 'user_id', 'game_id']);
+            $filters = request()->only(['date', 'user_id']);
             $queryString = http_build_query($filters);
 
             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&{$queryString}");
@@ -187,7 +192,6 @@ class CoinGameUserService
 
         return $grid;
     }
-
 
 
  
