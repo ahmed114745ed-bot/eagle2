@@ -229,10 +229,12 @@ class CoinGameUserService
             $filter->expand();
             $filter->disableIdFilter();
 
-            $filter->equal('u.uuid', 'User UUID')->placeholder('UUID');
-            $filter->equal('coin_game_users_daily_aggregated.game_id', 'Game ID')->placeholder('ID');
+            $filter->equal('user.uuid', 'User UUID')->placeholder('UUID');
+            $filter->where(function ($query) {
+                $query->where('coin_game_users_daily_aggregated.game_id', $this->input);
+            }, 'Game ID')->placeholder('ID');
 
-            $filter->between('coin_game_users_daily_aggregated.date', __('Created At'))
+            $filter->between('date', __('Created At'))
                 ->datetime([
                     'format' => 'YYYY-MM-DD HH:mm:ss',
                     'locale' => 'en',

@@ -16,6 +16,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\DB;
 use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
 
 use App\Services\Admin\CoinGameUserService;
 
@@ -32,19 +33,35 @@ class CoinGameUserAllController extends AdminController
     /**
      * Main index page with totals and grid.
      */
+    // public function index(Content $content)
+    // {
+
+    //     $filters = request()->all();
+    //     $query = CoinGameUserDailyAggregated::query();
+    //     $query = $this->service->applyFilters($query, $filters);
+    //     $totals = $this->service->calculateTotals($query, $filters);
+    //     return $content
+    //         ->title(__('coin_game_users'))
+    //         ->description(__('coin_game_users_description'))
+    //         ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
+    //         ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
+    // }
+
+
+
     public function index(Content $content)
     {
-    
-        $filters = request()->all();
-        $query = CoinGameUserDailyAggregated::query();
-        $query = $this->service->applyFilters($query, $filters);
-        $totals = $this->service->calculateTotals($query ,$filters);
+
+        // Inject your custom JS for AJAX
+        Admin::script($this->ajaxScript());
+
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
-            ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
+            ->row(fn($row) => $row->column(12, '<div id="info-boxes"></div>')) // container
             ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
     }
+
 
     /**
      * Show all rounds for a specific user and game.
@@ -60,5 +77,43 @@ class CoinGameUserAllController extends AdminController
             ->title(__('round_details'))
             ->description(__('round_details') . " | User: {$userId} | Game: {$gameId}")
             ->body($grid);
+    }
+
+
+    public function ajaxTotals(Request $request)
+    {
+        $filters = $request->all();
+        $query = CoinGameUserDailyAggregated::query();
+        $query = $this->service->applyFilters($query, $filters);
+        $totals = $this->service->calculateTotals($query, $filters);
+
+        $html = view('admin.info_boxes', compact('totals'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function ajaxScript()
+    {
+        $url = admin_url('coin-game-users/ajax'); // your AJAX route
+
+        return <<<JS
+    function loadInfoBoxes(filters = {}) {
+        $.ajax({
+            url: "$url",
+            data: filters,
+            success: function(res) {
+                $("#info-boxes").html(res.html);
+            },
+            error: function() {
+                alert("Failed to load totals");
+            }
+        });
+    }
+
+    // auto-load on page load
+    $(function() {
+        loadInfoBoxes();
+    });
+    JS;
     }
 }
