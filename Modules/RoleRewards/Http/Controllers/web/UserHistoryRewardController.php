@@ -67,11 +67,11 @@ class UserHistoryRewardController extends AdminController
                 if (!$data) return $extra ?: 'N/A';
     
                 if ($this->rewardable_type === \App\Models\User::class) {
-                    $data = $data['coins'] ?? $data;
+                    $data = $data['reward'] ?? $data;
                 }
     
                 if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-                    $data = $data['reward_achievement'] ?? $data;
+                    $data = $data['reward'] ?? $data;
                 }
     
                 return '<pre style="white-space: pre-wrap;">' .
