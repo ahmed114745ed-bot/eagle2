@@ -128,7 +128,8 @@ class CoinGameUserService
         $grid = new Grid(new CoinGameUserAggregated());
     
         $grid->model()->orderByDesc('total_played');
-    
+        $grid->model()->limit(10);
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
