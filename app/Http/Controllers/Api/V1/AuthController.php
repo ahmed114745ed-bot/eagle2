@@ -71,15 +71,15 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
-                $fields = ['name' => $request->name, 'apple_id' => $request->apple_id, 'device_token' => @$request['device_token'], 'email' => @$request->email, 'user_id', @$request['user_id']];
+                $fields = ['name' => $request->name, 'apple_id' => $request->apple_id, 'device_token' => @$request['device_token'], 'email' => @$request->email, 'user_id', @$request['user_id'], 'lat' => $request['lat'], 'long' => $request['long']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithApple($fields);
             case 'huawei':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithHuawei($fields);
 

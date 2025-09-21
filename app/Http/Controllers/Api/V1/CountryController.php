@@ -48,11 +48,11 @@ class CountryController extends Controller
         )
         ->groupBy('countries.id', 'countries.name', 'countries.flag')
         ->get();
-        
+
         // تقسيم النتائج إلى المصفوفتين
         $allCountriesSortedByName = $allTypesWithCountries->sortBy('country_name')->values();
         $hotCountries = $allTypesWithCountries->sortByDesc('user_count')->take(20)->values();
-        
+
         $data = [
             'all' => $allCountriesSortedByName,
             'hot' => $hotCountries,

@@ -296,11 +296,43 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+
     public function user_bd2(Request $request)
     {
         $key = $request->q;
         $page = $request->get('page', 1);
         $users = $this->userService->user_bd2($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function superAdminUsers(Request $request)
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->superAdminUsers($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function superAdminUsers2(Request $request): JsonResponse
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->superAdminUsers2($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersByCountry(Request $request): JsonResponse
+    {
+        $superAdminId = $request->get('super_admin_id');
+        $key = $request->get('q'); // search keyword
+        $page = $request->get('page', 1);
+
+        $users = $this->userService->usersByCountry($superAdminId, $key, $page);
 
         return response()->json($users);
     }
