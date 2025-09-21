@@ -58,40 +58,28 @@ class UserHistoryRewardController extends AdminController
         $grid->column('receive_name', __('receive_type'));
     
         $grid->column('reward', __('Rewards'))->display(function () {
-            $reward = $this->rewardable;
+            if ($this->reward_value) {
 
-            if ($this->rewardable_type === \App\Models\User::class) {
-            
-                return $this?->reward ?? 0 ;
+                if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+                    $path = $this->reward_img ?? 'achievement.png';
+                    $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
+                    return $imgTag ;
+                }
+                
+                return $this->reward_value;
+              
             }
         
-            // Achievement
-            if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-        
-        
-                $path =  $this?->reward ?? 'achievement.png';
-      
-                $url = getImagePath($path);
-                $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
-        
-                return $imgTag ;
+            if ($this->reward_name) {
+                $path = $this->reward_value ?? 'coin.png';
+                $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
+             
+                return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
             }
         
-         
-            if (!$reward) return 'N/A';
-    
-            $name = $reward->name ?? 'Unnamed';
-            $path = match ($this->rewardable_type) {
-                \App\Models\Ware::class => $reward->img2 ?? $reward->show_img ?? '',
-                \Modules\Vip\Entities\OVip::class => $reward->img ?? '',
-                \Modules\Badge\Entities\Badge::class => $reward?->image ?? '',
-                default => 'coin.png',
-            };
-    
-            $url = getImagePath($path);
-            $imgTag = handleShowImageWithTypes($this->id, $url, 50, 50);
-            return $imgTag . $name;
+            return 'N/A';
         });
+        
     
         $grid->column('created_at', __('Created At'))
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
