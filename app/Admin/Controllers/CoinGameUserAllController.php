@@ -39,8 +39,6 @@ class CoinGameUserAllController extends AdminController
         $query = CoinGameUserDailyAggregated::query();
         $query = $this->service->applyFilters($query, $filters);
         $totals = $this->service->calculateTotals($query ,$filters);
-
-    //   dd( $totals );
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
