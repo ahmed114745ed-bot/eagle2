@@ -174,7 +174,7 @@ class CoinGameUserService
             $filters = request()->only(['date', 'user_id', 'game_id']);
             $queryString = http_build_query($filters);
 
-            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
+            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&{$queryString}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
                 <i class='fa fa-eye'></i> " . __('round_details') . "
             </a>";
