@@ -141,10 +141,13 @@ class MilestoneRewardController
         ])
         ->when("ware", function (Form $form) {
             $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
+            $form->number('expire', __('Expire'))->default(1);
+
         })
         ->when("vip", function (Form $form) {
                 $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
-        
+                $form->number('expire', __('Expire'))->default(1);
+
             
         })
         ->when("achievement", function (Form $form) {
@@ -152,15 +155,18 @@ class MilestoneRewardController
             $form->image("reward1", __('Image'))
                 ->uniqueName() 
                 ->removable();
+                $form->number('expire', __('Expire'))->default(1);
+
         })
         ->when("badge", function () use ($form) {
             $this->addBadgeField($form);
+            $form->number('expire', __('Expire'))->default(1);
+
         })
         ->when("coins", function (Form $form) {
             $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
         });
     
-        $form->number('expire', __('Expire'))->default(1);
     
         $form->saving(function (Form $form) {
             switch ($form->type) {
