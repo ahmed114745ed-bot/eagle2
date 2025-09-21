@@ -55,7 +55,9 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new ShippingAgency());
         $grid->model()->with([
-            'owner',
+            'owner' => fn($q) => $q
+                ->withSum('userSalaries as total_user_salary', \DB::raw('sallary - cut_amount'))
+                ->withSum('roomSalaries as total_room_salary', \DB::raw('salary - cut_amount')),
             'owner.profile:id,user_id,avatar',
             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ]);
@@ -145,10 +147,7 @@ class ChargeController extends MainController
             ";
         });
         $grid->column('usd', __('usd'))->display(function ($coin) {
-            $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-                $setting =   Setting::where('key', 'shipping_coins')->first();
-                return $setting?->value;
-            });
+            $shippingCoins = getSettingCash('shipping_coins');
 
             if ($shippingCoins) {
                 $dollars = $this->coins / $shippingCoins;
