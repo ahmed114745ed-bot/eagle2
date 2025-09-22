@@ -124,7 +124,8 @@ class FamilyLevelController extends MainController
 
 
         $form->display(__('ID'));
-        $form->text('name', __('name'));
+        $form->text('name', __('Name ar'));
+        $form->text('name_en', __('name_en'));
         $form->image('img', __('img'));
         $form->number('exp', __('exp'));
         $form->number('members', __('members'));
