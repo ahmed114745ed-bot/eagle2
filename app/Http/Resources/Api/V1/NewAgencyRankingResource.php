@@ -20,7 +20,7 @@ class NewAgencyRankingResource extends JsonResource
 
     public function toArray($request)
     {
-        $target = UserSallary::where('user_agency_id', $this->ranker->agency_id)->sum('agency_sallary');
+        $target = UserSallary::where('user_agency_id', $this->ranker?->agency_id)->sum('agency_sallary');
 
         // Calculate the agency share threshold based on the target
 
