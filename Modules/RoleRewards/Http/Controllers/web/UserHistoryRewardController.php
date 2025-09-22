@@ -81,7 +81,7 @@ class UserHistoryRewardController extends AdminController
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
     
         $grid->filter(function ($filter) {
-            $filter->equal('receive_category', __('Receive Type'))->select([
+            $filter->equal('receive_category', __('receive_type'))->select([
                 'Role' => __('Role'),
                 'Milestone' => __('Milestone'),
             ]);

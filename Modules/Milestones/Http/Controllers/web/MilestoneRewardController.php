@@ -107,7 +107,7 @@ class MilestoneRewardController
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/milestones');
-            $back = __('Back');
+            $back = __('back');
             $customButtonHTML = <<<HTML
                 <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                     <i class="fa fa-arrow-left"></i> {$back}
