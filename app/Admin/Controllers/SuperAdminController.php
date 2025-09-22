@@ -1,0 +1,448 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Admin\Actions\DeleteSuperAdminAction;
+use App\Models\Country;
+use App\Models\SuperAdmin;
+use App\Models\User;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use Illuminate\Support\Carbon;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+
+class SuperAdminController extends MainController
+{
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'Super Admin';
+    public $permission_name = 'superadmin';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__($this->title))
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            }));
+    }
+
+    protected function grid2()
+    {
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.superadmin.description'),
+        ));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Super Admin'))
+            ->body($this->profile($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('Super Admin'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Super Admin'))
+            ->body($this->form()));
+    }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new SuperAdmin());
+        $grid->model()->with(['appUser.packs'])->orderByDesc('id');
+
+        $grid->filter(function ($filter) {
+            $filter->like('appUser.uuid', __('App User UUID'));
+            $filter->like('appUser.name', __('User Name'));
+        });
+        $grid->column('id', __('Id'));
+        $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+
+            $id = $this->id ?? '-';
+            $name = $this->username ?? 'غير معروف';
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/superadmin-users/{$this->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+        $grid->column('default', __('default_superadmin_status'))->display(function () {
+            if (request()->filled('_export_')) {
+                return $this->default;
+            }
+
+            if ($this->default == 1) {
+                return <<<HTML
+                    <span style="display: flex; align-items: center;">
+                        <span style="
+                            font-size: smaller;
+                            background: red;
+                            display: inline-block;
+                            border-radius: 50%;
+                            width: 10px;
+                            height: 10px;
+                            margin-left: 5px;
+                        " title=""></span>
+                    </span>
+                HTML;
+            } else {
+                return '<span style="color: #999;"></span>';
+            }
+        });
+
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
+            $user = $this->appUser;
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $uid = $user->uuid ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
+        $grid->column('country.name', __('country'));
+
+//        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
+//            return $this->agencies_count;
+//        });
+//
+//
+//        $grid->column('total_salary', __('total proft'))->display(function () {
+//            return truncateAndTrim($this->total_salary, 2);
+//        });
+//
+//        $grid->column('current_balance', __('current_balance'))->display(function () {
+//            $total = floatval($this->total_salary);
+//            $cut   = floatval($this->total_cut);
+//            return truncateAndTrim($total - $cut, 2);
+//        });
+//
+//        $grid->column('total_cut', __('Cut amount'))->display(function () {
+//            return truncateAndTrim($this->total_cut, 2);
+//        });
+
+//        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+//            $col = $grid->column('transfer_salary', __("transfer_salary"))
+//                ->display(function () {
+//                    return $this->transfer_salary ? 1 : 0;
+//                });
+//
+//            if (! request()->filled('_export_')) {
+//                $col->switch(Common::getSwitchStates());
+//            }
+//        }
+
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            $carbonDate = Carbon::parse($date);
+            $locale = App::getLocale();
+            $carbonDate->locale($locale);
+            return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
+        });
+
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteSuperAdminAction());
+            }
+        });
+
+        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+            });
+        }
+
+        $grid->disableRowSelector();
+
+        $this->extendGrid($grid);
+        return $grid;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new SuperAdmin());
+        $this->disableFormTools($form);
+
+
+        $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
+        $form->password('password', __('Password'))->rules('required');
+        $form->image('avatar', __('img'));
+
+//        $form->hidden('transfer_salary', __('transfer_salary'));
+
+        if ($form->isEditing()) {
+            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+                $ops2 = [];
+                foreach (User::Where('id', $value)->get() as $user) {
+                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                }
+                return $ops2;
+            })->ajax('/api/search/users-superadmin', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')->rules('required');
+        } else {
+            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+                $ops2 = [];
+                foreach (User::Where('id', $value)->get() as $user) {
+                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                }
+                return $ops2;
+            })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
+
+            $form->switch('default', __('set_superadmin_as_default'))
+                ->help(__('make_super_admin_default'));
+        }
+
+        $form->select('country_id', trans('country'))->options(function () {
+            $ops       = [null => __('no country')];
+            $countries = Country::all();
+            foreach ($countries as $country) {
+                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            }
+            return $ops;
+        })->required();
+
+        $form->hidden('type', __('Type'))->value('superadmin');
+//        $form->hidden('transfer_salary', __('transfer_salary'));
+
+        $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId) {
+                    $OldUserAppId = User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_super_admin = 0;
+                        $OldUserAppId->save();
+                    }
+
+                    $newUserAppId = User::find($newAppId);
+                    $newUserAppId->is_super_admin = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
+                }
+            }
+
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password   = Hash::make($form->password);
+            }
+        });
+
+        $form->saved(function (Form $form) {
+            $userId = $form->model()->id;
+            $userAppId = $form->model()->app_id;
+
+            $userApp = User::find($userAppId);
+            if (isset($userApp)) {
+                $userApp->is_super_admin = 1;
+                $userApp->save();
+            }
+
+            $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
+
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        });
+
+        return $form;
+    }
+
+    public function profile($id)
+    {
+        $tab = request()->query('tab', 'agencies');
+
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default'])->findOrFail($id);
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+
+//            case 'transactions':
+//                $transactions = $superAdmin->transactions()
+//                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+//                    ->with('receiveragency')
+//                    ->latest()
+//                    ->paginate(10, ['*'], 'transactions_page');
+//                break;
+//
+//            case 'target_history':
+//                $target_history = BdAgencyHostSallary::select(
+//                    'id',
+//                    'bd_id',
+//                    'agency_id',
+//                    // 'salary',
+//                    'amount',
+//                    'month',
+//                    'year',
+//                    'bd_user_id',
+//                    'created_at'
+//                )
+//                    ->where('bd_id', $superAdmin->id)
+//                    ->where('bd_id', $superAdmin->id)
+//                    ->where('amount', '!=', 0)
+//                    ->where('year', $year)
+//                    ->latest()
+//                    ->paginate(10, ['*'], 'target_history_page');
+//                break;
+        }
+
+        return view('admin.superAdmin.super_admin_profile', compact('superAdmin', 'agencies'));
+    }
+
+
+    protected function detail($id)
+    {
+        $show = new Show(SuperAdmin::findOrFail($id));
+
+        $show->field('id', __('Id'));
+        $show->field('username', __('Username'));
+        $show->field('avatar', __('Avatar'));
+        $show->field('created_at', __('Created at'));
+        $show->field('updated_at', __('Updated at'));
+        $show->field('app_id', __('App id'));
+
+        $this->extendShow($show);
+
+        return $show;
+    }
+
+//    public function sync($days = 0)
+//    {
+//        $days = request()->query('days', 0);
+//        $bds = DB::table('admin_users')
+//            ->where('type', 'bd')
+//            ->where('app_id', '!=', 0)
+//            ->get();
+//
+//        $updated = 0;
+//
+//        foreach ($bds as $bd) {
+//            $query = DB::table('agencies')
+//                ->where('bd_id', $bd->app_id);
+//
+//            if ($days > 0) {
+//                $query->where('created_at', '<=', now()->subDays($days));
+//            }
+//
+//            $affected = $query->update(['bd_id' => $bd->id]);
+//            $updated += $affected;
+//        }
+//
+//        return response()->json([
+//            'status' => 'success',
+//            'message' => $updated
+//        ]);
+//    }
+
+}

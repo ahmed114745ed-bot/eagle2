@@ -17,5 +17,6 @@ interface SearchRepositoryInterface
     public function getSearchList(int $userId): array;
     public function clearUserSearchHistory(int $userId): bool;
     public function getOfficialMessages(int $userId, int $page = 1): array;
+    public function getNotifications(int $userId, int $type);
 
 }

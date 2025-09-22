@@ -42,7 +42,7 @@ class UserResource extends JsonResource
              'is_followed'          => $this->is_followed,
              'is_follow'            => $this->is_follow,
              'is_friend'            => $this->isFriends(),
-             'room'                 => ! (bool) $packsByType->get(16)?->firstWhere('is_used', 1) ? new UserDataRoomResource($this->room) : (object)[],
+             'room'                 => ($this->room && ! ((bool) $packsByType->get(16)?->firstWhere('is_used', 1)) ) ? new UserDataRoomResource($this->room) : (object)[],
              'now_room'             => $this->formatNowRoom(),
              'agency'               => $this->formatAgency(),
              'family_id'            => $this->family_id,

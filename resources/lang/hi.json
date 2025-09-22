@@ -9,6 +9,7 @@
     "Admin": "प्रशासक",
     "Users": "उपयोगकर्ताओं",
     "URI": "यूआरआई",
+    "Select Super Admin": "सुपर एडमिन चुनें",
     "Roles": "भूमिकाएँ",
     "User Info": "उपयोगकर्ता जानकारी",
     "Charge reports": "चार्ज रिपोर्ट",
@@ -462,6 +463,7 @@
     "User_Report": "उपयोगकर्ता रिपोर्ट",
     "Shipping agency": "शिपिंग एजेंसी",
     "Host agency": "मेजबान एजेंसी",
+    "Professional Host Agencies": "पेशेवर होस्ट एजेंसियाँ",
     "Family": "परिवार",
     "pending": "बकाया",
     "accepted": "स्वीकृत",
@@ -2124,11 +2126,16 @@
 "total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!",
 "browse room vip": "कमरों के वीआईपी स्तर देखें",
 "default_current": "वर्तमान डिफ़ॉल्ट BD",
+    "default_current_superadmin": "वर्तमान सुपर एडमिन",
 "no_default_set": "अभी तक कोई डिफ़ॉल्ट BD सेट नहीं किया गया है",
 "select_default_bd": "डिफ़ॉल्ट BD चुनें",
+    "select_default_superadmin": "डिफ़ॉल्ट सुपर एडमिन चुनें",
 "set_as_default": "डिफ़ॉल्ट BD के रूप में सेट करें",
-"back": "वापस",
-"edit updates_family config": "अपडेट्स_परिवार कॉन्फ़िगरेशन संपादित करें",
+    "set_superadmin_as_default": "सुपर एडमिन के रूप में डिफ़ॉल्ट सेट करें",
+    "back": "वापस",
+    "Updated": "अद्यतन किया गया",
+    "Default Super Admin has been set successfully": "डिफ़ॉल्ट सुपर एडमिन सफलतापूर्वक सेट किया गया है",
+    "edit updates_family config": "अपडेट्स_परिवार कॉन्फ़िगरेशन संपादित करें",
 "Charge Switch": "चार्ज स्विच",
   "browse charge switch": "चार्ज स्विच देखें",
   "Invite Switch": "आमंत्रण स्विच",
@@ -2150,10 +2157,11 @@
   "browse delete shipping agency Switch": "शिपिंग एजेंसी हटाने का स्विच ब्राउज़ करें",
     "Hi": "Merhaba",
     "browse chang agency Switch": "एजेंसी बदलने का स्विच ब्राउज़ करें",
-
-
-
-
+    "You cannot delete the default super admin.": "आप डिफ़ॉल्ट सुपर एडमिन को नहीं हटा सकते।",
+    "You cannot delete a super admin created by the owner.": "आप उस सुपर एडमिन को नहीं हटा सकते जिसे मालिक ने बनाया है।",
+    "No default super admin found to transfer agencies to.": "एजेंसियों को स्थानांतरित करने के लिए कोई डिफ़ॉल्ट सुपर एडमिन नहीं मिला।",
+    "super admin deleted successfully.": "सुपर एडमिन सफलतापूर्वक हटाया गया।",
+    "dashboard.chickDelete": "क्या आप वाकई हटाना चाहते हैं?",
     "All permission": "सभी अनुमतियाँ",
   "Create games": "खेल बनाएँ",
   "Delete games": "खेल हटाएँ",
@@ -2921,7 +2929,8 @@
   "invitation.invitee_reward_help": "कॉइन की संख्या जो आमंत्रित व्यक्ति कोड का उपयोग करने पर प्राप्त करता है।",
     "Show Image": "छवि दिखाएँ",
     "Alternative Image": "वैकल्पिक छवि",
-  "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
+    "Live System Setting:": "लाइव सिस्टम सेटिंग",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
 
 
 

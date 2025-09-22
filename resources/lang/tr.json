@@ -12,6 +12,7 @@
   "Users": "Kullanıcılar",
   "URI": "URI",
     "User Info": "Kullanıcı Bilgisi",
+    "Select Super Admin": "Süper Yönetici Seç",
     "Charge reports": "Şarj raporları",
     "Charge Reports": "Şarj Raporları",
     "Top Gift": "En Çok Gönderilen Hediye",
@@ -451,6 +452,7 @@
     "User_Report": "Kullanıcı Raporları",
     "Shipping agency": "Kargo Ajansı",
     "Host agency": "Ev Sahibi Ajansı",
+    "Professional Host Agencies": "Profesyonel Ev Sahibi Ajansları",
     "Family": "Aile",
     "pending": "Beklemede",
     "accepted": "Kabul edildi",
@@ -2545,10 +2547,15 @@
   "frame": "çerçeve",
     "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
     "default_current": "Geçerli Varsayılan BD",
+    "default_current_superadmin": "Geçerli Varsayılan Süper Yönetici",
     "no_default_set": "Henüz varsayılan BD ayarlanmadı",
     "select_default_bd": "Varsayılan olacak BD'yi seçin",
+    "select_default_superadmin": "Varsayılan olacak Süper Yöneticiyi seçin",
     "set_as_default": "Varsayılan BD olarak ayarla",
+    "set_superadmin_as_default": "Varsayılan Süper Yönetici olarak ayarla",
     "back": "Geri",
+    "Updated": "Güncellendi",
+    "Default Super Admin has been set successfully": "Varsayılan Süper Yönetici başarıyla ayarlandı",
     "edit updates_family config": "updates_family yapılandırmasını düzenle",
    "Charge Switch": "Şarj Düğmesi",
   "browse charge switch": "Şarj Düğmesini Görüntüle",
@@ -2571,11 +2578,12 @@
   "browse delete shipping agency Switch": "Kargo Ajansını Silme Düğmesini Görüntüle",
     "Select All": "Tümünü Seç",
     "browse chang agency Switch": "Ajans Değiştirme Düğmesini Görüntüle",
-
-
-
-
-  "All permission": "Tüm izinler",
+    "You cannot delete the default super admin.": "Varsayılan süper yönetici silinemez.",
+    "You cannot delete a super admin created by the owner.": "Sahip tarafından oluşturulan süper yönetici silinemez.",
+    "No default super admin found to transfer agencies to.": "Ajansların aktarılacağı varsayılan süper yönetici bulunamadı.",
+    "super admin deleted successfully.": "Süper yönetici başarıyla silindi.",
+    "dashboard.chickDelete": "Silmek istediğinizden emin misiniz?",
+    "All permission": "Tüm izinler",
   "Create games": "Oyun oluştur",
   "Delete games": "Oyunu sil",
   "Edit games": "Oyunu düzenle",
@@ -3340,7 +3348,8 @@
   "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi",
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
-  "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "Live System Setting:": "Canlı Sistem Ayarı",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
 
 
 

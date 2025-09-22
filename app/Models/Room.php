@@ -289,13 +289,13 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-    
+
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
             ?? request()->default_background;
     }
-    
+
     public function defaultBackground()
     {
         return $this->hasOne(Background::class, 'id')->where('enable', 1)->orderBy('id');
@@ -353,5 +353,10 @@ class Room extends Model
         }
 
         return collect(self::$microphoneCache)->only($ids);
+    }
+
+    public function scopeAudio(Builder $query)
+    {
+        return $query->where('type', 'audio');
     }
 }

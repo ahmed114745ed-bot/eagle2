@@ -6,7 +6,7 @@
 <body>
 <h2>Test: User Data Processing</h2>
 
-<form method="POST" action="{{ url('admin/user-data-test') }}">
+<form method="POST" action="{{ url('admin/notifications-test') }}">
     @csrf
 
 {{--    <label>Device Token:</label>--}}

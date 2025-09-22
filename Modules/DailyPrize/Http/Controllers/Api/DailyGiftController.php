@@ -45,6 +45,7 @@ class DailyGiftController extends Controller
 
         $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
         $data = [
+            'total_days'    => $currentDay,
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
             'gift'          => $this->getWeekGifts($currentDay),
             'is_received'   => $check_received != null ? true : false,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
@@ -817,5 +818,77 @@ if (!function_exists('bd_url')) {
         }
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}
+
+if (!function_exists('superadmin_url')) {
+    function superadmin_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
+        }
+
+        $base = trim(config('superadmin.route.prefix', 'superadmin'), '/');
+
+        $secure = $secure ?? (config('superadmin.https') || config('superadmin.secure'));
+
+        if (app()->environment(['production', 'Production'])) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        }
+
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}
+
+if (!function_exists('getCountryIdFromLatLong')) {
+    function getCountryIdFromLatLong($lat, $lon)
+    {
+        $responseEn = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'en',
+        ]);
+
+        if (!$responseEn->ok()) {
+            return null;
+        }
+
+        $dataEn = $responseEn->json();
+        $countryCode = $dataEn['address']['country_code'] ?? null;
+        $countryNameEn = $dataEn['address']['country'] ?? null;
+
+        $country = Country::where('iso', $countryCode)->first();
+        if ($country) {
+            return $country->id;
+        }
+
+        $responseAr = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'ar',
+        ]);
+
+        $countryNameAr = null;
+        if ($responseAr->ok()) {
+            $dataAr = $responseAr->json();
+            $countryNameAr = $dataAr['address']['country'] ?? null;
+        }
+
+        $country = Country::create([
+            'iso' => $countryCode,
+            'e_name' => $countryNameEn,
+            'name' => $countryNameAr,
+            'status' => 1,
+        ]);
+
+        return $country->id;
     }
 }

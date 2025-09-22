@@ -9,6 +9,7 @@ use App\Models\Bd;
 use App\Models\Follow;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
+use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
@@ -119,12 +120,64 @@ class UserRepository extends Repository
                    ->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function superAdminUsers($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+            ->where('is_super_admin', 0)
+            ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            ->whereDoesntHave('shippingAgency')
+            ->where(function ($query) use ($key) {
+                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function superAdminUsers2($key, $page, $perPage)
+    {
+        return SuperAdmin::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('username', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
 
     public function searchInAgency($key, $page, $perPage)
     {
         return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function usersByCountry($superAdminId, $key, $page, $perPage)
+    {
+        $superAdmin = SuperAdmin::find($superAdminId);
+        if (!$superAdmin) return collect();
+
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+            ->where('is_super_admin', 0)
+            ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            ->whereDoesntHave('shippingAgency')
+            ->where('country_id', $superAdmin->country_id)
+            ->where(function ($query) use ($key) {
+                $query->fitterByUuid($key)
+                    ->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
@@ -139,8 +192,6 @@ class UserRepository extends Repository
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
-
-
 
     public function searchUserAgencyShipping($key, $page, $perPage)
     {
@@ -487,7 +538,7 @@ class UserRepository extends Repository
             ])
             ->withCount(['profileVisits as profile_visitors'])
             ->findOrFail($id);
-        
+
 
             return $user;
     }

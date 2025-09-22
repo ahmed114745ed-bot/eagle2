@@ -139,7 +139,7 @@ class UserRepository extends AbstractRepository
 //        ]);
 
         $admins = $this->model->select([
-            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id'
+            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id', 'sender_level', 'received_level'
         ])->with([
 //            'agency.owner',
 //            'agency.mempers',
@@ -548,5 +548,15 @@ class UserRepository extends AbstractRepository
         return $this->model->where('agency_id', $agencyId)->with(['targets' => function ($query) use ($agencyId, $month, $year) {
             $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
         }])->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+    public function exists(int $id): bool
+    {
+        return \Cache::remember(
+            "user_exists_{$id}",
+            now()->addMinutes(10),
+            fn() => $this->model->where('id', $id)->exists()
+        );
     }
 }

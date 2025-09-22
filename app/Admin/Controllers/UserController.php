@@ -1007,10 +1007,11 @@ class UserController extends MainController
             return [
                 'name' => $nameColumn,
                 'phone' => $user->phone,
+                'createdAt' => $user->created_at,
             ];
         });
 
-        $table = new Table([__('Name'), __('phone')], $rows->toArray());
+        $table = new Table([__('Name'), __('phone'), __('created_at')], $rows->toArray());
         // Return just table's HTML (your AJAX will inject this)
         return $table->render();
     }

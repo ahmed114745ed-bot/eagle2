@@ -244,19 +244,44 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function visitProfile(User $user, User $visitor)
+    public function visitProfile(User $user, User $visitor): void
     {
-        $tokens_notification = $user?->notification_id;
-        $body_ar = __('api.visited_profile', ['name' => $visitor->name], 'ar');
-        $body_en = __('api.visited_profile', ['name' => $visitor->name], 'en');
-        $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
-        $data['image'] = getDriverUrl() . '/' . $visitor->profile->avatar;
-        $data['user_id'] = $user?->id;
-        $icon = $data['image'];
-        if (!$user->is_logout)  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'visit-profile');
+        if (! $user) {
+            return;
+        }
 
-        Common::sendOfficialMessage($user->id, image: $visitor->profile->avatar, title: $body_en, content: $visitor->name, titleAr: $body_ar, fromUserId: $visitor->id);
-        (new UserCounterServices)->eventUser($user, 'official-messages');
+        $tokensNotification = $user->notification_id;
+        $bodyAr = __('api.visited_profile', ['name' => $visitor->name], 'ar');
+        $bodyEn = __('api.visited_profile', ['name' => $visitor->name], 'en');
+        $firebaseBody = $user->lan === 'ar' ? $bodyAr : $bodyEn;
+
+        $avatarPath = $visitor->profile->avatar ?? 'default-avatar.png';
+        $data = [
+            'image'   => getDriverUrl() . '/' . $avatarPath,
+            'user_id' => $user->id,
+        ];
+
+        if (! $user->is_logout) {
+            Common::send_firebase_notification(
+                $tokensNotification,
+                $this->appName($user->lan),
+                $firebaseBody,
+                icon: $data['image'],
+                data: $data,
+                messageType: 'visit-profile'
+            );
+        }
+
+        Common::sendOfficialMessage(
+            $user->id,
+            image: $avatarPath,
+            title: $bodyEn,
+            content: $visitor->name,
+            titleAr: $bodyAr,
+            fromUserId: $visitor->id
+        );
+
+        app(UserCounterServices::class)->eventUser($user, 'official-messages');
     }
 
     public function follow(User $receiver, User $user)
@@ -536,9 +561,9 @@ class CustomNotification
         );
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
-    
 
-    
+
+
     public function banUser(User $user, $duration)
     {
         $tokens_notification = $user?->notification_id;
