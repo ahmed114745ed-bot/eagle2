@@ -22,6 +22,7 @@ class Agency extends Model
 
     protected $hidden = [
         'password',
+        'salary',
     ];
 
     public function chargeAgency()
@@ -58,7 +59,7 @@ class Agency extends Model
     {
         return $this->hasMany(User::class, 'agency_id');
     }
-    
+
     public function users()
     {
         return $this->hasMany(User::class);
@@ -393,6 +394,7 @@ class Agency extends Model
     {
         return $value ?? 0;
     }
+
 
     protected static function boot()
     {

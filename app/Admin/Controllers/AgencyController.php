@@ -15,11 +15,9 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
-use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
-use Encore\Admin\Widgets\Tab;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
@@ -27,15 +25,9 @@ use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Services\AppFeatureService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Scopes\HostAgencyScope;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Http\Request as req;
-
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
@@ -378,7 +370,10 @@ class AgencyController extends MainController
 
         $grid->model()
             ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
+            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid'),
+            'owner.profile:id,user_id,avatar',
+            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
