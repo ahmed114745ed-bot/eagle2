@@ -37,13 +37,13 @@ class NewAgencyRankingResource extends JsonResource
         /** @var Agency $this*/
         return [
             'exp' => $this->total_gifts,
-            'id' => $this->ranker->id ?: 0,
+            'id' => $this->ranker?->id ?: 0,
             'target' => $result ?: 0,
-            'name' => $this->ranker->name ?: '',
-            'notice' => $this->ranker->notice ?: '',
-            'phone' => (string) $this->ranker->phone ?: "",
-            'img' => $this->ranker->img ?: '',
-            'owner' => new MyDataForAgancyResource($this->ranker->owner) ?: [
+            'name' => $this->ranker?->name ?: '',
+            'notice' => $this->ranker?->notice ?: '',
+            'phone' => (string) $this->ranker?->phone ?: "",
+            'img' => $this->ranker?->img ?: '',
+            'owner' => new MyDataForAgancyResource($this->ranker?->owner) ?: [
                 "id" => 0,
                 "uuid" => '',
                 "target_usd" => 0,
