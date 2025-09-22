@@ -130,9 +130,9 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-    
+   
         $form->hidden('milestone_id')->value(request('milestone_id'));
-    
+
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),
@@ -168,6 +168,7 @@ class MilestoneRewardController
         ->when("coins", function (Form $form) {
             $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
         });
+    
     
     
         $form->saving(function (Form $form) {
