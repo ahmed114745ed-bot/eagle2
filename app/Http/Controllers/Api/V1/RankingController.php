@@ -50,7 +50,7 @@ class RankingController extends Controller
     public function ranking2(Request $request)
     {
 
-        return Common::apiResponse(1, __('closed for update'));
+        return Common::apiResponse(0, __('closed for update'));
 
         throw new Exception(__('closed for update'));
 
