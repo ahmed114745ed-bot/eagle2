@@ -6,10 +6,12 @@ namespace Modules\Badge\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Enums\BadgeType;
+use App\Enums\ImageType;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Facades\Admin;
 
 class BadgeController extends MainController
 {
@@ -68,12 +70,12 @@ class BadgeController extends MainController
             $filter->like('name', 'name');
             $filter->equal('priority', 'Priority');
         });
-  Admin::script("
+        Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
-         $this->extendGrid($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -84,23 +86,19 @@ class BadgeController extends MainController
     {
         $form = new Form(new Badge());
 
-        $form->text('name', __('name'));
+        $form->text('name', __('Name'))
+            ->rules('required|unique:badges,name,{{id}}');
 
         $form->file('image', __('Default Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required();
-        $form->select('type', __('type'))
-            ->options([
-                'regular' => __('regular'),
-                'top'     => __('top'),
-            ])->default('regular')->required();
-        $form->select('image_type', __('image_type')) 
-            ->options([
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'vap' => __('vap'),
-                'image' => __('image:(jpeg,png,jpg,svg,etc)'),
-            ])->required();
+        $form->select('type', __('Type'))
+            ->options(BadgeType::options())
+            ->default(BadgeType::Regular->value)
+            ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
+        $form->select('image_type', __('Image Type'))
+            ->options(ImageType::options())
+            ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
 
         $form->number('priority', __('Priority'))->min(0)->default(0)->required();
 
