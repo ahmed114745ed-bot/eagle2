@@ -33,19 +33,7 @@ class CoinGameUserAllController extends AdminController
     /**
      * Main index page with totals and grid.
      */
-    // public function index(Content $content)
-    // {
 
-    //     $filters = request()->all();
-    //     $query = CoinGameUserDailyAggregated::query();
-    //     $query = $this->service->applyFilters($query, $filters);
-    //     $totals = $this->service->calculateTotals($query, $filters);
-    //     return $content
-    //         ->title(__('coin_game_users'))
-    //         ->description(__('coin_game_users_description'))
-    //         ->row(fn(Row $row) => $this->service->renderInfoBoxes($row, $totals))
-    //         ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
-    // }
 
 
 
@@ -57,10 +45,23 @@ class CoinGameUserAllController extends AdminController
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
-            ->row(fn($row) => $row->column(12, '<div id="info-boxes"></div>')) // container
+            ->row(fn($row) => $row->column(12, '<div id="info-boxes"></div>')) 
             ->row(fn($row) => $row->column(12, $this->service->buildGrid()));
     }
 
+
+    public function index_details(Content $content)
+    {
+     
+        $user_id = request('user_id');
+        if(!$user_id ){
+            return redirect(admin_url("coin-game-users-reports"));
+        }
+        return $content
+            ->title(__('coin_game_users'))
+            ->description(__('coin_game_users_description'))
+            ->row(fn($row) => $row->column(12, $this->service->buildGrid_details($user_id)));
+    }
 
     /**
      * Show all rounds for a specific user and game.
@@ -69,7 +70,9 @@ class CoinGameUserAllController extends AdminController
     {
         $userId = $request->get('user_id');
         $gameId = $request->get('game_id');
-
+        if(!$userId  || !$gameId){
+            return redirect(admin_url("coin-game-users/details"));
+        }
         $grid = $this->service->buildShowAllGrid($userId, $gameId);
 
         return $content
