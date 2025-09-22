@@ -15,7 +15,7 @@ class SuperAdminSelectController extends MainController
      * @var string
      */
     protected $title = 'Super Admin';
-    public $permission_name = 'superadmin';
+    public $permission_name = 'superadmin-settings';
 
     public function index(Content $content)
     {
@@ -52,19 +52,4 @@ class SuperAdminSelectController extends MainController
 
         return redirect()->back();
     }
-
-//    public function toggleSalaryTransfer(Request $request)
-//    {
-//            $enabled = (bool) $request->input('enabled');
-//
-//            settings()->set("bd_stop_charge", $enabled ? "1" : "0");
-//
-//            return response()->json([
-//                'status'  => 'success',
-//                'message' => $enabled
-//                    ? __('تم تفعيل تحويل الرواتب بنجاح ✅')
-//                    : __('تم إيقاف تحويل الرواتب للجميع 🚫'),
-//            ]);
-//    }
-
 }
