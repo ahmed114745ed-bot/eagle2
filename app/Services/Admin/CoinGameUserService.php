@@ -26,17 +26,9 @@ class CoinGameUserService
         $this->userService = $userService;
     }
 
-    /**
-     * Normalize request filters.
-     */
-
-
-    /**
-     * Apply filters to aggregated query (الفيو).
-     */
+    
     public function applyFilters($query,  array $filters)
     {
-        
         if (!empty($filters['user']['uuid'])) {
             $userUuid = $filters['user']['uuid'];
             $query->whereHas('user', function ($q) use ($userUuid) {
@@ -44,30 +36,34 @@ class CoinGameUserService
             });
         }
 
-        if (!empty($filters['user_id'])) {
-            $userId = $filters['user_id'];
-            $query->whereHas('user', function ($q) use ($userId) {
-                $q->where('uuid', $userId);
-            });
-        }
         if (!empty($filters['game_id'])) {
             $gameId = $filters['game_id'];
             $query->Where('game_id', $gameId);
         }
 
-        if (!empty($filters['date']['start']) && !empty($filters['date']['end'])) {
-            $start = Carbon::parse($filters['date']['start'])->startOfDay();
-            $end   = Carbon::parse($filters['date']['end'])->endOfDay();
-
+        if (isset($filters['date']['start'], $filters['date']['end']) &&
+            $filters['date']['start'] && $filters['date']['end']) {
+            
+            $startInput = $filters['date']['start'];
+            $endInput   = $filters['date']['end'];
+        
+            $start = Carbon::parse($startInput);
+            $end   = Carbon::parse($endInput);
+        
+            if (strlen($startInput) <= 10) {
+                $start = $start->startOfDay();
+            }
+            if (strlen($endInput) <= 10) {
+                $end = $end->endOfDay();
+            }
+        
             $query->whereBetween('date', [$start, $end]);
         }
 
         return $query;
     }
 
-    /**
-     * Calculate totals from aggregated view.
-     */
+   
     public function calculateTotals($query, $filters): object
     {
 
@@ -79,9 +75,7 @@ class CoinGameUserService
         ")->first();
     }
 
-    /**
-     * Render InfoBoxes row.
-     */
+  
     public function renderInfoBoxes(Row $row, $totals): void
     {
         $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
@@ -109,9 +103,6 @@ class CoinGameUserService
         });
     }
 
-    /**
-     * Build main grid.
-     */
 
    public function buildGrid(): Grid
     {
@@ -162,24 +153,21 @@ class CoinGameUserService
         });
 
 
-        // ✅ أعمدة الأرقام (باستخدام Loop)
         foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
             $grid->column($field, __(ucwords(str_replace('_', ' ', $field))))
-                ->display(fn($v) => number_format($v));
+                ->display(fn($v) => number_format($v))->sortable();
         }
 
-        // ✅ التفاصيل
         $grid->column('details', __('Details'))->display(function () {
             $filters = request()->only(['date', 'user_id']);
             $queryString = http_build_query($filters);
 
-            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&{$queryString}");
+            $url = admin_url("coin-game-users/details?user_id={$this->user_id}&{$queryString}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                <i class='fa fa-eye'></i> " . __('round_details') . "
+                <i class='fa fa-eye'></i> " . __('Details') . "
             </a>";
         });
 
-        // ✅ تعطيل الأزرار الغير لازمة
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
@@ -187,6 +175,100 @@ class CoinGameUserService
         return $grid;
     }
 
+
+
+    public function buildGrid_details($user_id): Grid
+    {
+        $grid = new Grid(new CoinGameUserAggregated());
+    
+        $grid->model()
+        ->where('user_id' , $user_id)
+        ->select([
+            'game_id',
+            'game_name',
+            'game_image',
+                DB::raw('SUM(total_played) as total_played'),
+                DB::raw('SUM(total_loss) as total_loss'),
+                DB::raw('SUM(total_win) as total_win'),
+                DB::raw('SUM(app_profit) as app_profit'),
+            'user_id',
+            'user_uuid',
+            'user_name',
+            'user_avatar',
+        ])
+        ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar')
+        ->orderByDesc('total_played');    
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+    
+            $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
+            $filter->like('game_id', 'Game')->placeholder('ID');
+            $filter->between('date', __('Created At'))->datetime([
+                'format' => 'YYYY-MM-DD HH:mm:ss',
+                'locale' => 'en'
+            ]);
+        });
+    
+        $userService = $this->userService;
+    
+        $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
+            return $userService->adminUserAvatar((object)[
+                'id'     => $this->user_id,
+                'uuid'   => $this->user_uuid,
+                'name'   => $this->user_name,
+                'avatar' => $this->user_avatar,
+            ], withoutLevels: true);
+        });
+    
+        $grid->column('game_id', __('Game'))->display(function () {
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($this->game_image) ?? $defaultImage;
+            if (!isImageExists($url)) $url = $defaultImage;
+    
+            $uniqueId = $this->game_id ?? 'game-unknown';
+            $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
+            
+            $gameIdHtml = "game-{$this->game_id}";
+            $urlLink = admin_url("all-games/{$this->game_id}");
+    
+            return <<<HTML
+            <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
+                $imageTag
+                <div>
+                    <strong style="font-size:16px;">{$this->game_name}</strong><br>
+                    <span style="font-size:13px;">
+                        ID: <span id="{$gameIdHtml}">{$this->game_id}</span>
+                        <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('{$gameIdHtml}')" style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;" title="Copy ID">📝</button>
+                    </span>
+                </div>
+            </a>
+        HTML;
+        });
+    
+        $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v))->sortable();
+        $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v))->sortable();
+        $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v))->sortable();
+    
+        $grid->column('details', __('Details'))->display(function () {
+
+            $filters = request()->only(['date', 'user_id', 'game_id']);
+            $queryString = http_build_query($filters);
+            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
+            return "<a href='{$url}' class='btn btn-sm btn-primary'>
+                    <i class='fa fa-eye'></i> " . __('round_details') . "
+                </a>";
+        });
+        $grid->tools(function ($tools) {
+            $tools->append('<a href="' . admin_url('coin-game-users-reports') . '" class="btn btn-sm btn-default">
+                <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
+        });
+        $grid->disableCreateButton();
+        $grid->disableActions();
+        $grid->disableExport();
+    
+        return $grid;
+    }
 
 
  
@@ -199,9 +281,7 @@ class CoinGameUserService
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
         }
-        if (!empty($game_id)) {
-            $grid->model()->where('game_id', $game_id);
-        }
+       
         $grid->model()
             ->selectRaw("
                 game_name,
@@ -210,12 +290,13 @@ class CoinGameUserService
                 round_id,
                 SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
                 SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-                MIN(created_at) as first_played,   -- يمكن أخذ أول وقت للروند للعرض
-                MAX(created_at) as last_played     -- أو آخر وقت للروند
+                MIN(created_at) as first_played,  
+                MAX(created_at) as last_played    
             ")
             ->where('user_id', $userId)
+            ->where('game_id', $gameId)
             ->groupBy('game_name', 'round_id' , 'game_image' ,'game_id')
-            ->orderByDesc('round_id');
+            ->orderByDesc('last_played');
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
@@ -262,16 +343,16 @@ class CoinGameUserService
         $grid->column('round_id', __('Round ID'))->sortable();
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
-        });
+        })->sortable();
 
         $grid->column('total_win', __('Total Win'))->display(function ($v) {
             return "<span style='color:green; font-weight:bold;'>" . number_format($v) . "</span>";
-        });
-        $grid->column('first_played', __('Start Date'))->display(fn($v) => $v);
-        $grid->column('last_played', __('End Date'))->display(fn($v) => $v);
+        })->sortable();
+        $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
+        $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
 
         $grid->tools(function ($tools) {
-            $tools->append('<a href="' . admin_url('coin-game-users-reports') . '" class="btn btn-sm btn-default">
+            $tools->append('<a href="' . admin_url('coin-game-users/details') . '" class="btn btn-sm btn-default">
                 <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
         });
         $grid->disableCreateButton();
