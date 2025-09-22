@@ -13,10 +13,10 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending'): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending' ,$isUsed = null): bool
     {
         try {
-            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType) {
+            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType,$isUsed) {
                 $vipp = UserVip::create([
                     'type'      => 1,
                     'sender_id' => $senderId ,
@@ -28,7 +28,9 @@ class VipCommon
                     'qty'       => $qty,
                     'price'     => $vip?->price,
                     'total'     => $total,
-                    'is_used'   => 0,
+                    'is_used'   => $isUsed ? 1 : 0,
+                    'using'   => $isUsed ? 1 : 0,
+                    'num_used'   => $isUsed ? 1 : 0,
                     'dash_user_id'   => $dashUserId ?? 0,
                     'type_send' => $typeSend,
                     'receive_type' => $receiveType

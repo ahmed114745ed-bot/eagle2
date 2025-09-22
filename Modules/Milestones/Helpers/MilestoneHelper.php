@@ -123,7 +123,7 @@ class MilestoneHelper
 
             case 'vip':
                 $vip = OVip::find($mr->rewardable_id);
-                UserCommon::addVipToUser($user, $vip, $mr->expire,0, $receiveType);
+                UserCommon::addVipToUser($user, $vip, $mr->expire,0, $receiveType ,1);
                 break;
 
             case 'ware':

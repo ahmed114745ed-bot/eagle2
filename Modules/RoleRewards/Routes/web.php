@@ -34,7 +34,7 @@ Route::group(
 
         Route::prefix('role-rewards/{role_id}')->group(function () {
             Route::get('/', [RoleRewardsController::class, 'index']);
-            Route::get('/create', [RoleRewardsController::class, 'create']);
+            Route::get('/create', [RoleRewardsController::class, 'create'])->name('role-rewards.create');
             Route::post('/', [RoleRewardsController::class, 'store']);
             Route::get('/{id}', [RoleRewardsController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [RoleRewardsController::class, 'edit'])->where('id', '[0-9]+');

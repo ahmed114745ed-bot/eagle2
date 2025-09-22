@@ -382,10 +382,10 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null,$receiveType)
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null,$receiveType , $isUsed = null )
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',1,0,0,$receiveType);
+        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',1,0,0,$receiveType,$isUsed);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -478,7 +478,7 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null,$receiveType = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null,$receiveType = null,$isUsed)
     {
         $title = __('congratulations');
         $body = __('You have received a gift: :ware', ['ware' => $ware->name]);

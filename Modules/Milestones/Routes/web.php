@@ -43,7 +43,7 @@ Route::group(
 
         Route::prefix('milestone-rewards/{milestone_id}')->group(function () {
             Route::get('/', [MilestoneRewardController::class, 'index']);
-            Route::get('/create', [MilestoneRewardController::class, 'create']);
+            Route::get('/create', [MilestoneRewardController::class, 'create'])->name('milestone-rewards.create');
             Route::post('/', [MilestoneRewardController::class, 'store']);
             Route::get('/{id}', [MilestoneRewardController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [MilestoneRewardController::class, 'edit'])->where('id', '[0-9]+');

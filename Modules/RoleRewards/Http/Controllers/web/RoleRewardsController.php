@@ -154,10 +154,11 @@ class RoleRewardsController extends MainController
         $form = new Form(new RoleReward());
         $this->disableFormTools($form);
         $this->addHiddenFields($form);
-
-        if (!$form->isEditing()) {
-            $this->addTypeSelector($form);
-        }
+      
+    
+            if (request()->route()->getName() === 'admin.role-rewards.create') {
+                $this->addTypeSelector($form);
+            }
     
         $this->addExpireField($form);
     
@@ -177,7 +178,7 @@ protected function addHiddenFields(Form $form)
 
 protected function addTypeSelector(Form $form)
 {
-    if (!$form->isEditing()) {
+  
 
     $form->select('type', __('Type'))->options([
         "ware"        => __('ware'),
@@ -196,9 +197,10 @@ protected function addTypeSelector(Form $form)
     })
     ->when("badge", function () use ($form) {
         $this->addBadgeField($form);
-    });
+    }) ;
 
-}
+
+  
 }
 
 protected function addBadgeField(Form $form)
