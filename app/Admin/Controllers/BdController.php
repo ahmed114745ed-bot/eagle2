@@ -93,7 +93,13 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $grid->model()->with('bdSalaries')->orderByDesc('id');
+
+        $grid->model()
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->withSum('bdSalaries', 'salary')
+            ->withSum('bdSalaries', 'cut_amount')
+            ->withCount('agencies as total_agencies')
+            ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
