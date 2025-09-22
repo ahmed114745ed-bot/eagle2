@@ -39,9 +39,9 @@ class UserRepository extends AbstractRepository
     public function filterUserNew($userUuId)
     {
 
-            return $this->model->select([
-                '*',
-                DB::raw("
+        return $this->model->select([
+            '*',
+            DB::raw("
                     CASE
                         WHEN uuid = '{$userUuId}' THEN 3
                         WHEN uuid LIKE '{$userUuId}%' THEN 2
@@ -49,16 +49,15 @@ class UserRepository extends AbstractRepository
                         ELSE 0
                     END AS matching_score
                 ")
-            ])
-           // ->where('uuid', 'like', "%{$userUuId}%")
-           ->where(function ($query) use ($userUuId) {
+        ])
+            // ->where('uuid', 'like', "%{$userUuId}%")
+            ->where(function ($query) use ($userUuId) {
                 $query->where('uuid', 'like', '%' . $userUuId . '%')
-                      ->orWhere('special_id', 'like', '%' . $userUuId . '%');
+                    ->orWhere('special_id', 'like', '%' . $userUuId . '%');
             })
             ->orderByDesc('matching_score')
             ->orderBy('uuid')
             ->get();
-
     }
 
     public function searchUserById($userUuId)
@@ -124,39 +123,45 @@ class UserRepository extends AbstractRepository
     public function getUsers($ids)
     {
         return $this->model->query()->with(['agency', 'profile', 'family'])
-        ->whereIn('id', $ids)->get();
-
+            ->whereIn('id', $ids)->get();
     }
 
     public function getAdmins($ids)
     {
         if (empty($ids)) return collect();
 
-//        $vipsData = DB::table('vips')->get()->groupBy('type');
-//        $expPercentages = config('exp_percentages', [
-//            'exp_received_percentage' => 1,
-//            'exp_sender_percentage' => 1
-//        ]);
+        //        $vipsData = DB::table('vips')->get()->groupBy('type');
+        //        $expPercentages = config('exp_percentages', [
+        //            'exp_received_percentage' => 1,
+        //            'exp_sender_percentage' => 1
+        //        ]);
 
         $admins = $this->model->select([
-            'id', 'name', 'uuid', 'dress_1', 'color_id', 'image_color_id', 'sender_level', 'received_level'
+            'id',
+            'name',
+            'uuid',
+            'dress_1',
+            'color_id',
+            'image_color_id',
+            'sender_level',
+            'received_level'
         ])->with([
-//            'agency.owner',
-//            'agency.mempers',
+            //            'agency.owner',
+            //            'agency.mempers',
             'profile:id,user_id,avatar',
-//            'family',
+            //            'family',
             'packs:id,user_id',
             'eligiblePacks',
-//            'ownAgency',
-//            'userSetting',
-//            'activePack20'
+            //            'ownAgency',
+            //            'userSetting',
+            //            'activePack20'
             'specialId.ware',
         ])->whereIn('id', $ids)->get();
 
         $admins->each(function ($user) {
             $user->user_types2 = $this->computeUserTypes($user);
-//            $user->preloaded_uuid = $this->computeUuid($user);
-//            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
+            //            $user->preloaded_uuid = $this->computeUuid($user);
+            //            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
         });
 
         return $admins;
@@ -358,16 +363,16 @@ class UserRepository extends AbstractRepository
     public function findUsersByAgencyId($agencyId, $perPage, $page)
     {
         return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
-        $q->where('month', now()->month)
-          ->where('year', now()->year);
-    }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
+            $q->where('month', now()->month)
+                ->where('year', now()->year);
+        }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
     public function findUsersByAgencyIdI($agencyId)
     {
         return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
-        $q->where('month', now()->month)
-          ->where('year', now()->year);
-    }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc');
+            $q->where('month', now()->month)
+                ->where('year', now()->year);
+        }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc');
     }
 
     public function getIdsByAgencyId($agencyId)
@@ -528,7 +533,7 @@ class UserRepository extends AbstractRepository
 
     public function allUsersPlay()
     {
-        return $this->model->whereNotNull('game_id')->where('online', 1)->with('nowGame')->paginate(10);
+        return $this->model->whereNotNull('game_id')->with(['profile:id,user_id,avatar'])->where('online', 1)->with('nowGame')->paginate(10);
     }
 
     public function friends(): LengthAwarePaginator

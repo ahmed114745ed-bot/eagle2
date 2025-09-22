@@ -45,6 +45,7 @@ class FamilyController extends MainController
             ->title(trans('families'))
             ->body($this->form()));
     }
+
     // public function show($id, Content $content)
     // {
     //     return parent::show($id, $content
@@ -60,6 +61,28 @@ class FamilyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Family);
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->equal('id', __('ID'));
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $query->whereHas('owner', function ($subQuery) {
+                        $subQuery->where('uuid', 'like', "%{$this->input}%");
+                    });
+                }, __('UUID'))->placeholder(__('search for host by UUID'));
+            });
+        });
+        $grid->model()->with([
+            'owner:id,name,uuid', // only needed fields
+            'owner.profile:id,user_id,avatar',
+            'owner.packs' => fn($q) => $q
+                ->select('id', 'user_id', 'type', 'is_used', 'target_id')
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->with('ware:id,value'),
+        ])->orderByDesc('id');
 
         $grid->id(__('ID'));
         $grid->column('image', __('family'))->display(function ($image) {
@@ -82,28 +105,32 @@ class FamilyController extends MainController
         ";
         });
 
-        $grid->column('owner.name', __('owner'))->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+            $uid = $this->owner?->uuid;
+            $path = $this->owner?->profile?->avatar;
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
 
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                   <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                    <span style='font-size: smaller;'>UUID: $uid</span>
                 </div>
             </div>
         ";
         });
+
         $grid->column('num', __('number of people'));
 
 

@@ -382,6 +382,7 @@ class RoomRepoService
     public function changeMode($request, $currentMode)
     {
         $user = request()->user();
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);

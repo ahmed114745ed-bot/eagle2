@@ -7,16 +7,13 @@ use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
-use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
@@ -623,7 +620,11 @@ Route::group(
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
+        Route::get('coin-game-users/details', [CoinGameUserAllController::class,'index_details']);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
+    ->name('coin-game-users.ajax');
+
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 

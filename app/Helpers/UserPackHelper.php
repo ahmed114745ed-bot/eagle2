@@ -26,6 +26,12 @@ class UserPackHelper
         return $ware?->id ?? 0;
     }
 
+    public static function getProfileFrameId(User $user) : string
+    {
+        $ware = self::getFrameWare($user);
+        return $ware?->id ?? 0;
+    }
+
     public static function getVipIcon(User $user) : string
     {
         return self::getPacks($user)
