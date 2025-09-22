@@ -44,8 +44,18 @@ class CoinGameUserService
         if (isset($filters['date']['start'], $filters['date']['end']) &&
             $filters['date']['start'] && $filters['date']['end']) {
             
-            $start = Carbon::parse($filters['date']['start'])->startOfDay();
-            $end   = Carbon::parse($filters['date']['end'])->endOfDay();
+            $startInput = $filters['date']['start'];
+            $endInput   = $filters['date']['end'];
+        
+            $start = Carbon::parse($startInput);
+            $end   = Carbon::parse($endInput);
+        
+            if (strlen($startInput) <= 10) {
+                $start = $start->startOfDay();
+            }
+            if (strlen($endInput) <= 10) {
+                $end = $end->endOfDay();
+            }
         
             $query->whereBetween('date', [$start, $end]);
         }
