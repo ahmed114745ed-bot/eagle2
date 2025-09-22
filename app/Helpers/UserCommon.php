@@ -174,21 +174,20 @@ class UserCommon
         if (!$invitation || !self::isInvitationValid($invitation)) {
             return;
         }
-    
+
         $parent = User::find($invitation->user_id);
         if (!$parent) {
             return;
         }
-    
+
         $percentage = self::getPercentage($parent);
         if ($percentage === null) {
             return;
         }
-    
-        self::applyEarnings($parent, $invitation, $amount, $percentage,$chargeId);
 
+        self::applyEarnings($parent, $invitation, $amount, $percentage, $chargeId);
     }
-    
+
     private static function getInvitation($userId)
     {
         return UserCodeInvitation::where("invited_id", $userId)->first();
@@ -198,36 +197,36 @@ class UserCommon
         return settings()->get('stop_invite_code');
     }
 
-    
 
-    
+
+
     private static function isInvitationValid($invitation): bool
     {
         $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
-    
+
         $validUntil = Carbon::parse($invitationDate)
             ->addMonths(settings()->get('invitation_code_date') ?? 1)
             ->format('Y-m-d');
-    
+
         return date("Y-m-d") < $validUntil;
     }
-    
+
     private static function getPercentage($parent): ?float
     {
         $configEarn = Config::where("name", "earn_from_invitation")->first();
 
         return $configEarn?->value ??  false;
     }
-    
-    private static function applyEarnings($parent, $invitation, $amount, $percentage,$chargeId): void
+
+    private static function applyEarnings($parent, $invitation, $amount, $percentage, $chargeId): void
     {
         $amountBefore =  Common::getCurrentBalance($parent->id);
 
         $parentWin = ($amount * $percentage) / 100;
-    
+
         $parent->di += $parentWin;
         $parent->save();
-    
+
         $invitation->invited_charge += $amount;
         $invitation->user_percentage += $parentWin;
         $invitation->save();
@@ -242,20 +241,18 @@ class UserCommon
         );
 
         InvitationEarningHelper::addEarning(
-            parentId:  $parent->id,
-            userId:  $invitation->invited_id,
+            parentId: $parent->id,
+            userId: $invitation->invited_id,
             sourceType: 'charge_percentage',
             amount: $parentWin,
             userCharge: $amount,
             parentPercentage: $percentage,
             chargeId: $chargeId,
         );
-     
-        CustomNotification::UserEarnedInvitation($parent, $parentWin);
 
-   
+        CustomNotification::UserEarnedInvitation($parent, $parentWin);
     }
-    
+
 
     public static function UserLuckyGift($isWin, $userId, Gift $gift, $value, $number, $totalNumWin, $totalUserWin)
     {
@@ -306,17 +303,16 @@ class UserCommon
         return $user_statistic;
     }
 
-    public static function userVip(User $user ,$receiveType = 'vip-check')
+    public static function userVip(User $user, $receiveType = 'vip-check')
     {
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)
-        ->where('level', '>=', $vip->level)->first();
+            ->where('level', '>=', $vip->level)->first();
         $expire = $vip->expire;
 
 
         if (!$user_vip_check) {
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',1,0,0,$receiveType);
-
+            VipCommon::createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, $receiveType);
         }
     }
 
@@ -382,10 +378,10 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null,$receiveType , $isUsed = null )
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',1,0,0,$receiveType,$isUsed);
+        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -396,27 +392,27 @@ class UserCommon
 
     public static function removeVipFromUser(User $user, $id, $receiveType)
     {
-        VipCommon::removeVipFromUser($user ,$id ,$receiveType);
+        VipCommon::removeVipFromUser($user, $id, $receiveType);
     }
 
     public static function removeEventsWareFromUser(User $user, $id, $receiveType)
     {
-     
+
         Pack::where('receive_type', $receiveType)
-                    ->where('user_id', $user->id)
-                    ->where('target_id',  $id)->delete();
+            ->where('user_id', $user->id)
+            ->where('target_id',  $id)->delete();
     }
 
     public static function removeBadgeFromUser(User $user, $id, $receiveType)
     {
-     
+
         UserBadge::where('receive_type', $receiveType)
-                    ->where('user_id', $user->id)
-                    ->where('badge_id',  $id)->delete();
+            ->where('user_id', $user->id)
+            ->where('badge_id',  $id)->delete();
     }
-    
-    
-    public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null , $receiveType = null )
+
+
+    public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null, $receiveType = null)
     {
         $receiveType = $receiveType ?? 'not-sending';
 
@@ -478,7 +474,7 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null,$receiveType = null,$isUsed)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
     {
         $title = __('congratulations');
         $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
@@ -539,7 +535,7 @@ class UserCommon
 
 
             $pack = Pack::query()->create($arr);
-          //  \Log::info('Created Pack:', $pack->toArray());
+            //  \Log::info('Created Pack:', $pack->toArray());
 
             if ($sender) {
                 $pack->senderable()->associate($sender);

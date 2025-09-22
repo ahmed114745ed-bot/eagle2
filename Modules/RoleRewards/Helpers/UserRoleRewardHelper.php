@@ -80,7 +80,7 @@ class UserRoleRewardHelper
             UserCommon::addVipToUser($user, $vip, $reward->expire, null, $receiveType ,1);
         } elseif ($reward->type === "ware") {
             $ware = Ware::find($reward->rewardable_id);
-            UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType ,1);
+            UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType );
         } elseif ($reward->type === "achievement") {
             UserAchievementLevel::create([
                 'user_id'      => $user->id,
