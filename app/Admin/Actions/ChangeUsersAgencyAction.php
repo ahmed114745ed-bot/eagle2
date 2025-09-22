@@ -17,154 +17,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 
-// class ChangeUsersAgencyAction extends RowAction
-// {
-//     public $name;
-
-//     public $id;
-
-//     public function __construct($id = 0)
-//     {
-//         Admin::script('$.fn.modal.Constructor.prototype.enforceFocus = function () {};');
-
-//         $this->id = $id;
-//         $this->name = __("dashboard.changeMemberAgency");
-//         parent::__construct();
-//     }
-//     /**
-//      * @throws ValidationException
-//      */
-//     public function handle(Model $model, Request $request)
-//     {
-//         $oldAgencyId = $request->old_agency_id;
-//         $newAgencyId = $request->new_agency_id;
-
-//         $ownerId = Agency::where('id', $oldAgencyId)->value('app_owner_id');
-
-//         $users = User::where('agency_id', $oldAgencyId)
-//             ->where('id', '!=', $ownerId)
-//             ->get();
-
-//         if ($users->isEmpty()) {
-//             $error = new MessageBag([
-//                 'title' => __('error_title_div'),
-//                 'message' => __('cant it owner or no members to move'),
-//             ]);
-//             session()->flash('error', $error);
-//             throw new \Exception(__('cant it owner or no members to move'));
-//         }
-
-//         UsersJoinedAgency::where('agency_id', $oldAgencyId)
-//             ->whereNull('leave_date')
-//             ->update([
-//                 'leave_date' => now(),
-//                 'status' => 'change agency by admin'
-//             ]);
-
-//         foreach ($users as $user) {
-
-//             $this->handleUserSalaries($user);
-//             $this->clearUserAgencyLogs($user ,$oldAgencyId);
-//             $user->agency_id = $newAgencyId;
-//             $user->save();
-
-//             uploadMonthlyDiamondReceive($user->id, 0);
-
-//             $joined = UsersJoinedAgency::where([
-//                 'user_id' => $user->id,
-//                 'agency_id' => $newAgencyId
-//             ])->whereNull('leave_date')->first();
-
-//             if (!$joined) {
-//                 UsersJoinedAgency::create([
-//                     'user_id' => $user->id,
-//                     'agency_id' => $newAgencyId,
-//                     'type' => 2,
-//                     'join_date' => now(),
-//                     'status' => 'Joined'
-//                 ]);
-//             }
-//         }
-
-//         return $this->response()->success('success')->refresh();
-//     }
-
-//     /**
-//      * Handle user's monthly salaries
-//      */
-//     private function handleUserSalaries(User $user)
-//     {
-   
-//         $agencyId = $user->agency_id;
-//         $timezone = getTimezone();
-//         $currentMonth = now( $timezone)->month;
-//         $currentYear = now( $timezone)->year;
-
-//         $userSalaries = UserSallary::query()
-//             ->where('user_id', $user->id)
-//             ->where('user_agency_id', $agencyId)
-//             ->where('month', $currentMonth)
-//             ->where('year', $currentYear)
-//             ->where('is_finished', 0)
-//             ->first();
-         
-//         if (!$userSalaries) return;
-       
-//         if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
-          
-//             $userSalaries->update(['is_finished' => 1]);
-//         }
-    
-//     }
-
-
-//     private function clearUserAgencyLogs(User $user,$agencyId)
-//     {
-//         GiftLog::query()->where('receiver_id', $user->id)
-//         ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
-//         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
-//     }
-
-//     public function form()
-//     {
-//         $this->hidden('old_agency_id', __('id'))->value($this->id);
-//         $this->select('new_agency_id', __('agency id'))->options(function ($value) {
-//             $ops2 = [];
-//             foreach (
-//                 Agency::where('id', '!=', $this->id)->where(function ($query) {
-//                     $query->WhereDoesntHave('additionalInfo')->orWhereHas(
-//                         'additionalInfo',
-//                         function ($query) {
-//                             $query->where('status', 1);
-//                         }
-//                     );
-//                 })->get() as $agency
-//             ) {
-//                 $ops2[$agency->id] = $agency->id . '_' . $agency->name;
-//             }
-//             return $ops2;
-//         });
-//     }
-
-//     public function html()
-//     {
-//         return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" ></a>
-//             <script>
-
-//             function pu(val) {
-
-//               $("#vid").val(val)
-//             }
-//             </script>
-//             ';
-//     }
-// }
-
 class ChangeUsersAgencyAction extends RowAction
 {
     public $name;
+
     public $id;
-    protected $agencies; // cache agencies
 
     public function __construct($id = 0)
     {
@@ -172,21 +29,11 @@ class ChangeUsersAgencyAction extends RowAction
 
         $this->id = $id;
         $this->name = __("dashboard.changeMemberAgency");
-
-        // ✅ Fetch agencies once (no per-row queries)
-        $this->agencies = Agency::query()
-            ->where('type', 1)
-            ->whereNull('deleted_at')
-            ->where(function ($query) {
-                $query->whereDoesntHave('additionalInfo')
-                      ->orWhereHas('additionalInfo', fn($q) => $q->where('status', 1));
-            })
-            ->pluck('name', 'id')
-            ->toArray();
-
         parent::__construct();
     }
-
+    /**
+     * @throws ValidationException
+     */
     public function handle(Model $model, Request $request)
     {
         $oldAgencyId = $request->old_agency_id;
@@ -200,7 +47,7 @@ class ChangeUsersAgencyAction extends RowAction
 
         if ($users->isEmpty()) {
             $error = new MessageBag([
-                'title'   => __('error_title_div'),
+                'title' => __('error_title_div'),
                 'message' => __('cant it owner or no members to move'),
             ]);
             session()->flash('error', $error);
@@ -211,30 +58,30 @@ class ChangeUsersAgencyAction extends RowAction
             ->whereNull('leave_date')
             ->update([
                 'leave_date' => now(),
-                'status'     => 'change agency by admin'
+                'status' => 'change agency by admin'
             ]);
 
         foreach ($users as $user) {
-            $this->handleUserSalaries($user);
-            $this->clearUserAgencyLogs($user, $oldAgencyId);
 
+            $this->handleUserSalaries($user);
+            $this->clearUserAgencyLogs($user ,$oldAgencyId);
             $user->agency_id = $newAgencyId;
             $user->save();
 
             uploadMonthlyDiamondReceive($user->id, 0);
 
             $joined = UsersJoinedAgency::where([
-                'user_id'   => $user->id,
+                'user_id' => $user->id,
                 'agency_id' => $newAgencyId
             ])->whereNull('leave_date')->first();
 
             if (!$joined) {
                 UsersJoinedAgency::create([
-                    'user_id'   => $user->id,
+                    'user_id' => $user->id,
                     'agency_id' => $newAgencyId,
-                    'type'      => 2,
+                    'type' => 2,
                     'join_date' => now(),
-                    'status'    => 'Joined'
+                    'status' => 'Joined'
                 ]);
             }
         }
@@ -242,12 +89,16 @@ class ChangeUsersAgencyAction extends RowAction
         return $this->response()->success('success')->refresh();
     }
 
+    /**
+     * Handle user's monthly salaries
+     */
     private function handleUserSalaries(User $user)
     {
+   
         $agencyId = $user->agency_id;
         $timezone = getTimezone();
-        $currentMonth = now($timezone)->month;
-        $currentYear  = now($timezone)->year;
+        $currentMonth = now( $timezone)->month;
+        $currentYear = now( $timezone)->year;
 
         $userSalaries = UserSallary::query()
             ->where('user_id', $user->id)
@@ -256,49 +107,55 @@ class ChangeUsersAgencyAction extends RowAction
             ->where('year', $currentYear)
             ->where('is_finished', 0)
             ->first();
-
+         
         if (!$userSalaries) return;
-
+       
         if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
+          
             $userSalaries->update(['is_finished' => 1]);
         }
+    
     }
 
-    private function clearUserAgencyLogs(User $user, $agencyId)
-    {
-        GiftLog::query()
-            ->where('receiver_id', $user->id)
-            ->where('agency_id', $agencyId)
-            ->update(['is_finished' => 1]);
 
-        AgencyUserJob::where([
-            'user_id'   => $user->id,
-            'agency_id' => $agencyId
-        ])->delete();
+    private function clearUserAgencyLogs(User $user,$agencyId)
+    {
+        GiftLog::query()->where('receiver_id', $user->id)
+        ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
 
     public function form()
     {
         $this->hidden('old_agency_id', __('id'))->value($this->id);
-
-        $this->select('new_agency_id', __('agency id'))
-            ->options(function () {
-                // ✅ Use cached agencies and filter out the current one in PHP
-                return collect($this->agencies)
-                    ->except($this->id)
-                    ->mapWithKeys(fn($name, $id) => [$id => $id . '_' . $name])
-                    ->toArray();
-            });
+        $this->select('new_agency_id', __('agency id'))->options(function ($value) {
+            $ops2 = [];
+            foreach (
+                Agency::where('id', '!=', $this->id)->where(function ($query) {
+                    $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                        'additionalInfo',
+                        function ($query) {
+                            $query->where('status', 1);
+                        }
+                    );
+                })->get() as $agency
+            ) {
+                $ops2[$agency->id] = $agency->id . '_' . $agency->name;
+            }
+            return $ops2;
+        });
     }
 
     public function html()
     {
         return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" ></a>
             <script>
+
             function pu(val) {
-                $("#vid").val(val)
+
+              $("#vid").val(val)
             }
-            </script>';
+            </script>
+            ';
     }
 }
-
