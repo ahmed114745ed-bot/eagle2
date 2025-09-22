@@ -4,7 +4,6 @@ namespace Modules\Milestones\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MilestoneReward extends Model
 {
@@ -18,7 +17,6 @@ class MilestoneReward extends Model
         'expire',
     ];
 
-    protected $dates = ['deleted_at'];
 
     public function milestone()
     {
