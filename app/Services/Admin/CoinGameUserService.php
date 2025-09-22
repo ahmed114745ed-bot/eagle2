@@ -155,7 +155,7 @@ class CoinGameUserService
 
             $url = admin_url("coin-game-users/details?user_id={$this->user_id}&{$queryString}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                <i class='fa fa-eye'></i> " . __('details') . "
+                <i class='fa fa-eye'></i> " . __('Details') . "
             </a>";
         });
 
