@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class MilestoneReward extends Model
 {
-    use SoftDeletes;
     protected $fillable = [
         'milestone_id',
         'rewardable_id',
