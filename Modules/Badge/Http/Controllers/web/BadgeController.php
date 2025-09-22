@@ -94,7 +94,7 @@ class BadgeController extends MainController
                 'regular' => __('regular'),
                 'top'     => __('top'),
             ])->default('regular')->required();
-        $form->select('image_type', __('image_type'))
+        $form->select('image_type', __('image_type')) 
             ->options([
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
