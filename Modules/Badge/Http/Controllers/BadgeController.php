@@ -21,7 +21,7 @@ class BadgeController extends Controller
         $userBadges = UserBadge::where('user_id', $userId)
             ->active()
             ->with(['badge' => function ($query) {
-                $query->select('id', 'name', 'image', 'type', 'image_type');
+                $query->select('id', 'image', 'type', 'image_type');
             }])
             ->get();
 
