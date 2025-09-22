@@ -50,12 +50,7 @@ class CoinGameUserService
             $start = Carbon::parse($startInput);
             $end   = Carbon::parse($endInput);
         
-            if (strlen($startInput) <= 10) {
-                $start = $start->startOfDay();
-            }
-            if (strlen($endInput) <= 10) {
-                $end = $end->endOfDay();
-            }
+         
         
             $query->whereBetween('date', [$start, $end]);
         }
@@ -352,8 +347,8 @@ class CoinGameUserService
         $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
         $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
 
-        $grid->tools(function ($tools) {
-            $tools->append('<a href="' . admin_url('coin-game-users/details') . '" class="btn btn-sm btn-default">
+        $grid->tools(function ($tools) use ($userId) {
+            $tools->append('<a href="' . admin_url("coin-game-users/details?user_id={$userId}") . '" class="btn btn-sm btn-default">
                 <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
         });
         $grid->disableCreateButton();
