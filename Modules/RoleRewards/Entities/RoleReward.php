@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 
 class RoleReward extends Model
 {
+    protected $appends = ['rewardable_id2', 'rewardable_id3', 'rewardable_id1'];
     protected $fillable = [
         'role_id',
         'rewardable_id',
@@ -26,6 +27,21 @@ class RoleReward extends Model
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function getRewardableId2Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
+    public function getRewardableId3Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
+    public function getRewardableId1Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
     /**
      * العلاقة المورفية
      */
@@ -39,29 +55,31 @@ class RoleReward extends Model
     {
         parent::boot();
         self::creating(function ($model) {
-            if ($model->type === 'ware') {
-                $model->rewardable_id = request('rewardable_id', $model->rewardable_id);
-            } elseif ($model->type === 'vip') {
+            if (request('type') === 'ware') {
+                $model->rewardable_id = request('rewardable_id1', $model->rewardable_id);
+            } elseif (request('type') === 'vip') {
                 $model->rewardable_id = request('rewardable_id2', $model->rewardable_id);
-            } elseif ($model->type === 'badge') {
+            } elseif (request('type') === "badge") {
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
             }
+            $model->type = request('type');
             unset($model->rewardable_id2);
             unset($model->rewardable_id3);
-        
+            unset($model->rewardable_id1);
         });
 
         self::updating(function ($model) {
-            if ($model->type === 'ware') {
-                $model->rewardable_id = request('rewardable_id', $model->rewardable_id);
-            } elseif ($model->type === 'vip') {
+            if (request('type') === 'ware') {
+                $model->rewardable_id = request('rewardable_id1', $model->rewardable_id);
+            } elseif (request('type') === 'vip') {
                 $model->rewardable_id = request('rewardable_id2', $model->rewardable_id);
-            }elseif ($model->type === 'badge') {
+            } elseif (request('type') === 'badge') {
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
-            } 
+            }
+            $model->type = request('type');
             unset($model->rewardable_id2);
+            unset($model->rewardable_id1);
             unset($model->rewardable_id3);
-        
         });
     }
 }

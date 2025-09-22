@@ -93,7 +93,7 @@ class RoleRewardsController extends MainController
             } elseif ($this->type === "achievement") {
                 return $this->rewardable?->title ?? "-";
             } elseif ($this->type === "badge") {
-                return $this->rewardable?->title ?? "-";
+                return $this->rewardable?->name ?? "-";
             }
             return "-";
         });
@@ -186,7 +186,7 @@ protected function addTypeSelector(Form $form)
         "achievement" => __('Achievement'),
         "badge"       => __('Badge'),
     ])->when("ware", function (Form $form) {
-        $form->belongsTo('rewardable_id', Wares::class, trans('wares'));
+        $form->belongsTo('rewardable_id1', Wares::class, trans('wares'));
     })->when("vip", function () use ($form) {
         $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
 
@@ -207,7 +207,7 @@ protected function addBadgeField(Form $form)
 {
     $prefix = 'badges';
     $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
-        $form->setElementName($prefix . 'target5')
+        $form->setElementName($prefix . 'rewardable_id3')
             ->select('id', __('badges'))
             ->options(function ($id) {
                 if (!$id) return [];
@@ -237,8 +237,9 @@ protected function addExpireField(Form $form)
 protected function handleSaving(Form $form)
 {
     $form->saving(function (Form $form) {
-        switch ($form->type) {
+        switch (request('type')) {
             case 'ware':
+                 
                 $form->rewardable_type = \App\Models\Ware::class;
                 $form->model()->rewardable_type = \App\Models\Ware::class;
                 break;

@@ -474,7 +474,7 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
     {
         $title = __('congratulations');
         $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
