@@ -42,6 +42,7 @@ class RankingController extends Controller
 
     public function ranking2(Request $request)
     {
+        return Common::apiResponse(0, __('closed for update'));
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
 
