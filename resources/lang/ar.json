@@ -3776,7 +3776,13 @@
     "Show Image": "عرض الصورة",
     "Alternative Image": "صورة بديلة",
     "Live System Setting:": "إعدادات النظام اللايف",
-    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount."
+    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
+    "Number of Visitors": "عدد الزوار",
+    "Number of Admins": "عدد المدراء",
+    "Owner Profit": "ربح المالك",
+    "Admin Profit": "ربح المدير",
+    "Room Cup Targets": "أهداف كأس الغرفة",
+    "room-cup-target": "هدف كأس الغرفة"
 
 
 

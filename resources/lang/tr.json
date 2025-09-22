@@ -3341,7 +3341,13 @@
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
     "Live System Setting:": "Canlı Sistem Ayarı",
-    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "Number of Visitors": "Ziyaretçi Sayısı",
+    "Number of Admins": "Yönetici Sayısı",
+    "Owner Profit": "Sahip Karı",
+    "Admin Profit": "Yönetici Karı",
+    "Room Cup Targets": "Oda Kupası Hedefleri",
+    "room-cup-target": "Oda Kupası Hedefi"
 
 
 
