@@ -377,8 +377,8 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -708,19 +708,19 @@ class AgencyController extends MainController
                     }
                     return null;
                 });
-    
+
             $row->hidden('phone_code')->default(function ($form) {
                 return $form->model()->phone_code ?? '';
             });
         });
-    
+
         if (Session::has('show_alert')) {
             $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
         }
-    
+
         Admin::script($this->phoneJs());
     }
-    
+
 
     protected function phoneJs()
     {
@@ -729,12 +729,12 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
@@ -745,7 +745,7 @@ class AgencyController extends MainController
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });

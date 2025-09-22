@@ -306,7 +306,7 @@ class AgencyController extends MainController
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
         ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen'])
-        ->with(['owner:id,name,uuid', 'owner.packs'])
+        ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
         ->where(function ($query) {
             $query
                 ->whereDoesntHave('additionalInfo')

@@ -164,8 +164,7 @@ class Agency extends Model
 
     public function getSalaryAttribute()
     {
-        return $this->agencySalaries
-            ->sum(fn ($row) => ($row->sallary - $row->cut_amount));
+        return $this->agencySalaries->sum(fn ($row) => ($row->sallary - $row->cut_amount));
 
 //        $salary = AgencySallary::query()->where('agency_id', $this->id)
 //            ->sum(DB::raw('sallary - cut_amount'));
