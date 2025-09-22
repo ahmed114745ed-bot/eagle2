@@ -94,7 +94,7 @@
 
                 @foreach($bdLinks as $link)
                     <li>
-                        <a href="{{  bd_url($link['uri']) }}">
+                        <a href="{{ bd_url($link['uri']) }}">
                             <i class="fa {{ $link['icon'] }}"></i>
                             <span>{{ $link['title'] }}</span>
                         </a>
@@ -105,18 +105,59 @@
                 @if (Admin::user()->type == 'superadmin')
                     @php
                         $superadminLinks = [
-                            ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard')],
+                            ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                            ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Host Agencies')],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host Agencies')],
+                                ],
+                            ],
                         ];
                     @endphp
 
-                    @foreach($superadminLinks as $link)
-                        <li>
-                            <a href="{{ superadmin_url($link['uri']) }}">
-                                <i class="fa {{ $link['icon'] }}"></i>
-                                <span>{{ $link['title'] }}</span>
-                            </a>
-                        </li>
+                @foreach($superadminLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ superadmin_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i>
+                                                <span>{{ $child['title'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ superadmin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif
                     @endforeach
+
+{{--                @foreach($superadminLinks as $link)--}}
+{{--                        <li>--}}
+{{--                            <a href="{{ superadmin_url($link['uri']) }}">--}}
+{{--                                <i class="fa {{ $link['icon'] }}"></i>--}}
+{{--                                <span>{{ $link['title'] }}</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                    @endforeach--}}
                 @endif
 
                 @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin')

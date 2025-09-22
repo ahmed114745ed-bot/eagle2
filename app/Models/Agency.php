@@ -8,6 +8,7 @@ use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Traits\AgencyAdditionalInfoTraits;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
@@ -44,6 +45,11 @@ class Agency extends Model
         return $this->belongsToMany(Country::class, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function salaryRequests()
     {
         return $this->hasMany(SalaryRequest::class, 'agency_id');
@@ -58,7 +64,7 @@ class Agency extends Model
     {
         return $this->hasMany(User::class, 'agency_id');
     }
-    
+
     public function users()
     {
         return $this->hasMany(User::class);
@@ -159,7 +165,6 @@ class Agency extends Model
     public function getSalaryAttribute()
     {
         $salary = AgencySallary::query()->where('agency_id', $this->id)
-            // ->where('is_paid', 0)
             ->sum(DB::raw('sallary - cut_amount'));
 
         return $salary;

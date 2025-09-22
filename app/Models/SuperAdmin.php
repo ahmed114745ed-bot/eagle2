@@ -26,7 +26,7 @@ class SuperAdmin extends Model
 
     public function agencies()
     {
-        return $this->hasMany(Agency::class, 'bd_id', 'id');
+        return $this->hasMany(Agency::class, 'country_id', 'country_id');
     }
 
     public function country(): BelongsTo
@@ -76,8 +76,8 @@ class SuperAdmin extends Model
                 ->first();
 
             if ($defaultSuperAdmin) {
-//                Agency::where('bd_id', $superAdmin->id)
-//                    ->update(['bd_id' => $defaultSuperAdmin->id]);
+                Bd::where('parent_id', $superAdmin->id)
+                    ->update(['parent_id' => $defaultSuperAdmin->id]);
             } else {
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
@@ -100,20 +100,20 @@ class SuperAdmin extends Model
 
             if ($model->default) {
                 static::query()->update(['default' => 0]);
-//                Agency::where(function ($query) {
-//                    $query->whereNull('bd_id')
-//                        ->orWhere('bd_id', 0);
-//                })->update(['bd_id' => $model->id]);
+                Bd::where(function ($query) {
+                    $query->whereNull('parent_id')
+                        ->orWhere('parent_id', 0);
+                })->update(['parent_id' => $model->id]);
             }
         });
 
         self::updating(function ($model) {
             if ($model->default) {
                 static::where('id', '!=', $model->id)->update(['default' => 0]);
-//                Agency::where(function ($query) {
-//                    $query->whereNull('bd_id')
-//                        ->orWhere('bd_id', 0);
-//                })->update(['bd_id' => $model->id]);
+                Bd::where(function ($query) {
+                    $query->whereNull('parent_id')
+                        ->orWhere('parent_id', 0);
+                })->update(['parent_id' => $model->id]);
             }
 
             if ($model->app_id) {

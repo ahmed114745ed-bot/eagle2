@@ -11,7 +11,7 @@ use Modules\Vip\Entities\Vip;
 
 class UserService
 {
-    public function adminUserAvatar($user, bool $withoutLevels = false): string
+    public function adminUserAvatar($user, bool $withoutLevels = false, $showUrl = null): string
     {
         if (! $user) return __('No user');
 
@@ -49,8 +49,9 @@ class UserService
 
 // now safely escape
         $name = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $showUrl = $showUrl ?: $this->adminUserUrl($user->id);
         return <<<HTML
-        <a href="{$this->adminUserUrl($user->id)}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
+        <a href="{$showUrl}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
             <div>
                 <strong style="font-size:16px;">{$name}</strong><br>
@@ -71,9 +72,5 @@ class UserService
     {
         return url("admin/users/{$id}");
     }
-
-
-
-
 
 }
