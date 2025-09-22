@@ -12,17 +12,32 @@ use Modules\Badge\Http\Resources\UserBadgeResource;
 class BadgeController extends Controller
 {
 
-    public function index($id)
+    public function index($userId)
     {
-        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
+        if (!is_numeric($userId) || $userId <= 0) {
+            return Common::apiResponse(0, 'Invalid user ID', null, 400);
+        }
+
+        $userBadges = UserBadge::where('user_id', $userId)
+            ->active()
+            ->with(['badge' => function ($query) {
+                $query->select('id', 'name', 'image', 'type', 'image_type');
+            }])
+            ->get();
+
+        $filteredBadges = $userBadges->filter(function ($userBadge) {
+            return !is_null($userBadge->badge);
+        });
+
         $data = [
             'top' => UserBadgeResource::collection(
-                $userBadges->filter(fn($ub) => $ub->badge && $ub->badge->type === 'top')
+                $filteredBadges->where('badge.type', 'top')
             ),
             'regular' => UserBadgeResource::collection(
-                $userBadges->filter(fn($ub) => $ub->badge && $ub->badge->type === 'regular')
+                $filteredBadges->where('badge.type', 'regular')
             ),
         ];
-        return Common::apiResponse(1, ' successfully',  $data, 200);
+
+        return Common::apiResponse(1, 'User badges retrieved successfully', $data, 200);
     }
 }
