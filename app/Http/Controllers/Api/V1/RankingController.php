@@ -50,7 +50,7 @@ class RankingController extends Controller
     public function ranking2(Request $request)
     {
 
-        throw new Exception(__('closed for update'));
+        throw new Exception(__('closed for update'), '200');
         return TryCatchHelper::handle(function () use ($request) {
 
             $class = (int) ($request->class ?? 1);
