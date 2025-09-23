@@ -230,6 +230,15 @@ class SwitchAccountController extends Controller
         ]);
         $token = $otherUser->tokens()->find($id);
         
+if (! $token) {
+    Log::warning('❌ Token not found when checking', [
+        'user_id' => $otherUser->id ?? null,
+        'token_id' => $id,
+        'full_token_string' => $tokenString,
+    ]);
+    return false;
+}
+
         //        info('id'.$token);
         //        if (! $token){
         //            info('no token');
