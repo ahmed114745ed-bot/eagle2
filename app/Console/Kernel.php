@@ -134,6 +134,9 @@ class Kernel extends ConsoleKernel
         ->timezone(getTimezone())
         ->withoutOverlapping()
         ->runInBackground();
+
+        $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
+
     
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()

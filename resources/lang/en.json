@@ -1166,7 +1166,31 @@
   "invitation.already_registered": "The user is already registered",
   "invitation.device_in_use": "This code has already been used with another account on this device",
   "invitation.stopped": "Sorry, the invitation system is currently disabled",
-  "wallet.insufficient_balance": "You cannot add this amount now. The maximum allowed is :amount."
+  "wallet.insufficient_balance": "You cannot add this amount now. The maximum allowed is :amount.",
+  "Number of Visitors": "Number of Visitors",
+  "Number of Admins": "Number of Admins",
+  "Owner Profit": "Owner Profit",
+  "Admin Profit": "Admin Profit",
+      "Room Cup Targets": "Room Cup Targets",
+    "room-cup-target": "Room Cup Target",
+    "Room Cup Daily Rewards": "Room Cup Daily Rewards",
+    "Owner Name": "Owner Name",
+    "Owner ID": "Owner ID",
+    "Room ID": "Room ID",
+    "Room Name": "Room Name",
+    "Daily Gain": "Daily Gain",
+    "Profit Coins": "Profit Coins",
+    "Date": "Date",
+    "Gain >= X": "Gain >= X",
+    "ID": "ID",
+    "User ID": "User ID",
+    "Amount": "Amount",
+    "Type": "Type",
+    "Created At": "Created At",
+    "Updated At": "Updated At"
+    
+  
+  
 
 
 
