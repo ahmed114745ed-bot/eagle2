@@ -27,7 +27,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class RoleRewardsController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'roles';
+    public $permission_name = 'roles-reward';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("target_events");

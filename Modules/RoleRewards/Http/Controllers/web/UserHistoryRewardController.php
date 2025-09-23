@@ -2,24 +2,26 @@
 
 namespace Modules\RoleRewards\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\RoleRewards\Entities\UserHistoryReward;
 use Encore\Admin\Facades\Admin;
-use App\Admin\Services\UserService;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
+use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\RoleRewards\Entities\VUserHistoryReward;
 
 
-class UserHistoryRewardController extends AdminController
+class UserHistoryRewardController extends MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
+     public $permission_name = 'user-reward';
 
     public function index(Content $content )
     {
@@ -27,7 +29,7 @@ class UserHistoryRewardController extends AdminController
         return parent::index($content
             ->header(__('User history rewards'))
             ->description(__('User history rewards'))
-            // ->body($this->grid())
+            ->body($this->grid())
         );
     }
   
