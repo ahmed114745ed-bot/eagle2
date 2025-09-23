@@ -25,7 +25,7 @@ class FamilyExporter implements FromCollection, WithHeadings
     public $uuid;
 
 
-    public function __construct($id = null, $date = null, $uuid = null,)
+    public function __construct($date = null, $id = null,  $uuid = null)
     {
 
         $this->id = $id;
@@ -48,7 +48,6 @@ class FamilyExporter implements FromCollection, WithHeadings
             ->when($uuid, fn($q) => $q->whereHas('owner', fn($sub) => $sub->searchByUuid($uuid)))
             ->when($date, fn($q) => $q->whereDate('created_at', $date))
             ->get();
-
         $arr = [];
 
         foreach ($families as $family) {

@@ -137,7 +137,7 @@ class ExportController extends Controller
         $date = request('date');
         $id = request('id');
         $uuid = request('uuid');
-
+   
         return Excel::download(
             new FamilyExporter($date, $id, $uuid),
             'families.csv'
