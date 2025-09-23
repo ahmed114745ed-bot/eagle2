@@ -135,6 +135,11 @@ class UserService
         return $this->userRepository->searchUserAgencyShipping($key, $page, $perPage);
     }
 
+    public function userAccounts($key)
+    {
+        return $this->userRepository->userAccounts($key);
+    }
+
     public function searchUsersInFamily($key, $page)
     {
         $perPage = 10;

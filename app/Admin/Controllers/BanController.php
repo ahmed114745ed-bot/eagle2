@@ -235,9 +235,9 @@ class BanController extends MainController
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
                 $deleteLabel = __('Delete');
-                return "<button class='btn btn-danger btn-sm delete-ban' 
-            data-uid='{$this->uid}' 
-            data-type='{$this->type}' 
+                return "<button class='btn btn-danger btn-sm delete-ban'
+            data-uid='{$this->uid}'
+            data-type='{$this->type}'
             data-ban-type-id='{$this->ban_type_id}'>
             {$deleteLabel}
         </button>";

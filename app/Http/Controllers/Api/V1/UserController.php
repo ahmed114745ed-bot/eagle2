@@ -333,6 +333,17 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function userAccounts(Request $request): JsonResponse
+    {
+        $key = $request->get('uuid');
+        if (!$key) {
+            return response()->json([]);
+        }
+        $users = $this->userService->userAccounts($key);
+
+        return response()->json($users);
+    }
+
     public function userFamily(Request $request)
     {
         $key = $request->q;

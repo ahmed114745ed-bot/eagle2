@@ -162,6 +162,17 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function userAccounts($key)
+    {
+        $user = User::where('uuid', $key)->first();
+        if (!$user) {
+            return response()->json([]);
+        }
+
+        return $user->sameDeviceUsers()->get(['id', 'uuid', 'name']);
+
+    }
+
     public function searchUserFamily($key, $page, $perPage)
     {
         return User::select('id', 'name','uuid') // keep light select
