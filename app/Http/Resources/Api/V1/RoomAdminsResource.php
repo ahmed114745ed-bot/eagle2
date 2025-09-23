@@ -3,12 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\ChatSettingResource;
-use App\Http\Resources\Api\V1\MangerTypeResource;
-use App\Models\Follow;
-use App\Models\User;
 
 class RoomAdminsResource extends JsonResource
 {

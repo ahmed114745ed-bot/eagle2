@@ -252,12 +252,12 @@ class RoomController extends Controller
 
         if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
         try {
-            $admins = $this->roomService->roomAdmins($request->owner_id);
+            $admins = $this->roomService->roomAdmins($request->id);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
 
-        $data        = RoomAdminsResource::collection($admins);
+        $data = RoomAdminsResource::collection($admins);
         return Common::apiResponse(1, '', $data, 200);
     }
 
