@@ -8,9 +8,12 @@ class AccountHelper
 {
     public static function linkAccountWithDevice($parentUserId, $childUserId, $deviceToken)
     {
-        UserAccount::where('child_user_id', $childUserId)
+        UserAccount::where(function ($q) use ($childUserId, $parentUserId) {
+            $q->where('child_user_id', $childUserId)
+              ->orWhere('parent_user_id', $childUserId);
+        })
         ->delete();
-        
+
         $key = Str::uuid();
 
         return UserAccount::create([
