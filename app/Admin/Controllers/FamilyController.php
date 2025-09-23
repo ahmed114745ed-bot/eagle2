@@ -72,7 +72,7 @@ class FamilyController extends MainController
                     $query->whereHas('owner', function ($subQuery) {
                         $subQuery->where('uuid', 'like', "%{$this->input}%");
                     });
-                }, __('UUID'),'uuid')->placeholder(__('search for host by UUID'));
+                }, __('UUID'), 'uuid')->placeholder(__('search for host by UUID'));
             });
 
             $filter->column(1 / 2, function ($filter) {
@@ -141,16 +141,20 @@ class FamilyController extends MainController
         ";
         });
 
-        $grid->column('num', __('number of people'));
-        $grid->column('num_admins', __('number of admins'));
+        $grid->column('num', __('number of people'))->display(function ($value) {
+            return $this->members_count . '/' . $value;
+        });;
+        $grid->column('num_admins', __('number of admins'))->display(function ($value) {
+            return $this->admins_num . '/' . $value;
+        });
         $grid->column('max_level', __('level'));
         $grid->column('max_exp', __('exp'));
         $grid->column('created_at', __('created_at'));
 
-      $grid->tools(function (Grid\Tools $tools) {
+        $grid->tools(function (Grid\Tools $tools) {
             $uuid = request('uuid') ?? (request('owner')['uuid'] ?? null);
             $query = http_build_query([
-       
+
                 'date' => request('date') ? convertArabicToEnglishNumbers(request('date')) : '',
                 'id' => request('id'),
                 'uuid' => $uuid,
@@ -199,7 +203,7 @@ class FamilyController extends MainController
         $family = Family::with('allMembers', 'owner')->find($id);
         $familyMembers = $family->allMembers()->when(isset($type), function ($query) use ($type) {
             $query->where('user_type', $type);
-        })->paginate(10, ['*'], 'member_page'); 
+        })->paginate(10, ['*'], 'member_page');
         return  parent::show($id, $content->title(__('family profile'))
             ->view('family_profile', compact('family', 'familyMembers')));
     }
@@ -223,7 +227,7 @@ class FamilyController extends MainController
         $form->select('user_id', __('user id'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
-               $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                $ops2[$user->id] = $user->uuid . '_' . $user->name;
             }
             return $ops2;
         })->ajax('/api/search/users4', 'id', 'name')->rules('required');

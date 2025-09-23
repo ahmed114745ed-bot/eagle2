@@ -169,7 +169,7 @@ class Family extends Model
             return $this->level_max_admins_num;
         }
 
-        return 0;
+        return 2;
     }
 
     // public function getRankAttribute0(){

@@ -55,14 +55,14 @@ class FamilyExporter implements FromCollection, WithHeadings
 
             $arr[] = [
                 'id' => $family->id,
-                'name' => $family->name??'',
-                'owner' => $family->owner->name??'',
-                'num' => $family->num ?? 0,
-                'num_admins' => $family->num_admins ?? 0,
-                'max_level' => $family->max_level ??'',
+                'name' => $family->name ?? '',
+                'owner' => $family->owner->name ?? '',
+                'num' => $family->members_count . '/' . ($family->num_admins ?? 0),
+                'num_admins' => $family->admins_num . '/' . ($family->num_admins ?? 0),
+                'max_level' => $family->max_level ?? '',
                 'max_exp' => $family->max_exp,
                 'created_at' => $family->created_at,
-               
+
 
             ];
         }
