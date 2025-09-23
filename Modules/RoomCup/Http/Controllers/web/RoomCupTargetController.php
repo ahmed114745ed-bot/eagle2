@@ -17,11 +17,13 @@ class RoomCupTargetController extends AdminController
     protected $title = '';
 
 
+  
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(__('Room Cup Targets'))
-        );
+        return $content
+        ->header(__('Room Cup Targets'))
+        ->description(__('Room Cup Targets'))
+        ->body($this->grid());
     }
 
     protected function grid()

@@ -9,11 +9,19 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Modules\RoomCup\Entities\TotalRoomGift;
+use Encore\Admin\Layout\Content;
 
 class RoomCupReportsController extends AdminController
 {
-    protected $title = 'Room Cup Daily Rewards';
+    protected $title = '';
 
+    public function index(Content $content)
+    {
+        return $content
+        ->header(__('Room Cup Daily Rewards'))
+        ->description(__('Room Cup Daily Rewards'))
+        ->body($this->grid());
+    }
     protected function grid()
     {
         $grid = new Grid(new RoomCupReward());
