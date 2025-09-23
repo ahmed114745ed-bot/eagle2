@@ -359,6 +359,14 @@ Route::group(
             ExportController::class,
             'exchangeChargeExcel'
         ])->name('exchange-charge-history');
+        Route::get('/family-level', [
+            ExportController::class,
+            'familyLevelExcel'
+        ])->name('family-level');
+        Route::get('/families-excel', [
+            ExportController::class,
+            'familiesExcel'
+        ])->name('families-excel');
         Route::get('/exchange-coin-history', [
             ExportController::class,
             'exchangeCoinExcel'

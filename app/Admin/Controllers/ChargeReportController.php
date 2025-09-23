@@ -585,7 +585,7 @@ class ChargeReportController extends MainController
             $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
             $query = http_build_query([
                 'from_date' => request('from_date') ? convertArabicToEnglishNumbers(request('from_date')) : '',
-                'to_date' => request('from_date') ? convertArabicToEnglishNumbers(request('to_date')) : '',
+                'to_date' => request('to_date') ? convertArabicToEnglishNumbers(request('to_date')) : '',
                 'trx' => request('trx'),
                 'status' => request('status'),
                 'method' => request('method'),
