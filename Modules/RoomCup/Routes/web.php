@@ -3,7 +3,7 @@
 use Modules\RoomCup\Http\Controllers\web\RoomCupTargetController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupSettingsController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupReportsController;
-
+use  Modules\RoomCup\Console\CalculateRoomCupRewards;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,3 +37,15 @@ Route::group(
    
     }
 );
+
+
+
+Route::get('/roomcup/calculate-rewards', function () {
+
+    Artisan::call('roomcup:calculate-rewards');
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'RoomCup rewards calculated',
+    ]);
+});

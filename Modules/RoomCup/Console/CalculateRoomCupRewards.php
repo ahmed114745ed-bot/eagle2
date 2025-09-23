@@ -33,6 +33,8 @@ class CalculateRoomCupRewards extends Command
 
         if (empty($settings['enabled']) || !$settings['enabled']) {
             $this->warn("❌ Room Cup feature disabled in settings");
+            logger()->warning("❌ Room Cup feature disabled in settings");
+
             return EnumCommand::SUCCESS;
         }
 
