@@ -28,7 +28,7 @@ class UserRoleRewardHelper
                 'receive_type'    => "Role:$roleId",
                 'rewardable_id'   => $reward->rewardable_id,
                 'rewardable_type' => $reward->rewardable_type,
-            ])->exists();
+            ])->where('is_deleted', 0)->exists();
 
             if (! $exists) {
                 UserHistoryReward::create([
