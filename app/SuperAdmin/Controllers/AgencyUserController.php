@@ -56,6 +56,32 @@ class AgencyUserController extends MainController
         return $content;
     }
 
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->detail($id));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->form());
+    }
+
+    public function update($id)
+    {
+        return $this->form()->update($id);
+    }
+
     public function indexProfessionals(Content $content)
     {
         $content = $content->title(__($this->title));
@@ -211,8 +237,6 @@ class AgencyUserController extends MainController
                 });
             });
         ");
-
-        $grid->disableActions();
 
         $grid->disableCreateButton();
 
@@ -385,6 +409,180 @@ class AgencyUserController extends MainController
         $grid->disableCreateButton();
 
         return $grid;
+    }
+
+    protected function form()
+    {
+        $form = new Form(new User());
+        $this->disableFormTools($form);
+        $form->disableEditingCheck();
+
+        if ($form->isEditing()) {
+            $userId           = request()->route('user');
+            $user             = User::findOrFail($userId);
+            $oldDiValue       = $user->getOriginal('di');
+            $oldDiamoundValue = $user->getOriginal('user_diamond');
+        } else {
+            $oldDiValue       = null;
+            $oldDiamoundValue = null;
+        }
+
+        $loggedInUserId = Admin::user()->id;
+        $form->display('id', __('id'));
+        if (!$form->isEditing()) {
+            $form->text('uuid', __('uuid'))->creationRules([
+                'required',
+                Rule::unique('users', 'uuid'),
+                function ($attribute, $value, $fail) {
+                    if (DB::table('wares')->where('value', $value)->exists()) {
+                        return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
+                    }
+                }
+            ])
+                ->updateRules([
+                    'required',
+                    Rule::unique('users', 'uuid')->ignore(request()->route('id')),
+                    // نفس الشيء هنا مع التحقق من عدم وجود القيمة في جدول wares
+                    function ($attribute, $value, $fail) {
+                        if (DB::table('wares')->where('value', $value)->exists()) {
+                            return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
+                        }
+                    }
+                ]);
+        }
+
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
+
+
+        $form->text('name', __('Name'));
+        if ($form->isEditing()) {
+            $form->hidden('oldDiValue')->default($oldDiValue);
+            $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
+        }
+        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+
+        // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
+        $form->image('profile.avatar', __('image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+
+        $form->image('profile.image_id', __('image Id'));
+        $state = [
+            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
+            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
+        ];
+
+        $form->switch('charge_status', __("charge status"))->states($state);
+        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
+        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
+        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
+        $form->hidden('country_id')->default(auth()->user()->country_id);
+
+        $states = [
+            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
+            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
+        ];
+        if ($form->isCreating()) {
+            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
+        } elseif ($form->isEditing()) {
+            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
+                $can_play = UserHandling::chickLevelToPlay($this);
+                return $can_play ? 'on' : 'off';
+            })->states($states);
+        }
+
+        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
+            if ($form->isEditing()) {
+                $form->number('di', __('Coins'))->default(0)
+                    ->disable($form->isEditing());
+            } else {
+                $form->number('di', __('Coins'))->default(0);
+            }
+            $form->number('user_diamond', __('Diamonds'))->default(0);
+            $form->number('total_sender_level', __('Sender Level'))->default(0);
+            $form->number('total_received_level', __('Received Level'))->default(0);
+            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
+            $form->number('salary', __('salary'))->disable();
+        }
+        $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
+        $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
+        $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
+        $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
+        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
+        $form->select('type_user', trans('User Type'))->options([
+            $form->model()->type_user => $form->model()->type_user,
+            0                         => 'مستخدم',
+            1                         => 'مضيف',
+            2                         => 'وكيل مضيفين',
+            3                         => 'وكيل شحن',
+            4                         => ' وكيل مصيفين ووكيل شحن',
+            5                         => 'اداري',
+
+        ])->default(0);
+
+        if (Session::has('show_alert')) {
+            $form->html('<script>
+            $(document).ready(function () {
+                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
+            });
+        </script>');
+        }
+
+        $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
+            $type_user = request()->type_user;
+            $model     = $form->model();
+            $user_id   = $model->id;
+            if ($form->oldDiValue != $oldDiValue) {
+                $form->di = $oldDiValue;
+            }
+
+            if ($form->oldDiamoundValue != $oldDiamoundValue) {
+                $form->user_diamond = $oldDiamoundValue;
+            }
+
+            $agancy = Agency::where('app_owner_id', $user_id)->first();
+            if ($agancy) {
+
+                if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
+                    session()->flash('show_alert', 'Your alert message');
+                    return redirect()->back();
+                }
+
+                switch ($type_user) {
+                    case 2:
+                        User::where('id', $user_id)->update(['type_user' => 2]);
+                        break;
+                    case 3:
+                        User::where('id', $user_id)->update(['type_user' => 3]);
+                        break;
+                    case 4:
+                        User::where('id', $user_id)->update(['type_user' => 4]);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        });
+
+
+        return $form;
+    }
+
+    protected function detail($id)
+    {
+        $show = new Show(User::findOrFail($id));
+
+        $show->field('id', __('Id'));
+        $show->field('uuid', __('uuid'));
+        $show->field('avatar', __('avatar'))->image('', 200);
+        $show->field('name', __('Name'));
+        $show->field('nickname', __('NickName'));
+        $show->field('flag', __('country'))->image('', 50);
+        $show->field('email', __('Email'));
+
+        return $show;
     }
 
 }

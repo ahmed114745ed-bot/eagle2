@@ -3,8 +3,10 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
+use App\Models\Agency;
 use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
@@ -14,8 +16,12 @@ use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;
@@ -58,6 +64,25 @@ class UserController extends MainController
         })->row(view('admin.same_device_users_modal'));
 
         return $content;
+    }
+
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->form());
+    }
+
+    public function destroy($id)
+    {
+        return $this->form()->destroy($id);
     }
 
     public function show($id, Content $content,)
@@ -169,7 +194,7 @@ class UserController extends MainController
                 );
         }
 
-        public function countries()
+    public function countries()
         {
             $ops       = [null => __('no country')];
             $countries = Country::all();
@@ -302,13 +327,146 @@ class UserController extends MainController
             });
         ");
 
-        $grid->disableActions();
-
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
 
         return $grid;
+    }
+
+    protected function form()
+    {
+        $form = new Form(new User());
+        $this->disableFormTools($form);
+
+        if ($form->isEditing()) {
+            $userId           = request()->route('user');
+            $user             = User::findOrFail($userId);
+            $oldDiValue       = $user->getOriginal('di');
+            $oldDiamoundValue = $user->getOriginal('user_diamond');
+        } else {
+            $oldDiValue       = null;
+            $oldDiamoundValue = null;
+        }
+
+        $form->display('id', __('id'));
+        if (!$form->isEditing()) {
+            $form->text('uuid', __('uuid'))->creationRules([
+                'required',
+                Rule::unique('users', 'uuid'),
+                function ($attribute, $value, $fail) {
+                    if (DB::table('wares')->where('value', $value)->exists()) {
+                        return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
+                    }
+                }
+            ])
+                ->updateRules([
+                    'required',
+                    Rule::unique('users', 'uuid')->ignore(request()->route('id')),
+                    function ($attribute, $value, $fail) {
+                        if (DB::table('wares')->where('value', $value)->exists()) {
+                            return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
+                        }
+                    }
+                ]);
+        }
+
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
+
+        $form->text('name', __('Name'));
+        if ($form->isEditing()) {
+            $form->hidden('oldDiValue')->default($oldDiValue);
+            $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
+        }
+        $form->text('original_uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+
+        $form->image('photo', __('image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+
+        $form->image('profile.image_id', __('image Id'));
+
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+            Admin::script(
+                <<<JS
+                    $(document).ready(function() {
+                        $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
+                    });
+                    JS
+            );
+        }
+
+
+        $form->hasMany('images', __('Profile Images'), function ($form) {
+            $form->image('img', __('Image'));
+        })->useTable()->disableCreate()->disableDelete();
+
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
+            Admin::script(
+                <<<JS
+        $(document).ready(function() {
+            $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
+            $('.has-many-images .has-many-remove').hide();
+            $('.has-many-images .remove').hide();
+            $('.has-many-images .close').hide();
+            $('.has-many-images a.close').hide();
+        });
+        JS
+            );
+        }
+        $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
+        $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
+        $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
+        $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
+        $form->hidden('country_id')->default(auth()->user()->country_id);
+
+
+        if (Session::has('show_alert')) {
+            $form->html('<script>
+            $(document).ready(function () {
+                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
+            });
+        </script>');
+        }
+
+        $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
+            $type_user = request()->type_user;
+            $model     = $form->model();
+            $user_id   = $model->id;
+            $form->model()->uuid = $form->original_uuid;
+            if ($form->oldDiValue != $oldDiValue) {
+                $form->di = $oldDiValue;
+            }
+
+            if ($form->oldDiamoundValue != $oldDiamoundValue) {
+                $form->user_diamond = $oldDiamoundValue;
+            }
+
+            $agancy = Agency::where('app_owner_id', $user_id)->first();
+            if ($agancy) {
+                if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
+                    session()->flash('show_alert', 'Your alert message');
+                    return redirect()->back();
+                }
+                switch ($type_user) {
+                    case 2:
+                        User::where('id', $user_id)->update(['type_user' => 2]);
+                        break;
+                    case 3:
+                        User::where('id', $user_id)->update(['type_user' => 3]);
+                        break;
+                    case 4:
+                        User::where('id', $user_id)->update(['type_user' => 4]);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        });
+
+
+        return $form;
     }
 
     public function ajaxSameDeviceUsersTable($id)
