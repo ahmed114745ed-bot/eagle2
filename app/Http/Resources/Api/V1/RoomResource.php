@@ -54,7 +54,7 @@ class RoomResource extends JsonResource
             'is_popular' => $this->is_popular ?: 0,
             'room_status' => $this->room_status,
             'password_status' => (bool) $this->room_pass,
-            'room_intro' => $this->room_intro ?: '',
+            'room_intro' => $this->room_intro ?? '',
             'max_admin' => $this->max_admin ?: '',
             'is_recommended' => $this->is_recommended ?: 0,
             'lang' => $this->lang ?: '',
