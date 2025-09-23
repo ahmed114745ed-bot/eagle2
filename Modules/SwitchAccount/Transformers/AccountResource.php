@@ -37,7 +37,7 @@ class AccountResource extends JsonResource
             'received_level'  => $this->total_received_level ?? 0,
             'unread_messages'  => $total_unread_message ?? 0,
             'key'           =>  $userAccount?->key,
-            'expire'        =>  $userAccount->expire,
+            'expire'        =>  $userAccount?->expire,
             'can_switch'    => ($this->id == $authId ? false : true),
             'vip' => Common::ovip_center(@$this),
             'special_color'    => @$this->color_id ?? '',
