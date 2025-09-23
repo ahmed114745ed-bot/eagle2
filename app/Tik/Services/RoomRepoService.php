@@ -214,9 +214,12 @@ class RoomRepoService
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
     }
 
-    public function roomAdmins($ownerId)
+    /**
+     * @throws \Exception
+     */
+    public function roomAdmins($id)
     {
-        $room = $this->repository->findRoomAdmins($ownerId, true);
+        $room = $this->repository->findRoomId($id, true);
         if (!$room) throw new \Exception(__('room not found'));
 
         if (empty($room->room_admin)) return collect();

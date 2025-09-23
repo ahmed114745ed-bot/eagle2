@@ -507,7 +507,7 @@ class EnteranceController extends Controller
     }
 
 
-    public function update(EditRoomRequest $request, $id)
+    public function update(EditRoomRequest $request, $id): JsonResponse
     {
         try {
             $user = $request->user();

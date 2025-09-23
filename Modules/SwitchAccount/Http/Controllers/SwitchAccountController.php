@@ -2,6 +2,8 @@
 
 namespace Modules\SwitchAccount\Http\Controllers;
 
+use App\helper\AccountHelper;
+use App\helper\TryCatchHelper;
 use App\Models\User;
 use Dotenv\Util\Str;
 use App\Helpers\Common;
@@ -18,7 +20,44 @@ use Modules\SwitchAccount\Transformers\AccountResource;
 
 class SwitchAccountController extends Controller
 {
+
+
     public function add_account(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$request->token_new_account) {
+            return Common::apiResponse(false, 'missing params', null, 422);
+        }
+
+        return TryCatchHelper::handle(function () use ($request, $user) {
+            $otherUser = $this->getOtherUser($request);
+
+            if ($otherUser->id == $user->id) {
+                throw new \Exception('can not add yourself');
+            }
+
+            $userAccount = AccountHelper::linkAccountWithDevice(
+                $user->id,
+                $otherUser->id,
+                $user->device_token
+            );
+
+            $accounts = $this->getAllAccounts($user->id, $otherUser->id, $user->device_token);
+
+            return [
+                'current' => [
+                    'image'      => $user->profile->avatar,
+                    'name'       => $user->name,
+                    'key'        => $userAccount->key,
+                    'expire'     => $userAccount->expire,
+                    'can_switch' => false,
+                ],
+                'other' => AccountResource::collection($accounts),
+            ];
+        }, 200, 400);
+    }
+    public function add_account0(Request $request)
     {
         $user = $request->user();
         if (!$request->token_new_account) return Common::apiResponse(0, 'missing params', null, 422);
@@ -102,6 +141,7 @@ class SwitchAccountController extends Controller
                     ->orWhere('child_user_id', $userId);
             })
             ->get();
+    
 
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
@@ -109,33 +149,8 @@ class SwitchAccountController extends Controller
             return $id != $userId;
         })->values();
 
-        //        info($userIds);
         return User::whereIn('id', $userIds)->get();
-        // if (empty($deviceToken))  return  [];
 
-        // $users = UserAccount::
-        //     where(function ($q) use ($userId,$otherUserId){
-        //         $q->where("parent_user_id", $userId)
-        //             ->orWhere("child_user_id", $userId)
-        //             ->orWhere("child_user_id", $otherUserId)
-        //             ->orWhere("parent_user_id", $otherUserId);
-        //     })
-        //     ->where('device_token', $deviceToken)
-        //     ->where('parent_user_id',$userId)
-        //     ->get();
-
-        // // $parentUserIds = $users->pluck('parent_user_id');
-        // $childUserIds = $users->pluck('child_user_id');
-
-        // // $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
-
-        // // $filteredIds = array_filter($allIds, function ($id) use ($userId) {
-        // //     return $id != $userId;
-        // // });
-        // // $filteredIds = array_values($filteredIds);
-        // $accounts = User::query()->whereIn('id', $childUserIds)->get();
-
-        // return $accounts ?? [];
     }
 
     public function getOtherUser($request)
