@@ -12,6 +12,7 @@ use App\Helpers\UserCoinLogHelper;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
+use Modules\Badge\Entities\Badge;
 
 class UserRoleRewardHelper
 {
@@ -53,7 +54,10 @@ class UserRoleRewardHelper
 
         foreach ($rewards as $reward) {
             self::removeReward($user, $reward);
-            $reward->update(['is_deleted' => 1]);
+            $reward->update([
+                'is_deleted' => 1,
+                'deleted_at' => now()
+            ]);
         }
     }
 
@@ -77,10 +81,10 @@ class UserRoleRewardHelper
     {
         if ($reward->type === "vip") {
             $vip = OVip::find($reward->rewardable_id);
-            UserCommon::addVipToUser($user, $vip, $reward->expire, null, $receiveType ,1);
+            UserCommon::addVipToUser($user, $vip, $reward->expire, null, $receiveType);
         } elseif ($reward->type === "ware") {
             $ware = Ware::find($reward->rewardable_id);
-            UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType );
+            UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType);
         } elseif ($reward->type === "achievement") {
             UserAchievementLevel::create([
                 'user_id'      => $user->id,
@@ -117,6 +121,7 @@ class UserRoleRewardHelper
             'vip'         => OVip::class,
             'ware'        => Ware::class,
             'achievement' => UserAchievementLevel::class,
+            'badge'       => Badge::class,
             default       => $type,
         };
     }
@@ -174,20 +179,20 @@ class UserRoleRewardHelper
         $dashboardUsers = \Encore\Admin\Auth\Database\Administrator::whereHas('roles', function ($q) use ($roleId) {
             $q->where('id', $roleId);
         })->get();
-    
+
         $appIds = $dashboardUsers->pluck('app_id')->filter()->unique();
-    
+
         if ($appIds->isEmpty()) {
             return;
         }
-    
+
         $users = User::whereIn('id', $appIds)->get();
-    
+
         foreach ($users as $user) {
             self::revokeOneReward($user, $roleId, $slug, $rewardableType, $rewardableId);
         }
     }
-    
+
     protected static function revokeOneReward($user, int $roleId, string $slug, string $rewardableType, int $rewardableId): void
     {
         $rewards = UserHistoryReward::where('user_id', $user->id)
@@ -195,7 +200,7 @@ class UserRoleRewardHelper
             ->where('rewardable_type', $rewardableType)
             ->where('rewardable_id', $rewardableId)
             ->get();
-    
+
         foreach ($rewards as $reward) {
             self::removeReward($user, $reward);
             $reward->delete();
