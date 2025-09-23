@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -992,6 +993,7 @@ class AgencyController extends MainController
     protected function addSavedLogic(Form $form)
     {
         $form->saved(function (Form $form) {
+
             $appOwnerId = intval($form->model()->app_owner_id);
 
             User::where('id', $appOwnerId)->update([
@@ -999,6 +1001,10 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
+
+            $user = User::find($appOwnerId)  ;
+            
+            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

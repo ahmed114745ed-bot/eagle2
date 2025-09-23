@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Modules\Badge\Entities\Badge;
 
 class Reward extends Model
 {
@@ -17,7 +18,7 @@ class Reward extends Model
 
     protected $guarded = [];
 
-    protected $appends = ['target1', 'target2', 'target3', 'target4'];
+    protected $appends = ['target1', 'target2', 'target3', 'target4', 'target5'];
 
     public function getAppends2(): array
     {
@@ -44,6 +45,11 @@ class Reward extends Model
         return $this->hasOne(OVip::class, 'id', 'target');
     }
 
+    public function badge()
+    {
+        return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
     public function getTarget1Attribute()
     {
         return $this->target;
@@ -64,6 +70,11 @@ class Reward extends Model
         return $this->target;
     }
 
+    public function getTarget5Attribute()
+    {
+        return $this->target;
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -74,6 +85,8 @@ class Reward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
+            } elseif ($model->type === 'badge') {
+                $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
 
                 $file = request('target4', $model->target);
@@ -87,6 +100,7 @@ class Reward extends Model
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
+            unset($model->target5);
         });
 
         self::updating(function ($model) {
@@ -96,6 +110,8 @@ class Reward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
+            } elseif ($model->type === 'badge') {
+                $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {
@@ -110,6 +126,7 @@ class Reward extends Model
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
+            unset($model->target5);
         });
     }
 }

@@ -221,6 +221,6 @@ class PackRepository extends AbstractRepository
 
     public function UnusedPack($id, $userId)
     {
-        return $this->model->query()->where('id', $id)->where('user_id', $userId)->where('is_used', 0)->whereNull('expire')->first();
+        return $this->model->query()->where('id', $id)->where('user_id', $userId)->where('is_used', 0)->where('using', 0)->whereNull('expire')->first();
     }
 }

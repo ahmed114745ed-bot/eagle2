@@ -33,6 +33,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
@@ -106,6 +107,7 @@ class AgencyService
 
         $requests = $this->agencyJoinRequestRepository->getByUser($user->id);
         CustomNotification::agencyJoinRequest($agency, $user);
+
         return $requests;
     }
 
@@ -248,6 +250,8 @@ class AgencyService
             // add vip to user
             // UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
+            MilestoneHelper::grantMilestoneToUser($user, 'host');
+
         }
         return true;
     }

@@ -2,18 +2,20 @@
 
 namespace Modules\DailyPrize\Http\Controllers\web;
 
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Facades\Admin;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Selectables\OVips;
 use App\Selectables\Wares;
+use App\Selectables\Badges;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Admin\Controllers\MainController;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Layout\Content;
 
 class DailyPrizeController extends MainController
 {
@@ -234,10 +236,15 @@ class DailyPrizeController extends MainController
                 "ware"        => __('ware'),
                 "vip"         => __('vip'),
                 "coins"       => __('coins'),
+                "badge" => __('badge'),
                 "achievement" => __('achievement'),
             ])
             ->when('ware', function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
+                $form->number('expire', __('expire'));
+            })
+            ->when("badge", function () use ($form) {
+                $form->belongsTo('target5', Badges::class, trans('Badges'));
                 $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
@@ -264,6 +271,10 @@ class DailyPrizeController extends MainController
                     if (!$form->target1) $errors[] = __('wares') . ' ' . __('is required');
                     if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
                     break;
+                case 'badge':
+                    if (!$form->target5) $errors[] = __('badge') . ' ' . __('is required');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
                 case 'vip':
                     if (!$form->target2) $errors[] = __('vips') . ' ' . __('is required');
                     if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
@@ -287,6 +298,7 @@ class DailyPrizeController extends MainController
         return $form;
     }
 
+
     public function store()
     {
         $data = request()->all();
@@ -301,6 +313,9 @@ class DailyPrizeController extends MainController
                 break;
             case 'vip':
                 $data['target'] = $data['target2'] ?? null;
+                break;
+            case 'badge':
+                $data['target'] = $data['target5'] ?? null;
                 break;
             case 'coins':
                 $data['target'] = $data['target3'] ?? null;
@@ -320,7 +335,7 @@ class DailyPrizeController extends MainController
         $validated = validator($data, [
             'type' => 'required|string',
             'order' => 'required|unique:daily_gifts,order,NULL,id,type,' . $type,
-            'gift_type' => 'required|in:ware,vip,coins,achievement',
+            'gift_type' => 'required|in:ware,vip,coins,achievement,badge',
             'target' => 'required',
         ])->validate();
 

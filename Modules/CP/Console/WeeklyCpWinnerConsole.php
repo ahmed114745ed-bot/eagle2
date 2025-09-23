@@ -3,11 +3,12 @@
 namespace Modules\CP\Console;
 
 use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
+use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Helpers\UserCommon;
+use Modules\Vip\Entities\OVip;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
@@ -84,9 +85,12 @@ class WeeklyCpWinnerConsole extends Command
                             case 'achievement':
                                 UserRewardsWeeklyCp::assignAchievement($reward->target, $reward->expire, $userOne, $userTwo);
                                 break;
+                            case 'badge':
+                                UserRewardsWeeklyCp::assignBadge($reward->target, $reward->expire, $userOne, $userTwo);
+                                break;
                         }
 
-                        CpWinnerReward::create(['winner_id'=>$userOne->id,'reward_id'=>$reward->id]);
+                        CpWinnerReward::create(['winner_id' => $userOne->id, 'reward_id' => $reward->id]);
                     }
                 }
             }
