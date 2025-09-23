@@ -633,6 +633,19 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function dedicateBadges(User $user, $duration, $name, $image)
+    {
+        $tokens_notification = $user?->notification_id;
+        $body_ar             = __('api.wareVips', ['duration' => $duration, 'name' => $name], 'ar');
+        $body_en             = __('api.wareVips', ['duration' => $duration, 'name' => $name], 'en');
+        $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
+        $data['image'] = getImagePath($image);
+        $icon = $data['image'];
+        if (!$user->is_logout)   Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'ware-vip');
+        Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
     /**
      * @param mixed $momentUser
      * @param \Illuminate\Foundation\Application|array|string|\Illuminate\Contracts\Translation\Translator|\Illuminate\Contracts\Foundation\Application|null $body_ar
