@@ -42,10 +42,11 @@ class RankingRepository
         [$from, $to] = $this->getDateRange($type);
 
         switch ($type) {
-            case 1: 
+            case 0: 
                 $model = CoinGameUser::class;
                 break;
 
+            case 1: 
             case 2: 
                 $model = CoinGameUserMerged::class;
                 break;
