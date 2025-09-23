@@ -75,7 +75,7 @@ class CalculateRoomCupRewards extends Command
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
 
-            $rewards[] = $this->makeReward($room->id, $gift->id, $room->owner_id, 'owner', $target->owner_profit);
+            $rewards[] = $this->makeReward($room->id, $gift->id, $room->uid, 'owner', $target->owner_profit);
 
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
