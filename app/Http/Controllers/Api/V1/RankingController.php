@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Services\RankingService;
 use App\Http\Controllers\Controller;
+use Mockery\Exception;
 use Modules\Vip\Services\Api\VipService;
 use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Http\Resources\Api\V1\NewAgencyRankingResource;
@@ -23,7 +24,7 @@ class RankingController extends Controller
     {
         $this->rankingService = $rankingService;
         $this->userService = $userService;
-        
+
     }
 
     public function ranking(Request $request)
@@ -49,22 +50,26 @@ class RankingController extends Controller
     public function ranking2(Request $request)
     {
 
+        // return Common::apiResponse(0, __('closed for update'));
+
+        // throw new Exception(__('closed for update'));
+
         return TryCatchHelper::handle(function () use ($request) {
-    
+
             $class = (int) ($request->class ?? 1);
             $type  = (int) ($request->type ?? 1);
-    
+
             if ($error = RankingHelper::validateParams($class, $type)) {
-                return $error; 
+                return $error;
             }
-    
+
             $limit = RankingHelper::getLimit((bool) $request->is_home);
-    
+
             $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
-    
+
             $data = RankingHelper::transformData($class, $data);
-    
-            return $data; 
+
+            return $data;
         });
     }
 

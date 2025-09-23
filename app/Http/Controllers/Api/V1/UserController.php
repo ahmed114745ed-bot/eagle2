@@ -2,15 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\UserCoinLogType;
-use App\helper\InvitationWalletHelper;
-use App\helper\TryCatchHelper;
-use App\helper\InvitationEarningHelper;
-use App\Helpers\UserCoinLogHelper;
-use App\Helpers\UserPackHelper;
-use App\Services\FilterChargeService;
 use Auth;
 use Exception;
+use App\Models\Ban;
 use App\Models\Gift;
 use App\Models\Pack;
 use App\Models\User;
@@ -18,49 +12,56 @@ use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Enums\UserType;
-use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\AllUsersResource;
-use App\Http\Resources\Api\V1\DataUserResource;
-use App\Http\Resources\Api\V1\DeviceTokenResource;
-use App\Http\Resources\Api\V1\LevelUserResource;
-use App\Http\Resources\Api\V1\MyDataResource;
-use App\Http\Resources\Api\V1\MyStoreResource;
-use App\Http\Resources\Api\V1\OnlineResource;
-use App\Http\Resources\Api\V1\ShowUserResource;
-use App\Http\Resources\Api\V1\ShowUserSettingResource;
-use App\Http\Resources\Api\V1\UserLevelHistoryResource;
-use App\Http\Resources\Api\V1\UserResource;
-use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Http\Resources\Api\V1\UserTargetResource;
-use App\Http\Resources\Api\V1\UserTypeResource;
-use App\Http\Resources\CpUserResource;
-use App\Http\Resources\MyDataUtdResource;
-use App\Http\Resources\UserPackUtdResource;
-use App\Http\Resources\UserPackVipResource;
-use App\Http\Resources\UserVipUtdResource;
-use App\Http\Resources\UserVisitRoomResource;
-use App\Http\Services\ProfileRelationsService;
+use App\Models\UserSallary;
+use Illuminate\Http\Request;
+use App\Facades\UserHandling;
+use App\Services\UserService;
+use App\Enums\UserCoinLogType;
+use App\helper\TryCatchHelper;
+use App\Helpers\UserPackHelper;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
-use App\Models\Ban;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
-use App\Models\UserSallary;
-use App\Services\UserService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Services\FilterChargeService;
 use Illuminate\Support\Facades\Cache;
+use App\helper\InvitationWalletHelper;
+use App\Http\Resources\CpUserResource;
+use App\helper\InvitationEarningHelper;
+use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use App\Http\Resources\UserVipUtdResource;
+use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackUtdResource;
+use App\Http\Resources\UserPackVipResource;
+use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\OnlineResource;
+use App\Http\Resources\UserVisitRoomResource;
+use App\Http\Resources\Api\V1\MyStoreResource;
+use App\Http\Services\ProfileRelationsService;
+use App\Http\Resources\Api\V1\AllUsersResource;
+use App\Http\Resources\Api\V1\DataUserResource;
+use App\Http\Resources\Api\V1\ShowUserResource;
+use App\Http\Resources\Api\V1\UserPlayResource;
+use App\Http\Resources\Api\V1\UserTypeResource;
+use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
+use App\Http\Resources\Api\V1\UserTargetResource;
+use App\Http\Resources\Api\V1\DeviceTokenResource;
+use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
+use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
-use Modules\WhatsappAuth\Services\WhatsappWebhook;
-use App\Facades\CustomNotification;
+use App\Http\Resources\Api\V1\UserLevelHistoryResource;
+use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
 class UserController extends Controller
 {
@@ -1273,7 +1274,7 @@ class UserController extends Controller
     public function allUsersPlayGame()
     {
         $data = $this->userService->allUsersPlayGame();
-        return Common::apiResponse(true, 'done', UserResourceSerche::collection($data));
+        return Common::apiResponse(true, 'done', UserPlayResource::collection($data));
     }
 
     public function online()

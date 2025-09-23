@@ -16,10 +16,8 @@ use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
-use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
@@ -365,6 +363,14 @@ Route::group(
             ExportController::class,
             'exchangeChargeExcel'
         ])->name('exchange-charge-history');
+        Route::get('/family-level', [
+            ExportController::class,
+            'familyLevelExcel'
+        ])->name('family-level');
+        Route::get('/families-excel', [
+            ExportController::class,
+            'familiesExcel'
+        ])->name('families-excel');
         Route::get('/exchange-coin-history', [
             ExportController::class,
             'exchangeCoinExcel'
@@ -626,7 +632,11 @@ Route::group(
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
+        Route::get('coin-game-users/details', [CoinGameUserAllController::class,'index_details']);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
+    ->name('coin-game-users.ajax');
+
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 

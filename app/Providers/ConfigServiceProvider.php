@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\CacheHelper;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -23,6 +24,8 @@ class ConfigServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Config::set('exp_percentages', $this->getReceivedAndSanderPercentage());
+
+        CacheHelper::cacheConfig();
 
         $config = getPusherConfig();
 
