@@ -62,6 +62,21 @@ class AdminUserController extends EncorUsersController
 
     }
 
+    public function grid ()
+    {
+
+        $grid =  parent::grid(); 
+
+        $grid->actions(function ( $actions) {
+                $actions->disableDelete();
+                $actions->add(new DeleteUser());
+            
+        });
+
+        return $grid;
+
+    }
+
     public function update ( $id )
     {
         $admin = Auth::user();
