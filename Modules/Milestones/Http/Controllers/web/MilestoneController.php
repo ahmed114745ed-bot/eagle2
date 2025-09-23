@@ -2,15 +2,16 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Milestones\Entities\Milestone;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Modules\Milestones\Entities\Milestone;
 
-class MilestoneController extends AdminController
+class MilestoneController extends MainController
 {
+     public $permission_name = 'milestone';
     /**
      * Title for current resource.
      *
@@ -24,6 +25,34 @@ class MilestoneController extends AdminController
             ->header(__('Milestone'))
             ->description(__('Milestone'))
             ->body($this->grid());
+    }
+
+     public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Milestone'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('Milestone'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Milestone'))
+            ->body($this->form()));
     }
 
     protected function grid()
