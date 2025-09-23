@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_history_rewards', function (Blueprint $table) {
-           $table->softDeletes();
+            $table->softDeletes();
         });
     }
 
@@ -22,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_history_rewards', function (Blueprint $table) {
-            //
         });
     }
 };
