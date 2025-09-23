@@ -21,9 +21,9 @@ class DedicateBadgeController extends MainController
             ->title(trans('badges'))
             ->body($this->grid()));
     }
-    
 
-    
+
+
     protected function grid()
     {
         $grid = new Grid(new Badge());
@@ -46,12 +46,17 @@ class DedicateBadgeController extends MainController
             $filter->equal('priority', 'Priority');
         });
 
-         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
 
                 return (new \App\Admin\Actions\BadgeDedicateAction($this->id))->render();
             });
         }
+
+        $grid->tools(function (Grid\Tools $tools) {
+
+            $tools->append('<a href="' . url('/admin/user-badges') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+        });
 
         $grid->disableExport();
         $grid->disableActions();
