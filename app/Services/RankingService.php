@@ -177,6 +177,8 @@ class RankingService
         ]);
     
         $topUsers = $data->take(3); 
+        \Log::info('Top User Resources:', $topUsers->toArray());
+
         $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
         
        
