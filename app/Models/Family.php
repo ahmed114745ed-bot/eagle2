@@ -30,7 +30,7 @@ class Family extends Model
 
     public function getMembersNumAttribute()
     {
-        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */ ->count();
+        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */->count();
 
         return $fu;
     }
@@ -120,6 +120,30 @@ class Family extends Model
         return null;
     }
 
+    public function getMaxExpAttribute()
+    {
+        $level = $this->getLevelMax();
+
+        if ($level) {
+            return $level->exp;
+        }
+
+        return 0;
+    }
+
+    public function getMaxLevelAttribute()
+    {
+        $level = $this->getLevelMax();
+
+        if ($level) {
+            return app()->getLocale() === 'ar' ? ($level->name ?? $level->name_en) : ($level->name_en ?? $level->name);
+        }
+
+        return '';
+    }
+
+
+
     public function getLevelMaxAdminsNumAttribute()
     {
         $level = $this->getLevelMax();
@@ -145,7 +169,7 @@ class Family extends Model
             return $this->level_max_admins_num;
         }
 
-        return 2;
+        return 0;
     }
 
     // public function getRankAttribute0(){
@@ -179,7 +203,6 @@ class Family extends Model
         } else {
 
             $gl = $this->month_rank;
-
         }
 
         return $gl;

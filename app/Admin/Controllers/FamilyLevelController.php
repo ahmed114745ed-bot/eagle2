@@ -82,6 +82,11 @@ class FamilyLevelController extends MainController
         $grid->column('members', __('members'));
         $grid->column('admins', __('admins'));
 
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->append('<a href="' . url('/admin/family-level') . '" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        });
+
 
         $grid->actions(function ($actions) {
             $actions->disableView();
