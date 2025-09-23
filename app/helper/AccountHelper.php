@@ -32,10 +32,7 @@ class AccountHelper
             return null;
         }
 
-        // UserAccount::where(function ($q) use ($userId) {
-        //     $q->where('parent_user_id', $userId)
-        //       ->orWhere('child_user_id', $userId);
-        // })->delete();
+    
 
         $linkedUserIds = UserAccount::where('device_token', $deviceToken)
             ->pluck('parent_user_id')
@@ -58,6 +55,10 @@ class AccountHelper
             ->toArray();
      
         foreach ($allRelatedUsers as $otherUserId) {
+
+            if($userId == $otherUserId){
+                continue;
+            }
             UserAccount::create([
                 'parent_user_id' => $userId,
                 'child_user_id'  => $otherUserId,
@@ -67,16 +68,7 @@ class AccountHelper
             ]);
         }
 
-        if (empty($allRelatedUsers)) {
-     
-            return UserAccount::create([
-                'parent_user_id' => $userId,
-                'child_user_id'  => null,
-                'device_token'   => $deviceToken,
-                'key'            => \Illuminate\Support\Str::uuid(),
-                'expire'         => 30,
-            ]);
-        }
+ 
 
         return true;
     }
