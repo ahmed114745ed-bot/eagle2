@@ -31,27 +31,51 @@ class AccountHelper
         if (empty($deviceToken)) {
             return null;
         }
-    
-        $existingAccounts = UserAccount::where('device_token', $deviceToken)->get();
-    
-        if ($existingAccounts->isEmpty()) {
-            $otherUsers = \App\Models\User::where('device_token', $deviceToken)
-                ->where('id', '!=', $userId)
-                ->get();
-    
-            if ($otherUsers->isNotEmpty()) {
-                foreach ($otherUsers as $otherUser) {
-                    UserAccount::create([
-                        'parent_user_id' => $userId,
-                        'child_user_id'  => $otherUser->id,
-                        'device_token'   => $deviceToken,
-                        'key'            => \Illuminate\Support\Str::uuid(),
-                        'expire'         => 30,
-                    ]);
-                }
-                return true;
-            }
-    
+
+        UserAccount::where(function ($q) use ($userId) {
+            $q->where('parent_user_id', $userId)
+              ->orWhere('child_user_id', $userId);
+        })->delete();
+
+        $linkedUserIds = UserAccount::where('device_token', $deviceToken)
+            ->pluck('parent_user_id')
+            ->merge(
+                UserAccount::where('device_token', $deviceToken)->pluck('child_user_id')
+            )
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $usersWithSameDevice = \App\Models\User::where('device_token', $deviceToken)
+            ->where('id', '!=', $userId)
+            ->pluck('id')
+            ->toArray();
+
+        $allRelatedUsers = collect($linkedUserIds)
+            ->merge($usersWithSameDevice)
+            ->unique()
+            ->values()
+            ->toArray();
+        logger()->info("🔑 Login link accounts", [
+                'logged_in_user'   => $userId,
+                'device_token'     => $deviceToken,
+                'linked_accounts'  => $allRelatedUsers,
+            ]);
+        foreach ($allRelatedUsers as $otherUserId) {
+            UserAccount::create([
+                'parent_user_id' => $userId,
+                'child_user_id'  => $otherUserId,
+                'device_token'   => $deviceToken,
+                'key'            => \Illuminate\Support\Str::uuid(),
+                'expire'         => 30,
+            ]);
+        }
+
+        if (empty($allRelatedUsers)) {
+            logger()->info("🆕 First account linked with device", [
+                'logged_in_user' => $userId,
+                'device_token'   => $deviceToken,
+            ]);
             return UserAccount::create([
                 'parent_user_id' => $userId,
                 'child_user_id'  => null,
@@ -60,24 +84,7 @@ class AccountHelper
                 'expire'         => 30,
             ]);
         }
-    
-        foreach ($existingAccounts as $account) {
-            $alreadyLinked = UserAccount::where(function ($q) use ($userId, $account) {
-                $q->where('parent_user_id', $userId)
-                  ->where('child_user_id', $account->parent_user_id);
-            })->exists();
-    
-            if (!$alreadyLinked) {
-                UserAccount::create([
-                    'parent_user_id' => $userId,
-                    'child_user_id'  => $account->parent_user_id,
-                    'device_token'   => $deviceToken,
-                    'key'            => \Illuminate\Support\Str::uuid(),
-                    'expire'         => 30,
-                ]);
-            }
-        }
-    
+
         return true;
     }
 }
