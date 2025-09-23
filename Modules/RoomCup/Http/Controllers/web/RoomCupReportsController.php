@@ -10,6 +10,7 @@ use Encore\Admin\Show;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Modules\RoomCup\Entities\TotalRoomGift;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
 
 class RoomCupReportsController extends AdminController
 {
@@ -30,35 +31,57 @@ class RoomCupReportsController extends AdminController
             ->with(['gift', 'gift.room', 'gift.room.owner'])
             ->orderBy('created_at', 'desc');
 
-        // 🔹 Owner Data
-        $grid->column('gift.room.owner.name', 'Owner Name');
-        $grid->column('gift.room.owner.id', 'Owner ID');
+   
+        $grid->column('user_id', __('room owner'))->display(function ($name) {
+            $user = $this->room->owner;
+            if (! $user) {
+                return __('No User');
+            }
 
-        // 🔹 Room Data
-        $grid->column('gift.room.id', 'Room ID');
-        $grid->column('gift.room.name', 'Room Name');
+            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+        });
 
-        // 🔹 Daily Gain (from TotalRoomGift)
-        $grid->column('gift.current_total', 'Daily Gain');
+        $grid->column('room_id', __('room'))->display(function ($name) {
+            $path = @$this->room->room_cover;
+            $id = @$this->room->id;
+            $defaultImage = asset("images/room.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-        // 🔹 Profit in Coins (from reward amount)
-        $grid->column('amount', 'Profit Coins')->totalRow();
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            if (strlen($name) > 50){
+                $name = substr($name,0,50) . ' ...';
+            }
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                    <div>
+                        <span style='cursor: pointer;'>$name</span><br>
+                        <span style='cursor: pointer;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+
+    
+
+        $grid->column('gift.current_total', __('Daily Gain'));
+
+        $grid->column('amount', __('Profit Coins'));
 
         // 🔹 Date of gain
-        $grid->column('created_at', 'Date')->display(function ($date) {
+        $grid->column('created_at', __('Date'))->display(function ($date) {
             return \Carbon\Carbon::parse($date)->toDateString();
         });
 
         // 🔹 Filters
         $grid->filter(function ($filter) {
-            $filter->like('gift.room.owner.name', 'Owner Name');
-            $filter->equal('gift.room.id', 'Room ID');
-            $filter->between('created_at', 'Date')->date();
-            $filter->where(function ($query) {
-                $query->whereHas('gift', function ($q) {
-                    $q->where('current_total', '>=', $this->input);
-                });
-            }, 'Gain >= X');
+            $filter->like('gift.room.owner.name',  __('Owner Name'));
+            $filter->equal('gift.room.id',  __('Room ID'));
+            $filter->between('created_at', __('Date'))->date();
+        
         });
 
         $grid->disableCreateButton();

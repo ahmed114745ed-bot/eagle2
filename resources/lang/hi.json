@@ -2927,14 +2927,28 @@
 "Number of Admins": "प्रशासकों की संख्या",
 "Owner Profit": "मालिक का लाभ",
 "Admin Profit": "प्रशासक का लाभ",
-  "Room Cup Targets": "Oda Kupası Hedefleri",
-"room-cup-target": "Oda Kupası Hedefi",
+
 "Room Cup Settings": "रूम कप सेटिंग्स",
 "Enable Room Cup Feature": "रूम कप फीचर सक्षम करें",
 "ON": "चालू",
 "OFF": "बंद",
 "Interval (minutes)": "अंतराल (मिनटों में)",
-"Save": "सहेजें"
+"Save": "सहेजें",
+"Room Cup Daily Rewards": "रूम कप दैनिक पुरस्कार",
+"Owner Name": "मालिक का नाम",
+"Owner ID": "मालिक आईडी",
+"Room ID": "कमरे की आईडी",
+"Room Name": "कमरे का नाम",
+"Daily Gain": "दैनिक लाभ",
+"Profit Coins": "लाभ (सिक्के)",
+"Date": "तारीख",
+"Gain >= X": "लाभ >= X",
+"ID": "आईडी",
+"User ID": "यूज़र आईडी",
+"Amount": "राशि",
+"Type": "प्रकार",
+"Created At": "बनाने की तारीख",
+"Updated At": "अपडेट की तारीख"
 
 
 

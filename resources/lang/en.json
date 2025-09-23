@@ -1167,12 +1167,23 @@
   "Admin Profit": "Admin Profit",
       "Room Cup Targets": "Room Cup Targets",
     "room-cup-target": "Room Cup Target",
-    "Room Cup Settings": "रूम कप सेटिंग्स",
-    "Enable Room Cup Feature": "रूम कप फीचर सक्षम करें",
-    "ON": "चालू",
-    "OFF": "बंद",
-    "Interval (minutes)": "अंतराल (मिनटों में)",
-    "Save": "सहेजें"
+    "Room Cup Daily Rewards": "Room Cup Daily Rewards",
+    "Owner Name": "Owner Name",
+    "Owner ID": "Owner ID",
+    "Room ID": "Room ID",
+    "Room Name": "Room Name",
+    "Daily Gain": "Daily Gain",
+    "Profit Coins": "Profit Coins",
+    "Date": "Date",
+    "Gain >= X": "Gain >= X",
+    "ID": "ID",
+    "User ID": "User ID",
+    "Amount": "Amount",
+    "Type": "Type",
+    "Created At": "Created At",
+    "Updated At": "Updated At"
+    
+  
   
 
 
