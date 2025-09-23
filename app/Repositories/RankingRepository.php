@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\helper\RankingHelper;
+use App\Helpers\Common;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
 use App\Models\CoinGameUserMerged;
@@ -41,11 +42,10 @@ class RankingRepository
         [$from, $to] = $this->getDateRange($type);
 
         switch ($type) {
-            case 0: 
+            case 1: 
                 $model = CoinGameUser::class;
                 break;
 
-            case 1: 
             case 2: 
                 $model = CoinGameUserMerged::class;
                 break;
@@ -91,30 +91,31 @@ class RankingRepository
 
     protected function getDateRange(int $type): array
     {
+        $timezone = Common::timeZone();
         switch ($type) {
             case 0: 
-                $from = Carbon::now()->startOfHour();
-                $to   = Carbon::now()->endOfHour();
+                $from = Carbon::now($timezone)->startOfHour();
+                $to   = Carbon::now($timezone)->endOfHour();
                 break;
 
             case 1: 
-                $from = Carbon::now()->startOfDay();
-                $to   = Carbon::now()->endOfDay();
+                $from = Carbon::now($timezone)->startOfDay();
+                $to   = Carbon::now($timezone)->endOfDay();
                 break;
 
             case 2: 
-                $from = Carbon::now()->startOfWeek();
-                $to   = Carbon::now()->endOfWeek();
+                $from = Carbon::now($timezone)->startOfWeek();
+                $to   = Carbon::now($timezone)->endOfWeek();
                 break;
 
             case 3: 
-                $from = Carbon::now()->startOfMonth();
-                $to   = Carbon::now()->endOfMonth();
+                $from = Carbon::now($timezone)->startOfMonth();
+                $to   = Carbon::now($timezone)->endOfMonth();
                 break;
 
             default: 
-                $from = Carbon::now()->startOfDay();
-                $to   = Carbon::now()->endOfDay();
+                $from = Carbon::now($timezone)->startOfDay();
+                $to   = Carbon::now($timezone)->endOfDay();
                 break;
         }
 
