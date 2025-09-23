@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Http\Resources\Api\V1\UserResourceSearchV2;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +36,27 @@ class CommunityController extends Controller
         $this->searchRepository->saveSearchHistory($user_id, $keywords);
 
         $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => RoomSearchResource::collection($this->searchRepository->searchRooms($user_id, $keywords)),];
+
+        return Common::apiResponse(1, '', $result, paginationKey: 'user');
+    }
+
+    public function mergeSearchV2(Request $request): JsonResponse
+    {
+        $keywords = $request->keywords;
+        $user = Auth::user();
+        $user_id = $user->id;
+
+        if (!$keywords || !$user_id) {
+            return Common::apiResponse(0, 'Missing parameters');
+        }
+
+        $this->searchRepository->saveSearchHistory($user_id, $keywords);
+
+        $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
+
+        $result = ['user' => UserResourceSearchV2::collection($this->searchRepository->userSearchHandV2($user_id, $keywords, $blockedUserIds)), 'rooms' => RoomSearchResource::collection($this->searchRepository->searchRoomsV2($user_id, $keywords, $blockedUserIds)),];
 
         return Common::apiResponse(1, '', $result, paginationKey: 'user');
     }
@@ -90,4 +113,21 @@ class CommunityController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function notifications(Request $request): JsonResponse
+    {
+        // 0 => 'agency', 1 => 'sys', 2 => 'official',
+        $data = $request->validate([
+            'type' => 'required|integer|in:0,1,2',
+        ]);
+
+        $userId = $request->user()->id;
+        if (!$userId) return Common::apiResponse(0, 'un_auth');
+
+        $data = $this->searchRepository->getNotifications($userId,$data['type']);
+
+        (new UserCounterServices)->UpgradeDateForType($request->user(), 'official_message');
+        (new UserCounterServices)->UpgradeDateForType($request->user(), 'system_message');
+
+        return Common::apiResponse(1, '', $data);
+    }
 }

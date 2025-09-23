@@ -70,9 +70,10 @@ class RoomSearchResource extends JsonResource
             "nickname" => $this->nickname ?? '',
             'country' =>$endCountry ,
             'achievement_images' => $achievement_images,
-            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
+//            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
             'country_hidden' => $isHideCountry,
             'frame' => $frame,
+            'room_type' => $this->type,
 
         ];
     }

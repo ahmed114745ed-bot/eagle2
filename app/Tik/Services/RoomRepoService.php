@@ -27,6 +27,7 @@ use App\Repositories\Room\RoomRepoInterface;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
 
 class RoomRepoService
 {
@@ -50,6 +51,24 @@ class RoomRepoService
         return $this->repository->all($request);
     }
 
+    public function getAllMine($request, $user_id)
+    {
+        return $this->repository->mine($request, $user_id);
+    }
+
+    public function getUserRooms($request, $user_id)
+    {
+        return $this->repository->getUserRooms($request, $user_id);
+    }
+
+
+
+    public function getAllLiveRooms($request)
+    {
+        return $this->repository->liveRooms($request);
+    }
+
+
     /**
      * @throws \Exception
      */
@@ -59,10 +78,10 @@ class RoomRepoService
         $data = array_merge($request->all(), ['uid' => $userId]);
         unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
- 
-        if ($paidRoom && $paidRoom->value){
+
+        if ($paidRoom && $paidRoom->value) {
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
-            if ($user->di < $paidRoomAmount->value){
+            if ($user->di < $paidRoomAmount->value) {
                 throw new \Exception(__('you do not have enough coins for creating a room'));
             }
 
@@ -76,15 +95,13 @@ class RoomRepoService
 
             $user->di = $user->di - $paidRoomAmount->value;
             $user->save();
-
-
         }
 
         $room = $this->repository->create($data);
 
         if ($request->type) {
             $room->type = $request->type;
-            if ($request->type == 'single_live' || $request->type == 'multi_live') {
+            if ($request->type == 'live') {
                 $room->is_live = true;
             }
         }
@@ -108,6 +125,12 @@ class RoomRepoService
     {
         return $this->repository->findRoomUser($userId);
     }
+
+    public function findRoomUserByType($userId, $type)
+    {
+        return $this->repository->findRoomUserByType($userId, $type);
+    }
+
 
     public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
     {
@@ -191,13 +214,16 @@ class RoomRepoService
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
     }
 
-    public function roomAdmins($ownerId)
+    /**
+     * @throws \Exception
+     */
+    public function roomAdmins($id)
     {
-        $room = $this->repository->findRoomAdmins($ownerId, true);
+        $room = $this->repository->findRoomId($id, true);
         if (!$room) throw new \Exception(__('room not found'));
-    
+
         if (empty($room->room_admin)) return collect();
-    
+
         $adminIds = explode(',', $room->room_admin);
         return $this->userRepository->getAdmins($adminIds);
     }
@@ -359,9 +385,12 @@ class RoomRepoService
     public function changeMode($request, $currentMode)
     {
         $user = request()->user();
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
+        $youtubeStatus =  (bool)(getSettingCash('youtube_status') ?? true);
+        if ($currentMode == 5 && $youtubeStatus === false) return Common::apiResponse(0, __('this feature stopped'), null, 404);
         //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
         $room->mode = $currentMode;

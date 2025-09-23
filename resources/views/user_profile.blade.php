@@ -1171,6 +1171,15 @@
                     </div>
 
             </div>
+
+            <div class="agency-meta">
+                 <div class="meta-item">
+                        <span class="meta-label">{{__('badges')}}:</span>
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
+                   {!! @$user->userBadge() !!}
+                    </div>
+
+            </div>
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
@@ -1179,10 +1188,19 @@
                 </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                        <button type="submit" class="btn btn-success edit_user_item_model_btn">
                             {{ __('edit') }}
                         </button>
                  @endif
+
+                 @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                     <button type="button"
+                            class="btn btn-danger remove-bd-btn"
+                            data-id="{{ $user->id }}"
+                            data-url="{{ route('users.remove', $user->id) }}">
+                        {{ __('Remove BD') }}
+                    </button>
+                @endif
             </div>
         </div>
     </div>
@@ -1244,19 +1262,16 @@
             </div>
             <div class="box-body">
                 <div class="nav-scroll-container">
-                    <ul class="nav nav-pills">
-                        @foreach($types as $id => $name)
-                            @php
-                             $defaultType = $types->keys()->first();
-                                $selectedType = request()->get('type', $defaultType); // Default to 1
-                            @endphp
-                            <li class="{{ $selectedType == $id ? 'active' : '' }}">
-                                <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
-                                    {{ __($name) }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                  
+                        <ul class="nav nav-pills">
+                            @foreach($types as $id => $name)
+                                <li class="{{ $type == $id ? 'active' : '' }}">
+                                    <a href="{{ request()->fullUrlWithQuery(['type' => $id, 'pack_page' => 1]) }}" class="charge_action">
+                                        {{ __($name) }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                 </div>
             </div>
 
@@ -1305,7 +1320,7 @@
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
-                                        @if ($admin)
+                                        @if ($admin && @$pack->receive_type == 'wares-dash-dedicate')
                                             <a href="{{ $url ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
@@ -1326,7 +1341,50 @@
 
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
-                                    <td>{{ $pack->receive_type }}</td>
+                                    {{-- <td>{{ $pack->receive_type }}</td> --}}
+                                        <td>
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                {{-- Always show type --}}
+                                                <span style="font-weight: 600; color: #444;">
+                                                    {{ @$pack->receive_type ?? '' }}
+                                                </span>
+
+                                                {{-- If receive_type contains "send", show sender below --}}
+                                                @if(@$pack->sender && Str::contains(@$pack->receive_type, 'send'))
+                                                    @php
+                                                        $name = @$pack->sender->name ?? 'Unknown User';
+                                                        $showUrl = url("admin/users/" . @$pack->sender->id);
+                                                    @endphp
+
+                                                    <a href="{{ $showUrl }}" 
+                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                            sender:
+                                                        </span>
+                                                        <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                            {{ $name }}
+                                                        </span>
+                                                    </a>
+                                                     @elseif($pack->receive_type == 'wares-dash-dedicate' && $pack->admin)
+                                                @php
+                                                    $name = @$pack->admin->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/auth/users/" . @$pack->admin->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #28a745; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        admin:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+        
+                                                @endif
+                                            </div>
+                                        </td>
+
 
                                     <td>
                                         <div class="d-flex">
@@ -1350,6 +1408,7 @@
 
             <div class="pagination-wrapper">
                 {{ $packs?->appends([
+                     'type'        => $type, 
                     'vip_page' => $userVips?->currentPage(),
                     'salary_page' => $salaries?->currentPage(),
                     'gift_page' => $giftSLogs?->currentPage(),
@@ -1399,7 +1458,48 @@
                                     </td> 
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>{{ @$userVip->receive_type ?? 0 }}</td>
+                                  <td>
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            {{-- Always show type --}}
+                                            <span style="font-weight: 600; color: #444;">
+                                                {{ @$userVip->receive_type ?? '' }}
+                                            </span>
+
+                                            {{-- If send-vip, show sender below --}}
+                                            @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
+                                                @php
+                                                    $name = @$userVip->sender->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/users/" . @$userVip->sender->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        sender:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+                                            @endif
+                                            @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
+                                                @php
+                                                    $name = @$userVip->admin->name ?? 'Unknown Admin';
+                                                    $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        sender:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
                                     
                                     <td>
                                         <div class="d-flex">
@@ -2584,7 +2684,37 @@
 
     $(document).ready(function () {
 
-
+    $(document).on('click', '.remove-bd-btn', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                let url = btn.data('url');
+        
+                Swal.fire({
+                    title: 'هل أنت متأكد؟',
+                    text: "لن تستطيع التراجع بعد الحذف!",
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'نعم، احذف',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.value) {
+                        let form = $('<form>', {
+                            'method': 'POST',
+                            'action': url
+                        }).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_token',
+                            'value': LA.token
+                        })).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_method',
+                            'value': 'POST'  
+                        }));
+                        form.appendTo('body').submit();
+                    }
+                });
+            });
 
          $('#agency_id').select2({
         placeholder: 'Select agency',

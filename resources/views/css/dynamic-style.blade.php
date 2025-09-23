@@ -756,6 +756,11 @@ html.ltr .dropdown-menu {
         right: 0;
     }
 
+    
+    .rtl  .column-reward .rtlSvga {
+            direction: ltr !important;
+        }
+  
     select>option{
         background-color: var(--box-background-color) !important;
         color: var(--inverse-box-color) !important;

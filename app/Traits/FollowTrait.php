@@ -28,7 +28,6 @@ trait FollowTrait
     public function rooms_uids()
     {
         return Room::query()->where('room_status', 1)->where('is_afk', 1)->pluck('uid');
-        // return Room::query ()->where ('room_status',1)->pluck ('uid');
     }
 
     public function following(): BelongsToMany
@@ -73,6 +72,25 @@ trait FollowTrait
         })->wherePivot('status', 1)->orderBy('follows.created_at', 'desc');
     }
 
+    public function friendRelations()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'user_id',
+            'followed_user_id'
+        )
+        ->wherePivot('status', 1)
+        ->whereExists(function ($query) {
+            $query->selectRaw(1)
+                ->from('follows as f2')
+                ->whereColumn('f2.user_id', 'follows.followed_user_id')
+                ->whereColumn('f2.followed_user_id', 'follows.user_id')
+                ->where('f2.status', 1);
+        })
+        ->orderBy('follows.created_at', 'desc');
+    }
+
 
     public function friendsFollowedId()
     {
@@ -89,13 +107,13 @@ trait FollowTrait
         })
         ->wherePivot('status', 1)
         ->pluck('followed_user_id'); // استخراج معرفات الأصدقاء
-    
+
         $followedIds = Follow::where('user_id', $this->id)
             ->pluck('followed_user_id'); // استخراج معرفات المستخدمين الذين يتابعهم
-    
+
         return $friendsIds->merge($followedIds)->unique(); // دمج النتائج وإزالة التكرارات
     }
-    
+
     // Assume we have a relationship to check if the user is being followed
     public function followedByAuthUser()
     {

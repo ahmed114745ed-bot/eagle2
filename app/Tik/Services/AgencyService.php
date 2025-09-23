@@ -2,7 +2,6 @@
 
 namespace App\Tik\Services;
 
-use App\Tik\Repositories\ShippingAgencyRepository;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
@@ -15,12 +14,14 @@ use App\Helpers\UserCommon;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
 use App\Models\AgencyJoinRequest;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
 use http\Exception\RuntimeException;
 use Illuminate\Support\Facades\Hash;
+use App\Models\MonthlyDiamondReceive;
 use App\Notifications\AgencyOwnerRole;
 use Illuminate\Support\Facades\Storage;
 use App\Exceptions\CValidationException;
@@ -29,6 +30,7 @@ use App\Tik\Repositories\AdminRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\FollowRepository;
 use App\Tik\Repositories\TargetRepository;
+use Modules\Milestones\Entities\Milestone;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
@@ -36,11 +38,13 @@ use Illuminate\Support\Facades\Notification;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
@@ -50,9 +54,7 @@ use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use App\Models\MonthlyDiamondReceive;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
-use App\Models\UsersJoinedAgency;
 
 
 
@@ -106,6 +108,7 @@ class AgencyService
 
         $requests = $this->agencyJoinRequestRepository->getByUser($user->id);
         CustomNotification::agencyJoinRequest($agency, $user);
+
         return $requests;
     }
 
@@ -246,8 +249,10 @@ class AgencyService
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
             // add vip to user
-            UserCommon::userVip($user,'request-action-agency');
+            // UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
+            MilestoneHelper::grantMilestoneToUser($user, 'host');
+
         }
         return true;
     }
@@ -644,6 +649,8 @@ class AgencyService
         UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
         if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
+         $milestone = Milestone::where('slug', 'host')->first();
+            MilestoneHelper::revokeRewardFromUser($user_kicked, $milestone->rewards);
         return true;
     }
 
@@ -1165,7 +1172,7 @@ class AgencyService
         ];
         $this->agencyJoinRequestRepository->update($data, $id);
         if ($request->status == 1) {
-            UserCommon::userVip($user , 'updatea-gency-join-request');
+            // UserCommon::userVip($user , 'updatea-gency-join-request');
             $this->userRepository->update(['type_user' => 1, 'monthly_diamond_received' => 0], $user->id);
         }
         return true;

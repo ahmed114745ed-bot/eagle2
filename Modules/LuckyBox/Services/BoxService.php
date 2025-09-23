@@ -160,6 +160,7 @@ class BoxService
                 "room_cover" => $room->room_cover ?? '',
                 "room_background" => $room->final_room_image ?? '',
                 "room_mode" => $room->mode,
+                "room_type" => $room->type,
             ],
             "sender" => [
                 "id" => $user->id,
@@ -173,7 +174,10 @@ class BoxService
             "ownerBoxAL"  => $user->UserVip?->level ?? 0,
             // ]
         ];
-        event(new SuperLuckyBox($d2));
+        try {
+            event(new SuperLuckyBox($d2));
+        } catch (\Exception $e) {
+        }
         // $json2 = json_encode($d2);
         // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
         return $boxUser;

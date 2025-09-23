@@ -2,21 +2,22 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainController;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Helpers\UserCommon;
-use App\Services\AppFeatureService;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Services\AppFeatureService;
 use Modules\Events\Entities\PkEvent;
 use Modules\Events\Entities\PkReward;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class PkEventController extends MainController
@@ -85,12 +86,39 @@ class PkEventController extends MainController
     protected function grid()
     {
         $grid = new Grid(new PkEvent());
+        $grid->model()->orderByDesc("id");
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereDate('start_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('Start Date'), 'from_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('from_date')));
+            });
+
+            // End Date
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+
+                        $query->whereDate('end_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('End Date'), 'to_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+        });
 
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        if (Admin::user()->can('browse-' . 'pk-event-rewards') || Admin::user()->can('*')) {
+        if (!request()->filled('_export_') && (Admin::user()->can('browse-' . 'pk-event-rewards') || Admin::user()->can('*'))) {
             $grid->column('الاجرائات')->display(function () {
                 // توليد الروابط
                 $url1 = url('admin/pk-events-gift/pk-star/' . $this->id);
@@ -160,7 +188,7 @@ class PkEventController extends MainController
         $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+        $form->date('start_date_local', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
 
                 $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
@@ -205,8 +233,8 @@ class PkEventController extends MainController
         $grid = new Grid(new PkEvent());
         $grid->model()->where('id', $id);
 
-        $grid->column('start_date', __('Start Date'));
-        $grid->column('end_date', __('End Date'));
+        $grid->column('start_date_local', __('Start Date'));
+        $grid->column('end_date_local', __('End Date'));
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->disableFilter();
@@ -232,10 +260,13 @@ class PkEventController extends MainController
                 return $target;
             } elseif ($this->type == "ware") {
                 $ware = Ware::find($target);
-                return $ware->name;
+                return $ware ? ($ware->name ?? "") : "";
             } elseif ($this->type == "vip") {
                 $vip = OVip::find($target);
-                return $vip->name;
+                return $vip ? ($vip->name ?? "") : "";
+            } elseif ($this->type == "badge") {
+                $vip = Badge::find($target);
+                return $vip ? (@$vip->name ?? '') : "";
             } else {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";

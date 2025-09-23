@@ -62,18 +62,26 @@ class EnteranceController extends Controller
     public function libraryAgoraZego()
     {
         $agora_app_id = Common::getConfig('app_id');
-        $zego_server_secret = Common::zegoData('zego_server_secret');
-        $zego_app_id = Common::zegoData('zego_app_id');
-        $app_sign = Common::zegoData('app_sign');
-        $library = Common::getConfig('library');
+        $zego_server_secret = Common::getConfig('zego_server_secret');
+        $zego_app_id = Common::getConfig('zego_app_id');
+        $app_sign = Common::getConfig('app_sign');
+        $library = Common::getConfig('video_library');
+        $liveLibrary = Common::getConfig('live_library');
+        $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+
+        $libraries = ['agora', 'zego', 'tencent'];
+        $liveTypes = ['RTC', 'CDN', 'L3'];
+
         $data = [
             'agora_app_id' => $agora_app_id,
             'zego' => [
                 'server_secret' => $zego_server_secret,
                 'app_id' => $zego_app_id,
-                'app_sign' => $app_sign
+                'app_sign' => $app_sign,
+                'filter' => $zego_filter_enabled == 1 ? true : false,
+                'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
-            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
+            'library' => $libraries[$library],
 
         ];
         return Common::apiResponse(1, '', $data);
@@ -228,34 +236,68 @@ class EnteranceController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+
+
     public function enter_room(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $realtimeProject =  Common::checkRealTime('audio');
+        $user     = $request->user();
+        $roomId   = $request->input('room_id');
+        $roomPass = $request->input('room_pass');
 
-        $room_pass = $request['room_pass'];
-        // $owner_id = $request['owner_id'];
-
-        $room_id = $request->input('room_id');
-
-        if (!$room_id) {
-            return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
+        if (!$roomId) {
+            return $this->errorResponse(__('Please provide a room_id.'), 422);
         }
 
-        $room = Room::findOrFail($room_id);
-        $owner_id = $room->uid;
-        if (!$realtimeProject) {
-            return Common::apiResponse(0, __('you can not enter room now '));
+        $room = $this->findRoom($roomId);
+        if (!$room) {
+            return $this->errorResponse(__('Room not found.'), 404);
         }
 
-
-        $ban = Common::ifRoomHasband($owner_id);
-        if ($ban) {
-            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true],402);
+        if ($this->isRoomBanned($room->uid)) {
+            return $this->errorResponse(
+                __('This room has been closed. Wait until moderators lift the ban.'),
+                403,
+                ['ban' => true]
+            );
         }
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $type  =  $room->type;
 
-        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $room);
+
+        $this->setDefaultBackground();
+
+        return $this->handleRoomType($type, $user, $request, $roomPass, $room);
+    }
+
+    private function errorResponse(string $message, int $code, array $extra = []): JsonResponse
+    {
+        return Common::apiResponse(0, $message, $extra ?: null, $code);
+    }
+
+    private function findRoom(int $roomId): ?Room
+    {
+        return Room::find($roomId);
+    }
+
+    private function isRoomBanned(int $ownerId): bool
+    {
+        return Common::ifRoomHasband($ownerId);
+    }
+
+    private function setDefaultBackground(): void
+    {
+        request()->default_background = \DB::table('backgrounds')
+            ->where('enable', 1)
+            ->orderBy('id')
+            ->value('img');
+    }
+
+    private function handleRoomType(?string $type, $user, Request $request, $roomPass, Room $room): JsonResponse
+    {
+        return match ($type) {
+            'audio' => $this->enteranceRoomService->enterRoom($user, $request, $roomPass, $room),
+            'live'  => $this->enteranceRoomService->enterLiveRoom($user, $request, $roomPass, $room),
+            default => $this->errorResponse(__('Invalid room type. Allowed types: audio, live.'), 422),
+        };
     }
 
     private function updateRoom($user_id, $owner_id, Room &$room)
@@ -466,7 +508,9 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $room = $this->repo->find($id);
+            $type = $request->get('type', 'audio');
+
+            $room = $this->repo->findByType($id, $type);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
@@ -488,10 +532,12 @@ class EnteranceController extends Controller
                 $room->room_intro = $request->room_intro;
             }
 
-            if ($request->type) {
-                $room->type = $request->type;
-                if ($request->type == 'single_live' || $request->type == 'multi_live') {
+            if ($type) {
+                $room->type = $type;
+                if ($request->type == 'live' ) {
                     $room->is_live = true;
+                }else{
+                    $room->is_live = false;
                 }
             }
 
@@ -656,9 +702,6 @@ class EnteranceController extends Controller
             $errors = implode(',', $validator->errors()->all());
             return Common::apiResponse(0, $errors);
         }
-
-
-
         $user = $request->user();
         try {
             $send = $this->enteranceRoomService->makeRequestInviteRoom($user, $request);

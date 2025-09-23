@@ -139,10 +139,16 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         $schedule->command('coin_game:archive')
-            ->monthlyOn(1, '00:30')
+            ->dailyAt('07:00')
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->runInBackground();
+        $schedule->command('coin-game:aggregate')
+        ->dailyAt('07:00')
+        ->timezone(getTimezone())
+        ->withoutOverlapping()
+        ->runInBackground();
+    
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())

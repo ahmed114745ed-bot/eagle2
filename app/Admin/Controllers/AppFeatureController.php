@@ -7,6 +7,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\AppFeature;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Content;
 
 class AppFeatureController extends MainController
 {
@@ -16,6 +17,49 @@ class AppFeatureController extends MainController
      * @var string
      */
     protected $title = 'AppFeature';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('AppFeature'))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('AppFeature'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('AppFeature'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('AppFeature'))
+            ->body($this->form()));
+    }
+
 
     /**
      * Make a grid builder.
@@ -64,7 +108,7 @@ class AppFeatureController extends MainController
     {
         $form = new Form(new AppFeature());
 
-        
+
         $form->text('name_ar', __('name '));
         $form->text('name', __('name_en'));
         $form->text('slug', __('Slug'));

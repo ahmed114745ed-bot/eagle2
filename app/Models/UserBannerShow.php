@@ -10,6 +10,10 @@ class UserBannerShow extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
+    protected $fillable = [
+        'user_id',
+        'banner_id',
+    ];
     public function banner()
     {
         return $this->belongsTo(Banner::class);

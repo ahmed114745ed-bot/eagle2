@@ -12,7 +12,7 @@ use Modules\Vip\Entities\UserVip;
 
 class Pack extends Model
 {
-    use SoftDeletes, TimestampsWithTimezone ,AutoReceiveType;
+    use SoftDeletes, TimestampsWithTimezone, AutoReceiveType;
 
     protected $guarded = [];
 
@@ -35,7 +35,7 @@ class Pack extends Model
 
     public function sender()
     {
-        return $this->belongTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function admin()
@@ -68,6 +68,8 @@ class Pack extends Model
                 return __('purchase');
             case 5:
                 return __('background addition');
+            case 6:
+                return __('limited time purchase');
             default:
                 return '-';
         }
@@ -161,7 +163,12 @@ class Pack extends Model
 
     public function getFormattedExpireAttribute()
     {
-        return $this->expire ? date('Y-m-d H:i:s', $this->expire) : 0;
+        if (!is_null($this->expire)) {
+            return date('Y-m-d H:i:s', $this->expire);
+        }
+
+        // if expire is NULL
+        return (string) ($this->days ?? 0);;
     }
 
     public function getIsDressAttribute()
@@ -212,5 +219,4 @@ class Pack extends Model
         }
         return Carbon::parse($this->created_at)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
-
 }

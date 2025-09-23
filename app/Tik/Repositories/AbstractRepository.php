@@ -2,14 +2,11 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Family;
-use App\Models\Mode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 
-/** @property Family $model*/
 abstract class AbstractRepository
 {
     /**

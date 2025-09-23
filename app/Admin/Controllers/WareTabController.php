@@ -228,6 +228,29 @@ class WareTabController extends MainController
     {
         $request = request();
 
+        if ($request->ajax() && $request->has('_editable')) {
+            $field = $request->input('name');
+            $value = $request->input('value');
+
+            $allowedFields = ['name', 'price'];
+
+            if (in_array($field, $allowedFields)) {
+                $model = Ware::findOrFail($id);
+                $model->$field = $value;
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully'),
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('Field not allowed to be edited.'),
+                ]);
+            }
+        }
+
         $toggleFields = ['enable', 'is_active_for_vip'];
 
         $editableField = collect($request->except(['_token', '_method', '_edit_inline']))->keys()->first();
@@ -306,76 +329,47 @@ class WareTabController extends MainController
 //                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
 //            });
 
+        $form->display('img2', 'Preview')->with(function ($value) {
+            if (!$value) return "<div id='preview-display-img2'></div>";
+
+            $url = \Storage::disk(config('admin.upload.disk'))->url($value);
+            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+            $uniqueId = 'file_' . uniqid();
+
+            if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
+                return "<div id='preview-display-img2'>" .
+                    handleShowImageWithTypes($uniqueId, $url, null, 100, 10) .
+                    "</div>";
+            }
+
+            return "<div id='preview-display-img2'>
+                <img src='{$url}' style='max-height:150px' class='img img-thumbnail' />
+            </div>";
+        });
+
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
-                return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             })
             ->attribute([
                 'id' => 'file-input-img2'
-            ])->help('<div id="preview-img2" style="margin-top:10px;"></div>');
+            ])->hidePreview();
 
-//        $form->display('img2', 'Preview')->with(function ($value) {
-//            if (!$value) return null;
-//
-//            $url = \Storage::disk(config('admin.upload.disk'))->url($value);
-//            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
-//            $uniqueId = 'file_' . uniqid();
-//
-//            if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
-//                return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
-//            }
-//
-//            return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
-//        });
-
-        Admin::script(<<<'JS'
-    $(document).ready(function () {
-        $('#file-input-img2').on('change', function (event) {
-            let file = event.target.files[0];
-            if (!file) return;
-
-            let ext = file.name.split('.').pop().toLowerCase();
-
-            // clear old preview
-            $('#preview-img2').empty();
-
-            if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#preview-img2').html(
-                        `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`
-                    );
-                };
-                reader.readAsDataURL(file);
-            } else if (['mp4','mov','webm'].includes(ext)) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#preview-img2').html(
-                        `<video src="${e.target.result}" controls style="max-height:150px"></video>`
-                    );
-                };
-                reader.readAsDataURL(file);
-            } else if (ext === 'svga') {
-                let uniqueId = 'svga_preview_' + Date.now();
-                $('#preview-img2').html(`<div id="${uniqueId}" style="width:150px;height:150px;"></div>`);
-
-                let player = new SVGA.Player('#' + uniqueId);
-                player.loops = 0; // infinite loop
-                player.clearsAfterStop = false;
-                let parser = new SVGA.Parser('#' + uniqueId);
-
-                let blobUrl = URL.createObjectURL(file);
-
-                parser.load(blobUrl, function(videoItem) {
-                    player.setVideoItem(videoItem);
-                    player.startAnimation();
-                });
-            } else {
-                $('#preview-img2').html(`<p>Selected file: ${file.name}</p>`);
-            }
-        });
-    });
-JS);
+//        $form->file('img2', trans('svg'))
+//            ->name(function ($file) {
+//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//            })
+//            ->options([
+//                'showPreview' => false,
+////                'showCaption' => false,
+////                'showRemove'  => false,
+////                'showUpload'  => false,
+////                'showCancel'  => false,
+////                'dropZoneEnabled' => false,     // no drag & drop area
+//                'initialPreview' => [],         // don’t render existing file
+//                'initialPreviewConfig' => [],
+//            ])
+//            ->hidePreview();
 
 //        \Encore\Admin\Form::extend('customfile', CustomFile::class);
 //        $form->customfile('img2', 'Upload Image/Animation');

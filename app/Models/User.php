@@ -2,39 +2,44 @@
 
 namespace App\Models;
 
+use DB;
+use Log;
+use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
-use App\Traits\MomentRelationshipTrait;
-use App\Traits\PaymentGetWayTrait;
-use App\Traits\TimestampsWithTimezone;
-use App\Traits\User\UserLevel;
-use DB;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\HasApiTokens;
-use Log;
-use Modules\Achievement\Http\Traits\AchievementUser;
-use Modules\AgencyApp\Entities\AdditionalInfo;
-use Modules\Chat\Traits\ChatUserTrait;
-use Modules\Moment\Entities\Moment;
-use Modules\Moment\Entities\MomentUserGift;
-use Modules\Reals\Entities\Real;
-use Modules\Reals\Traits\RealRelationshipTrait;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
-use Modules\SalaryTransaction\Traits\UserTransferTrait;
-use Modules\SpecialId\Traits\SpecialId;
-use App\Models\Config as ConfigModel;
-use Carbon\Carbon;
-use Modules\Vip\Entities\UserVip;
+use Modules\CP\Entities\Cp;
 use Modules\Vip\Entities\Vip;
+use App\Traits\User\UserLevel;
+use Modules\Vip\Entities\OVip;
+use App\Helpers\UserPackHelper;
+use Modules\Reals\Entities\Real;
+use Illuminate\Http\UploadedFile;
+use Laravel\Sanctum\HasApiTokens;
+use Modules\Badge\Entities\Badge;
+use Modules\Vip\Entities\UserVip;
+use App\Traits\PaymentGetWayTrait;
+use Modules\Moment\Entities\Moment;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Config as ConfigModel;
+use Modules\Badge\Entities\UserBadge;
+use App\Traits\TimestampsWithTimezone;
+use Illuminate\Support\Facades\Config;
+use Modules\Chat\Traits\ChatUserTrait;
+use App\Traits\MomentRelationshipTrait;
+use Illuminate\Support\Facades\Storage;
+use Modules\SpecialId\Traits\SpecialId;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Modules\Moment\Entities\MomentUserGift;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AgencyApp\Entities\AdditionalInfo;
+use Modules\Reals\Traits\RealRelationshipTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Achievement\Http\Traits\AchievementUser;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\SalaryTransaction\Traits\UserTransferTrait;
 
 /**
  * @method static withoutAppends()
@@ -79,6 +84,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'salary',
     ];
 
     /**
@@ -96,16 +102,22 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-//        'user_diamond',
+        //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        'original_uuid',
-        'is_frozen',
-        'total_charge_level',
-        'photo',
-        'org_online_time',
-//        'monthly_diamond_received',
+        //        'original_uuid',
+        //        'is_frozen',
+        //        'total_charge_level',
+        //        'photo',
+        //        'org_online_time',
+        //        'user_types',
+        //        'vip_data',
+        //        'level_data',
+        //        'profile_frame',
+        //        'profile_frame_id'
+
     ];
+
 
 
     /* protected $appends = [
@@ -169,6 +181,27 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function cpsAsOne()
+    {
+        return $this->hasMany(Cp::class, 'user_one_id');
+    }
+
+    public function userBadges()
+    {
+        return $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
+    }
+
+    public function cpsAsTwo()
+    {
+        return $this->hasMany(Cp::class, 'user_two_id');
+    }
+
+    public function allCps()
+    {
+        return $this->cpsAsOne()->union($this->cpsAsTwo());
+    }
     public function agencyUserJob()
     {
         return $this->hasOne(AgencyUserJob::class, 'user_id', 'id');
@@ -428,10 +461,10 @@ class User extends Authenticatable
         return $this->hasMany(ExchangeLog::class);
     }
 
-    public function coinLogs()
-    {
-        return $this->hasMany(CoinLog::class);
-    }
+    // public function coinLogs()
+    // {
+    //     return $this->hasMany(CoinLog::class);
+    // }
 
     public function charges()
     {
@@ -764,6 +797,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'id');
     }
 
+    public function ownerAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
+    }
+
     public function familyType()
     {
         return $this->hasOne(FamilyUser::class, 'user_id', 'id');
@@ -798,6 +836,12 @@ class User extends Authenticatable
         })->with('OVip')->orderByDesc('level');
     }
 
+    public function Ovip()
+    {
+        return $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
+            ->with('privilegs');
+    }
+
     public function haveVip()
     {
         return $this->hasMany(UserVip::class, 'user_id');
@@ -807,7 +851,6 @@ class User extends Authenticatable
     {
         $amount =
             $type === 2 ? $this->sender_level + $this->sub_sender_level : $this->received_level + $this->sub_receiver_level;
-
         $level = Vip::collectionBuilder()->where('type', $type)->where('level', $amount)->orderByDesc('exp')->first();
 
         return $level;
@@ -1066,6 +1109,30 @@ class User extends Authenticatable
         return $this->hasMany(Pack::class, 'user_id')->whereIn('type', [4, 5, 6, 25])->where('get_type', '!=', 1)->where('is_used', 1)->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
+    }
+    // public function hasPackOfType(int $type, bool $onlyUsed = false): bool
+    // {
+    //     return $this->packs()
+    //         ->where('type', $type)
+    //         ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+    //         ->exists();
+    // }
+
+    public function hasPackOfType(int $type, bool $onlyUsed = false): bool
+    {
+        // if packs relation already loaded, filter in-memory
+        if ($this->relationLoaded('packs')) {
+            return $this->packs
+                ->where('type', $type)
+                ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+                ->isNotEmpty();
+        }
+
+        // fallback: query database
+        return $this->packs()
+            ->when($onlyUsed, fn($q) => $q->where('is_used', 1))
+            ->where('type', $type)
+            ->exists();
     }
 
     public function sendPacks()
@@ -1416,12 +1483,14 @@ class User extends Authenticatable
     public function getUuidAttribute($value)
     {
         if ($this->relationLoaded('packs')) {
+
             $pack = $this->packs
                 ->where('type', 25)
                 ->where('is_used', true)
                 ->where('ware.value', $this->special_id)
                 ->first();
         } else {
+
             $pack = $this->packs()
                 ->with('ware')
                 ->where('type', 25)
@@ -1464,7 +1533,7 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
-        if ($this->getPackWithType(20)) {
+        if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
 
@@ -1495,6 +1564,20 @@ class User extends Authenticatable
     public function getPackWithTypeV2($type)
     {
         return $this->eligiblePacks->where('type', $type)->isNotEmpty();
+    }
+
+    public function getPackWithTypeV3($type)
+    {
+        if ($this->relationLoaded('packs')) {
+            return $this->packs
+                ->where('is_used', 1)
+                ->where('type', $type)
+                ->isNotEmpty();
+        }
+        return $this->packs()
+            ->where('is_used', 1)
+            ->where('type', $type)
+            ->exists();
     }
 
     public function nowGame()
@@ -1608,6 +1691,27 @@ class User extends Authenticatable
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
 
+    public function userBadge()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($this->id, $url, 100, 100, 4,'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
+
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
@@ -1687,8 +1791,15 @@ class User extends Authenticatable
             $userTypes[] = 2;
         }
 
-        if ($this->hasShippingAgency()) {
-            $userTypes[] = 3;
+        if ($this->relationLoaded('shippingAgency')) {
+            if ($this->shippingAgency) {
+                $userTypes[] = 3;
+            }
+        } else {
+            $this->loadMissing('shippingAgency');
+            if ($this->shippingAgency) {
+                $userTypes[] = 3;
+            }
         }
 
         if ($this->is_bd) {
@@ -1866,12 +1977,223 @@ class User extends Authenticatable
     public function activePack20()
     {
         return $this->hasOne(Pack::class)
-                    ->where('is_used', 1)
-                    ->where('type', 20)
-                    ->where(function($q) {
-                        $q->where('expire', 0)
-                        ->orWhere('expire', '>=', now()->timestamp);
-                    });
-}
+            ->where('is_used', 1)
+            ->where('type', 20)
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                    ->orWhere('expire', '>=', now()->timestamp);
+            });
+    }
 
+
+
+    public function giftLogs()
+    {
+        return $this->hasMany(GiftLog::class, 'receiver_id');
+    }
+
+
+
+    public function blacklists()
+    {
+        return $this->hasMany(BlackList::class, 'user_id', 'id')
+            ->where('status', 1);
+    }
+
+
+    public function chatSetting()
+    {
+        return $this->hasOne(\App\Models\ChatSetting::class, 'user_id')
+            ->withDefault([
+                'chat_with_friends' => 1,
+                'chat_with_all' => 0,
+            ]);
+    }
+
+    public function userDataSetting()
+    {
+        return $this->hasOne(\App\Models\UserSetting::class, 'user_id')
+            ->withDefault([
+                'show_git'   => 1,
+                'show_intro' => 1,
+                'show_banner' => 1,
+            ]);
+    }
+
+
+
+    public function getVipDataAttribute()
+    {
+        $vip = $this->Ovip;
+        if (!$vip) {
+            return new \stdClass();
+        }
+
+        $vipIcon = $vip->wareIcon;
+        $hasColor = Common::hasInPackV2($this->packs, 18, true);
+        $color    = Common::hasColorInPackV2($this->packs, 21, true);
+
+        $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
+        $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
+
+        return [
+            'id'             => 1,
+            'level'          => $vip->level ?? 0,
+            'name'           => $vip->name ?? '',
+            'price'          => $vip->price ?? 0,
+            'img_old'        => $vip->img ?? '',
+            'img'            => $vipIcon->show_img ?? '',
+            'image'          => $vip->image ?? '',
+            'image_from_wares' => $vipIcon->show_img ?? '',
+            'expire'         => $vip->expire ?? 0,
+            'ware_id'        => $vipIcon?->id ?? 0,
+            'color'          => $color ?? '',
+            'vip_gifts'      => $vip_gifts ?? 0,
+            'vip_upload_gif' => $vip_upload_gif ?? 0,
+            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
+        ];
+    }
+
+
+
+
+
+
+    public function getLevelDataAttribute()
+    {
+        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+
+        $diamondReceived = $this->total_received_diamonds ?? 0;
+        $diamondSend     = $this->total_sender_diamonds ?? 0;
+
+        $receivedNum = floor($diamondReceived * ($expPercentages['exp_received_percentage'] ?? 1));
+        $senderNum   = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
+
+        $star_level  = $this->total_received_level ?? 0;
+        $gold_level  = $this->total_sender_level ?? 0;
+
+        $vipsData = \Cache::rememberForever(
+            'vips_data',
+            fn() =>
+            Vip::all()->groupBy('type')
+        );
+
+        $firstVip_type1 = $vipsData[1]->firstWhere('level', $star_level);
+        $firstVip_type2 = $vipsData[2]->firstWhere('level', $gold_level);
+
+        $star_level_img = $firstVip_type1->img ?? '';
+        $gold_level_img = $firstVip_type2->img ?? '';
+
+        $current_star_num = $this->getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+        $current_gold_num = $this->getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+
+        $nextStarData = $this->getNextLevelDataFromCache(1, $star_level, $vipsData);
+        $nextGoldData = $this->getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $next_star_num    = $nextStarData['next_exp'];
+        $next_star_level  = $nextStarData['next_level'];
+        $next_gold_num    = $nextGoldData['next_exp'];
+        $next_gold_level  = $nextGoldData['next_level'];
+
+        return [
+            'receiver_num'        => $receivedNum,
+            'receiver_img'        => $star_level_img,
+            'sender_num'          => $senderNum,
+            'sender_rem'          => max(0, $next_gold_num - $senderNum),
+            'receiver_rem'        => max(0, $next_star_num - $receivedNum),
+            'sender_img'          => $gold_level_img,
+            'receiver_level'      => $star_level,
+            'next_receiver_num'   => $next_star_num ?: 0,
+            'next_receiver_level' => $next_star_level ?: 0,
+            'sender_level'        => $gold_level,
+            'next_sender_num'     => $next_gold_num ?: 0,
+            'next_sender_level'   => $next_gold_level ?: 0,
+            'prev_receiver_num'   => $current_star_num ?: 0,
+            'prev_sender_num'     => $current_gold_num ?: 0,
+            'current_receiver_num' => $current_star_num,
+            'current_sender_num'  => $current_gold_num,
+            'exp-sender'          => $expPercentages['exp_sender_percentage'] ?? 1,
+            'exp-receiver'        => $expPercentages['exp_received_percentage'] ?? 1,
+            'receiver_per'        => $this->calcPercentage($receivedNum, $current_star_num, $next_star_num),
+            'sender_per'          => $this->calcPercentage($senderNum, $current_gold_num, $next_gold_num),
+        ];
+    }
+
+    private function calcPercentage($current, $prev, $next)
+    {
+        $range = $next - $prev;
+        $progress = $current - $prev;
+        if ($range <= 0) return 0.0;
+        $percentage = $progress / $range;
+        return $percentage < 0 ? 0.0 : ($percentage > 1 ? 1.0 : round($percentage, 2));
+    }
+
+    private  function getCurrentLevelFromCache($type = null, $level = 0, $field = null, $vipsData = [])
+    {
+        if (!$type || !$field || !isset($vipsData[$type])) return 0;
+
+        $levelData = $vipsData[$type]->where('level', '=', $level)->first();
+
+        return $levelData ? $levelData->$field : 0;
+    }
+
+    private  function getNextLevelDataFromCache($type, $currentLevel, $vipsData)
+    {
+        if (!isset($vipsData[$type])) return ['next_exp' => 0, 'next_level' => 0];
+
+        $data = $vipsData[$type];
+        $nextData = ['next_exp' => 0, 'next_level' => 0];
+
+        foreach ($data as $row) {
+            if ($row->level > $currentLevel) {
+                $nextData['next_exp'] = $row->exp;
+                $nextData['next_level'] = $row->level;
+                break;
+            }
+        }
+
+        if ($nextData['next_exp'] == 0) {
+            $nextData['next_exp'] = $data->last()->exp ?? 0;
+        }
+
+        if ($nextData['next_level'] == 0) {
+            $nextData['next_level'] = $data->last()->level ?? 0;
+        }
+
+        return $nextData;
+    }
+
+    public function getProfileFrameAttribute()
+    {
+        return Common::wareUserVipV2($this, 28, 'img2', true);
+    }
+
+    public function getProfileFrameIdAttribute()
+    {
+        return Common::wareUserVipV2($this, 28, 'id', true);
+    }
+
+
+    public function nowRoomOwner()
+    {
+        return $this->belongsTo(User::class, 'now_room_uid');
+    }
+
+
+
+    public function coinLogs()
+    {
+        return $this->morphMany(CoinLog::class, 'owner', 'user_type', 'user_id');
+    }
+
+
+    public function agencyJobs()
+    {
+        return $this->hasMany(AgencyUserJob::class, 'user_id');
+    }
+
+    public function getIsAdminInAgencyAttribute()
+    {
+        return $this->agencyJobs()->where('type', 'requestManger')->exists();
+    }
 }

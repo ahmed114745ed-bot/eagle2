@@ -3,22 +3,23 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Selectables\Gifts;
 use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Services\AppFeatureService;
 use Modules\Events\Entities\Reward;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
-use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class WeeklyEventNController extends MainController
@@ -73,22 +74,50 @@ class WeeklyEventNController extends MainController
     protected function grid()
     {
         $grid = new Grid(new WeeklyStar());
-        $grid->model()->whereType("weekly_star");
+        $grid->model()->whereType("weekly_star")->orderByDesc("id");
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereDate('start_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('Start Date'), 'from_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('from_date')));
+            });
+
+            // End Date
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+
+                        $query->whereDate('end_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('End Date'), 'to_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+        });
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
+        if (!request()->filled('_export_')) {
+            if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
+                $grid->column(__('procedures'))->display(function () {
+                    // توليد الروابط
+                    $url1 = url('admin/weekly-events-gift/' . $this->id);
 
-        if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
-            $grid->column(__('procedures'))->display(function () {
-                // توليد الروابط
-                $url1 = url('admin/weekly-events-gift/' . $this->id);
-
-                // إنشاء أزرار HTML
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
-                // دمج الأزرار في سلسلة واحدة وإرجاعها
-                return $button1;
-            });
+                    // إنشاء أزرار HTML
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
+                    // دمج الأزرار في سلسلة واحدة وإرجاعها
+                    return $button1;
+                });
+            }
         }
         $this->extendGrid($grid);
         return $grid;
@@ -155,7 +184,8 @@ class WeeklyEventNController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return parent::show($id, $content->title(__('weekly-events-new'))
+
             ->row("<h3>" . __('weekly Star') . "</h3>")->row(function ($row) use ($id) {
                 $row->column(12, $this->weeklyStar($id));
             })
@@ -195,26 +225,30 @@ class WeeklyEventNController extends MainController
         $grid = new Grid(new Reward);
         $grid->model()->where('weekly_star_id', $id);
 
-        $grid->column('level', trans('level'));
+        $grid->column('level', trans('winners'));
         $grid->column('type', trans('type'))->display(function ($type) {
 
             return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
-        $grid->column('target', trans('target'))->display(function ($target) {
+        $grid->column('target', trans('gift'))->display(function ($target) {
 
             if ($this->type == "coins") {
                 return $target;
             } elseif ($this->type == "ware") {
                 $ware = Ware::find($target);
-                return $ware->name;
+                return  $ware ? ($ware->name ?? '') : "";
             } elseif ($this->type == "vip") {
                 $vip = OVip::find($target);
-                return $vip->name;
+                return  $vip ? ($vip->name ?? '') : "";
+            } elseif ($this->type == "badge") {
+                $vip = Badge::find($target);
+                return $vip ? (@$vip->name ?? '') : "";
             } else {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+        $grid->column('expire', trans('expire'));
 
         $grid->disableActions();
         $grid->disableCreateButton();
