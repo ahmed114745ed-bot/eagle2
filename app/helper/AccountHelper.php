@@ -56,11 +56,7 @@ class AccountHelper
             ->unique()
             ->values()
             ->toArray();
-        logger()->info("🔑 Login link accounts", [
-                'logged_in_user'   => $userId,
-                'device_token'     => $deviceToken,
-                'linked_accounts'  => $allRelatedUsers,
-            ]);
+     
         foreach ($allRelatedUsers as $otherUserId) {
             UserAccount::create([
                 'parent_user_id' => $userId,
@@ -72,10 +68,7 @@ class AccountHelper
         }
 
         if (empty($allRelatedUsers)) {
-            logger()->info("🆕 First account linked with device", [
-                'logged_in_user' => $userId,
-                'device_token'   => $deviceToken,
-            ]);
+     
             return UserAccount::create([
                 'parent_user_id' => $userId,
                 'child_user_id'  => null,

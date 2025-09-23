@@ -212,6 +212,8 @@ class SwitchAccountController extends Controller
             'is_first'      => @(bool)$new_account->is_points_first,
             'auth_token'    => $new_account->auth_token
         ];
+        AccountHelper::linkLoginAccountWithDevice($new_account->id, $new_account->device_token);
+
         return Common::apiResponse(1, 'success', $data, 200);
     }
 
