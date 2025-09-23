@@ -49,6 +49,8 @@ class RankingRepository
             case 1: 
             case 2: 
                 $model = CoinGameUserMerged::class;
+
+                return $this->getCoinsForModel2($model, $from, $to, $limit);
                 break;
 
             case 3: 
@@ -77,6 +79,19 @@ class RankingRepository
             ->get();
     }
 
+    protected function getCoinsForModel2(string $model, $from, $to, int $limit)
+    {
+        $model::query()
+            ->select('user_id', DB::raw('SUM(coins) as exp'))
+            ->whereBetween('date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
+            ->groupBy('user_id')
+            ->orderByDesc('exp')
+            ->limit($limit)
+            ->get();
+    }
+
+
+  
   
     protected function userRelations(): array
     {
