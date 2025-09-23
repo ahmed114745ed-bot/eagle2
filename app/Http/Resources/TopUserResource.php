@@ -36,7 +36,7 @@ class TopUserResource extends JsonResource
              'remaining'         => $this->remaining ?? '0',
              'remaining_int'     => $this->remaining_int ?? 0,
              'name'              => $this->name,
-             'avatar'            => $this->avatar,
+             'avatar'            => $this->ranker?->profile?->avatar ?? '',
              'frame'             => $this->frame,
              'frame_id'          => $this->frame_id,
              'type_user'         => $this->type_user,
@@ -54,7 +54,7 @@ class TopUserResource extends JsonResource
              'ranker'            =>  null,
              'packs'             =>  [],
              'user_vip'          => null,
-             'profile'           => $this->profile ?? null,
+             'profile'           => $this->ranker?->profile ?? null,
          ];
      }
  }
