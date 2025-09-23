@@ -134,16 +134,14 @@ class SwitchAccountController extends Controller
     {
         if (empty($deviceToken)) return [];
 
-        // $accounts = UserAccount::query()
-        //     ->where('device_token', $deviceToken)
-        //     ->where(function ($query) use ($userId) {
-        //         $query->where('parent_user_id', $userId)
-        //             ->orWhere('child_user_id', $userId);
-        //     })
-        //     ->get();
         $accounts = UserAccount::query()
             ->where('device_token', $deviceToken)
-            ->get();    
+            ->where(function ($query) use ($userId) {
+                $query->where('parent_user_id', $userId)
+                    ->orWhere('child_user_id', $userId);
+            })
+            ->get();
+    
 
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
