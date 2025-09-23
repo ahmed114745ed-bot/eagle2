@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Entities\ChatMessage;
 use Illuminate\Contracts\Support\Renderable;
@@ -217,9 +218,18 @@ class SwitchAccountController extends Controller
 
     public function isTokenFromLastTwoWeeks($otherUser, $tokenString): bool
     {
+        Log::info('🔑 Checking token validity', [
+            'user_id' => $otherUser->id ?? null,
+            'tokenString' => $tokenString,
+        ]);
         [$id, $plainToken] = explode('|', $tokenString);
 
+        Log::debug('Token parts extracted', [
+            'id' => $id,
+            'plainToken' => $plainToken,
+        ]);
         $token = $otherUser->tokens()->find($id);
+        
         //        info('id'.$token);
         //        if (! $token){
         //            info('no token');
@@ -234,6 +244,15 @@ class SwitchAccountController extends Controller
         //            return false;
         //        }
         //        $token = PersonalAccessToken::find($id);
+        $hashMatch = hash_equals($token->token, hash('sha256', $plainToken));
+        $isRecent = $token->created_at >= Carbon::now()->subDays(14);
+        Log::info('🔍 Token check results', [
+            'token_id'   => $token->id,
+            'hash_match' => $hashMatch,
+            'created_at' => $token->created_at,
+            'recent'     => $isRecent,
+        ]);
+    
         if (
             $token &&
             hash_equals($token->token, hash('sha256', $plainToken)) &&
@@ -241,6 +260,11 @@ class SwitchAccountController extends Controller
         ) {
             return true;
         }
+
+        Log::warning('⚠️ Token is invalid or expired', [
+            'user_id' => $otherUser->id,
+            'token_id' => $token->id,
+        ]);
 
         return false;
     }
