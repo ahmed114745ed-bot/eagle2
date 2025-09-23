@@ -14,11 +14,11 @@ use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
-use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
+use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class RankingRepository
 {
