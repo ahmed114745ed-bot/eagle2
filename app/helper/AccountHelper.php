@@ -59,13 +59,17 @@ class AccountHelper
             if($userId == $otherUserId){
                 continue;
             }
-            UserAccount::create([
-                'parent_user_id' => $userId,
-                'child_user_id'  => $otherUserId,
-                'device_token'   => $deviceToken,
-                'key'            => \Illuminate\Support\Str::uuid(),
-                'expire'         => 30,
-            ]);
+            UserAccount::updateOrCreate(
+                [
+                    'parent_user_id' => $userId,
+                    'child_user_id'  => $otherUserId,
+                ],
+                [
+                    'device_token'   => $deviceToken,
+                    'key'    => \Illuminate\Support\Str::uuid(),
+                    'expire' => 30,
+                ]
+            );
         }
 
  
