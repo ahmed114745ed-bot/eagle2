@@ -36,7 +36,7 @@ class AccountResource extends JsonResource
             'sender_level'  => $this->total_sender_level ?? 0,
             'received_level'  => $this->total_received_level ?? 0,
             'unread_messages'  => $total_unread_message ?? 0,
-            'key'           =>  $userAccount->key,
+            'key'           =>  $userAccount?->key,
             'expire'        =>  $userAccount->expire,
             'can_switch'    => ($this->id == $authId ? false : true),
             'vip' => Common::ovip_center(@$this),
