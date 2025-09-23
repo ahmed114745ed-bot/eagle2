@@ -2,6 +2,9 @@
 
 namespace Modules\RoomCup\Console;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -84,6 +87,15 @@ class CalculateRoomCupRewards extends Command
             RoomCupReward::insert($rewards);
 
             foreach ($rewards as $reward) {
+
+                $amountBefore =  Common::getCurrentBalance($reward['user_id']);
+                UserCoinLogHelper::logByType(
+                    $reward['user_id'],
+                    $reward['amount'],
+                    $amountBefore,
+                    UserCoinLogType::ROOM_CUP,
+                );
+
                 User::whereKey($reward['user_id'])
                     ->increment('di', $reward['amount']);
                         
