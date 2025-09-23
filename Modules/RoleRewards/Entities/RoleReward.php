@@ -75,6 +75,8 @@ class RoleReward extends Model
                 $model->rewardable_id = request('rewardable_id2', $model->rewardable_id);
             } elseif (request('type') === 'badge') {
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
+            } else {
+                $model->rewardable_id = 0;
             }
             $model->type = request('type');
             unset($model->rewardable_id2);
