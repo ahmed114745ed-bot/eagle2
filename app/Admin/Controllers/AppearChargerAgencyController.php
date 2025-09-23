@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteShippingAgencyAction;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
@@ -474,22 +475,13 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        // $form->saved(function (Form $form) {
-        //     $checkAgencyUser = UsersJoinedAgency::where([
-        //         'user_id' => $form->model()->app_owner_id,
-        //         'agency_id' => $form->model()->id,
-        //         'type' => 1,
-        //     ])->whereNull('leave_date')->exists();
+        $form->saved(function (Form $form) {
 
-        //     if (!$checkAgencyUser) {
-        //         UsersJoinedAgency::create([
-        //             'user_id' => $form->model()->app_owner_id,
-        //             'agency_id' => $form->model()->id,
-        //             'type' => 1,
-        //             'join_date' => now(),
-        //         ]);
-        //     }
-        // });
+            $appOwnerId = intval($form->model()->app_owner_id);
+
+            $user = User::find($appOwnerId)  ;
+            MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
+        });
 
         return $form;
     }
