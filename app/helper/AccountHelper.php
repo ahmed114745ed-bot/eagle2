@@ -32,10 +32,10 @@ class AccountHelper
             return null;
         }
 
-        UserAccount::where(function ($q) use ($userId) {
-            $q->where('parent_user_id', $userId)
-              ->orWhere('child_user_id', $userId);
-        })->delete();
+        // UserAccount::where(function ($q) use ($userId) {
+        //     $q->where('parent_user_id', $userId)
+        //       ->orWhere('child_user_id', $userId);
+        // })->delete();
 
         $linkedUserIds = UserAccount::where('device_token', $deviceToken)
             ->pluck('parent_user_id')
