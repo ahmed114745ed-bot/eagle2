@@ -14,11 +14,11 @@ use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
+use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
-use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class RankingRepository
 {
@@ -50,7 +50,6 @@ class RankingRepository
             case 2: 
                 $model = CoinGameUserMerged::class;
 
-                return $this->getCoinsForModel2($model, $from, $to, $limit);
                 break;
 
             case 3: 
@@ -79,19 +78,6 @@ class RankingRepository
             ->get();
     }
 
-    protected function getCoinsForModel2(string $model, $from, $to, int $limit)
-    {
-        $model::query()
-            ->select('user_id', DB::raw('SUM(coins) as exp'))
-            ->whereBetween('date', [$from->format('Y-m-d'), $to->format('Y-m-d')])
-            ->groupBy('user_id')
-            ->orderByDesc('exp')
-            ->limit($limit)
-            ->get();
-    }
-
-
-  
   
     protected function userRelations(): array
     {
