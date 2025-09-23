@@ -87,7 +87,8 @@ class RoomAdminsResource extends JsonResource
     private function getUserDress($type, $dress, $item = 'img1')
     {
         $key = $type . '_' . $dress;
-        return $this->userDresses[$key]?->ware->{$item} ?? '';
+
+        return $this->userDresses[$key]?->ware->img2 ?? $this->userDresses[$key]?->ware->img1 ?? '';
     }
 
     private function getVip()
