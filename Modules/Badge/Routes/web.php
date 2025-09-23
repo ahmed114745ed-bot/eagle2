@@ -36,5 +36,6 @@ Route::group(
         Route::resource('badges', BadgeController::class);
         Route::resource('dedicate-badges', DedicateBadgeController::class);
         Route::get('user-badges', [UserBadgeController::class, 'index']);
+
     }
 );
