@@ -1166,7 +1166,13 @@
   "Owner Profit": "Owner Profit",
   "Admin Profit": "Admin Profit",
       "Room Cup Targets": "Room Cup Targets",
-    "room-cup-target": "Room Cup Target"
+    "room-cup-target": "Room Cup Target",
+    "Room Cup Settings": "रूम कप सेटिंग्स",
+    "Enable Room Cup Feature": "रूम कप फीचर सक्षम करें",
+    "ON": "चालू",
+    "OFF": "बंद",
+    "Interval (minutes)": "अंतराल (मिनटों में)",
+    "Save": "सहेजें"
   
 
 

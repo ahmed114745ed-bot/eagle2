@@ -3347,7 +3347,13 @@
     "Owner Profit": "Sahip Karı",
     "Admin Profit": "Yönetici Karı",
     "Room Cup Targets": "Oda Kupası Hedefleri",
-    "room-cup-target": "Oda Kupası Hedefi"
+    "room-cup-target": "Oda Kupası Hedefi",
+    "Room Cup Settings": "Oda Kupası Ayarları",
+    "Enable Room Cup Feature": "Oda Kupası Özelliğini Etkinleştir",
+    "ON": "Açık",
+    "OFF": "Kapalı",
+    "Interval (minutes)": "Aralık (dakika)",
+    "Save": "Kaydet"
 
 
 

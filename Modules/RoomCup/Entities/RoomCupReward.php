@@ -2,13 +2,14 @@
 
 namespace Modules\RoomCup\Entities;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 
 class RoomCupReward extends Model
 {
-    protected $table = 'room_owner_rewards';
+    protected $table = 'room_cup_rewards';
 
     protected $fillable = [
         'room_id',
@@ -21,5 +22,11 @@ class RoomCupReward extends Model
     public function gift(): BelongsTo
     {
         return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
+    }
+
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

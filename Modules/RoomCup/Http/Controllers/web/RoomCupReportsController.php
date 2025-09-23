@@ -2,74 +2,75 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Modules\RoomCup\Entities\RoomCupTarget;
+use App\Models\User;
+use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
+use Modules\RoomCup\Entities\RoomCupReward;
+use Modules\RoomCup\Entities\TotalRoomGift;
 
 class RoomCupReportsController extends AdminController
 {
-    protected $title = '';
-
-
-    public function index(Content $content)
-    {
-        return parent::index($content
-            ->title(__('Room Cup Targets'))
-        );
-    }
+    protected $title = 'Room Cup Daily Rewards';
 
     protected function grid()
     {
-        $grid = new Grid(new RoomCupTarget());
+        $grid = new Grid(new RoomCupReward());
 
-        $grid->column('id', __('ID'))->sortable();
-        $grid->column('total', __('Total'))->sortable();
-        $grid->column('number_of_visitors', __('Number of Visitors'))->sortable();
-        $grid->column('number_of_admins', __('Number of Admins'))->sortable();
-        $grid->column('owner_profit', __('Owner Profit'))->sortable();
-        $grid->column('admin_profit', __('Admin Profit'))->sortable();
+        $grid->model()
+            ->with(['gift', 'gift.room', 'gift.room.owner'])
+            ->orderBy('created_at', 'desc');
 
-        $grid->filter(function($filter) {
-            $filter->between('total', __('Total'));
-            $filter->between('number_of_visitors', __('Visitors Count'));
-            $filter->between('number_of_admins', __('admins'));
+        // 🔹 Owner Data
+        $grid->column('gift.room.owner.name', 'Owner Name');
+        $grid->column('gift.room.owner.id', 'Owner ID');
+
+        // 🔹 Room Data
+        $grid->column('gift.room.id', 'Room ID');
+        $grid->column('gift.room.name', 'Room Name');
+
+        // 🔹 Daily Gain (from TotalRoomGift)
+        $grid->column('gift.current_total', 'Daily Gain');
+
+        // 🔹 Profit in Coins (from reward amount)
+        $grid->column('amount', 'Profit Coins')->totalRow();
+
+        // 🔹 Date of gain
+        $grid->column('created_at', 'Date')->display(function ($date) {
+            return \Carbon\Carbon::parse($date)->toDateString();
         });
+
+        // 🔹 Filters
+        $grid->filter(function ($filter) {
+            $filter->like('gift.room.owner.name', 'Owner Name');
+            $filter->equal('gift.room.id', 'Room ID');
+            $filter->between('created_at', 'Date')->date();
+            $filter->where(function ($query) {
+                $query->whereHas('gift', function ($q) {
+                    $q->where('current_total', '>=', $this->input);
+                });
+            }, 'Gain >= X');
+        });
+
+        $grid->disableCreateButton();
+        $grid->disableActions();
 
         return $grid;
     }
 
     protected function detail($id)
     {
-        $show = new Show(RoomCupTarget::findOrFail($id));
+        $show = new Show(RoomCupReward::findOrFail($id));
 
-        $show->field('id', __('ID'));
-        $show->field('total', __('Total'));
-        $show->field('number_of_visitors', __('Number of Visitors'));
-        $show->field('number_of_admins', __('Number of Admins'));
-        $show->field('owner_profit', __('Owner Profit'));
-        $show->field('admin_profit', __('Admin Profit'));
-        $show->field('created_at', __('Created At'));
-        $show->field('updated_at', __('Updated At'));
+        $show->field('id', 'ID');
+        $show->field('room_id', 'Room ID');
+        $show->field('user_id', 'User ID');
+        $show->field('amount', 'Amount');
+        $show->field('type', 'Type');
+        $show->field('created_at', 'Created At');
+        $show->field('updated_at', 'Updated At');
 
         return $show;
-    }
-
-    protected function form()
-    {
-        $form = new Form(new RoomCupTarget());
-
-        $form->number('total', __('Total'))->default(0);
-        $form->number('number_of_visitors', __('Number of Visitors'))->default(0);
-        $form->number('number_of_admins', __('Number of Admins'))->default(0);
-        $form->decimal('owner_profit', __('Owner Profit'))->default(0.00);
-        $form->decimal('admin_profit', __('Admin Profit'))->default(0.00);
-
-        return $form;
     }
 }

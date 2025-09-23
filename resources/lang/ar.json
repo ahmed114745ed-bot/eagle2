@@ -3782,7 +3782,15 @@
     "Owner Profit": "ربح المالك",
     "Admin Profit": "ربح المدير",
     "Room Cup Targets": "أهداف كأس الغرفة",
-    "room-cup-target": "هدف كأس الغرفة"
+    "room-cup-target": "هدف كأس الغرفة",
+    "Room Cup Settings": "إعدادات كأس الغرفة",
+    "Room-cup-settings": "إعدادات كأس الغرفة",
+    "room-cup-settings": "إعدادات كأس الغرفة",
+    "Enable Room Cup Feature": "تفعيل خاصية كأس الغرفة",
+    "ON": "تشغيل",
+    "OFF": "إيقاف",
+    "Interval (minutes)": "الفاصل الزمني (بالدقائق)",
+    "Save": "حفظ"
 
 
 

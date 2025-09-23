@@ -9,33 +9,35 @@ use Illuminate\Support\Facades\Storage;
 
 class RoomCupSettingsController extends AdminController
 {
-    protected $title = 'Room Cup Settings';
+    protected $title = '';
 
     public function index(Content $content)
     {
         $settings = $this->getSettings();
 
+        $csrf = csrf_token();
+        $checked = $settings['enabled'] ? 'checked' : '';
+        $interval = $settings['interval_minutes'];
+        $statusText = $settings['enabled'] ? 'ON' : 'OFF';
+
+   
+        
+
         return $content
-            ->title('Room Cup Settings')
-            ->body($this->form()->fill($settings));
-    }
+        ->title(__('Room Cup Settings'))
+        ->body(view('roomcup::room_cup_settings', compact('settings')));    }
 
-    protected function form()
+    private function saveUrl()
     {
-        $form = new Form(new \stdClass());
-
-        $form->switch('enabled', 'Enable Room Cup Feature')->default(1);
-        $form->number('interval_minutes', 'Interval (minutes)')
-            ->min(1)->default(60);
-
-        $form->setAction(admin_url('room-cup-settings/save'));
-
-        return $form;
+        return admin_url('room-cup-settings/save');
     }
 
     public function save()
     {
-        $data = request()->only(['enabled', 'interval_minutes']);
+        $data = [
+            'enabled' => request()->has('enabled') ? true : false,
+            'interval_minutes' => (int) request('interval_minutes', 60)
+        ];
 
         Storage::disk('local')->put('roomcup_settings.json', json_encode($data, JSON_PRETTY_PRINT));
 
@@ -53,4 +55,5 @@ class RoomCupSettingsController extends AdminController
 
         return json_decode(Storage::disk('local')->get('roomcup_settings.json'), true);
     }
+   
 }
