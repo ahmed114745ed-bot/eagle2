@@ -17,7 +17,8 @@ class UserHistoryReward extends Model
         'rewardable_type',
         'extra',
         'sub_type',
-        'is_deleted'
+        'is_deleted',
+        
 
     ];
     protected $dates = ['deleted_at'];
