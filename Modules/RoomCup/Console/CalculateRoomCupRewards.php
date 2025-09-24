@@ -61,13 +61,13 @@ class CalculateRoomCupRewards extends Command
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
-
-        DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
+        DB::transaction(function () use ($room, $gift, $target, $adminsCount)  {
             $rewards = [];
+            $targetId =$target->id;
 
             // Owner reward
             if ($target->owner_profit > 0) {
-                $rewards[] = $this->makeReward($room->id, $gift->id, $room->uid, 'owner', $target->owner_profit);
+                $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $room->uid, 'owner', $target->owner_profit);
                 $this->line("💰 Room owner #{$room->uid} will get {$target->owner_profit}");
             }
 
@@ -75,7 +75,7 @@ class CalculateRoomCupRewards extends Command
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins_v2() as $admin) {
-                    $rewards[] = $this->makeReward($room->id, $gift->id, $admin->id, 'admin', $share);
+                    $rewards[] = $this->makeReward($room->id, $gift->id,$targetId, $admin->id, 'admin', $share);
                     $this->line("👤 Admin {$admin->id} will get $share");
                 }
             }
@@ -124,11 +124,12 @@ class CalculateRoomCupRewards extends Command
             ->first();
     }
 
-    private function makeReward(int $roomId, int $giftId, int $userId, string $type, float $amount): array
+    private function makeReward(int $roomId, int $giftId,$targetId,  int $userId, string $type, float $amount): array
     {
         return [
             'room_id'            => $roomId,
             'total_room_gift_id' => $giftId,
+            'target_id'          => $targetId,
             'user_id'            => $userId,
             'type'               => $type,
             'amount'             => $amount,

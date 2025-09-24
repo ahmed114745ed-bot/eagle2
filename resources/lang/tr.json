@@ -3392,6 +3392,14 @@
     "Select Accounts to Ban": "Yasaklanacak Hesapları Seç",
     "others": "Diğerleri",
     "Bd Count": "BD Sayısı",
+    "Schedule Type": "Zamanlama Türü",
+  "Daily": "Günlük",
+  "Every X Days": "Her X Günde",
+  "Weekly": "Haftalık",
+  "Monthly": "Aylık",
+  "Execution Time": "Çalışma Zamanı",
+  "Day (0=Sunday,1=Monday,...)": "Gün (0=Pazar,1=Pazartesi, ...)",
+  "Interval (days)": "Aralık (gün)",
     "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
 
 

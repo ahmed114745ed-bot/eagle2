@@ -1,44 +1,59 @@
 
 <div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
-    <div class="card shadow-lg" style="width:400px; border-radius:15px;">
+    <div class="card shadow-lg" style="width:511px; border-radius:15px;">
         <div class="card-header text-center bg-primary text-white" style="border-top-left-radius:15px; border-top-right-radius:15px;">
-        <h4 class="mb-0">{{ __('Room Cup Settings') }}</h4>
+            <h4 class="mb-0">{{ __('Room Cup Settings') }}</h4>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-4" style="    height: 100%;">
 
-        <div class="card-body p-4">
+            <form method="POST" action="{{ admin_url('room-cup-settings/save') }}" style="height: 100%;">
+                @csrf
 
-        <form method="POST" action="{{ admin_url('room-cup-settings/save') }}">
-            @csrf
-
-            <!-- Toggle Switch Group -->
-            <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse">
-            <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
-            <div class="d-flex align-items-center">
-            <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable Room Cup Feature') }}</label>
-                 <label class="switch mb-0">
-                        <input type="checkbox" name="enabled" id="enabled" {{ $settings['enabled'] ? 'checked' : '' }}>
-                        <span class="slider round"></span>
-                    </label>
+                <!-- Toggle Switch Group -->
+                <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
+                    <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
+                    <div class="d-flex align-items-center">
+                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable Room Cup Feature') }}</label>
+                        <label class="switch mb-0">
+                            <input type="checkbox" name="enabled" id="enabled" {{ $settings['enabled'] ? 'checked' : '' }}>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Interval Input Group -->
-            <div class="mb-4 inp">
-                <label for="interval_minutes" class="form-label fw-bold d-block text-end">{{ __('Interval (minutes)') }}</label>
-                   <div class="input-group justify-content-end  inp-div">
-                    <input type="number" class="form-control text-end" name="interval_minutes" id="interval_minutes" min="1" value="{{ $settings['interval_minutes'] }}" style=";">
-                    <span class="input-group-text bg-light"><i class="bi bi-clock-fill"></i></span>
+                <!-- Type of Schedule -->
+                <div class="mb-4 inp-div">
+                    <label for="type" class="form-label fw-bold d-block text-end">{{ __('Schedule Type') }}</label>
+                    <select name="type" id="type" class="form-control text-end">
+                        <option value="daily" {{ $settings['type']=='daily' ? 'selected' : '' }}>{{ __('Daily') }}</option>
+                        <option value="every_x_days" {{ $settings['type']=='every_x_days' ? 'selected' : '' }}>{{ __('Every X Days') }}</option>
+                        <option value="weekly" {{ $settings['type']=='weekly' ? 'selected' : '' }}>{{ __('Weekly') }}</option>
+                        <option value="monthly" {{ $settings['type']=='monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
+                    </select>
                 </div>
-            </div>
 
-            <!-- Save Button -->
-            <div class="d-flex justify-content-end">
-               <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm btn-form">{{ __('Save') }}</button>
-            </div>
+                <!-- Time -->
+                <div class="mb-4  inp-div">
+                    <label for="time" class="form-label fw-bold d-block text-end">{{ __('Execution Time') }}</label>
+                    <div class="input-group justify-content-end ">
+                        <input type="time" class="form-control text-end" name="time" id="time" value="{{ $settings['time'] ?? '23:59' }}">
+                        <span class="input-group-text bg-light"><i class="bi bi-clock-fill"></i></span>
+                    </div>
+                </div>
 
-        </form>
+                <!-- Day (for weekly/monthly) -->
+                <div class="mb-4 inp-div" >
+                    <label for="day" class="form-label fw-bold d-block text-end">{{ __('Day (0=Sunday,1=Monday,...)') }}</label>
+                    <input type="number" class="form-control text-end" name="day" id="day" value="{{ $settings['day'] ?? 0 }}" min="0" max="31">
+                </div>
 
+
+                <!-- Save Button -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm btn-form">{{ __('Save') }}</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
@@ -47,8 +62,8 @@
 <style>
 
     .inp-div{
-        width: 68%;
-        margin: auto;
+        width: 77%;
+        margin: 10px auto;
     }
     .inp{
         width: 100%;
@@ -112,7 +127,7 @@ input:checked + .slider:before {
     margin: auto;
     width: 445px;
     border-radius: 15px;
-    height: 326px;
+    height: 495px;
 }
 </style>
 
