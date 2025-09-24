@@ -2924,6 +2924,16 @@
     "Live System Setting:": "लाइव सिस्टम सेटिंग",
     "Select Accounts to Ban": "प्रतिबंधित करने के लिए खातों का चयन करें",
     "others": "अन्य",
+    "Select Ban Removal Type": "बैन हटाने का प्रकार चुनें",
+    "By UUID": "UUID द्वारा",
+    "By IP Address": "आईपी ​​पते द्वारा",
+    "By Device Token": "डिवाइस टोकन द्वारा",
+    "IP Address": "आईपी ​​पता",
+    "Device Token": "डिवाइस टोकन",
+    "IP Address is required": "आईपी ​​पता आवश्यक है",
+    "Device Token is required": "डिवाइस टोकन आवश्यक है",
+    "Ban(s) successfully removed": "बैन सफलतापूर्वक हटाया गया",
+    "dashboard.remove_bans": "बैन हटाएँ",
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
 
 

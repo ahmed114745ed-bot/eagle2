@@ -3798,6 +3798,16 @@
   "Milestones":"الانجازات ",
     "Select Accounts to Ban": "اختر الحسابات للحظر",
     "others": "أخرى",
+    "Select Ban Removal Type": "اختر نوع إزالة الحظر",
+    "By UUID": "حسب UUID",
+    "By IP Address": "حسب عنوان الـ IP",
+    "By Device Token": "حسب رمز الجهاز",
+    "IP Address": "عنوان الـ IP",
+    "Device Token": "رمز الجهاز",
+    "IP Address is required": "عنوان الـ IP مطلوب",
+    "Device Token is required": "رمز الجهاز مطلوب",
+    "Ban(s) successfully removed": "تمت إزالة الحظر بنجاح",
+    "dashboard.remove_bans": "إزالة الحظر",
   "milestones":"الانجازات "
 
 
