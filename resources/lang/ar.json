@@ -3811,7 +3811,15 @@
     "Select Accounts to Ban": "اختر الحسابات للحظر",
     "others": "أخرى",
   "milestones":"الانجازات ",
-  "Gain >": "القيمة المكتسبة أكبر من"
+  "Gain >": "القيمة المكتسبة أكبر من",
+    "Schedule Type": "نوع الجدولة",
+  "Daily": "يومي",
+  "Every X Days": "كل X أيام",
+  "Weekly": "أسبوعي",
+  "Monthly": "شهري",
+  "Execution Time": "وقت التنفيذ",
+  "Day (0=Sunday,1=Monday,...)": "اليوم (0=الأحد،1=الإثنين، ...)",
+  "Interval (days)": "الفاصل (بالأيام)"
 
 
 

@@ -1182,7 +1182,15 @@
     "Type": "Type",
     "Created At": "Created At",
     "Updated At": "Updated At",
-    "Gain >": "Gain >"
+    "Gain >": "Gain >",
+    "Schedule Type": "Schedule Type",
+    "Daily": "Daily",
+    "Every X Days": "Every X Days",
+    "Weekly": "Weekly",
+    "Monthly": "Monthly",
+    "Execution Time": "Execution Time",
+    "Day (0=Sunday,1=Monday,...)": "Day (0=Sunday,1=Monday,...)",
+    "Interval (days)": "Interval (days)"
 
     
   

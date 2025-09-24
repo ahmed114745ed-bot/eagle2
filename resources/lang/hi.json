@@ -2961,6 +2961,15 @@
     "Select Accounts to Ban": "प्रतिबंधित करने के लिए खातों का चयन करें",
     "others": "अन्य",
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "Schedule Type": "अनुसूची प्रकार",
+    "Daily": "दैनिक",
+    "Every X Days": "हर X दिन",
+    "Weekly": "साप्ताहिक",
+    "Monthly": "मासिक",
+    "Execution Time": "निष्पादन समय",
+    "Day (0=Sunday,1=Monday,...)": "दिन (0=रविवार,1=सोमवार, ...)",
+    "Interval (days)": "अंतराल (दिन)",
     "Gain >": "लाभ >"
 
 
