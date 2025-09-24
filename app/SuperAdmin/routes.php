@@ -9,6 +9,7 @@ use App\SuperAdmin\Controllers\ChargeController;
 use App\SuperAdmin\Controllers\HomeController;
 use App\SuperAdmin\Controllers\MultiLanguageController;
 use App\SuperAdmin\Controllers\RequestAgencyController;
+use App\SuperAdmin\Controllers\RoomController;
 use App\SuperAdmin\Controllers\UserController;
 use App\SuperAdmin\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +85,8 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+
+        Route::resource('rooms', RoomController::class);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
     }
