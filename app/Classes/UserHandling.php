@@ -216,27 +216,25 @@ class UserHandling
     {
         $now = now();
 
-        return Ban::query()->where('type', '!=', 'action')
+        return Ban::query()
+            ->where('type', '!=', 'action')
             ->where(function ($q) use ($uuid, $request) {
-
-                $q->orWhere(function ($q) use ($uuid) {
+                $q->where(function ($q) use ($uuid) {
                     $q->where('type', 'normal')
                         ->where('uid', $uuid);
                 });
 
                 $q->orWhere(function ($q) use ($request) {
                     $q->where('type', 'ip')
-                        ->whereNotNull('ip')
                         ->where('ip', $request->ip());
                 });
 
                 $q->orWhere(function ($q) use ($request) {
                     $q->where('type', 'device')
-                        ->whereNotNull('device_number')
                         ->where('device_number', $request->header('x-device-token'));
                 });
             })
-            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
+            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [$now])
             ->first();
     }
 
