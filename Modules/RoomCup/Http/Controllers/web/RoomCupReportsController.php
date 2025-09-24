@@ -32,8 +32,17 @@ class RoomCupReportsController extends AdminController
             ->orderBy('created_at', 'desc');
 
    
-        $grid->column('user_id', __('room owner'))->display(function ($name) {
+        $grid->column('user_id', __('user'))->display(function ($name) {
             $user = $this->user;
+            if (! $user) {
+                return __('No User');
+            }
+
+            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+        });
+           
+        $grid->column('owner', __('room owner'))->display(function ($name) {
+            $user = $this->room->owner;
             if (! $user) {
                 return __('No User');
             }
