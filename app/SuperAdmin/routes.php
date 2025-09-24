@@ -73,12 +73,17 @@ Route::group(
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
-            Route::get('users', [AgencyUserController::class, 'index']);
+            Route::resource('users', AgencyUserController::class);
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
 
         //users
-        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::resource('users', 'UserController', [
+            'names' => [
+                'index' => 'users',
+                'show' => 'users.show'
+            ]
+        ]);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
     }

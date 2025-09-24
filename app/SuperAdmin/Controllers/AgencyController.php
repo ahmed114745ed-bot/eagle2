@@ -2,6 +2,9 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Admin\Actions\ChangeUsersAgencyAction;
+use App\Admin\Actions\DeleteAgencyAction;
+use App\Models\Bd;
 use App\Models\Charge;
 use Carbon\Carbon;
 use App\Models\User;
@@ -58,6 +61,29 @@ class AgencyController extends MainController
             });
     }
 
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(__(@$this->title ?? ''))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(__($this->title))
+            ->body($this->form());
+    }
+
+    public function show($id, Content $content)
+    {
+        return $this->profile($id, request(), $content);
+    }
+
+//    public function destroy($id)
+//    {
+//        return parent::destroy($id);
+//    }
     public function profile($id, req $request, Content $content)
     {
         $year = $request->year ?? Carbon::now()->year;
@@ -66,22 +92,22 @@ class AgencyController extends MainController
         $user = Auth::user();
 
         $agency = Agency::query()
-             ->where('country_id' ,$user->country_id )
+            ->where('country_id', $user->country_id)
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type'])
+            ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
             ->find($id);
 
         if (!$agency) {
-            $agency =  ShippingAgency::query()
-                 ->where('country_id' ,$user->country_id )
+            $agency = ShippingAgency::query()
+                ->where('country_id', $user->country_id)
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type'])
+                ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
                 ->find($id);
         }
 
         if (!$agency) {
             $error = new MessageBag([
-                'title'   => __('error_title_div'),
+                'title' => __('error_title_div'),
                 'message' => __('Agency not found'),
             ]);
 
@@ -107,56 +133,56 @@ class AgencyController extends MainController
             case 'members':
                 $members =
                     $agency->mempers()
-                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
-                    ->with('country', 'agencyUserJob')
-                    ->paginate(10, ['*'], 'members_page');
+                        ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
+                        ->with('country', 'agencyUserJob')
+                        ->paginate(10, ['*'], 'members_page');
                 break;
 
             case 'charges':
                 $charges =
                     $agency->senderCharges()
-                    ->with(Common::chargerRelationsQuery())
-                    ->latest()
-                    ->paginate(10, ['*'], 'charges_page');
+                        ->with(Common::chargerRelationsQuery())
+                        ->latest()
+                        ->paginate(10, ['*'], 'charges_page');
                 break;
 
             case 'salary':
                 $salaries =
                     AgencySallary::query()
-                    ->where('agency_id', $id)
-                    ->select(['id', 'sallary', 'cut_amount', 'month', 'year', 'created_at'])
-                    ->orderByDesc('id')
-                    ->paginate(10, ['*'], 'salary_page');
+                        ->where('agency_id', $id)
+                        ->select(['id', 'sallary', 'cut_amount', 'month', 'year', 'created_at'])
+                        ->orderByDesc('id')
+                        ->paginate(10, ['*'], 'salary_page');
                 break;
 
             case 'requests':
                 $agencyJoinRequests =
                     AgencyJoinRequest::query()
-                    ->where(['agency_id' => $id, 'status' => 0])
-                    ->with('user')
-                    ->whereHas('user')
-                    ->orderByDesc('id')
-                    ->paginate(10, ['*'], 'join_page');
+                        ->where(['agency_id' => $id, 'status' => 0])
+                        ->with('user')
+                        ->whereHas('user')
+                        ->orderByDesc('id')
+                        ->paginate(10, ['*'], 'join_page');
                 break;
 
             case 'targets':
 
                 $memberTargets =
                     $agency
-                    ->mempers()
-                    ->whereHas('targets', function ($query) use ($agencyId, $month, $year) {
-                        $query
-                            ->where('agency_id', $agencyId)
-                            ->where('add_month', $month)
-                            ->where('add_year', $year);
-                    })
-                    ->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-                        $query
-                            ->where('agency_id', $agencyId)
-                            ->where('add_month', $month)
-                            ->where('add_year', $year);
-                    }])
-                    ->paginate(10, ['*'], 'target_page');
+                        ->mempers()
+                        ->whereHas('targets', function ($query) use ($agencyId, $month, $year) {
+                            $query
+                                ->where('agency_id', $agencyId)
+                                ->where('add_month', $month)
+                                ->where('add_year', $year);
+                        })
+                        ->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+                            $query
+                                ->where('agency_id', $agencyId)
+                                ->where('add_month', $month)
+                                ->where('add_year', $year);
+                        }])
+                        ->paginate(10, ['*'], 'target_page');
 
 
                 [$agencyTarget, $rate] = Cache::remember(
@@ -180,19 +206,19 @@ class AgencyController extends MainController
 
         $giftLog =
             GiftLog::where('agency_id', $id)
-            ->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')
-            ->groupBy('receiver_id')
-            ->whereHas('receiver')
-            ->orderByDesc('exp')
-            ->get();
+                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->with('receiver')
+                ->groupBy('receiver_id')
+                ->whereHas('receiver')
+                ->orderByDesc('exp')
+                ->get();
 
         $sumTargets = GiftLog::where('agency_id', $agencyId)
-        ->whereBetween('created_at', [
-            Carbon::now()->startOfMonth(),
-            Carbon::now()->endOfMonth(),
-        ])
-        ->sum('giftPrice');
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth(),
+            ])
+            ->sum('giftPrice');
 
 
         return $content
@@ -215,7 +241,7 @@ class AgencyController extends MainController
             ));
     }
 
-    public static function shippingProfile(ShippingAgency $agency ,req $request,  Content $content)
+    public static function shippingProfile(ShippingAgency $agency, req $request, Content $content)
     {
         $tab = $request->input('tab', 'charges');
 
@@ -305,17 +331,17 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-        ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen'])
-        ->with(['owner:id,name,uuid', 'owner.packs'])
-        ->where(function ($query) {
-            $query
-                ->whereDoesntHave('additionalInfo')
-                ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
-        })
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->where(function ($query) {
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+            })
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('country_id',  Auth::user()->country_id)
+            ->where('country_id', Auth::user()->country_id)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -407,8 +433,15 @@ class AgencyController extends MainController
                 </div>";
         });
 
-        $grid->disableActions();
-        $grid->disableCreateButton();
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+            $actions->disableView();
+            $actions->disableDelete();
+            $actions->add(new DeleteAgencyAction());
+            $actions->add(new ChangeUsersAgencyAction($model->id));
+        });
+
         $grid->disableExport();
         $grid->disableRowSelector();
 
@@ -499,6 +532,193 @@ class AgencyController extends MainController
         return $grid;
     }
 
+    protected function form()
+    {
+        $form = new Form(new Agency());
+
+        $form->display('ID');
+
+        $this->addMainFields($form);
+        $this->addPhoneFields($form);
+        $this->addSavingLogic($form);
+        $this->addSavedLogic($form);
+        $this->addFooter($form);
+
+        return $form;
+    }
+
+    protected function addMainFields(Form $form)
+    {
+
+        if ($form->isEditing()){
+            $form->tools(function (Form\Tools $tools) {
+                $tools->disableDelete();
+            });
+        }
+
+        $form->row(function ($row) {
+            $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
+            $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            $row->width(12)->hidden('agency_manger_id', __('app manger id'));
+            $row->width(12)->text('name', __('agency name'))->rules('required');
+            $row->width(12)->switch('status', __('status'));
+            $row->width(12)->hidden('country_id')->default(Auth::user()->country_id);
+        });
+    }
+
+    protected function bdOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (Bd::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
+            }
+            return $ops;
+        };
+    }
+
+    protected function ownerOptions()
+    {
+        return function ($value) {
+            $ops = [];
+            foreach (User::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid . '_' . $user->name;
+            }
+            return $ops;
+        };
+    }
+
+    protected function addPhoneFields(Form $form)
+    {
+        $form->row(function ($row) {
+            $row->width(9)->text('phone', __('agency whatsApp number'))
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 13)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+
+            $row->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+            });
+        });
+
+        if (Session::has('show_alert')) {
+            $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
+        }
+
+        Admin::script($this->phoneJs());
+    }
+
+
+    protected function phoneJs()
+    {
+        return <<<JS
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                    });
+                    form.classList.add('phone-init');
+        }
+    }
+
+    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
+    initAllPhones();
+    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+    JS;
+    }
+    protected function addSavingLogic(Form $form)
+    {
+        $form->saving(function (Form $form) {
+            if (! $form->bd_id){
+                $defaultBd = Bd::where('default', 1)->first();
+
+                if ($defaultBd) {
+                    $form->bd_id = $defaultBd->id;
+                } else {
+                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                }
+            }
+            $form->country_id = Auth::user()->country_id;
+            $appOwnerId = $form->input('app_owner_id');
+            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
+            $newOwnerId = request()->app_owner_id;
+            $form->model()->type = 1;
+
+            if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
+                $user = User::find($originalOwnerId);
+                $agencyId = $form->model()->id;
+                Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
+
+                $user->update([
+                    'type_user' => 0,
+                    'agency_id' => 0,
+                    'is_host' => 0,
+                ]);
+                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+
+            }
+
+            User::where('id', intval($appOwnerId))->update([
+                'type_user' => 2,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,
+            ]);
+        });
+    }
+
+    protected function addSavedLogic(Form $form)
+    {
+        $form->saved(function (Form $form) {
+            $appOwnerId = intval($form->model()->app_owner_id);
+
+            User::where('id', $appOwnerId)->update([
+                'type_user' => 2,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,
+            ]);
+
+            $exists = UsersJoinedAgency::where([
+                'user_id' => $appOwnerId,
+                'agency_id' => $form->model()->id,
+                'type' => 1,
+            ])->whereNull('leave_date')->exists();
+
+            if (!$exists) {
+                UsersJoinedAgency::create([
+                    'user_id' => $appOwnerId,
+                    'agency_id' => $form->model()->id,
+                    'type' => 1,
+                    'join_date' => now(),
+                    'status' => 'Joined',
+                ]);
+            }
+        });
+    }
+
+    protected function addFooter(Form $form)
+    {
+        $form->footer(function ($footer) {
+            $footer->disableEditingCheck();
+            $footer->disableCreatingCheck();
+        });
+    }
     public function response()
     {
         if (is_null($this->response)) {

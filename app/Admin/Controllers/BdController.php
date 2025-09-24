@@ -93,7 +93,13 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $grid->model()->with('bdSalaries')->orderByDesc('id');
+
+        $grid->model()
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs'])
+            ->withSum('bdSalaries', 'salary')
+            ->withSum('bdSalaries', 'cut_amount')
+            ->withCount('agencies as total_agencies')
+            ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -221,22 +227,22 @@ class BdController extends MainController
         });
 
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
-            return $this->agencies_count;
+            return $this->total_agencies;
         });
 
 
         $grid->column('total_salary', __('total proft'))->display(function () {
-            return truncateAndTrim($this->total_salary, 2);
+            return truncateAndTrim($this->bd_salaries_sum_salary ?? 0, 2);
         });
 
         $grid->column('current_balance', __('current_balance'))->display(function () {
-            $total = floatval($this->total_salary);
-            $cut   = floatval($this->total_cut);
+            $total = floatval($this->bd_salaries_sum_salary ?? 0);
+            $cut   = floatval($this->bd_salaries_sum_cut_amount ?? 0);
             return truncateAndTrim($total - $cut, 2);
         });
 
         $grid->column('total_cut', __('Cut amount'))->display(function () {
-            return truncateAndTrim($this->total_cut, 2);
+            return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
         $grid->column('country.name', __('country'));

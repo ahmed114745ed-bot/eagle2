@@ -577,25 +577,53 @@ class AgencyController extends MainController
 
 
     protected function grid()
-{
-    $grid = new Grid(new Agency);
-    $grid->model()
-        ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-        ->with([
-            'owner:id,name,uuid', // only needed fields
-            'owner.profile:id,user_id,avatar',
-            'owner.packs' => fn($q) => $q
-                ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->with('ware:id,value'),
-        ])
-        ->available()
-        ->orderByDesc('id');
-    if (request()->has('active')) {
-        $grid->model()->whereHas('agencySalaries', function ($q) {
-            $q->where('month', now()->month)
-              ->where('year', now()->year);
+    {
+        $grid = new Grid(new Agency);
+
+        $grid->model()
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->where(function ($query) {
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+            })
+            ->orderByDesc('id');
+
+        if (request()->has('active')) {
+            $grid->model()
+                ->whereHas('agencySalaries', function ($q) {
+                    $q
+                        ->where('month', now()->month)
+                        ->where('year', now()->year);
+                });
+        }
+
+        $grid->column('name', __('Agency'))->display(function ($name) {
+            $cacheKey = "agency_image_{$this->id}";
+            $image = Cache::remember($cacheKey, 3600, function () {
+                $path = @$this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
+            });
+
+            $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+
+            return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->id}</span>
+                            </div>
+                        </div>
+                    </a>";
         });
     }
 
@@ -933,12 +961,12 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
@@ -949,7 +977,7 @@ class AgencyController extends MainController
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });

@@ -259,6 +259,15 @@ class SuperAdminController extends MainController
 
 //        $form->hidden('transfer_salary', __('transfer_salary'));
 
+        $form->select('country_id', trans('country'))->options(function () {
+            $ops       = [null => __('no country')];
+            $countries = Country::all();
+            foreach ($countries as $country) {
+                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            }
+            return $ops;
+        })->required();
+        
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -279,15 +288,6 @@ class SuperAdminController extends MainController
             $form->switch('default', __('set_superadmin_as_default'))
                 ->help(__('make_super_admin_default'));
         }
-
-        $form->select('country_id', trans('country'))->options(function () {
-            $ops       = [null => __('no country')];
-            $countries = Country::all();
-            foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
-            }
-            return $ops;
-        })->required();
 
         $form->hidden('type', __('Type'))->value('superadmin');
 //        $form->hidden('transfer_salary', __('transfer_salary'));
