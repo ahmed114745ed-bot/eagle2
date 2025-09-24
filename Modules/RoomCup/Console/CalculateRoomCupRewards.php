@@ -50,7 +50,7 @@ class CalculateRoomCupRewards extends Command
             return;
         }
 
-        $adminsCount   = $room->admins()->count();
+        $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
 
         $this->line("👥 Admins: $adminsCount | Visitors: $visitorsCount | Total: {$gift->current_total}");
@@ -74,7 +74,7 @@ class CalculateRoomCupRewards extends Command
             // Admin rewards
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
-                foreach ($room->admins as $admin) {
+                foreach ($room->admins_v2() as $admin) {
                     $rewards[] = $this->makeReward($room->id, $gift->id, $admin->id, 'admin', $share);
                     $this->line("👤 Admin {$admin->id} will get $share");
                 }

@@ -359,4 +359,10 @@ class Room extends Model
     {
         return $query->where('type', 'audio');
     }
+
+    public function admins_v2()
+    {
+        return User::whereIn('id', explode(',', $this->room_admin ?? ''))
+                ->get();
+    }
 }
