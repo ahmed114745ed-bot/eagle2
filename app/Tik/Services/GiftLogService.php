@@ -202,9 +202,7 @@ class GiftLogService
 
             $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
-            info('total gift price', [$totalGiftPrice]);
             if ($totalPrice > $totalGiftPrice) {
-                info('total price bigger than gift price');
                 $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
             }
             return $message;
@@ -422,7 +420,7 @@ class GiftLogService
             'gift_img'          => $gift->img,
             'gift_id'           => $gift->id,
             'sender_id'         => (int)$user->id,
-            'receiver_id'       => (int)$receivedUser->id,
+            'receiver_id'       => @(int)$receivedUser->id,
             'num_gift'          => $totalPrice,
             "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
             'room_session'      => $room->session_string,
@@ -435,7 +433,7 @@ class GiftLogService
             "room_cover"        => $room->room_cover ?? '',
             "room_background"   => $room->final_room_image ?? '',
             'from_name'         => $user->name,
-            'to_name'           => $receivedUser->name,
+            'to_name'           => @$receivedUser->name,
             'gift_price'        => $gift->price,
             'owner_id'          => $ownerId,
             'number'            => $number,
