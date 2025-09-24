@@ -111,12 +111,12 @@ class UserHandling
 
     private function handleUserSalaries(User $user)
     {
-   
+
             $agencyId = $user->agency_id;
             $timezone = getTimezone();
             $currentMonth = now( $timezone)->month;
             $currentYear = now( $timezone)->year;
-    
+
             $userSalaries = UserSallary::query()
                 ->where('user_id', $user->id)
                 ->where('user_agency_id', $agencyId)
@@ -124,14 +124,14 @@ class UserHandling
                 ->where('year', $currentYear)
                 ->where('is_finished', 0)
                 ->first();
-             
+
             if (!$userSalaries) return;
-           
+
             if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
-              
+
                 $userSalaries->update(['is_finished' => 1]);
             }
-        
+
     }
 
     private function clearUserAgencyLogs(User $user)
@@ -166,25 +166,25 @@ class UserHandling
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
     {
         $agencyId = $agency->id;
-    
+
         $users = User::where('agency_id', $agencyId)
             ->get();
-    
+
         if ($users->isEmpty()) {
-            return; 
+            return;
         }
-    
+
         DB::transaction(function () use ($users, $agencyId) {
-    
+
             foreach ($users as $user) {
                 self::kickUserFromAgency($user, 0);
             }
 
-    
+
             DB::table('agency_sallaries')->where('agency_id', $agencyId)->delete();
         });
     }
-    
+
 
 
     public static function checkIfUserOwnerOfAgency(User $user): bool
@@ -217,9 +217,25 @@ class UserHandling
         $now = now();
 
         return Ban::query()->where('type', '!=', 'action')
-            ->where(fn($q) => $q->where('uid', $uuid)
-                ->orWhere(fn($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))
-                ->orWhere(fn($q) => $q->where('device_number', '!=', null)->where('device_number', $request->header('x-device-token'))))
+            ->where(function ($q) use ($uuid, $request) {
+
+                $q->orWhere(function ($q) use ($uuid) {
+                    $q->where('type', 'normal')
+                        ->where('uid', $uuid);
+                });
+
+                $q->orWhere(function ($q) use ($request) {
+                    $q->where('type', 'ip')
+                        ->whereNotNull('ip')
+                        ->where('ip', $request->ip());
+                });
+
+                $q->orWhere(function ($q) use ($request) {
+                    $q->where('type', 'device')
+                        ->whereNotNull('device_number')
+                        ->where('device_number', $request->header('x-device-token'));
+                });
+            })
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->first();
     }
@@ -314,7 +330,7 @@ class UserHandling
             ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
             ->where('receiver_id', $userId)
             ->groupBy('sender_id')
-            ->orderByDesc('total')  
+            ->orderByDesc('total')
             ->take(3)
             ->get();
 
