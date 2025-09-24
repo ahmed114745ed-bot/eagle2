@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class MilestoneReward extends Model
 {
+     protected $appends = ['rewardable_id2', 'rewardable_id3', 'reward1','reward2'];
     protected $fillable = [
         'milestone_id',
         'rewardable_id',
@@ -25,6 +26,25 @@ class MilestoneReward extends Model
     public function rewardable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getRewardableId2Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
+    public function getRewardableId3Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
+    public function getReward1Attribute()
+    {
+        return $this->rewardable_id;
+    }
+    public function getReward2Attribute()
+    {
+        return $this->rewardable_id;
     }
 
     protected static function boot()

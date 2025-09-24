@@ -26,8 +26,8 @@ class MilestoneRewardController
     {
         $milestone = Milestone::find($milestoneId);
         return $content
-            ->header(__('Milestone rewards') . '-:-' .$milestone->name)
-            ->description(__('id') . '-:-' .$milestone->id)
+            ->header(__('Milestone rewards') . '-:-' . $milestone->name)
+            ->description(__('id') . '-:-' . $milestone->id)
             ->body($this->grid($milestoneId));
     }
 
@@ -41,7 +41,7 @@ class MilestoneRewardController
 
     public function show($id, Content $content)
     {
-       
+
         return $content
             ->header(__('Detail'))
             ->description(__('Reward details'))
@@ -50,7 +50,7 @@ class MilestoneRewardController
 
     public function edit($id, Content $content)
     {
-        $id = request('id') ;
+        $id = request('id');
         return $content
             ->header(__('Edit Reward'))
             ->description(__('Edit milestone reward'))
@@ -59,7 +59,7 @@ class MilestoneRewardController
 
     protected function grid($milestoneId)
     {
-       
+
         $grid = new Grid(new MilestoneReward());
 
         if ($milestoneId) {
@@ -67,12 +67,16 @@ class MilestoneRewardController
         }
 
         $grid->column('id', __('ID'))->sortable();
-        $grid->column('type', __('Type'))->label();
+        if (!request()->filled('_export_')) {
+            $grid->column('type', __('Type'))->label();
+        } else {
+            $grid->column('type', __('Type'));
+        }
 
         $grid->column('reward_id', __('Rewards'))->display(function () {
             if ($this->type === "coins") {
                 return $this?->reward ?? "-";
-            }elseif ($this->type === "ware") {
+            } elseif ($this->type === "ware") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "vip") {
                 return $this->rewardable?->name ?? "-";
@@ -83,26 +87,26 @@ class MilestoneRewardController
             }
             return "-";
         });
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('Image'))->display(function () {
+                if ($this->type === "coins") {
+                    $path = 'coin.png';
+                } elseif ($this->type === "ware") {
+                    $path = $this->rewardable?->img2 ?? $this->rewardable?->show_img;
+                } elseif ($this->type === "vip") {
+                    $path = $this->rewardable?->img;
+                } elseif ($this->type === "achievement") {
+                    $path = $this->reward;
+                } elseif ($this->type === "badge") {
+                    $path = $this->rewardable?->icon;
+                } else {
+                    $path = 'coin.png';
+                }
 
-        $grid->column('image', __('Image'))->display(function () {
-            if ($this->type === "coins") {
-                $path = 'coin.png';
-            }elseif ($this->type === "ware") {
-                $path = $this->rewardable?->img2 ?? $this->rewardable?->show_img;
-            } elseif ($this->type === "vip") {
-                $path = $this->rewardable?->img;
-            } elseif ($this->type === "achievement") {
-                $path = $this->reward;
-            } elseif ($this->type === "badge") {
-                $path = $this->rewardable?->icon;
-            } else {
-                $path = 'coin.png';
-            }
-
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
-
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('expire', __('Expire'))->display(fn($expire) => $expire ?: '-');
 
         $grid->tools(function (Grid\Tools $tools) {
@@ -116,7 +120,7 @@ class MilestoneRewardController
             $tools->append($customButtonHTML);
         });
 
-  
+
 
         Admin::script("
             if (window.innerWidth >= 1024) {
@@ -130,7 +134,7 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-   
+
         $form->hidden('milestone_id')->value(request('milestone_id'));
 
         $form->select('type', __('Type'))->options([
@@ -140,63 +144,58 @@ class MilestoneRewardController
             "achievement"  => __('Achievement'),
             "badge"        => __('Badge'),
         ])
-        ->when("ware", function (Form $form) {
-            $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
-            $form->number('expire', __('Expire'))->default(1);
-
-        })
-        ->when("vip", function (Form $form) {
+            ->when("ware", function (Form $form) {
+                $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
+                $form->number('expire', __('Expire'))->default(1);
+            })
+            ->when("vip", function (Form $form) {
                 $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
                 $form->number('expire', __('Expire'))->default(1);
+            })
+            ->when("achievement", function (Form $form) {
 
-            
-        })
-        ->when("achievement", function (Form $form) {
+                $form->image("reward1", __('Image'))
+                    ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+                    ->disk('gcs');
 
-            $form->image("reward1", __('Image'))
-            ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
-            ->disk('gcs');
-            
-            $form->number('expire', __('Expire'))->default(1);
+                $form->number('expire', __('Expire'))->default(1);
+            })
+            ->when("badge", function () use ($form) {
+                $this->addBadgeField($form);
+                $form->number('expire', __('Expire'))->default(1);
+            })
+            ->when("coins", function (Form $form) {
+                $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
+            });
 
-        })
-        ->when("badge", function () use ($form) {
-            $this->addBadgeField($form);
-            $form->number('expire', __('Expire'))->default(1);
 
-        })
-        ->when("coins", function (Form $form) {
-            $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
-        });
-    
-    
-    
+
         $form->saving(function (Form $form) {
             switch ($form->type) {
                 case 'ware':
                     $form->rewardable_type = \App\Models\Ware::class;
                     $form->model()->rewardable_type = \App\Models\Ware::class;
                     break;
-    
+
                 case 'vip':
                     $form->rewardable_type = \Modules\Vip\Entities\OVip::class;
                     $form->model()->rewardable_type = \Modules\Vip\Entities\OVip::class;
                     break;
-    
+
                 case 'badge':
                     $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     break;
-    
+
                 case 'achievement':
                     $form->rewardable_id = 0;
                     $form->model()->rewardable_id = 0;
                     $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
                     $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                   
-                   
+
+
                     break;
-    
+
                 case 'coins':
                     $form->rewardable_id = 0;
                     $form->model()->rewardable_id = 0;
@@ -206,10 +205,14 @@ class MilestoneRewardController
                     break;
             }
         });
-    
+        $form->saved(function (Form $form) {
+
+            $route = url('admin/milestone-rewards/' . request('milestone_id'));
+            return redirect($route);
+        });
         return $form;
     }
-    
+
 
     protected function detail($id)
     {
@@ -226,25 +229,24 @@ class MilestoneRewardController
     }
 
     protected function addBadgeField(Form $form)
-{
-    $prefix = 'badges';
-    $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
-        $form
-            ->select('id', __('badges'))
-            ->options(function ($id) {
-                if (!$id) return [];
-                $ware = Badge::find($id);
-                return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
-            })
-            ->attribute([
-                'data-image-select' => 1,
-                'data-load-url' => admin_url('wares-by-id')
-            ]);
+    {
+        $prefix = 'badges';
+        $form->belongsTo('rewardable_id3', Badges::class, __('Badges'), function ($form) use ($prefix) {
+            $form
+                ->select('id', __('badges'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Badge::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id')
+                ]);
 
-        $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
 
-        $this->addWareJs();
-    });
-}
-
+            $this->addWareJs();
+        });
+    }
 }

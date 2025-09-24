@@ -2,15 +2,17 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Milestones\Entities\Milestone;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Modules\Milestones\Entities\Milestone;
+use Encore\Admin\Facades\Admin;
 
-class MilestoneController extends AdminController
+class MilestoneController extends MainController
 {
+    public $permission_name = 'milestone';
     /**
      * Title for current resource.
      *
@@ -26,19 +28,48 @@ class MilestoneController extends AdminController
             ->body($this->grid());
     }
 
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Milestone'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('Milestone'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Milestone'))
+            ->body($this->form()));
+    }
+
     protected function grid()
     {
         $grid = new Grid(new Milestone());
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('Name'));
-        $grid->column('rewards', __('rewards'))->display(function () {
-            $url =  admin_url("milestone-rewards/". $this->id);
-            return "<a href='{$url}' class='btn btn-xs btn-info'>
-                        <i class='fa fa-eye'></i> ".__('rewards')."
+        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('rewards', __('rewards'))->display(function () {
+                $url =  admin_url("milestone-rewards/" . $this->id);
+                return "<a href='{$url}' class='btn btn-xs btn-info'>
+                        <i class='fa fa-eye'></i> " . __('rewards') . "
                     </a>";
-        });
-     
+            });
+        }
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));

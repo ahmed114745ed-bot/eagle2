@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 
 use App\Events\DeviceTokenSent;
+use App\helper\AccountHelper;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use App\Helpers\Common;
@@ -106,6 +107,8 @@ class AuthController extends Controller
         }
 
         $user->auth_token = $token;
+        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+
         return Common::apiResponse(
             true,
             __('api_responses.logged'),
@@ -139,6 +142,7 @@ class AuthController extends Controller
             event(new DeviceTokenSent($user->id, $user->device_token));
         } catch (\Exception $e) {
         }
+        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
 
         return Common::apiResponse(
@@ -209,6 +213,7 @@ class AuthController extends Controller
 
         $user->auth_token = $token;
         event(new DeviceTokenSent($user->id, $user->device_token));
+        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
         return Common::apiResponse(true, '', new MyDataResource($user), 200);
     }
@@ -225,6 +230,7 @@ class AuthController extends Controller
         }
         $user->auth_token = $token;
         event(new DeviceTokenSent($user->id, $user->device_token));
+        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
         return Common::apiResponse(
             true,
@@ -247,6 +253,8 @@ class AuthController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         $user->auth_token = $token;
+        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+
         return Common::apiResponse(
             true,
             __('api_responses.logged'),
