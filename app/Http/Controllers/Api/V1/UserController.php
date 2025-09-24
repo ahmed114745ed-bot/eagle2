@@ -721,10 +721,7 @@ class UserController extends Controller
     {
         $lang = app()->getLocale();
 
-        \Log::info('explain_invitation language used', [
-            'locale' => $lang,
-            'headers' => request()->headers->all(),
-        ]);
+
     
         if ($lang == "en") {
             $data = Common::getSettingValue('invitation_content_en');
