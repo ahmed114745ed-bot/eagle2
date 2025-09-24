@@ -2,6 +2,12 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Admin\Actions\CanPlaySwitchAction;
+use App\Admin\Actions\ChangeAgencyAction;
+use App\Admin\Actions\ChargeSwitchAction;
+use App\Admin\Actions\InviteSwitchAction;
+use App\Admin\Actions\KickOfAgencyAction;
+use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
@@ -326,6 +332,20 @@ class UserController extends MainController
                 });
             });
         ");
+
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $actions->add(new ChargeSwitchAction());
+            $actions->add(new InviteSwitchAction());
+
+            $row = $actions->row;
+            $actions->add(new CanPlaySwitchAction($row['can_play']));
+
+            $actions->add(new KickOfAgencyAction());
+            $actions->add(new KickOfFamilyAction());
+
+            $actions->add(new ChangeAgencyAction($model->id));
+        });
 
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
