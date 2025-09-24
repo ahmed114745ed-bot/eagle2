@@ -333,19 +333,20 @@ class UserController extends MainController
             });
         ");
 
-        $grid->actions(function ($actions) {
-            $model = $actions->row;
-            $actions->add(new ChargeSwitchAction());
-            $actions->add(new InviteSwitchAction());
+        // $grid->actions(function ($actions) {
+        //     $model = $actions->row;
+        //     $actions->add(new ChargeSwitchAction());
+        //     $actions->add(new InviteSwitchAction());
 
-            $row = $actions->row;
-            $actions->add(new CanPlaySwitchAction($row['can_play']));
+        //     $row = $actions->row;
+        //     $actions->add(new CanPlaySwitchAction($row['can_play']));
 
-            $actions->add(new KickOfAgencyAction());
-            $actions->add(new KickOfFamilyAction());
+        //     $actions->add(new KickOfAgencyAction());
+        //     $actions->add(new KickOfFamilyAction());
 
-            $actions->add(new ChangeAgencyAction($model->id));
-        });
+        //     $actions->add(new ChangeAgencyAction($model->id));
+        // });
+        $grid->disableActions();
 
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
