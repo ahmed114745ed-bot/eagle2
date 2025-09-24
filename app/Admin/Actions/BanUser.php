@@ -297,6 +297,8 @@ class BanUser extends Action
         JS);
 
         Admin::script(<<<JS
+            $('input[name="ban_accounts[]"]').closest('.form-group').hide();
+
             $(document).on('ifChecked', 'input[name="type[]"][value="device"]', function() {
                 console.log("Device checkbox checked with iCheck!");
                 var uuid = $('input[name="uuid"]').val();
@@ -318,10 +320,9 @@ class BanUser extends Action
                         } else {
                             var html = '<div class="dynamic-ban-accounts" style="margin-top:10px;">';
                             res.forEach(function(acc) {
-                                var checked = (acc.uuid == uuid) ? 'checked' : '';
                                 html += '<div style="margin-bottom:5px;">' +
                                             '<label style="display:block; font-weight:normal;">' +
-                                                '<input type="checkbox" name="ban_accounts[]" value="' + acc.id + '" ' + checked + '> ' +
+                                                '<input type="checkbox" name="ban_accounts[]" value="' + acc.id + '"> ' +
                                                 (acc.name ? acc.name : "Unknown") + ' (UUID: ' + acc.uuid + ')' +
                                             '</label>' +
                                         '</div>';
@@ -332,13 +333,9 @@ class BanUser extends Action
                             $('input[name="ban_accounts[]"]').iCheck({
                                 checkboxClass: 'icheckbox_minimal-blue'
                             });
-
-                            $('input[name="ban_accounts[]"][value]').each(function() {
-                                if ($(this).is(':checked')) {
-                                    $(this).iCheck('check');
-                                }
-                            });
                         }
+
+                        container.show();
                     },
                     error: function(xhr) {
                         console.error("AJAX Error:", xhr.responseText);
@@ -346,8 +343,13 @@ class BanUser extends Action
                     }
                 });
             });
-        JS);
 
+            $(document).on('ifUnchecked', 'input[name="type[]"][value="device"]', function() {
+                var container = $('input[name="ban_accounts[]"]').closest('.form-group');
+                container.hide();
+                container.find('.dynamic-ban-accounts').remove();
+            });
+        JS);
 
         $banText = __('create bans');
         return <<<HTML
