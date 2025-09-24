@@ -219,8 +219,7 @@ class UserHandling
         return Ban::query()
             ->where('type', '!=', 'action')
             ->where(function ($q) use ($uuid, $request) {
-
-                $q->orWhere(function ($q) use ($uuid) {
+                $q->where(function ($q) use ($uuid) {
                     $q->where('type', 'normal')
                         ->where('uid', $uuid);
                 });
@@ -235,7 +234,7 @@ class UserHandling
                         ->where('device_number', $request->header('x-device-token'));
                 });
             })
-            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
+            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [$now])
             ->first();
     }
 
