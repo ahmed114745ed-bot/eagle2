@@ -257,7 +257,8 @@ class BanUser extends Action
             'others' => __('others'),
         ]);
 
-        $this->multipleSelect('ban_accounts', __('Select Accounts to Ban'))->options([]);
+//        $this->multipleSelect('ban_accounts', __('Select Accounts to Ban'))->options([]);
+        $this->checkbox('ban_accounts', __('Select Accounts to Ban'))->options([]);
 
 
         $this->select('ban_type_id', __('ban_type'))
@@ -308,13 +309,34 @@ class BanUser extends Action
                     data: {uuid: uuid},
                     success: function(res) {
                         console.log("Accounts:", res);
-                        var select = $('select[name="ban_accounts[]"]');
-                        select.empty();
+
+                        var container = $('input[name="ban_accounts[]"]').closest('.form-group');
+                        container.find('.dynamic-ban-accounts').remove();
+
                         if (res.length === 0) {
-                            select.append('<option value="">No accounts found</option>');
+                            container.append('<div class="dynamic-ban-accounts"><p>No accounts found</p></div>');
                         } else {
+                            var html = '<div class="dynamic-ban-accounts" style="margin-top:10px;">';
                             res.forEach(function(acc) {
-                                select.append('<option value="'+acc.id+'">'+acc.name+' (UUID: '+acc.uuid+')</option>');
+                                var checked = (acc.uuid == uuid) ? 'checked' : '';
+                                html += '<div style="margin-bottom:5px;">' +
+                                            '<label style="display:block; font-weight:normal;">' +
+                                                '<input type="checkbox" name="ban_accounts[]" value="' + acc.id + '" ' + checked + '> ' +
+                                                (acc.name ? acc.name : "Unknown") + ' (UUID: ' + acc.uuid + ')' +
+                                            '</label>' +
+                                        '</div>';
+                            });
+                            html += '</div>';
+                            container.append(html);
+
+                            $('input[name="ban_accounts[]"]').iCheck({
+                                checkboxClass: 'icheckbox_minimal-blue'
+                            });
+
+                            $('input[name="ban_accounts[]"][value]').each(function() {
+                                if ($(this).is(':checked')) {
+                                    $(this).iCheck('check');
+                                }
                             });
                         }
                     },
@@ -325,6 +347,7 @@ class BanUser extends Action
                 });
             });
         JS);
+
 
         $banText = __('create bans');
         return <<<HTML
