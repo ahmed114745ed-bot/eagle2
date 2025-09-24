@@ -441,7 +441,7 @@ class RoomRepoService
     public function getRoomBackground(?Room $room)
     {
         if ($room == null) return '';
-        return $room->final_room_image;
+        return $room->final_room_image ?? '' ;
     }
 
     // public function changeMode($request, $currentMode, $userId = null)
