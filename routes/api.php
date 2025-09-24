@@ -285,7 +285,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
                 Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
                 Route::get('/frames/{id?}', [UserController::class, 'frames']);
-
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -302,7 +301,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('search')->group(function () {
-//                Route::get('/', [CommunityController::class, 'merge_search']);
+                //                Route::get('/', [CommunityController::class, 'merge_search']);
                 Route::get('/', [CommunityController::class, 'mergeSearchV2']);
                 Route::get('user-friends', [CommunityController::class, 'user_friends']);
                 Route::get('/history', [CommunityController::class, 'searchList']);
@@ -652,8 +651,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         return response()->json(['html' => $Page]);
     });
 
-     Route::get('/setting-invitation-code', function () {
-        $Page = \App\Models\Page::where("name", "setting-invitation-code")->first();
+    Route::get('/setting-invitation-code', function () {
+        $Page = [
+            'content_ar' => Common::getSettingValue('invitation_content_ar'),
+            'content_en' => Common::getSettingValue('invitation_content_en'),
+        ];
         return response()->json(['html' => $Page]);
     });
 });
@@ -710,7 +712,3 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
-
-
-
-
