@@ -286,11 +286,11 @@ class GiftLogController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-//        try {
+        try {
             $message = $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
-//        } catch (\Exception $e) {
-//            return Common::apiResponse(false, $e->getMessage());
-//        }
+        } catch (\Exception $e) {
+            return Common::apiResponse(false, $e->getMessage());
+        }
 
         settings()->set('gift_send', true);
 
