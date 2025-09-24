@@ -33,7 +33,6 @@ enum UserCoinLogType: string
     case ROOM_BOOM = 'room_boom';
     case MILESTONE = 'milestone';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
-    case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
     
     
