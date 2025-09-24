@@ -653,8 +653,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::get('/setting-invitation-code', function () {
         $Page = [
-            'content_ar' => Common::getSettingValue('invitation_content_ar'),
-            'content_en' => Common::getSettingValue('invitation_content_en'),
+            'content_ar' => Common::getSettingValue('invitation_content_ar') ?? '',
+            'content_en' => Common::getSettingValue('invitation_content_en') ??'',
         ];
         return response()->json(['html' => $Page]);
     });
