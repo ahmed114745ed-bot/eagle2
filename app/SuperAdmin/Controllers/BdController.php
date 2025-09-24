@@ -278,8 +278,8 @@ class BdController extends AdminController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name')->rules('required');
 
-            $form->switch('default', __('set_as_default'))
-                ->help(__('make_bd_default'));
+//            $form->switch('default', __('set_as_default'))
+//                ->help(__('make_bd_default'));
         }
 
         $user = auth()->user();
