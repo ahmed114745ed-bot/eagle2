@@ -53,7 +53,7 @@ class BanUser extends Action
                     // if(!$ban && $ip != $ban->ip){
                     Ban::query()->create(
                         [
-                            'uid' => $userUuid,
+//                            'uid' => $userUuid,
                             'duration' => $request->duration,
                             'ip' => $ip->ip,
                             'type' => 'ip',
@@ -79,7 +79,7 @@ class BanUser extends Action
 
                 Ban::query()->create(
                     [
-                        'uid' => $userUuid,
+//                        'uid' => $userUuid,
                         'duration' => $request->duration,
                         'device_number' => $user->device_token,
                         'type' => 'device',
@@ -358,4 +358,5 @@ class BanUser extends Action
                 {$banText}
             </a>
         HTML;
-        }}
+    }
+}
