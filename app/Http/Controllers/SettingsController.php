@@ -375,12 +375,4 @@ class SettingsController extends Controller
 
         return response()->json(['hasActiveTargets' => $hasActiveTargets]);
     }
-
-    public function invitationCode()
-    {
-        $Page = [
-            'content' => app()->getLocale() === 'ar' ? (Common::getSettingValue('invitation_content_ar') ?? (Common::getSettingValue('invitation_content_en') ?? '')) : (Common::getSettingValue('invitation_content_en') ?? (Common::getSettingValue('invitation_content_ar') ?? '')),
-        ];
-        return Common::apiResponse(0, '', $Page, 200);
-    }
 }

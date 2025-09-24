@@ -720,12 +720,15 @@ class UserController extends Controller
     public function explain_invitation()
     {
         $lang = app()->getLocale();
-        if ($lang == "en") {
-            $data = Common::getSettingValue('invitation_content_ar');
-        } else {
-            $data = Common::getSettingValue('invitation_content_en');
-        }
 
+
+    
+        if ($lang == "en") {
+            $data = Common::getSettingValue('invitation_content_en');
+        } else {
+            $data = Common::getSettingValue('invitation_content_ar');
+        }
+    
         return Common::apiResponse(true, '', $data, 200);
     }
 

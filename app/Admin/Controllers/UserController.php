@@ -339,50 +339,47 @@ class UserController extends MainController
 
 
 
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
 
-        $grid->disableActions();
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new ChargeSwitchAction());
+            }
+            if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
-        // $grid->actions(function ($actions) use ($permission) {
-        //     $model = $actions->row;
+                $actions->add(new InviteSwitchAction());
+            }
+            if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
-        //     if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-        //         $actions->add(new ChargeSwitchAction());
-        //     }
-        //     if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
+                $row = $actions->row; // force load
 
-        //         $actions->add(new InviteSwitchAction());
-        //     }
-        //     if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
+            }
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new KickOfAgencyAction());
+            }
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new KickOfFamilyAction());
+            }
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new ChangeAgencyAction($model->id));
+            }
+            if ($model->phone == '+201000100010') {
+                $actions->disableDelete();
+            }
 
-        //         $row = $actions->row; // force load
-
-        //         $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
-        //     }
-        //     if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-        //         $actions->add(new KickOfAgencyAction());
-        //     }
-        //     if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
-        //         $actions->add(new KickOfFamilyAction());
-        //     }
-        //     if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-        //         $actions->add(new ChangeAgencyAction($model->id));
-        //     }
-        //     if ($model->phone == '+201000100010') {
-        //         $actions->disableDelete();
-        //     }
-
-        //     if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
-        //         $actions->disableDelete();
-        //     }
+            if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
+                $actions->disableDelete();
+            }
 
 
-        //     if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
-        //         $actions->disableEdit();
-        //     }
-        //     if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
-        //         $actions->disableView();
-        //     }
-        // });
+            if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
+                $actions->disableEdit();
+            }
+            if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
+                $actions->disableView();
+            }
+        });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();

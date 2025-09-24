@@ -250,7 +250,7 @@
             </button>
                          <button onclick="showSection('InviteCodeSettings')"
                     style="text-align: right;">
-                {{ __('dashboard.closeCose') }}
+                {{ __('invitation code setting') }}
             </button>
         </div>
     </div>
@@ -406,13 +406,6 @@
                             <span class="slider round"></span>
                         </label>
                         <input type="hidden" name="invite_code" id="invite_code_value" value="{{ $invite_code ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
                     </div>
                 </div>
             </form>

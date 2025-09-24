@@ -652,7 +652,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         return response()->json(['html' => $Page]);
     });
 
-    Route::get('/setting-invitation-code', [SettingsController::class ,'invitationCode']);
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
