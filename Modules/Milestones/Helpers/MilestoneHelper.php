@@ -172,7 +172,7 @@ class MilestoneHelper
 
         switch ($type) {
             case 'coins':
-               // UserCommon::removeCoinsFromUser($user->id, (int)($extra['reward'] ?? 0), $receiveType);
+                // UserCommon::removeCoinsFromUser($user->id, (int)($extra['reward'] ?? 0), $receiveType);
                 break;
 
             case 'vip':
@@ -194,5 +194,12 @@ class MilestoneHelper
                     ->delete();
                 break;
         }
+    }
+
+
+    public static function removeReward($user, $slug)
+    {
+        $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
+        self::revokeRewardFromUser($user, $milestone->rewards);
     }
 }
