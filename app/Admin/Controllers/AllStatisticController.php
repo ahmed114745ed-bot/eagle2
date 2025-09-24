@@ -25,7 +25,7 @@ class AllStatisticController extends MainController
 
     public function index(Content $content)
     {
-        
+
         $userId = \Encore\Admin\Facades\Admin::user()->id;
         // if ($userId == 1) {
             $coins                      = User::sum("di");
@@ -41,10 +41,10 @@ class AllStatisticController extends MainController
 
             $lose1 = UsdTransfer::whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->sum("value");
             $lose2 = RequestTakeSalary::where("status", 1)->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->sum("amount");
-            $lose = $lose1 + $lose2;
+            $lose = ((integer)$lose1) + ((integer)$lose2);
             $first_earned_charge = Charge::where("charger_type", "dash")->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->sum("usd");
             $second_earned_charge = CoinLog::whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->sum("paid_usd");
-            $earned_charge = $first_earned_charge + $second_earned_charge;
+            $earned_charge = ((integer)$first_earned_charge) + ((integer)$second_earned_charge);
             $app_earned_charge = $earned_charge - $lose;
 
             //gameWallet
@@ -107,7 +107,7 @@ class AllStatisticController extends MainController
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
                 }));
         // } else {
-          
+
         //     return parent::index($content
         //         ->title(trans('Dashboard')));
         // }

@@ -9,11 +9,11 @@ class TopUsersRankResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'name' => @$this->name ?? '',
-            'uuid' => @$this->uuid,
-            'img' => $this->profile->avatar ?? '',
-            'total_gift' => $this->total_gift ?? 0,
+            'id' => $this->user_id,
+            'name' => @$this->user->name ?? '',
+            'uuid' => @$this->user->uuid,
+            'img' => $this->user->profile->avatar ?? '',
+            'total_gift' => (int) ($this->total_gift ?? 0),
         ];
     }
 }

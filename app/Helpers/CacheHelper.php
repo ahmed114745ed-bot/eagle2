@@ -1,6 +1,8 @@
 <?php
 namespace App\Helpers;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class CacheHelper{
     public static function put($key,$value){
@@ -25,5 +27,19 @@ class CacheHelper{
 
     public static function forget($key){
         Cache::forget ($key);
+    }
+
+    public static function cacheSettings()
+    {
+        return Cache::rememberForever('all_settings', function () {
+            return Setting::select(['value', 'key'])->get();
+        });
+    }
+
+    public static function cacheConfig()
+    {
+        return cache()->rememberForever('all_configs', function () {
+            return DB::table('configs')->pluck('value', 'name')->toArray();
+        });
     }
 }

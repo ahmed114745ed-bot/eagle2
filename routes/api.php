@@ -1,23 +1,21 @@
 <?php
 
-use App\Admin\Controllers\AgencySettingsController;
-use App\Events\PublicTestEvent;
-use App\Http\Controllers\AppFeatureController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\RoomSettingController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\PayPalService;
 use Illuminate\Http\Request;
+use App\Events\PublicTestEvent;
+use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -26,6 +24,9 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\RoomSettingController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
+use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
@@ -61,7 +63,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -202,15 +203,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
+                Route::get('/mine', [RoomController::class, 'mine']);
+                Route::get('/user/{id}', [RoomController::class, 'userRoom']);
                 Route::get('/', [RoomController::class, 'index']);
+                Route::get('/live-rooms', [RoomController::class, 'getAllLiveRooms']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
                 Route::post('/create', [RoomController::class, 'store']);
+                Route::get('/{id}', [RoomController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
                 Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-                Route::get('/{id}', [RoomController::class, 'show']);
                 Route::post('/{id}/edit', [EnteranceController::class, 'update']);
                 Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
                 Route::post('admins', [RoomController::class, 'getAdmins']);
@@ -277,6 +281,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
                 Route::get('/data', [UserController::class, 'dataUser']);
+
+                Route::get('/stats/{id?}', [UserController::class, 'stats']);
+                Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
+                Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
+                Route::get('/frames/{id?}', [UserController::class, 'frames']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -293,7 +302,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('search')->group(function () {
-                Route::get('/', [CommunityController::class, 'merge_search']);
+                //                Route::get('/', [CommunityController::class, 'merge_search']);
+                Route::get('/', [CommunityController::class, 'mergeSearchV2']);
                 Route::get('user-friends', [CommunityController::class, 'user_friends']);
                 Route::get('/history', [CommunityController::class, 'searchList']);
                 Route::get('/clean_search_history', [CommunityController::class, 'cleanSearchList']);
@@ -305,6 +315,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
+                Route::get('notifications', [CommunityController::class, 'notifications']);
             });
 
             Route::prefix('home_carousels')->group(function () {
@@ -412,6 +423,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-earn-from-invitation', [UserController::class, 'UserEarnFromInvitation']);
             Route::get('create-code-invitation', [UserController::class, 'CreateCodeInvitation']);
             Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
+            Route::get('/invitations/earnings', [UserController::class, 'invitationsEarnings']);
+            Route::post('/invitations/earnings/{id}/claim', [UserController::class, 'invitationsEarningsClaim']);
+
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
@@ -637,6 +651,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
+
+    Route::get('/setting-invitation-code', [SettingsController::class ,'invitationCode']);
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
@@ -691,5 +707,3 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
-
-

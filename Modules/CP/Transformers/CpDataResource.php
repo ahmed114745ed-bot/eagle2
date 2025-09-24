@@ -8,6 +8,7 @@ use App\Models\Vip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\Cp;
 use Modules\CP\Entities\CpLevel;
@@ -32,19 +33,19 @@ class CpDataResource extends JsonResource
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
         $ratio = 0;
-    
+
         if (
             ($currentLevel || $currentLevel === 0) &&
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
-          
+
             $nextExp = $nextLevel->exp;
-        
-            $progress = max(0, $this->di - $currentExp); 
-            $required = $nextExp - $currentExp;      
-        
-            $ratio = round(min(($progress / $required) * 100, 100), 2);                    
+
+            $progress = max(0, $this->di - $currentExp);
+            $required = $nextExp - $currentExp;
+
+            $ratio = round(min(($progress / $required) * 100, 100), 2);
         } else {
             $ratio = 100;
         }

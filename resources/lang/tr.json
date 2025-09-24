@@ -21,6 +21,10 @@
     "Badges" : "rozetler",
     "this room has been banned.": "Bu oda yasaklandı.",
     "Owner uuid": "Sahip Kimlik Numarası",
+    "YouTube Settings": "YouTube Ayarları",
+    "Live Settings": "Canlı Yayın Ayarları",
+    "Enable youtube Feature": "YouTube Özelliğini Etkinleştir",
+    "Enable live Feature": "Canlı Yayın Özelliğini Etkinleştir",
     "Roles": "Roller",
     "Agency wallet": "Ajans cüzdanı",
     "Supporter" : "Destekçi",
@@ -3267,6 +3271,8 @@
     "min target": "minimum hedef",
     "Updated At": "Güncellenme Tarihi",
     "Room Boom Rewards": "Oda Patlaması Ödülleri",
+    "Room Boom Winners": "Room Boom Kazananları",
+    "Browse room boom winners": "Room Boom kazananlarına göz at",
     "You can only have a maximum of 5 Room Boom Levels.": "En fazla 5 Oda Patlaması Seviyesi ekleyebilirsiniz.",
     "room-boom-levels": "oda-patlamasi-seviyeleri",
     "Room Boom Reward": "Oda Patlaması Ödülü",
@@ -3324,7 +3330,20 @@
     "The minimum required gifts to activate the Boom Room at this level.": "Bu seviyede Boom Room'u etkinleştirmek için gerekli minimum hediyeler.",
     "The full target that must be achieved to complete the Room Boom at this level.": "Bu seviyedeki Room Boom'u tamamlamak için ulaşılması gereken tam hedef.",
     "The special video for this level, displayed after completion. Each level has its own unique video.": "Bu seviyeye özel video, tamamlandıktan sonra gösterilir. Her seviyenin kendine özgü bir videosu vardır.",
-  "filters.yes": "Evet"
+  "filters.yes": "Evet",
+  "invitation.earn_percentage": "Davet Eden Kazanç Yüzdesi (%)",
+  "invitation.earn_percentage_help": "Davet eden kişinin, davetlinin davetten sonraki bir ay içinde yaptığı her yüklemeden kazandığı yüzde.",
+  "invitation.host_reward": "Davet Eden Ödülü (Coins)",
+  "invitation.host_reward_help": "Davetli kodu kullandığında davet edenin hemen aldığı coin sayısı.",
+  "invitation.invitee_reward": "Davetli Ödülü (Coins)",
+  "invitation.invitee_reward_help": "Davetli, davet kodunu kullandığında aldığı coin sayısı.",
+  "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi",
+    "Show Image": "Resmi Göster",
+    "Alternative Image": "Alternatif Resim",
+    "Live System Setting:": "Canlı Sistem Ayarı",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+
+
 
 
 

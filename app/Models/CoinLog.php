@@ -13,9 +13,18 @@ class CoinLog extends Model
 
     protected $guarded = [];
 
+
+    public function owner()
+    {
+        return $this->morphTo(__FUNCTION__, 'user_type', 'user_id')
+            ->withDefault(function ($model, $relation) {
+                return new \App\Models\User();
+            });
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id')->with('profile');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function coin()

@@ -19,7 +19,8 @@ class GeneralBanMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $user = $request->user ();
+        $user = $request->user();
+        $user->loadMissing('packs');
 
         $message = UserHandling::hasReasonOfBan($user->uuid, $request);
 

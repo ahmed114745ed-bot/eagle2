@@ -22,6 +22,7 @@ class Agency extends Model
 
     protected $hidden = [
         'password',
+        'salary',
     ];
 
     public function chargeAgency()
@@ -50,6 +51,11 @@ class Agency extends Model
     }
 
     public function mempers()
+    {
+        return $this->hasMany(User::class, 'agency_id');
+    }
+
+    public function members()
     {
         return $this->hasMany(User::class, 'agency_id');
     }
@@ -388,6 +394,15 @@ class Agency extends Model
     {
         return $value ?? 0;
     }
+
+    public function scopeAvailable($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereDoesntHave('additionalInfo')
+                ->orWhereHas('additionalInfo', fn($q) => $q->where('status', 1));
+        })->whereNull('deleted_at')->where('type', 1);
+    }
+
 
     protected static function boot()
     {

@@ -39,6 +39,7 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -797,6 +798,9 @@ class AgencyController extends MainController
                 'agency_id' => $form->model()->id,
             ]);
     
+
+            $user = User::find($appOwnerId);  
+            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,
@@ -1085,7 +1089,7 @@ class AgencyController extends MainController
             UsersJoinedAgency::create($joinAgencyData);
         }
         // add vip to user
-        UserCommon::userVip($user,'accept-join-bd');
+        // UserCommon::userVip($user,'accept-join-bd');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([

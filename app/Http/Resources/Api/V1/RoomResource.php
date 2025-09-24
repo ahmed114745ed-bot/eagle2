@@ -27,7 +27,7 @@ class RoomResource extends JsonResource
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse->where("is_closed",0);
-        $isHideCountry = $this?->owner?->getPackWithType(13);
+        $isHideCountry = $this?->owner?->getPackWithTypeV2(13);
 
         /**@var Room $this*/
         $data = [
@@ -36,7 +36,8 @@ class RoomResource extends JsonResource
             //            'owner_uuid' => $this->owner?->uuid ?: 0,
             'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'owner_name' => $this->owner?->name ?: '',
-            'owner_image' => $this->owner?->profile->avatar ?: '',
+            'room_name' => $this->owner?->name ?: '',
+            'owner_image' => $this->owner?->profile?->avatar ?: '',
             'room_id' => (string)($this->id ?: 0),
             'owner_special_id'          => $this->owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => $this->owner?->color_image,
@@ -45,15 +46,15 @@ class RoomResource extends JsonResource
             //            'visitors_count' => $this->count_room_socket,
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
-            'class' => $this->myClass ?: new \stdClass(),
-            'type' => $this->myType ?: new \stdClass(),
+//            'class' => $this->myClass ?: new \stdClass(),
+//            'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,
             'session' => $this->session_string,
             'giftPrice' => $this->session_string,
             'is_popular' => $this->is_popular ?: 0,
             'room_status' => $this->room_status,
             'password_status' => (bool) $this->room_pass,
-            'room_intro' => $this->room_intro ?: '',
+            'room_intro' => $this->room_intro ?? '',
             'max_admin' => $this->max_admin ?: '',
             'is_recommended' => $this->is_recommended ?: 0,
             'lang' => $this->lang ?: '',
@@ -106,7 +107,7 @@ class RoomResource extends JsonResource
                 'created_at' => $this->created_at,
             ]);
         }
-        return $data;
+        return $data ;
     }
 
 

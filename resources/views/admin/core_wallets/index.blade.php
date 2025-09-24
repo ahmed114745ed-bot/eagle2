@@ -20,8 +20,11 @@
                 $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
             @endphp
             <div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">
-                <div class="card shadow-lg position-relative border-0"
-                    style="padding-top: 39px; border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">
+            <div class="card shadow-lg position-relative border-0 
+                    {{ $wallet->is_negative ? 'bg-danger text-white' : 'bg-light' }}"
+                    style="padding-top: 39px; border-radius: 15px; overflow: hidden; 
+                        background: {{ $wallet->is_negative ? 'linear-gradient(135deg, #ff7a7a, #ff3d3d)' : 'linear-gradient(135deg, rgb(211, 211, 183), rgb(202, 211, 193))' }};
+                        transition: transform 0.3s ease-in-out; margin-bottom: 20px;">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
                             <i class="{{ $icon }} text-primary" style="font-size: 2.5rem;"></i>

@@ -31,20 +31,21 @@ class SettingController extends MainController
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
         $videoLibrary = Common::getConfig('video_library');
+        $liveLibrary = Common::getConfig('live_library');
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
-        $paymentCoins = PaymentCoin::with('settings')->orderByDesc('status')->get();
-        $pusher_app_id = Common::getConf('pusher_app_id');
-        $pusher_app_key = Common::getConf('pusher_app_key');
-        $pusher_app_secret = Common::getConf('pusher_app_secret');
-        $pusher_app_cluster = Common::getConf('pusher_app_cluster');
+        $paymentCoins = PaymentCoin::with('settings')->uniqueTypes()->orderByDesc('status')->get();
+        $pusher_app_id =  config('broadcasting.connections.pusher.app_id');
+        $pusher_app_key = config('broadcasting.connections.pusher.key');
+        $pusher_app_secret = config('broadcasting.connections.pusher.secret');
+        $pusher_app_cluster = config('broadcasting.connections.pusher.options.cluster');
         $firebase_api_key = Common::getConf('firebase_api_key');
         $firebase_auth_domain = Common::getConf('firebase_auth_domain');
         $firebase_database_url = Common::getConf('firebase_database_url');
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
-       
+
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
@@ -73,6 +74,7 @@ class SettingController extends MainController
                 'tencent_server_secret',
                 'soundLibrary',
                 'videoLibrary',
+                'liveLibrary',
                 'gamesLibrary',
                 'agora_app_certificate',
                 'zego_filter_enabled'
@@ -89,7 +91,7 @@ class SettingController extends MainController
 
     public function saveSettings(Request $request)
     {
-        
+
         $data = $request->except('_token');
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);

@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Models\Config;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use App\Models\Setting;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Controllers\AdminController;
+
+class InvitationSettingsController extends AdminController
+{
+    protected $title = 'setting';
+
+    public function index(Content $content)
+    {
+        $content = $content->title(__($this->title));
+
+        $content = $content->row(function (Row $row) {
+            $row->column(12, $this->grid());
+            $row->column(12,  $this->form());
+        });
+
+        return $content;
+    }
+
+    protected function grid()
+    {
+        $stop_invite_code = settings()->get('stop_invite_code');
+
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.invitationCodeStop', compact(['stop_invite_code'])),
+        ));
+    }
+
+
+
+    protected function form()
+    {
+        $form = new Form(new Config());
+        Admin::style('.box-header { display: none !important; }');
+        $form->setAction(admin_url('invitation-code/settings'));
+
+        // Invitation Tab
+        $form->tab(__('percentage invitation code'), function (Form $form) {
+            $form->decimal('value', __('invitation.earn_percentage'))
+                ->default($this->getValue('earn_from_invitation'))
+                ->rules('required|numeric|min:0|max:100')
+                ->help(__('invitation.earn_percentage_help'));
+
+            $form->hidden('name')->default('earn_from_invitation');
+
+            $form->decimal('host_reward', __('invitation.host_reward'))
+                ->default($this->getValue('invitation_host_reward'))
+                ->rules('required|numeric|min:0')
+                ->help(__('invitation.host_reward_help'));
+
+            $form->decimal('invitee_reward', __('invitation.invitee_reward'))
+                ->default($this->getValue('invitation_invitee_reward'))
+                ->rules('required|numeric|min:0')
+                ->help(__('invitation.invitee_reward_help'));
+        });
+
+        // General Tab
+        $form->tab(__('invitation code setting'), function (Form $form) {
+
+
+            $content = $this->getSettingValue('invitation_content_ar');
+
+            // Replace only if it's a string (always true here)
+            if (is_string($content)) {
+                $content = str_replace('search_string', 'replacement_string', $content);
+            }
+
+            $form->textarea('content', __('content'))->default($content);
+
+            $content_en = $this->getSettingValue('invitation_content_en');
+
+            if (is_string($content_en)) {
+                $content_en = str_replace('search_string', 'replacement_string', $content_en);
+            }
+
+            $form->textarea('content_en', __('content_en'))->default($content_en);
+        });
+
+        $form->saving(function (Form $form) {
+            Config::updateOrCreate(['name' => 'earn_from_invitation'], ['value' => $form->value]);
+            Config::updateOrCreate(['name' => 'invitation_host_reward'], ['value' => $form->host_reward]);
+            Config::updateOrCreate(['name' => 'invitation_invitee_reward'], ['value' => $form->invitee_reward]);
+            Setting::updateOrCreate(['key' => 'invitation_content_ar'], ['value' => $form->content]);
+            Setting::updateOrCreate(['key' => 'invitation_content_en'], ['value' => $form->content_en]);
+
+
+            admin_toastr(__('invitation.saved_successfully'), 'success');
+            return back();
+        });
+
+        return $form;
+    }
+
+
+
+
+    private function getValue(string $key, $default = 0)
+    {
+        return Config::where('name', $key)->value('value') ?? $default;
+    }
+
+    private function getSettingValue(string $key, $default = '')
+    {
+        return Setting::where('key', $key)->value('value') ?? $default;
+    }
+}

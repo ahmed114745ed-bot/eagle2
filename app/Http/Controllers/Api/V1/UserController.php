@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Services\FilterChargeService;
 use Auth;
 use Exception;
+use App\Models\Ban;
 use App\Models\Gift;
 use App\Models\Pack;
 use App\Models\User;
@@ -12,47 +12,56 @@ use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Enums\UserType;
-use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\AllUsersResource;
-use App\Http\Resources\Api\V1\DataUserResource;
-use App\Http\Resources\Api\V1\DeviceTokenResource;
-use App\Http\Resources\Api\V1\LevelUserResource;
-use App\Http\Resources\Api\V1\MyDataResource;
-use App\Http\Resources\Api\V1\MyStoreResource;
-use App\Http\Resources\Api\V1\OnlineResource;
-use App\Http\Resources\Api\V1\ShowUserResource;
-use App\Http\Resources\Api\V1\ShowUserSettingResource;
-use App\Http\Resources\Api\V1\UserLevelHistoryResource;
-use App\Http\Resources\Api\V1\UserResource;
-use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Http\Resources\Api\V1\UserTargetResource;
-use App\Http\Resources\Api\V1\UserTypeResource;
-use App\Http\Resources\CpUserResource;
-use App\Http\Resources\MyDataUtdResource;
-use App\Http\Resources\UserPackUtdResource;
-use App\Http\Resources\UserPackVipResource;
-use App\Http\Resources\UserVipUtdResource;
-use App\Http\Resources\UserVisitRoomResource;
-use App\Http\Services\ProfileRelationsService;
+use App\Models\UserSallary;
+use Illuminate\Http\Request;
+use App\Facades\UserHandling;
+use App\Services\UserService;
+use App\Enums\UserCoinLogType;
+use App\helper\TryCatchHelper;
+use App\Helpers\UserPackHelper;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
-use App\Models\Ban;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
-use App\Models\UserSallary;
-use App\Services\UserService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Services\FilterChargeService;
 use Illuminate\Support\Facades\Cache;
+use App\helper\InvitationWalletHelper;
+use App\Http\Resources\CpUserResource;
+use App\helper\InvitationEarningHelper;
+use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use App\Http\Resources\UserVipUtdResource;
+use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackUtdResource;
+use App\Http\Resources\UserPackVipResource;
+use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\OnlineResource;
+use App\Http\Resources\UserVisitRoomResource;
+use App\Http\Resources\Api\V1\MyStoreResource;
+use App\Http\Services\ProfileRelationsService;
+use App\Http\Resources\Api\V1\AllUsersResource;
+use App\Http\Resources\Api\V1\DataUserResource;
+use App\Http\Resources\Api\V1\ShowUserResource;
+use App\Http\Resources\Api\V1\UserPlayResource;
+use App\Http\Resources\Api\V1\UserTypeResource;
+use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
+use App\Http\Resources\Api\V1\UserTargetResource;
+use App\Http\Resources\Api\V1\DeviceTokenResource;
+use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
-use Modules\WhatsappAuth\Services\WhatsappWebhook;
+use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use Modules\SwitchAccount\Entities\UserDevicesHistory;
+use App\Http\Resources\Api\V1\UserLevelHistoryResource;
+use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
 class UserController extends Controller
 {
@@ -346,7 +355,7 @@ class UserController extends Controller
 
     public function my_data(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
         try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (Exception $exception) {
@@ -419,14 +428,25 @@ class UserController extends Controller
     public function show(Request $request, $id)
     {
         $isVisit = @$request->is_visit == 'true' ? true : false;
-        $auth   = $request->user();
-        try {
 
-            $user = $this->userService->showUser($id, $auth, $request, $isVisit);
+        try {
+            $this->userService->showUserCheck($id, $isVisit);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        return Common::apiResponse(true, '', new UserResource($user), 200);
+
+        $cacheKey = "user_response_{$id}";
+
+        $response = \Cache::remember(
+            $cacheKey,
+            now()->addMinutes(30),
+            function () use ($id) {
+                $user = $this->userService->showUser($id);
+                return (new UserResource($user))->toArray(request());
+            }
+        );
+
+        return Common::apiResponse(true, '', $response, 200);
     }
 
     public function vTwoshow(Request $request, $id)
@@ -624,7 +644,7 @@ class UserController extends Controller
                 'total_diff' => $totalDiff,
                 'frame'      => $frame,
                 'frame_id'   => $frame ? $dressId : 0,
-                'colored_name'   => UserCommon::getColoredName($sender),
+                'colored_name'   => UserPackHelper::getColorName($sender),
             ];
         })->filter()->values()->all(); // filter to remove nulls
 
@@ -668,7 +688,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
             [$user, $token] = $this->userService->anonymous($user, $request);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -755,37 +775,110 @@ class UserController extends Controller
 
     public function AddCodeInvitation(Request $request)
     {
-        $user_id      = Auth::id();
-        $user_parent  = User::where("uuid", $request->code)->first();
-        $existingUser = UserCommon::CheckUserParent($user_id);
-        $CheckUserNew = UserCommon::CheckUserNew($user_id);
-        $lang         = app()->getLocale();
-        if ($lang == 'ar') {
-            $mes_user_not_found = 'لم يتم العثور علي المستخدم';
-            $mes_validation     = "لقد مر علي المستخدم 48 ساعه من تاريخ انشائه او المستخدم مسجل من قبل لدي شخص اخر";
-            $success_mes        = 'تم الاضافه بنجاح';
-        } else {
-            $mes_user_not_found = 'It was not found on the user';
-            $mes_validation     = "48 hours have passed since the user was created, or the user has already been registered with someone else";
-            $success_mes        = 'Added successfully';
-        }
-        if (!$user_parent) {
-            return Common::apiResponse(false, $mes_user_not_found, $existingUser, 404);
-        }
-        if ($CheckUserNew == false) {
-            return Common::apiResponse(false, $mes_validation, $existingUser, 404);
+        if (self::isStopInvitationValid()) {
+            return Common::apiResponse(false, __('invitation.stopped'), null, 403);
         }
 
-        if ($existingUser != null) {
-            return Common::apiResponse(false, 'المستخدم مسجل من قبل', $existingUser, 404);
+        $userId     = Auth::id();
+        $userParent = $this->getUserByCode($request->code);
+        $existing   = UserCommon::CheckUserParent($userId);
+        $isNew      = UserCommon::CheckUserNew($userId);
+
+        if (!$this->isDeviceUniqueForUser($userId, Auth::user()->device_token)) {
+            return Common::apiResponse(false, __('invitation.device_in_use'), null, 403);
         }
-        $data = UserCodeInvitation::create([
-            "user_id"    => $user_parent->id,
-            "invited_id" => $user_id,
+
+        if (!$userParent) {
+            return Common::apiResponse(false, __('invitation.user_not_found'), $existing, 404);
+        }
+
+        if (!$isNew) {
+            return Common::apiResponse(false, __('invitation.validation_failed'), $existing, 422);
+        }
+
+        if ($existing !== null) {
+            return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
+        }
+
+         $this->createInvitation($userParent->id, $userId);
+
+
+        $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
+            'invited_id' => $userId
         ]);
 
-        return Common::apiResponse(true, $success_mes, $request->code, 200);
+        $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
+            'parent_id' => $userParent->id
+        ]);
+
+        CustomNotification::codeInvitationUses($userParent, Auth::user());
+
+        return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }
+
+    private static function isStopInvitationValid()
+    {
+        return settings()->get('stop_invite_code');
+    }
+    private function getUserByCode(string $code): ?User
+    {
+        return User::where("uuid", $code)->first();
+    }
+
+    private function createInvitation(int $parentId, int $invitedId): UserCodeInvitation
+    {
+        InvitationWalletHelper::updateInvitationWallet($this->getValue('invitation_host_reward'));
+        InvitationWalletHelper::updateInvitationWallet($this->getValue('invitation_invitee_reward'));
+
+        InvitationEarningHelper::addEarning(
+            parentId: $parentId,
+            userId: $invitedId,
+            sourceType: 'first_join_reward_host',
+            amount: $this->getValue('invitation_host_reward')
+        );
+        InvitationEarningHelper::addEarning(
+            parentId: $parentId,
+            userId: $invitedId,
+            sourceType: 'first_join_reward_invitee',
+            amount: $this->getValue('invitation_invitee_reward')
+        );
+
+        return UserCodeInvitation::create([
+            "user_id"    => $parentId,
+            "invited_id" => $invitedId,
+        ]);
+    }
+
+    private function getValue(string $key, $default = 0)
+    {
+        return Config::where('name', $key)->value('value') ?? $default;
+    }
+    private function isDeviceUniqueForUser(int $userId, ?string $deviceToken): bool
+    {
+        if (!$deviceToken) {
+            return true;
+        }
+
+        return !UserDevicesHistory::where('device_token', $deviceToken)
+            ->where('user_id', '!=', $userId)
+            ->exists();
+    }
+
+    private function rewardUser(User $user, int $reward, string $type, array $meta = []): void
+    {
+        $amountBefore =  Common::getCurrentBalance($user->id);
+
+        if ($reward > 0) {
+            $user->increment('di', $reward);
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $reward,
+                $amountBefore,
+                UserCoinLogType::INVITATION_CODE,
+            );
+        }
+    }
+
 
     public function CreateCodeInvitation()
     {
@@ -1149,7 +1242,7 @@ class UserController extends Controller
     public function allUsersPlayGame()
     {
         $data = $this->userService->allUsersPlayGame();
-        return Common::apiResponse(true, 'done', UserResourceSerche::collection($data));
+        return Common::apiResponse(true, 'done', UserPlayResource::collection($data));
     }
 
     public function online()
@@ -1178,13 +1271,30 @@ class UserController extends Controller
         return Common::apiResponse(true, 'success', $data);
     }
 
+//    public function dataUser(Request $request)
+//    {
+//        $id = $request->id;
+//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+////        $data = $this->userService->dataUser($id);
+//        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
+//            $user = $this->userService->dataUser($id);
+//            return new DataUserResource($user);
+//        });
+//
+//        request()->merge(['user_id' => $id]);
+//        return Common::apiResponse(true, 'done', $data);
+//    }
+
     public function dataUser(Request $request)
     {
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-        $data = $this->userService->dataUser($id);
-        request()->merge(['user_id' => $id]);
-        return Common::apiResponse(true, 'done', new DataUserResource($data));
+
+        return Cache::remember("data_user_{$id}",600, function () use ($id) {
+            $data = $this->userService->dataUser($id);
+            request()->merge(['user_id' => $id]);
+            return Common::apiResponse(true, 'done', new DataUserResource($data));
+        });
     }
 
     public function syncBD()
@@ -1192,4 +1302,52 @@ class UserController extends Controller
         $result = $this->userService->syncBDUsers();
         return response()->json($result);
     }
+
+
+
+
+    public function stats(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserStats($id ?? $request->user()->id);
+        });
+    }
+
+    public function rooms(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserRooms($id ?? $request->user()->id);
+        });
+    }
+
+    public function vipLevel(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserVipLevel($id ?? $request->user()->id);
+        });
+    }
+
+    public function frames(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserFrames($id ?? $request->user()->id);
+        });
+    }
+
+    public function invitationsEarnings(Request $request)
+    {
+        return TryCatchHelper::handle(function () use ($request) {
+            $parentId = $request->user()->id;
+            return $this->userService->getEarningsForParent($parentId);
+        });
+    }
+
+    public function invitationsEarningsClaim(Request $request, int $id)
+    {
+        return TryCatchHelper::handle(function () use ($request, $id) {
+            $parentId = $request->user()->id;
+            return $this->userService->claimEarning($parentId, $id);
+        });
+    }
+
 }

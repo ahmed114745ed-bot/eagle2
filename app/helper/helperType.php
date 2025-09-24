@@ -25,7 +25,8 @@ const TYPE_GIFT =
     5 => 'Famous gifts',
     6 => 'Lucky gifts',
     7 => 'events',
-    9 => 'vip'
+    9 => 'vip',
+    10 => 'cp',
 
 ];
 

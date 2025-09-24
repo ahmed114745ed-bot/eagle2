@@ -13,7 +13,7 @@ class RoomRepo implements RoomRepoInterface {
     public $model;
     public function __construct (Room $model)
     {
-        $this->model = $model; 
+        $this->model = $model;
     }
 
     public function all ( $req )
@@ -33,14 +33,14 @@ class RoomRepo implements RoomRepoInterface {
             });
         })
         ->where('room_status', 1);
-    
+
         // Filter by country if provided
         if (!is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
                 $q->where('country_id', $req->country_id);
             });
         }
-        
+
         // Apply filters based on 'filter' parameter
         switch ($req->filter) {
             case 'boss':
@@ -51,37 +51,37 @@ class RoomRepo implements RoomRepoInterface {
                     ->toArray();
                 $result->whereIn('id', $roomIds);
                 break;
-        
+
             case 'trend':
                 $result->orderBy('top_room', 'DESC')
                     ->orderByDesc('session');
                 break;
-        
+
             case 'popular':
                 $result->orderByDesc('top_room')
                     ->orderByDesc('count_room_socket');
                 break;
-        
+
             case 'festival':
                 $result->orderByDesc('top_room')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;
-        
+
             case 'nearby':
                 $userLat  = $user->lat;
                 $userLong = $user->long;
-        
+
                 // Use lat/long from the related `owner` (User) model
                 $result->selectRaw(
-                        '*, 
+                        '*,
                         ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
                         [$userLat, $userLong, $userLat]
                     )
-                    ->join('users as owner', 'rooms.uid', '=', 'owner.id') 
+                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
                     ->orderBy('distance');
                 break;
-        
+
             default:
                 $result->orderByDesc('hour_hot');
                 break;
@@ -93,6 +93,12 @@ class RoomRepo implements RoomRepoInterface {
     public function find ( $id )
     {
         return $this->model->where('uid', $id)->first();
+    }
+
+    public function findByType ( $id ,$type)
+    {
+        info($type);
+        return $this->model->where('uid', $id)->where('type' , $type)->first();
     }
 
     public function create ( $data )

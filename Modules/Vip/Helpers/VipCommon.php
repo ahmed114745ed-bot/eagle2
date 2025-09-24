@@ -13,13 +13,13 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending'): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending' ,$isUsed = null): bool
     {
         try {
-            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType) {
+            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType,$isUsed) {
                 $vipp = UserVip::create([
                     'type'      => 1,
-                    'sender_id' => $senderId,
+                    'sender_id' => $senderId ,
                     'user_id'   => $user->id,
                     'vip_id'    => $vip->id,
                     'level'     => $vip->level,
@@ -28,7 +28,9 @@ class VipCommon
                     'qty'       => $qty,
                     'price'     => $vip?->price,
                     'total'     => $total,
-                    'is_used'   => 0,
+                    'is_used'   => $isUsed ? 1 : 0,
+                    'using'   => $isUsed ? 1 : 0,
+                    'num_used'   => $isUsed ? 1 : 0,
                     'dash_user_id'   => $dashUserId ?? 0,
                     'type_send' => $typeSend,
                     'receive_type' => $receiveType
@@ -272,4 +274,37 @@ class VipCommon
             $user->save();
         }
     }
+
+
+    public static function  removeVipFromUser( $user ,$id ,$receive_type)
+    {
+        \Log::info("Start removeVipFromUser", [
+            'user_id' => $user->id,
+            'vip_id' => $id,
+            'receive_type' => $receive_type,
+        ]);
+        $vip = UserVip::where('receive_type', $receive_type)
+            ->where('user_id', $user->id)
+            ->where('vip_id', $id)
+            ->first();
+            if (!$vip) {
+                return; 
+            }
+         
+        
+            $vipReceiveType = $receive_type . '-' . $vip->level;
+            \Log::info("Deleted Packs", [
+                'vip_user_id' => $vip->id,
+                'count_deleted' => $vipReceiveType,
+            ]);
+            Pack::where('vip_user_id',  $vip->id)
+                ->where('receive_type', $vipReceiveType)
+                ->where('user_id', $user->id)
+                ->delete();
+        
+            $vip->delete();
+    }
 }
+
+
+

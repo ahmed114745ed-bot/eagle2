@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Admin\Fields\Image;
 use App\Admin\Fields\ImagePath;
 use App\Classes\UserHandling;
+use App\Helpers\CacheHelper;
 use App\Helpers\CustomNotification;
 use App\Helpers\ManagerHelper;
 use App\Helpers\RoomHelper;
@@ -20,6 +21,10 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
+use App\Observers\ConfigObserver;
+use App\Observers\SettingObserver;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
@@ -72,11 +77,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
         $this->app->bind(UserRepoInterface::class, UserRepo::class);
-        $this->app->bind('RedisService', fn ($app) => new RedisService());
-        $this->app->bind('UserHandling', fn ($app) => new UserHandling());
-        $this->app->bind('CustomNotification', fn ($app) => new CustomNotification());
-        $this->app->bind('RoomHelper', fn ($app) => new RoomHelper());
-        $this->app->bind('ManagerHelper', fn ($app) => new ManagerHelper());
+        $this->app->bind('RedisService', fn($app) => new RedisService());
+        $this->app->bind('UserHandling', fn($app) => new UserHandling());
+        $this->app->bind('CustomNotification', fn($app) => new CustomNotification());
+        $this->app->bind('RoomHelper', fn($app) => new RoomHelper());
+        $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
         $this->defineCarbonMacros();
@@ -84,8 +89,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Schema::defaultStringLength(191);
-
         $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
@@ -98,8 +101,8 @@ class AppServiceProvider extends ServiceProvider
             $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
 
             return [
-                 $firstDay->copy()->setTimezone('UTC'),
-                 $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
+                $firstDay->copy()->setTimezone('UTC'),
+                $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
             ];
         });
     }
@@ -116,7 +119,12 @@ class AppServiceProvider extends ServiceProvider
 
         config(['app.name' => $appName]);
 
-        $settings = DB::table('settings')->pluck('value', 'key')->toArray();
+        $settings = CacheHelper::cacheSettings();
+
+        /** @var Collection $rememberForever*/
+        if (gettype($settings) !== 'array'){
+            $settings = $settings->pluck('value', 'key')->toArray();
+        }
 
         Config::set([
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
@@ -226,6 +234,8 @@ class AppServiceProvider extends ServiceProvider
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
+        Setting::observe(SettingObserver::class);
+        \App\Models\Config::observe(ConfigObserver::class);
     }
 
     protected function cacheLuckyGiftProbabilities(): void
@@ -233,7 +243,7 @@ class AppServiceProvider extends ServiceProvider
         $probabilities = app(LuckyGiftService::class)->getProbabilityTimes();
 
         foreach ($probabilities as $index => $value) {
-            Cache::put('probability_times_'.($index + 1), $value, now()->addMinutes(60));
+            Cache::put('probability_times_' . ($index + 1), $value, now()->addMinutes(60));
         }
     }
 }

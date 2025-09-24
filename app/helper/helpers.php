@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
+
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 
@@ -513,12 +514,20 @@ if (!function_exists('getFileExtension')) {
     }
 }
 if (!function_exists('handleShowImageWithTypes')) {
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50): string
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
-
+            if ($objectFit !== 'cover') {
+                return "<div class='rtlSvga' id='$model' 
+            style='width: {$width}px; 
+                   height: {$height}px; 
+                   object-fit: {$objectFit}; 
+                   border-radius: {$borderRadius}px; 
+                   margin-right: 4px;'>
+             </div>";
+            }
             return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
@@ -529,11 +538,16 @@ if (!function_exists('handleShowImageWithTypes')) {
                     Your browser does not support the video tag.
                  </video>
                 ";
+        } elseif ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
         }
 
-        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: cover;' alt='' />";
+
+
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
 }
+
 if (!function_exists('userType')) {
     function userType($type)
     {
@@ -683,8 +697,18 @@ if (!function_exists('getTimezone')) {
     }
 }
 
+if (!function_exists('getSettingCash')) {
+    function getSettingCash($key)
+    {
+        return \Cache::rememberForever($key, function () use ($key) {
+            $setting = \App\Models\Setting::where('key', $key)->first();
+            return $setting?->value;
+        });
+    }
+}
+
 if (! function_exists('getFavIcon')) {
-    function getFavIcon() : ?string
+    function getFavIcon(): ?string
     {
         return \Cache::rememberForever('favicon', function () {
             $favIcon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');

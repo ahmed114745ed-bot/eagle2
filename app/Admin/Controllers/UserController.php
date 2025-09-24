@@ -2,10 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\AgencyService;
-use App\Admin\Services\UserService;
 use App\Models\Bd;
-use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -17,7 +14,8 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use Modules\Vip\Entities\UserVip;
+use App\Models\Profile;
+use App\Models\UserCoinLog;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
@@ -29,13 +27,18 @@ use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
+use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
+use Modules\Vip\Entities\UserVip;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Services\UserService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
+use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
+use Modules\Badge\Entities\UserBadge;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -44,8 +47,6 @@ use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
-use App\Models\Profile;
-use App\Models\UsersJoinedAgency;
 
 class UserController extends MainController
 {
@@ -160,7 +161,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','huawei_version','android_version','ios_version', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id','family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -353,7 +354,9 @@ class UserController extends MainController
             }
             if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new CanPlaySwitchAction());
+                $row = $actions->row; // force load
+
+                $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
             }
             if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
@@ -499,7 +502,8 @@ class UserController extends MainController
 
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
-        }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
+        }])->orderByDesc('is_used')->latest()->paginate(10, ['*'], 'pack_page');
+
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $hasVip = UserVip::where('user_id', $id)
             ->where('is_used', 1)
@@ -580,7 +584,7 @@ class UserController extends MainController
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
 
-
+        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
         $countries = $this->countries();
         $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
@@ -831,12 +835,7 @@ class UserController extends MainController
         return $form;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
+
 
     public function request_invite_code(Request $request)
     {
@@ -845,6 +844,8 @@ class UserController extends MainController
         } else {
             settings()->set("stop_invite_code", "0");
         }
+
+        return true;
     }
 
 
@@ -1006,10 +1007,11 @@ class UserController extends MainController
             return [
                 'name' => $nameColumn,
                 'phone' => $user->phone,
+                'createdAt' => $user->created_at,
             ];
         });
 
-        $table = new Table([__('Name'), __('phone')], $rows->toArray());
+        $table = new Table([__('Name'), __('phone'), __('created_at')], $rows->toArray());
         // Return just table's HTML (your AJAX will inject this)
         return $table->render();
     }
