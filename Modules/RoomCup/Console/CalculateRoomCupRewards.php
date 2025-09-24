@@ -15,16 +15,17 @@ use App\Models\Room;
 use App\Models\User;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 use Symfony\Component\Console\Command\Command as EnumCommand ;
+
 class CalculateRoomCupRewards extends Command
 {
     protected $signature = 'roomcup:calculate-rewards';
-    protected $description = 'حساب الكوينزات اليومية وتوزيع المكاسب للمالك والمديرين إذا تحقق التارجت';
+    protected $description = 'Calculate daily RoomCup rewards and distribute profits to the owner and admins if the target is achieved';
 
     private function getSettings(): array
     {
         $path = storage_path('app/roomcup_settings.json');
         if (!file_exists($path)) {
-            logger()->warning("⚠️ ملف الإعدادات غير موجود: $path");
+            logger()->warning("⚠️ Settings file not found: $path");
             return ['enabled' => false, 'interval_minutes' => 60];
         }
 
@@ -42,7 +43,7 @@ class CalculateRoomCupRewards extends Command
         }
 
         $today = Carbon::today();
-        $this->info("🚀 بدء الحساب ليوم: {$today->toDateString()}");
+        $this->info("🚀 Starting calculation for: {$today->toDateString()}");
 
         TotalRoomGift::whereDate('updated_at', $today)
             ->orderBy('id')
@@ -52,19 +53,19 @@ class CalculateRoomCupRewards extends Command
                 }
             });
 
-        $this->info("✅ انتهى الحساب اليومي");
+        $this->info("✅ Daily calculation finished");
         return EnumCommand::SUCCESS;
     }
 
     private function processGift(TotalRoomGift $gift): void
     {
-        $this->line("📦 معالجة RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
+        $this->line("📦 Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
 
         $room = Room::find($gift->room_id);
 
         if (!$room) {
-            $this->warn("⛔ روم غير موجود (ID: {$gift->room_id})");
-            logger()->error("⛔ روم غير موجود (ID: {$gift->room_id})");
+            $this->warn("⛔ Room not found (ID: {$gift->room_id})");
+            logger()->error("⛔ Room not found (ID: {$gift->room_id})");
             return;
         }
 
@@ -76,7 +77,7 @@ class CalculateRoomCupRewards extends Command
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
 
         if (!$target) {
-            $this->line("⛔ لم يتحقق التارجت للروم #{$room->id}");
+            $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
 
@@ -84,13 +85,13 @@ class CalculateRoomCupRewards extends Command
             $rewards = [];
 
             $rewards[] = $this->makeReward($room->id, $gift->id, $room->uid, 'owner', $target->owner_profit);
-            $this->line("💰 مالك الروم #{$room->uid} سيأخذ {$target->owner_profit}");
+            $this->line("💰 Room owner #{$room->uid} will get {$target->owner_profit}");
 
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins as $admin) {
                     $rewards[] = $this->makeReward($room->id, $gift->id, $admin->id, 'admin', $share);
-                    $this->line("👤 أدمين {$admin->id} سيأخذ $share");
+                    $this->line("👤 Admin {$admin->id} will get $share");
                 }
             }
 
@@ -98,7 +99,7 @@ class CalculateRoomCupRewards extends Command
 
             foreach ($rewards as $reward) {
                 $amountBefore = Common::getCurrentBalance($reward['user_id']);
-                $this->line("🪙 إضافة {$reward['amount']} للمستخدم {$reward['user_id']} (رصيد قبل: {$amountBefore})");
+                $this->line("🪙 Adding {$reward['amount']} to user {$reward['user_id']} (balance before: {$amountBefore})");
 
                 UserCoinLogHelper::logByType(
                     $reward['user_id'],
@@ -114,7 +115,7 @@ class CalculateRoomCupRewards extends Command
             }
         });
 
-        $this->info("✅ تم توزيع الأرباح لروم #{$room->id}");
+        $this->info("✅ Rewards distributed for Room #{$room->id}");
     }
 
     private function findTarget(float $total, int $visitors, int $admins): ?RoomCupTarget
@@ -126,9 +127,9 @@ class CalculateRoomCupRewards extends Command
             ->first();
 
         if (!$target) {
-            logger()->info("📉 لم يتم إيجاد Target (Total: $total, Visitors: $visitors, Admins: $admins)");
+            logger()->info("📉 No matching target (Total: $total, Visitors: $visitors, Admins: $admins)");
         } else {
-            logger()->info("🎯 Target مختار: ID {$target->id}, Owner Profit {$target->owner_profit}, Admin Profit {$target->admin_profit}");
+            logger()->info("🎯 Target selected: ID {$target->id}, Owner Profit {$target->owner_profit}, Admin Profit {$target->admin_profit}");
         }
 
         return $target;
