@@ -33,7 +33,7 @@ class RoomCupReportsController extends AdminController
 
    
         $grid->column('user_id', __('room owner'))->display(function ($name) {
-            $user = $this->room->owner;
+            $user = $this->user;
             if (! $user) {
                 return __('No User');
             }
@@ -70,6 +70,7 @@ class RoomCupReportsController extends AdminController
         $grid->column('gift.current_total', __('Daily Gain'));
 
         $grid->column('amount', __('Profit Coins'));
+        $grid->column('type', __('type'));
 
         // 🔹 Date of gain
         $grid->column('created_at', __('Date'))->display(function ($date) {
