@@ -221,13 +221,11 @@ class UserHandling
             ->where(function ($q) use ($uuid, $request) {
                 $q->where('uid', $uuid)
                     ->orWhere(function ($q2) use ($request) {
-                        // ينفذ شرط الـ IP فقط لو type = 'ip'
                         $q2->where('type', 'ip')
                             ->whereNotNull('ip')
                             ->where('ip', $request->ip());
                     })
                     ->orWhere(function ($q3) use ($request) {
-                        // ينفذ شرط الـ device فقط لو type = 'device'
                         $q3->where('type', 'device')
                             ->whereNotNull('device_number')
                             ->where('device_number', $request->header('x-device-token'));
