@@ -49,6 +49,7 @@ class RankingRepository
             case 1: 
             case 2: 
                 $model = CoinGameUserMerged::class;
+
                 break;
 
             case 3: 

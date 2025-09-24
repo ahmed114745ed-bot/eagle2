@@ -13,6 +13,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Badge\Http\Controllers\web\BadgeController;
+use Modules\Badge\Http\Controllers\web\UserBadgeController;
 use Modules\Badge\Http\Controllers\web\DedicateBadgeController;
 
 
@@ -33,6 +34,8 @@ Route::group(
     ],
     function () {
         Route::resource('badges', BadgeController::class);
-         Route::resource('dedicate-badges', DedicateBadgeController::class);
+        Route::resource('dedicate-badges', DedicateBadgeController::class);
+        Route::get('user-badges', [UserBadgeController::class, 'index']);
+
     }
 );
