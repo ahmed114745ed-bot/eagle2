@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Jobs\UpdateUserFollowCountsJob;
+use App\Models\CoinLog;
+use App\Models\PaymentCoin;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -500,5 +502,7 @@ Route::get('/update-user-follow-counts', function () {
 });
 
 
-
-
+//Route::get('delete-payment', function (){
+//    $paymentTypes = PaymentCoin::pluck('type')->toArray();
+//    CoinLog::whereIn('method', $paymentTypes)->delete();
+//});

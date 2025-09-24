@@ -192,9 +192,14 @@ class UserCommon
     {
         return UserCodeInvitation::where("invited_id", $userId)->first();
     }
+    // private static function isStopInvitationValid()
+    // {
+    //     return settings()->get('stop_invite_code');
+    // }
+
     private static function isStopInvitationValid()
     {
-        return settings()->get('stop_invite_code');
+        return getSettingCash('invite_code') ?? 0;
     }
 
 

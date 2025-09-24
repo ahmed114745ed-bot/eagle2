@@ -20,23 +20,21 @@ class InvitationSettingsController extends AdminController
     {
         $content = $content->title(__($this->title));
 
-        $content = $content->row(function (Row $row) {
-            $row->column(12, $this->grid());
-            $row->column(12,  $this->form());
-        });
+        $content = $content->body(  $this->form());
+        
 
         return $content;
     }
 
-    protected function grid()
-    {
-        $stop_invite_code = settings()->get('stop_invite_code');
+    // protected function grid()
+    // {
+    //     $stop_invite_code = settings()->get('stop_invite_code');
 
-        return (new Box(
-            title: __('admin.Actions'),
-            content: view('admin.grid.users.invitationCodeStop', compact(['stop_invite_code'])),
-        ));
-    }
+    //     return (new Box(
+    //         title: __('admin.Actions'),
+    //         content: view('admin.grid.users.invitationCodeStop', compact(['stop_invite_code'])),
+    //     ));
+    // }
 
 
 
