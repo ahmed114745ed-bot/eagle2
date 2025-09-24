@@ -122,8 +122,8 @@ class UserController extends Controller
             ->where(function ($q) {
                 $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
             });
-//        if ($dress != null) $pack->where('target_id', $dress);
-//        return $pack;
+        //        if ($dress != null) $pack->where('target_id', $dress);
+        //        return $pack;
     }
     public function image_intro($id)
     {
@@ -134,7 +134,7 @@ class UserController extends Controller
         $pack = self::checkPack($user->id, 6, $user->dress_3);
         $pack = $pack->pluck('target_id');
 
-//        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
+        //        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
         $ware = Ware::query()
             ->whereIn('id', $pack)
             ->where('type', 6)
@@ -186,7 +186,7 @@ class UserController extends Controller
 
         if (now()->month == $month && now()->year == $year) {
             $cacheKey = 'cache-data-my-store-' . $user->id;
-            if (Cache::add($cacheKey, true, now()->addSeconds(30)))  {
+            if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                 $targetService = new FixedTargetService($user);
                 ($targetService)->calculateTarget();
             }
@@ -200,7 +200,8 @@ class UserController extends Controller
         $user = auth()->user();
         $chat_status = settings()->get('chat_status');
         $showChat = $user->userSetting?->hide_chat ?? $chat_status;
-        $stop_invite_code = settings()->get('stop_invite_code');
+        // $stop_invite_code = settings()->get('stop_invite_code');
+        $stop_invite_code = getSettingCash('invite_code') ?? 0;
         if ($stop_invite_code == 1) {
             $invite_code = true;
         } else {
@@ -212,7 +213,7 @@ class UserController extends Controller
         //        $shared = Common::getConfig('shared') ?? '1234';
         $now = now();
 
-        $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
+        $ban = Ban::where('ban_type_id', 7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
             ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
 
         $data = [
@@ -720,11 +721,12 @@ class UserController extends Controller
     {
         $lang = app()->getLocale();
         if ($lang == "en") {
-            $data = Config::where("name", "explain_invitation_english")->first();
+            $data = Common::getSettingValue('invitation_content_ar');
         } else {
-            $data = Config::where("name", "explain_invitation_arabic")->first();
+            $data = Common::getSettingValue('invitation_content_en');
         }
-        return Common::apiResponse(true, '', $data?->desc, 200);
+
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function UserEarnFromInvitationStatistics()
@@ -800,7 +802,7 @@ class UserController extends Controller
             return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
         }
 
-         $this->createInvitation($userParent->id, $userId);
+        $this->createInvitation($userParent->id, $userId);
 
 
         $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
@@ -816,9 +818,14 @@ class UserController extends Controller
         return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }
 
+    // private static function isStopInvitationValid()
+    // {
+    //     return settings()->get('stop_invite_code');
+    // }
+
     private static function isStopInvitationValid()
     {
-        return settings()->get('stop_invite_code');
+        return getSettingCash('invite_code') ?? 0;
     }
     private function getUserByCode(string $code): ?User
     {
@@ -1271,26 +1278,26 @@ class UserController extends Controller
         return Common::apiResponse(true, 'success', $data);
     }
 
-//    public function dataUser(Request $request)
-//    {
-//        $id = $request->id;
-//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-////        $data = $this->userService->dataUser($id);
-//        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
-//            $user = $this->userService->dataUser($id);
-//            return new DataUserResource($user);
-//        });
-//
-//        request()->merge(['user_id' => $id]);
-//        return Common::apiResponse(true, 'done', $data);
-//    }
+    //    public function dataUser(Request $request)
+    //    {
+    //        $id = $request->id;
+    //        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+    ////        $data = $this->userService->dataUser($id);
+    //        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
+    //            $user = $this->userService->dataUser($id);
+    //            return new DataUserResource($user);
+    //        });
+    //
+    //        request()->merge(['user_id' => $id]);
+    //        return Common::apiResponse(true, 'done', $data);
+    //    }
 
     public function dataUser(Request $request)
     {
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
 
-        return Cache::remember("data_user_{$id}",600, function () use ($id) {
+        return Cache::remember("data_user_{$id}", 600, function () use ($id) {
             $data = $this->userService->dataUser($id);
             request()->merge(['user_id' => $id]);
             return Common::apiResponse(true, 'done', new DataUserResource($data));
@@ -1349,5 +1356,4 @@ class UserController extends Controller
             return $this->userService->claimEarning($parentId, $id);
         });
     }
-
 }

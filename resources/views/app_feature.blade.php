@@ -246,6 +246,12 @@
                     style="text-align: right;">
                 {{ __('Live Settings') }}
             </button>
+
+            </button>
+                         <button onclick="showSection('InviteCodeSettings')"
+                    style="text-align: right;">
+                {{ __('dashboard.closeCose') }}
+            </button>
         </div>
     </div>
 
@@ -349,7 +355,7 @@
         </div>
         <div id="LiveSettings" class="settings-section">
             <h2>{{ __('Live Settings') }}</h2>
-            <form id="liveFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="inviteCodeFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -364,10 +370,42 @@
                         <label class="switch">
                             <input type="checkbox" id="live_toggle" {{ $liveSettings ? 'checked' : '' }}
                             onchange="document.getElementById('host_live_value').value = this.checked ? '1' : '0';
-                                document.getElementById('liveFeatureForm').submit();">
+                                document.getElementById('inviteCodeFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
                         <input type="hidden" name="live_status" id="host_live_value" value="{{ $liveSettings ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+         <div id="InviteCodeSettings" class="settings-section">
+            <h2>{{ __('invite code') }}</h2>
+            <form id="liveFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('dashboard.closeCose') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="invite_code_toggle" {{ $invite_code ? 'checked' : '' }}
+                            onchange="document.getElementById('invite_code_value').value = this.checked ? '1' : '0';
+                                document.getElementById('liveFeatureForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="invite_code" id="invite_code_value" value="{{ $invite_code ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -442,6 +480,8 @@
         document.getElementById('youtube_toggle').checked = (youtubeHiddenValue === '1')
         var liveHiddenValue = document.getElementById('host_live_value').value;
         document.getElementById('live_toggle').checked = (liveHiddenValue === '1')
+        var inviteCodeValue = document.getElementById('invite_code_value').value;
+        document.getElementById('invite_code_toggle').checked = (inviteCodeValue === '1')
     });
 </script>
 </body>
