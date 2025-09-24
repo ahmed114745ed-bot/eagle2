@@ -651,6 +651,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
+
+     Route::get('/setting-invitation-code', function () {
+        $Page = \App\Models\Page::where("name", "setting-invitation-code")->first();
+        return response()->json(['html' => $Page]);
+    });
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
