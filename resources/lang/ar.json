@@ -3859,8 +3859,10 @@
     "Select Accounts to Ban": "اختر الحسابات للحظر",
     "others": "أخرى",
   "milestones":"الانجازات ",
-  "Gain >": "القيمة المكتسبة أكبر من"
+  "Gain >": "القيمة المكتسبة أكبر من",
 
+    "Bd Count": "مجموع ال bd",
+    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount."
 
 
 
