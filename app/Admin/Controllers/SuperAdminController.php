@@ -267,6 +267,8 @@ class SuperAdminController extends MainController
             }
             return $ops;
         })->required();
+
+
         
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -288,6 +290,7 @@ class SuperAdminController extends MainController
             $form->switch('default', __('set_superadmin_as_default'))
                 ->help(__('make_super_admin_default'));
         }
+        $this->addPhoneFields( $form);
 
         $form->hidden('type', __('Type'))->value('superadmin');
 //        $form->hidden('transfer_salary', __('transfer_salary'));
@@ -346,6 +349,60 @@ class SuperAdminController extends MainController
         });
 
         return $form;
+    }
+
+    protected function addPhoneFields(Form $form)
+    {
+        
+           $form->text('phone', __('whatsApp number'))
+                ->rules('required')
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 12)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+
+           $form->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+          ;
+        });
+
+       
+        Admin::script($this->phoneJs());
+    }
+
+
+    protected function phoneJs()
+    {
+        return <<<JS
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                    });
+                    form.classList.add('phone-init');
+        }
+    }
+
+    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
+    initAllPhones();
+    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+    JS;
     }
 
     public function profile($id)
