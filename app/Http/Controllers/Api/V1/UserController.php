@@ -721,11 +721,12 @@ class UserController extends Controller
     {
         $lang = app()->getLocale();
         if ($lang == "en") {
-            $data = Config::where("name", "explain_invitation_english")->first();
+            $data = Common::getSettingValue('invitation_content_ar');
         } else {
-            $data = Config::where("name", "explain_invitation_arabic")->first();
+            $data = Common::getSettingValue('invitation_content_en');
         }
-        return Common::apiResponse(true, '', $data?->desc, 200);
+
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function UserEarnFromInvitationStatistics()
