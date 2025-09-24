@@ -44,8 +44,11 @@ Route::get('/roomcup/calculate-rewards', function () {
 
     Artisan::call('roomcup:calculate-rewards');
 
+    $output = Artisan::output();
+
     return response()->json([
-        'status' => 'success',
+        'status'  => 'success',
         'message' => 'RoomCup rewards calculated',
+        'output'  => $output, // هنرجعها كمان في الرد
     ]);
 });
