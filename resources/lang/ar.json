@@ -3776,7 +3776,8 @@
     "Alternative Image": "صورة بديلة",
     "Live System Setting:": "إعدادات النظام اللايف",
     "Bd Count": "مجموع ال bd",
-    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount."
+    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
+    "whatsApp number": "رقم الواتساب"
 
 
 

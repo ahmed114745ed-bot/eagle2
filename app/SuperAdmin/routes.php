@@ -35,6 +35,7 @@ Route::group(
         }
         Route::post('login', [AuthController::class, 'postLogin']);
         Route::get('logout', [AuthController::class, 'logout']);
+        Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
     }
 );
 

@@ -3,18 +3,21 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use Exception;
+use App\Models\Agent;
+use Encore\Admin\Form;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use KevinSoft\MultiLanguage\MultiLanguage;
-use Illuminate\Support\Facades\Cookie;
-use Encore\Admin\Controllers\AuthController as BaseAuthController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use App\Http\Services\WhatsappOtp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Encore\Admin\Form;
-use App\Models\Agent;
+use Illuminate\Support\Facades\Cookie;
+use KevinSoft\MultiLanguage\MultiLanguage;
+use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 
 class AuthController extends BaseAuthController
@@ -67,10 +70,24 @@ class AuthController extends BaseAuthController
         return view("superadmin.auth.login", compact('languages', 'current', 'test'));
     }
 
+    public function sendCodeWhatsapp(Request $request)
+    {
+        $auth = Admin::where('username', $request->username)->first();
+        $phone =  $auth->phone_code . $auth->phone;
+
+        try {
+            (new WhatsappOtp())->sendOtpMessage($phone);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(true, __('messages.code_is_sent_to_your_phone'));
+    }
+
 
     public function postLogin(Request $request)
     {
-       $url = $request->url;
+        $url = $request->url;
 
         $this->loginValidator($request->all())->validate();
 
@@ -116,22 +133,22 @@ class AuthController extends BaseAuthController
     public function logout(Request $request)
     {
 
-        $this->getLogout( $request);
+        $this->getLogout($request);
         return redirect()->route('superadmin.login');
     }
 
-    public function putSetting ()
+    public function putSetting()
     {
-        if (\request ('password') != Admin::user ()->getAuthPassword ()){
-            Agent::where("id",Admin::user ()->id)->update([
+        if (\request('password') != Admin::user()->getAuthPassword()) {
+            Agent::where("id", Admin::user()->id)->update([
                 "remember_token" => null
             ]);
-            DB::table ('sessions')->where ('user_id',Admin::user ()->getAuthIdentifier ())->delete ();
+            DB::table('sessions')->where('user_id', Admin::user()->getAuthIdentifier())->delete();
         }
-         parent ::putSetting ();
+        parent::putSetting();
 
-         return redirect(superadmin_url('/'));
-        }
+        return redirect(superadmin_url('/'));
+    }
 
     public function getSetting(Content $content)
     {
@@ -159,13 +176,12 @@ class AuthController extends BaseAuthController
         $form->display('username', trans('admin.username'));
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
-       if(!(Auth::user()->username == 'demo'))
-       {
-        $form->password('password', trans('admin.password'))->rules('confirmed|required');
-        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
-            ->default(function ($form) {
-                return $form->model()->password;
-            });
+        if (!(Auth::user()->username == 'demo')) {
+            $form->password('password', trans('admin.password'))->rules('confirmed|required');
+            $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
+                ->default(function ($form) {
+                    return $form->model()->password;
+                });
         }
 
         $form->setAction(superadmin_url('update-setting'));
@@ -173,7 +189,7 @@ class AuthController extends BaseAuthController
         $form->ignore(['password_confirmation']);
 
         $form->saving(function (Form $form) {
-            if ( $form->model()->password != $form->password && $form->model()->username == 'admin'|| $form->model()->password_confirmation != $form->password_confirmation && $form->model()->username == 'admin'){
+            if ($form->model()->password != $form->password && $form->model()->username == 'admin' || $form->model()->password_confirmation != $form->password_confirmation && $form->model()->username == 'admin') {
                 $error = new MessageBag(
                     [
                         'title'   => 'forbidden',
@@ -195,5 +211,4 @@ class AuthController extends BaseAuthController
 
         return $form;
     }
-
 }
