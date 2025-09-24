@@ -3376,8 +3376,14 @@
 "Amount": "Miktar",
 "Type": "Tür",
 "Created At": "Oluşturulma Tarihi",
-"Updated At": "Güncellenme Tarihi"
+"Updated At": "Güncellenme Tarihi",
 
+    "Show Image": "Resmi Göster",
+    "Alternative Image": "Alternatif Resim",
+    "Live System Setting:": "Canlı Sistem Ayarı",
+    "Select Accounts to Ban": "Yasaklanacak Hesapları Seç",
+    "others": "Diğerleri",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
 
 
 

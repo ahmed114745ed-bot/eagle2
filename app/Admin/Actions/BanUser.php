@@ -2,25 +2,18 @@
 
 namespace App\Admin\Actions;
 
-use Exception;
 use App\Models\Ban;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agency;
-use App\Models\Charge;
-use Encore\Admin\Form;
 use App\Helpers\Common;
 use App\Models\BanType;
-use App\Models\CoinLog;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
-use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin as AuthAdmin;
+use Encore\Admin\Facades\Admin;
 
 
 class BanUser extends Action
@@ -60,7 +53,7 @@ class BanUser extends Action
                     // if(!$ban && $ip != $ban->ip){
                     Ban::query()->create(
                         [
-                            'uid' => $userUuid,
+//                            'uid' => $userUuid,
                             'duration' => $request->duration,
                             'ip' => $ip->ip,
                             'type' => 'ip',
@@ -75,6 +68,7 @@ class BanUser extends Action
                 }
             }
         }
+
         if (in_array('device', $request->type)) {
             $haveBan = Ban::query()->where('uid', $userUuid)->where('type', 'device')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
@@ -85,7 +79,7 @@ class BanUser extends Action
 
                 Ban::query()->create(
                     [
-                        'uid' => $userUuid,
+//                        'uid' => $userUuid,
                         'duration' => $request->duration,
                         'device_number' => $user->device_token,
                         'type' => 'device',
@@ -98,6 +92,7 @@ class BanUser extends Action
                 );
             }
         }
+
         if (in_array('normal', $request->type)) {
             $haveBan = Ban::query()->where('uid', $userUuid)->where('type', 'normal')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
@@ -180,8 +175,6 @@ class BanUser extends Action
             }
         }
 
-
-
         if ($room && $newBan) {
             $d = [
                 "messageContent" => [
@@ -196,13 +189,47 @@ class BanUser extends Action
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
         }
+
         if ($newBan) {
             CustomNotification::banUser($user, $request->duration);
+        }
+
+        if ($request->filled('ban_accounts')) {
+            foreach ($request->ban_accounts as $accountId) {
+                $accountUser = User::find($accountId);
+                if (!$accountUser) {
+                    continue;
+                }
+
+                $exists = Ban::query()
+                    ->where('uid', $accountUser->original_uuid)
+                    ->where('type', 'normal')
+                    ->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
+                    ->exists();
+
+                if ($exists) {
+                    $messages[] = __("User {$accountUser->name} already has a normal ban");
+                } else {
+                    Ban::create([
+                        'uid'            => $accountUser->original_uuid,
+                        'duration'       => $request->duration,
+                        'type'           => 'normal',
+                        'user_type'      => 0,
+                        'staff_id'       => Auth::id(),
+                        'description_ar' => $request->description_ar,
+                        'description_en' => $request->description_en ?? $request->description_ar,
+                        'img'            => ($request->file('img') ? Common::upload('bans', $request->file('img')) : ""),
+                    ]);
+
+                    CustomNotification::banUser($accountUser, $request->duration);
+                }
+            }
         }
 
         if (count($messages) > 0) {
             return $this->response()->error(implode("<br>", $messages))->refresh();
         }
+
         return $this->response()->success('success')->refresh();
     }
 
@@ -227,24 +254,106 @@ class BanUser extends Action
             'normal' => __('normal'),
             'ip' => __('ip'),
             'device' => __('device'),
+            'others' => __('others'),
         ]);
-        $this->select('ban_type_id', __('ban_type'))->options(function ($value) {
-            $ops2 = [];
-            foreach (BanType::get() as $ban) {
-                $ops2[$ban->id] = $ban->name_en . '_' . $ban->name_ar;
-            }
-            return $ops2;
-        });
+
+//        $this->multipleSelect('ban_accounts', __('Select Accounts to Ban'))->options([]);
+        $this->checkbox('ban_accounts', __('Select Accounts to Ban'))->options([]);
+
+
+        $this->select('ban_type_id', __('ban_type'))
+            ->options(function () {
+                $locale = app()->getLocale();
+                if ($locale === 'ar') {
+                    return BanType::all()->pluck('name_ar', 'id');
+                }
+                return BanType::all()->pluck('name_en', 'id');
+            })
+            ->attribute(['id' => 'ban_type_id_field']);
+
+//
+//        $this->select('ban_type_id', __('ban_type'))->options(function ($value) {
+//            $ops2 = [];
+//            foreach (BanType::get() as $ban) {
+//                $ops2[$ban->id] = $ban->name_en . '_' . $ban->name_ar;
+//            }
+//            return $ops2;
+//        });
     }
 
     public function html()
     {
-        $banText = __('create bans'); // Laravel translation
+        Admin::script(<<<JS
+            $('#ban_type_id_field').closest('.form-group').hide();
+
+            $(document).on('ifChecked', 'input[name="type[]"][value="others"]', function() {
+                $('#ban_type_id_field').closest('.form-group').show();
+            });
+
+            $(document).on('ifUnchecked', 'input[name="type[]"][value="others"]', function() {
+                $('#ban_type_id_field').closest('.form-group').hide();
+                $('#ban_type_id_field').val('').trigger('change');
+            });
+        JS);
+
+        Admin::script(<<<JS
+            $(document).on('ifChecked', 'input[name="type[]"][value="device"]', function() {
+                console.log("Device checkbox checked with iCheck!");
+                var uuid = $('input[name="uuid"]').val();
+                if (!uuid) {
+                    toastr.error('Please enter UUID first');
+                    return;
+                }
+                $.ajax({
+                    url: '/api/search/user-accounts',
+                    data: {uuid: uuid},
+                    success: function(res) {
+                        console.log("Accounts:", res);
+
+                        var container = $('input[name="ban_accounts[]"]').closest('.form-group');
+                        container.find('.dynamic-ban-accounts').remove();
+
+                        if (res.length === 0) {
+                            container.append('<div class="dynamic-ban-accounts"><p>No accounts found</p></div>');
+                        } else {
+                            var html = '<div class="dynamic-ban-accounts" style="margin-top:10px;">';
+                            res.forEach(function(acc) {
+                                var checked = (acc.uuid == uuid) ? 'checked' : '';
+                                html += '<div style="margin-bottom:5px;">' +
+                                            '<label style="display:block; font-weight:normal;">' +
+                                                '<input type="checkbox" name="ban_accounts[]" value="' + acc.id + '" ' + checked + '> ' +
+                                                (acc.name ? acc.name : "Unknown") + ' (UUID: ' + acc.uuid + ')' +
+                                            '</label>' +
+                                        '</div>';
+                            });
+                            html += '</div>';
+                            container.append(html);
+
+                            $('input[name="ban_accounts[]"]').iCheck({
+                                checkboxClass: 'icheckbox_minimal-blue'
+                            });
+
+                            $('input[name="ban_accounts[]"][value]').each(function() {
+                                if ($(this).is(':checked')) {
+                                    $(this).iCheck('check');
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("AJAX Error:", xhr.responseText);
+                        toastr.error('Failed to load accounts');
+                    }
+                });
+            });
+        JS);
+
+
+        $banText = __('create bans');
         return <<<HTML
-    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white"
-       style="background-color: var(--primary-color); border-color: var(--secondary-color); color: var(--text-secondary-color);">
-        {$banText}
-    </a>
-    HTML;
-    }
-}
+            <a href="javascript:void(0);" class="ban_user_action btn btn-sm text-white"
+               style="background-color: var(--primary-color); border-color: var(--secondary-color);">
+                {$banText}
+            </a>
+        HTML;
+        }}
