@@ -293,7 +293,7 @@ class Room extends Model
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
-            ?? (string) (request()->default_background ?? '');
+            ?? request()->default_background;
     }
 
     public function defaultBackground()
@@ -357,6 +357,6 @@ class Room extends Model
 
     public function scopeAudio(Builder $query)
     {
-        return $query->where('type', 'audio');
+        return $query->where('rooms.type', 'audio');
     }
 }
