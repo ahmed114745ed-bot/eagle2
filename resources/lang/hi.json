@@ -2948,7 +2948,21 @@
 "Amount": "राशि",
 "Type": "प्रकार",
 "Created At": "बनाने की तारीख",
-"Updated At": "अपडेट की तारीख"
+"Updated At": "अपडेट की तारीख",
+  "invitation.earn_percentage": "रेफ़र करने वाले की कमाई प्रतिशत (%)",
+  "invitation.earn_percentage_help": "प्रतिशत जो रेफ़र करने वाले को आमंत्रित व्यक्ति द्वारा आमंत्रण के एक महीने के भीतर किए गए प्रत्येक रिचार्ज से मिलता है।",
+  "invitation.host_reward": "रेफ़र करने वाले का इनाम (कॉइन)",
+  "invitation.host_reward_help": "कॉइन की संख्या जो रेफ़र करने वाले को तुरंत मिलती है जब आमंत्रित व्यक्ति कोड का उपयोग करता है।",
+  "invitation.invitee_reward": "आमंत्रित व्यक्ति का इनाम (कॉइन)",
+  "invitation.invitee_reward_help": "कॉइन की संख्या जो आमंत्रित व्यक्ति कोड का उपयोग करने पर प्राप्त करता है।",
+    "Show Image": "छवि दिखाएँ",
+    "Alternative Image": "वैकल्पिक छवि",
+    "Live System Setting:": "लाइव सिस्टम सेटिंग",
+    "Select Accounts to Ban": "प्रतिबंधित करने के लिए खातों का चयन करें",
+    "others": "अन्य",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "Gain >": "लाभ >"
+
 
 
 

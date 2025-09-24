@@ -26,10 +26,9 @@ class RoomCupReportsController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new RoomCupReward());
-
         $grid->model()
-            ->with(['gift', 'gift.room', 'gift.room.owner'])
-            ->orderBy('created_at', 'desc');
+        ->with(['gift', 'gift.room', 'gift.room.owner'])
+        ->orderBy('created_at', 'desc');
 
    
         $grid->column('user_id', __('user'))->display(function ($name) {
@@ -91,6 +90,9 @@ class RoomCupReportsController extends AdminController
             $filter->like('gift.room.owner.name',  __('Owner Name'));
             $filter->equal('gift.room.id',  __('Room ID'));
             $filter->between('created_at', __('Date'))->date();
+            $filter->where(function ($query) {
+                $query->where('gain_value', '>', $this->input);
+            }, __('Gain >'));
         
         });
 

@@ -63,9 +63,8 @@
 
     }
     .btn-form{
-        bottom: -53px;
+        bottom: -33px;
         position: relative;
-        left: -15px;
     }
 .switch {
   position: relative;
