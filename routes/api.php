@@ -1,23 +1,21 @@
 <?php
 
-use App\Admin\Controllers\AgencySettingsController;
-use App\Events\PublicTestEvent;
-use App\Http\Controllers\AppFeatureController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\RoomSettingController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\PayPalService;
 use Illuminate\Http\Request;
+use App\Events\PublicTestEvent;
+use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -26,6 +24,9 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\RoomSettingController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
+use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
@@ -61,7 +63,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -651,13 +652,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         return response()->json(['html' => $Page]);
     });
 
-    Route::get('/setting-invitation-code', function () {
-        $Page = [
-            'content_ar' => Common::getSettingValue('invitation_content_ar') ?? '',
-            'content_en' => Common::getSettingValue('invitation_content_en') ??'',
-        ];
-           return Common::apiResponse(0, '', $Page, 200);
-    });
+    Route::get('/setting-invitation-code', [SettingsController::class ,'invitationCode']);
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
