@@ -1,8 +1,8 @@
 
 <div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
-    <div class="card shadow-lg" style="width:511px; border-radius:15px;">
+    <div class="card shadow-lg" style="width:95%; border-radius:15px;">
         <div class="card-header text-center bg-primary text-white" style="border-top-left-radius:15px; border-top-right-radius:15px;">
-            <h4 class="mb-0">{{ __('Room Cup Settings') }}</h4>
+            <!-- <h4 class="mb-0">{{ __('Room Cup Settings') }}</h4> -->
         </div>
         <div class="card-body p-4" style="    height: 100%;">
 
@@ -26,14 +26,14 @@
                     <label for="type" class="form-label fw-bold d-block text-end">{{ __('Schedule Type') }}</label>
                     <select name="type" id="type" class="form-control text-end">
                         <option value="daily" {{ $settings['type']=='daily' ? 'selected' : '' }}>{{ __('Daily') }}</option>
-                        <option value="every_x_days" {{ $settings['type']=='every_x_days' ? 'selected' : '' }}>{{ __('Every X Days') }}</option>
+                        <!-- <option value="every_x_days" {{ $settings['type']=='every_x_days' ? 'selected' : '' }}>{{ __('Every X Days') }}</option> -->
                         <option value="weekly" {{ $settings['type']=='weekly' ? 'selected' : '' }}>{{ __('Weekly') }}</option>
                         <option value="monthly" {{ $settings['type']=='monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
                     </select>
                 </div>
 
                 <!-- Time -->
-                <div class="mb-4  inp-div">
+                <!-- <div class="mb-4  inp-div">
                     <label for="time" class="form-label fw-bold d-block text-end">{{ __('Execution Time') }}</label>
                     <div class="input-group justify-content-end ">
                         <input type="time" class="form-control text-end" name="time" id="time" value="{{ $settings['time'] ?? '23:59' }}">
@@ -41,15 +41,14 @@
                     </div>
                 </div>
 
-                <!-- Day (for weekly/monthly) -->
                 <div class="mb-4 inp-div" >
                     <label for="day" class="form-label fw-bold d-block text-end">{{ __('Day (0=Sunday,1=Monday,...)') }}</label>
                     <input type="number" class="form-control text-end" name="day" id="day" value="{{ $settings['day'] ?? 0 }}" min="0" max="31">
-                </div>
+                </div> -->
 
 
                 <!-- Save Button -->
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-end div-btn-form">
                     <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm btn-form">{{ __('Save') }}</button>
                 </div>
 
@@ -61,9 +60,10 @@
 
 <style>
 
+
     .inp-div{
         width: 77%;
-        margin: 10px auto;
+        margin: 23px auto;
     }
     .inp{
         width: 100%;
@@ -73,13 +73,20 @@
 
     form{
         height: 243px;
-        padding: 10px;
         border-radius: 30px;
+        height: 100%;
+        padding: 7% 9%;
 
     }
     .btn-form{
-        bottom: -33px;
+        width: 22% !important;
         position: relative;
+    }
+    .div-btn-form {
+    top: 10px;
+    position: relative;
+    width: 75%;
+    margin: auto;
     }
 .switch {
   position: relative;

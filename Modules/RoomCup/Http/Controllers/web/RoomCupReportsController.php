@@ -27,7 +27,13 @@ class RoomCupReportsController extends AdminController
     {
         $grid = new Grid(new RoomCupReward());
         $grid->model()
-        ->with(['gift', 'gift.room', 'gift.room.owner'])
+        ->with(['gift:id,current_total', 'gift.room','user.packs', 'user.profile',
+        
+        'gift.room.owner:id,id,name,uuid',
+        'gift.room.owner.packs',
+        'gift.room.owner.profile:id,user_id,avatar',
+        
+        ])
         ->orderBy('created_at', 'desc');
 
    
@@ -40,38 +46,38 @@ class RoomCupReportsController extends AdminController
             return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
         });
            
-        $grid->column('owner', __('room owner'))->display(function ($name) {
-            $user = $this->room->owner;
-            if (! $user) {
-                return __('No User');
-            }
+        // $grid->column('owner', __('room owner'))->display(function ($name) {
+        //     $user = $this->room->owner;
+        //     if (! $user) {
+        //         return __('No User');
+        //     }
 
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
-        });
+        //     return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+        // });
 
-        $grid->column('room_id', __('room'))->display(function ($name) {
-            $path = @$this->room->room_cover;
-            $id = @$this->room->id;
-            $defaultImage = asset("images/room.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+        // $grid->column('room_id', __('room'))->display(function ($name) {
+        //     $path = @$this->room->room_cover;
+        //     $id = @$this->room->id;
+        //     $defaultImage = asset("images/room.jpg");
+        //     $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
 
-            if (strlen($name) > 50){
-                $name = substr($name,0,50) . ' ...';
-            }
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                    <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
+        //     if (strlen($name) > 50){
+        //         $name = substr($name,0,50) . ' ...';
+        //     }
+        //     return "
+        //         <div style='display: flex; align-items: center; gap: 10px;'>
+        //             <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+        //             <div>
+        //                 <span style='cursor: pointer;'>$name</span><br>
+        //                 <span style='cursor: pointer;'>ID: $id</span>
+        //             </div>
+        //         </div>
+        //     ";
+        // });
 
     
 
@@ -87,6 +93,7 @@ class RoomCupReportsController extends AdminController
 
         // 🔹 Filters
         $grid->filter(function ($filter) {
+            $filter->expand();
             $filter->like('gift.room.owner.name',  __('Owner Name'));
             $filter->equal('gift.room.id',  __('Room ID'));
             $filter->between('created_at', __('Date'))->date();

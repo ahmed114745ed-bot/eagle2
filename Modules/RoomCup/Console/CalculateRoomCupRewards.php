@@ -15,6 +15,7 @@ use App\Models\Room;
 use App\Models\User;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 use Symfony\Component\Console\Command\Command as EnumCommand ;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -26,17 +27,87 @@ class CalculateRoomCupRewards extends Command
 
     public function handle(): int
     {
-        $this->info("🚀 Starting full calculation at " . Carbon::now());
+        $settings = $this->getRoomCupSettings();
+        $type     = $settings['type'] ?? 'daily';
 
-        TotalRoomGift::orderBy('id')
+        if (!$this->isEnabledRoomCup($settings)) {
+            $this->warn("⛔ Room Cup not enabled");
+            return EnumCommand::SUCCESS;
+        }
+    
+        [$start, $end] = $this->getPeriodByType($type);
+    
+        $this->logStart($start, $end);
+    
+        $this->processGiftsInPeriod($start, $end);
+    
+        $this->logEnd();
+    
+        return EnumCommand::SUCCESS;
+    }
+    private function isEnabledRoomCup(array $settings): bool
+    {
+        return $settings['enabled'] ?? false;
+    }
+
+
+    private function getRoomCupSettings(): array
+    {
+        $default = [
+            'enabled'          => true,
+            'interval_minutes' => 60,
+            'type'             => 'daily',
+            'time'             => '23:59',
+        ];
+    
+        if (!Storage::disk('local')->exists('roomcup_settings.json')) {
+            Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
+        }
+    
+        return array_merge($default, json_decode(Storage::disk('local')->get('roomcup_settings.json'), true) ?? []);
+    }
+    
+    private function getPeriodByType(string $type): array
+    {
+        return match ($type) {
+            'daily'   => [
+                Carbon::yesterday(getTimezone())->startOfDay(),
+                Carbon::yesterday(getTimezone())->endOfDay(),
+            ],
+            'weekly'  => [
+                Carbon::now(getTimezone())->subWeek()->startOfWeek(), 
+                Carbon::now(getTimezone())->subWeek()->endOfWeek(),
+            ],
+            'monthly' => [
+                Carbon::now(getTimezone())->subMonth()->startOfMonth(),
+                Carbon::now(getTimezone())->subMonth()->endOfMonth(),
+            ],
+            default   => [
+                Carbon::yesterday(getTimezone())->startOfDay(),
+                Carbon::yesterday(getTimezone())->endOfDay(),
+            ],
+        };
+    }
+    
+    private function processGiftsInPeriod(Carbon $start, Carbon $end): void
+    {
+        TotalRoomGift::whereBetween('created_at', [$start, $end])
+            ->orderBy('id')
             ->chunk(100, function ($gifts) {
                 foreach ($gifts as $gift) {
                     $this->processGift($gift);
                 }
             });
-
+    }
+    
+    private function logStart(Carbon $start, Carbon $end): void
+    {
+        $this->info("🚀 Starting full calculation for gifts between {$start} and {$end}");
+    }
+    
+    private function logEnd(): void
+    {
         $this->info("✅ Calculation finished");
-        return EnumCommand::SUCCESS;
     }
 
     private function processGift(TotalRoomGift $gift): void
@@ -71,7 +142,6 @@ class CalculateRoomCupRewards extends Command
                 $this->line("💰 Room owner #{$room->uid} will get {$target->owner_profit}");
             }
 
-            // Admin rewards
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins_v2() as $admin) {
