@@ -3782,7 +3782,12 @@
 "change password": "تغيير كلمة المرور",
 "please enter new password": "الرجاء إدخال كلمة مرور جديدة",
 "change": "تغيير",
-"send": "إرسال"
+"send": "إرسال",
+"online Users Count": "عدد المستخدمين المتصلين",
+"you Wallet": "محفظتك",
+"online rooms Count": "عدد الغرف المتصلة",
+"total users salary": "إجمالي رواتب المستخدمين",
+"total agency salary": "إجمالي رواتب الوكالات"
 
 
 
