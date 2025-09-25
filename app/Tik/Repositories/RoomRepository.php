@@ -370,7 +370,7 @@ class RoomRepository extends AbstractRepository
             'live'  => $live
                 ? new RoomResource($live)
                 : (object)[],
-            'now_room'  => $nowRooms
+            'now_room'  => ($nowRooms && !$nowRooms->isEmpty())
                 ? $nowRooms
                 : (object)[],
         ];
