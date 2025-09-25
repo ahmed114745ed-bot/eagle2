@@ -36,7 +36,7 @@ Route::group(
         Route::post('login', [AuthController::class, 'postLogin']);
         Route::get('logout', [AuthController::class, 'logout']);
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
-        Route::post('change-password-view', [AuthController::class, 'changePasswordView']);
+        Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
         Route::post('change-password', [AuthController::class, 'changePasswordView']);
     }
 );
@@ -58,7 +58,6 @@ Route::group(
       //  'as' => 'superadmin.',
     ],
     function () {
-          Route::post('change-password-view', [AuthController::class, 'changePasswordView']);
         Route::get('setting', [AuthController::class, 'getSetting']);
         Route::put('update-setting', [AuthController::class, 'putSetting']);
 
