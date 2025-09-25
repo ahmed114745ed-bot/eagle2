@@ -419,6 +419,8 @@ class RankingService
             $data = $this->rankingRepo->getUserGameCoinsV2($type, $limit);
             return $this->prepareResponse2($data, $user, $type, $user->id, $class);
             return \App\Http\Resources\RankingResource::collection($data);
+            $this->transformData($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
@@ -761,6 +763,7 @@ class RankingService
 
 
         $toArray = $data->toArray();
+       
         $countData = count($data);
         $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
         $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
