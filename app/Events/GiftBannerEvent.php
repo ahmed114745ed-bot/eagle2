@@ -23,6 +23,7 @@ class GiftBannerEvent implements ShouldBroadcast
      */
     public function __construct($gift)
     {
+        info('in gift logs');
         $this->gift = $gift;
     }
 
