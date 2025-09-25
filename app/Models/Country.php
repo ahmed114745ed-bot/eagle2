@@ -21,4 +21,9 @@ class Country extends Model
     {
         return $this->hasMany(ChargeCountry::class, 'country_id');
     }
+
+    public function superAdmin()
+    {
+        return $this->hasMany( SuperAdmin::class,'country_id');
+    }
 }
