@@ -27,12 +27,7 @@ class RoomCupReportsController extends AdminController
     {
         $grid = new Grid(new RoomCupReward());
         $grid->model()
-        ->with(['gift:id,current_total', 'gift.room','user.packs', 'user.profile',
-        
-        'gift.room.owner:id,id,name,uuid',
-        'gift.room.owner.packs',
-        'gift.room.owner.profile:id,user_id,avatar',
-        
+        ->with(['gift:id,current_total', 'gift.room','user.packs', 'user.profile', 'gift.room.owner'
         ])
         ->orderBy('created_at', 'desc');
 
