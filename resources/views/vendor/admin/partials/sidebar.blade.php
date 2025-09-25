@@ -118,6 +118,7 @@
                                     ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host Agencies')],
                                 ],
                             ],
+                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
                         ];
                     @endphp
 

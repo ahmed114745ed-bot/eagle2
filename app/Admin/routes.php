@@ -2,7 +2,6 @@
 
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
-use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\PusherStatisticsController;
@@ -65,7 +64,6 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
-use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
@@ -116,7 +114,7 @@ use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
+use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 
 Route::group(
     [
@@ -457,9 +455,9 @@ Route::group(
         // Route::prefix('ware-gifts')->group(function () {
 
 
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
@@ -598,8 +596,8 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
+            ->except(['update'])
+            ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::resource('badges', BadgeController::class);
@@ -628,11 +626,11 @@ Route::group(
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
-        Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-        Route::group(['middleware' => 'local'], function (){
+        Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
             Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
 
@@ -657,12 +655,13 @@ Route::group(
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
         });
-    });
+    }
+);
 
 
 Route::group([
     'prefix' => 'admin',
     'middleware' => ['web', 'admin'],
-], function() {
+], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
 });

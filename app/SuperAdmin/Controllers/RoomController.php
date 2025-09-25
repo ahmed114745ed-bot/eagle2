@@ -52,7 +52,7 @@ class RoomController extends MainController
         $grid = $this->grid();
         $content = $content->body($grid);
 
-        return parent::index($content);
+        return $content;
     }
 
     /**
@@ -323,7 +323,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $authCountryId = Admin::user()->user->country_id;
+        $authCountryId = Admin::user()->country_id;
         $grid->model()
             ->audio()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("

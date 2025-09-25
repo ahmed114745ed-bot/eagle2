@@ -739,8 +739,10 @@ class AgencyController extends MainController
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
                     form.addEventListener('submit', function(){
-                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                         hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
                     });
                     form.classList.add('phone-init');
         }
