@@ -172,27 +172,27 @@ class GiftLogService
                         $q->withoutAppends();
                     }]);
 
-              /*  $fUser = $topUser?->user;
-                if ($room->top_user_id != $userId) {
-                    $room->top_user_id = $fUser->id;
-                    $room->save();
-                    $ms1 = [
-                        'messageContent' => [
-                            'message'        => 'topSendGifts',
-                            'img'            => $fUser?->profile?->avatar,
-                            'id'             => $fUser->id,
-                            'name'           => $fUser->name,
-                            'has_color_name' => Common::hasInPack($fUser->id, 18),
-                            'frame'          => Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true),
-                            'fid'            => @$fUser->dress_1,
-                            'vlev'           => @$fUser->UserVip->level
-                        ]
-                    ];
+                /*  $fUser = $topUser?->user;
+                  if ($room->top_user_id != $userId) {
+                      $room->top_user_id = $fUser->id;
+                      $room->save();
+                      $ms1 = [
+                          'messageContent' => [
+                              'message'        => 'topSendGifts',
+                              'img'            => $fUser?->profile?->avatar,
+                              'id'             => $fUser->id,
+                              'name'           => $fUser->name,
+                              'has_color_name' => Common::hasInPack($fUser->id, 18),
+                              'frame'          => Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true),
+                              'fid'            => @$fUser->dress_1,
+                              'vlev'           => @$fUser->UserVip->level
+                          ]
+                      ];
 
-                    $json = json_encode($ms1);
+                      $json = json_encode($ms1);
 
-                    Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                }*/
+                      Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+                  }*/
             }
             // (new RoomAchievementTargetService)->roomTarget($room);
 
