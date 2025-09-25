@@ -103,7 +103,7 @@
                     </a>
                 </div>
                 <br>
-                    <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form"
+                    <form action="{{ admin_url('change-password-view') }}" method="get" id="forget-password-form"
                         class="text-center" style="display: none; margin-top: 15px;">
                         @csrf
                         {{-- hidden username from login --}}

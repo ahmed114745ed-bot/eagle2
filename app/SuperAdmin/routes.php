@@ -49,8 +49,7 @@ Route::group([
     ],
 ], function () {
     
-    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
-        ->name('superadmin.change-password-view');
+    Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
 
 });
 
