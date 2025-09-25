@@ -74,13 +74,6 @@
                     </label>
                 </div>
             @endif
-
-              <div class="checkbox icheck text-center" dir="rtl">
-                    <label>
-                        <input type="checkbox" name="code" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
-                        {{ __('please inter code sent to your whatsapp') }}
-                    </label>
-                </div>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ trans('admin.login') }}</button>
             <!--
