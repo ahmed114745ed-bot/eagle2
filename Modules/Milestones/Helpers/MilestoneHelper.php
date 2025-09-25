@@ -200,6 +200,6 @@ class MilestoneHelper
     public static function removeReward($user, $slug)
     {
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
-        self::revokeRewardFromUser($user, $milestone->rewards);
+        if ($milestone && $milestone->rewards)  self::revokeRewardFromUser($user, $milestone->rewards);
     }
 }
