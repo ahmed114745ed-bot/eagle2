@@ -11,8 +11,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GiftBannerEvent implements ShouldBroadcastNow
+class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
 {
+//    use Dispatchable, InteractsWithSockets, SerializesModels;
     use InteractsWithSockets;
 
     public $gift;
