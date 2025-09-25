@@ -54,6 +54,11 @@
                 @endforeach
             </div>
         @endif
+        @if(session('success'))
+            <div class="alert alert-success text-center">
+                <i class="fa fa-check-circle-o"></i> {{ session('success') }}
+            </div>
+        @endif
         <form action="{{ superadmin_url('login') }}" method="post">
             <div class="form-group has-feedback ">
             @if (@$errors && $errors->has('username'))
