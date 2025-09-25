@@ -37,7 +37,7 @@ Route::group(
         Route::get('logout', [AuthController::class, 'logout']);
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
         Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
-        Route::post('change-password', [AuthController::class, 'changePasswordView']);
+        Route::post('change-password', [AuthController::class, 'changePasswordView'])->name('superadmin.change-password');
     }
 );
 
