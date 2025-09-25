@@ -7,6 +7,7 @@ use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperAdminChargeController;
+use App\Admin\Controllers\SuperAdminChargeReportController;
 use App\Admin\Controllers\SuperAdminController;
 use App\Admin\Controllers\SuperAdminSelectController;
 use App\Admin\Controllers\SuperBoomRuleController;
@@ -623,6 +624,9 @@ Route::group(
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
+        });
+        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);

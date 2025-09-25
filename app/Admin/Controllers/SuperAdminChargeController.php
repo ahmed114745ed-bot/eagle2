@@ -2,16 +2,12 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\SuperAdminChargeAction;
 use App\Models\SuperAdmin;
-use App\Models\User;
-use App\Models\Charge;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use App\Admin\Actions\UsersChargeAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class SuperAdminChargeController extends MainController
@@ -106,7 +102,7 @@ class SuperAdminChargeController extends MainController
             $grid->column('actions', __('Actions'))
                 ->display(function () {
 
-                    return (new UsersChargeAction())->setUserId($this->id)->render();
+                    return (new SuperAdminChargeAction())->setUserId($this->id)->render();
                 })
                 ->style('white-space: nowrap; width: 100px;');
         }

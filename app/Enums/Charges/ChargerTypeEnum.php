@@ -4,10 +4,9 @@ namespace App\Enums\Charges;
 
 enum ChargerTypeEnum: string
 {
-    case DASH = 'dash';
-
-    public function label(): string
-    {
-        return ucfirst($this->value);
-    }
+    const DASH = 'dash';
+    const AGENCY = 'agency';
+    const HOST_AGENCY = 'host_agency';
+    const BD = 'bd';
+    const USER = 'user';
 }

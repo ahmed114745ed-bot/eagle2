@@ -2,22 +2,22 @@
 
 namespace App\Admin\Actions;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use App\Models\User;
+use App\Models\SuperAdmin;
 use App\Models\Charge;
 use App\Models\Setting;
-use App\Helpers\UserCommon;
+use Cache;
+use Encore\Admin\Actions\Response;
 use Illuminate\Http\Request;
 use App\Models\ChargeInvoice;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Modules\Public\Http\Services\UserCounterServices;
 
 class SuperAdminChargeAction extends Action
 {
@@ -31,103 +31,88 @@ class SuperAdminChargeAction extends Action
         return $this;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function handle(Request $request)
     {
         $userId = $this->userId ?? $request->input('userId');
-        $user = $this->getUser($userId);
-        // if (!$user) {
-        //     return $this->response()->error(__('api_responses.agency'))->refresh();
-        // }
-        // if ($user->is_frozen == 1) {
-        //     return $this->response()->error(__('frozen'))->refresh();
-        // }
-        return $this->handleUserCharge($request, $user);
+        $superAdmin = $this->getSuperAdmin($userId);
+
+        return $this->handleUserCharge($request, $superAdmin);
     }
 
-
-    private function getUser($userId)
+    private function getSuperAdmin($userId)
     {
-        return User::where('id', $userId)->first();
+        return SuperAdmin::where('id', $userId)->first();
     }
 
     /**
      * @throws \Throwable
      */
-    private function handleUserCharge(Request $request, User $user)
+    private function handleUserCharge(Request $request, SuperAdmin $superAdmin): Response
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
         $typeCharge = $request->charge_type;
 
-        if ($amount < 0 && $user->di < abs($amount)) {
-            return $this->response()->error(__('Insufficient user balance'))->refresh();
-        }
-        $userCoins = \Cache::rememberForever('user_coins', function () {
-            $setting =   Setting::where('key', 'user_coins')->first();
+        $userCoins = Cache::rememberForever('super_admin_coins', function () {
+            $setting =   Setting::where('key', 'super_admin_coins')->first();
             return $setting?->value;
         });
 
-        $coins = $amount * $userCoins;
-
-        if (! $userCoins || $userCoins == 0) {
-            return $this->response()->error(__('please set user coins in configs'))->refresh();
+        if ($request->amount_unit === 'usd') {
+            $coins = $amount * $userCoins;
+        } else {
+            $coins = $amount;
         }
 
-        DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+        if ($coins < 0 && $superAdmin->di < abs($amount)) {
+            return $this->response()->error(__('Insufficient user balance'))->refresh();
+        }
 
-            $amountBefore =  Common::getCurrentBalance($user->id);
+        if (! $userCoins || $userCoins == 0) {
+            return $this->response()->error(__('please set super admin coins in configs'))->refresh();
+        }
+
+        DB::transaction(function () use ($request, $superAdmin,  $amount, $coins, $typeCharge) {
+
+            $amountBefore = $superAdmin->di; //Common::getCurrentBalance($superAdmin->id);
 
             UserCoinLogHelper::logByType(
-                $user->id,
+                $superAdmin->id,
                 $coins,
                 $amountBefore,
                 UserCoinLogType::ADMIN_CHARGES,
+                userType: UserTypeEnum::SUPER_ADMIN,
             );
 
-            $user->di += $coins;
-            if ($user->di < 0) {
+            $superAdmin->di += $coins;
+            if ($superAdmin->di < 0) {
                 throw ValidationException::withMessages([
                     'di' => [__('user does not have this coin')],
                 ]);
             }
-            $user->save();
 
-            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount);
+            $superAdmin->save();
 
-            if ($typeCharge == "increment") {
-                $admin = Auth::user()->username ?? 'Admin';
-                if ($user->owner) CustomNotification::chargeAction($user, $request, $admin);
-                UserCommon::addChargeLevel($user->id, $amount);
-            }
+            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $request->amount);
         });
-
-        $title = $typeCharge == 'increment' ? 'Coins Added' : 'Coins Deducted';
-
-        $body = $typeCharge === 'increment'
-            ? 'You have received :coins coins from admin.'
-            : ':coins coins were deducted from your account by admin.';
-
-
-        CustomNotification::charges($user, $title, $body, ['coins' => $coins]);
 
         return $this->response()->success('Success')->refresh();
     }
 
-
-
-    private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, SuperAdmin $superAdmin, $amount, $coins = 0, $usdAmount): void
     {
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
-        $charge->user_id = $user->id;
+        $charge->user_id = $superAdmin->id;
         $charge->agency_id =   null;
-        $charge->user_type = 'user';
+        $charge->user_type = UserTypeEnum::SUPER_ADMIN;
         $charge->amount = $coins;
-        $charge->usd = $usdAmount;
-        $charge->balance_before =  $user->di  - $coins;
+        $charge->usd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / Cache::get('super_admin_coins', 1);
+        $charge->balance_before =  $superAdmin->di  - $coins;
         $charge->save();
-
-        UserCommon::UserEarnedInvitation($user->id, $coins,$charge->id);
 
         if ($request->hasFile('invoice')) {
             $imagePath = Common::upload('profile', $request->file('invoice'));
@@ -135,23 +120,33 @@ class SuperAdminChargeAction extends Action
 
         ChargeInvoice::create([
             'charge_id' => $charge->id,
-            'user_id' => $user->id,
+            'user_id' => $superAdmin->id,
             'reason_en' => $request->reason_en,
             'reason_ar' => $request->reason_ar,
             'invoice' => $imagePath ?? '',
-            'type' => 'user',
+            'type' => UserTypeEnum::SUPER_ADMIN,
         ]);
     }
 
-    public function form()
+    public function form(): void
     {
         $this->name = __('Charge');
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
+
+        $this->select('amount_unit', __('Amount Unit'))
+            ->options([
+                'usd'   => __('Dollar'),
+                'coins' => __('Coins'),
+            ])
+            ->default('usd')
+            ->help(__('Choose whether the entered amount is in USD or Coins'));
+
         $this->text('amount', __('Amount'))
             ->rules('numeric|gt:0')
             ->addElementClass('price-input')
-            ->help(__('Enter amount in dollars'));
+            ->help(__('Enter the amount based on the selected type'));
+
         $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));
 
@@ -169,6 +164,7 @@ class SuperAdminChargeAction extends Action
             ]);
 
         $this->hidden('amount_type')->value(1);
+
         Admin::script(<<<'SCRIPT'
             function toggleInvoiceField() {
                 var selected = $('#form-select').val();
@@ -184,11 +180,11 @@ class SuperAdminChargeAction extends Action
         SCRIPT);
     }
 
-    public function html()
+    public function html(): string
     {
         $title = __('dashboard.add_coins');
         $shippingReports = __('Charge reports');
-        $url = url('admin/user-charges-report/' . $this->userId);
+        $url = url('admin/superadmin-charges-report/' . $this->userId);
 
         $html = '';
 
