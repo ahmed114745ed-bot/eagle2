@@ -27,7 +27,7 @@ Route::group(
             'web',
             'multiLanguage',
         ],
-      //  'as' => 'superadmin.',
+        'as' => 'superadmin.',
     ],
     function () {
         if (MultiLanguage::config("show-login-page", true)) {
