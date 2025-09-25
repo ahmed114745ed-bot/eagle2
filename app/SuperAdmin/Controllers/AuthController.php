@@ -107,8 +107,10 @@ class AuthController extends BaseAuthController
         $auth = \App\Models\Admin::where('username', $request->username)->first();
         $auth->password = Hash::make($request->password);
         $auth->save();
-        return redirect()->to('superadmin/login')
+        return redirect(superadmin_url('login'))
+        
             ->with('success', __('Password changed successfully. Please login with your new password.'));
+            return redirect()->route('admin.login')->with('success', __('Password changed successfully'));
     }
 
 
