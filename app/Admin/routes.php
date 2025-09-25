@@ -7,6 +7,7 @@ use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\SuperAdminChargeController;
 use App\Admin\Controllers\SuperAdminController;
 use App\Admin\Controllers\SuperAdminSelectController;
 use App\Admin\Controllers\SuperBoomRuleController;
@@ -620,6 +621,7 @@ Route::group(
         Route::resource('ware-management', WareTabController::class);
 
         Route::resource('user-charges', UsersChargeController::class);
+        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
