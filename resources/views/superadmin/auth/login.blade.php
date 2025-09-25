@@ -23,6 +23,12 @@
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <style>
+            #forget-password:hover {
+                text-decoration: underline;
+            }
+    </style>
 </head>
 
 <body class="hold-transition login-page" @if(config('admin.login_background_image'))style="background: url({{config('admin.login_background_image')}}) no-repeat;background-size: cover;"@endif>
@@ -68,6 +74,13 @@
                     </label>
                 </div>
             @endif
+
+              <div class="checkbox icheck text-center" dir="rtl">
+                    <label>
+                        <input type="checkbox" name="code" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
+                        {{ __('please inter code sent to your whatsapp') }}
+                    </label>
+                </div>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ trans('admin.login') }}</button>
             <!--
@@ -80,10 +93,41 @@
             </div>
             -->
         </form>
-        <div class="language-switch text-center">
+       <div class="language-switch text-center">
             <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
         </div>
+                <div class="forget-password text-center" style="margin-top: 10px;">
+                    <a href="" id="forget-password" 
+                    style="color: var(--green-color); font-weight: bold; text-decoration: underline;">
+                        {{ __('forget password') }}
+                    </a>
+                </div>
+                <br>
+                    <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form"
+                        class="text-center" style="display: none; margin-top: 15px;">
+                        @csrf
+                        {{-- hidden username from login --}}
+                        <input type="hidden" name="username" id="forget-username">
 
+                        <label for="whatsapp_code" style="font-weight: bold; margin-bottom: 10px; display: block;">
+                            {{ __('please enter the code sent to your WhatsApp') }}
+                        </label>
+                        <input type="text" class="form-control input-lg text-center"
+                            id="whatsapp_code"
+                            placeholder="{{ trans('code whatsapp') }}"
+                            name="code"
+                            value="{{ old('whatsapp_code') }}">
+
+                        @if($errors->has('code'))
+                            <label class="control-label text-danger">
+                                {{ $errors->first('code') }}
+                            </label>
+                        @endif
+
+                        <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit" style="margin-top: 10px;">
+                            {{ trans('send') }}
+                        </button>
+                    </form>
     </div>
 </div>
 
@@ -109,6 +153,61 @@
                 location.reload();
             });
         });
+
+        // Prevent double submission
+        $('form').on('submit', function () {
+            var $btn = $(this).find('button[type="submit"]');
+            $btn.prop('disabled', true).text('{{ trans('logging in') ?? 'Logging in...' }}');
+        });
+
+         document.getElementById('forget-password').addEventListener('click', function (e) {
+                e.preventDefault();
+                let form = document.getElementById('forget-password-form');
+                form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+            });
+
+           document.getElementById('forget-password').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let username = document.getElementById('username').value;
+
+            if (!username) {
+                alert("{{ __('Please enter your username first') }}");
+                return;
+            }
+
+            // Send AJAX request to backend
+          fetch("{{ superadmin_url('send-whatsapp-code') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ username: username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    alert(data.message); 
+                    document.getElementById('forget-password-form').style.display = "block";
+                } else {
+                    alert(data.message); 
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("{{ __('Something went wrong, please try again later.') }}");
+            });
+        });
+            document.getElementById('forget-password').addEventListener('click', function (e) {
+                e.preventDefault();
+                // copy username into hidden field
+                let username = document.getElementById('username').value;
+                document.getElementById('forget-username').value = username;
+
+                // show forget-password form
+                document.getElementById('forget-password-form').style.display = 'block';
+            });
     });
 </script>
 </body>

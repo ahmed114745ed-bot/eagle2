@@ -186,35 +186,35 @@ class SuperAdminController extends MainController
 
         $grid->column('country.name', __('country'));
 
-//        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
-//            return $this->agencies_count;
-//        });
-//
-//
-//        $grid->column('total_salary', __('total proft'))->display(function () {
-//            return truncateAndTrim($this->total_salary, 2);
-//        });
-//
-//        $grid->column('current_balance', __('current_balance'))->display(function () {
-//            $total = floatval($this->total_salary);
-//            $cut   = floatval($this->total_cut);
-//            return truncateAndTrim($total - $cut, 2);
-//        });
-//
-//        $grid->column('total_cut', __('Cut amount'))->display(function () {
-//            return truncateAndTrim($this->total_cut, 2);
-//        });
+        //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
+        //            return $this->agencies_count;
+        //        });
+        //
+        //
+        //        $grid->column('total_salary', __('total proft'))->display(function () {
+        //            return truncateAndTrim($this->total_salary, 2);
+        //        });
+        //
+        //        $grid->column('current_balance', __('current_balance'))->display(function () {
+        //            $total = floatval($this->total_salary);
+        //            $cut   = floatval($this->total_cut);
+        //            return truncateAndTrim($total - $cut, 2);
+        //        });
+        //
+        //        $grid->column('total_cut', __('Cut amount'))->display(function () {
+        //            return truncateAndTrim($this->total_cut, 2);
+        //        });
 
-//        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-//            $col = $grid->column('transfer_salary', __("transfer_salary"))
-//                ->display(function () {
-//                    return $this->transfer_salary ? 1 : 0;
-//                });
-//
-//            if (! request()->filled('_export_')) {
-//                $col->switch(Common::getSwitchStates());
-//            }
-//        }
+        //        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+        //            $col = $grid->column('transfer_salary', __("transfer_salary"))
+        //                ->display(function () {
+        //                    return $this->transfer_salary ? 1 : 0;
+        //                });
+        //
+        //            if (! request()->filled('_export_')) {
+        //                $col->switch(Common::getSwitchStates());
+        //            }
+        //        }
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -232,8 +232,7 @@ class SuperAdminController extends MainController
         });
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {
-            });
+            $grid->tools(function (Grid\Tools $tools) {});
         }
 
         $grid->disableRowSelector();
@@ -257,7 +256,7 @@ class SuperAdminController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
-//        $form->hidden('transfer_salary', __('transfer_salary'));
+        //        $form->hidden('transfer_salary', __('transfer_salary'));
 
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
@@ -267,7 +266,9 @@ class SuperAdminController extends MainController
             }
             return $ops;
         })->required();
-        
+
+
+
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -288,9 +289,10 @@ class SuperAdminController extends MainController
             $form->switch('default', __('set_superadmin_as_default'))
                 ->help(__('make_super_admin_default'));
         }
+        $this->addPhoneFields($form);
 
         $form->hidden('type', __('Type'))->value('superadmin');
-//        $form->hidden('transfer_salary', __('transfer_salary'));
+        //        $form->hidden('transfer_salary', __('transfer_salary'));
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
@@ -348,6 +350,61 @@ class SuperAdminController extends MainController
         return $form;
     }
 
+    protected function addPhoneFields(Form $form)
+    {
+
+        $form->text('phone', __('whatsApp number'))
+            ->rules('required')
+            ->attribute('id', 'phone-input')
+            ->attribute('maxlength', 12)
+            ->default(function ($form) {
+                if ($form->model()->phone && $form->model()->phone_code) {
+                    return $form->model()->phone;
+                }
+                return null;
+            });
+
+        $form->hidden('phone_code')->default(function ($form) {
+            return $form->model()->phone_code ?? '';;
+        });
+
+
+        Admin::script($this->phoneJs());
+    }
+
+
+    protected function phoneJs()
+    {
+        return <<<JS
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.E164);
+                                hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
+                    });
+                    form.classList.add('phone-init');
+        }
+    }
+
+    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
+    initAllPhones();
+    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+    JS;
+    }
+
     public function profile($id)
     {
         $tab = request()->query('tab', 'agencies');
@@ -368,33 +425,33 @@ class SuperAdminController extends MainController
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
 
-//            case 'transactions':
-//                $transactions = $superAdmin->transactions()
-//                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-//                    ->with('receiveragency')
-//                    ->latest()
-//                    ->paginate(10, ['*'], 'transactions_page');
-//                break;
-//
-//            case 'target_history':
-//                $target_history = BdAgencyHostSallary::select(
-//                    'id',
-//                    'bd_id',
-//                    'agency_id',
-//                    // 'salary',
-//                    'amount',
-//                    'month',
-//                    'year',
-//                    'bd_user_id',
-//                    'created_at'
-//                )
-//                    ->where('bd_id', $superAdmin->id)
-//                    ->where('bd_id', $superAdmin->id)
-//                    ->where('amount', '!=', 0)
-//                    ->where('year', $year)
-//                    ->latest()
-//                    ->paginate(10, ['*'], 'target_history_page');
-//                break;
+                //            case 'transactions':
+                //                $transactions = $superAdmin->transactions()
+                //                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                //                    ->with('receiveragency')
+                //                    ->latest()
+                //                    ->paginate(10, ['*'], 'transactions_page');
+                //                break;
+                //
+                //            case 'target_history':
+                //                $target_history = BdAgencyHostSallary::select(
+                //                    'id',
+                //                    'bd_id',
+                //                    'agency_id',
+                //                    // 'salary',
+                //                    'amount',
+                //                    'month',
+                //                    'year',
+                //                    'bd_user_id',
+                //                    'created_at'
+                //                )
+                //                    ->where('bd_id', $superAdmin->id)
+                //                    ->where('bd_id', $superAdmin->id)
+                //                    ->where('amount', '!=', 0)
+                //                    ->where('year', $year)
+                //                    ->latest()
+                //                    ->paginate(10, ['*'], 'target_history_page');
+                //                break;
         }
 
         return view('admin.superAdmin.super_admin_profile', compact('superAdmin', 'agencies'));
@@ -417,32 +474,32 @@ class SuperAdminController extends MainController
         return $show;
     }
 
-//    public function sync($days = 0)
-//    {
-//        $days = request()->query('days', 0);
-//        $bds = DB::table('admin_users')
-//            ->where('type', 'bd')
-//            ->where('app_id', '!=', 0)
-//            ->get();
-//
-//        $updated = 0;
-//
-//        foreach ($bds as $bd) {
-//            $query = DB::table('agencies')
-//                ->where('bd_id', $bd->app_id);
-//
-//            if ($days > 0) {
-//                $query->where('created_at', '<=', now()->subDays($days));
-//            }
-//
-//            $affected = $query->update(['bd_id' => $bd->id]);
-//            $updated += $affected;
-//        }
-//
-//        return response()->json([
-//            'status' => 'success',
-//            'message' => $updated
-//        ]);
-//    }
+    //    public function sync($days = 0)
+    //    {
+    //        $days = request()->query('days', 0);
+    //        $bds = DB::table('admin_users')
+    //            ->where('type', 'bd')
+    //            ->where('app_id', '!=', 0)
+    //            ->get();
+    //
+    //        $updated = 0;
+    //
+    //        foreach ($bds as $bd) {
+    //            $query = DB::table('agencies')
+    //                ->where('bd_id', $bd->app_id);
+    //
+    //            if ($days > 0) {
+    //                $query->where('created_at', '<=', now()->subDays($days));
+    //            }
+    //
+    //            $affected = $query->update(['bd_id' => $bd->id]);
+    //            $updated += $affected;
+    //        }
+    //
+    //        return response()->json([
+    //            'status' => 'success',
+    //            'message' => $updated
+    //        ]);
+    //    }
 
 }

@@ -3864,7 +3864,10 @@
     "Device Token is required": "رمز الجهاز مطلوب",
     "Ban(s) successfully removed": "تمت إزالة الحظر بنجاح",
     "dashboard.remove_bans": "إزالة الحظر",
-  "milestones":"الانجازات "
+  "milestones":"الانجازات ",
+    "Bd Count": "مجموع ال bd",
+    "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
+    "whatsApp number": "رقم الواتساب"
 
 
 

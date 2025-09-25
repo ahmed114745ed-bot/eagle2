@@ -2979,7 +2979,10 @@
     "Device Token is required": "डिवाइस टोकन आवश्यक है",
     "Ban(s) successfully removed": "बैन सफलतापूर्वक हटाया गया",
     "dashboard.remove_bans": "बैन हटाएँ",
-    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "Bd Count": "BD की संख्या",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "whatsApp number": "व्हाट्सऐप नंबर"
 
 
 
