@@ -68,7 +68,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-      //  'as' => 'superadmin.',
+        'as' => 'superadmin.',
     ],
     function () {
         Route::get('setting', [AuthController::class, 'getSetting']);
