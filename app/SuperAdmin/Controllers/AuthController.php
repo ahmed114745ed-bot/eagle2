@@ -98,7 +98,7 @@ class AuthController extends BaseAuthController
         if (!$isValid) {
             return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
         }
-      //  $whatsappOtpService->resetCodes($phone);
+        $whatsappOtpService->resetCodes($phone);
         return view("superadmin.auth.password", compact('userName'));
     }
 
