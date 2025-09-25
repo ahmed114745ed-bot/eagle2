@@ -98,19 +98,20 @@ class AuthController extends BaseAuthController
         if (!$isValid) {
             return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
         }
+        $whatsappOtpService->resetCodes($phone);
         return view("superadmin.auth.password", compact('userName'));
     }
 
     public function changePassword(Request $request)
     {
-      //  dd(123,$request->username);
+        //  dd(123,$request->username);
         $auth = \App\Models\Admin::where('username', $request->username)->first();
         $auth->password = Hash::make($request->password);
         $auth->save();
         return redirect(superadmin_url('login'))
-        
+
             ->with('success', __('Password changed successfully. Please login with your new password.'));
-            return redirect()->route('admin.login')->with('success', __('Password changed successfully'));
+        return redirect()->route('admin.login')->with('success', __('Password changed successfully'));
     }
 
 
@@ -163,7 +164,7 @@ class AuthController extends BaseAuthController
     {
 
         $this->getLogout($request);
-        return redirect()->route('superadmin.login');
+        return redirect(superadmin_url('login'));
     }
 
     public function putSetting()
