@@ -37,6 +37,7 @@ class AuthController extends BaseAuthController
 
     public function showLoginForm()
     {
+
         $user = Admin::user();
         $uri = request()->path();
 
@@ -72,9 +73,8 @@ class AuthController extends BaseAuthController
 
     public function sendCodeWhatsapp(Request $request)
     {
-        $auth = Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->first();
         $phone =  $auth->phone_code . $auth->phone;
-
         try {
             (new WhatsappOtp())->sendOtpMessage($phone);
         } catch (Exception $exception) {
@@ -82,6 +82,33 @@ class AuthController extends BaseAuthController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         return Common::apiResponse(true, __('messages.code_is_sent_to_your_phone'));
+    }
+
+    public function changePasswordView(Request $request)
+    {
+
+        $userName = $request->username;
+        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        if (!$auth) {
+            return back()->withErrors(['username' => __('User not found')]);
+        }
+        $whatsappOtpService = new WhatsappOtp();
+        $phone              = $auth->phone_code . $auth->phone;
+        $isValid            = $whatsappOtpService->isValidate($phone, $request->code);
+        if (!$isValid) {
+            return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
+        }
+        return view("superadmin.auth.password", compact('userName'));
+    }
+
+    public function changePassword(Request $request)
+    {
+      //  dd(123,$request->username);
+        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth->password = Hash::make($request->password);
+        $auth->save();
+        return redirect()->to('superadmin/login')
+            ->with('success', __('Password changed successfully. Please login with your new password.'));
     }
 
 

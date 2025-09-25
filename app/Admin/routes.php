@@ -1,15 +1,5 @@
 <?php
 
-use App\Admin\Controllers\CoinGameUserAllController;
-use App\Admin\Controllers\CoinLogReportsController;
-use App\Admin\Controllers\GiftLogController;
-use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\InvitationSettingsController;
-use App\Admin\Controllers\PusherStatisticsController;
-use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\SuperAdminController;
-use App\Admin\Controllers\SuperAdminSelectController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +27,7 @@ use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -54,6 +45,7 @@ use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
+use App\SuperAdmin\Controllers\AuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\FeatureAppController;
@@ -61,9 +53,11 @@ use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
+use App\Admin\Controllers\SuperAdminController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
@@ -82,18 +76,23 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
+use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
+use App\Admin\Controllers\PusherStatisticsController;
+use App\Admin\Controllers\SuperAdminSelectController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -104,6 +103,7 @@ use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\ChangeLevelHistoryController;
+use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
@@ -112,10 +112,11 @@ use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
+use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 
 Route::group(
     [
@@ -456,9 +457,9 @@ Route::group(
         // Route::prefix('ware-gifts')->group(function () {
 
 
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
@@ -597,8 +598,8 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
+            ->except(['update'])
+            ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::resource('badges', BadgeController::class);
@@ -626,11 +627,11 @@ Route::group(
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
-        Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-        Route::group(['middleware' => 'local'], function (){
+        Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
             Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
 
@@ -655,12 +656,13 @@ Route::group(
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
         });
-    });
+    }
+);
 
 
 Route::group([
     'prefix' => 'admin',
     'middleware' => ['web', 'admin'],
-], function() {
+], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
 });
