@@ -52,7 +52,7 @@ class RoomCupReportsController extends AdminController
         });
            
         $grid->column('owner', __('room owner'))->display(function ($name) {
-            $user = $this->room->owner;
+            $user = $this->gift?->room?->owner;
             if (! $user) {
                 return __('No User');
             }
@@ -61,8 +61,8 @@ class RoomCupReportsController extends AdminController
         });
 
         $grid->column('room_id', __('room'))->display(function ($name) {
-            $path = @$this->room->room_cover;
-            $id = @$this->room->id;
+            $path = @ $this->gift->room->room_cover;
+            $id = @ $this->gift->room->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
