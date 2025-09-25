@@ -54,7 +54,7 @@
                     <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}</label><br>
                 @endforeach
             @endif
-                <input type="text" class="form-control input-lg  text-center" placeholder="{{ trans('admin.username') }}" name="username" value="{{ old('username') }}">
+                <input type="text" id="username" class="form-control input-lg  text-center" placeholder="{{ trans('admin.username') }}" name="username" value="{{ old('username') }}">
                 <input type="hidden" name="url"  value="{{ @$test }}">
             </div>
             <div class="form-group has-feedback ">
