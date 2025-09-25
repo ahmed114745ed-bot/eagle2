@@ -158,7 +158,7 @@ class Kernel extends ConsoleKernel
         }
     
         $type     = $settings['type'] ?? 'daily';
-        $time     = $settings['time'] ?? '23:59';
+        $time     =  '23:59';
     
         $command = $schedule->command('roomcup:calculate-rewards')
                             ->timezone(getTimezone());

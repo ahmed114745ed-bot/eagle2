@@ -26,15 +26,20 @@ class CalculateRoomCupRewards extends Command
 
     public function handle(): int
     {
-        $this->info("🚀 Starting full calculation at " . Carbon::now());
 
-        TotalRoomGift::orderBy('id')
+        $yesterdayStart = Carbon::yesterday(getTimezone())->startOfDay();
+        $yesterdayEnd   = Carbon::yesterday(getTimezone())->endOfDay();
+    
+        $this->info("🚀 Starting full calculation for gifts between {$yesterdayStart} and {$yesterdayEnd}");
+    
+        TotalRoomGift::whereBetween('created_at', [$yesterdayStart, $yesterdayEnd])
+            ->orderBy('id')
             ->chunk(100, function ($gifts) {
                 foreach ($gifts as $gift) {
                     $this->processGift($gift);
                 }
             });
-
+    
         $this->info("✅ Calculation finished");
         return EnumCommand::SUCCESS;
     }
@@ -71,7 +76,6 @@ class CalculateRoomCupRewards extends Command
                 $this->line("💰 Room owner #{$room->uid} will get {$target->owner_profit}");
             }
 
-            // Admin rewards
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins_v2() as $admin) {
