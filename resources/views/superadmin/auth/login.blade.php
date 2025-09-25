@@ -103,9 +103,8 @@
                     </a>
                 </div>
                 <br>
-                    <form action="{{ admin_url('change-password-view') }}" method="get" id="forget-password-form"
+                   <form action="{{ admin_url('change-password-view') }}" method="get" id="forget-password-form"
                         class="text-center" style="display: none; margin-top: 15px;">
-                        @csrf
                         {{-- hidden username from login --}}
                         <input type="hidden" name="username" id="forget-username">
 
@@ -128,6 +127,7 @@
                             {{ trans('send') }}
                         </button>
                     </form>
+
     </div>
 </div>
 
