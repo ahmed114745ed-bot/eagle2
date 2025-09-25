@@ -3867,7 +3867,12 @@
   "milestones":"الانجازات ",
     "Bd Count": "مجموع ال bd",
     "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
-    "whatsApp number": "رقم الواتساب"
+    "whatsApp number": "رقم الواتساب",
+   "please enter the code sent to your WhatsApp": "الرجاء إدخال الرمز المرسل إلى الواتساب الخاص بك",
+"change password": "تغيير كلمة المرور",
+"please enter new password": "الرجاء إدخال كلمة مرور جديدة",
+"change": "تغيير",
+"send": "إرسال"
 
 
 

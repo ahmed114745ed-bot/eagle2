@@ -260,7 +260,7 @@ class SuperAdminController extends MainController
 
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
-            $countries = Country::all();
+            $countries = Country::doesntHave('superAdmin')->all();
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
