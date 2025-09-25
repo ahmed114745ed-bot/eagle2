@@ -258,9 +258,9 @@ class SuperAdminController extends MainController
 
         //        $form->hidden('transfer_salary', __('transfer_salary'));
 
-        $form->select('country_id', trans('country'))->options(function () {
+        $form->select('country_id', trans('country'))->options(function ($value) {
             $ops       = [null => __('no country')];
-            $countries = Country::doesntHave('superAdmin')->get();
+            $countries = Country::doesntHave('superAdmin')->orWhere('id', $value)->get();
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
