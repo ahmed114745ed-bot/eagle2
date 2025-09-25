@@ -63,7 +63,7 @@
 
     .inp-div{
         width: 77%;
-        margin: 10px auto;
+        margin: 23px auto;
     }
     .inp{
         width: 100%;
