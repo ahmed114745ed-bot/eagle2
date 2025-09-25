@@ -31,7 +31,8 @@ class RemoveBanUser extends Action
         if (!Admin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);
         }
-        $user = User::query()->searchByUuid('uuid', $request->uid)->first();
+     
+        $user = User::query()->searchByUuid( $request->uid)->first();
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
