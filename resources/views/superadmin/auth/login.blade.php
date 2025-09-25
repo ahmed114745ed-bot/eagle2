@@ -47,6 +47,13 @@
     </div>
 
     <div class="login-box-body">
+        @if($errors->any())
+            <div class="alert alert-danger text-center">
+                @foreach($errors->all() as $error)
+                    <div><i class="fa fa-times-circle-o"></i> {{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
         <form action="{{ superadmin_url('login') }}" method="post">
             <div class="form-group has-feedback ">
             @if (@$errors && $errors->has('username'))
