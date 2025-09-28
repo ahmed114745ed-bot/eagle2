@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use Modules\Chat\Entities\ChatMessage;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -280,6 +281,12 @@ class Room extends Model
     {
         return $this->belongsTo(Background::class, 'room_background');
     }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
+    }
+
 
     public function getFinalRoomImageAttribute()
     {
