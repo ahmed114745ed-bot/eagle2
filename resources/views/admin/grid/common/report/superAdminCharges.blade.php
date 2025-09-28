@@ -11,7 +11,7 @@
             <h4 class="details-title">{{ __('Details') }}</h4>
 
             @php
-                $name = $superAdmin->name ?? '';
+                $name = $superAdmin->username ?? '';
                 $id = $superAdmin->id ?? 0;
                 $path = $superAdmin->profile->avatar ?? null;
                 $defaultImage = asset("images/businessman-icon.jpg");
