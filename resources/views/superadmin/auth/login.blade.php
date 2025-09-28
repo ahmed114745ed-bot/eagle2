@@ -85,9 +85,7 @@
                 <br>
      
 
-                        <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit" style="margin-top: 10px;">
-                            {{ trans('send') }}
-                        </button>
+                       
                     </form>
 
         <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form" style="display:none; margin-top:15px;">
