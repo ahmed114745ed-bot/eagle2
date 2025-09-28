@@ -53,18 +53,18 @@
             <div class="form-group has-feedback">
                 <input type="text" id="username" name="username"
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.username') }}"
-                       value="{{ old('username') }}">
+                       value="{{ old('username') }}" required>
             </div>
 
             <div class="form-group has-feedback">
                 <input type="password" name="password"
-                       class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}">
+                       class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
             </div>
 
             @if(config('admin.auth.remember'))
                 <div class="checkbox icheck text-center" dir="rtl">
                     <label>
-                        <input type="checkbox" name="remember" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
+                        <input type="checkbox" name="remember" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }} >
                         {{ __('dashboard.login.remember') }}
                     </label>
                 </div>
