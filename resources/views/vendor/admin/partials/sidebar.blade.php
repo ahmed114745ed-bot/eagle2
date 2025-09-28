@@ -108,6 +108,7 @@
                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
                             ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
                             ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
+                            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-building',
