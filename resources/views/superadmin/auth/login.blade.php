@@ -74,7 +74,7 @@
         </form>
 
         <div class="language-switch text-center">
-            <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
+            <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang2')}}</span></a>
         </div>
                 <div class="forget-password text-center" style="margin-top: 10px;">
                     <a href="" id="forget-password" 
@@ -96,7 +96,7 @@
             </label>
             <input type="text" id="whatsapp_code" name="code" class="form-control input-lg text-center" placeholder="{{ __('dashboard.login.whatsapp_code') }}">
             <div style="margin-top:10px;">
-                <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ __('dashboard.login.confirm_code') }}</button>
+                <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ __('Validation') }}</button>
             </div>
         </form>
     </div>
@@ -105,10 +105,10 @@
 <div class="rights text-center">{{ __('dashboard.login.rights') . ' ' . config('app.name') }}</div>
 
 <!-- مودال الخطأ -->
-<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-hidden="true" >
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+    <div class="modal-content" >
+      <div class="modal-header  text-white"  style="background-color: #ff0000 !important;">
         <h5 class="modal-title"><i class="fa fa-exclamation-circle"></i> {{ __('dashboard.login.error') }}</h5>
         <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
       </div>
@@ -122,9 +122,8 @@
   </div>
 </div>
 
-<!-- مودال التأكيد (يعرض الرقم المشفر) -->
 <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title"><i class="fa fa-whatsapp"></i> {{ __('dashboard.login.confirm_send') }}</h5>
@@ -142,7 +141,7 @@
 </div>
 
 <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
         <h5 class="modal-title"><i class="fa fa-check-circle"></i> {{ __('dashboard.login.success') }}</h5>
@@ -194,8 +193,14 @@ $(document).ready(function () {
     // prevent double submit for forms
     $('#login-form, #forget-password-form').on('submit', function () {
         var $btn = $(this).find('button[type="submit"]');
-        $btn.prop('disabled', true).text('{{ trans('logging in') ?? 'Logging in...' }}');
+
+        if ($(this).attr('id') === 'forget-password-form') {
+            $btn.text("{{ __('dashboard.login.loading.check_code') }}");
+        } else {
+            $btn.text("{{ __('dashboard.login.loading.logging_in') }}");
+        }
     });
+
 
     // نقر على "نسيت كلمة المرور"
     $('#forget-password').on('click', function (e) {
@@ -280,6 +285,55 @@ $(document).ready(function () {
                 console.error('preview error:', xhr.responseText || error);
             }
         });
+    });
+});
+
+$('#forget-password-form').on('submit', function (e) {
+    e.preventDefault(); // منع إعادة تحميل الصفحة
+
+    var $form = $(this);
+    var $btn  = $form.find('button[type="submit"]');
+
+    var username = $('#forget-username').val();
+    var code     = $('#whatsapp_code').val();
+
+    $btn.text("{{ __('dashboard.login.loading.check_code') }}");
+
+    $.ajax({
+        url: "{{ superadmin_url('verify-whatsapp-code') }}", // نفس الـ action بتاع الفورم
+        method: "GET", // زي ما انت كاتب في الفورم
+        data: {
+            username: username,
+            code: code,
+            _token: $('meta[name="csrf-token"]').attr('content') 
+        },
+        dataType: "json",
+        success: function (res) {
+            $btn.text("{{ __('Validation') }}").prop('disabled', false);
+
+            if (res.success) {
+                $('#successModalText').text(res.message);
+                $('#successModal').modal('show');
+              
+                if (res.redirect) {
+                    setTimeout(function () {
+                        window.location.href = res.redirect;
+                    }, 1500);
+                }
+            } else {
+                $('#errorModalText').text(res.message);
+                $('#errorModal').modal('show');
+            }
+        },
+        error: function (xhr, status, error) {
+            $('#errorModalText').text(xhr.responseJSON?.message || "{{ __('حدث خطأ أثناء التحقق، حاول مرة أخرى') }}");
+            $('#errorModal').modal('show');
+            console.error('verify-code error:', xhr.responseText || error);
+        },
+        complete: function () {
+            // رجع النص الأصلي للزر بعد الانتهاء
+            $btn.text("{{ __('Validation') }}");
+        }
     });
 });
 </script>

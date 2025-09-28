@@ -1201,7 +1201,7 @@
 
     
   
-  
+  "dashboard.login.loading.check_code":"check code ...",
   "change password": "Change Password",
   "please enter new password": "Please enter new password",
   "please confirm new password": "Please confirm new password",
@@ -1214,6 +1214,7 @@
   "logging in": "Logging in...",
   "dashboard.login.language.switch": "Switch Language",
   "dashboard.login.language.lang": "English",
+  "dashboard.login.language.lang2": "العربية",
   "dashboard.login.rights": "All rights reserved",
   "dashboard.login.forgot_password": "Forgot password?",
   "dashboard.login.enter_code": "Please enter the code sent to WhatsApp",

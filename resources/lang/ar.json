@@ -3517,6 +3517,7 @@
 "is required": "مطلوب",
 "is required and must be numeric": "مطلوب ويجب أن يكون رقمًا",
 "Validation error": "خطأ في التحقق",
+"Validation": "التحقق",
 "Agency Feature": "ميزة الوكالة",
 "Enable Agency Feature": "تفعيل ميزة الوكالة",
 "Enable Reel Feature": "تفعيل ميزة الريل",
@@ -3890,6 +3891,7 @@
 "logging in": "جاري تسجيل الدخول...",
 "dashboard.login.language.switch": "تغيير اللغة",
 "dashboard.login.language.lang": "العربية",
+"dashboard.login.language.lang2": "English",
 "dashboard.login.rights": "جميع الحقوق محفوظة",
 "dashboard.login.forgot_password": "نسيت كلمة المرور؟",
 "dashboard.login.enter_code": "الرجاء إدخال الكود المرسل إلى واتساب",
@@ -3912,7 +3914,8 @@
 "dashboard.login.whatsapp.failed": "فشل إرسال الكود، حاول لاحقًا",
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
 "dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
-"wait-2-minutes" : "انتظر دقيقتان من فضلك"
+"wait-2-minutes" : "انتظر دقيقتان من فضلك" ,
+"dashboard.login.loading.check_code":"جاري التحقق ...."
 
 
 
