@@ -2,6 +2,7 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -22,14 +23,20 @@ class ChargeController extends MainController
     /**
      * Make a grid builder.
      *
-     * @return Grid
+     * @return Content
      */
-
-
-    public function index(Content $content)
+    public function index(Content $content): Content
     {
+        $finalSalary = Auth::user()->di;
+
         return $content
             ->header(trans('Charges'))
+            ->description(trans('Charges'))
+
+            ->row(function ($row) use ($finalSalary) {
+                $row->column(12, view('admin.grid.superadmin.wallet', ['finalSalary' => $finalSalary]));
+            })
+
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
@@ -38,14 +45,10 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new Charge());
 
-
-
-        $grid->model()->where('charger_type', 'bd')
+        $grid->model()->where('charger_type', 'superadmin')
             ->with('receiverUser', 'receiveragency')
             ->where('charger_id', Auth::user()->id)
             ->orderBy('id', 'desc');
-
-
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -59,11 +62,7 @@ class ChargeController extends MainController
                     });
                 });
             }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
-
                 $filter->between('created_at', __('تاريخ الإنشاء'))->date();
-
-
-
         });
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
@@ -80,13 +79,8 @@ class ChargeController extends MainController
             ";
         });
 
-
-        // $grid->column('id', __('Id'));
-        // $grid->column('amount', __('Amount'));
-        // $grid->column('amount_type', __('Amount type'));
-
         $grid->column('user_id', __('receiver'))->display(function () {
-            $info = \App\Helpers\Common::getReceiverInfo($this);
+            $info = Common::getReceiverInfo($this);
 
             if ($info['type'] === 'agency') {
                 if (request()->filled('_export_')) {
@@ -160,11 +154,7 @@ class ChargeController extends MainController
             $tools->append($button);
         });
         $grid->disableRowSelector();
-        $grid->actions(function (Grid\Displayers\Actions $actions) {
-
-                $actions->disableDelete();
-
-        });
+        $grid->disableActions();
         return $grid;
     }
 
