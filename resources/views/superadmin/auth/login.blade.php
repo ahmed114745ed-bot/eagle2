@@ -83,17 +83,7 @@
                     </a>
                 </div>
                 <br>
-                   <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form"
-                        class="text-center" style="display: none; margin-top: 15px;">
-                        {{-- hidden username from login --}}
-                        <input type="hidden" name="username" id="forget-username">
-
-        <div class="forget-password text-center" style="margin-top:12px;">
-            <a id="forget-password" style="color: var(--green-color); font-weight:bold; text-decoration: underline;">
-            {{ __('dashboard.login.forgot_password') }}
-
-            </a>
-        </div>
+     
 
                         <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit" style="margin-top: 10px;">
                             {{ trans('send') }}

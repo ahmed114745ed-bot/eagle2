@@ -20,24 +20,6 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 });
 
 
-Route::get('set-language', function ( Illuminate\Http\Request $request) {
-    $lang = $request->get('lang', 'ar');
-
-    $languages = MultiLanguage::config('languages');
-    $cookie_name = MultiLanguage::config('cookie-name', 'locale');
-
-    if (array_key_exists($lang, $languages)) {
-        session(['locale' => $lang]);
-
-        app()->setLocale($lang);
-        App::setLocale($lang);
-
-        return redirect()->to($request->get('redirect', url('/')))
-            ->cookie($cookie_name, $lang, 60 * 24 * 30); 
-    }
-
-    return redirect()->back()->with('error', 'اللغة غير مدعومة');
-})->name('set-language');
 Route::group(
     [
         'prefix' => 'superadmin',
