@@ -425,7 +425,7 @@ Route::group(
         Route::resource('usersBd', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::resource('superadmin-users', SuperAdminController::class);
+        Route::resource('   ', SuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
