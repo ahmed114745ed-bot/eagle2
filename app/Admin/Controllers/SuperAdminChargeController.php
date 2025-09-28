@@ -53,7 +53,7 @@ class SuperAdminChargeController extends MainController
         });
 
         $grid->model()
-            ->select('id', 'name', 'di')
+            ->select('id', 'username', 'di', 'avatar')
 //            ->with('profile')
             ->orderByDesc('id');
 
