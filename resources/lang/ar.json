@@ -3817,6 +3817,7 @@
 "dashboard.login.whatsapp.send_to_number": "سيتم إرسال كود عبر الواتساب إلى الرقم:",
 "dashboard.login.loading.sending": "جاري الإرسال...",
 "dashboard.login.confirm": "موافق",
+"forget password": "نسيت كلمه المرور",
 "dashboard.login.whatsapp.sent": "تم إرسال الكود إلى واتساب",
 "dashboard.login.whatsapp.failed": "فشل إرسال الكود، حاول لاحقًا",
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
