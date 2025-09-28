@@ -727,7 +727,7 @@
 .flag-image {
     height: 30px;  /* adjust size */
     width: auto;
-    margin-top: 20px; 
+    margin-top: 10px; 
     border-radius: 4px; /* optional */
 }
 

@@ -27,7 +27,7 @@
 
             @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
                 <img src="{{ getImagePath($country->flag) }}" 
-                    class="flag-image" 
+                    class="fa fa-refresh" 
                     alt="flag Image">
             @endif
             <ul class="nav navbar-nav">

@@ -210,7 +210,6 @@ $(document).ready(function () {
             return;
         }
 
-        // 2) طلب معاينة (masked number) من السيرفر
         $.ajax({
             url: "{{ superadmin_url('send-whatsapp-code-preview') }}",
             method: "POST",
@@ -262,7 +261,12 @@ $(document).ready(function () {
                         error: function (xhr, status, error) {
                             $btn.prop('disabled', false).text("{{ __('dashboard.login.confirm') }}");
                             $('#confirmModal').modal('hide');
-                            $('#errorModalText').text("{{ __('dashboard.login.error.unexpected') }}");
+                            let res = xhr.responseJSON;
+                            let errMsg = res?.message 
+                                ? "{{ __('') }}" + res.message 
+                                : xhr.responseText || error || "{{ __('dashboard.login.whatsapp.failed') }}";
+
+                            $('#errorModalText').text(errMsg);
                             $('#errorModal').modal('show');
                             console.error('send-whatsapp-code error:', xhr.responseText || error);
                         }
