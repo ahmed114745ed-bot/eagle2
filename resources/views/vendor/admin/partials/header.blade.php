@@ -22,7 +22,7 @@
         <div class="navbar-custom-menu">
             
              @if (Admin::user()->type == 'superadmin')
-                 <img src="{{ Admin::user()->country->flag ?? '' }}" class="flag-image" alt="User Image">
+                 <img src="{{ getImagePath(Admin::user()->country->flag) ?? '' }}" class="flag-image" alt="flag Image">
              @endif
             <ul class="nav navbar-nav">
 
