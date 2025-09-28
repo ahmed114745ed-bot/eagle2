@@ -2,12 +2,8 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
-use App\Helpers\UserCoinLogHelper;
-use App\Helpers\UserCommon;
-use App\Models\Bd;
-use App\Models\User;
+use App\Models\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -19,8 +15,6 @@ use Illuminate\Http\Request;
 use App\Models\ShippingAgency;
 use App\Services\WalletService;
 use Encore\Admin\Layout\Content;
-use App\Models\WalletTransaction;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -288,7 +282,6 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
-
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
@@ -297,7 +290,7 @@ class WalletController extends MainController
             ]);
 
             $types = [
-                'user' => [$this, 'chargeToUser'],
+//                'user' => [$this, 'chargeToUser'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 
@@ -320,102 +313,10 @@ class WalletController extends MainController
         }
     }
 
-    public function chargeToUser(array $data)
-    {
-
-        $bdId = Auth::user()->id;
-        // $sender = Auth::user();
-        $amount = $data['amount'];
-        $receiverId = $data['target_id'] ?? null;
-
-
-        if (settings()->get("bd_stop_charge", 0)) {
-
-            throw new \Exception(__('api_responses.freez_charge'));
-        }
-
-        $receiver = User::find($receiverId);
-        $sender = Bd::find($bdId);
-        if (!$receiver) {
-            throw new \Exception(__('this user not found'));
-        }
-        if ($sender->transfer_salary == 1) {
-            throw new \Exception(__('api_responses.freeze_transfer_charger'));
-        }
-        if ($receiver->transfer_salary == 1) {
-            throw new \Exception(__('api_responses.freeze_transfer_receiver'));
-        }
-        $totalSalary = $sender?->bdSalary ?? 0;
-        if ($totalSalary < $amount) {
-            throw new \Exception(__('balance not enough'));
-        }
-        $rate = Common::getCoinsValue('user_coins');
-        if (!$rate) {
-            throw new \Exception(__('please set usd_value_in_coins in configs'));
-        }
-
-        $coins = $amount * $rate;
-
-        return $this->startTransaction($receiver, $sender, $amount, $coins, 'user');
-    }
-
-    public function startTransaction(User $receiver, Bd $sender, int $amount, int $coins, string $receiverType)
-    {
-        DB::beginTransaction();
-        try {
-
-
-            $amountBefore =  Common::getCurrentBalance($receiver->id);
-            UserCoinLogHelper::logByType(
-                $receiver->id,
-                $coins,
-                $amountBefore,
-                UserCoinLogType::BD_CHARGES,
-            );
-            $sender->incrementCutAmountInBdSallary($amount);
-            $receiver->increment('di', $coins);
-            $descriptionData = ['receiver_id'  => $receiver->id];
-
-            WalletTransaction::create([
-                'user_id' => $sender->id,
-                'type' => 'cut',
-                'transactions_type' => 'user_transaction',
-                'value' => $amount,
-                'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
-                'message' => 'transfer_to_',
-            ]);
-
-
-
-            $data = [
-                'charger_id' => $sender->id,
-                'charger_type' => 'bd',
-                'user_id' => $receiver->id,
-                'agency_id' => null,
-                'user_type' => $receiverType,
-                'amount' => $coins,
-                'amount_type' => 2,
-                "usd" =>  $amount ?? 0,
-                'is_used_transferred' => 1,
-                'user_charger_type' => 'bd'
-            ];
-
-            $charge =  Charge::create($data);
-
-            UserCommon::UserEarnedInvitation($receiver->id, $coins ,$charge->id);
-
-            DB::commit();
-            return true;
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return false;
-        }
-    }
-
     public function chargeToAgency(array $data)
     {
         $user = Auth::user();
-        $from = Bd::find($user->id);
+        $from = SuperAdmin::find($user->id);
         $usd = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
@@ -424,12 +325,10 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
-
-        if (settings()->get("bd_stop_charge", 0)) {
-
-            throw new \Exception(__('api_responses.freez_charge'));
-        }
-
+//        if (settings()->get("bd_stop_charge", 0)) {
+//
+//            throw new \Exception(__('api_responses.freez_charge'));
+//        }
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
@@ -454,26 +353,20 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
         $coins = $usd * $rate;
-        // $wallet = UserWallet::where('user_id', $from->id)->first();
-        // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $usd) {
-        //     throw new \Exception(__('balance not enough'));
-        // }    $totalSalary = $sender->salary;
-        $totalSalary = $from->bdSalary;
+
+        $totalSalary = $from->di;
 
         if ($totalSalary < $usd) {
             throw new \Exception(__('balance not enough'));
         }
 
-
         $this->performAgencyCharge($from, $to, $coins, $usd);
         return 1;
     }
 
-    private function performAgencyCharge(Bd $fromUser, ShippingAgency $toAgency, $coins, $usd)
+    private function performAgencyCharge(SuperAdmin $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
-
-
-        $fromUser->incrementCutAmountInBdSallary($usd);
+        $fromUser->decrement('di', $usd);
         $toAgency->increment('coins', $coins);
 
         WalletService::storeTransaction(
@@ -489,7 +382,7 @@ class WalletController extends MainController
 
         $data = [
             'charger_id' => $fromUser->id,
-            'charger_type' => 'bd',
+            'charger_type' => 'superadmin',
             'user_id' => $toAgency->id,
             'agency_id' => null,
             'user_type' => 'agency',
@@ -497,7 +390,7 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => 'bd'
+            'user_charger_type' => 'superadmin'
 
         ];
 

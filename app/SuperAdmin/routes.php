@@ -39,7 +39,7 @@ Route::group(
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
       //  Route::get('change-password-view', [AuthController::class, 'changePasswordView'])->name('superadmin.change-password-view');
         Route::post('change-password', [AuthController::class, 'changePassword'])->name('superadmin.change-password');
-         
+
         Route::post('send-whatsapp-code-preview', [AuthController::class, 'send_whatsapp_code_preview'])
         ->name('superadmin.send-whatsapp-code-preview');
     }
@@ -79,11 +79,9 @@ Route::group(
         Route::put('update-setting', [AuthController::class, 'putSetting']);
 
         Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::resource('/salaries', BdSalariesController::class);
         Route::resource('/charges', ChargeController::class);
         // Route::resource('/wallet', 'WalletController');
-        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::post('/locale', MultiLanguageController::class . '@locale');
 
@@ -109,6 +107,8 @@ Route::group(
         Route::resource('rooms', RoomController::class);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
-  
+
+        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
     }
 );
