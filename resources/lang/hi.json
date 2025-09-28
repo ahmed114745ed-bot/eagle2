@@ -468,7 +468,7 @@
     "User_Report": "उपयोगकर्ता रिपोर्ट",
     "Shipping agency": "शिपिंग एजेंसी",
     "Host agency": "मेजबान एजेंसी",
-    "Professional Host Agencies": "पेशेवर होस्ट एजेंसियाँ",
+    "Professional Host": "पेशेवर होस्ट",
     "Family": "परिवार",
     "pending": "बकाया",
     "accepted": "स्वीकृत",
@@ -2961,7 +2961,7 @@
     "dashboard.login.whatsapp.failed": "कोड भेजने में विफल, कृपया बाद में पुनः प्रयास करें",
     "dashboard.login.error.unexpected": "भेजते समय एक अप्रत्याशित त्रुटि हुई, कृपया बाद में पुनः प्रयास करें",
     "dashboard.login.error.user_fetch": "उपयोगकर्ता डेटा प्राप्त करते समय त्रुटि हुई, कृपया बाद में पुनः प्रयास करें"
-  
+
 
 
 

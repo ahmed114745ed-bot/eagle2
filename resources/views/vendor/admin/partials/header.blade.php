@@ -25,11 +25,13 @@
                 $country = \App\Models\Country::find(Admin::user()->country_id);
             @endphp
 
-            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
-                <img src="{{ getImagePath($country->flag) }}" 
+                @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
+                 <img src="{{ getImagePath($country->flag) }}" 
                     class="flag-image" 
-                    alt="flag Image">
-            @endif
+                    alt="flag Image"
+                    title="{{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}">
+                @endif
+           
             <ul class="nav navbar-nav">
 
                 {!! Admin::getNavbar()->render() !!}
@@ -41,7 +43,7 @@
                         <!-- The user image in the navbar-->
                         <img src="{{ Admin::user()->image }}" class="user-image" alt="User Image">
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                        <span class="hidden-xs">{{ Admin::user()->name }}</span>
+                        <span class="hidden-xs">{{ Admin::user()->name?? Admin::user()->username }}</span>
                         
                     </a>
                     <ul class="dropdown-menu">

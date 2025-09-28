@@ -2,12 +2,17 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\Common;
+use App\Models\Agency;
 use App\Models\Charge;
+use App\Models\ShippingAgency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 
@@ -27,8 +32,20 @@ class ChargeController extends MainController
      */
     public function index(Content $content): Content
     {
-        $finalSalary = Auth::user()->di;
+        $user = Auth::user();
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN, $user->id,
+            UserTypeEnum::SUPER_ADMIN, $user->id
+        ])
+            ->first();
 
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
+        $finalSalary = $user->di;
         return $content
             ->header(trans('Charges'))
             ->description(trans('Charges'))
@@ -36,7 +53,10 @@ class ChargeController extends MainController
             ->row(function ($row) use ($finalSalary) {
                 $row->column(12, view('admin.grid.superadmin.wallet', ['finalSalary' => $finalSalary]));
             })
-
+            ->row(function (Row $row) use ($totalCharges, $totalSpent ) {
+                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
+                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
+            })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
@@ -45,24 +65,17 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new Charge());
 
-        $grid->model()->where('charger_type', 'superadmin')
+        $grid->model()->where('charger_type', UserTypeEnum::SUPER_ADMIN)
             ->with('receiverUser', 'receiveragency')
             ->where('charger_id', Auth::user()->id)
             ->orderBy('id', 'desc');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->where(function ($query) {
-                $uuid = $this->input;
-                $query->where(function ($q) use ($uuid) {
-                    $q->whereHas('receiverUser', function ($subQuery) use ($uuid) {
-                        $subQuery->where('uuid', 'like', "%{$uuid}%");
-                    })->orWhereHas('receiveragency', function ($subQuery) use ($uuid) {
-                        $subQuery->where('id', 'like', "%{$uuid}%");
-                    });
-                });
-            }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
-                $filter->between('created_at', __('تاريخ الإنشاء'))->date();
+
+            $filter->equal('user_id', __('Agency'))->select(
+                ShippingAgency::where('country_id', Auth::user()->country_id)->pluck('name', 'id')->toArray()
+            );
         });
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
@@ -148,11 +161,11 @@ class ChargeController extends MainController
         });
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools) {
-            $url = 'salaries';
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
-            $tools->append($button);
-        });
+//        $grid->tools(function (Grid\Tools $tools) {
+//            $url = 'salaries';
+//            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
+//            $tools->append($button);
+//        });
         $grid->disableRowSelector();
         $grid->disableActions();
         return $grid;

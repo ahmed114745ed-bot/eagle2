@@ -273,10 +273,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
     ">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
-                    <h5 class="modal-title" id="modalDescriptionTitle"></h5>
-                    <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
-                </div>
-                <form id="chargeForm" class="transferForm" method="POST" action="{{ route('superadmin.wallet.charge') }}">
+          <h5 class="modal-title" id="modalDescriptionTitle"></h5>
+          <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
+      </div>
+    <form id="chargeForm" class="transferForm" method="POST" action="{{ route('superadmin.wallet.charge') }}">
     @csrf
 
     <div class="form-group">
@@ -351,6 +351,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         document.getElementById('searchResults').style.display = 'none';
     }
 
+    const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
+
     function searchTarget() {
         clearTimeout(searchTimeout);
 
@@ -363,15 +365,13 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             return;
         }
 
-        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/agencies';
+        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
 
         searchTimeout = setTimeout(() => {
-            fetch(`${url}?q=${encodeURIComponent(query)}`)
+            fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
                 .then(res => res.json())
                 .then(response => {
                     const data = response.data;
-
-                    console.log(data);
 
                     resultsDiv.innerHTML = '';
                     if (!data.length) {
@@ -380,7 +380,6 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     }
 
                     data.forEach(item => {
-
                         const div = document.createElement('div');
                         div.className = 'list-group-item list-group-item-action list-group-item2';
                         div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;

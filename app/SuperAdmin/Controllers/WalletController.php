@@ -2,6 +2,7 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\ShippingAgencyHelper;
 use App\Models\SuperAdmin;
 use App\Models\Charge;
@@ -382,7 +383,7 @@ class WalletController extends MainController
 
         $data = [
             'charger_id' => $fromUser->id,
-            'charger_type' => 'superadmin',
+            'charger_type' => UserTypeEnum::SUPER_ADMIN,
             'user_id' => $toAgency->id,
             'agency_id' => null,
             'user_type' => 'agency',
@@ -390,7 +391,7 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => 'superadmin'
+            'user_charger_type' => UserTypeEnum::SUPER_ADMIN
 
         ];
 

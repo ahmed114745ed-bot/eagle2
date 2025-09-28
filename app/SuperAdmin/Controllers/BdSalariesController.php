@@ -2,6 +2,7 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Models\Agency;
 use App\Models\BdAgencyHostSallary;
 use App\Models\Charge;
 use App\Models\BdSalary;
@@ -132,7 +133,7 @@ class BdSalariesController extends AdminController
             $filter->equal('year', __('Year'))->select($years);
 
             $filter->equal('agency_id', __('Agency'))->select(
-                \App\Models\Agency::where('bd_id',Auth::id())->pluck('name', 'id')->toArray()
+                Agency::where('bd_id',Auth::id())->pluck('name', 'id')->toArray()
             );
         });
 
