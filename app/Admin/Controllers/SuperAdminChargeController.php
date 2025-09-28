@@ -59,32 +59,36 @@ class SuperAdminChargeController extends MainController
 
         $grid->id(__('ID'));
 
+        $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $name;
+            }
 
+            $id = $this->id ?? '-';
+            $name = $this->username ?? 'غير معروف';
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-        $grid->column('name', trans('owner'))
-            ->display(function ($name) {
-                $id = @$this->id;
-                $path = @$this?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/superadmin-users/{$this->id}");
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = $this ? url("admin/users/{$this->id}") : 0;
-                return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>Id: $id</span>
-                        </div>
-                    </div>";
-            });
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
 
         $grid->column('di', __('coins'))->display(function ($coin) {
             $icon = asset('images/coin.jpg');
