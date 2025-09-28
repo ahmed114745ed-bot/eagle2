@@ -256,14 +256,8 @@ class AuthController extends BaseAuthController
     {
         $username = $request->input('username');
 
-        $superAdmin = SuperAdmin::where('username', $username)->first();
-        if (!$superAdmin ) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
-            ]);
-        }
-        $user =User::find($superAdmin->app_id);
+        $user = SuperAdmin::where('username', $username)->first();
+    
         if (! $user || ! $user->phone) {
             return response()->json([
                 'status'  => false,
