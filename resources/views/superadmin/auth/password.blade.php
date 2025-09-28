@@ -67,9 +67,9 @@
             </button>
         </form>
 
-        <div class="language-switch text-center">
+        <!-- <div class="language-switch text-center">
             <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
-        </div>
+        </div> -->
 
     </div>
 </div>
