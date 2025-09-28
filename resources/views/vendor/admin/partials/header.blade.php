@@ -21,11 +21,15 @@
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
             
-             @if (Admin::user()->type == 'superadmin')
-                    <img src="{{ getImagePath(Admin::user()->country?->flag) ?? '' }}" 
-                        class="flag-image" 
-                        alt="flag Image">
-                @endif
+             @php
+                $country = \App\Models\Country::find(Admin::user()->country_id);
+            @endphp
+
+            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
+                <img src="{{ getImagePath($country->flag) }}" 
+                    class="flag-image" 
+                    alt="flag Image">
+            @endif
             <ul class="nav navbar-nav">
 
                 {!! Admin::getNavbar()->render() !!}
