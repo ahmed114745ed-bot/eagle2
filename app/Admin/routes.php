@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\SuperAdminChargeReportController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -643,6 +644,9 @@ Route::group(
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
+        });
+        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
