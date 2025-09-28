@@ -30,7 +30,6 @@ class SuperAdminChargeReportController extends MainController
             ->row(function (Row $row) {
                 $row->column(12, function (Column $column) {
                     $box = new Box();
-                    $box->title(__('user'));
                     $box->content($this->combinedContent());
                     $column->append($box);
                 });
@@ -265,15 +264,6 @@ class SuperAdminChargeReportController extends MainController
         $superAdmin = SuperAdmin::find(request('id'));
 
         return view('admin.grid.common.report.superAdminCharges', compact('superAdmin'))->render();
-
-        $content = new Row();
-
-        $box = (new Box(
-            title: __('user'),
-        ))->collapsable();
-
-
-        return $box;
     }
 
     public function showChargeReports(Content $content, $agency_id)
