@@ -25,11 +25,13 @@
                 $country = \App\Models\Country::find(Admin::user()->country_id);
             @endphp
 
-            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
-                <img src="{{ getImagePath($country->flag) }}" 
+                @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
+                 <img src="{{ getImagePath($country->flag) }}" 
                     class="flag-image" 
-                    alt="flag Image">
-            @endif
+                    alt="flag Image"
+                    title="{{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}">
+                @endif
+           
             <ul class="nav navbar-nav">
 
                 {!! Admin::getNavbar()->render() !!}
