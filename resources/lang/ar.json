@@ -3821,7 +3821,9 @@
 "dashboard.login.whatsapp.sent": "تم إرسال الكود إلى واتساب",
 "dashboard.login.whatsapp.failed": "فشل إرسال الكود، حاول لاحقًا",
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
-"dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً"
+"dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
+"wait-2-minutes" : "انتظر دقيقتان من فضلك"
+
 
 
 
