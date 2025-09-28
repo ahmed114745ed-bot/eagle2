@@ -458,7 +458,7 @@
     "User_Report": "Kullanıcı Raporları",
     "Shipping agency": "Kargo Ajansı",
     "Host agency": "Ev Sahibi Ajansı",
-    "Professional Host Agencies": "Profesyonel Ev Sahibi Ajansları",
+    "Professional Host": "Profesyonel Ev Sahibi",
     "Family": "Aile",
     "pending": "Beklemede",
     "accepted": "Kabul edildi",
@@ -3390,7 +3390,7 @@
     "dashboard.login.whatsapp.failed": "Kod gönderilemedi, lütfen tekrar deneyin",
     "dashboard.login.error.unexpected": "Gönderim sırasında beklenmedik bir hata oluştu, lütfen tekrar deneyin",
     "dashboard.login.error.user_fetch": "Kullanıcı verileri alınırken bir hata oluştu, lütfen tekrar deneyin"
-  
+
 
 
 

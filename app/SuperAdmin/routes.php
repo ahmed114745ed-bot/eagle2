@@ -2,6 +2,7 @@
 
 use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\AgencyUserController;
+use App\SuperAdmin\Controllers\AppearChargerAgencyController;
 use App\SuperAdmin\Controllers\AuthController;
 use App\SuperAdmin\Controllers\BdController;
 use App\SuperAdmin\Controllers\BdSalariesController;
@@ -76,6 +77,8 @@ Route::group(
 
         //agencies
         Route::resource('/agencies', AgencyController::class);
+        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
