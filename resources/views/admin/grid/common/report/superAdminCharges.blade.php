@@ -13,7 +13,7 @@
             @php
                 $name = $superAdmin->username ?? '';
                 $id = $superAdmin->id ?? 0;
-                $path = $superAdmin->profile->avatar ?? null;
+                $path = $superAdmin->avatar ?? null;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
