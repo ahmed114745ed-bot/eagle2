@@ -120,6 +120,7 @@
                                 ],
                             ],
                             ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
                         ];
                     @endphp
 

@@ -1,19 +1,20 @@
 <?php
 
-use App\SuperAdmin\Controllers\AgencyController;
-use App\SuperAdmin\Controllers\AgencyUserController;
-use App\SuperAdmin\Controllers\AuthController;
-use App\SuperAdmin\Controllers\BdController;
-use App\SuperAdmin\Controllers\BdSalariesController;
-use App\SuperAdmin\Controllers\ChargeController;
-use App\SuperAdmin\Controllers\HomeController;
-use App\SuperAdmin\Controllers\MultiLanguageController;
-use App\SuperAdmin\Controllers\RequestAgencyController;
-use App\SuperAdmin\Controllers\RoomController;
-use App\SuperAdmin\Controllers\UserController;
-use App\SuperAdmin\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\SuperAdmin\Controllers\BdController;
+use App\SuperAdmin\Controllers\AuthController;
+use App\SuperAdmin\Controllers\HomeController;
+use App\SuperAdmin\Controllers\RoomController;
+use App\SuperAdmin\Controllers\UserController;
+use App\SuperAdmin\Controllers\AgencyController;
+use App\SuperAdmin\Controllers\ChargeController;
+use App\SuperAdmin\Controllers\WalletController;
+use App\SuperAdmin\Controllers\LiveRoomController;
+use App\SuperAdmin\Controllers\AgencyUserController;
+use App\SuperAdmin\Controllers\BdSalariesController;
+use App\SuperAdmin\Controllers\MultiLanguageController;
+use App\SuperAdmin\Controllers\RequestAgencyController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -95,6 +96,7 @@ Route::group(
             Route::resource('users', AgencyUserController::class);
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
+        Route::resource('live-rooms', LiveRoomController::class);
 
         //users
         Route::resource('users', 'UserController', [
