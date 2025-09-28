@@ -1,14 +1,11 @@
 <div class="box-body no-padding">
     <div class="nav-scroll-container">
-
     </div>
-
 
     <div class="box-body no-padding">
         <div class="nav-scroll-container">
         </div>
         <div class="col">
-            <h4 class="details-title">{{ __('Details') }}</h4>
 
             @php
                 $name = $superAdmin->username ?? '';
@@ -23,17 +20,18 @@
                 $showUrl = url('admin/users/' . $superAdmin->id);
                   $image = "<img src='{$url}' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
             @endphp
-            <a href="{{$showUrl}}"
-               style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-
-                <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
-                    {!! $image !!}
-                    <div>
-                        <strong>{{ $name }}</strong><br>
-                        <span style="color: #aaa; font-size: smaller;">UID: {{ $id }}</span>
+            <div class="col" style="display: flex; justify-content: center;">
+                <a href="{{$showUrl}}"
+                   style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;">
+                        {!! $image !!}
+                        <div>
+                            <strong>{{ $name }}</strong><br>
+                            <span style="color: #aaa; font-size: smaller;">UID: {{ $id }}</span>
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+            </div>
         </div>
     </div>
 

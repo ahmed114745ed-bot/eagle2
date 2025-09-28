@@ -724,6 +724,12 @@
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     color: var(--inverse-box-color) !important;
 }
+.flag-image {
+    height: 30px;  /* adjust size */
+    width: auto;
+    margin-top: 20px; 
+    border-radius: 4px; /* optional */
+}
 
 /* RTL override */
 html.rtl .dropdown-menu {
