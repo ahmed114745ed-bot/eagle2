@@ -1196,11 +1196,43 @@
     "Monthly": "Monthly",
     "Execution Time": "Execution Time",
     "Day (0=Sunday,1=Monday,...)": "Day (0=Sunday,1=Monday,...)",
-    "Interval (days)": "Interval (days)"
+    "Interval (days)": "Interval (days)",
 
     
   
   
+  "change password": "Change Password",
+  "please enter new password": "Please enter new password",
+  "please confirm new password": "Please confirm new password",
+  "Confirm Password": "Confirm Password",
+  "Passwords do not match": "Passwords do not match",
+  "change": "Change",
+  "admin.password": "Password",
+  "admin.username": "Username",
+  "admin.login": "Login",
+  "logging in": "Logging in...",
+  "dashboard.login.language.switch": "Switch Language",
+  "dashboard.login.language.lang": "English",
+  "dashboard.login.rights": "All rights reserved",
+  "dashboard.login.forgot_password": "Forgot password?",
+  "dashboard.login.enter_code": "Please enter the code sent to WhatsApp",
+  "dashboard.login.whatsapp_code": "WhatsApp code",
+  "dashboard.login.confirm_code": "Confirm code",
+  "dashboard.login.error": "Error",
+  "dashboard.login.ok": "OK",
+  "dashboard.login.confirm_send": "Confirm sending",
+  "dashboard.login.cancel": "Cancel",
+  "dashboard.login.success": "Success",
+  "dashboard.login.error.enter_username_first": "Please enter the username first",
+  "dashboard.login.loading.prepare": "Preparing...",
+  "dashboard.login.error.try_again": "An error occurred, please try again later",
+  "dashboard.login.whatsapp.send_to_number": "A code will be sent via WhatsApp to the number:",
+  "dashboard.login.loading.sending": "Sending...",
+  "dashboard.login.confirm": "Confirm",
+  "dashboard.login.whatsapp.sent": "The code has been sent to WhatsApp",
+  "dashboard.login.whatsapp.failed": "Failed to send the code, please try again later",
+  "dashboard.login.error.unexpected": "An unexpected error occurred during sending, please try again later",
+  "dashboard.login.error.user_fetch": "An error occurred while fetching user data, please try again later"
 
 
 

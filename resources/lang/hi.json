@@ -2987,7 +2987,31 @@
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
     "Bd Count": "BD की संख्या",
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
-    "whatsApp number": "व्हाट्सऐप नंबर"
+    "whatsApp number": "व्हाट्सऐप नंबर",
+    "dashboard.login.language.switch": "भाषा बदलें",
+    "dashboard.login.language.lang": "हिन्दी",
+    "dashboard.login.rights": "सर्वाधिकार सुरक्षित",
+    "dashboard.login.forgot_password": "क्या आप पासवर्ड भूल गए?",
+    "dashboard.login.enter_code": "कृपया WhatsApp पर भेजा गया कोड दर्ज करें",
+    "dashboard.login.whatsapp_code": "WhatsApp कोड",
+    "dashboard.login.confirm_code": "कोड की पुष्टि करें",
+    "dashboard.login.error": "त्रुटि",
+    "dashboard.login.ok": "ठीक है",
+    "dashboard.login.confirm_send": "भेजने की पुष्टि करें",
+    "dashboard.login.cancel": "रद्द करें",
+    "dashboard.login.confirm": "पुष्टि करें",
+    "dashboard.login.success": "सफलता",
+    "dashboard.login.error.enter_username_first": "कृपया पहले उपयोगकर्ता नाम दर्ज करें",
+    "dashboard.login.loading.prepare": "तैयार किया जा रहा है...",
+    "dashboard.login.error.try_again": "कोई त्रुटि हुई, कृपया बाद में पुनः प्रयास करें",
+    "dashboard.login.whatsapp.send_to_number": "व्हाट्सएप पर इस नंबर पर एक कोड भेजा जाएगा:",
+    "dashboard.login.loading.sending": "भेजा जा रहा है...",
+    "dashboard.login.confirm": "पुष्टि करें",
+    "dashboard.login.whatsapp.sent": "कोड व्हाट्सएप पर भेज दिया गया है",
+    "dashboard.login.whatsapp.failed": "कोड भेजने में विफल, कृपया बाद में पुनः प्रयास करें",
+    "dashboard.login.error.unexpected": "भेजते समय एक अप्रत्याशित त्रुटि हुई, कृपया बाद में पुनः प्रयास करें",
+    "dashboard.login.error.user_fetch": "उपयोगकर्ता डेटा प्राप्त करते समय त्रुटि हुई, कृपया बाद में पुनः प्रयास करें"
+  
 
 
 
