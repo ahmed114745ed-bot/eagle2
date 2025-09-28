@@ -19,6 +19,25 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
+
+Route::get('set-language', function ( Illuminate\Http\Request $request) {
+    $lang = $request->get('lang', 'ar');
+
+    $languages = MultiLanguage::config('languages');
+    $cookie_name = MultiLanguage::config('cookie-name', 'locale');
+
+    if (array_key_exists($lang, $languages)) {
+        session(['locale' => $lang]);
+
+        app()->setLocale($lang);
+        App::setLocale($lang);
+
+        return redirect()->to($request->get('redirect', url('/')))
+            ->cookie($cookie_name, $lang, 60 * 24 * 30); 
+    }
+
+    return redirect()->back()->with('error', 'اللغة غير مدعومة');
+})->name('set-language');
 Route::group(
     [
         'prefix' => 'superadmin',
@@ -38,6 +57,9 @@ Route::group(
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
       //  Route::get('change-password-view', [AuthController::class, 'changePasswordView'])->name('superadmin.change-password-view');
         Route::post('change-password', [AuthController::class, 'changePassword'])->name('superadmin.change-password');
+         
+        Route::post('send-whatsapp-code-preview', [AuthController::class, 'send_whatsapp_code_preview'])
+        ->name('superadmin.send-whatsapp-code-preview');
     }
 );
 
@@ -105,5 +127,6 @@ Route::group(
         Route::resource('rooms', RoomController::class);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
+  
     }
 );
