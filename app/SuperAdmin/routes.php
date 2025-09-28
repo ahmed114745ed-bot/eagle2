@@ -1,5 +1,8 @@
 <?php
 
+use App\SuperAdmin\Controllers\AgencyController;
+use App\SuperAdmin\Controllers\AgencyUserController;
+use App\SuperAdmin\Controllers\AppearChargerAgencyController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
@@ -7,11 +10,9 @@ use App\SuperAdmin\Controllers\AuthController;
 use App\SuperAdmin\Controllers\HomeController;
 use App\SuperAdmin\Controllers\RoomController;
 use App\SuperAdmin\Controllers\UserController;
-use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\ChargeController;
 use App\SuperAdmin\Controllers\WalletController;
 use App\SuperAdmin\Controllers\LiveRoomController;
-use App\SuperAdmin\Controllers\AgencyUserController;
 use App\SuperAdmin\Controllers\BdSalariesController;
 use App\SuperAdmin\Controllers\MultiLanguageController;
 use App\SuperAdmin\Controllers\RequestAgencyController;
@@ -90,6 +91,8 @@ Route::group(
 
         //agencies
         Route::resource('/agencies', AgencyController::class);
+        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {

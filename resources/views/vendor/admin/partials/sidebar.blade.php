@@ -114,9 +114,10 @@
                                 'icon' => 'fa-building',
                                 'title' => __('Agencies'),
                                 'children' => [
-                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Agencies')],
-                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Host Agencies')],
-                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host Agencies')],
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
                                 ],
                             ],
                             ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
