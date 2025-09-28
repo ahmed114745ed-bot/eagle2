@@ -724,6 +724,12 @@
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     color: var(--inverse-box-color) !important;
 }
+.flag-image {
+    height: 30px;  /* adjust size */
+    width: auto;
+    margin-top: 10px; 
+    border-radius: 4px; /* optional */
+}
 
 /* RTL override */
 html.rtl .dropdown-menu {
@@ -756,6 +762,11 @@ html.ltr .dropdown-menu {
         right: 0;
     }
 
+    
+    .rtl  .column-reward .rtlSvga {
+            direction: ltr !important;
+        }
+  
     select>option{
         background-color: var(--box-background-color) !important;
         color: var(--inverse-box-color) !important;

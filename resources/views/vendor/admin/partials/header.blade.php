@@ -20,6 +20,16 @@
 
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
+            
+             @php
+                $country = \App\Models\Country::find(Admin::user()->country_id);
+            @endphp
+
+            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
+                <img src="{{ getImagePath($country->flag) }}" 
+                    class="flag-image" 
+                    alt="flag Image">
+            @endif
             <ul class="nav navbar-nav">
 
                 {!! Admin::getNavbar()->render() !!}
@@ -32,6 +42,7 @@
                         <img src="{{ Admin::user()->image }}" class="user-image" alt="User Image">
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
                         <span class="hidden-xs">{{ Admin::user()->name }}</span>
+                        
                     </a>
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
@@ -48,22 +59,18 @@
                             @if (Admin::user()->type == 'bd')
                                 <a href="{{ bd_url('setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
                             @endif
-                            @if (Admin::user()->type == 'superadmin')
-                                <a href="{{ superadmin_url('setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
-                            @endif
-                            @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin')
+                            @if (Admin::user()->type != 'bd')
                                 <a href="{{ admin_url('auth/setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
+
                             @endif
                             </div>
                             <div class="pull-right">
-                                @if (Admin::user()->type == 'bd')
-                                    <a href="{{ bd_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
-                                @endif
-                                @if (Admin::user()->type == 'superadmin')
-                                    <a href="{{ superadmin_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
-                                @endif
-                                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin')
-                                    <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                            @if (Admin::user()->type == 'bd')
+                            <a href="{{ bd_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+
+                            @endif
+                                    @if (Admin::user()->type != 'bd')
+                                        <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
                                 @endif
                             </div>
                         </li>

@@ -3,6 +3,8 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Models\SuperAdmin;
+use App\Models\User;
 use Exception;
 use App\Models\Agent;
 use Encore\Admin\Form;
@@ -99,7 +101,15 @@ class AuthController extends BaseAuthController
             return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
         }
         $whatsappOtpService->resetCodes($phone);
-        return view("superadmin.auth.password", compact('userName'));
+        $test = request()->query('redirect_url');
+        $languages = MultiLanguage::config("languages");
+        $cookie_name = MultiLanguage::config('cookie-name', 'locale');
+
+        $current = MultiLanguage::config('default');
+        if (Cookie::has($cookie_name)) {
+            $current = Cookie::get($cookie_name);
+        }
+        return view("superadmin.auth.password", compact('userName','current'));
     }
 
     public function changePassword(Request $request)
@@ -241,4 +251,29 @@ class AuthController extends BaseAuthController
 
         return $form;
     }
+
+    public function send_whatsapp_code_preview(Request $request)
+    {
+        $username = $request->input('username');
+
+        $user = SuperAdmin::where('username', $username)->first();
+    
+        if (! $user || ! $user->phone) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
+            ]);
+        }
+
+        $masked = substr($user->phone, 0, -3) . '***';
+
+        return response()->json([
+            'status'        => true,
+            'masked_number' => $masked,
+            'message'       => 'تم جلب بيانات الرقم بنجاح',
+        ]);
+    }
+
+    
+ 
 }
