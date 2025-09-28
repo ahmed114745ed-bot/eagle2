@@ -141,6 +141,12 @@ class UserService
         return $this->userRepository->searchInAgency($key, $page, $perPage);
     }
 
+    public function superAdminAgencies($key, $page, $countryId)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminAgencies($key, $page, $perPage, $countryId);
+    }
+
     public function searchInHostAgency($key, $page)
     {
         $perPage = 10;

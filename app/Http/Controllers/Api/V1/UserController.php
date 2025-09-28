@@ -347,6 +347,17 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function superAdminAgencies(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $countryId = $request->get('country_id');
+
+        $users = $this->userService->superAdminAgencies($key, $page, $countryId);
+
+        return response()->json($users);
+    }
+
     public function hostAgencies(Request $request)
     {
         $key = $request->q;
