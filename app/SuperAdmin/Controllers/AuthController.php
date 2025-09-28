@@ -90,17 +90,17 @@ class AuthController extends BaseAuthController
     {
 
         $userName = $request->username;
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
-        if (!$auth) {
-            return back()->withErrors(['username' => __('User not found')]);
-        }
-        $whatsappOtpService = new WhatsappOtp();
-        $phone              = $auth->phone_code . $auth->phone;
-        $isValid            = $whatsappOtpService->isValidate($phone, $request->code);
-        if (!$isValid) {
-            return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
-        }
-        $whatsappOtpService->resetCodes($phone);
+        // $auth = \App\Models\Admin::where('username', $request->username)->first();
+        // if (!$auth) {
+        //     return back()->withErrors(['username' => __('User not found')]);
+        // }
+        // $whatsappOtpService = new WhatsappOtp();
+        // $phone              = $auth->phone_code . $auth->phone;
+        // $isValid            = $whatsappOtpService->isValidate($phone, $request->code);
+        // if (!$isValid) {
+        //     return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
+        // }
+        // $whatsappOtpService->resetCodes($phone);
         $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
@@ -110,6 +110,48 @@ class AuthController extends BaseAuthController
             $current = Cookie::get($cookie_name);
         }
         return view("superadmin.auth.password", compact('userName','current'));
+    }
+
+    public function verifyWhatsappCode(Request $request)
+    {
+        $username = $request->username;
+        $code     = $request->code;
+
+        $auth = \App\Models\Admin::where('username', $username)->first();
+        if (!$auth) {
+            return response()->json([
+                'success' => false,
+                'message' => __('User not found'),
+            ], 404);
+        }
+
+        $whatsappOtpService = new WhatsappOtp();
+        $phone = $auth->phone_code . $auth->phone;
+
+        if (!$whatsappOtpService->isValidate($phone, $code)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('api_responses.invalid_code'),
+            ], 422);
+        }
+
+        $whatsappOtpService->resetCodes($phone);
+
+        $languages   = MultiLanguage::config("languages");
+        $cookie_name = MultiLanguage::config('cookie-name', 'locale');
+        $current     = MultiLanguage::config('default');
+        if (Cookie::has($cookie_name)) {
+            $current = Cookie::get($cookie_name);
+        }
+
+        $redirect = superadmin_url('change-password-view') . '?username=' . urlencode($username);
+
+
+        return response()->json([
+            'success'  => true,
+            'message'  => __('تم التحقق بنجاح'),
+            'redirect' =>  $redirect
+        ]);
     }
 
     public function changePassword(Request $request)
@@ -264,8 +306,8 @@ class AuthController extends BaseAuthController
                 'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
             ]);
         }
-
-        $masked = substr($user->phone, 0, -3) . '***';
+             
+        $masked = substr($user->phone_code.$user->phone, 0, -5) . '***';
 
         return response()->json([
             'status'        => true,

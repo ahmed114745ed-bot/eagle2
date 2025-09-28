@@ -38,10 +38,14 @@ Route::group(
         Route::get('logout', [AuthController::class, 'logout']);
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
         Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
+        Route::get('verify-whatsapp-code', [AuthController::class, 'verifyWhatsappCode'])
+        ->name('verify-whatsapp-code');
+    
         Route::post('change-password', [AuthController::class, 'changePassword'])->name('superadmin.change-password');
 
         Route::post('send-whatsapp-code-preview', [AuthController::class, 'send_whatsapp_code_preview'])
         ->name('superadmin.send-whatsapp-code-preview');
+
     }
 );
 
