@@ -76,13 +76,14 @@
         <div class="language-switch text-center">
             <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
         </div>
-
-        <div class="forget-password text-center" style="margin-top:12px;">
-            <a id="forget-password" style="color: var(--green-color); font-weight:bold; text-decoration: underline;">
-            {{ __('dashboard.login.forgot_password') }}
-
-            </a>
-        </div>
+                <div class="forget-password text-center" style="margin-top: 10px;">
+                    <a href="" id="forget-password" 
+                    style="color: var(--green-color); font-weight: bold; text-decoration: underline;">
+                        {{ __('forget password') }}
+                    </a>
+                </div>
+                <br>
+     
 
         <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form" style="display:none; margin-top:15px;">
             @csrf
