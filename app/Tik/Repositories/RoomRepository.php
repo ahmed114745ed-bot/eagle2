@@ -451,7 +451,7 @@ class RoomRepository extends AbstractRepository
                 'id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status',
                 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak',
                 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended',
-                'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot',
+                'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot','room_background',
                 'type', 'mode', 'created_at'
             ])
             ->with([
