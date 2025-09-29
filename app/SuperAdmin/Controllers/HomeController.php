@@ -3,6 +3,7 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Admin\Widgets\Table;
+use App\Models\LiveTime;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use App\Models\Bd;
@@ -13,7 +14,6 @@ use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -27,6 +27,17 @@ class HomeController extends Controller
     {
         $countryID = Auth::user()->country_id;
         $usersCount = User::where('country_id', $countryID)->count();
+        $newSignUpsToday = User::whereDate('created_at', today())
+            ->where('country_id', $countryID)
+            ->count();
+
+        $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->where('country_id', $countryID)
+            ->count();
+        $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->where('country_id', $countryID)
+            ->count();
         $agencyCount = Agency::where('country_id', $countryID)->count();
         $bdCount = Bd::where('parent_id', auth()->id())->count();
         $onlineUser = User::where('country_id', $countryID)->where('online', 1)->count();
@@ -41,58 +52,125 @@ class HomeController extends Controller
             $q->where('country_id', $countryID);
         })->sum(DB::raw('sallary - cut_amount'));
 
-//        $totalMessages = ChatMessage::count();
-        $peakHours = ChatMessage::selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
+        $peakHours = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();
 
-        $totalRoomsJoined = DB::table('room_visitors')->count();
-        $activeRooms = Room::whereHas('roomVisitors', function ($q) {
-            $q->with(['users' => fn($q) => $q->where('online', 1)]);
-        })->count();
-        $avgUsersPerRoom = Room::withCount('roomVisitors')->get()->avg('room_visitors_count');
-        $topRooms = Room::withCount('messages')->orderByDesc('messages_count')->take(10)->get();
+        $totalRoomsJoined = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->withCount('roomVisitors')
+            ->get()
+            ->sum('room_visitors_count');
 
-        //        $salaryData = \App\Models\BdSalary::where('bd_id', $appID)
-        //            ->selectRaw('COALESCE(SUM(salary),0) AS total_sallary, COALESCE(SUM(cut_amount),0) AS total_cut')
-        //            ->first();
-        //        $finalSalary = truncateAndTrim($salaryData->total_sallary - $salaryData->total_cut, 2);
-        //
-        //        $finalWallet = '';
+        $activeRooms = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->whereHas('roomVisitors', function ($q) {
+                $q->whereHas('user', function ($query) {
+                    $query->where('online', 1);
+                });
+            })
+            ->count();
+
+        $avgUsersPerRoom = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->withCount('roomVisitors')
+            ->get()
+            ->avg('room_visitors_count');
+
+        $topRooms = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->withCount('messages')
+            ->orderByDesc('messages_count')
+            ->take(10)
+            ->get();
+
+        $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->whereDate('created_at', today())
+            ->count();
+
+        $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $totalUsers = User::where('country_id', $countryID)->count();
+        $usersWhoNeverSend = $totalUsers - $usersWhoSend;
+
+        $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->whereDate('created_at', today())
+            ->distinct('chat_room_id')
+            ->count('chat_room_id');
+
+        $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->where('country_id', $countryID);
+        })
+            ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+            ->groupBy('chat_room_id')
+            ->pluck('duration')
+            ->avg() ?? 0;
+
         return $content
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                 $row->column(12, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . ' 💰'));
 
-                $row->column(12, function ($column) use ($usersCount, $onlineUser, $user_salaries, $countryID, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined) {
+                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
-                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $user_salaries, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined) {
+                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'green', 'superadmin/users', $onlineUser));
-                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'yellow', 'superadmin/users', $user_salaries));
 
                         $peakHourData = $peakHours->sortByDesc('total')->first();
                         $peakHour = $peakHourData ? $peakHourData->hour . ':00' : 'N/A';
                         $peakHourCount = $peakHourData ? $peakHourData->total : 0;
                         $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $peakHour . ' (' . $peakHourCount . ')'));
-
+                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'green', 'superadmin/users', $newSignUpsToday));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'aqua', 'superadmin/users', $newSignUpsThisWeek));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'yellow', 'superadmin/users', $newSignUpsThisMonth));
+                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'aqua', '', $messagesToday));
+                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'green', '', $messagesThisMonth));
+                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'yellow', '', $usersWhoSend));
+                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'red', '', $usersWhoNeverSend));
+                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'purple', '', $openConversationsToday));
+                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'blue', '', round($avgConversationDuration, 2)));
                     });
 
                     $column->row(function (Row $row) use ($countryID) {
                         // Right: chart view (Top Salaries)
-                        $row->column(6, function ($column) use ($countryID) {
-                            $topUsersByMessages = ChatMessage::selectRaw('user_id, COUNT(*) as total_messages')
-                                ->groupBy('user_id')
-                                ->orderByDesc('total_messages')
+                        $row->column(6, function ($column) {
+                            $topUsersByLiveTime = LiveTime::query()
+                                ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
+                                ->groupBy('uid')
+                                ->havingRaw('SUM(hours) >= 1')
+                                ->orderByDesc('total_hours')
                                 ->take(10)
                                 ->get();
 
-                            $labels = User::whereIn('id', $topUsersByMessages->pluck('user_id'))->pluck('name');
-                            $data   = $topUsersByMessages->pluck('total_messages');
+                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->pluck('name');
+                            $data   = $topUsersByLiveTime->pluck('total_hours');
 
                             $view = view('admin.widgets.users_chart', [
                                 'labels' => $labels,
@@ -136,15 +214,15 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Top Room Messages'), 'commenting', 'red', 'superadmin/rooms/' . ($topRoom ? $topRoom->id : '#'), $topRoom ? $topRoom->messages_count : 0));
                     });
                 });
-                $row->column(12, function ($column) use ($agencyCount, $agency_salaries) {
+                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries) {
+                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries) {
                         $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'aqua', 'superadmin/agencies', $agencyCount));
                         $row->column(3, new InfoBox(__('total agency salary'), 'building', 'aqua', 'superadmin/agencies',  $agency_salaries));
+                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'yellow', 'superadmin/users', $user_salaries));
                     });
                 });
-
                 $row->column(12, function ($column) use ($bdCount) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
