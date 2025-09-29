@@ -324,7 +324,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('home_carousels')->group(function () {
-                Route::get('/', [HomeCarouselController::class, 'index']);
+                Route::get('/',[HomeCarouselController::class, 'index']);
             });
 
 

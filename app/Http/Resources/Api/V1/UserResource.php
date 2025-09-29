@@ -88,7 +88,7 @@ class UserResource extends JsonResource
 
              'profile_frame'        => $this->profile_frame,
              'profile_frame_id'     => $this->getProfileFrame()?->id ?? '',
-             'multi_images'         => $this->images?->pluck("img"),
+             'multi_images'         => MultiImageUserResource::collection($this->images),
              'user_types'           => $this->user_types,
              'shipping_agency'      => $this->formatShippingAgency(),
              'has_anti_ban'         => $this->getPackWithType(15),

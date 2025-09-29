@@ -270,6 +270,8 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
+    
+
     public function getVisitorsImages()
     {
         $visitors = $this->roomVisitorUsers;
@@ -296,7 +298,7 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-
+        // dd($this->background?->img);
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
