@@ -566,6 +566,8 @@ class UserRepository extends Repository
             ])
             ->withCount(['profileVisits as profile_visitors'])
             ->findOrFail($id);
+
+
         return $user;
     }
 

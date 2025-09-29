@@ -59,6 +59,8 @@
 "Delete badges": "حذف الشارات",
 "Edit badges": "تعديل الشارات",
 "Show badges": "عرض الشارات",
+"invitation code setting": "إعدادات كود الدعوة",
+"percentage invitation code": "نسبة كود الدعوة",
 
 
     "This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.": "تم إغلاق هذة الغرفة ولن تستطيع الدخول حتي يتم الغاء الحظر عن هذه الغرفة من خلال مشرفين الغرفة",    "action": "عمليات",
@@ -2066,7 +2068,6 @@
     "Primary Color": "اللون الأساسي",
     "Second Color": "اللون الثانوي",
     "Background Type": "نوع الخلفية",
-
     "Online Users Count": "عدد المستخدمين المتصلين",
     "Total Messages": "إجمالي الرسائل",
     "Total Rooms Joined By Visitors": "إجمالي الغرف التي انضم إليها الزوار",
@@ -2076,6 +2077,16 @@
     "Peak Hour": "ساعة الذروة",
     "Top Messages": "أعلى الرسائل",
     "Top Followers": "أعلى متابعين",
+
+    "New Sign Ups This Month": "التسجيلات الجديدة هذا الشهر",
+    "Messages Today": "الرسائل اليوم",
+    "Messages This Month": "عدد الرسائل هذا الشهر",
+    "Users Who Send Messages": "المستخدمين الذين يرسلون رسائل",
+    "Users Who Never Send": "المستخدمين الذين لا يرسلون رسائل",
+    "Open Conversations Today": "المحادثات المفتوحة اليوم",
+    "Avg Conversation Duration (min)": "متوسط مدة المحادثة (بالدقائق)",
+    "New Sign Ups Today": "التسجيلات الجديدة اليوم",
+    "New Sign Ups This Week": "التسجيلات الجديدة هذا الأسبوع",
 
     "Background Color": "لون الخلفية",
     "Background Image": "صورة الخلفية",
@@ -3931,6 +3942,37 @@
 
 
 
+  ,"Show Image": "عرض الصورة",
+  "Alternative Image": "صورة بديلة",
+  "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
+  "badges":"شارات",
+  "regular": "عادي",
+  "Milestone":"الانجازات",
+  "milestone":"الانجازات",
+  "Milestone-rewards" : " مكافآت الانجازات",
+  "milestone-rewards" : " مكافآت الانجازات",
+  "Milestone rewards" : " مكافآت الانجازات",
+  "Milestone Rewards" : " مكافآت الانجازات",
+  "milestone rewards" : " مكافآت الانجازات",
+  "User-history-rewards" : "سجل استلام الهدايا",
+  "user-history-rewards" : "سجل استلام الهدايا",
+  "User history rewards" : "سجل استلام الهدايا",
+  "UserHistoryReward" : "سجل استلام الهدايا",
+  "Role-rewards" : "هدايا القواعد",
+  "role-rewards" : "هدايا القواعد",
+  "Role rewards" : "هدايا القواعد",
+  "role rewards" : "هدايا القواعد",
+  "Milestones":"الانجازات ",
+  "milestones":"الانجازات ",
+ "invite code": "رمز الدعوة",
+ "url": "الرابط",
+ "Display Discover": "عرض الاستكشاف",
+ "Display Home Top": "عرض أعلى الصفحة الرئيسية",
+ "Display Home Middle": "عرض منتصف الصفحة الرئيسية",
+ "Display Live": "عرض البث المباشر",
+ "Display Country": "عرض الدول",
+ "ON": "مفعل",
+ "OFF": "معطل"
 
 
 

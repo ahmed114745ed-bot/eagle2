@@ -481,6 +481,15 @@
     "Peak Hour": "पीक घंटे",
     "Top Messages": "सर्वाधिक संदेश",
     "Top Followers": "सर्वाधिक अनुयायी वाले उपयोगकर्ता",
+    "New Sign Ups This Month": "इस महीने के नए साइन अप",
+    "Messages Today": "आज के संदेश",
+    "Messages This Month": "इस महीने के संदेश",
+    "Users Who Send Messages": "संदेश भेजने वाले उपयोगकर्ता",
+    "Users Who Never Send": "जो उपयोगकर्ता कभी संदेश नहीं भेजते",
+    "Open Conversations Today": "आज खुली हुई बातचीत",
+    "Avg Conversation Duration (min)": "औसत बातचीत की अवधि (मिनटों में)",
+    "New Sign Ups Today": "आज के नए साइन अप",
+    "New Sign Ups This Week": "इस हफ़्ते के नए साइन अप",
     "denied": "इनकार",
     "problem": "समस्या",
     "ID_tiket": "टिकट आईडी",
@@ -3021,6 +3030,16 @@
     "dashboard.login.error.unexpected": "भेजते समय एक अप्रत्याशित त्रुटि हुई, कृपया बाद में पुनः प्रयास करें",
     "dashboard.login.error.user_fetch": "उपयोगकर्ता डेटा प्राप्त करते समय त्रुटि हुई, कृपया बाद में पुनः प्रयास करें"
 
+    ,"invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "invite code": "आमंत्रण कोड",
+    "url": "लिंक",
+    "Display Discover": "डिस्कवर दिखाएँ",
+    "Display Home Top": "होम टॉप दिखाएँ",
+    "Display Home Middle": "होम मिडल दिखाएँ",
+    "Display Live": "लाइव दिखाएँ",
+    "Display Country": "देश दिखाएँ",
+    "ON": "चालू",
+    "OFF": "बंद"
 
 
 

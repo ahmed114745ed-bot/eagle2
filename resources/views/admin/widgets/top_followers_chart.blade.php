@@ -10,7 +10,7 @@
     (function () {
         var ctx = document.getElementById('topSalariesChart').getContext('2d');
         new Chart(ctx, {
-            type: 'doughnut', // or bar, or horizontalBar
+            type: 'doughnut',
             data: {
                 labels: @json($labels),
                 datasets: [{

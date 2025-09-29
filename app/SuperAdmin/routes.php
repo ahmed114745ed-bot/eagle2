@@ -3,6 +3,7 @@
 use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\AgencyUserController;
 use App\SuperAdmin\Controllers\AppearChargerAgencyController;
+use App\SuperAdmin\Controllers\HomeCarouselController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
@@ -115,6 +116,7 @@ Route::group(
         ]);
 
         Route::resource('rooms', RoomController::class);
+        Route::resource('home-carousel', HomeCarouselController::class);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
 

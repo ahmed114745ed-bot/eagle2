@@ -447,21 +447,12 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
-
             [
-                'name' => 'reward',
-                'sort' => 37,
+                'name' => 'Super Admin',
+                'sort' => 36,
                 'permissions' => [
-                    ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
-
-                ],
-            ],
-            [
-                'name' => 'Milestone',
-                'sort' => 38,
-                'permissions' => [
-                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
-
+                    ['key' => 'superadmin', 'except' => [], 'additional' => []],
+                    ['key' => 'superadmin-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
         ];

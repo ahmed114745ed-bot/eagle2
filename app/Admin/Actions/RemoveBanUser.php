@@ -30,29 +30,10 @@ class RemoveBanUser extends Action
         if (!Admin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);
         }
-
-        $banType = $request->ban_type;
-
-        if ($banType === 'uuid') {
-            $user = User::query()->searchByUuid('uuid', $request->uid)->first();
-            if (!$user) {
-                return $this->response()->error(__('User not found'))->refresh();
-            }
-
-            Ban::query()->where('uid', $user->original_uuid)->delete();
-            CustomNotification::removeBanUser($user);
-
-        } elseif ($banType === 'ip') {
-            if (!$request->ip_address) {
-                return $this->response()->error(__('IP Address is required'))->refresh();
-            }
-            Ban::query()->where('ip', $request->ip_address)->delete();
-
-        } elseif ($banType === 'device') {
-            if (!$request->device_token) {
-                return $this->response()->error(__('Device Token is required'))->refresh();
-            }
-            Ban::query()->where('device_number', $request->device_token)->delete();
+     
+        $user = User::query()->searchByUuid( $request->uid)->first();
+        if (!$user) {
+            return $this->response()->error(__('user not found'))->refresh();
         }
 
         return $this->response()->success(__('Ban(s) successfully removed'))->refresh();

@@ -105,7 +105,7 @@ class User extends Authenticatable
         //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        //        'original_uuid',
+        'original_uuid',
         //        'is_frozen',
         //        'total_charge_level',
         //        'photo',
@@ -1701,7 +1701,7 @@ class User extends Authenticatable
             $url = getImagePath($badge->badge->image);
 
             if ($url) {
-                $html .= handleShowImageWithTypes($this->id, $url, 100, 100, 4,'contain');
+                $html .= handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
                 //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }

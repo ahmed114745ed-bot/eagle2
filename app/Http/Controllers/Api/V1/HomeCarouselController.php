@@ -20,12 +20,12 @@ class HomeCarouselController extends Controller
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
-        $items = HomeCarousel::query()->with('user','room','generalRole')
-            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
-            ->where('enable', 1)
+        $items = HomeCarousel::query()->with('user','room','generalRole','countriesLite')
+            // ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
+            // ->where('enable', 1)
             ->orderBy('sort')
-            ->when($request->type, fn($q) => $q->where('type', $request->type))
-            ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
+            // ->when($request->type, fn($q) => $q->where('type', $request->type))
+            // ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
             ->get();
 
         return Common::apiResponse(1, '', HomeCarouselResource::collection($items));

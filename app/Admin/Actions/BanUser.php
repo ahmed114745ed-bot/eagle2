@@ -31,6 +31,7 @@ class BanUser extends Action
         $user = User::query()->searchByUuid($request->uuid)->first();
         if (!$user) return $this->response()->error('user not found')->refresh();
         $userUuid  = $user->original_uuid;
+        $userId  = $user->id;
         $now = now();
         $messages = [];
         $newBan = false;
@@ -42,7 +43,7 @@ class BanUser extends Action
         // $ban = Ban::query()->where('uid', $userUuid)->where('ty')->first();
         if (in_array('ip', $request->type)) {
 
-            $haveBan = Ban::query()->where('uid', $userUuid)->where('type', 'ip')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
+            $haveBan = Ban::query()->where('uid', $userUuid)->where('user_id', $userId)->where('type', 'ip')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
             if ($haveBan) {
                 $messages[] = __('already have ip ban');
@@ -53,7 +54,8 @@ class BanUser extends Action
                     // if(!$ban && $ip != $ban->ip){
                     Ban::query()->create(
                         [
-//                            'uid' => $userUuid,
+                            'uid' => $userUuid,
+                            'user_id' => $userId,
                             'duration' => $request->duration,
                             'ip' => $ip->ip,
                             'type' => 'ip',
@@ -70,7 +72,7 @@ class BanUser extends Action
         }
 
         if (in_array('device', $request->type)) {
-            $haveBan = Ban::query()->where('uid', $userUuid)->where('type', 'device')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
+            $haveBan = Ban::query()->where('uid', $userUuid)->where('user_id', $userId)->where('type', 'device')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
             if ($haveBan) {
                 $messages[] = __('already have device ban');
@@ -79,7 +81,8 @@ class BanUser extends Action
 
                 Ban::query()->create(
                     [
-//                        'uid' => $userUuid,
+                        'uid' => $userUuid,
+                        'user_id' => $userId,
                         'duration' => $request->duration,
                         'device_number' => $user->device_token,
                         'type' => 'device',
@@ -94,7 +97,7 @@ class BanUser extends Action
         }
 
         if (in_array('normal', $request->type)) {
-            $haveBan = Ban::query()->where('uid', $userUuid)->where('type', 'normal')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
+            $haveBan = Ban::query()->where('uid', $userUuid)->where('user_id', $userId)->where('type', 'normal')->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
             if ($haveBan) {
                 $messages[] = __('already have normal ban');
@@ -104,6 +107,7 @@ class BanUser extends Action
                 Ban::query()->create(
                     [
                         'uid' => $userUuid,
+                        'user_id' => $userId,
                         'duration' => $request->duration,
                         'type' => 'normal',
                         'user_type' => 0,
@@ -117,11 +121,12 @@ class BanUser extends Action
         }
 
         if ($request->ban_type_id) {
-            $haveBan = Ban::query()->where('uid', $userUuid)->where('ban_type_id', $request->ban_type_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")->exists();
+            $haveBan = Ban::query()->where('uid', $userUuid)->where('user_id', $userId)->where('ban_type_id', $request->ban_type_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")->exists();
             if ($haveBan)  $messages[] = __('already have ban');
             $ban = Ban::query()->create(
                 [
                     'uid' => $userUuid,
+                    'user_id' => $userId,
                     'duration' => $request->duration,
                     'type' => 'action',
                     'user_type' => 0,
