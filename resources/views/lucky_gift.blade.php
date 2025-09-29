@@ -153,12 +153,12 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
+                <button onclick="showSection('VipSetting')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
             </div>
         </div>
 
         <div class="settings-content">
-            <div id="VipSettings" class="settings-section active">
+            <div id="VipSetting" class="settings-section active">
                 <h3>{{ __('Luck gift Settings') }}</h3>
 
                 <form action="{{ route('admin.lucky.gift.settings.update') }}" method="POST" enctype="multipart/form-data">
