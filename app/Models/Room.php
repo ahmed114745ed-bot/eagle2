@@ -254,21 +254,6 @@ class Room extends Model
         return $this->hasMany(BoxUse::class, 'room_id');
     }
 
-    // public function backgroundImage()
-    // {
-    //     return $this->hasOneThrough(
-    //         RequestBackgroundImage::class,
-    //         User::class,
-    //         'id',
-    //         'owner_room_id',
-    //         'uid',
-    //         'id'
-    //     )->where('request_background_images.status', 1)->where(function ($q) {
-    //         $q->where('expair', '>=', now()->timestamp)
-    //             ->orWhere('expair', 0);
-    //     })->orderByDesc('id');
-    // }
-
     public function backgroundImage()
     {
         return $this->hasOneThrough(
@@ -278,15 +263,13 @@ class Room extends Model
             'owner_room_id',
             'uid',
             'id'
-        )
-            ->where('request_background_images.status', 1)
-            ->where(function ($q) {
-                $q->where('expair', '>=', now()->timestamp)
-                    ->orWhere('expair', 0);
-            })
-            ->latestOfMany(); // 👈 ensures only the latest one
+        )->where('request_background_images.status', 1)->where(function ($q) {
+            $q->where('expair', '>=', now()->timestamp)
+                ->orWhere('expair', 0);
+        })->orderByDesc('id');
     }
 
+    
 
     public function getVisitorsImages()
     {
