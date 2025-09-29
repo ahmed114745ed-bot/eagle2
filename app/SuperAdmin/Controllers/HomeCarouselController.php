@@ -84,7 +84,6 @@ class HomeCarouselController extends MainController
         $grid->column('img', trans('img'))->image('', 235, 77);
         $grid->column('url', trans('url'));
     
-        $grid->column('countries', __('Country'))->pluck('name')->label();
     
         // $this->extendGrid($grid);
         $grid->disableExport();
@@ -169,6 +168,7 @@ class HomeCarouselController extends MainController
          $form->saving(function (Form $form) {
              $form->model()->display_at = json_encode(['country']);
              $form->model()->display_country = 1;
+             $form->display_country = 1;
          });
      
          $form->saved(function (Form $form) {

@@ -21,11 +21,16 @@ class HomeCarouselController extends Controller
         }
 
         $items = HomeCarousel::query()->with('user','room','generalRole','countriesLite')
-            // ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
-            // ->where('enable', 1)
+                ->when($displayAt, function ($q) use ($displayAt) {
+                    $q->where(function ($sub) use ($displayAt) {
+                        $sub->where('display_at', $displayAt) // دعم القديم
+                            ->orWhereJsonContains('display_at', $displayAt); // دعم الجديد
+                    });
+                })
+            ->where('enable', 1)
             ->orderBy('sort')
-            // ->when($request->type, fn($q) => $q->where('type', $request->type))
-            // ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
+            ->when($request->type, fn($q) => $q->where('type', $request->type))
+            ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
             ->get();
 
         return Common::apiResponse(1, '', HomeCarouselResource::collection($items));
