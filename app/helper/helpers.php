@@ -842,10 +842,22 @@ if (!function_exists('bd_url')) {
                 }
             }
             if ($value === null) {
-                return 0.0;
+                $value = match ($key) {
+                    'app_wallet_lucky_gift' => 80,  
+                    'owner_lucky_gift'      => 10,  
+                    'host_lucky_gift'       => 10, 
+                    default                  => 0,
+                };
             }
-    
-            return round(((float) $value) / 10, 2);
+            \Log::info("Gift percentage for {$key}: {$value}");
+
+            $percentage = round(((float) $value) / 10, 2);
+            
+            \Log::info("Gift percentage for {$key}: {$percentage}");
+
+            return $percentage;
+
+
         }
     }
 }
