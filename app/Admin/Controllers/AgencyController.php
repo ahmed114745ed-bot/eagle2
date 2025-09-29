@@ -15,11 +15,9 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
-use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
-use Encore\Admin\Widgets\Tab;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
@@ -27,19 +25,14 @@ use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Services\AppFeatureService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Scopes\HostAgencyScope;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Http\Request as req;
-
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -372,10 +365,220 @@ class AgencyController extends MainController
      *
      * @return Grid
      */
+    // protected function grid()
+    // {
+    //     $grid = new Grid(new Agency);
+
+    //     $grid->model()
+    //         ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
+    //         ->with([
+    //             'owner' => fn($query) => $query->select('id', 'name', 'uuid'),
+    //             'owner.profile:id,user_id,avatar',
+    //             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+    //         ])->available()->orderByDesc('id');
+
+    //     if (request()->has('active')) {
+    //         $grid->model()
+    //             ->whereHas('agencySalaries', function ($q) {
+    //                 $q
+    //                     ->where('month', now()->month)
+    //                     ->where('year', now()->year);
+    //             });
+    //     }
+
+    //     $grid->column('name', __('Agency'))->display(function ($name) {
+    //         $cacheKey = "agency_image_{$this->id}";
+    //         $image = Cache::remember($cacheKey, 3600, function () {
+    //             $path = @$this->img;
+    //             $defaultImage = asset("images/icon-agency.jpg");
+    //             $url = getImagePath($path) ?? $defaultImage;
+
+    //             if (!isImageExists($url)) {
+    //                 $url = $defaultImage;
+    //             }
+
+    //             return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
+    //         });
+
+    //         $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+
+    //         return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+    //                     <div style='display: flex; align-items: center; gap: 10px;'>
+    //                         {$image}
+    //                         <div style='display: flex; flex-direction: column;'>
+    //                             <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+    //                             <span style='font-size: smaller;'>ID: {$this->id}</span>
+    //                         </div>
+    //                     </div>
+    //                 </a>";
+    //     });
+
+    //     $grid->column('owner.name', trans('owner'))->display(function ($name) {
+    //         $uid = @$this->owner->uuid;
+    //         $path = @$this->owner->profile?->avatar;
+    //         $defaultImage = asset('images/businessman-icon.jpg');
+    //         $url = getImagePath($path) ?? $defaultImage;
+
+    //         // Check if the image exists
+    //         if (!isImageExists($url)) {
+    //             $url = $defaultImage;
+    //         }
+
+    //         $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+    //         $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+    //         return "
+    //             <div style='display: flex; align-items: center; gap: 10px;'>
+    //                 $image
+    //                 <div>
+    //                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+    //                      <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+    //                     </a>
+    //                     <span style='font-size: smaller;'>UUID: $uid</span>
+    //                 </div>
+    //             </div>
+    //         ";
+    //     });
+
+    //     $grid->column('phone', trans('phone'))->display(function ($number) {
+    //         if (!$number) return '-';
+
+    //         $iconUrl = asset('images/phone.jpg');
+    //         $phoneCode = $this->phone_code;
+    //         $locale = app()->getLocale();
+
+    //         // RTL لو عربي، LTR لو إنجليزي
+    //         $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
+    //         $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
+
+    //         return "
+    //             <div style='display: ; align-items: center; flex-direction: {$direction};'>
+    //                 <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
+    //                 <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
+    //             </div>
+    //         ";
+    //     });
+    //     $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+    //         $coin = truncateAndTrim($this->salary ?? 0);
+    //         $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+    //         return "<div style='display: flex; align-items: center; gap: 5px;'>
+    //                 <span>" . $coin . "</span>
+    //                 <img src='{$icon}' alt='Coin' width='20' height='20'>
+    //             </div>";
+    //     });
+
+
+    //     $grid->column('is_frozen', __("frozen"))
+    //         ->display(function () {
+    //             return $this->is_frozen ? 1 : 0;
+    //         })->switch(Common::getSwitchStates());
+    //     $permission = $this->permission_name;
+
+    //     $grid->actions(function ($actions) use ($permission) {
+    //         $model = $actions->row;
+    //         $actions->disableDelete();
+    //         if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+    //             $actions->add(new DeleteAgencyAction());
+    //         }
+
+    //         if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
+    //             $actions->add(new ChangeUsersAgencyAction($model->id));
+    //         }
+    //     });
+    //     $grid->disableExport();
+    //     $grid->disableRowSelector();
+    //     $this->extendGrid($grid);
+
+    //     $grid->filter(function (Grid\Filter $filter) {
+    //         $filter->expand();
+
+    //         $filter->disableIdFilter();
+    //         $filter->equal('id', __('ID'));
+
+    //         $filter->where(function ($query) {
+    //             $query->whereHas('owner', function ($subQuery) {
+    //                 $subQuery->where('uuid', 'like', "%{$this->input}%");
+    //             });
+    //         }, __('UUID'))->placeholder(__('search for host by UUID'));
+    //     });
+
+    //     Admin::style("
+    //         .box-footer {
+    //             flex-direction: row-reverse;
+    //             flex-wrap: wrap;
+    //             align-items: center;
+    //             justify-content: space-between;
+    //             padding: 10px;
+    //         }
+
+    //         .pagination-info {
+    //             margin: 5px 0;
+    //             white-space: nowrap;
+    //             text-align: right;
+    //             width: auto;
+    //             order: 2;
+    //         }
+
+    //         .box-footer .pull-right {
+    //             display: flex;
+    //             align-items: center;
+    //             flex-wrap: wrap;
+    //             gap: 5px;
+    //             margin: 5px 0;
+    //             order: 1;
+    //         }
+
+    //         .box-footer .pull-right .dropdown {
+    //             margin-left: 5px;
+    //         }
+
+    //         .pagination > li > a,
+    //         .pagination > li > span {
+    //             min-width: 35px;
+    //             height: 35px;
+    //             display: flex;
+    //             align-items: center;
+    //             justify-content: center;
+    //             padding: 5px;
+    //         }
+
+    //         .pagination {
+    //             margin: 0;
+    //             padding: 0;
+    //             display: flex;
+    //         }
+
+    //         @media (max-width: 576px) {
+    //             .box-footer {
+    //                 flex-direction: column;
+    //                 align-items: center;
+    //             }
+
+    //             .pagination-info,
+    //             .box-footer .pull-right {
+    //                 width: 100%;
+    //                 display: flex;
+    //                 justify-content: center;
+    //                 text-align: center;
+    //             }
+
+    //             .pagination-info {
+    //                 order: 1;
+    //                 margin-bottom: 10px;
+    //             }
+
+    //             .box-footer .pull-right {
+    //                 order: 2;
+    //             }
+    //         }
+    //     ");
+
+    //     return $grid;
+    // }
+
+
     protected function grid()
     {
         $grid = new Grid(new Agency);
-
         $grid->model()
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
             ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
@@ -385,20 +588,19 @@ class AgencyController extends MainController
                     ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
             ->orderByDesc('id');
-
         if (request()->has('active')) {
-            $grid->model()
-                ->whereHas('agencySalaries', function ($q) {
-                    $q
-                        ->where('month', now()->month)
-                        ->where('year', now()->year);
-                });
+            $grid->model()->whereHas('agencySalaries', function ($q) {
+                $q->where('month', now()->month)
+                    ->where('year', now()->year);
+            });
         }
 
+        // --- Agency name column ---
         $grid->column('name', __('Agency'))->display(function ($name) {
             $cacheKey = "agency_image_{$this->id}";
+
             $image = Cache::remember($cacheKey, 3600, function () {
-                $path = @$this->img;
+                $path = $this->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
@@ -412,42 +614,44 @@ class AgencyController extends MainController
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                                <span style='font-size: smaller;'>ID: {$this->id}</span>
-                            </div>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        {$image}
+                        <div style='display: flex; flex-direction: column;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            <span style='font-size: smaller;'>ID: {$this->id}</span>
                         </div>
-                    </a>";
+                    </div>
+                </a>";
         });
 
+        // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner->profile?->avatar;
+            $uid = $this->owner?->uuid;
+            $path = $this->owner?->profile?->avatar;
             $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
+
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                   <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                    <span style='font-size: smaller;'>UUID: $uid</span>
                 </div>
-            ";
+            </div>
+        ";
         });
 
+        // --- Phone column ---
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
 
@@ -455,37 +659,38 @@ class AgencyController extends MainController
             $phoneCode = $this->phone_code;
             $locale = app()->getLocale();
 
-            // RTL لو عربي، LTR لو إنجليزي
             $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
             $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
 
             return "
-                <div style='display: ; align-items: center; flex-direction: {$direction};'>
-                    <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
-                    <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
-                </div>
-            ";
+            <div style='display: flex; align-items: center; flex-direction: {$direction};'>
+                <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
+                <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
+            </div>
+        ";
         });
-        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
-            $coin = truncateAndTrim($this->salary ?? 0);
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+
+        // --- Salary column (using withSum preload) ---
+        $grid->column('salary', __('Agency wallet'))->display(function () {
+            $coin = truncateAndTrim($this->current_salary ?? 0);
+            $icon = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . $coin . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-                </div>";
+                <span>{$coin}</span>
+                <img src='{$icon}' alt='Coin' width='20' height='20'>
+            </div>";
         });
 
-
+        // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
-            ->display(function () {
-                return $this->is_frozen ? 1 : 0;
-            })
+            ->display(fn() => $this->is_frozen ? 1 : 0)
             ->switch(Common::getSwitchStates());
-        $permission = $this->permission_name;
 
+        // --- Actions ---
+        $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
             $actions->disableDelete();
+
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new DeleteAgencyAction());
             }
@@ -494,13 +699,15 @@ class AgencyController extends MainController
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }
         });
+
+        // --- Misc ---
         $grid->disableExport();
         $grid->disableRowSelector();
         $this->extendGrid($grid);
 
+        // --- Filters ---
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
             $filter->disableIdFilter();
             $filter->equal('id', __('ID'));
 
@@ -511,79 +718,72 @@ class AgencyController extends MainController
             }, __('UUID'))->placeholder(__('search for host by UUID'));
         });
 
+        // --- Styles ---
         Admin::style("
+        .box-footer {
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .pagination-info {
+            margin: 5px 0;
+            white-space: nowrap;
+            text-align: right;
+            width: auto;
+            order: 2;
+        }
+        .box-footer .pull-right {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 5px 0;
+            order: 1;
+        }
+        .box-footer .pull-right .dropdown {
+            margin-left: 5px;
+        }
+        .pagination > li > a,
+        .pagination > li > span {
+            min-width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        .pagination {
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        @media (max-width: 576px) {
             .box-footer {
-                flex-direction: row-reverse;
-                flex-wrap: wrap;
+                flex-direction: column;
                 align-items: center;
-                justify-content: space-between;
-                padding: 10px;
             }
-
+            .pagination-info,
+            .box-footer .pull-right {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                text-align: center;
+            }
             .pagination-info {
-                margin: 5px 0;
-                white-space: nowrap;
-                text-align: right;
-                width: auto;
+                order: 1;
+                margin-bottom: 10px;
+            }
+            .box-footer .pull-right {
                 order: 2;
             }
-
-            .box-footer .pull-right {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 5px;
-                margin: 5px 0;
-                order: 1;
-            }
-
-            .box-footer .pull-right .dropdown {
-                margin-left: 5px;
-            }
-
-            .pagination > li > a,
-            .pagination > li > span {
-                min-width: 35px;
-                height: 35px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 5px;
-            }
-
-            .pagination {
-                margin: 0;
-                padding: 0;
-                display: flex;
-            }
-
-            @media (max-width: 576px) {
-                .box-footer {
-                    flex-direction: column;
-                    align-items: center;
-                }
-
-                .pagination-info,
-                .box-footer .pull-right {
-                    width: 100%;
-                    display: flex;
-                    justify-content: center;
-                    text-align: center;
-                }
-
-                .pagination-info {
-                    order: 1;
-                    margin-bottom: 10px;
-                }
-
-                .box-footer .pull-right {
-                    order: 2;
-                }
-            }
-        ");
+        }
+    ");
 
         return $grid;
     }
+
 
     protected function balance_details($id)
     {
@@ -791,6 +991,7 @@ class AgencyController extends MainController
     protected function addSavedLogic(Form $form)
     {
         $form->saved(function (Form $form) {
+
             $appOwnerId = intval($form->model()->app_owner_id);
 
             User::where('id', $appOwnerId)->update([
@@ -798,6 +999,10 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
+
+            $user = User::find($appOwnerId);
+
+            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

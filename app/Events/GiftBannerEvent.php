@@ -7,12 +7,14 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GiftBannerEvent implements ShouldBroadcast
+class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+//    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use InteractsWithSockets;
 
     public $gift;
 
@@ -23,6 +25,7 @@ class GiftBannerEvent implements ShouldBroadcast
      */
     public function __construct($gift)
     {
+        info('in gift logs');
         $this->gift = $gift;
     }
 

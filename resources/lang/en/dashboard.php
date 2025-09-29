@@ -229,6 +229,7 @@ return [
     'roomClose' => " Close Room",
     'removeBlackList' => 'Remove user from blacklist',
     'userNotFound' => 'User not found',
+    'haveBadges' => ' user have this badge',
     'taken' => 'Special ID is taken',
     'chickTaken' => 'The item is owned by the user and cannot be expired',
     'addAchivement' => 'You cannot add aristocracy for more than 30 days',

@@ -49,14 +49,23 @@ class AdminPermissionRefact extends Seeder
                     ],
                     [
                         'key' => 'coin-game-users-report',
-                        'except' => ['show', 'edit','create', 'delete'],
+                        'except' => ['show', 'edit', 'create', 'delete'],
                         'additional' => ['details-switch'],
                     ],
                 ],
             ],
             [
-                'name' => 'Fast orders',
+                'name' => 'badge',
                 'sort' => 3,
+                'permissions' => [
+                    ['key' => 'badges', 'except' => [], 'additional' => []],
+                    ['key' => 'dedicate-badges', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
+
+                ],
+            ],
+            [
+                'name' => 'Fast orders',
+                'sort' => 4,
                 'permissions' => [
                     [
                         'key' => 'request-backgrounds-image',
@@ -100,8 +109,9 @@ class AdminPermissionRefact extends Seeder
                     ],
                 ],
             ],
-            ['name' => 'Wallet',
-                'sort' => 4,
+            [
+                'name' => 'Wallet',
+                'sort' => 5,
                 'permissions' =>  [
                     [
                         'key' => 'app-wallet',
@@ -117,7 +127,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'charge system',
-                'sort' => 5,
+                'sort' => 6,
                 'permissions' => [
                     [
                         'key' => 'charger-reports',
@@ -148,7 +158,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'users',
-                'sort' => 6,
+                'sort' => 7,
                 'permissions' => [
                     ['key' => 'deleted-accounts', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['delete-user-account-switch', 'restore-user-account-switch']],
                     ['key' => 'users', 'except' => [], 'additional' => ['level-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch', 'salary-switch', 'delete-profile-switch']],
@@ -160,7 +170,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Advertisements',
-                'sort' => 7,
+                'sort' => 8,
                 'permissions' => [
                     ['key' => 'banner', 'except' => [], 'additional' => []],
                     ['key' => 'splash', 'except' => [], 'additional' => []],
@@ -170,14 +180,14 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Store',
-                'sort' => 8,
+                'sort' => 9,
                 'permissions' => [
                     ['key' => 'store', 'except' => [], 'additional' => []],
                 ],
             ],
             [
                 'name' => 'Distinguished identifier',
-                'sort' => 9,
+                'sort' => 10,
                 'permissions' => [
                     ['key' => 'featured-ids', 'except' => [], 'additional' => []],
                     ['key' => 'details-of-unique-identifiers', 'except' => ['create', 'edit', 'show'], 'additional' => []],
@@ -186,7 +196,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Vip',
-                'sort' => 10,
+                'sort' => 11,
                 'permissions' => [
                     ['key' => 'VIPs', 'except' => [], 'additional' => []],
                     ['key' => 'vip-gift', 'except' => ['show',], 'additional' => []],
@@ -195,7 +205,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'families',
-                'sort' => 11,
+                'sort' => 12,
                 'permissions' => [
                     ['key' => 'families', 'except' => [], 'additional' => []],
                     ['key' => 'families-level', 'except' => [], 'additional' => []],
@@ -203,14 +213,14 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Agency System',
-                'sort' => 12,
+                'sort' => 13,
                 'permissions' => [
                     ['key' => 'agency-settings', 'except' => ['create', 'delete', 'show'], 'additional' => []],
                 ],
             ],
-             [
+            [
                 'name' => 'Agency System',
-                'sort' => 13,
+                'sort' => 14,
                 'permissions' => [
 
                     ['key' => 'salary', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
@@ -219,7 +229,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Internal Sales System',
-                'sort' => 14,
+                'sort' => 15,
                 'permissions' => [
                     ['key' => 'salary-payment-countries', 'except' => [], 'additional' => []],
                     ['key' => 'salary-requests', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
@@ -229,7 +239,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Host Agencies',
-                'sort' => 15,
+                'sort' => 16,
                 'permissions' => [
                     ['key' => 'reports', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'achieved-Target', 'except' => [], 'additional' => []],
@@ -243,7 +253,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Agency Settings',
-                'sort' => 16,
+                'sort' => 17,
                 'permissions' => [
                     ['key' => 'agencies-join-requests', 'except' => ['create'], 'additional' => []],
                     ['key' => 'target', 'except' => [], 'additional' => []],
@@ -253,7 +263,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Charging Agencies',
-                'sort' => 17,
+                'sort' => 18,
                 'permissions' => [
                     ['key' => 'appear-charger-agency', 'except' => ['delete', 'show'], 'additional' => ['delete-switch']],
                     ['key' => 'charge-agency', 'except' => [], 'additional' => ['actions-switch']],
@@ -264,18 +274,18 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Agency Manager',
-                'sort' => 18,
+                'sort' => 19,
                 'permissions' => [
                     [
                         'key' => 'BD',
                         'except' => [],
-                        'additional' => ['delete-switch', 'choose-switch','stop-salary-switch'],
+                        'additional' => ['delete-switch', 'choose-switch', 'stop-salary-switch'],
                     ],
                 ],
             ],
             [
                 'name' => 'Room',
-                'sort' => 19,
+                'sort' => 20,
                 'permissions' => [
                     ['key' => 'rooms', 'except' => ['create'], 'additional' => ['actions-switch', 'pin-switch', 'close-switch']],
                     ['key' => 'categories', 'except' => [], 'additional' => []],
@@ -285,28 +295,28 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => []],
                 ],
             ],
-             [
+            [
                 'name' => 'Gift',
-                'sort' => 20,
+                'sort' => 21,
                 'permissions' => [
 
                     ['key' => 'gift', 'except' => [], 'additional' => []],
-                    ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show','edit'], 'additional' => []],
+                    ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => []],
                 ],
             ],
             [
                 'name' => 'Cp',
-                'sort' => 21,
+                'sort' => 22,
                 'permissions' => [
 
                     ['key' => 'cp-report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['cancel-cp-switch']],
-                   ['key' => 'cp-relation', 'except' => [], 'additional' => []],
+                    ['key' => 'cp-relation', 'except' => [], 'additional' => []],
                     ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => []],
                 ],
             ],
             [
                 'name' => 'Achievements',
-                'sort' => 22,
+                'sort' => 23,
                 'permissions' => [
                     ['key' => 'achievement', 'except' => ['create', 'delete'], 'additional' => []],
                     ['key' => 'achievement_level', 'except' => [], 'additional' => []],
@@ -315,7 +325,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Group chat',
-                'sort' => 23,
+                'sort' => 24,
                 'permissions' => [
                     ['key' => 'group-chat', 'except' => [], 'additional' => []],
                     ['key' => 'updates_group_chat', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
@@ -323,7 +333,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Lucky box',
-                'sort' => 24,
+                'sort' => 25,
                 'permissions' => [
                     ['key' => 'boxes', 'except' => [], 'additional' => []],
                     ['key' => 'box-use', 'except' => ['create'], 'additional' => []],
@@ -332,7 +342,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Events',
-                'sort' => 25,
+                'sort' => 26,
                 'permissions' => [
                     ['key' => 'event-period', 'except' => [], 'additional' => []],
                     ['key' => 'weekly-star', 'except' => [], 'additional' => []],
@@ -347,7 +357,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Reels',
-                'sort' => 26,
+                'sort' => 27,
                 'permissions' => [
                     ['key' => 'Real', 'except' => [], 'additional' => []],
                     ['key' => 'report-real', 'except' => ['create', 'edit', 'show'], 'additional' => []],
@@ -355,7 +365,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Moment',
-                'sort' => 27,
+                'sort' => 28,
                 'permissions' => [
                     ['key' => 'Moment', 'except' => [], 'additional' => []],
                     ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
@@ -363,15 +373,16 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Employees and Permissions',
-                'sort' => 28,
+                'sort' => 29,
                 'permissions' => [
                     ['key' => 'auth-users', 'except' => [], 'additional' => []],
                     ['key' => 'roles', 'except' => [], 'additional' => []],
+                    ['key' => 'roles-reward', 'except' => ['show'], 'additional' => []],
                 ],
             ],
             [
                 'name' => 'Work Settings',
-                'sort' => 29,
+                'sort' => 30,
                 'permissions' => [
                     ['key' => 'delete-account-details', 'except' => [], 'additional' => []],
                     ['key' => 'questions', 'except' => [], 'additional' => []],
@@ -385,7 +396,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Sensitive Settings',
-                'sort' => 30,
+                'sort' => 31,
                 'permissions' => [
                     ['key' => 'updates', 'except' => [], 'additional' => []],
                     ['key' => 'config', 'except' => [], 'additional' => []],
@@ -394,7 +405,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'System Settings',
-                'sort' => 31,
+                'sort' => 32,
                 'permissions' => [
                     ['key' => 'settings', 'except' => [], 'additional' => []],
                     ['key' => 'language', 'except' => [], 'additional' => []],
@@ -404,7 +415,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Level',
-                'sort' => 32,
+                'sort' => 33,
                 'permissions' => [
                     ['key' => 'level', 'except' => [], 'additional' => []],
                     ['key' => 'level-interval', 'except' => [], 'additional' => []],
@@ -413,14 +424,14 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'user parent',
-                'sort' => 33,
+                'sort' => 34,
                 'permissions' => [
                     ['key' => 'user-parent', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
             [
                 'name' => 'tribe events',
-                'sort' => 34,
+                'sort' => 35,
                 'permissions' => [
                     ['key' => 'tribe-periods', 'except' => [], 'additional' => []],
                     ['key' => 'tribe-tops', 'except' => [], 'additional' => []],
@@ -429,7 +440,7 @@ class AdminPermissionRefact extends Seeder
             ],
             [
                 'name' => 'Room Boom',
-                'sort' => 35,
+                'sort' => 36,
                 'permissions' => [
                     ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
                     ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],

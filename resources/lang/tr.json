@@ -115,6 +115,7 @@
     "description": "Açıklama",
   "english name": "İngilizce Adı",
   "phone code": "Telefon Kodu",
+  "invite code": "davet kodu",
   "language": "Dil",
   "flag": "Bayrak",
   "iso": "ISO Kodu (2 karakter)",
@@ -3400,6 +3401,15 @@
     "dashboard.login.error.unexpected": "Gönderim sırasında beklenmedik bir hata oluştu, lütfen tekrar deneyin",
     "dashboard.login.error.user_fetch": "Kullanıcı verileri alınırken bir hata oluştu, lütfen tekrar deneyin"
 
+    ,"wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "url": "Bağlantı",
+    "Display Discover": "Keşif Göster",
+    "Display Home Top": "Ana Sayfa Üstünü Göster",
+    "Display Home Middle": "Ana Sayfa Ortasını Göster",
+    "Display Live": "Canlı Yayını Göster",
+    "Display Country": "Ülkeleri Göster",
+    "ON": "Açık",
+    "OFF": "Kapalı"
 
 
 
