@@ -457,7 +457,7 @@ class RoomRepository extends AbstractRepository
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
-                'background:id',
+                'background:id,img',
                 'roomVisitorUsers' => fn($q) => $q->limit(5),
                 'myClass',
                 'roomCategory:id,type',
