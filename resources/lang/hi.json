@@ -2923,7 +2923,15 @@
     "Alternative Image": "वैकल्पिक छवि",
     "Live System Setting:": "लाइव सिस्टम सेटिंग",
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
-    "invite code": "आमंत्रण कोड"
+    "invite code": "आमंत्रण कोड",
+    "url": "लिंक",
+    "Display Discover": "डिस्कवर दिखाएँ",
+    "Display Home Top": "होम टॉप दिखाएँ",
+    "Display Home Middle": "होम मिडल दिखाएँ",
+    "Display Live": "लाइव दिखाएँ",
+    "Display Country": "देश दिखाएँ",
+    "ON": "चालू",
+    "OFF": "बंद"
 
 
 

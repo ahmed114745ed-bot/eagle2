@@ -3342,7 +3342,15 @@
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
     "Live System Setting:": "Canlı Sistem Ayarı",
-    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "url": "Bağlantı",
+    "Display Discover": "Keşif Göster",
+    "Display Home Top": "Ana Sayfa Üstünü Göster",
+    "Display Home Middle": "Ana Sayfa Ortasını Göster",
+    "Display Live": "Canlı Yayını Göster",
+    "Display Country": "Ülkeleri Göster",
+    "ON": "Açık",
+    "OFF": "Kapalı"
 
 
 
