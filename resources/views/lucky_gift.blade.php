@@ -189,7 +189,7 @@
                                 min="1" 
                                 value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" 
                                 class="form-control" 
-                                placeholder="{{ __('Enter the wallet lucky gift value') }}" />
+                                placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
                         </div>
 
                         <div class="form-group">
@@ -200,7 +200,7 @@
                                 min="1" 
                                 value="{{ $config['owner_lucky_gift'] ?? 0 }}" 
                                 class="form-control" 
-                                placeholder="{{ __('Enter  value') }}" />
+                                placeholder="{{ __('Enter  value') }}"  required/>
                         </div>
 
                         
@@ -212,7 +212,7 @@
                                 min="1" 
                                 value="{{ $config['host_lucky_gift'] ?? 0 }}" 
                                 class="form-control" 
-                                placeholder="{{ __('Enter  value') }}" />
+                                placeholder="{{ __('Enter  value') }}" required />
                         </div>
                         
 
