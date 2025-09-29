@@ -428,7 +428,7 @@ class RoomRepoService
             } else {
                 $mode = 'topCenter';
             }
-            $room =  $this->findRoomUser($request->owner_id);
+            $room =  $this->findAudioRoomUser($request->owner_id);
         } catch (\Throwable $e) {
             \Log::error("changeMode: Exception - " . $e->getMessage());
 
