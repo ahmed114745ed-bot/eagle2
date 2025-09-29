@@ -108,6 +108,8 @@ class DailyGiftController extends Controller
                 'target'    => $target,
             ]);
 
+
+
             return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
         } catch (\Exception $exception) {
 
@@ -147,13 +149,13 @@ class DailyGiftController extends Controller
             $user->save();
         } elseif ($type == "vip") {
             $vip = OVip::query()->find($target);
-            if ($vip) UserCommon::addVipToUser($user, $vip, $expire,null ,'daily-gift');
+            if ($vip) UserCommon::addVipToUser($user, $vip, $expire, null, 'daily-gift');
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
             logger("🎁 User {$user->id} received VIP {$ware->id}. Expire: {$expire}");
 
-            if ($ware) UserCommon::addWareToUser($user, $ware, $expire,null ,'daily-gifts');
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire, null, 'daily-gifts');
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,
@@ -161,6 +163,8 @@ class DailyGiftController extends Controller
                 'end_at' =>  Carbon::parse($expire)->format("Y-m-d H:i:s"),
             ];
             UserAchievementLevel::create($attributes);
+        } elseif ($type == 'badge') {
+            Common::userBadge($user->id, $target, $expire, 'daily-gifts');
         }
     }
 

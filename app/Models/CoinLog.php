@@ -22,10 +22,10 @@ class CoinLog extends Model
             });
     }
 
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class, 'user_id');
-    // }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function coin()
     {
@@ -33,8 +33,8 @@ class CoinLog extends Model
     }
 
 
-    // public function shippingAgency()
-    // {
-    //     return $this->belongsTo(ShippingAgency::class, 'user_id');
-    // }
+    public function shippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency::class, 'user_id');
+    }
 }

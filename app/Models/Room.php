@@ -364,6 +364,6 @@ class Room extends Model
 
     public function scopeAudio(Builder $query)
     {
-        return $query->where('type', 'audio');
+        return $query->where('rooms.type', 'audio');
     }
 }

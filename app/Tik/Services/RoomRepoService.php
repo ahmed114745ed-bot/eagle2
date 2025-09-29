@@ -214,9 +214,12 @@ class RoomRepoService
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
     }
 
-    public function roomAdmins($ownerId)
+    /**
+     * @throws \Exception
+     */
+    public function roomAdmins($id)
     {
-        $room = $this->repository->findRoomAdmins($ownerId, true);
+        $room = $this->repository->findRoomId($id, true);
         if (!$room) throw new \Exception(__('room not found'));
 
         if (empty($room->room_admin)) return collect();
@@ -382,6 +385,7 @@ class RoomRepoService
     public function changeMode($request, $currentMode)
     {
         $user = request()->user();
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
@@ -441,7 +445,7 @@ class RoomRepoService
     public function getRoomBackground(?Room $room)
     {
         if ($room == null) return '';
-        return $room->final_room_image;
+        return $room->final_room_image ?? '';
     }
 
     // public function changeMode($request, $currentMode, $userId = null)

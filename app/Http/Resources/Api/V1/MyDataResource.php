@@ -118,7 +118,6 @@ class MyDataResource extends JsonResource
 
         if (self::isStopInvitationValid()) {
             $isStopInvitationValid = true;
-
         }
         $data = [
             'id' => @$this->id,
@@ -159,6 +158,8 @@ class MyDataResource extends JsonResource
 
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => UserPackHelper::hasHideCountry($this->resource),
+
+            'profile_frame_id' => UserPackHelper::getProfileFrameId($this->resource),
 
             'is_first' => (bool)$this->is_points_first,
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
@@ -235,7 +236,6 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame_id' => $this->getProfileFrame()?->id ?? '',
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
@@ -288,8 +288,13 @@ class MyDataResource extends JsonResource
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 
+    // private static function isStopInvitationValid()
+    // {
+    //     return settings()->get('stop_invite_code');
+    // }
+
     private static function isStopInvitationValid()
     {
-        return settings()->get('stop_invite_code');
+        return getSettingCash('invite_code') ?? 0;
     }
 }

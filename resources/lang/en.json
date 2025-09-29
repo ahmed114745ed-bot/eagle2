@@ -1234,7 +1234,16 @@
   "dashboard.login.whatsapp.sent": "The code has been sent to WhatsApp",
   "dashboard.login.whatsapp.failed": "Failed to send the code, please try again later",
   "dashboard.login.error.unexpected": "An unexpected error occurred during sending, please try again later",
-  "dashboard.login.error.user_fetch": "An error occurred while fetching user data, please try again later"
+  "dashboard.login.error.user_fetch": "An error occurred while fetching user data, please try again later",
+  "url": "URL",
+  "Display Discover": "Display Discover",
+  "Display Home Top": "Display Home Top",
+  "Display Home Middle": "Display Home Middle",
+  "Display Live": "Display Live",
+  "Display Country": "Display Country",
+  "ON": "ON",
+  "OFF": "OFF"
+
 
 
 

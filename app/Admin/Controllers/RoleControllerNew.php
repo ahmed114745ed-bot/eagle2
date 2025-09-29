@@ -9,6 +9,9 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Models\Role;
 use Illuminate\Support\Str;
+use Modules\RoleRewards\Actions\DeleteRole;
+use Modules\RoleRewards\Actions\DeleteRoleReward;
+use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
 class RoleControllerNew extends MainController
 {
@@ -71,7 +74,9 @@ class RoleControllerNew extends MainController
         $grid = new Grid(new $roleModel());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
+
         $grid->column('name', trans('admin.name'));
+
         $grid->column('preview', trans('admin.preview'))->display(function () {
             $id = $this->id; // Assuming 'id' is the record ID field
             return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">
@@ -79,6 +84,12 @@ class RoleControllerNew extends MainController
             </a>';
         });
 
+        $grid->column('rewards', __('Rewards'))->display(function () {
+            $url = admin_url("role-rewards/{$this->id}");
+            return '<a href="' . $url . '" class="btn btn-sm btn-info">
+                        <i class="fa fa-gift"></i> ' . __('rewards') . '
+                    </a>';
+        });
         // $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
         $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
             return collect($permissions)->pluck('name')->take(7)->map(function ($name) {
@@ -88,16 +99,18 @@ class RoleControllerNew extends MainController
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 
+  
+
+
         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            if (
-                $actions->row->slug == 'administrator' ||
-                $actions->row->slug == 'admin' ||
-                $actions->row->slug == 'developer' ||
-                $actions->row->slug == 'agency' ||
-                $actions->row->slug == 'charger'
-            ) {
+            // $protectedSlugs = ['administrator', 'admin', 'developer', 'agency', 'charger'];
+        
+            // if (in_array($actions->row->slug, $protectedSlugs)) {
+            //     $actions->disableDelete(); 
+            // } else {
                 $actions->disableDelete();
-            }
+                $actions->add(new DeleteRole());
+            // }
         });
 
         $grid->tools(function (Grid\Tools $tools) {
@@ -105,6 +118,10 @@ class RoleControllerNew extends MainController
                 $actions->disableDelete();
             });
         });
+
+        
+      
+        
         $grid->disableExport();
         $this->extendGrid($grid);
         return $grid;
@@ -165,7 +182,7 @@ class RoleControllerNew extends MainController
 
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
-        $form->image('image', __('Image'))->help('Image will appear beside user in app') ->rules('required|image|mimes:jpeg,png,jpg');
+        $form->image('image', __('Image'))->help('');
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');
@@ -272,5 +289,15 @@ class RoleControllerNew extends MainController
         });
 
         return response()->json(['permissions' => $data]);
+    }
+
+
+    public function destroy($id)
+    {
+        $role = Role::findOrFail($id);
+
+        UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
+
+        return parent::destroy($id); 
     }
 }

@@ -29,6 +29,17 @@ class RoomRepository extends AbstractRepository
         return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
 
+    public function findRoomId($id, $withoutAppends = true)
+    {
+        $query = $this->model;
+
+        if ($withoutAppends) {
+            $query = $query->withoutAppends();
+        }
+        $query = $query->select(['id', 'uid', 'room_admin']);
+        return $query->where('id', $id)->first();
+    }
+
     public function findRoomUserByType($userId, $type, $withoutAppends = true)
     {
         $model = $this->model;
@@ -376,7 +387,9 @@ class RoomRepository extends AbstractRepository
 
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-        return new NowRoomResource($user) ?? (object)[];
+        $resource = (new NowRoomResource($this))->toArray(request());
+
+        return empty($resource) ? (object)[] : $resource;
 
     }
 

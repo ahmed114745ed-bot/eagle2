@@ -2980,6 +2980,16 @@
     "dashboard.login.error.unexpected": "भेजते समय एक अप्रत्याशित त्रुटि हुई, कृपया बाद में पुनः प्रयास करें",
     "dashboard.login.error.user_fetch": "उपयोगकर्ता डेटा प्राप्त करते समय त्रुटि हुई, कृपया बाद में पुनः प्रयास करें"
 
+    ,"invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "invite code": "आमंत्रण कोड",
+    "url": "लिंक",
+    "Display Discover": "डिस्कवर दिखाएँ",
+    "Display Home Top": "होम टॉप दिखाएँ",
+    "Display Home Middle": "होम मिडल दिखाएँ",
+    "Display Live": "लाइव दिखाएँ",
+    "Display Country": "देश दिखाएँ",
+    "ON": "चालू",
+    "OFF": "बंद"
 
 
 
