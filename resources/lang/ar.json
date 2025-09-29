@@ -2066,6 +2066,17 @@
     "Primary Color": "اللون الأساسي",
     "Second Color": "اللون الثانوي",
     "Background Type": "نوع الخلفية",
+
+    "Online Users Count": "عدد المستخدمين المتصلين",
+    "Total Messages": "إجمالي الرسائل",
+    "Total Rooms Joined By Visitors": "إجمالي الغرف التي انضم إليها الزوار",
+    "Active Rooms": "الغرف النشطة",
+    "Avg Users Per Room": "متوسط المستخدمين لكل غرفة",
+    "Top Room Messages": "الغرفة الأعلى في عدد الرسائل",
+    "Peak Hour": "ساعة الذروة",
+    "Top Messages": "أعلى الرسائل",
+    "Top Followers": "أعلى متابعين",
+
     "Background Color": "لون الخلفية",
     "Background Image": "صورة الخلفية",
     "Save Settings": "حفظ الإعدادات",
