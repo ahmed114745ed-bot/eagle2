@@ -128,7 +128,7 @@ class RoomRepoService
 
     public function findAudioRoomUser($userId)
     {
-        return $this->repository->findRoomUser($userId);
+        return $this->repository->findAudioRoomUser($userId);
     }
 
     public function findRoomUserByType($userId, $type)
