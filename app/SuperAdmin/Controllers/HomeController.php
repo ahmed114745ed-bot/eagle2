@@ -3,7 +3,10 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Admin\Widgets\Table;
+use App\Models\AgencyJoinRequest;
 use App\Models\LiveTime;
+use App\Models\UserTarget;
+use Carbon\Carbon;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use App\Models\Bd;
@@ -175,8 +178,6 @@ class HomeController extends Controller
         })
             ->has('lastPk')
             ->count();
-
-
         $avgMicPerRoom = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
             ->pluck('microphone')
             ->filter()
@@ -199,10 +200,8 @@ class HomeController extends Controller
             ->count();
         $percentageWithMic = $totalRooms > 0 ? ($roomsWithMic / $totalRooms) * 100 : 0;
 
-        //others
+        //agencies
         $agencyCount = Agency::where('country_id', $countryID)->count();
-        $bdCount = Bd::where('parent_id', auth()->id())->count();
-        $diAuth = Auth::user()->di;
         $user_salaries   = UserSallary::query()->whereHas('user', function ($q) use ($countryID) {
             $q->where('agency_id', '!=', 0)->where('country_id', $countryID);
         })->sum(DB::raw('sallary - cut_amount'));
@@ -210,11 +209,40 @@ class HomeController extends Controller
             $q->where('country_id', $countryID);
         })->sum(DB::raw('sallary - cut_amount'));
 
+        $activeAgencies = Agency::where('country_id', $countryID)
+            ->whereHas('agencySalaries', fn($q) => $q->whereMonth('created_at', now()->month))
+            ->count();
+        $newAgenciesToday = Agency::where('country_id', $countryID)->whereDate('created_at', today())->count();
+        $newAgenciesMonth = Agency::where('country_id', $countryID)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $topAgencies = Agency::where('country_id', $countryID)
+            ->orderByDesc('coins')
+            ->take(10)
+            ->get(['id','name','coins']);
+        $avgAgencyWallet = Agency::where('country_id',$countryID)->avg('coins');
+        $totalMembers = User::where('country_id',$countryID)->where('agency_id','!=',0)->count();
+        $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
+        $pendingJoins = AgencyJoinRequest::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
+            ->where('status',0)->count();
+        $achievedTargets = UserTarget::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
+            ->where('add_month', now()->month)
+            ->where('add_year', now()->year)
+            ->where('agency_obtain','>',0)
+            ->count();
+        $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->where('country_id',$countryID))
+            ->sum('achieved_diamond');
+
+        //others
+        $bdCount = Bd::where('parent_id', auth()->id())->count();
+        $diAuth = Auth::user()->di;
+
         return $content
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
                 $row->column(12, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . ' 💰'));
 
                 $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
@@ -280,6 +308,42 @@ class HomeController extends Controller
                             $column->row($view);
                         });
 
+                        $row->column(6, function ($column) use ($countryID) {
+                            $currMonth = now()->month;
+                            $prevMonth = now()->subMonth()->month;
+
+                            $signups = User::where('country_id', $countryID)
+                                ->selectRaw("
+                                YEAR(created_at) as year,
+                                MONTH(created_at) as month,
+                                FLOOR((DAY(created_at)-1)/7)+1 as week_of_month,
+                                COUNT(*) as total
+                            ")
+                                ->whereIn(DB::raw('MONTH(created_at)'), [$currMonth, $prevMonth])
+                                ->groupBy('year','month','week_of_month')
+                                ->orderBy('year')
+                                ->orderBy('month')
+                                ->orderBy('week_of_month')
+                                ->get();
+
+                            $labels = ['Week 1','Week 2','Week 3','Week 4'];
+
+                            $dataCurrent = [];
+                            $dataPrevious = [];
+
+                            foreach (range(1,4) as $week) {
+                                $dataCurrent[]  = $signups->where('month',$currMonth)->where('week_of_month',$week)->sum('total');
+                                $dataPrevious[] = $signups->where('month',$prevMonth)->where('week_of_month',$week)->sum('total');
+                            }
+
+                            $view = view('admin.widgets.signups_weekly_chart', [
+                                'labels'       => $labels,
+                                'dataCurrent'  => $dataCurrent,
+                                'dataPrevious' => $dataPrevious,
+                            ])->render();
+
+                            $column->row($view);
+                        });
                     });
                 });
                 $row->column(12, function ($column) use ($rooms, $totalRoomsJoined, $activeRooms, $topRooms, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
@@ -311,13 +375,22 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Rooms With Mic (%)'), 'pie-chart', 'teal', 'superadmin/rooms', round($percentageWithMic, 1) . '%'));
                     });
                 });
-                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries) {
+                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries) {
-                        $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'aqua', 'superadmin/agencies', $agencyCount));
-                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'aqua', 'superadmin/agencies',  $agency_salaries));
-                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'yellow', 'superadmin/users', $user_salaries));
+                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                        $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
+                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies',  $agency_salaries));
+                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/users', $user_salaries));
+                        $row->column(3, new InfoBox(__('Active Agencies'), 'building', 'red', 'superadmin/agencies', $activeAgencies));
+                        $row->column(3, new InfoBox(__('New Agencies Today'), 'plus', 'teal', 'superadmin/agencies', $newAgenciesToday));
+                        $row->column(3, new InfoBox(__('New Agencies This Month'), 'calendar', 'orange', 'superadmin/agencies', $newAgenciesMonth));
+                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', 'superadmin/agencies', round($avgAgencyWallet, 2)));
+                        $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/users', $totalMembers));
+                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency, 2)));
+                        $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies', $pendingJoins));
+                        $row->column(3, new InfoBox(__('Agencies Achieved Targets'), 'flag', 'yellow', 'superadmin/agencies', $achievedTargets));
+                        $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/users', $diamondsAchieved));
                     });
                 });
                 $row->column(12, function ($column) use ($bdCount) {
