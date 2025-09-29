@@ -141,21 +141,21 @@ class HomeController extends Controller
 
                     $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $topRooms, $avgUsersPerRoom, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
-                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'green', 'superadmin/users', $onlineUser));
+                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
                         $peakHourData = $peakHours->sortByDesc('total')->first();
                         $peakHour = $peakHourData ? $peakHourData->hour . ':00' : 'N/A';
                         $peakHourCount = $peakHourData ? $peakHourData->total : 0;
                         $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $peakHour . ' (' . $peakHourCount . ')'));
-                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'green', 'superadmin/users', $newSignUpsToday));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'aqua', 'superadmin/users', $newSignUpsThisWeek));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'yellow', 'superadmin/users', $newSignUpsThisMonth));
-                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'aqua', '', $messagesToday));
-                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'green', '', $messagesThisMonth));
-                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'yellow', '', $usersWhoSend));
-                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'red', '', $usersWhoNeverSend));
-                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'purple', '', $openConversationsToday));
-                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'blue', '', round($avgConversationDuration, 2)));
+                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
+                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', '', $messagesToday));
+                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', '', $messagesThisMonth));
+                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'navy', '', $usersWhoSend));
+                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', '', $usersWhoNeverSend));
+                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', '', $openConversationsToday));
+                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', '', round($avgConversationDuration, 2)));
                     });
 
                     $column->row(function (Row $row) use ($countryID) {
