@@ -291,7 +291,7 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-         dd(request()->default_background);
+         dd($this->background?->img);
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
