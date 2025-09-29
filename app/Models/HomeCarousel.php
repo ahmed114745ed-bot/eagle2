@@ -42,12 +42,12 @@ class HomeCarousel extends Model
         return $this->belongsToMany(Country::class, 'banner_country');
     }
 
-public function countriesLite()
-{
-    return $this->belongsToMany(Country::class, 'banner_country', 'home_carousel_id', 'country_id')
-                ->select(['countries.id', 'countries.name', 'countries.e_name', 'countries.flag'])
-                ->withPivot('home_carousel_id', 'country_id');
-}
+    public function countriesLite()
+    {
+        return $this->belongsToMany(Country::class, 'banner_country', 'home_carousel_id', 'country_id')
+                    ->select(['countries.id', 'countries.name', 'countries.e_name', 'countries.flag'])
+                    ->withPivot('home_carousel_id', 'country_id');
+    }
     protected static function boot()
     {
         parent::boot();
