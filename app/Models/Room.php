@@ -292,8 +292,8 @@ class Room extends Model
 
         return $this->backgroundImage?->img
             ?? $this->background?->img
-            ?? $this->defaultBackground?->img
-            ?? request()->default_background;
+            ?? $this->defaultBackground?->img;
+           // ?? request()->default_background;
     }
 
     public function defaultBackground()
