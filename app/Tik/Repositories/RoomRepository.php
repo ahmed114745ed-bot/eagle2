@@ -28,7 +28,13 @@ class RoomRepository extends AbstractRepository
         if ($withoutAppends) $model = $model->withoutAppends();
         return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
-
+    public function findAudioRoomUser($userId, $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type' ,'audio')->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
+    
     public function findRoomId($id, $withoutAppends = true)
     {
         $query = $this->model;

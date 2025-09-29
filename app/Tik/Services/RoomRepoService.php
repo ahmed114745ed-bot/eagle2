@@ -126,6 +126,11 @@ class RoomRepoService
         return $this->repository->findRoomUser($userId);
     }
 
+    public function findAudioRoomUser($userId)
+    {
+        return $this->repository->findRoomUser($userId);
+    }
+
     public function findRoomUserByType($userId, $type)
     {
         return $this->repository->findRoomUserByType($userId, $type);
@@ -386,7 +391,7 @@ class RoomRepoService
     {
         $user = request()->user();
         if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
-        $room =  $this->findRoomUser($request->owner_id);
+        $room =  $this->findAudioRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         $youtubeStatus =  (bool)(getSettingCash('youtube_status') ?? true);
