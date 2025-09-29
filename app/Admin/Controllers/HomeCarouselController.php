@@ -205,14 +205,15 @@ class HomeCarouselController extends MainController
                 ->attribute('id', 'display_at_select');
         
             $form->ignore('display_at');
+            $form->belongsToMany('countries', Countries::class, trans('Country'));
+
+            // $form->multipleSelect('countries', __('Country'))
+            //     ->options(Country::all()->pluck('name', 'id'))
+            //     ->rules(['array'])
+            //     ->attribute('id', 'countries_select');
         
-            // countries
-            $form->multipleSelect('countries', 'الدول')
-                ->options(Country::all()->pluck('name', 'id'))
-                ->rules(['array'])
-                ->attribute('id', 'countries_select');
-        
-            // hide countries by default
+
+
             $form->html('<style>#countries_select { display:none; }</style>');
         
             // script to toggle
