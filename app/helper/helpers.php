@@ -817,4 +817,33 @@ if (!function_exists('bd_url')) {
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
     }
+
+
+    if (!function_exists('getGiftPercentage')) {
+        /**
+         * Get gift percentage by key from cache or DB
+         * and return it as decimal out of 10.
+         *
+         * @param string $key
+         * @return float
+         */
+        function getGiftPercentage(string $key): float
+        {
+            $cacheKey = "percentage_{$key}";
+    
+            $value = Cache::get($cacheKey);
+    
+            if ($value === null) {
+                $value = \App\Models\Setting::where('key', $key)->value('value');
+                if ($value !== null) {
+                    Cache::put($cacheKey, $value);
+                }
+            }
+            if ($value === null) {
+                return 0.0;
+            }
+    
+            return round(((float) $value) / 10, 2);
+        }
+    }
 }

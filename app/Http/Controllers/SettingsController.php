@@ -235,19 +235,19 @@ class SettingsController extends Controller
         $sum = $request->app_wallet_lucky_gift
             + $request->owner_lucky_gift
             + $request->host_lucky_gift;
-
+         
         if ($sum !== 100) {
             return back()->withErrors([
                 'gift_percentage' => 'The total gift percentage must equal 100.'
             ])->withInput();
         }
 
-        // Correct: get all input values as array
         $data = $request->all();
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            Cache::put($key, $value);
+            $cacheKey = "percentage_{$key}";
+            Cache::put($cacheKey, $value);    
         }
 
         return back();
