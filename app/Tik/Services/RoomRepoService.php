@@ -430,6 +430,8 @@ class RoomRepoService
             }
             $room =  $this->findRoomUser($request->owner_id);
         } catch (\Throwable $e) {
+            \Log::error("changeMode: Exception - " . $e->getMessage());
+
             return Common::apiResponse(0, $e->getMessage());
         }
         $ms   = [
@@ -440,12 +442,17 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
             Utils::unwrap($promises);
         } catch (\Throwable $e) {
+            \Log::error("changeMode: Zego send failed - " . $e->getMessage());
+
         }
+                \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+
 
         return Common::apiResponse(1, 'done', null, 201);
     }
