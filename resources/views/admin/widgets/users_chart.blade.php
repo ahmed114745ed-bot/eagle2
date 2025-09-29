@@ -14,7 +14,7 @@
             data: {
                 labels: @json($labels),
                 datasets: [{
-                    label: '{{ __("Net Salary") }}',
+                    label: '{{ __("Follower") }}',
                     data: @json($data),
                     backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
