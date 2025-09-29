@@ -1,5 +1,5 @@
 <div class="box box-success">
-    <div class="box-header"><h4>📈 {{ __('Top Salaries') }}</h4></div>
+    <div class="box-header"><h4>📈 {{ __('Top Messages') }}</h4></div>
     <div class="box-body" style="height:380px;">   <!-- increase height -->
         <canvas id="salaryChart" style="width:100%; height:100%;"></canvas>
     </div>
