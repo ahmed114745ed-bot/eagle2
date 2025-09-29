@@ -152,7 +152,7 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
                         $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', '', $messagesToday));
                         $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', '', $messagesThisMonth));
-                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'navy', '', $usersWhoSend));
+                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'blue', '', $usersWhoSend));
                         $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', '', $usersWhoNeverSend));
                         $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', '', $openConversationsToday));
                         $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', '', round($avgConversationDuration, 2)));
