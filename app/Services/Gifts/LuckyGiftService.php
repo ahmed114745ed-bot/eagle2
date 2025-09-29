@@ -49,9 +49,7 @@ class LuckyGiftService
         $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;             
         $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10; 
 
-        \Log::info("sendLuckyGift2: UserID={$userId}, GiftID={$giftId}, Number={$number}, Count={$count}");
-        \Log::info("Gift percentages: app={$appPercentage}, owner={$roomrPercentage}, host={$hostPercentage}");
-    
+  
        
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)

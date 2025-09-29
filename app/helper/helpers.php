@@ -847,11 +847,9 @@ if (!function_exists('bd_url')) {
                     default                  => 0,
                 };
             }
-            \Log::info("Gift percentage for {$key}: {$value}");
 
             $percentage = round(((float) $value) / 10, 2);
             
-            \Log::info("Gift percentage for {$key}: {$percentage}");
 
             return $percentage;
 
