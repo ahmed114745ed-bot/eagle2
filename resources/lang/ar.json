@@ -2068,7 +2068,6 @@
     "Primary Color": "اللون الأساسي",
     "Second Color": "اللون الثانوي",
     "Background Type": "نوع الخلفية",
-
     "Online Users Count": "عدد المستخدمين المتصلين",
     "Total Messages": "إجمالي الرسائل",
     "Total Rooms Joined By Visitors": "إجمالي الغرف التي انضم إليها الزوار",
@@ -2078,6 +2077,16 @@
     "Peak Hour": "ساعة الذروة",
     "Top Messages": "أعلى الرسائل",
     "Top Followers": "أعلى متابعين",
+
+    "New Sign Ups This Month": "التسجيلات الجديدة هذا الشهر",
+    "Messages Today": "الرسائل اليوم",
+    "Messages This Month": "عدد الرسائل هذا الشهر",
+    "Users Who Send Messages": "المستخدمين الذين يرسلون رسائل",
+    "Users Who Never Send": "المستخدمين الذين لا يرسلون رسائل",
+    "Open Conversations Today": "المحادثات المفتوحة اليوم",
+    "Avg Conversation Duration (min)": "متوسط مدة المحادثة (بالدقائق)",
+    "New Sign Ups Today": "التسجيلات الجديدة اليوم",
+    "New Sign Ups This Week": "التسجيلات الجديدة هذا الأسبوع",
 
     "Background Color": "لون الخلفية",
     "Background Image": "صورة الخلفية",
