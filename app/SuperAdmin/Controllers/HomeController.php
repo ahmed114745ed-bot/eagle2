@@ -253,7 +253,7 @@ class HomeController extends Controller
 
                         // Left: top 10 salaries
                         $row->column(6, function ($column) use ($countryID,$topUsersByFollowers) {
-                        
+
                             $view = view('admin.widgets.top_users_visits_chart')->render();
 
                             $column->row($view);
@@ -307,11 +307,11 @@ class HomeController extends Controller
                     $column->row(function (Row $row) use ($countryID ,$topUsersByFollowers) {
                         $row->column(6, function ($col) use ($topUsersByFollowers) {
                             $top5 = $topUsersByFollowers->take(5);
-                
+
                             $view5 = view('admin.widgets.top_followers_table', [
                                 'top5' => $top5,
                             ])->render();
-                        
+
                             $col->row($view5);
                         });
 
@@ -389,12 +389,12 @@ class HomeController extends Controller
                         $row->column(6, function ($column) use ($countryID) {
                             $topGiftedRooms = Room::with('owner')
                                 ->withSum('gifts', 'giftPrice')
-                                ->orderByDesc('gifts_sum_gift_price') // <-- snake_case
+                                ->orderByDesc('gifts_sum_gift_price')
                                 ->take(10)
                                 ->get();
 
                             $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
-                            $data   = $topGiftedRooms->pluck('gifts_sum_gift_price'); // <-- snake_case
+                            $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
 
                             $view = view('admin.widgets.top_gifted_rooms_chart', [
                                 'labels' => $labels,
@@ -440,12 +440,12 @@ class HomeController extends Controller
     {
         $countryID = Auth::user()->country_id;
         $period = $request->get('period', 'day');
-    
+
         $query = DB::table('live_times')
             ->join('rooms', 'live_times.uid', '=', 'rooms.id')
             ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('users.country_id', $countryID);
-    
+
         if ($period === 'day') {
             $query->selectRaw("FROM_UNIXTIME(live_times.start_time, '%H') as label, COUNT(*) as total")
                 ->whereRaw("DATE(FROM_UNIXTIME(live_times.start_time)) = CURDATE()")
@@ -456,13 +456,13 @@ class HomeController extends Controller
                 ->groupBy('label');
         } elseif ($period === 'month') {
             $query->selectRaw("DATE(FROM_UNIXTIME(live_times.start_time)) as label, COUNT(*) as total")
-                ->whereRaw("YEAR(FROM_UNIXTIME(live_times.start_time)) = YEAR(CURDATE()) 
+                ->whereRaw("YEAR(FROM_UNIXTIME(live_times.start_time)) = YEAR(CURDATE())
                             AND MONTH(FROM_UNIXTIME(live_times.start_time)) = MONTH(CURDATE())")
                 ->groupBy('label');
         }
-    
+
         $rows = $query->orderBy('label')->get();
-    
+
         return response()->json([
             'success' => true,
             'labels' => $rows->pluck('label'),
@@ -472,12 +472,12 @@ class HomeController extends Controller
 
     public function onlineStats()
     {
-       
+
         $countryID = Auth::user()->country_id;
         $online  = User::where('country_id', $countryID)->where('isOnline', 1)->count();
         $offline = User::where('country_id', $countryID)->where('isOnline', 0)->count();
 
-    
+
         return response()->json(data: [
             'online'  => $online,
             'offline' => $offline,
@@ -593,7 +593,7 @@ class HomeController extends Controller
 
         $topUsers = User::select('id', 'name')
             ->withCount(['roomVisitors as visits_count' => function($q) {
-                $q->whereDate('created_at', '>=', now()->subMonth()); 
+                $q->whereDate('created_at', '>=', now()->subMonth());
             }])
             ->where('country_id', $countryID)
             ->having('visits_count', '>', 0)

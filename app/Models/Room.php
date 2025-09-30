@@ -128,7 +128,7 @@ class Room extends Model
     {
         return $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
             ->selectRaw('SUM(giftPrice) as exp, sender_id, roomowner_id')
-            ->whereHas('sender') // Ensures only valid senders are included
+            ->whereHas('sender')
             ->groupBy('sender_id', 'roomowner_id')
             ->orderByDesc('exp');
     }
