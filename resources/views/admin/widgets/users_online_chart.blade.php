@@ -1,11 +1,14 @@
 <div class="card">
     <div class="card-header">
-        <h4>📊 إحصائيات المستخدمين (النشطين / الغير نشطين)</h4>
+    <h4>{{ __('title_user') }}</h4>
     </div>
     <div class="card-body">
         <canvas id="usersOnlineChart" height="300"></canvas>
     </div>
 </div>
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -18,7 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
             labels: ['Users'], // نقطة واحدة فقط على X
             datasets: [
                 {
-                    label: 'Online Users',
+                    label: "{{ __('online_users') }}",
+    
                     data: [0], // يبدأ من 0
                     borderColor: '#28a745',
                     borderWidth: 2,
@@ -26,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     tension: 0.3
                 },
                 {
-                    label: 'Offline Users',
+                    label: "{{ __('offline_users') }}",
                     data: [0], // يبدأ من 0
                     borderColor: '#dc3545',
                     borderWidth: 2,
@@ -42,14 +46,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     beginAtZero: true, // المحور X يبدأ من 0
                     title: {
                         display: true,
-                        text: 'Online Users'
+                        text: "{{ __('online_users') }}",
                     }
                 },
                 y: {
                     beginAtZero: true, // المحور Y يبدأ من 0
                     title: {
                         display: true,
-                        text: 'Offline Users'
+                        text: "{{ __('offline_users') }}"
                     }
                 }
             },
