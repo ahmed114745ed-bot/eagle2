@@ -3,7 +3,7 @@
     <div class="box-header with-border">
         <h3 class="box-title">{{ __('Rooms Distribution') }}</h3>
     </div>
-    <div class="box-body" style="height:380px;">
+    <div class="box-body" style="height:375px;">
         <canvas id="roomsDistributionChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>

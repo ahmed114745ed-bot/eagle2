@@ -373,6 +373,26 @@ class HomeController extends Controller
                             $view = view('admin.widgets.rooms_activity_chart')->render();
                             $column->row($view);
                         });
+
+                        //chart 3
+                        $row->column(6, function ($column) use ($countryID) {
+                            $topGiftedRooms = Room::with('owner')
+                                ->withSum('gifts', 'giftPrice')
+                                ->orderByDesc('gifts_sum_gift_price') // <-- snake_case
+                                ->take(10)
+                                ->get();
+
+                            $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
+                            $data   = $topGiftedRooms->pluck('gifts_sum_gift_price'); // <-- snake_case
+
+                            $view = view('admin.widgets.top_gifted_rooms_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+
                     });
 
                 });
@@ -440,24 +460,31 @@ class HomeController extends Controller
         $countryID = Auth::user()->country_id;
 
         if ($period === 'day') {
+            // last 7 days
             $dates = collect(range(0, 6))
                 ->map(fn($i) => now()->subDays($i)->format('Y-m-d'))
                 ->reverse()
                 ->values();
 
-            $newRooms = $dates->map(fn($date) =>
-            Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                ->whereDate('created_at', $date)
-                ->count()
-            )->values();
+            $newRoomsData = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+                ->whereDate('created_at', '>=', now()->subDays(6))
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+                ->groupBy('date')
+                ->pluck('total','date');
 
-            $inactiveRooms = $dates->map(fn($date) =>
-            Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                ->whereDoesntHave('roomVisitors', function($q) use ($date) {
-                    $q->where('created_at', '>=', $date);
-                })
-                ->count()
-            )->values();
+            $newRooms = $dates->map(fn($d) => $newRoomsData[$d] ?? 0);
+
+            $activeOwners = \DB::table('users')
+                ->join('live_times','users.id','=','live_times.uid')
+                ->where('users.country_id',$countryID)
+                ->whereDate('live_times.created_at','>=',now()->subDays(6))
+                ->selectRaw('DATE(live_times.created_at) as date, COUNT(DISTINCT users.id) as active_owners')
+                ->groupBy('date')
+                ->pluck('active_owners','date');
+
+            $totalRooms = Room::whereHas('owner', fn($q) => $q->where('country_id',$countryID))->count();
+
+            $inactiveRooms = $dates->map(fn($d) => $totalRooms - ($activeOwners[$d] ?? 0));
 
             $labels = $dates;
 
@@ -468,23 +495,27 @@ class HomeController extends Controller
                 ->reverse()
                 ->values();
 
-            $newRooms = $weeks->map(function ($week) use ($countryID) {
-                [$year, $weekNum] = explode('-W', $week);
-                return Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                    ->whereYear('created_at', $year)
-                    ->whereRaw("WEEK(created_at, 1) = ?", [$weekNum])
-                    ->count();
-            })->values();
+            $newRoomsData = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+                ->where('created_at', '>=', now()->subWeeks(3)->startOfWeek())
+                ->selectRaw("YEAR(created_at) as year, WEEK(created_at,1) as week, COUNT(*) as total")
+                ->groupBy('year','week')
+                ->get()
+                ->mapWithKeys(fn($r) => [sprintf('%d-W%02d',$r->year,$r->week) => $r->total]);
 
-            $inactiveRooms = $weeks->map(function ($week) use ($countryID) {
-                [$year, $weekNum] = explode('-W', $week);
-                return Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                    ->whereDoesntHave('roomVisitors', function($q) use ($year, $weekNum) {
-                        $q->whereYear('created_at', $year)
-                            ->whereRaw("WEEK(created_at, 1) = ?", [$weekNum]);
-                    })
-                    ->count();
-            })->values();
+            $newRooms = $weeks->map(fn($w) => $newRoomsData[$w] ?? 0);
+
+            $activeOwners = \DB::table('users')
+                ->join('live_times','users.id','=','live_times.uid')
+                ->where('users.country_id',$countryID)
+                ->whereDate('live_times.created_at','>=',now()->subWeeks(3)->startOfWeek())
+                ->selectRaw("YEAR(live_times.created_at) as year, WEEK(live_times.created_at,1) as week, COUNT(DISTINCT users.id) as active_owners")
+                ->groupBy('year','week')
+                ->get()
+                ->mapWithKeys(fn($r) => [sprintf('%d-W%02d',$r->year,$r->week) => $r->active_owners]);
+
+            $totalRooms = Room::whereHas('owner', fn($q) => $q->where('country_id',$countryID))->count();
+
+            $inactiveRooms = $weeks->map(fn($w) => $totalRooms - ($activeOwners[$w] ?? 0));
 
             $labels = $weeks;
 
@@ -495,23 +526,25 @@ class HomeController extends Controller
                 ->reverse()
                 ->values();
 
-            $newRooms = $months->map(function ($month) use ($countryID) {
-                [$year, $monthNum] = explode('-', $month);
-                return Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                    ->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $monthNum)
-                    ->count();
-            })->values();
+            $newRoomsData = Room::whereHas('owner', fn($q) => $q->where('country_id',$countryID))
+                ->where('created_at','>=',now()->subMonths(5)->startOfMonth())
+                ->selectRaw("DATE_FORMAT(created_at,'%Y-%m') as ym, COUNT(*) as total")
+                ->groupBy('ym')
+                ->pluck('total','ym');
 
-            $inactiveRooms = $months->map(function ($month) use ($countryID) {
-                [$year, $monthNum] = explode('-', $month);
-                return Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-                    ->whereDoesntHave('roomVisitors', function($q) use ($year, $monthNum) {
-                        $q->whereYear('created_at', $year)
-                            ->whereMonth('created_at', $monthNum);
-                    })
-                    ->count();
-            })->values();
+            $newRooms = $months->map(fn($m) => $newRoomsData[$m] ?? 0);
+
+            $activeOwners = \DB::table('users')
+                ->join('live_times','users.id','=','live_times.uid')
+                ->where('users.country_id',$countryID)
+                ->where('live_times.created_at','>=', now()->subMonths(5)->startOfMonth())
+                ->selectRaw("DATE_FORMAT(live_times.created_at,'%Y-%m') as ym, COUNT(DISTINCT users.id) as active_owners")
+                ->groupBy('ym')
+                ->pluck('active_owners','ym');
+
+            $totalRooms = Room::whereHas('owner', fn($q) => $q->where('country_id',$countryID))->count();
+
+            $inactiveRooms = $months->map(fn($m) => $totalRooms - ($activeOwners[$m] ?? 0));
 
             $labels = $months;
         }
