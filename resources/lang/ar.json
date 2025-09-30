@@ -3987,7 +3987,6 @@
     "Avg Mic Users per Room": "متوسط مستخدمي الميكروفون لكل غرفة",
     "Rooms With Mic Usage": "الغرف التي استُخدم بها الميكروفون",
     "Rooms With Mic (%)": "النسبة المئوية للغرف مع الميكروفون",
-
     "Active Agencies": "الوكالات النشطة",
     "New Agencies Today": "الوكالات الجديدة اليوم",
     "New Agencies This Month": "الوكالات الجديدة هذا الشهر",
@@ -3998,6 +3997,16 @@
     "Agencies Achieved Targets": "الوكالات التي حققت الأهداف",
     "Diamonds Achieved by Hosts": "الألماس الذي حققه المضيفون",
     "User Signups Comparison (Weeks)": "مقارنة تسجيلات المستخدمين (أسابيع)",
+
+    "Live Rooms (Active)": "الغرف المباشرة (نشطة)",
+    "Live Rooms (Inactive)": "الغرف المباشرة (غير نشطة)",
+    "Rooms Activity Analytics": "تحليلات نشاط الغرف",
+    "Last 7 Days": "آخر ٧ أيام",
+    "Last 4 Weeks": "آخر ٤ أسابيع",
+    "Last 6 Months": "آخر ٦ أشهر",
+    "New Rooms": "الغرف الجديدة",
+    "Rooms Distribution": "توزيع الغرف",
+    "Rooms with PK": "الغرف مع PK",
 
  "Display Discover": "عرض الاستكشاف",
  "Display Home Top": "عرض أعلى الصفحة الرئيسية",
