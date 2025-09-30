@@ -210,7 +210,6 @@ class CalculateRoomCupRewards extends Command
     {
         return RoomCupTarget::where('total', '<=', $total)
             ->where('number_of_visitors', '<=', $visitors)
-            ->where('number_of_admins', '<=', $admins)
             ->orderByDesc('total')
             ->first();
     }
