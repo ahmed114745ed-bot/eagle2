@@ -43,7 +43,7 @@ Route::group(
         Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
         Route::get('verify-whatsapp-code', [AuthController::class, 'verifyWhatsappCode'])
         ->name('verify-whatsapp-code');
-    
+
         Route::post('change-password', [AuthController::class, 'changePassword'])->name('superadmin.change-password');
 
         Route::post('send-whatsapp-code-preview', [AuthController::class, 'send_whatsapp_code_preview'])
@@ -108,8 +108,8 @@ Route::group(
 
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-  
-        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
 
+        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
+        Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
     }
 );

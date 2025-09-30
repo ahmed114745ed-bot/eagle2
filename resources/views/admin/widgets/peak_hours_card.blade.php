@@ -1,14 +1,14 @@
-<div class="card">
-    <div class="card-header">
-        <h4>{{ __('Peak Hour Analytics') }}</h4>
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">{{ __('Peak Hour Analytics') }}</h3>
         <select id="peak-filter" class="form-control" style="width: 200px; display:inline-block;">
             <option value="day">{{ __('Today') }}</option>
             <option value="week">{{ __('This Week') }}</option>
             <option value="month">{{ __('This Month') }}</option>
         </select>
     </div>
-    <div class="card-body">
-        <canvas id="peakChart" style="height: 300px;"></canvas>
+    <div class="box-body" style="height:245px;">
+        <canvas id="peakChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
 
