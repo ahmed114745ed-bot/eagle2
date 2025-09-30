@@ -218,16 +218,10 @@ class HomeController extends Controller
                         $peakHourData = $peakHours->sortByDesc('total')->first();
 
                         if ($peakHourData) {
-                            $time = \Carbon\Carbon::createFromTime($peakHourData->hour);
-
-                            // ضبط اللغة حسب لغة الموقع
+                            $time = Carbon::createFromTime($peakHourData->hour);
                             $time->locale(app()->getLocale());
-
-                            // صيغة الوقت حسب اللغة
                             $peakHour = $time->isoFormat('h A'); // مثال: 12 PM أو ١٢ م
-
                             $peakHourCount = $peakHourData->total;
-
                             $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
                         } else {
                             $value = 'N/A';
