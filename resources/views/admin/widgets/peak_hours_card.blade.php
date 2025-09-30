@@ -17,7 +17,7 @@
 <script>
     const translations = {
         count_sessions: "{{ __('count_sessions') }}",
-  
+
     };
 </script>
 <script>
