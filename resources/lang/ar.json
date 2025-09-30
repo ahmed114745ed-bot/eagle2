@@ -3933,7 +3933,14 @@
  "Display Live": "عرض البث المباشر",
  "Display Country": "عرض الدول",
  "ON": "مفعل",
- "OFF": "معطل"
+ "OFF": "معطل",
+ "Peak Hour Analytics": "تحليلات ساعة الذروة",
+ "Today": "اليوم",
+ "This Week": "هذا الأسبوع",
+ "This Month": "هذا الشهر",
+ "count_sessions": "عدد الجلسات"
+
+
 
 
 
