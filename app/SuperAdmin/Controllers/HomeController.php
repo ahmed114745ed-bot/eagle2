@@ -34,19 +34,23 @@ class HomeController extends Controller
         $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->where('country_id', $countryID)->count();
         $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where('country_id', $countryID)->count();
         $onlineUser = User::where('country_id', $countryID)->where('online', 1)->count();
-        // $peakHours = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->where('country_id', $countryID);
-        // })
-        //     ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
-        //     ->groupBy('hour')
-        //     ->orderBy('hour')
-        //     ->get();
-        $peakHours = LiveTime::selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
-                    ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
-                    ->groupBy('hour')
-                    ->orderByDesc('total_sessions')
-                    ->limit(1)
-                    ->first();
+  
+        $topUsersByFollowers = User::withCount('followers')
+            ->with('packs','profile')
+            ->where('country_id', $countryID)
+            ->orderByDesc('followers_count')
+            ->take(10)
+            ->get();
+        $peakHours = LiveTime::
+                whereHas('room.owner', function ($q) use ($countryID) {
+                    $q->where('country_id', $countryID);
+                })
+                ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
+                ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+                ->groupBy('hour')
+                ->orderByDesc('total_sessions')
+                ->limit(1)
+                ->first();
         $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
         })
@@ -212,9 +216,9 @@ class HomeController extends Controller
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved,$topUsersByFollowers) {
                 $row->column(12, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
-                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration ,$topUsersByFollowers) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
                     $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
@@ -241,7 +245,7 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration, 2)));
                     });
 
-                    $column->row(function (Row $row) use ($countryID) {
+                    $column->row(function (Row $row) use ($countryID,$topUsersByFollowers) {
                         // Right: chart view (Top Salaries)
                         $row->column(6, function ($column) {
                             $topUsersByLiveTime = LiveTime::query()
@@ -264,12 +268,8 @@ class HomeController extends Controller
                         });
 
                         // Left: top 10 salaries
-                        $row->column(6, function ($column) use ($countryID) {
-                            $topUsersByFollowers = User::withCount('followers')
-                            ->where('country_id', $countryID)
-                                ->orderByDesc('followers_count')
-                                ->take(10)
-                                ->get();
+                        $row->column(6, function ($column) use ($countryID,$topUsersByFollowers) {
+                        
 
                             $labels = $topUsersByFollowers->pluck('name');
                             $data   = $topUsersByFollowers->pluck('followers_count');
@@ -281,6 +281,8 @@ class HomeController extends Controller
 
                             $column->row($view);
                         });
+
+
 
                         $row->column(6, function ($column) use ($countryID) {
                             $currMonth = now()->month;
@@ -323,8 +325,22 @@ class HomeController extends Controller
                             $view = view('admin.widgets.peak_hours_card')->render();
                             $column->row($view);
                         });
+
+                        
                     });
                 });
+
+                $row->column(12, function ($column) use ($countryID ,$topUsersByFollowers) {
+                
+                    $top5 = $topUsersByFollowers->take(5);
+
+                    $view5 = view('admin.widgets.top_followers_table', [
+                        'top5' => $top5,
+                    ])->render();
+                
+                    $column->row($view5);
+                });
+                
                 $row->column(12, function ($column) use ($rooms, $totalRoomsJoined, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
@@ -378,26 +394,31 @@ class HomeController extends Controller
 
     public function peakHours(Request $request)
     {
+        $countryID = Auth::user()->country_id;
         $period = $request->get('period', 'day');
-
-        $query = DB::table('live_times');
-
+    
+        $query = DB::table('live_times')
+            ->join('rooms', 'live_times.uid', '=', 'rooms.id')
+            ->join('users', 'rooms.uid', '=', 'users.id')
+            ->where('users.country_id', $countryID);
+    
         if ($period === 'day') {
-            $query->selectRaw("FROM_UNIXTIME(start_time, '%H') as label, COUNT(*) as total")
-                ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+            $query->selectRaw("FROM_UNIXTIME(live_times.start_time, '%H') as label, COUNT(*) as total")
+                ->whereRaw("DATE(FROM_UNIXTIME(live_times.start_time)) = CURDATE()")
                 ->groupBy('label');
         } elseif ($period === 'week') {
-            $query->selectRaw("DATE(FROM_UNIXTIME(start_time)) as label, COUNT(*) as total")
-                ->whereRaw("YEARWEEK(FROM_UNIXTIME(start_time)) = YEARWEEK(CURDATE())")
+            $query->selectRaw("DATE(FROM_UNIXTIME(live_times.start_time)) as label, COUNT(*) as total")
+                ->whereRaw("YEARWEEK(FROM_UNIXTIME(live_times.start_time)) = YEARWEEK(CURDATE())")
                 ->groupBy('label');
         } elseif ($period === 'month') {
-            $query->selectRaw("DATE(FROM_UNIXTIME(start_time)) as label, COUNT(*) as total")
-                ->whereRaw("YEAR(FROM_UNIXTIME(start_time)) = YEAR(CURDATE()) AND MONTH(FROM_UNIXTIME(start_time)) = MONTH(CURDATE())")
+            $query->selectRaw("DATE(FROM_UNIXTIME(live_times.start_time)) as label, COUNT(*) as total")
+                ->whereRaw("YEAR(FROM_UNIXTIME(live_times.start_time)) = YEAR(CURDATE()) 
+                            AND MONTH(FROM_UNIXTIME(live_times.start_time)) = MONTH(CURDATE())")
                 ->groupBy('label');
         }
-
+    
         $rows = $query->orderBy('label')->get();
-
+    
         return response()->json([
             'success' => true,
             'labels' => $rows->pluck('label'),
