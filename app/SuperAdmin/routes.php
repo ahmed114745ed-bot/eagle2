@@ -34,9 +34,9 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
-        if (MultiLanguage::config("show-login-page", true)) {
+         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-        }
+         }
         Route::post('login', [AuthController::class, 'postLogin']);
         Route::get('logout', [AuthController::class, 'logout']);
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);

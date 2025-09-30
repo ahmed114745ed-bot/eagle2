@@ -15,6 +15,11 @@ class SuperAdminReward extends Model
     use HasFactory;
     protected $guarded = [];
     protected $appends = ['target1', 'target2', 'target3', 'target4', 'target5'];
+
+    public function superAdmin()
+    {
+        return $this->belongsTo(SuperAdmin::class, 'super_admin_id');
+    }
     public function ware()
     {
         return $this->hasOne(Ware::class, 'id', 'target');
