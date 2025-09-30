@@ -14,15 +14,15 @@
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {!! json_encode($labels) !!}, // ["Week 1","Week 2",...]
+            labels: {!! json_encode($labels) !!},
             datasets: [
                 {
-                    label: "{{ Carbon::now()->format('F') }}", // سبتمبر
+                    label: "{{ Carbon::now()->format('F') }}",
                     data: {!! json_encode($dataCurrent) !!},
                     backgroundColor: 'rgba(75, 192, 192, 0.7)'
                 },
                 {
-                    label: "{{ \Carbon\Carbon::now()->subMonth()->format('F') }}", // أغسطس
+                    label: "{{ \Carbon\Carbon::now()->subMonth()->format('F') }}",
                     data: {!! json_encode($dataPrevious) !!},
                     backgroundColor: 'rgba(255, 99, 132, 0.7)'
                 }
