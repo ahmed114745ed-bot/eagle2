@@ -26,6 +26,7 @@ class RoomCupTargetController extends MainController
             ->description(__('Room Cup Targets'))
             ->body($this->grid()));
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -33,13 +34,6 @@ class RoomCupTargetController extends MainController
             ->body($this->detail($id)));
     }
 
-    /**
-     * Edit interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
@@ -53,6 +47,7 @@ class RoomCupTargetController extends MainController
             ->title(trans('Room Cup Targets'))
             ->body($this->form()));
     }
+    
     protected function grid()
     {
         $grid = new Grid(new RoomCupTarget());
