@@ -29,7 +29,7 @@ class ChatRoomResource extends JsonResource
             'user_id'             => @$user2->id,
             'name'                => @$user2->name,
             'img'                 => @$user2->profile->avatar,
-            'in_room'             => @$user2->now_room_uid ? true : false,
+            'in_room'             => @$user2?->now_room_uid ? true : false,
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
