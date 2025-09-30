@@ -16,6 +16,7 @@ use App\Models\User;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 use Symfony\Component\Console\Command\Command as EnumCommand;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -130,9 +131,12 @@ class CalculateRoomCupRewards extends Command
         $this->line("👥 Admins: $adminsCount | Visitors: $visitorsCount | Total: {$gift->current_total}");
 
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
-        if ($gift->room_id == 215) {
-            dd($target, $room);
-        }
+       if ($gift->room_id == 215) {
+    Log::info('Gift Debug Data', [
+        'target' => $target,
+        'room'   => $room,
+    ]);
+}
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
