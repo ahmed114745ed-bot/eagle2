@@ -222,9 +222,7 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
-                        // $peakHourData = $peakHours->sortByDesc('total')->first();
-                        // $peakHour = $peakHourData ? $peakHourData->hour . ':00' : 'N/A';
-                        // $peakHourCount = $peakHourData ? $peakHourData->total : 0;
+                   
                     
                         $peakHour = $peakHours ?  $peakHours->hour . ':00' : 'N/A';
                         $peakHourCount = $peakHours ?   $peakHours->total_sessions : 0;
