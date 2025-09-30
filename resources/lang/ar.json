@@ -62,6 +62,9 @@
 "invitation code setting": "إعدادات كود الدعوة",
 "percentage invitation code": "نسبة كود الدعوة",
 
+"total profit": "إجمالي الأرباح",
+"Owner Profit %": "نسبة ربح المالك %",
+"Admin Profit %": "نسبة ربح المسؤول %",
 
     "This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.": "تم إغلاق هذة الغرفة ولن تستطيع الدخول حتي يتم الغاء الحظر عن هذه الغرفة من خلال مشرفين الغرفة",    "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",

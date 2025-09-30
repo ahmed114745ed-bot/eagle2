@@ -2,28 +2,29 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Modules\RoomCup\Entities\RoomCupTarget;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
+use Illuminate\Routing\Controller;
+use App\Admin\Controllers\MainController;
+use Modules\RoomCup\Entities\RoomCupTarget;
+use Illuminate\Contracts\Support\Renderable;
+use Encore\Admin\Controllers\AdminController;
 
-class RoomCupTargetController extends AdminController
+class RoomCupTargetController extends MainController
 {
     protected $title = '';
 
 
-  
+
     public function index(Content $content)
     {
-        return $content
-        ->header(__('Room Cup Targets'))
-        ->description(__('Room Cup Targets'))
-        ->body($this->grid());
+        return parent::index($content
+            ->header(__('Room Cup Targets'))
+            ->description(__('Room Cup Targets'))
+            ->body($this->grid()));
     }
 
     protected function grid()
@@ -31,18 +32,39 @@ class RoomCupTargetController extends AdminController
         $grid = new Grid(new RoomCupTarget());
 
         $grid->column('id', __('ID'))->sortable();
-        $grid->column('total', __('Total'))->sortable();
+        $grid->column('total', __('Total'))->display(function ($coins) {
+            $image = asset('images/coin.jpg');
+            return "<div style='display: flex; align-items: center;'>
+
+                        <span>{$coins}</span>
+                         <img src='{$image}' alt='Coins' width='20' height='20'>
+                    </div>";
+        });
         $grid->column('number_of_visitors', __('Number of Visitors'))->sortable();
         $grid->column('number_of_admins', __('Number of Admins'))->sortable();
-        $grid->column('owner_profit', __('Owner Profit'))->sortable();
-        $grid->column('admin_profit', __('Admin Profit'))->sortable();
+        $grid->column('owner_profit', __('Owner Profit'))->display(function ($coins) {
+            $image = asset('images/coin.jpg');
+            return "<div style='display: flex; align-items: center;'>
 
-        $grid->filter(function($filter) {
+                        <span>{$coins}</span>
+                         <img src='{$image}' alt='Coins' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('admin_profit', __('Admin Profit'))->display(function ($coins) {
+            $image = asset('images/coin.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center;'>
+
+                        <span>{$coins}</span>
+                         <img src='{$image}' alt='Coins' width='20' height='20'>
+                    </div>";
+        });
+
+        $grid->filter(function ($filter) {
             $filter->between('total', __('Total'));
             $filter->between('number_of_visitors', __('Visitors Count'));
             $filter->between('number_of_admins', __('admins'));
         });
-
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -69,9 +91,26 @@ class RoomCupTargetController extends AdminController
         $form->number('total', __('Total'))->default(0);
         $form->number('number_of_visitors', __('Number of Visitors'))->default(0);
         $form->number('number_of_admins', __('Number of Admins'))->default(0);
-        $form->decimal('owner_profit', __('Owner Profit'))->default(0.00);
-        $form->decimal('admin_profit', __('Admin Profit'))->default(0.00);
+        $form->number('total_profit', __('total profit'))->default(0);
+        $form->decimal('owner_percentage', __('Owner Profit %'))->default(0.00);
+        $form->decimal('admin_percentage', __('Admin Profit %'))->default(0.00);
 
+        $form->saving(function (Form $form) {
+            $ownerPercentage = request('owner_percentage');
+            $adminPercentage = request('admin_percentage');
+            $total = $adminPercentage + $ownerPercentage;
+            if ($total != 100) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => trans('admin.percent_total_error', ['total' => $total]),
+                ]);
+
+                return back()->with(compact('error'))->withInput();
+            }
+
+            $form->model()->owner_profit = $form->total_profit * ($ownerPercentage / 100);
+            $form->model()->admin_profit = $form->total_profit * ($adminPercentage / 100);
+        });
         return $form;
     }
 }
