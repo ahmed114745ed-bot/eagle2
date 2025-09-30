@@ -1248,7 +1248,11 @@
   "This Week": "This Week",
   "This Month": "This Month",
   "count_sessions": "Number of Users",
-  "Followers Count": "Followers Count"
+  "Followers Count": "Followers Count",
+  "title_user": "📊 User Statistics (Online / Offline)",
+  "online_users": "Online Users",
+  "offline_users": "Offline Users",
+  "Top Users Visits":"Most interactive"
 
 
 

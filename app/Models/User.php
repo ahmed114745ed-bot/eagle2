@@ -2196,4 +2196,9 @@ class User extends Authenticatable
     {
         return $this->agencyJobs()->where('type', 'requestManger')->exists();
     }
+
+    public function roomVisitors()
+    {
+        return $this->hasMany(RoomVisitor::class, 'user_id');
+    }
 }

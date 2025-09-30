@@ -3090,7 +3090,10 @@
     "Today": "आज",
     "This Week": "यह सप्ताह",
     "This Month": "यह महीना",
-    "count_sessions": "सत्रों की संख्या"
+    "count_sessions": "सत्रों की संख्या",
+    "title_user": "📊 उपयोगकर्ता आँकड़े (ऑनलाइन / ऑफलाइन)",
+    "online_users": "ऑनलाइन उपयोगकर्ता",
+    "offline_users": "ऑफ़लाइन उपयोगकर्ता"
 
 
 
