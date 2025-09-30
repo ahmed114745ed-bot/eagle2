@@ -73,7 +73,30 @@ class SuperAdminRewardController extends MainController
         $grid = new Grid(new SuperAdminReward());
 
         $grid->column('id', __('Id'));
-        $grid->column('super_admin_id', __('Super admin id'));
+       $grid->column('superadmin', __('super admin'))->display(function ($name) {
+            $name = @$this->superAdmin->name ?? '';
+            $uid = @$this->superAdmin->username;
+            $path = @$this?->superAdmin?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this ? url("admin/superadmin-users/{$this->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>";
+        });
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
@@ -125,14 +148,6 @@ class SuperAdminRewardController extends MainController
     protected function form()
     {
         $form = new Form(new SuperAdminReward());
-
-        // $form->number('super_admin_id', __('Super admin id'))->options(function () {
-        //             $vips = SuperAdmin::query()->select('id', 'name','username')->get();
-        //             foreach ($vips as  $vip) {
-        //                 $ops[$vip->id] = $vip->name;
-        //             }
-        //             return $ops;
-        //         });
 
         $this->addSuperAdminField($form);
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
@@ -194,7 +209,7 @@ class SuperAdminRewardController extends MainController
     protected function addSuperAdminField(Form $form)
     {
 
-        $form->belongsTo('superAdmin', SuperAdmins::class, __('Super admin'), function ($form) use ($prefix) {
+        $form->belongsTo('super_admin_id', SuperAdmins::class, __('Super admin'), function ($form)  {
             $form->select('id', __('super Admin'))
                 ->options(function ($id) {
                     if (!$id) return [];

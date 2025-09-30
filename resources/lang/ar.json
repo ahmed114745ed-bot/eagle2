@@ -3792,6 +3792,10 @@
   "Round ID": "رقم الجولة",
   "Result": "النتيجة",
   "Win": "مكسب",
+  "Super Admin Reward": "مكافأة المشرف الأعلى",
+"super admin": "المشرف الأعلى",
+"No reward": "عدد  مكافأة",
+"Super admin": "المشرف الأعلى",
   "Lose": "خسارة",
   "Bet Amount": "المبلغ الملقي",
   "Created at": "تاريخ الإنشاء",
@@ -3944,8 +3948,10 @@
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
 "dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
 "wait-2-minutes" : "انتظر دقيقتان من فضلك" ,
-"dashboard.login.loading.check_code":"جاري التحقق ...."
-
+"dashboard.login.loading.check_code":"جاري التحقق ....",
+"Total BD Salary": "إجمالي رواتب BD",
+"Total Cut Amount": "إجمالي المبالغ المقتطعة",
+"Average Agencies Per BD": "متوسط امتلاك كل BD للوكالات"
 
 
   ,"Show Image": "عرض الصورة",
@@ -4009,6 +4015,8 @@
     "Rooms with PK": "الغرف مع PK",
     "Inactive Rooms": "الغرف غير النشطة",
     "Top 10 Rooms by Gifts Sent": "أعلى 10 غرف من حيث عدد الهدايا المرسلة",
+    "Average Session Duration per Room": "⏳ متوسط مدة الجلسة لكل غرفة",
+    "Average Duration (hours)": "⏳ متوسط المدة (بالساعات)",
 
  "Display Discover": "عرض الاستكشاف",
  "Display Home Top": "عرض أعلى الصفحة الرئيسية",

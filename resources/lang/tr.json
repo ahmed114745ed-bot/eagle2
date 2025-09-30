@@ -514,6 +514,8 @@
     "Rooms with PK": "PK'lı Odalar",
     "Inactive Rooms": "Pasif Odalar",
     "Top 10 Rooms by Gifts Sent": "Gönderilen hediyelere göre en iyi 10 oda",
+    "Average Session Duration per Room": "⏳ Oda başına ortalama oturum süresi",
+    "Average Duration (hours)": "⏳ Ortalama Süre (saat)",
     "Top Messages": "En Çok Mesaj Gönderenler",
     "Top Followers": "En Çok Takipçiye Sahip Kullanıcılar",
     "New Sign Ups This Month": "Bu ayki yeni kayıtlar",
@@ -3359,6 +3361,10 @@
     "Deleted successfully": "Başarıyla silindi",
     "room-boom-rewards": "oda-patlamasi-odulleri",
     "priority": "öncelik",
+    "Super Admin Reward": "Süper Admin Ödülü",
+"super admin": "Süper Admin",
+"No reward": "Ödül yok",
+"Super admin": "Süper Admin",
 
     "Reel Comments": "Video Yorumları",
     "salary_transfer_label": "Tüm BD'ler için maaş transferini durdur",
@@ -3518,7 +3524,10 @@
     "count_sessions": "Oturum Sayısı",
     "title_user": "📊 Kullanıcı İstatistikleri (Çevrimiçi / Çevrimdışı)",
     "online_users": "Çevrimiçi Kullanıcılar",
-    "offline_users": "Çevrimdışı Kullanıcılar"
+    "offline_users": "Çevrimdışı Kullanıcılar",
+    "Total BD Salary": "Toplam BD Maaşı",
+    "Total Cut Amount": "Toplam Kesilen Miktar",
+    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı"
 
 
 

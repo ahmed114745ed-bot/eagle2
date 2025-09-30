@@ -36,6 +36,10 @@
 "total profit": "कुल लाभ",
 "Owner Profit %": "मालिक का लाभ %",
 "Admin Profit %": "प्रशासक का लाभ %",
+"Super Admin Reward": "सुपर एडमिन इनाम",
+"super admin": "सुपर एडमिन",
+"No reward": "कोई इनाम नहीं",
+"Super admin": "सुपर एडमिन",
 "Enable youtube Feature": "यूट्यूब फ़ीचर सक्षम करें",
 "Enable live Feature": "लाइव फ़ीचर सक्षम करें",
     "Badges": "बैज",
@@ -536,6 +540,8 @@
     "Rooms with PK": "PK वाले कमरे",
     "Inactive Rooms": "निष्क्रिय कमरे",
     "Top 10 Rooms by Gifts Sent": "भेजे गए उपहारों के आधार पर शीर्ष 10 कमरे",
+    "Average Session Duration per Room": "⏳ प्रत्येक कक्ष में औसत सत्र की अवधि",
+    "Average Duration (hours)": "⏳ औसत अवधि (घंटों में)",
     "Diamonds Achieved by Hosts": "होस्ट द्वारा प्राप्त हीरे",
     "denied": "इनकार",
     "problem": "समस्या",
@@ -3094,7 +3100,10 @@
     "count_sessions": "सत्रों की संख्या",
     "title_user": "📊 उपयोगकर्ता आँकड़े (ऑनलाइन / ऑफलाइन)",
     "online_users": "ऑनलाइन उपयोगकर्ता",
-    "offline_users": "ऑफ़लाइन उपयोगकर्ता"
+    "offline_users": "ऑफ़लाइन उपयोगकर्ता",
+    "Total BD Salary": "कुल बीडी वेतन",
+    "Total Cut Amount": "कुल कटौती राशि",
+    "Average Agencies Per BD": "प्रति BD औसत एजेंसियों की संख्या"
 
 
 

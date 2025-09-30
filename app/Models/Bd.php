@@ -160,4 +160,10 @@ class Bd extends Model
 
         return floor($userSallary);
     }
+
+    public function salaries()
+    {
+        return $this->hasMany(BdSalary::class, 'bd_id', 'id');
+    
+    }
 }
