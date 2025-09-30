@@ -727,7 +727,7 @@
 .flag-image {
     height: 30px;  /* adjust size */
     width: auto;
-    margin-top: 10px; 
+    margin-top: 10px;
     border-radius: 4px; /* optional */
 }
 
@@ -762,11 +762,11 @@ html.ltr .dropdown-menu {
         right: 0;
     }
 
-    
+
     .rtl  .column-reward .rtlSvga {
             direction: ltr !important;
         }
-  
+
     select>option{
         background-color: var(--box-background-color) !important;
         color: var(--inverse-box-color) !important;
@@ -1264,6 +1264,18 @@ html.ltr .dropdown-menu {
 
     .rtl label.control-label.pull-right small:last-of-type{
         margin-left: 50px;
+    }
+
+    @media (max-width: 768px) {
+        .col-md-3,
+        .col-sm-6 {
+            flex: 0 0 100%;
+            width: 50%;
+        }
+
+        .small-box h3{
+            font-size: 25px;
+        }
     }
 
 </style>
