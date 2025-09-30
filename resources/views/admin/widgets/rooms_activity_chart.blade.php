@@ -7,7 +7,7 @@
             <option value="month">{{ __('Last 6 Months') }}</option>
         </select>
     </div>
-    <div class="box-body" style="height:280px;">
+    <div class="box-body" style="height:365px;">
         <canvas id="roomsActivityChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
