@@ -2,18 +2,15 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Admin\Widgets\Table;
 use App\Models\AgencyJoinRequest;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
-use Carbon\Carbon;
-use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
 use App\Models\Bd;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\UserSallary;
+use Carbon\Carbon;
 use Encore\Admin\Layout\Row;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
@@ -42,13 +39,6 @@ class HomeController extends Controller
             ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
             ->groupBy('hour')
             ->orderBy('hour')
-            ->get();
-        $topRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->withCount('messages')
-            ->orderByDesc('messages_count')
-            ->take(10)
             ->get();
         $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
@@ -92,15 +82,6 @@ class HomeController extends Controller
             ->withCount('roomVisitors')
             ->get()
             ->sum('room_visitors_count');
-        $activeRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->whereHas('roomVisitors', function ($q) {
-                $q->whereHas('user', function ($query) {
-                    $query->where('online', 1);
-                });
-            })
-            ->count();
         $totalRooms = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
         })->count();
@@ -109,47 +90,28 @@ class HomeController extends Controller
         })
             ->whereDate('created_at', today())
             ->count();
-        $activeRoomsToday = Room::whereHas('messages', function ($q) use ($countryID) {
-            $q->whereDate('created_at', today())
-                ->whereHas('user', function ($u) use ($countryID) {
-                    $u->where('country_id', $countryID);
-                });
-        })->count();
-        $topVisitedRoom = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->withCount('roomVisitors')
-            ->orderByDesc('room_visitors_count')
-            ->first();
-        $topVisitedRoomVisitors = $topVisitedRoom?->room_visitors_count ?? 0;
 
         $inactiveRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-            ->whereDoesntHave('messages', function($q) {
+            ->whereDoesntHave('roomVisitors', function($q) {
                 $q->where('created_at', '>=', now()->subDays(7));
             })
             ->count();
-        $longestActiveRoom = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->with(['messages' => function ($q) {
+        $longestActiveRoom = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+            ->with(['roomVisitors' => function ($q) {
                 $q->select('id', 'room_id', 'created_at');
             }])
             ->get()
             ->map(function ($room) {
-                $min = $room->messages->min('created_at');
-                $max = $room->messages->max('created_at');
+                $min = $room->roomVisitors->min('created_at');
+                $max = $room->roomVisitors->max('created_at');
 
                 if (!$min || !$max) {
                     return 0;
                 }
 
-                return $max->diffInDays($min);
+                return Carbon::parse($max)->diffInDays(Carbon::parse($min));
             })
             ->max() ?? 0;
-        $avgMessagesPerRoom = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-            ->withCount('messages')
-            ->get()
-            ->avg('messages_count');
         $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
         })
@@ -183,17 +145,18 @@ class HomeController extends Controller
             ->filter()
             ->map(fn($mics) => count(array_filter(explode(',', $mics))))
             ->avg();
-        $topMicRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-            ->get()
-            ->map(function ($room) {
-                $micCount = count(array_filter(explode(',', $room->microphone ?? '')));
-                return [
-                    'room' => $room,
-                    'mic_count' => $micCount
-                ];
-            })
-            ->sortByDesc('mic_count')
-            ->take(10);
+        //return back another way
+//        $topMicRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+//            ->get()
+//            ->map(function ($room) {
+//                $micCount = count(array_filter(explode(',', $room->microphone ?? '')));
+//                return [
+//                    'room' => $room,
+//                    'mic_count' => $micCount
+//                ];
+//            })
+//            ->sortByDesc('mic_count')
+//            ->take(10);
         $roomsWithMic = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
             ->whereNotNull('microphone')
             ->where('microphone', '!=', '')
@@ -242,13 +205,13 @@ class HomeController extends Controller
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
                 $row->column(12, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . ' 💰'));
 
-                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
-                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $topRooms, $activeRooms, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
@@ -346,20 +309,16 @@ class HomeController extends Controller
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($rooms, $totalRoomsJoined, $activeRooms, $topRooms, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
+                $row->column(12, function ($column) use ($rooms, $totalRoomsJoined, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
-                    $column->row(function (Row $row) use ($rooms, $totalRoomsJoined, $activeRooms, $topRooms, $totalRooms, $newRoomsToday, $activeRoomsToday, $topVisitedRoomVisitors, $liveRooms,
-                        $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMessagesPerRoom, $topMicRooms, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
+                    $column->row(function (Row $row) use ($rooms, $totalRoomsJoined, $totalRooms, $newRoomsToday, $liveRooms,
+                        $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
                         $row->column(3, new InfoBox(__('Total Rooms'), 'building', 'aqua', 'superadmin/rooms', $totalRooms));
                         $row->column(3, new InfoBox(__('online rooms Count'), 'users', 'green', 'superadmin/rooms', $rooms));
                         $row->column(3, new InfoBox(__('Total Rooms Joined By Visitors'), 'building', 'yellow', 'superadmin/rooms', $totalRoomsJoined));
-                        $row->column(3, new InfoBox(__('Active Rooms'), 'users', 'red', 'superadmin/rooms', $activeRooms));
                         $row->column(3, new InfoBox(__('New Rooms Today'), 'plus', 'blue', 'superadmin/rooms', $newRoomsToday));
-                        $row->column(3, new InfoBox(__('Active Rooms Today'), 'comments', 'purple', 'superadmin/rooms', $activeRoomsToday));
-                        $row->column(3, new InfoBox(__('Top Room Visitors'), 'users', 'maroon', 'superadmin/rooms', $topVisitedRoomVisitors));
-                        $topRoom = $topRooms->first();
-                        $row->column(3, new InfoBox(__('Top Room Messages'), 'commenting', 'teal', 'superadmin/rooms/' . ($topRoom ? $topRoom->id : '#'), $topRoom ? $topRoom->messages_count : 0));
+//                        $row->column(3, new InfoBox(__('Top Room Messages'), 'commenting', 'teal', 'superadmin/rooms/' . ($topRoom ? $topRoom->id : '#'), $topRoom ? $topRoom->messages_count : 0));
                         $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'olive', 'superadmin/rooms', $liveRooms));
                         $row->column(3, new InfoBox(__('Audio Rooms'), 'music', 'orange', 'superadmin/rooms', $audioRooms));
                         $row->column(3, new InfoBox(__('Most Visited Room (visitors)'), 'users', 'lime', 'superadmin/rooms', $mostVisitedRoomCount));
@@ -367,9 +326,6 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Rooms With PK Battles'), 'gamepad', 'aqua', 'superadmin/rooms', $roomsWithPk));
                         $row->column(3, new InfoBox(__('Inactive Rooms (last 7 days)'), 'bed', 'green', 'superadmin/rooms', $inactiveRooms));
                         $row->column(3, new InfoBox(__('Longest Active Room (days)'), 'clock-o', 'yellow', 'superadmin/rooms', $longestActiveRoom));
-                        $row->column(3, new InfoBox(__('Avg Messages Per Room'), 'envelope-open', 'red', 'superadmin/rooms', round($avgMessagesPerRoom, 2)));
-
-                        $row->column(3, new InfoBox(__('Top Room by Mic Users'), 'microphone', 'blue', 'superadmin/rooms/' . ($topMicRooms->first()?->room->id ?? '#'), $topMicRooms->first()?->mic_count ?? 0));
                         $row->column(3, new InfoBox(__('Avg Mic Users per Room'), 'users', 'purple', 'superadmin/rooms', round($avgMicPerRoom, 2)));
                         $row->column(3, new InfoBox(__('Rooms With Mic Usage'), 'volume-up', 'maroon', 'superadmin/rooms', $roomsWithMic));
                         $row->column(3, new InfoBox(__('Rooms With Mic (%)'), 'pie-chart', 'teal', 'superadmin/rooms', round($percentageWithMic, 1) . '%'));
