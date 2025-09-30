@@ -213,7 +213,7 @@ class HomeController extends Controller
             ->description('إحصائيات عامة')
 
             ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
-                $row->column(12, new InfoBox(__('Your Wallet'), 'money', 'green', '/', $diAuth . '🟡'));
+                $row->column(12, new InfoBox(__('Your Wallet'), 'money', 'green', '/', $diAuth . '💎'));
                 $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
