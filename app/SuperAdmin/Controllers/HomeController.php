@@ -354,10 +354,10 @@ class HomeController extends Controller
                                 ->count();
 
                             $roomStats = [
-                                'Rooms with PK'  => $roomsWithPk,
-                                'Audio Rooms'    => $audioRooms,
-                                'Live Rooms'     => $liveRooms,
-                                'Inactive Rooms' => $inactiveRooms,
+                                __('Rooms with PK')  => $roomsWithPk,
+                                __('Audio Rooms')    => $audioRooms,
+                                __('Live Rooms')     => $liveRooms,
+                                __('Inactive Rooms') => $inactiveRooms,
                             ];
 
                             $view = view('admin.widgets.rooms_distribution_chart', [
