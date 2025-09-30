@@ -214,21 +214,17 @@ class HomeController extends Controller
                     $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
-
                         $peakHourData = $peakHours->sortByDesc('total')->first();
-
                         if ($peakHourData) {
                             $time = Carbon::createFromTime($peakHourData->hour);
                             $time->locale(app()->getLocale());
-                            $peakHour = $time->isoFormat('h A'); // مثال: 12 PM أو ١٢ م
+                            $peakHour = $time->isoFormat('h A');
                             $peakHourCount = $peakHourData->total;
                             $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
                         } else {
                             $value = 'N/A';
                         }
-
                         $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $value));
-
                         $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
                         $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
                         $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
