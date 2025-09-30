@@ -17,7 +17,7 @@ class RoomCupTargetController extends MainController
 {
     protected $title = '';
 
-
+ public $permission_name = 'room-cup-target';
 
     public function index(Content $content)
     {
