@@ -66,7 +66,7 @@ class RoomCupReportsController extends AdminController
             }
              $showUrl = $this ? url("admin/rooms/{$id}") : 0;
             return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    $url
+                   <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                          <span style='text-decoration: underline; cursor: pointer;'>$name</span>
