@@ -141,6 +141,11 @@ class CalculateRoomCupRewards extends Command
                 'target' => $target,
                 'room'   => $room,
             ]);
+           
+            Log::info('count', [
+                'visitor' => $visitorsCount,
+                'admin'   => $adminsCount,
+            ]);
         }
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
