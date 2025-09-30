@@ -14,7 +14,7 @@ use Modules\RoomCup\Entities\RoomCupReward;
 use App\Models\Room;
 use App\Models\User;
 use Modules\RoomCup\Helpers\RoomCupHelper;
-use Symfony\Component\Console\Command\Command as EnumCommand ;
+use Symfony\Component\Console\Command\Command as EnumCommand;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -34,15 +34,15 @@ class CalculateRoomCupRewards extends Command
             $this->warn("⛔ Room Cup not enabled");
             return EnumCommand::SUCCESS;
         }
-    
+
         [$start, $end] = $this->getPeriodByType($type);
-    
+
         $this->logStart($start, $end);
-    
+
         $this->processGiftsInPeriod($start, $end);
-    
+
         $this->logEnd();
-    
+
         return EnumCommand::SUCCESS;
     }
     private function isEnabledRoomCup(array $settings): bool
@@ -59,14 +59,14 @@ class CalculateRoomCupRewards extends Command
             'type'             => 'daily',
             'time'             => '23:59',
         ];
-    
+
         if (!Storage::disk('local')->exists('roomcup_settings.json')) {
             Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
         }
-    
+
         return array_merge($default, json_decode(Storage::disk('local')->get('roomcup_settings.json'), true) ?? []);
     }
-    
+
     private function getPeriodByType(string $type): array
     {
         return match ($type) {
@@ -75,7 +75,7 @@ class CalculateRoomCupRewards extends Command
                 Carbon::yesterday(getTimezone())->endOfDay(),
             ],
             'weekly'  => [
-                Carbon::now(getTimezone())->subWeek()->startOfWeek(), 
+                Carbon::now(getTimezone())->subWeek()->startOfWeek(),
                 Carbon::now(getTimezone())->subWeek()->endOfWeek(),
             ],
             'monthly' => [
@@ -88,7 +88,7 @@ class CalculateRoomCupRewards extends Command
             ],
         };
     }
-    
+
     private function processGiftsInPeriod(Carbon $start, Carbon $end): void
     {
         TotalRoomGift::whereBetween('created_at', [$start, $end])
@@ -99,12 +99,12 @@ class CalculateRoomCupRewards extends Command
                 }
             });
     }
-    
+
     private function logStart(Carbon $start, Carbon $end): void
     {
         $this->info("🚀 Starting full calculation for gifts between {$start} and {$end}");
     }
-    
+
     private function logEnd(): void
     {
         $this->info("✅ Calculation finished");
@@ -121,6 +121,7 @@ class CalculateRoomCupRewards extends Command
             return;
         }
 
+
         $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
 
@@ -132,10 +133,11 @@ class CalculateRoomCupRewards extends Command
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
-        DB::transaction(function () use ($room, $gift, $target, $adminsCount)  {
+        DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
-            $targetId =$target->id;
-
+            $targetId = $target->id;
+            $room->max_admin = $target->number_of_admins;
+            $room->save();
             // Owner reward
             if ($target->owner_profit > 0) {
                 $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $room->uid, 'owner', $target->owner_profit);
@@ -145,7 +147,7 @@ class CalculateRoomCupRewards extends Command
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins_v2() as $admin) {
-                    $rewards[] = $this->makeReward($room->id, $gift->id,$targetId, $admin->id, 'admin', $share);
+                    $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $admin->id, 'admin', $share);
                     $this->line("👤 Admin {$admin->id} will get $share");
                 }
             }
@@ -194,7 +196,7 @@ class CalculateRoomCupRewards extends Command
             ->first();
     }
 
-    private function makeReward(int $roomId, int $giftId,$targetId,  int $userId, string $type, float $amount): array
+    private function makeReward(int $roomId, int $giftId, $targetId,  int $userId, string $type, float $amount): array
     {
         return [
             'room_id'            => $roomId,
