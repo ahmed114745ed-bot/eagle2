@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ZegoFeatureEvent;
 use Log;
 use Cache;
 use Carbon\Carbon;
@@ -163,6 +164,15 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
+        if ($request->has('zego_feature')) {
+            if ($request->zego_feature == 0) {
+                $zegoFeature = [
+                    'zego_feature' => (bool)0,
+                ];
+                event(new ZegoFeatureEvent($zegoFeature));
+            }
+        }
+
         if ($request->brand_background_type == 'color') {
             $data['brand_background_image'] = null;
         }
@@ -233,7 +243,6 @@ class SettingsController extends Controller
 
     public function updateAppConfig(Request $request)
     {
-
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
