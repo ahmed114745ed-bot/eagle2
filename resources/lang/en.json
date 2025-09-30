@@ -1242,7 +1242,13 @@
   "Display Live": "Display Live",
   "Display Country": "Display Country",
   "ON": "ON",
-  "OFF": "OFF"
+  "OFF": "OFF",
+  "Peak Hour Analytics": "Peak Hour Analytics",
+  "Today": "Today",
+  "This Week": "This Week",
+  "This Month": "This Month",
+  "count_sessions": "Number of Sessions"
+
 
 
 

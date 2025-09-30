@@ -3014,7 +3014,13 @@
     "Display Live": "लाइव दिखाएँ",
     "Display Country": "देश दिखाएँ",
     "ON": "चालू",
-    "OFF": "बंद"
+    "OFF": "बंद",
+    "Peak Hour Analytics": "पीक आवर विश्लेषण",
+    "Today": "आज",
+    "This Week": "यह सप्ताह",
+    "This Month": "यह महीना",
+    "count_sessions": "सत्रों की संख्या"
+
 
 
 
