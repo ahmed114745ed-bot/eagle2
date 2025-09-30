@@ -150,8 +150,9 @@
     }
 
     .rtl .small-box .icon{
-        width: 96%;
+        width: 100%;
         text-align: left;
+        right: -2px !important;
     }
 
     .skin-black-light .main-header > .navbar {
@@ -1272,10 +1273,21 @@ html.ltr .dropdown-menu {
             flex: 0 0 100%;
             width: 50%;
         }
-
-        .small-box h3{
-            font-size: 25px;
-        }
     }
 
+    .small-box h3{
+        font-size: x-large !important;
+    }
+
+    .small-box:hover .icon{
+        font-size: 80px;
+        transform: translateY(-37px);
+        transition: all 0.3s ease;
+    }
+
+    .small-box .icon{
+        font-size: 50px;
+        top: 25px;
+        right: 2px;
+    }
 </style>

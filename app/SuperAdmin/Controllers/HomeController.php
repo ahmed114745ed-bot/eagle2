@@ -216,9 +216,25 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
                         $peakHourData = $peakHours->sortByDesc('total')->first();
-                        $peakHour = $peakHourData ? $peakHourData->hour . ':00' : 'N/A';
-                        $peakHourCount = $peakHourData ? $peakHourData->total : 0;
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $peakHour . ' (' . $peakHourCount . ')'));
+
+                        if ($peakHourData) {
+                            $time = \Carbon\Carbon::createFromTime($peakHourData->hour);
+
+                            // ضبط اللغة حسب لغة الموقع
+                            $time->locale(app()->getLocale());
+
+                            // صيغة الوقت حسب اللغة
+                            $peakHour = $time->isoFormat('h A'); // مثال: 12 PM أو ١٢ م
+
+                            $peakHourCount = $peakHourData->total;
+
+                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
+                        } else {
+                            $value = 'N/A';
+                        }
+
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $value));
+
                         $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
                         $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
                         $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
