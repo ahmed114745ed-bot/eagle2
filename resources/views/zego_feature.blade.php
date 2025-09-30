@@ -238,7 +238,7 @@
     </div>
 
     <div class="settings-content">
-        <div id="AppFeature" class="settings-section active">
+        <div id="ZegoFeature" class="settings-section active">
             <h2>{{ __('Zego Feature') }}</h2>
             <form id="zegoFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -278,7 +278,7 @@
             return urlParams.get(name);
         }
 
-        const activeTab = getQueryParam("firsttab") || "AppFeature";
+        const activeTab = getQueryParam("firsttab") || "ZegoFeature";
         showSection(activeTab);
     });
 
