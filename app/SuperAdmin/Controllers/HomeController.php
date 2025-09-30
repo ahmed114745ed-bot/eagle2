@@ -223,11 +223,17 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
                    
-                    
-                        $peakHour = $peakHours ?  $peakHours->hour . ':00' : 'N/A';
-                        $peakHourCount = $peakHours ?   $peakHours->total_sessions : 0;
+                        if ($peakHours) {
+                            $time = Carbon::createFromTime($peakHours->hour);
+                            $time->locale(app()->getLocale());
+                            $peakHour = $time->isoFormat('h A');
+                            $peakHourCount = $peakHours->total_sessions;
+                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
+                        } else {
+                            $value = 'N/A';
+                        }
 
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $peakHour . ' (' . $peakHourCount . ')'));
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $value));
                         $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
                         $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
                         $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
