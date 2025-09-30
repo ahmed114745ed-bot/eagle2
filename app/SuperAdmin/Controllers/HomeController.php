@@ -254,14 +254,7 @@ class HomeController extends Controller
                         // Left: top 10 salaries
                         $row->column(6, function ($column) use ($countryID,$topUsersByFollowers) {
                         
-
-                            $labels = $topUsersByFollowers->pluck('name');
-                            $data   = $topUsersByFollowers->pluck('followers_count');
-
-                            $view = view('admin.widgets.top_followers_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
+                            $view = view('admin.widgets.top_users_visits_chart')->render();
 
                             $column->row($view);
                         });
@@ -559,4 +552,25 @@ class HomeController extends Controller
             'inactiveRooms' => $inactiveRooms,
         ]);
     }
+
+
+    public function topUsersVisits(Request $request)
+    {
+        $countryID = Auth::user()->country_id;
+
+        $topUsers = User::select('id', 'name')
+            ->withCount(['roomVisitors as visits_count' => function($q) {
+                $q->whereDate('created_at', '>=', now()->subMonth()); 
+            }])
+            ->where('country_id', $countryID)
+            ->orderByDesc('visits_count')
+            ->take(10)
+            ->get();
+
+        return response()->json([
+            'labels' => $topUsers->pluck('name'),
+            'data'   => $topUsers->pluck('visits_count')
+        ]);
+    }
+
 }

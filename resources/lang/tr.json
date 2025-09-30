@@ -3458,7 +3458,10 @@
     "Today": "Bugün",
     "This Week": "Bu Hafta",
     "This Month": "Bu Ay",
-    "count_sessions": "Oturum Sayısı"
+    "count_sessions": "Oturum Sayısı",
+    "title_user": "📊 Kullanıcı İstatistikleri (Çevrimiçi / Çevrimdışı)",
+    "online_users": "Çevrimiçi Kullanıcılar",
+    "offline_users": "Çevrimdışı Kullanıcılar"
 
 
 

@@ -111,10 +111,11 @@ Route::group(
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
    
-   
+         // ajax
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])
         ->name('users.online.stats');
-   
+        Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+
     }
 );
