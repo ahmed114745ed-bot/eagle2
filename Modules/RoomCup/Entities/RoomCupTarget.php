@@ -14,5 +14,8 @@ class RoomCupTarget extends Model
         'number_of_admins',
         'owner_profit',
         'admin_profit',
+        'total_profit',
+        'owner_percentage',
+        'admin_percentage'
     ];
 }
