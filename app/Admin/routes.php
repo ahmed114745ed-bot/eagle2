@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\SuperAdminChargeReportController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -93,6 +92,7 @@ use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\SuperAdminChargeController;
+use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminSelectController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
@@ -114,6 +114,7 @@ use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\SuperAdminChargeReportController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
@@ -145,10 +146,9 @@ Route::group([
         'multiLanguage',
     ],
 ], function () {
-    
+
     Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
-    
 });
 
 Route::group(
@@ -325,7 +325,7 @@ Route::group(
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
-       
+
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
@@ -607,6 +607,7 @@ Route::group(
             }
             dD("goold");
         });
+        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::get('background-count', function () {
             $backgrounds = \App\Models\Background::get();
             if ($backgrounds) {
@@ -657,6 +658,10 @@ Route::group(
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/details', [CoinGameUserAllController::class, 'index_details']);
+        Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
+            ->name('coin-game-users.ajax');
+
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
