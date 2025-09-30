@@ -4009,7 +4009,14 @@
 "owner percentage from the lucky gift": "نسبة المالك من هدية الحظ",
 "host percentage from the lucky gift": "نسبة المضيف من هدية الحظ",
 "Lucky Gift Setting": "إعداد هدية الحظ",
-"Browse lucky gift setting": "تصفح إعداد هدية الحظ"
+"Browse lucky gift setting": "تصفح إعداد هدية الحظ",
+ "Peak Hour Analytics": "تحليلات ساعة الذروة",
+ "Today": "اليوم",
+ "This Week": "هذا الأسبوع",
+ "This Month": "هذا الشهر",
+ "count_sessions": "عدد الجلسات"
+
+
 
 
 

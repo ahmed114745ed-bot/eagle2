@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Chat\Entities\ChatMessage;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -33,13 +34,19 @@ class HomeController extends Controller
         $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->where('country_id', $countryID)->count();
         $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where('country_id', $countryID)->count();
         $onlineUser = User::where('country_id', $countryID)->where('online', 1)->count();
-        $peakHours = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
-            ->groupBy('hour')
-            ->orderBy('hour')
-            ->get();
+        // $peakHours = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->where('country_id', $countryID);
+        // })
+        //     ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
+        //     ->groupBy('hour')
+        //     ->orderBy('hour')
+        //     ->get();
+        $peakHours = LiveTime::selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
+                    ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+                    ->groupBy('hour')
+                    ->orderByDesc('total_sessions')
+                    ->limit(1)
+                    ->first();
         $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
         })
@@ -215,10 +222,17 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users', $onlineUser));
 
-                        $peakHourData = $peakHours->sortByDesc('total')->first();
-                        $peakHour = $peakHourData ? $peakHourData->hour . ':00' : 'N/A';
-                        $peakHourCount = $peakHourData ? $peakHourData->total : 0;
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $peakHour . ' (' . $peakHourCount . ')'));
+                   
+                        if ($peakHours) {
+                            $time = Carbon::createFromTime($peakHours->hour);
+                            $time->locale(app()->getLocale());
+                            $peakHour = $time->isoFormat('h A');
+                            $peakHourCount = $peakHours->total_sessions;
+                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
+                        } else {
+                            $value = 'N/A';
+                        }
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $value));
                         $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
                         $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
                         $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users', $newSignUpsThisMonth));
@@ -307,6 +321,11 @@ class HomeController extends Controller
 
                             $column->row($view);
                         });
+
+                        $row->column(6, function ($column) {
+                            $view = view('admin.widgets.peak_hours_card')->render();
+                            $column->row($view);
+                        });
                     });
                 });
                 $row->column(12, function ($column) use ($rooms, $totalRoomsJoined, $totalRooms, $newRoomsToday, $liveRooms, $audioRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $roomsWithPk, $inactiveRooms, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
@@ -357,5 +376,35 @@ class HomeController extends Controller
                     });
                 });
             });
+    }
+
+
+    public function peakHours(Request $request)
+    {
+        $period = $request->get('period', 'day');
+
+        $query = DB::table('live_times');
+
+        if ($period === 'day') {
+            $query->selectRaw("FROM_UNIXTIME(start_time, '%H') as label, COUNT(*) as total")
+                ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+                ->groupBy('label');
+        } elseif ($period === 'week') {
+            $query->selectRaw("DATE(FROM_UNIXTIME(start_time)) as label, COUNT(*) as total")
+                ->whereRaw("YEARWEEK(FROM_UNIXTIME(start_time)) = YEARWEEK(CURDATE())")
+                ->groupBy('label');
+        } elseif ($period === 'month') {
+            $query->selectRaw("DATE(FROM_UNIXTIME(start_time)) as label, COUNT(*) as total")
+                ->whereRaw("YEAR(FROM_UNIXTIME(start_time)) = YEAR(CURDATE()) AND MONTH(FROM_UNIXTIME(start_time)) = MONTH(CURDATE())")
+                ->groupBy('label');
+        }
+
+        $rows = $query->orderBy('label')->get();
+
+        return response()->json([
+            'success' => true,
+            'labels' => $rows->pluck('label'),
+            'data'   => $rows->pluck('total'),
+        ]);
     }
 }

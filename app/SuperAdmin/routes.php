@@ -122,5 +122,8 @@ Route::group(
 
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+  
+        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
+
     }
 );

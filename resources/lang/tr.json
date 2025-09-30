@@ -3497,7 +3497,13 @@
     "Display Live": "Canlı Yayını Göster",
     "Display Country": "Ülkeleri Göster",
     "ON": "Açık",
-    "OFF": "Kapalı"
+    "OFF": "Kapalı",
+    "Peak Hour Analytics": "Yoğun Saat Analizi",
+    "Today": "Bugün",
+    "This Week": "Bu Hafta",
+    "This Month": "Bu Ay",
+    "count_sessions": "Oturum Sayısı"
+
 
 
 
