@@ -41,7 +41,7 @@ class HomeController extends Controller
             ->take(10)
             ->get();
         $peakHours = LiveTime::
-                whereHas('room.owner', function ($q) use ($countryID) {
+                whereHas('user', function ($q) use ($countryID) {
                     $q->where('country_id', $countryID);
                 })
                 ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
@@ -422,8 +422,7 @@ class HomeController extends Controller
         $period = $request->get('period', 'day');
     
         $query = DB::table('live_times')
-            ->join('rooms', 'live_times.uid', '=', 'rooms.id')
-            ->join('users', 'rooms.uid', '=', 'users.id')
+            ->join('users', 'live_times.uid', '=', 'users.id')
             ->where('users.country_id', $countryID);
     
         if ($period === 'day') {
@@ -559,18 +558,19 @@ class HomeController extends Controller
         $countryID = Auth::user()->country_id;
 
         $topUsers = User::select('id', 'name')
-            ->withCount(['roomVisitors as visits_count' => function($q) {
-                $q->whereDate('created_at', '>=', now()->subMonth()); 
+            ->withCount(['liveTimes as total_hours' => function($q) {
+                $q->select(DB::raw("SUM(hours)"))
+                  ->where('start_time', '>=', now()->subMonth()); 
             }])
             ->where('country_id', $countryID)
-            ->having('visits_count', '>', 0)
-            ->orderByDesc('visits_count')
+            ->having('total_hours', '>', 0) 
+            ->orderByDesc('total_hours')
             ->take(10)
             ->get();
-
+    
         return response()->json([
             'labels' => $topUsers->pluck('name'),
-            'data'   => $topUsers->pluck('visits_count')
+            'data'   => $topUsers->pluck('total_hours')
         ]);
     }
 

@@ -17,4 +17,8 @@ class LiveTime extends Model
     {
         return $this->belongsTo(Room::class, 'uid', 'id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'uid', 'id');
+    }
 }
