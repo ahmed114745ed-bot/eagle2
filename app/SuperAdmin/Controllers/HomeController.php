@@ -563,6 +563,7 @@ class HomeController extends Controller
                 $q->whereDate('created_at', '>=', now()->subMonth()); 
             }])
             ->where('country_id', $countryID)
+            ->having('visits_count', '>', 0)
             ->orderByDesc('visits_count')
             ->take(10)
             ->get();
