@@ -12,6 +12,12 @@
 
     .table thead th {
         vertical-align: middle;
+     
+    }
+
+    .table thead .th {
+   
+        width: 21%;
     }
 
     .avatar-cell {
@@ -26,6 +32,9 @@
         border-radius: 50%;
         object-fit: cover;
     }
+    .text-center{
+        text-align: center !important;
+    }
 </style>
 
 <div class="card shadow-sm border-0">
@@ -39,8 +48,8 @@
                 <thead class="table-light">
                     <tr>
                         <th class="text-center" style="width: 60px;">#</th>
-                        <th>{{ __('User') }}</th>
-                        <th class="text-center">{{ __('Followers Count') }}</th>
+                        <th class="text-center">{{ __('User') }}</th>
+                        <th class="text-center th">{{ __('Followers Count') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,7 +63,6 @@
                                     'name'   => $user->name ,
                                     'avatar' => $user->profile?->avatar ,
                                 ], withoutLevels: true) !!}
-                                <span>{{ $user->name }}</span>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-success fs-6">
