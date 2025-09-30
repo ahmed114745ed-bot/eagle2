@@ -13,7 +13,7 @@ return [
 
 
     ],
-
+   'admins_greater_than' => 'Number of admins must be greater than :limit.',
     'notCharge' => ' your agency not active please call administrator',
     'yorSelf' => ' you can\'t charge to your agency',
     'off_msg' => '',

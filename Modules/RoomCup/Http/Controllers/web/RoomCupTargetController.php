@@ -5,6 +5,7 @@ namespace Modules\RoomCup\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use Illuminate\Routing\Controller;
@@ -47,7 +48,7 @@ class RoomCupTargetController extends MainController
             ->title(trans('Room Cup Targets'))
             ->body($this->form()));
     }
-    
+
     protected function grid()
     {
         $grid = new Grid(new RoomCupTarget());
@@ -111,7 +112,16 @@ class RoomCupTargetController extends MainController
 
         $form->number('total', __('Total'))->default(0);
         $form->number('number_of_visitors', __('Number of Visitors'))->default(0);
-        $form->number('number_of_admins', __('Number of Admins'))->default(0);
+        $form->number('number_of_admins', __('Number of Admins'))
+            ->default(0)
+            ->rules([
+                function ($attribute, $value, $fail) {
+                    $limit = Common::getConfig('max_room_admin');
+                    if ($value < $limit) {
+                        $fail(__('api.admins_greater_than', ['limit' => $limit]));
+                    }
+                },
+            ]);
         $form->number('total_profit', __('total profit'))->default(0);
         $form->decimal('owner_percentage', __('Owner Profit %'))->default(0.00);
         $form->decimal('admin_percentage', __('Admin Profit %'))->default(0.00);

@@ -116,10 +116,12 @@ class CalculateRoomCupRewards extends Command
 
         $room = Room::find($gift->room_id);
 
+
         if (!$room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
             return;
         }
+
 
 
         $adminsCount   = $room->admins_v2()->count();
@@ -128,16 +130,19 @@ class CalculateRoomCupRewards extends Command
         $this->line("👥 Admins: $adminsCount | Visitors: $visitorsCount | Total: {$gift->current_total}");
 
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
-
+        if ($gift->room_id == 215) {
+            dd($target, $room);
+        }
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
+        $room->max_admin = $target->number_of_admins;
+        $room->save();
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
             $targetId = $target->id;
-            $room->max_admin = $target->number_of_admins;
-            $room->save();
+
             // Owner reward
             if ($target->owner_profit > 0) {
                 $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $room->uid, 'owner', $target->owner_profit);
