@@ -205,7 +205,7 @@ class ChatRoomService
             ->where('user_id', '!=', $user->id)
             ->where('status', '!=', 'seen')
             ->paginate(20);
-            return 'dd';
+           
         return [
             'success' => true,
             'message' => 'successfully',
