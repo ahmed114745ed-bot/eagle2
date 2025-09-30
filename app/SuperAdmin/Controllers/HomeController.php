@@ -232,7 +232,6 @@ class HomeController extends Controller
                         } else {
                             $value = 'N/A';
                         }
-
                         $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', '', $value));
                         $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users', $newSignUpsToday));
                         $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users', $newSignUpsThisWeek));
