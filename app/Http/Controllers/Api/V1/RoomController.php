@@ -1291,7 +1291,7 @@ class RoomController extends Controller
 
         if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
        
-        if (count($adm_arr) == ($roomMax >= Common::getConfig('max_room_admin') ? $roomMax : Common::getConfig('max_room_admin'))) return Common::apiResponse(0, 'room manager is full', null, 422);
+        if (count($adm_arr) == ($roomMax >= Common::getConfig('max_room_admin') ? $roomMax : Common::getConfig('max_room_admin'))) return Common::apiResponse(0, 'room manager is full', null, 404);
 
 
         $adm_arr = array_merge($adm_arr, [$admin_id]);
