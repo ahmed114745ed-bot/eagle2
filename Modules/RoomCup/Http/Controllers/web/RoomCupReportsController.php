@@ -51,15 +51,6 @@ class RoomCupReportsController extends AdminController
             return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
         });
            
-        $grid->column('owner', __('room owner'))->display(function ($name) {
-            $user = $this->gift?->room?->owner;
-            if (! $user) {
-                return __('No User');
-            }
-
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
-        });
-
         $grid->column('room_id', __('room'))->display(function ($name) {
             $path = @ $this->gift->room->room_cover;
             $id = @ $this->gift->room->id;
@@ -73,20 +64,17 @@ class RoomCupReportsController extends AdminController
             if (strlen($name) > 50){
                 $name = substr($name,0,50) . ' ...';
             }
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+             $showUrl = $this ? url("admin/rooms/{$id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $url
                     <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>ID: $id</span>
                     </div>
-                </div>
-            ";
+                </div>";
         });
-
-    
-
-        $grid->column('gift.current_total', __('Daily Gain'));
 
         $grid->column('amount', __('Profit Coins'));
         $grid->column('type', __('type'));
