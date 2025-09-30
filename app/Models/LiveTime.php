@@ -12,4 +12,9 @@ class LiveTime extends Model
     protected $table = 'live_times';
 
     protected $guarded = [];
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'uid', 'id');
+    }
 }
