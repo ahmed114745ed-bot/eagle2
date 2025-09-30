@@ -404,6 +404,35 @@ class HomeController extends Controller
                             $column->row($view);
                         });
 
+                        //chart4
+                        $row->column(6, function ($column) use ($countryID) {
+                            $avgSessionRooms = \DB::table('rooms')
+                                ->join('users', 'rooms.uid', '=', 'users.id')
+                                ->join('live_times', 'users.id', '=', 'live_times.uid')
+                                ->where('users.country_id', Auth::user()->country_id)
+                                ->select(
+                                    'rooms.id',
+                                    'users.name as room_name',
+                                    \DB::raw('AVG(
+                                        COALESCE(live_times.hours,
+                                            TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(live_times.start_time), FROM_UNIXTIME(live_times.end_time)) / 3600
+                                        )
+                                    ) as avg_duration')
+                                )
+                                ->groupBy('rooms.id', 'users.name')
+                                ->orderByDesc('avg_duration')
+                                ->limit(10)
+                                ->get();
+
+                            $labels = $avgSessionRooms->pluck('room_name');
+                            $data   = $avgSessionRooms->pluck('avg_duration');
+                            $view = view('admin.widgets.avg_session_duration_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
                     });
 
                 });

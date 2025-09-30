@@ -3938,6 +3938,8 @@
     "Rooms with PK": "الغرف مع PK",
     "Inactive Rooms": "الغرف غير النشطة",
     "Top 10 Rooms by Gifts Sent": "أعلى 10 غرف من حيث عدد الهدايا المرسلة",
+    "Average Session Duration per Room": "⏳ متوسط مدة الجلسة لكل غرفة",
+    "Average Duration (hours)": "⏳ متوسط المدة (بالساعات)",
 
  "Display Discover": "عرض الاستكشاف",
  "Display Home Top": "عرض أعلى الصفحة الرئيسية",
