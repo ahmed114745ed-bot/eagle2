@@ -196,7 +196,7 @@ class UserController extends MainController
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return $content
             ->title(__('user profile'))
-            ->view('bd_user_profile', $data
+            ->view('super_user_profile', $data
             );
     }
 

@@ -72,6 +72,22 @@ class SuperAdminRewardController extends MainController
     {
         $grid = new Grid(new SuperAdminReward());
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $query->whereHas('superAdmin', function ($subQuery) {
+                        $subQuery->where('username', 'like', "%{$this->input}%");
+                    });
+                }, __('username'))->placeholder(__('search for host by username'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->between('created_at', __('Created At'))->datetime();
+            });
+        });
+
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
             $name = @$this->superAdmin->name ?? '';
@@ -181,7 +197,7 @@ class SuperAdminRewardController extends MainController
                 $form->number('expire', __('expire'))->default(1);
             })->rules('required');
 
-        $form->number('no_reward', __('No reward'));
+        $form->number('no_reward', __('No reward'))->default(1);
 
 
         return $form;

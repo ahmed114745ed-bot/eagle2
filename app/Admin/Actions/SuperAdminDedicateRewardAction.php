@@ -30,12 +30,16 @@ class SuperAdminDedicateRewardAction extends Action
         parent::__construct();
     }
 
-    
+
     public function handle(Request $request)
     {
         $user = User::query()->searchByUuid($request->user_uuid)->first();
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+        }
+        
+        if ($user->country_id != auth()->user()->country_id) {
+            return $this->response()->error(__('you don\'t have permission to dedicate this user'))->refresh();
         }
 
         $reward = SuperAdminReward::find($request->id);
@@ -55,7 +59,6 @@ class SuperAdminDedicateRewardAction extends Action
     public function form()
     {
         $this->hidden('id', __('id'))->attribute('id', 'vid');
-        $this->integer('days', __('days'));
         $this->text('user_uuid', __('user uuid'));
     }
 
