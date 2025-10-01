@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Enums;
 
 enum UserCoinLogType: string
@@ -33,8 +34,9 @@ enum UserCoinLogType: string
     case ROOM_BOOM = 'room_boom';
     case MILESTONE = 'milestone';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
-    
-     public function meta(): array
+    case SUPER_ADMIN_REWARD = 'super_admin_reward';
+
+    public function meta(): array
     {
         return match ($this) {
             self::ADMIN_CHARGES => [
@@ -52,10 +54,15 @@ enum UserCoinLogType: string
                 'item_name' => 'app_charges',
                 'queue_job' => null,
             ],
-            
+
             self::ROOM_COMMENT => [
                 'sub_type' => 'rooms',
                 'item_name' => 'Special Bar',
+                'queue_job' => null,
+            ],
+            self::SUPER_ADMIN_REWARD => [
+                'sub_type' => 'super_admin_reward',
+                'item_name' => 'rewards',
                 'queue_job' => null,
             ],
 
@@ -129,7 +136,7 @@ enum UserCoinLogType: string
                 'item_name' => 'lucky_box',
                 'queue_job' => null,
             ],
-            
+
             self::COIN_GAME => [
                 'sub_type' => 'coin_game_users',
                 'item_name' => 'coin_game',
@@ -141,7 +148,7 @@ enum UserCoinLogType: string
                 'queue_job' => \App\Jobs\LogUserCumulativeCoinProfit::class,
             ],
             self::CASHBACK => [
-                'sub_type' => 'lucky_gifts', 
+                'sub_type' => 'lucky_gifts',
                 'item_name' => 'cashback',
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
@@ -185,16 +192,12 @@ enum UserCoinLogType: string
                 'item_name' => 'room_boom',
                 'queue_job' => null,
             ],
-            
+
             self::MILESTONE => [
                 'sub_type' => 'milestones',
                 'item_name' => 'milestone',
                 'queue_job' => null,
             ],
-            
-            
-            
         };
     }
 }
-

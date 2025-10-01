@@ -3877,11 +3877,11 @@
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
 "dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
 "wait-2-minutes" : "انتظر دقيقتان من فضلك" ,
-"dashboard.login.loading.check_code":"جاري التحقق ...."
+"dashboard.login.loading.check_code":"جاري التحقق ....",
 
-
-
-  ,"Show Image": "عرض الصورة",
+"dashboard.login.loading.logging_in": "جاري تسجيل الدخول...",
+ "Show Image": "عرض الصورة",
+ "reward dedicate": "إهداء المكافأة",
   "Alternative Image": "صورة بديلة",
   "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
   "badges":"شارات",

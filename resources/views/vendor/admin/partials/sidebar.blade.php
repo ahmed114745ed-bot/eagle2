@@ -123,6 +123,7 @@
                             ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
                             ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
                             ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                            ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
                         ];
                     @endphp
 
