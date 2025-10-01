@@ -320,7 +320,7 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-         $authCountryId = Admin::user()->country_id;
+        $authCountryId = Admin::user()->country_id;
         $grid->model()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
                 CASE room_status
@@ -356,9 +356,19 @@ class LiveRoomController extends MainController
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
+        if (request()->online == 1) {
+            $grid->model()->whereHas('roomVisitors');
+        }
+
+        if (request()->is_live == 1) {
+            $grid->model()->where('is_live', 1);
+        }
+
+        if (request()->is_live == 0 && !is_null(request()->is_live)) {
+            $grid->model()->where('is_live', 0);
+        }
+
         $grid->model()->orderByRaw(implode(', ', $orderSql));
-
-
     }
 
 
@@ -600,7 +610,7 @@ class LiveRoomController extends MainController
         });
 
         $grid->column('session', __('Gifts'))->display(function () {
-            return $this->session  ?? 0; 
+            return $this->session  ?? 0;
         });
 
 

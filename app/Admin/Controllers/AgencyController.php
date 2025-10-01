@@ -26,6 +26,7 @@ use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Session;
@@ -960,6 +961,16 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
+
+            if (!$form->bd_id && !$form->model()->bd_id ){
+                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
+
+                if ($defaultBd) {
+                    $form->bd_id = $defaultBd->id;
+                } else {
+                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                }
+            }
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;

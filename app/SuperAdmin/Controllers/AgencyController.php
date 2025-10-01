@@ -351,6 +351,19 @@ class AgencyController extends MainController
             });
         }
 
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
+        }
+
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
                 $cacheKey = "agency_image_{$this->id}";
@@ -648,8 +661,9 @@ class AgencyController extends MainController
     protected function addSavingLogic(Form $form)
     {
         $form->saving(function (Form $form) {
-            if (! $form->bd_id){
-                $defaultBd = Bd::where('default', 1)->first();
+            if (!$form->bd_id && !$form->model()->bd_id ){
+                
+                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
