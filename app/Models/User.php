@@ -9,7 +9,6 @@ use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\PreventDeleteIfCreatedByDeveloper;
-use App\Traits\TimestampsWithTimezone;
 use App\Traits\User\UserLevel;
 use DB;
 use Log;
