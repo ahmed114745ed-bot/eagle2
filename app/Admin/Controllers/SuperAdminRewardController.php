@@ -82,9 +82,16 @@ class SuperAdminRewardController extends MainController
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('type', __('status'))->select(['ware' => __('ware'), "vip" => __('vip'), 'coin' => __('coin'), 'badge' => __("badge"), 'achievement' => __('achievement')]);
+            });
+
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->between('created_at', __('Created At'))->datetime();
+                $filter->where(function ($query) {
+                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', $date);
+                }, __('Created At'))->date();
             });
         });
 

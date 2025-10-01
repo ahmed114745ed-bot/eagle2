@@ -7,6 +7,7 @@ namespace App\Admin\Services;
 use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Models\Admin;
+use Encore\Admin\Facades\Admin as Super;
 use Modules\Vip\Entities\Vip;
 
 class UserService
@@ -70,7 +71,7 @@ class UserService
 
     protected function adminUserUrl($id): string
     {
-        if (Admin::user()->type == "superAdmin") {
+        if (Super::user()->type == "superAdmin") {
             return url("superadmin/users/profile/{$id}");
         }
         return url("admin/users/{$id}");
