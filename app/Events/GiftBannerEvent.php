@@ -13,8 +13,8 @@ use Illuminate\Queue\SerializesModels;
 
 class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
 {
-//    use Dispatchable, InteractsWithSockets, SerializesModels;
-    use InteractsWithSockets;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+    // use InteractsWithSockets;
 
     public $gift;
 
@@ -25,7 +25,6 @@ class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
      */
     public function __construct($gift)
     {
-        info('in gift logs');
         $this->gift = $gift;
     }
 
