@@ -11,7 +11,7 @@
     const ctxTargets = document.getElementById("agenciesTargetsChart").getContext("2d");
 
     new Chart(ctxTargets, {
-        type: 'bar', // vertical, you can flip below
+        type: 'bar',
         data: {
             labels: @json($labels),
             datasets: [{

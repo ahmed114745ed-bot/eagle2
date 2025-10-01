@@ -3947,7 +3947,11 @@
     "Average Session Duration per Room": "⏳ متوسط مدة الجلسة لكل غرفة",
     "Average Duration (hours)": "⏳ متوسط المدة (بالساعات)",
     "Top Agencies by Achieved Targets": "أعلى الوكالات من حيث الأهداف المُحققة",
-
+    "Top Receivers": "📥 أفضل المستلمين",
+    "Top 10 Receivers by Gifts Received": "📥 أعلى 10 مستخدمين من حيث الهدايا المستلمة",
+    "Top Senders": "📤 أفضل المرسلين",
+    "Top 10 Senders by Gift Value": "📤 أعلى 10 مستخدمين من حيث قيمة الهدايا المرسلة",
+    "Top 10 Agencies by Targets Achieved": "🏆 أعلى 10 وكالات من حيث الأهداف المحققة",
  "Display Discover": "عرض الاستكشاف",
  "Display Home Top": "عرض أعلى الصفحة الرئيسية",
  "Display Home Middle": "عرض منتصف الصفحة الرئيسية",
