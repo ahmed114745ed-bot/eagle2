@@ -2815,6 +2815,8 @@
   "congratulations": "تهانينا",
   "superAdminRewardDescription":"تتيح ميزة مكافأة المشرف الأعلى اختيار مشرف أعلى ومنحه مكافآت مع تاريخ انتهاء وعدد محدد من المكافآت. يمكن للمشرف الأعلى بعد ذلك إهداء هذه المكافآت للمستخدمين في نفس البلد، وفقًا للعدد المحدد من المكافآت.",
   "vip_gift_message": "لقد حصلت على مستوى VIP جديد كهدية",
+"you used this phone before": "لقد استخدمت هذا الرقم الهاتف من قبل",
+"Rewards Center":"مركز المكافات",
   "default_status":"BD افتراضي",
   "default_superadmin_status":"سوبر ادمن افتراضي",
     "You cannot delete the default super admin.": "لا يمكنك حذف السوبر أدمن الافتراضي.",

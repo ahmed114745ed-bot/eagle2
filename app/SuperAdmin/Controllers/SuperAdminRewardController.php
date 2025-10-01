@@ -24,7 +24,7 @@ class SuperAdminRewardController extends MainController
     {
         session(['last_ware_type' => request()->get('type', 'vip')]);
         return $content
-            ->title(trans('Products'))
+            ->title(trans('Rewards Center'))
             ->row(function (Row $row) {
                 $row->column(12, $this->tabsComponent());
             })
