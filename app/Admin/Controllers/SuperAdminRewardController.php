@@ -73,7 +73,7 @@ class SuperAdminRewardController extends MainController
         $grid = new Grid(new SuperAdminReward());
 
         $grid->column('id', __('Id'));
-       $grid->column('superadmin', __('super admin'))->display(function ($name) {
+        $grid->column('superadmin', __('super admin'))->display(function ($name) {
             $name = @$this->superAdmin->name ?? '';
             $uid = @$this->superAdmin->username;
             $path = @$this?->superAdmin?->avatar;
@@ -136,6 +136,9 @@ class SuperAdminRewardController extends MainController
         }
         $grid->column('expire', __('Expire'));
         $grid->column('no_reward', __('No reward'));
+        $grid->disableRowSelector();
+        $grid->disableExport();
+        $grid->disableActions();
         return $grid;
     }
 
@@ -209,7 +212,7 @@ class SuperAdminRewardController extends MainController
     protected function addSuperAdminField(Form $form)
     {
 
-        $form->belongsTo('super_admin_id', SuperAdmins::class, __('Super admin'), function ($form)  {
+        $form->belongsTo('super_admin_id', SuperAdmins::class, __('Super admin'), function ($form) {
             $form->select('id', __('super Admin'))
                 ->options(function ($id) {
                     if (!$id) return [];

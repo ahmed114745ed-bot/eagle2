@@ -4,19 +4,18 @@
 
 <style>
     .shadow-sm {
-        width: 95%;
-        margin: 20px auto;
+        width: 100%;
         box-shadow: 0 0.15rem 1.75rem rgba(58,59,69,.15) !important;
         border-radius: 0.5rem;
     }
 
     .table thead th {
         vertical-align: middle;
-     
+
     }
 
     .table thead .th {
-   
+
         width: 21%;
     }
 
@@ -48,12 +47,13 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
 </style>
-<div class="card shadow-sm border-0">
-    <div class="card-header text-white d-flex justify-content-between align-items-center">
+
+<div class="box box-success shadow-sm border-0">
+    <div class="box-header with-border text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="fa fa-users me-2"></i> {{ __('Top Followers') }}</h4>
     </div>
 
-    <div class="card-body p-0">
+    <div class="box-body p-0">
         <div class="table-responsive">
             <table class="table table-hover  align-middle mb-0">
                 <thead class="table-light">

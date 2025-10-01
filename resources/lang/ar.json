@@ -3949,12 +3949,14 @@
 "dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
 "wait-2-minutes" : "انتظر دقيقتان من فضلك" ,
 "dashboard.login.loading.check_code":"جاري التحقق ....",
+
+"dashboard.login.loading.logging_in": "جاري تسجيل الدخول...",
+ "Show Image": "عرض الصورة",
+ "reward dedicate": "إهداء المكافأة",
 "Total BD Salary": "إجمالي رواتب BD",
 "Total Cut Amount": "إجمالي المبالغ المقتطعة",
-"Average Agencies Per BD": "متوسط امتلاك كل BD للوكالات"
-
-
-  ,"Show Image": "عرض الصورة",
+"Average Agencies Per BD": "متوسط امتلاك كل BD للوكالات",
+ "Show Image": "عرض الصورة",
   "Alternative Image": "صورة بديلة",
   "wallet.insufficient_balance": "لا يمكن إضافة هذا المبلغ الآن. الحد الأقصى المسموح هو :amount.",
   "badges":"شارات",
@@ -4018,7 +4020,11 @@
     "Average Session Duration per Room": "⏳ متوسط مدة الجلسة لكل غرفة",
     "Average Duration (hours)": "⏳ متوسط المدة (بالساعات)",
     "Top Agencies by Achieved Targets": "أعلى الوكالات من حيث الأهداف المُحققة",
-
+    "Top Receivers": "📥 أفضل المستلمين",
+    "Top 10 Receivers by Gifts Received": "📥 أعلى 10 مستخدمين من حيث الهدايا المستلمة",
+    "Top Senders": "📤 أفضل المرسلين",
+    "Top 10 Senders by Gift Value": "📤 أعلى 10 مستخدمين من حيث قيمة الهدايا المرسلة",
+    "Top 10 Agencies by Targets Achieved": "🏆 أعلى 10 وكالات من حيث الأهداف المحققة",
  "Display Discover": "عرض الاستكشاف",
  "Display Home Top": "عرض أعلى الصفحة الرئيسية",
  "Display Home Middle": "عرض منتصف الصفحة الرئيسية",
