@@ -351,6 +351,19 @@ class AgencyController extends MainController
             });
         }
 
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
+        }
+
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
                 $cacheKey = "agency_image_{$this->id}";

@@ -152,7 +152,7 @@ class ChargeController extends MainController
         });
 
 
-        $grid->column('created_at', __('تاريخ الإنشاء'))->display(function ($value) {
+        $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 

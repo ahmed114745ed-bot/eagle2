@@ -2821,6 +2821,9 @@
 "your reward finished": "انتهت مكافأتك",
 "you dedicate all reward": "لقد خصصت جميع المكافآت",
 "not used": "غير مستخدم",
+
+ "General Statistics":"إحصائيات عامة" ,
+ "Number of Accounts":"عدد الحسابات",
   "default_status":"BD افتراضي",
   "default_superadmin_status":"سوبر ادمن افتراضي",
     "You cannot delete the default super admin.": "لا يمكنك حذف السوبر أدمن الافتراضي.",
