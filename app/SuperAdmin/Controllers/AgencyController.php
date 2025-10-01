@@ -648,8 +648,9 @@ class AgencyController extends MainController
     protected function addSavingLogic(Form $form)
     {
         $form->saving(function (Form $form) {
-            if (! $form->bd_id){
-                $defaultBd = Bd::where('default', 1)->first();
+            if (!$form->bd_id && !$form->model()->bd_id ){
+                
+                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
