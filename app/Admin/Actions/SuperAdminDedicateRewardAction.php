@@ -27,7 +27,6 @@ class SuperAdminDedicateRewardAction extends Action
     {
         $this->name = __('dedicate');
         $this->id = $id;
-         $this->setAction('/superadmin/_handle_action_');
         parent::__construct();
     }
 
