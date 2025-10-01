@@ -39,7 +39,7 @@ class SuperAdminDedicateRewardAction extends Action
         }
         
         if ($user->country_id != auth()->user()->country_id) {
-            return $this->response()->error(__('you don\'t have permission to dedicate this user'))->refresh();
+            return $this->response()->error(__('you do not have permission to dedicate this user'))->refresh();
         }
 
         $reward = SuperAdminReward::find($request->id);
