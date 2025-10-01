@@ -5,7 +5,6 @@ namespace App\Admin\Controllers;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Models\SuperAdmin;
 use App\Selectables\Badges;
 use Modules\Vip\Entities\OVip;
@@ -15,6 +14,8 @@ use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 
 class SuperAdminRewardController extends MainController
 {
@@ -30,9 +31,21 @@ class SuperAdminRewardController extends MainController
     {
         return parent::index($content
             ->title(trans('Super Admin Reward'))
-            ->body($this->grid()));
+           ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            }));
     }
 
+    protected function grid2()
+    {
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.superadmin.description'),
+        ));
+    }
     /**
      * Show interface.
      *
@@ -82,9 +95,16 @@ class SuperAdminRewardController extends MainController
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('type', __('status'))->select(['ware' => __('ware'), "vip" => __('vip'), 'coin' => __('coin'), 'badge' => __("badge"), 'achievement' => __('achievement')]);
+            });
+
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->between('created_at', __('Created At'))->datetime();
+                $filter->where(function ($query) {
+                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', $date);
+                }, __('Created At'))->date();
             });
         });
 

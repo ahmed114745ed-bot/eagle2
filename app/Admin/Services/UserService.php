@@ -7,6 +7,7 @@ namespace App\Admin\Services;
 use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Models\Admin;
+use Encore\Admin\Facades\Admin as Super;
 use Modules\Vip\Entities\Vip;
 
 class UserService
@@ -44,10 +45,10 @@ class UserService
 
         $rawName = $user->name ?? '';
 
-// remove NULL bytes and control chars
+        // remove NULL bytes and control chars
         $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $rawName);
 
-// now safely escape
+        // now safely escape
         $name = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $showUrl = $showUrl ?: $this->adminUserUrl($user->id);
         return <<<HTML
@@ -70,7 +71,9 @@ class UserService
 
     protected function adminUserUrl($id): string
     {
+        if (Super::user()->type == "superadmin") {
+            return url("superadmin/users/profile/{$id}");
+        }
         return url("admin/users/{$id}");
     }
-
 }
