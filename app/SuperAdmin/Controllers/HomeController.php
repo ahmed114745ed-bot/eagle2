@@ -265,7 +265,7 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', 'superadmin/users?sent_messages=1', $usersWhoSend));
                         $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', 'superadmin/users?never_send=1', $usersWhoNeverSend));
                         $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', 'superadmin/users', $openConversationsToday));
-                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration, 2)));
+                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration)));
                     });
 
                     $column->row(function (Row $row) use ($countryID,$topUsersByFollowers) {
@@ -488,14 +488,14 @@ class HomeController extends Controller
 
                     $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                         $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
-                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies',  $agency_salaries));
-                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', $user_salaries));
+                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies', round($agency_salaries)));
+                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', round($user_salaries)));
                         $row->column(3, new InfoBox(__('Active Agencies'), 'building', 'red', 'superadmin/agencies?active=true', $activeAgencies));
                         $row->column(3, new InfoBox(__('New Agencies Today'), 'plus', 'teal', 'superadmin/agencies?created=today', $newAgenciesToday));
                         $row->column(3, new InfoBox(__('New Agencies This Month'), 'calendar', 'orange', 'superadmin/agencies?created=month', $newAgenciesMonth));
-                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', 'superadmin/agencies', round($avgAgencyWallet, 2)));
+                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', 'superadmin/agencies', round($avgAgencyWallet)));
                         $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/users?agencyMembers=1', $totalMembers));
-                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency, 2)));
+                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency)));
                         $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies?pending=1', $pendingJoins));
                         $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
                     });
