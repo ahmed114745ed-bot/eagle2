@@ -34,8 +34,7 @@ class FixAgenciesBdByCountrySeeder extends Seeder
                                 $agency->bd_id = $firstBd->id;
                                 $agency->save();
                             } else {
-                                $agency->bd_id = null;
-                                $agency->save();
+                              
                             }
                         }
                     }
