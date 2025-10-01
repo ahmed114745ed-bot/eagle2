@@ -90,6 +90,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->dashboardAdminConfig();
+        $this->setupAppSettings();
+        $this->setupLanguages();
+        $this->registerModelObservers();
+        $this->cacheLuckyGiftProbabilities();
+    }
+
+    public function dashboardAdminConfig(): void
+    {
         $prefix = request()->segment(1);
 
         $originalConfig = config('admin.route');
@@ -101,11 +110,6 @@ class AppServiceProvider extends ServiceProvider
             Admin::routes();
             config(['admin.route' => $originalConfig]);
         }
-
-        $this->setupAppSettings();
-        $this->setupLanguages();
-        $this->registerModelObservers();
-        $this->cacheLuckyGiftProbabilities();
     }
 
     protected function defineCarbonMacros(): void
