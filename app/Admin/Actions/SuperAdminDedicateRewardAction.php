@@ -48,6 +48,7 @@ class SuperAdminDedicateRewardAction extends Action
             if ($rewardNom !== 0) {
                 $this->assignRewards($reward, $user);
                 $reward->gave_reward_no += 1;
+                $reward->save();
                 return $this->response()->success(__('dashboard.successful'));
             }
             return $this->response()->error(__('your reward finished'));
