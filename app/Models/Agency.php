@@ -470,4 +470,10 @@ class Agency extends Model
             clearAgencyCache($agency->id);
         });
     }
+
+
+    public function bd()
+    {
+        return $this->belongsTo(Bd::class, 'bd_id');
+    }
 }
