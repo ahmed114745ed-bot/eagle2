@@ -524,3 +524,11 @@ Route::get('/fix-bans-user-id', function () {
 
     return "done";
 });
+
+Route::get('/fix-agencies-bd', function () {
+    Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
+    ]);
+
+    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
+});
