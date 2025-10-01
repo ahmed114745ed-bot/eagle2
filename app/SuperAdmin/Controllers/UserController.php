@@ -306,7 +306,7 @@ class UserController extends MainController
             }
         ");
 
-        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+        $grid->column('custom_button2', __('Number of Accounts'))->display(function () {
             $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
