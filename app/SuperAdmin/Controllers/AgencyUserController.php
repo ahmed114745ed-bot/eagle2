@@ -102,7 +102,7 @@ class AgencyUserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
-            ->with([ 'profile', 'packs'])
+            ->with(['profile', 'packs'])
             ->where('is_host', 1)
             ->where('country_id', auth()->user()->country_id)
             ->withCount('sameDeviceUsers');
@@ -123,8 +123,15 @@ class AgencyUserController extends MainController
         });
         $grid->column('id', __('Id'));
         if ($haveCoins) {
-            $grid->column('di', __('coins'))->display(function ($value) {
-                return number_format($value);
+            $grid->column('di', __('coins'))->display(function ($coin) {
+                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
             });
         }
 
@@ -284,9 +291,16 @@ class AgencyUserController extends MainController
         });
         $grid->column('id', __('Id'));
         if ($haveCoins) {
-            $grid->column('di', __('coins'))->display(function ($value) {
-                return number_format($value);
-            });
+            $grid->column('di', __('coins'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
         }
 
         $grid->column('name', __('Name'))
@@ -584,5 +598,4 @@ class AgencyUserController extends MainController
 
         return $show;
     }
-
 }

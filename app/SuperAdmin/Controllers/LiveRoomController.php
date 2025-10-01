@@ -576,14 +576,17 @@ class LiveRoomController extends MainController
             if (strlen($name) > 50){
                 $name = substr($name,0,50) . ' ...';
             }
+             $showUrl = url("superadmin/rooms/{$id}");
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                    <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                        <div>
+                            <span style='cursor: pointer;'>$name</span><br>
+                            <span style='cursor: pointer;'>ID: $id</span>
+                        </div>
                     </div>
-                </div>
+                 </a>
             ";
         });
 
