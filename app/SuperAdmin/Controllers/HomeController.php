@@ -186,11 +186,6 @@ class HomeController extends Controller
         $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
         $pendingJoins = AgencyJoinRequest::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
             ->where('status',0)->count();
-        $achievedTargets = UserTarget::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
-            ->where('add_month', now()->month)
-            ->where('add_year', now()->year)
-            ->where('agency_obtain','>',0)
-            ->count();
         $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->where('country_id',$countryID))
             ->sum('achieved_diamond');
 
@@ -212,9 +207,9 @@ class HomeController extends Controller
         $totals = BD::where('country_id', $countryID)
         ->withSum('salaries', 'salary')
         ->withSum('salaries', 'cut_amount')
-        ->withCount('agencies')  
+        ->withCount('agencies')
         ->get();
-    
+
         $totalBDSalary = $totals->sum('salaries_sum_salary');
         $totalBDCut = $totals->sum('salaries_sum_cut_amount');
         $averageAgenciesPerBD = $totals->avg('agencies_count');
@@ -223,7 +218,7 @@ class HomeController extends Controller
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($totalCharges,$totalSpent,$agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse,$topUsersByFollowers,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD) {
+            ->row(function (Row $row) use ($totalCharges,$totalSpent,$agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse,$topUsersByFollowers,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD) {
                 $row->column(4, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
                 $row->column(4, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
                 $row->column(4, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
@@ -461,10 +456,10 @@ class HomeController extends Controller
                     });
 
                 });
-                $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                         $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
                         $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies',  $agency_salaries));
                         $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', $user_salaries));
@@ -475,7 +470,6 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/ag/users', $totalMembers));
                         $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency, 2)));
                         $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies', $pendingJoins));
-                        $row->column(3, new InfoBox(__('Agencies Achieved Targets'), 'flag', 'yellow', 'superadmin/agencies', $achievedTargets));
                         $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
                     });
 
@@ -514,7 +508,7 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'superadmin/bd-salaries', number_format($totalBDSalary)));
                         $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'superadmin/bd-salaries', number_format($totalBDCut)));
                         $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'superadmin/usersBD', number_format($averageAgenciesPerBD)));
-                        
+
                     });
                 });
             });
