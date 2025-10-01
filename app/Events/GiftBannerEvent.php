@@ -13,8 +13,8 @@ use Illuminate\Queue\SerializesModels;
 
 class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
 {
-//    use Dispatchable, InteractsWithSockets, SerializesModels;
-    use InteractsWithSockets;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+    // use InteractsWithSockets;
 
     public $gift;
 
