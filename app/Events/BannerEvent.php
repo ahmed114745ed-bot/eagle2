@@ -31,12 +31,18 @@ class BannerEvent implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel(str_replace('.', '-', $this->channel));
+        \Log::info('📡 BannerEvent broadcastOn called', [
+            'channel' => $this->channel,
+        ]);
+        return new Channel($this->channel);
     }
-    
+
     public function broadcastAs()
     {
-        return str_replace('.', '-', $this->channel);
+        \Log::info('📡 BannerEvent broadcastAs called', [
+            'alias' => $this->channel,
+        ]);
+        return $this->channel;
     }
 
     public function broadcastWith()
