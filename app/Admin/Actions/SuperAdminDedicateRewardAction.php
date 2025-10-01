@@ -45,7 +45,7 @@ class SuperAdminDedicateRewardAction extends Action
         $reward = SuperAdminReward::find($request->id);
         $rewardNom =  $reward->no_reward -  $reward->gave_reward_no;
         try {
-            if ($rewardNom != 0) {
+            if ($rewardNom !== 0) {
                 $this->assignRewards($reward, $user);
                 $reward->gave_reward_no += 1;
                 return $this->response()->success(__('dashboard.successful'));
