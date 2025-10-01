@@ -1328,7 +1328,7 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
+                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :(empty($userVip->expire)? __('not used'): '∞') }}</td>
                                     <!-- <td> -->
                                         <!-- <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
@@ -1390,7 +1390,7 @@
                                 <tr>
                                     <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                     <td>{{ $userVip->level }}</td>
-                                    <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
+                                    <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') :(empty($userVip->expire)? __('not used'): '∞') }}</td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
                                     <!-- <td>

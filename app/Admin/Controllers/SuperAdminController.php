@@ -251,7 +251,7 @@ class SuperAdminController extends MainController
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
-         $form->text('name', __('name'));
+        $form->text('name', __('name'));
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
@@ -295,6 +295,16 @@ class SuperAdminController extends MainController
         //        $form->hidden('transfer_salary', __('transfer_salary'));
 
         $form->saving(function (Form $form) {
+            $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'))->exists();
+            if ($superAdmin) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => trans('you used this phone before'),
+                ]);
+                return back()->with(compact('error'))->withInput();
+            }
+
+            
             $isEditing = $form->isEditing();
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');

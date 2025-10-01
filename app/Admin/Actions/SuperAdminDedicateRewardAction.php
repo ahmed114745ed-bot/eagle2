@@ -39,17 +39,19 @@ class SuperAdminDedicateRewardAction extends Action
         }
         
         if ($user->country_id != auth()->user()->country_id) {
-            return $this->response()->error(__('you don\'t have permission to dedicate this user'))->refresh();
+            return $this->response()->error(__('you do not have permission to dedicate this user'))->refresh();
         }
 
         $reward = SuperAdminReward::find($request->id);
         $rewardNom =  $reward->no_reward -  $reward->gave_reward_no;
         try {
-            if ($rewardNom != 0) {
+            if ($rewardNom !== 0) {
                 $this->assignRewards($reward, $user);
                 $reward->gave_reward_no += 1;
+                $reward->save();
                 return $this->response()->success(__('dashboard.successful'));
             }
+            return $this->response()->error(__('your reward finished'));
         } catch (\Exception $exception) {
 
             return $this->response()->error('you dedicate all reward');

@@ -138,29 +138,37 @@ class BdController extends AdminController
                 </div>
             ";
         });
-        $grid->column('default', __('default_status'))->display(function () {
-            if (request()->filled('_export_')) {
-                return $this->default;
-            }
 
-            if ($this->default == 1) {
-                return <<<HTML
-                    <span style="display: flex; align-items: center;">
-                        <span style="
-                            font-size: smaller;
-                            background: red;
-                            display: inline-block;
-                            border-radius: 50%;
-                            width: 10px;
-                            height: 10px;
-                            margin-left: 5px;
-                        " title=""></span>
-                    </span>
-                HTML;
-            } else {
-                return '<span style="color: #999;"></span>';
-            }
+
+        $grid->column('default', trans('default_status'))
+        ->switch(Common::getSwitchStates())
+        ->display(function ($enable) {
+                return $enable;
+            
         });
+        // $grid->column('default', __('default_status'))->display(function () {
+        //     if (request()->filled('_export_')) {
+        //         return $this->default;
+        //     }
+
+        //     if ($this->default == 1) {
+        //         return <<<HTML
+        //             <span style="display: flex; align-items: center;">
+        //                 <span style="
+        //                     font-size: smaller;
+        //                     background: red;
+        //                     display: inline-block;
+        //                     border-radius: 50%;
+        //                     width: 10px;
+        //                     height: 10px;
+        //                     margin-left: 5px;
+        //                 " title=""></span>
+        //             </span>
+        //         HTML;
+        //     } else {
+        //         return '<span style="color: #999;"></span>';
+        //     }
+        // });
 
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
@@ -260,6 +268,7 @@ class BdController extends AdminController
         $form->image('avatar', __('img'));
 
         $form->hidden('transfer_salary', __('transfer_salary'));
+        $form->hidden('default', __('default'))->default(0);
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -293,13 +302,13 @@ class BdController extends AdminController
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
-                if ($originalAppId !=  $newAppId) {
+                if ($originalAppId !=  $newAppId && $newAppId != null) {
+                    
                     $OldUserAppId = \App\Models\User::find($originalAppId);
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
                     }
-
                     $newUserAppId = \App\Models\User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();

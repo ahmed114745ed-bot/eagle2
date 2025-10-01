@@ -125,6 +125,7 @@ const PACK_USER =
     9 => 'NoKick',
     10 => 'Icon',
     12 => 'wapel',
+    11 => 'intro animation',
     13 => 'hide country',
     14 => 'vip gifts',
     15 => 'no pan',
