@@ -1212,6 +1212,7 @@
   "admin.username": "Username",
   "admin.login": "Login",
   "logging in": "Logging in...",
+  "dashboard.login.loading.logging_in" :"Logging in...",
   "dashboard.login.language.switch": "Switch Language",
   "dashboard.login.language.lang": "English",
   "dashboard.login.language.lang2": "العربية",
