@@ -3468,7 +3468,10 @@
     "count_sessions": "Oturum Sayısı",
     "title_user": "📊 Kullanıcı İstatistikleri (Çevrimiçi / Çevrimdışı)",
     "online_users": "Çevrimiçi Kullanıcılar",
-    "offline_users": "Çevrimdışı Kullanıcılar"
+    "offline_users": "Çevrimdışı Kullanıcılar",
+    "Total BD Salary": "Toplam BD Maaşı",
+    "Total Cut Amount": "Toplam Kesilen Miktar",
+    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı"
 
 
 

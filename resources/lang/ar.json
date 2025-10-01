@@ -3877,8 +3877,10 @@
 "dashboard.login.error.unexpected": "حدث خطأ غير متوقع أثناء الإرسال، حاول لاحقاً",
 "dashboard.login.error.user_fetch": "حدث خطأ أثناء جلب بيانات المستخدم، حاول لاحقاً",
 "wait-2-minutes" : "انتظر دقيقتان من فضلك" ,
-"dashboard.login.loading.check_code":"جاري التحقق ...."
-
+"dashboard.login.loading.check_code":"جاري التحقق ....",
+"Total BD Salary": "إجمالي رواتب BD",
+"Total Cut Amount": "إجمالي المبالغ المقتطعة",
+"Average Agencies Per BD": "متوسط امتلاك كل BD للوكالات"
 
 
   ,"Show Image": "عرض الصورة",

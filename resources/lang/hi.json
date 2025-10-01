@@ -3039,7 +3039,10 @@
     "count_sessions": "सत्रों की संख्या",
     "title_user": "📊 उपयोगकर्ता आँकड़े (ऑनलाइन / ऑफलाइन)",
     "online_users": "ऑनलाइन उपयोगकर्ता",
-    "offline_users": "ऑफ़लाइन उपयोगकर्ता"
+    "offline_users": "ऑफ़लाइन उपयोगकर्ता",
+    "Total BD Salary": "कुल बीडी वेतन",
+    "Total Cut Amount": "कुल कटौती राशि",
+    "Average Agencies Per BD": "प्रति BD औसत एजेंसियों की संख्या"
 
 
 
