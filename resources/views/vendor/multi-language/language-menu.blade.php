@@ -30,6 +30,8 @@
         // تحديد الـ URL حسب نوع اليوزر
         @if(auth()->check() && auth()->user()->type === 'bd')
             var url = "{{ url('bd/locale') }}";
+        @elseif(auth()->check() && auth()->user()->type === 'superadmin')
+            var url = "{{ url('superadmin/locale') }}";
         @else
             var url = "{{ admin_url('/locale') }}";
         @endif

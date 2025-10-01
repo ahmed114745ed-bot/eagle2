@@ -248,7 +248,7 @@ class EnteranceController extends Controller
         $roomPass = $request->input('room_pass');
 
         if (!$roomId) {
-            return $this->errorResponse(__('Please provide a room_id.'), 422);
+            return $this->errorResponse(__('Please provide a room id.'), 422);
         }
 
         $room = $this->findRoom($roomId);

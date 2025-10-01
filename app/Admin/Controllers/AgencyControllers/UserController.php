@@ -443,6 +443,7 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
         });
+       
 
         $grid->disableCreateButton();
 

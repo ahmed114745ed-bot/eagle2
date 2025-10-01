@@ -25,6 +25,7 @@ use Modules\Moment\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Config as ConfigModel;
 use Modules\Badge\Entities\UserBadge;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
 use Illuminate\Support\Facades\Storage;
@@ -106,7 +107,7 @@ class User extends Authenticatable
         //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        //        'original_uuid',
+        'original_uuid',
         //        'is_frozen',
         //        'total_charge_level',
         //        'photo',
@@ -2197,4 +2198,13 @@ class User extends Authenticatable
     {
         return $this->agencyJobs()->where('type', 'requestManger')->exists();
     }
+
+    public function roomVisitors()
+    {
+        return $this->hasMany(RoomVisitor::class, 'user_id');
+    }
+    public function liveTimes() {
+        return $this->hasMany(LiveTime::class, 'uid');
+    }
+    
 }

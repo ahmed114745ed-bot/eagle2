@@ -93,7 +93,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'super_admin_coins');
+        $data = $request->except('_token');
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -206,6 +206,7 @@ class SettingsController extends Controller
 
                 // Room::where('mode', 5)->update(['mode' => 1]);
             }
+
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -237,7 +238,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'super_admin_coins');
+        $data = $request->except('_token');
 
 
         if ($request->background_type === 'color') {

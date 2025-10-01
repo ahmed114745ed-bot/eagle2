@@ -78,6 +78,8 @@ class AuthService
 
         DB::beginTransaction();
         try {
+            $lat = $request->lat;
+            $long = $request->long;
             if ($trashedUser) {
                 $trashedUser->restore();
 
@@ -91,14 +93,21 @@ class AuthService
                     'status' => 1
                 ];
 
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
+
                 $user = $this->userRepository->create($data);
             }
             if (\request('tags') && is_array(\request('tags'))) {
                 $user->tags()->attach(\request('tags'));
             }
-            if (!$request->country_id) {
-                $country = $this->countryRepository->findByPhoneCode('101');
-                $user->country_id = @$country->id;
+            if (!$lat && !$long){
+                if (!$request->country_id) {
+                    $country = $this->countryRepository->findByPhoneCode('101');
+                    $user->country_id = @$country->id;
+                }
             }
             $user->is_points_first = 1;
             if (!$this->checkDeviceToken(@$request->device_token)) {
@@ -144,8 +153,6 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-
-
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
@@ -191,6 +198,15 @@ class AuthService
                     'is_points_first' => 1,
                     'status' => true,
                 ];
+
+                $lat = $request['lat'];
+                $long = $request['long'];
+
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
+
                 $user = $this->userRepository->create($data);
                 if (!$this->checkDeviceToken(@$request['device_token'])) {
                     $user->di = 20000;
@@ -260,6 +276,15 @@ class AuthService
                 'apple_id' => $unique_id,
                 // 'di' => 1000000,
             ];
+
+            $lat = $request['lat'];
+            $long = $request['long'];
+
+            if ($lat && $long){
+                $countryId = getCountryIdFromLatLong($lat, $long);
+                $data['country_id'] = $countryId;
+            }
+
             $user = $this->userRepository->create($data);
         }
         $this->rule($user, '', @$request['device_token'], $request);
@@ -289,6 +314,15 @@ class AuthService
                     'is_points_first' => 1,
                     // 'di' => 1000000,
                 ];
+
+                $lat = $data['lat'];
+                $long = $data['long'];
+
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
+
                 $user = $this->userRepository->create($dataUser);
             }
         }

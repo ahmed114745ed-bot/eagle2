@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use Modules\Chat\Entities\ChatMessage;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -127,7 +128,7 @@ class Room extends Model
     {
         return $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
             ->selectRaw('SUM(giftPrice) as exp, sender_id, roomowner_id')
-            ->whereHas('sender') // Ensures only valid senders are included
+            ->whereHas('sender')
             ->groupBy('sender_id', 'roomowner_id')
             ->orderByDesc('exp');
     }
@@ -281,6 +282,12 @@ class Room extends Model
         return $this->belongsTo(Background::class, 'room_background');
     }
 
+    public function messages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
+    }
+
+
     public function getFinalRoomImageAttribute()
     {
         if ($this->is_pk_custom && $this->mode === 3) {
@@ -293,7 +300,7 @@ class Room extends Model
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
-            ?? (string) (request()->default_background ?? '');
+            ?? request()->default_background;
     }
 
     public function defaultBackground()
@@ -357,6 +364,6 @@ class Room extends Model
 
     public function scopeAudio(Builder $query)
     {
-        return $query->where('type', 'audio');
+        return $query->where('rooms.type', 'audio');
     }
 }

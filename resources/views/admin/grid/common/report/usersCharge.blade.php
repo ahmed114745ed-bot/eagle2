@@ -1,8 +1,8 @@
 <div class="box-body no-padding">
     <div class="nav-scroll-container">
-        
+
     </div>
-    
+
 
     <div class="box-body no-padding">
     <div class="nav-scroll-container">
@@ -11,6 +11,7 @@
         <h4 class="details-title">{{ __('Details') }}</h4>
 
         @php
+        info($user);
             $name = $user->name ?? '';
             $uid = $user->uuid ?? 0;
             $path = $user->profile->avatar ?? null;

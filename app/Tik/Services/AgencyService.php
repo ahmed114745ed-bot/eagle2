@@ -2,7 +2,6 @@
 
 namespace App\Tik\Services;
 
-use App\Tik\Repositories\ShippingAgencyRepository;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
@@ -15,12 +14,14 @@ use App\Helpers\UserCommon;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
 use App\Models\AgencyJoinRequest;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
 use http\Exception\RuntimeException;
 use Illuminate\Support\Facades\Hash;
+use App\Models\MonthlyDiamondReceive;
 use App\Notifications\AgencyOwnerRole;
 use Illuminate\Support\Facades\Storage;
 use App\Exceptions\CValidationException;
@@ -29,6 +30,7 @@ use App\Tik\Repositories\AdminRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\FollowRepository;
 use App\Tik\Repositories\TargetRepository;
+use Modules\Milestones\Entities\Milestone;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
@@ -37,11 +39,13 @@ use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
@@ -51,9 +55,7 @@ use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use App\Models\MonthlyDiamondReceive;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
-use App\Models\UsersJoinedAgency;
 
 
 
@@ -261,7 +263,6 @@ class AgencyService
             // UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
             MilestoneHelper::grantMilestoneToUser($user, 'host');
-
         }
         return true;
     }
@@ -658,6 +659,7 @@ class AgencyService
         UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
         if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
+        MilestoneHelper::removeReward($user_kicked, 'host');
         return true;
     }
 
@@ -679,9 +681,9 @@ class AgencyService
             return [];
         }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest('join_date')
-        ->first();
+            ->where('agency_id', $user->agency_id)
+            ->latest('join_date')
+            ->first();
 
         if (!$joinRecord) {
             $joinRecord =  null;
@@ -693,14 +695,14 @@ class AgencyService
 
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
-      
+
         [$startDate, $endDate, $joinedDate, $leaveDate] = $this->getReportDateRange(
             $year,
             $month,
             $timezone,
             $joinRecord
         );
-        
+
 
 
         $reportStart = 1;
@@ -714,7 +716,7 @@ class AgencyService
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
-   
+
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
             //$data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
@@ -798,10 +800,10 @@ class AgencyService
         $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $startOfMonth  = $firstDayLocal->copy()->startOfDay();
         $endOfMonth    = $firstDayLocal->copy()->endOfMonth()->endOfDay();
-    
+
         if ($joinRecord) {
             $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
-    
+
             $leaveDate  = $joinRecord->leave_date
                 ? Carbon::parse($joinRecord->leave_date, $timezone)
                 : $endOfMonth;
@@ -809,15 +811,15 @@ class AgencyService
             $joinedDate = null;
             $leaveDate  = $endOfMonth;
         }
-    
+
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
             ? $joinedDate
             : $startOfMonth;
-    
+
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
             ? $leaveDate
             : $endOfMonth;
-    
+
         return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 

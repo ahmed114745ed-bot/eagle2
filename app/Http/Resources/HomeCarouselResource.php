@@ -71,9 +71,20 @@ class HomeCarouselResource extends JsonResource
             'owner_id'   => $this->owner_id ?? 0,
             'avatar'     => $avatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
-            'display_at' => @$this->display_at
+            'display_at' => @$this->display_at,
+            'display_discover' => @$this->display_discover,
+            'display_home_top' => @$this->display_home_top,
+            'display_home_middle' => @$this->display_home_middle,
+            'display_live' => @$this->display_live,
+            'display_country' => @$this->display_country,
+
+        
         ];
 
+            if (\Str::contains($this->display_at, 'country')) {
+                $data['countries'] = $this->countriesLite()->get();
+                    
+            }        
         if ($this->event_type === 'weekly_cp') {
             $data += [
                 'cp_winner_name_one' => $nameOne,

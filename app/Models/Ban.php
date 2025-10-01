@@ -13,8 +13,9 @@ class Ban extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, 'uuid', 'uid');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
+ 
 
     public function banType()
     {

@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\ConfigObserver;
 use App\Observers\SettingObserver;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Modules\Vip\Entities\Vip;
@@ -71,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
         Form::extend('imagePath', ImagePath::class);
 
         if ($this->app->isLocal()) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+//            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -90,10 +91,26 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
+    }
+
+    public function dashboardAdminConfig(): void
+    {
+        $prefix = request()->segment(1);
+
+        $originalConfig = config('admin.route');
+
+        if ($prefix === 'superadmin') {
+            config(['admin.route' => config('admin.superadmin_route')]);
+            Admin::routes();
+        } elseif ($prefix === 'admin') {
+            Admin::routes();
+            config(['admin.route' => $originalConfig]);
+        }
     }
 
     protected function defineCarbonMacros(): void

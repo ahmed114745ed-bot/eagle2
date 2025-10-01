@@ -8,6 +8,7 @@ use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Traits\AgencyAdditionalInfoTraits;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
@@ -43,6 +44,11 @@ class Agency extends Model
     public function Countries()
     {
         return $this->belongsToMany(Country::class, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function salaryRequests()
@@ -159,11 +165,12 @@ class Agency extends Model
 
     public function getSalaryAttribute()
     {
-        $salary = AgencySallary::query()->where('agency_id', $this->id)
-            // ->where('is_paid', 0)
-            ->sum(DB::raw('sallary - cut_amount'));
+        return $this->agencySalaries->sum(fn ($row) => ($row->sallary - $row->cut_amount));
 
-        return $salary;
+//        $salary = AgencySallary::query()->where('agency_id', $this->id)
+//            ->sum(DB::raw('sallary - cut_amount'));
+//
+//        return $salary;
     }
 
     public function setSalaryAttribute()
@@ -462,5 +469,11 @@ class Agency extends Model
             }
             clearAgencyCache($agency->id);
         });
+    }
+
+
+    public function bd()
+    {
+        return $this->belongsTo(Bd::class, 'bd_id');
     }
 }

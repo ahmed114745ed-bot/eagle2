@@ -243,14 +243,13 @@ class RoomController extends MainController
 
     protected function grid2()
     {
-        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function() {
+        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function () {
             return settings()->get('make_rooms_top');
         });
-            return (new Box(
-                title: __('admin.Actions'),
-                content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
-            ));
-
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
+        ));
     }
 
     /**
@@ -265,7 +264,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        $grid->header(fn () => $this->buildTabsHeader($filterType));
+        $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -330,16 +329,29 @@ class RoomController extends MainController
     {
         $grid->model()
             ->audio()
-            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
-                CASE room_status
-                    WHEN 1 THEN 100
-                    WHEN 2 THEN 10
-                    ELSE 80
-                END AS status_priority,
-                (SELECT GROUP_CONCAT(user_id)
-                 FROM room_visitors
-                 WHERE room_visitors.room_id = rooms.id) AS visitor_ids
-            "))
+            ->select(
+                'rooms.id',
+                'rooms.uid',
+                'rooms.microphone',
+                'rooms.pin',
+                'rooms.max_admin',
+                'rooms.is_top',
+                'rooms.top_room',
+                'rooms.room_name',
+                'rooms.room_cover',
+                'rooms.room_admin',
+                \DB::raw("
+        CASE rooms.room_status
+            WHEN 1 THEN 100
+            WHEN 2 THEN 10
+            ELSE 80
+        END AS status_priority,
+        (SELECT GROUP_CONCAT(user_id)
+         FROM room_visitors
+         WHERE room_visitors.room_id = rooms.id) AS visitor_ids
+    ")
+            )
+
             ->with([
 
                 'owner' => fn($q)  => $q->with([
@@ -365,8 +377,6 @@ class RoomController extends MainController
         $orderSql[] = 'room_visitors_count DESC';
 
         $grid->model()->orderByRaw(implode(', ', $orderSql));
-
-
     }
 
 
@@ -397,7 +407,7 @@ class RoomController extends MainController
                 $grid->model()
                     ->orderByDesc('top_room')
                     ->orderByDesc('pin');
-                    // ->orderByDesc('room_visitors_count');
+                // ->orderByDesc('room_visitors_count');
                 break;
 
             case 'last_create':
@@ -548,7 +558,7 @@ class RoomController extends MainController
             $users = collect();
             if (!empty($allIds)) {
                 $users = User::select(['id', 'name'])
-                ->with('profile:id,user_id,avatar')
+                    ->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
                     ->keyBy('id');
@@ -558,7 +568,7 @@ class RoomController extends MainController
             $collection->each(function ($row) use ($users) {
                 $ids = array_filter(explode(',', (string) $row->microphone));
                 $row->microphone_users = collect($ids)
-                    ->map(fn ($id) => $users->get($id))
+                    ->map(fn($id) => $users->get($id))
                     ->filter()
                     ->values();
             });
@@ -584,8 +594,8 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50){
-                $name = substr($name,0,50) . ' ...';
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
             }
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -604,7 +614,7 @@ class RoomController extends MainController
                 return __('No User');
             }
 
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
@@ -811,7 +821,7 @@ class RoomController extends MainController
             });
             </script>
             HTML);
-        }
+    }
     /**
      * Make a show builder.
      *
@@ -995,14 +1005,14 @@ class RoomController extends MainController
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "") {
                     $newList[] = $item;
                 }
             }
 
             $newList = array_filter($newList);
 
-            $blackList= implode(',', $newList) ?: null;
+            $blackList = implode(',', $newList) ?: null;
         }
 
         $room->room_black = $blackList;

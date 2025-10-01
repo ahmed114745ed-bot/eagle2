@@ -151,8 +151,11 @@ class UserResource extends JsonResource
 
          if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-         return new NowRoomResource($this) ?? (object)[];
-     }
+         $resource = (new NowRoomResource($this))->toArray(request());
+
+         return empty($resource) ? (object)[] : $resource;
+        
+        }
 
 
      private function formatShippingAgency()

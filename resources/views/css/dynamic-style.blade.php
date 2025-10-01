@@ -150,8 +150,9 @@
     }
 
     .rtl .small-box .icon{
-        width: 96%;
+        width: 100%;
         text-align: left;
+        right: -2px !important;
     }
 
     .skin-black-light .main-header > .navbar {
@@ -724,6 +725,12 @@
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     color: var(--inverse-box-color) !important;
 }
+.flag-image {
+    height: 30px;  /* adjust size */
+    width: auto;
+    margin-top: 10px;
+    border-radius: 4px; /* optional */
+}
 
 /* RTL override */
 html.rtl .dropdown-menu {
@@ -1260,4 +1267,27 @@ html.ltr .dropdown-menu {
         margin-left: 50px;
     }
 
+    @media (max-width: 768px) {
+        .col-md-3,
+        .col-sm-6 {
+            flex: 0 0 100%;
+            width: 50%;
+        }
+    }
+
+    .small-box h3{
+        font-size: x-large !important;
+    }
+
+    .small-box:hover .icon{
+        font-size: 80px;
+        transform: translateY(-37px);
+        transition: all 0.3s ease;
+    }
+
+    .small-box .icon{
+        font-size: 50px;
+        top: 25px;
+        right: 2px;
+    }
 </style>
