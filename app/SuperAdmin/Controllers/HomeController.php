@@ -436,7 +436,7 @@ class HomeController extends Controller
                     });
 
                 });
-                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
                     $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
@@ -453,6 +453,33 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Agencies Achieved Targets'), 'flag', 'yellow', 'superadmin/agencies', $achievedTargets));
                         $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
                     });
+
+                    $column->row(function (Row $row) use ($countryID) {
+                        //chart 1
+                        $row->column(6, function ($column) use ($countryID) {
+                            $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
+//                                ->where('add_month', now()->month)
+//                                ->where('add_year', now()->year)
+                                ->where('agency_obtain','>',0)
+                                ->selectRaw('agency_id, COUNT(*) as total_achieved')
+                                ->groupBy('agency_id')
+                                ->orderByDesc('total_achieved')
+                                ->with('agency:id,name')
+                                ->take(10)
+                                ->get();
+
+                            $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
+                            $data   = $topAgenciesByTargets->pluck('total_achieved');
+
+                            $view = view('admin.widgets.agencies_targets_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+                    });
+
                 });
                 $row->column(12, function ($column) use ($bdCount) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
