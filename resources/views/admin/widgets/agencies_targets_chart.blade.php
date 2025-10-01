@@ -2,8 +2,8 @@
     <div class="box-header with-border">
         <h3 class="box-title">🏆 {{ __('Top Agencies by Achieved Targets') }}</h3>
     </div>
-    <div class="box-body">
-        <canvas id="agenciesTargetsChart"></canvas>
+    <div class="box-body" style="height:500px;">
+        <canvas id="agenciesTargetsChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
 

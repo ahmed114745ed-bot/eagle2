@@ -5,6 +5,7 @@ namespace App\SuperAdmin\Controllers;
 use App\Enums\Charges\UserTypeEnum;
 use App\Models\AgencyJoinRequest;
 use App\Models\Charge;
+use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\Bd;
@@ -491,6 +492,46 @@ class HomeController extends Controller
                             $data   = $topAgenciesByTargets->pluck('total_achieved');
 
                             $view = view('admin.widgets.agencies_targets_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+
+                        //chart 2
+                        $row->column(6, function ($column) {
+                            $topSenders = GiftLog::selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+                                ->groupBy('sender_id')
+                                ->orderByDesc('total_sent')
+                                ->take(10)
+                                ->with('sender:id,name')
+                                ->get();
+
+                            $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
+                            $data   = $topSenders->pluck('total_sent');
+
+                            $view = view('admin.widgets.top_senders_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+
+                        //chart 3
+                        $row->column(6, function ($column) {
+                            $topReceivers = GiftLog::selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+                                ->groupBy('receiver_id')
+                                ->orderByDesc('total_received')
+                                ->take(10)
+                                ->with('receiver:id,name')
+                                ->get();
+
+                            $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
+                            $data   = $topReceivers->pluck('total_received');
+
+                            $view = view('admin.widgets.top_receivers_chart', [
                                 'labels' => $labels,
                                 'data'   => $data,
                             ])->render();
