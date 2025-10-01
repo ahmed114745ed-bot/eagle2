@@ -526,10 +526,18 @@
     "Last 4 Weeks": "पिछले 4 सप्ताह",
     "Last 6 Months": "पिछले 6 महीने",
     "New Rooms": "नए कमरे",
+    "Top Agencies by Achieved Targets": "उपलब्ध लक्ष्यों के आधार पर शीर्ष एजेंसियाँ",
+    "Top Receivers": "📥 शीर्ष प्राप्तकर्ता",
+    "Top 10 Receivers by Gifts Received": "📥 उपहार प्राप्त करने वाले शीर्ष 10 उपयोगकर्ता",
+    "Top Senders": "📤 शीर्ष प्रेषक",
+    "Top 10 Senders by Gift Value": "📤 उपहार मूल्य के आधार पर शीर्ष 10 प्रेषक",
+    "Top 10 Agencies by Targets Achieved": "🏆 उपलब्ध लक्ष्यों के आधार पर शीर्ष 10 एजेंसियाँ",
     "Rooms Distribution": "कमरों का वितरण",
     "Rooms with PK": "PK वाले कमरे",
     "Inactive Rooms": "निष्क्रिय कमरे",
     "Top 10 Rooms by Gifts Sent": "भेजे गए उपहारों के आधार पर शीर्ष 10 कमरे",
+    "Average Session Duration per Room": "⏳ प्रत्येक कक्ष में औसत सत्र की अवधि",
+    "Average Duration (hours)": "⏳ औसत अवधि (घंटों में)",
     "Diamonds Achieved by Hosts": "होस्ट द्वारा प्राप्त हीरे",
     "denied": "इनकार",
     "problem": "समस्या",
@@ -3038,7 +3046,10 @@
     "count_sessions": "सत्रों की संख्या",
     "title_user": "📊 उपयोगकर्ता आँकड़े (ऑनलाइन / ऑफलाइन)",
     "online_users": "ऑनलाइन उपयोगकर्ता",
-    "offline_users": "ऑफ़लाइन उपयोगकर्ता"
+    "offline_users": "ऑफ़लाइन उपयोगकर्ता",
+    "Total BD Salary": "कुल बीडी वेतन",
+    "Total Cut Amount": "कुल कटौती राशि",
+    "Average Agencies Per BD": "प्रति BD औसत एजेंसियों की संख्या"
 
 
 

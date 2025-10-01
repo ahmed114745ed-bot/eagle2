@@ -508,6 +508,14 @@
     "Rooms with PK": "PK'lı Odalar",
     "Inactive Rooms": "Pasif Odalar",
     "Top 10 Rooms by Gifts Sent": "Gönderilen hediyelere göre en iyi 10 oda",
+    "Average Session Duration per Room": "⏳ Oda başına ortalama oturum süresi",
+    "Average Duration (hours)": "⏳ Ortalama Süre (saat)",
+    "Top Agencies by Achieved Targets": "Hedeflere Ulaşan En İyi Ajanslar",
+    "Top Receivers": "📥 En Çok Hediye Alanlar",
+    "Top 10 Receivers by Gifts Received": "📥 En Çok Hediye Alan İlk 10 Kullanıcı",
+    "Top Senders": "📤 En Çok Gönderenler",
+    "Top 10 Senders by Gift Value": "📤 Gönderilen Hediye Değerine Göre İlk 10 Kullanıcı",
+    "Top 10 Agencies by Targets Achieved": "🏆 Hedeflere Ulaşan İlk 10 Ajans",
     "Top Messages": "En Çok Mesaj Gönderenler",
     "Top Followers": "En Çok Takipçiye Sahip Kullanıcılar",
     "New Sign Ups This Month": "Bu ayki yeni kayıtlar",
@@ -3467,7 +3475,10 @@
     "count_sessions": "Oturum Sayısı",
     "title_user": "📊 Kullanıcı İstatistikleri (Çevrimiçi / Çevrimdışı)",
     "online_users": "Çevrimiçi Kullanıcılar",
-    "offline_users": "Çevrimdışı Kullanıcılar"
+    "offline_users": "Çevrimdışı Kullanıcılar",
+    "Total BD Salary": "Toplam BD Maaşı",
+    "Total Cut Amount": "Toplam Kesilen Miktar",
+    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı"
 
 
 

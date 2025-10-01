@@ -2,7 +2,10 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Models\AgencyJoinRequest;
+use App\Models\Charge;
+use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\Bd;
@@ -184,24 +187,42 @@ class HomeController extends Controller
         $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
         $pendingJoins = AgencyJoinRequest::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
             ->where('status',0)->count();
-        $achievedTargets = UserTarget::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
-            ->where('add_month', now()->month)
-            ->where('add_year', now()->year)
-            ->where('agency_obtain','>',0)
-            ->count();
         $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->where('country_id',$countryID))
             ->sum('achieved_diamond');
 
         //others
         $bdCount = Bd::where('parent_id', auth()->id())->count();
         $diAuth = Auth::user()->di;
+        $totals = Charge::selectRaw("
+                SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+                SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+            ", [
+                UserTypeEnum::SUPER_ADMIN,  Auth::user()->id,
+                UserTypeEnum::SUPER_ADMIN,  Auth::user()->id
+            ])
+                ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
+        $totals = BD::where('country_id', $countryID)
+        ->withSum('salaries', 'salary')
+        ->withSum('salaries', 'cut_amount')
+        ->withCount('agencies')
+        ->get();
+
+        $totalBDSalary = $totals->sum('salaries_sum_salary');
+        $totalBDCut = $totals->sum('salaries_sum_cut_amount');
+        $averageAgenciesPerBD = $totals->avg('agencies_count');
 
         return $content
             ->title(__('Home'))
             ->description('إحصائيات عامة')
 
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse,$topUsersByFollowers) {
-                $row->column(12, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
+            ->row(function (Row $row) use ($totalCharges,$totalSpent,$agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $rooms, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $totalRooms, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse,$topUsersByFollowers,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD) {
+                $row->column(4, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
+                $row->column(4, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
+                $row->column(4, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
                 $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,$topUsersByFollowers) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
@@ -404,13 +425,42 @@ class HomeController extends Controller
                             $column->row($view);
                         });
 
+                        //chart4
+                        $row->column(6, function ($column) use ($countryID) {
+                            $avgSessionRooms = \DB::table('rooms')
+                                ->join('users', 'rooms.uid', '=', 'users.id')
+                                ->join('live_times', 'users.id', '=', 'live_times.uid')
+                                ->where('users.country_id', Auth::user()->country_id)
+                                ->select(
+                                    'rooms.id',
+                                    'users.name as room_name',
+                                    \DB::raw('AVG(
+                                        COALESCE(live_times.hours,
+                                            TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(live_times.start_time), FROM_UNIXTIME(live_times.end_time)) / 3600
+                                        )
+                                    ) as avg_duration')
+                                )
+                                ->groupBy('rooms.id', 'users.name')
+                                ->orderByDesc('avg_duration')
+                                ->limit(10)
+                                ->get();
+
+                            $labels = $avgSessionRooms->pluck('room_name');
+                            $data   = $avgSessionRooms->pluck('avg_duration');
+                            $view = view('admin.widgets.avg_session_duration_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
                     });
 
                 });
-                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $achievedTargets, $diamondsAchieved) {
+                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                         $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
                         $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies',  $agency_salaries));
                         $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', $user_salaries));
@@ -421,15 +471,85 @@ class HomeController extends Controller
                         $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/ag/users', $totalMembers));
                         $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency, 2)));
                         $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies', $pendingJoins));
-                        $row->column(3, new InfoBox(__('Agencies Achieved Targets'), 'flag', 'yellow', 'superadmin/agencies', $achievedTargets));
                         $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
                     });
+
+                    $column->row(function (Row $row) use ($countryID) {
+                        //chart 1
+                        $row->column(6, function ($column) use ($countryID) {
+                            $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
+//                                ->where('add_month', now()->month)
+//                                ->where('add_year', now()->year)
+                                ->where('agency_obtain','>',0)
+                                ->selectRaw('agency_id, COUNT(*) as total_achieved')
+                                ->groupBy('agency_id')
+                                ->orderByDesc('total_achieved')
+                                ->with('agency:id,name')
+                                ->take(10)
+                                ->get();
+
+                            $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
+                            $data   = $topAgenciesByTargets->pluck('total_achieved');
+
+                            $view = view('admin.widgets.agencies_targets_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+
+                        //chart 2
+                        $row->column(6, function ($column) {
+                            $topSenders = GiftLog::selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+                                ->groupBy('sender_id')
+                                ->orderByDesc('total_sent')
+                                ->take(10)
+                                ->with('sender:id,name')
+                                ->get();
+
+                            $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
+                            $data   = $topSenders->pluck('total_sent');
+
+                            $view = view('admin.widgets.top_senders_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+
+                        //chart 3
+                        $row->column(6, function ($column) {
+                            $topReceivers = GiftLog::selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+                                ->groupBy('receiver_id')
+                                ->orderByDesc('total_received')
+                                ->take(10)
+                                ->with('receiver:id,name')
+                                ->get();
+
+                            $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
+                            $data   = $topReceivers->pluck('total_received');
+
+                            $view = view('admin.widgets.top_receivers_chart', [
+                                'labels' => $labels,
+                                'data'   => $data,
+                            ])->render();
+
+                            $column->row($view);
+                        });
+                    });
+
                 });
-                $row->column(12, function ($column) use ($bdCount) {
+                $row->column(12, function ($column) use ($bdCount,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
-                    $column->row(function (Row $row) use ($bdCount) {
+                    $column->row(function (Row $row) use ($bdCount,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD) {
                         $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'superadmin/usersBD', $bdCount));
+                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'superadmin/bd-salaries', number_format($totalBDSalary)));
+                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'superadmin/bd-salaries', number_format($totalBDCut)));
+                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'superadmin/usersBD', number_format($averageAgenciesPerBD)));
+
                     });
                 });
             });

@@ -1253,7 +1253,10 @@
   "title_user": "📊 User Statistics (Online / Offline)",
   "online_users": "Online Users",
   "offline_users": "Offline Users",
-  "Top Users Visits":"Most interactive"
+  "Top Users Visits":"Most interactive",
+  "Total BD Salary": "Total BD Salary",
+    "Total Cut Amount": "Total Cut Amount",
+    "Average Agencies Per BD": "Average Agencies Per BD"
 
 
 
