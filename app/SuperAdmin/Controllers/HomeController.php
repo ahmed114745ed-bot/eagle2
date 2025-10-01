@@ -163,9 +163,13 @@ class HomeController extends Controller
 
         //agencies
         $agencyCount = Agency::where('country_id', $countryID)->count();
-        $user_salaries   = UserSallary::query()->whereHas('user', function ($q) use ($countryID) {
-            $q->where('agency_id', '!=', 0)->where('country_id', $countryID);
-        })->sum(DB::raw('sallary - cut_amount'));
+        $user_salaries = UserSallary::query()
+            ->whereHas('user', function ($q) use ($countryID) {
+                $q->where('agency_id', '!=', 0)
+                    ->where('country_id', $countryID)
+                    ->whereHas('agency', fn($a) => $a->where('country_id', $countryID));
+            })
+            ->sum(DB::raw('sallary - cut_amount'));
         $agency_salaries = AgencySallary::query()->whereHas('agency', function ($q) use ($countryID) {
             $q->where('country_id', $countryID);
         })->sum(DB::raw('sallary - cut_amount'));
@@ -183,11 +187,19 @@ class HomeController extends Controller
             ->take(10)
             ->get(['id','name','coins']);
         $avgAgencyWallet = Agency::where('country_id',$countryID)->avg('coins');
-        $totalMembers = User::where('country_id',$countryID)->where('agency_id','!=',0)->count();
+        $totalMembers = User::where('country_id', $countryID)
+            ->where('agency_id', '!=', 0)
+            ->whereHas('agency', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+            ->count();
         $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
         $pendingJoins = AgencyJoinRequest::whereHas('agency', fn($q) => $q->where('country_id',$countryID))
             ->where('status',0)->count();
         $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->where('country_id',$countryID))
+            ->whereHas('agency', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
             ->sum('achieved_diamond');
 
         //others
@@ -252,8 +264,11 @@ class HomeController extends Controller
 
                     $column->row(function (Row $row) use ($countryID,$topUsersByFollowers) {
                         // Right: chart view (Top Salaries)
-                        $row->column(6, function ($column) {
+                        $row->column(6, function ($column) use ($countryID){
                             $topUsersByLiveTime = LiveTime::query()
+                                ->whereHas('user', function ($q) use ($countryID) {
+                                    $q->where('country_id', $countryID);
+                                })
                                 ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
                                 ->groupBy('uid')
                                 ->havingRaw('SUM(hours) >= 1')
@@ -261,7 +276,7 @@ class HomeController extends Controller
                                 ->take(10)
                                 ->get();
 
-                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->pluck('name');
+                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->where('country_id', $countryID)->pluck('name');
                             $data   = $topUsersByLiveTime->pluck('total_hours');
 
                             $view = view('admin.widgets.users_chart', [
@@ -327,7 +342,9 @@ class HomeController extends Controller
                 $row->column(12, function ($column) use ($countryID,$topUsersByFollowers) {
                     $column->row(function (Row $row) use ($countryID ,$topUsersByFollowers) {
                         $row->column(6, function ($col) use ($topUsersByFollowers) {
-                            $top5 = $topUsersByFollowers->take(5);
+                            $top5 = $topUsersByFollowers
+                                ->filter(fn($user) => $user->followers_count > 0)
+                                ->take(5);
 
                             $view5 = view('admin.widgets.top_followers_table', [
                                 'top5' => $top5,
@@ -408,11 +425,13 @@ class HomeController extends Controller
 
                         //chart 3
                         $row->column(6, function ($column) use ($countryID) {
-                            $topGiftedRooms = Room::with('owner')
+                            $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+                                ->with('owner')
                                 ->withSum('gifts', 'giftPrice')
                                 ->orderByDesc('gifts_sum_gift_price')
                                 ->take(10)
-                                ->get();
+                                ->get()
+                                ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
 
                             $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
                             $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
@@ -500,13 +519,18 @@ class HomeController extends Controller
                         });
 
                         //chart 2
-                        $row->column(6, function ($column) {
-                            $topSenders = GiftLog::selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+                        $row->column(6, function ($column) use ($countryID){
+                            $topSenders = GiftLog::whereHas('sender', fn($q) =>
+                            $q->where('country_id', $countryID)
+                                ->whereHas('agency', fn($a) => $a->where('country_id', $countryID))
+                            )
+                                ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
                                 ->groupBy('sender_id')
                                 ->orderByDesc('total_sent')
                                 ->take(10)
                                 ->with('sender:id,name')
-                                ->get();
+                                ->get()
+                                ->filter(fn($s) => $s->total_sent > 0);
 
                             $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
                             $data   = $topSenders->pluck('total_sent');
@@ -520,13 +544,18 @@ class HomeController extends Controller
                         });
 
                         //chart 3
-                        $row->column(6, function ($column) {
-                            $topReceivers = GiftLog::selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+                        $row->column(6, function ($column) use ($countryID){
+                            $topReceivers = GiftLog::whereHas('receiver', fn($q) =>
+                            $q->where('country_id', $countryID)
+                                ->whereHas('agency', fn($a) => $a->where('country_id', $countryID))
+                            )
+                                ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
                                 ->groupBy('receiver_id')
                                 ->orderByDesc('total_received')
                                 ->take(10)
                                 ->with('receiver:id,name')
-                                ->get();
+                                ->get()
+                                ->filter(fn($s) => $s->total_received > 0);
 
                             $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
                             $data   = $topReceivers->pluck('total_received');
