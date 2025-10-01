@@ -1190,7 +1190,8 @@
     "Monthly": "Monthly",
     "Execution Time": "Execution Time",
     "Day (0=Sunday,1=Monday,...)": "Day (0=Sunday,1=Monday,...)",
-    "Interval (days)": "Interval (days)"
+    "Interval (days)": "Interval (days)",
+  "roomTarget": "Room Cup Target: Gifts and visitors help reach the target. When reached, the room owner and admins receive coin profits."
 
     
   

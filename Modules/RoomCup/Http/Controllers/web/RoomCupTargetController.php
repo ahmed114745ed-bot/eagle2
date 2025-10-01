@@ -35,7 +35,7 @@ class RoomCupTargetController extends MainController
     {
         return (new Box(
             title: __('admin.description'),
-            content: view('admin.grid.superadmin.description'),
+            content: view('admin.grid.roomTarget'),
         ));
     }
     public function show($id, Content $content)
