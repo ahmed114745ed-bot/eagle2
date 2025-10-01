@@ -1198,9 +1198,7 @@
     "Day (0=Sunday,1=Monday,...)": "Day (0=Sunday,1=Monday,...)",
     "Interval (days)": "Interval (days)",
     "wait-2-minutes" : "please wait 2 minutes",
-
-    
-  
+  "roomTarget": "Room Cup Target: Gifts and visitors help reach the target. When reached, the room owner and admins receive coin profits.",
   "dashboard.login.loading.check_code":"check code ...",
   "change password": "Change Password",
   "please enter new password": "Please enter new password",

@@ -22,6 +22,10 @@
 "host percentage from the lucky gift": "लकी गिफ्ट से होस्ट का प्रतिशत",
 "Lucky Gift Setting": "लकी गिफ्ट सेटिंग",
 "Browse lucky gift setting": "लकी गिफ्ट सेटिंग ब्राउज़ करें",
+    
+  "roomTarget": "रूम कप टारगेट: गिफ्ट और विज़िटर्स मिलकर टारगेट पूरा करते हैं। पूरा होने पर, रूम ओनर और एडमिन्स को कॉइन प्रॉफिट मिलता है।",
+
+
     "Delete profile switch users": "प्रोफ़ाइल स्विच उपयोगकर्ताओं को हटाएं",
     "Profile Images": "प्रोफ़ाइल छवियाँ",
     "Charged by dash": "सिस्टम से चार्ज",

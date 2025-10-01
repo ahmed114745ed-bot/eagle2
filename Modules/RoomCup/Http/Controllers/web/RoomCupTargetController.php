@@ -6,13 +6,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
-use Illuminate\Routing\Controller;
 use App\Admin\Controllers\MainController;
 use Modules\RoomCup\Entities\RoomCupTarget;
-use Illuminate\Contracts\Support\Renderable;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 
 class RoomCupTargetController extends MainController
 {
@@ -25,9 +23,21 @@ class RoomCupTargetController extends MainController
         return parent::index($content
             ->header(__('Room Cup Targets'))
             ->description(__('Room Cup Targets'))
-            ->body($this->grid()));
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            }));
     }
 
+    protected function grid2()
+    {
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.roomTarget'),
+        ));
+    }
     public function show($id, Content $content)
     {
         return parent::show($id, $content
