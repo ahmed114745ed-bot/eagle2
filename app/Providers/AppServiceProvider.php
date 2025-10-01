@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\ConfigObserver;
 use App\Observers\SettingObserver;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Modules\Vip\Entities\Vip;
@@ -89,6 +90,16 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $prefix = request()->segment(1);
+
+        $originalConfig = config('admin.route');
+
+        if ($prefix === 'superadmin') {
+            config(['admin.route' => config('admin.superadmin_route')]);
+        } elseif ($prefix === 'admin') {
+            config(['admin.route' => $originalConfig]);
+        }
+
         $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
