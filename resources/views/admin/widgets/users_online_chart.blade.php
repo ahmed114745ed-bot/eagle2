@@ -1,9 +1,9 @@
-<div class="card">
-    <div class="card-header">
+<div class="box box-success">
+    <div class="box-header with-border">
     <h4>{{ __('title_user') }}</h4>
     </div>
-    <div class="card-body">
-        <canvas id="usersOnlineChart" height="300"></canvas>
+    <div class="box-body">
+        <canvas id="usersOnlineChart" height="430"></canvas>
     </div>
 </div>
 
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
             datasets: [
                 {
                     label: "{{ __('online_users') }}",
-    
+
                     data: [0], // يبدأ من 0
                     borderColor: '#28a745',
                     borderWidth: 2,
@@ -89,6 +89,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     fetchData();
-    setInterval(fetchData, 10000); 
+    setInterval(fetchData, 10000);
 });
 </script>
