@@ -46,12 +46,15 @@ trait PreventDeleteIfCreatedByDeveloper
     protected static function shouldBlock($model)
     {
         $isApi = Request::is('api/*');
+        $isSuperAdmin = Request::is('superadmin/*'); 
         $admin = Admin::user();
         $developerId = env('DEVELOPER_ADMIN_ID', 1); 
+
         return !$isApi &&
+            !$isSuperAdmin &&
             $admin &&
             ($model->created_by == $developerId || is_null($model->created_by)) &&
-           intval( $admin->id) !== intval($developerId);
+            intval($admin->id) !== intval($developerId);
     }
 
     protected static function failWithToastr($message)
