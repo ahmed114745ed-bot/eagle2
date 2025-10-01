@@ -109,7 +109,7 @@ class ChargeController extends MainController
                 });
                 $profileUrl ='';
                 if (!empty($info['uuid'])) {
-                $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
+                $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -133,7 +133,7 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("bd/users/profile/{$info['id']}");
+                $showUrl = url("superadmin/users/profile/{$info['id']}");
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
@@ -156,16 +156,17 @@ class ChargeController extends MainController
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 
-        $grid->column('usd', __('usd'))->display(function ($value) {
-            return number_format($value, 2);
+        $grid->column('usd', __('usd'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin, 2) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
         });
         $grid->disableCreateButton();
-
-//        $grid->tools(function (Grid\Tools $tools) {
-//            $url = 'salaries';
-//            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
-//            $tools->append($button);
-//        });
         $grid->disableRowSelector();
         $grid->disableActions();
         return $grid;

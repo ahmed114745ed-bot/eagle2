@@ -124,7 +124,7 @@ class BdController extends AdminController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/usersBd/{$this->id}");
+            $showUrl = url("superadmin/usersBd/{$this->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -179,7 +179,7 @@ class BdController extends AdminController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
+            $showUrl = url("superadmin/users/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
