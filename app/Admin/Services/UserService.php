@@ -71,7 +71,7 @@ class UserService
 
     protected function adminUserUrl($id): string
     {
-        if (Super::user()->type == "superAdmin") {
+        if (Super::user()->type == "superadmin") {
             return url("superadmin/users/profile/{$id}");
         }
         return url("admin/users/{$id}");
