@@ -50,6 +50,7 @@ class SuperAdminDedicateRewardAction extends Action
                 $reward->gave_reward_no += 1;
                 return $this->response()->success(__('dashboard.successful'));
             }
+            return $this->response()->error(__('your reward finished'));
         } catch (\Exception $exception) {
 
             return $this->response()->error('you dedicate all reward');
