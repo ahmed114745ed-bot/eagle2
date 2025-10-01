@@ -648,10 +648,9 @@ class HomeController extends Controller
 
     public function onlineStats()
     {
-
         $countryID = Auth::user()->country_id;
-        $online  = User::where('country_id', $countryID)->where('isOnline', 1)->count();
-        $offline = User::where('country_id', $countryID)->where('isOnline', 0)->count();
+        $online  = User::where('country_id', $countryID)->where('online', 1)->count();
+        $offline = User::where('country_id', $countryID)->where('online', 0)->count();
 
 
         return response()->json(data: [
