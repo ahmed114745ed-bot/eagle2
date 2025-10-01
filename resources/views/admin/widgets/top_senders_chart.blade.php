@@ -1,6 +1,6 @@
 <div class="box box-warning">
     <div class="box-header with-border">
-        <h3 class="box-title">💸 {{ __('Top Senders (Polar View)') }}</h3>
+        <h3 class="box-title">💸 {{ __('Top Senders') }}</h3>
     </div>
     <div class="box-body" style="height:500px;">
         <canvas id="topSendersPolar" style="width:100%; height:100%;"></canvas>

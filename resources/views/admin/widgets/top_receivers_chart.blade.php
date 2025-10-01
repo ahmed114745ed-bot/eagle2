@@ -1,6 +1,6 @@
 <div class="box box-success">
     <div class="box-header with-border">
-        <h3 class="box-title">🎁 {{ __('Top Receivers (Radar View)') }}</h3>
+        <h3 class="box-title">🎁 {{ __('Top Receivers') }}</h3>
     </div>
     <div class="box-body" style="height:500px;">
         <canvas id="topReceiversRadar" style="width:100%; height:100%;"></canvas>
