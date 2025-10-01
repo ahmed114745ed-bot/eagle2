@@ -967,7 +967,7 @@ class AgencyController extends MainController
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
-                } else {
+                } elseif (Bd::where('country_id',Auth::user()->country_id)->count() > 0) {
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
