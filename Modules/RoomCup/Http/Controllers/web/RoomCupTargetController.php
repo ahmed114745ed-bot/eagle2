@@ -23,9 +23,21 @@ class RoomCupTargetController extends MainController
         return parent::index($content
             ->header(__('Room Cup Targets'))
             ->description(__('Room Cup Targets'))
-            ->body($this->grid()));
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            }));
     }
 
+    protected function grid2()
+    {
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.superadmin.description'),
+        ));
+    }
     public function show($id, Content $content)
     {
         return parent::show($id, $content
