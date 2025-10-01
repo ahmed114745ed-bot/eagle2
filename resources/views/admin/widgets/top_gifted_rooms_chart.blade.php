@@ -11,7 +11,7 @@
     const ctxGift = document.getElementById('giftedRoomsChart').getContext('2d');
 
     new Chart(ctxGift, {
-        type: 'bar', // "bar" but horizontal
+        type: 'bar',
         data: {
             labels: @json($labels),
             datasets: [{
