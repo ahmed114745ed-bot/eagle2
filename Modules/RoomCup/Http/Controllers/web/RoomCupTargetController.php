@@ -6,13 +6,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
-use Illuminate\Routing\Controller;
 use App\Admin\Controllers\MainController;
 use Modules\RoomCup\Entities\RoomCupTarget;
-use Illuminate\Contracts\Support\Renderable;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 
 class RoomCupTargetController extends MainController
 {
