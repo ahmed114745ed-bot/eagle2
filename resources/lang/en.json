@@ -1212,6 +1212,7 @@
   "admin.username": "Username",
   "admin.login": "Login",
   "logging in": "Logging in...",
+  "superAdminRewardDescription":"The Super Admin Reward feature allows you to choose a Super Admin and assign rewards with an expiration date and a reward limit. The selected Super Admin can then dedicate these rewards to users in the same country, within the limit of the assigned number of rewards.",
   "dashboard.login.loading.logging_in" :"Logging in...",
   "dashboard.login.language.switch": "Switch Language",
   "dashboard.login.language.lang": "English",

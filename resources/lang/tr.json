@@ -3361,6 +3361,7 @@
     "Edit Room Boom Reward": "Oda Patlaması Ödülünü Düzenle",
     "Create Room Boom Reward": "Oda Patlaması Ödülü Oluştur",
     "target type": "hedef türü",
+    "superAdminRewardDescription":"Süper Admin Ödülü özelliği, bir Süper Admin seçmenizi ve ona son kullanma tarihi ve belirli sayıda ödül atamanızı sağlar. Seçilen Süper Admin, bu ödülleri aynı ülkedeki kullanıcılara, kendisine tanımlanan ödül sayısı kadar dağıtabilir.",
     "You can only have a maximum of 7 gifts for this Room Boom Level.": "Bu Oda Patlaması Seviyesi için en fazla 7 hediye ekleyebilirsiniz.",
     "Created successfully": "Başarıyla oluşturuldu",
     "Deleted successfully": "Başarıyla silindi",
