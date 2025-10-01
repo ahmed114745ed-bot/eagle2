@@ -538,6 +538,28 @@ class HomeController extends Controller
 
                             $column->row($view);
                         });
+
+                        //chart 4
+                        $row->column(6, function ($column) use ($countryID){
+                            $achievedAgencies = Agency::where('country_id', $countryID)
+                                ->whereHas('userTarget', function ($q) {
+                                    $q
+//                                        ->where('add_month', now()->month)
+//                                        ->where('add_year', now()->year)
+                                        ->where('agency_obtain', '>', 0);
+                                })
+                                ->count();
+
+                            $notAchievedAgencies = Agency::where('country_id', $countryID)
+                                    ->count() - $achievedAgencies;
+
+                            $view = view('admin.widgets.agencies_compare_chart', [
+                                'achieved'    => $achievedAgencies,
+                                'notAchieved' => $notAchievedAgencies,
+                            ])->render();
+
+                            $column->row($view);
+                        });
                     });
 
                 });
