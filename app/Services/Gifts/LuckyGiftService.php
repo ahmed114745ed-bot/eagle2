@@ -36,8 +36,6 @@ class LuckyGiftService
 
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-
-
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
         $ownerId  = $data['owner_id'];
@@ -45,6 +43,11 @@ class LuckyGiftService
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
         $amountBefore = $user->di;
+        $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
+        $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
+        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+
+
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
@@ -83,7 +86,7 @@ class LuckyGiftService
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
-        $receiverName = $receivedUsers->first()->name;
+        $receiverName = $receivedUsers->first()?->name;
         $receiversCount  = $receivedUsers->count();
         $isToRoom      = $receiversCount > 1;
 
@@ -93,7 +96,7 @@ class LuckyGiftService
 
         $index = $count;
 
-        $coinsForReceiver   = $number * ($giftPrice * 0.1);
+        $coinsForReceiver   = $number * ($giftPrice * $hostPercentage);
         $price              = $coinsForReceiver * $receiversCount;
         $total_user_win  = 0;
         $total_count_win = 0;
@@ -106,10 +109,14 @@ class LuckyGiftService
             $gift?->name ,
         );
 
+        $totalPrice = $giftPrice * $number * $receiversCount;
+        $coinsForApp   = $totalPrice * $appPercentage;
+        $coinsForOwner = $totalPrice * $roomrPercentage;
 
         while ($user->di >= $totalPrice && $index > 0) {
 
-            $appWallet->coins   += $price * 8;
+            // $appWallet->coins   += $price * 8;
+            $appWallet->coins   += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
@@ -138,7 +145,20 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
+                \Log::info('⚡ Popular check result', [
+                    'isPopular'           => $isPopular,
+                    'cashback_percentage' => $cashback_percentage,
+                ]);
+                
+              
                 if ($isPopular) {
+
+                     \Log::info('🚀 Sending Popular To Zego...', [
+                            'user_id'  => $userId,
+                            'owner_id' => $ownerId,
+                            'room_id'  => $room->id ?? null,
+                        ]);
+
                     $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
             } else {
@@ -193,8 +213,10 @@ class LuckyGiftService
         }
 
         // update room session
-        $room->session      += (int)$gift->price * $number * $count * 0.1;
+        // $room->session      += (int)$gift->price * $number * $count * 0.1;
+        $room->session      +=  $coinsForOwner;
         $room->save();
+
 
         // add session to response
         $responseData['session'] = $room->session_string;
@@ -229,10 +251,7 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
-
-
         return  $responseData;
-
     }
 
 
@@ -452,6 +471,7 @@ class LuckyGiftService
         return [
             'gift_image'      => $gift->img,
             'receiver_name'   => $receiverName,
+            'receivers_ids'   => $receiversIds,
             'sender_id'       => $user->id ?? 0,
             'sender_name'     => $user->name ?? '',
             'sender_img'      => $user->profile->avatar ?? '',

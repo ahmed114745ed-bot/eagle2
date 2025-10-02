@@ -221,7 +221,6 @@ class AuthController extends Controller
 
     protected function loginWithHuawei($data)
     {
-
         try {
             [$user, $token] = $this->authService->loginWithHuawei($data);
         } catch (\Exception $exception) {

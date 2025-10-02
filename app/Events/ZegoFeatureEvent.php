@@ -11,21 +11,21 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
+class ZegoFeatureEvent implements ShouldBroadcastNow //ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-    // use InteractsWithSockets;
+//    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use InteractsWithSockets;
 
-    public $gift;
+    public $zegoFeature;
 
     /**
      * Create a new event instance.
      *
      * @param array $gift
      */
-    public function __construct($gift)
+    public function __construct($zegoFeature)
     {
-        $this->gift = $gift;
+        $this->zegoFeature = $zegoFeature;
     }
 
     /**
@@ -35,7 +35,7 @@ class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('gift_banner');
+        return new Channel('zego_feature');
     }
 
     /**
@@ -45,6 +45,6 @@ class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
      */
     public function broadcastAs()
     {
-        return 'gift_banner';
+        return 'zego_feature';
     }
 }
