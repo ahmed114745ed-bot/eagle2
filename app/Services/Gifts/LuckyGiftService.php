@@ -145,7 +145,20 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
+                \Log::info('⚡ Popular check result', [
+                    'isPopular'           => $isPopular,
+                    'cashback_percentage' => $cashback_percentage,
+                ]);
+                
+              
                 if ($isPopular) {
+
+                    \Log::info('🚀 Sending Popular To Zego...', [
+                        'user_id'  => $userId,
+                        'owner_id' => $ownerId,
+                        'room_id'  => $room->id ?? null,
+                    ]);
+                
                     $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
             } else {
