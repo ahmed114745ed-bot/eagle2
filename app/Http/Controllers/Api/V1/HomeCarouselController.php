@@ -21,7 +21,7 @@ class HomeCarouselController extends Controller
         }
 
         $items = HomeCarousel::query()->with('user','room','generalRole')
-            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
+            ->when($displayAt, fn($q) => $q->where("display_$displayAt", 1))
             ->where('enable', 1)
             ->orderBy('sort')
             ->when($request->type, fn($q) => $q->where('type', $request->type))
