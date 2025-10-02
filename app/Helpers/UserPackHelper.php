@@ -114,7 +114,7 @@ class UserPackHelper
      */
     public static function getFrameWare(User $user): mixed
     {
-        return self::getWare($user, 4);
+        return self::getWare($user, 28);
     }
 
     /**
