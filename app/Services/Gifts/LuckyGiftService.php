@@ -123,6 +123,13 @@ class LuckyGiftService
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
+            \Log::info('⚡ Popular check result', [
+                'isPopular'           => $isPopular,
+                'cashback_percentage' => $cashback_percentage,
+                'isWinner' => $isWinner,
+                'appWalletCoins' => $appWalletCoins,
+                'totalGiftPrice' => $totalGiftPrice,
+            ]);
             if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
                 $properties = $gift->luckyGift?->min_percentage;
 
