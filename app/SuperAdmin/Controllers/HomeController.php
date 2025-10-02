@@ -634,9 +634,9 @@ class HomeController extends Controller
 
                     $column->row(function (Row $row) use ($game) {
                         $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue',"" ,number_format($game->total_played ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red',"", number_format($game->total_loss ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange',"", number_format($game->total_win ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red',"", number_format($game->total_loss ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange',"", number_format($game->total_win ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
                     });
                 });
             });
