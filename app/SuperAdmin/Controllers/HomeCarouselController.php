@@ -28,7 +28,7 @@ class HomeCarouselController extends MainController
         ->row(function ($row) {
             $row->column(12, $this->grid());
         });
-          
+
     }
 
     /**
@@ -40,9 +40,9 @@ class HomeCarouselController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return $content
             ->title(trans('HomeCarousel'))
-            ->body($this->detail($id)));
+            ->body($this->detail($id));
     }
 
     /**
@@ -75,20 +75,20 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-    
+
         $grid->model()->whereHas('countries', function ($q) {
             $q->where('countries.id', auth()->user()->country_id);
         });
-    
+
         $grid->id(__('ID'));
         $grid->column('img', trans('img'))->image('', 235, 77);
         $grid->column('url', trans('url'));
-    
-    
+
+
         // $this->extendGrid($grid);
         $grid->disableExport();
         $grid->disableActions();
-    
+
         return $grid;
     }
 
@@ -102,7 +102,7 @@ class HomeCarouselController extends MainController
     {
         $show = new Show(HomeCarousel::findOrFail($id));
 
-     
+
 
         return $show;
     }
@@ -117,13 +117,11 @@ class HomeCarouselController extends MainController
      {
          $form = new Form(new HomeCarousel);
          $this->disableFormTools($form);
-     
-    
-     
+
          $form->number('sort', __('sort'));
          $form->imagePath('img', trans('img'))->setResolution(80)->required();
          $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-     
+
          $form->select('form', trans('time view type'))->options([
              0 => __(''),
              1 => __('hours'),
@@ -132,7 +130,7 @@ class HomeCarouselController extends MainController
          ])->when(1, fn(Form $form) => $form->text('input', trans('input')))
            ->when(2, fn(Form $form) => $form->text('input', trans('input')))
            ->when(3, fn(Form $form) => $form->text('input', trans('input')));
-     
+
          $form->select('type', trans('type'))
              ->options([
                  'room'   => __('Room'),
@@ -160,27 +158,27 @@ class HomeCarouselController extends MainController
                      ])
                      ->when('event', fn(Form $form) => $form->url('url', trans('url')))
              );
-     
+
          $form->hidden('display_at')->default(json_encode(['country']));
-     
+
          $form->hidden('countries');
-     
+
          $form->saving(function (Form $form) {
              $form->model()->display_at = json_encode(['country']);
              $form->model()->display_country = 1;
              $form->display_country = 1;
          });
-     
+
          $form->saved(function (Form $form) {
              $userCountryId = auth()->user()->country_id ?? null;
              if ($userCountryId) {
                  $form->model()->countries()->sync([$userCountryId]);
              }
          });
-     
+
          return $form;
      }
-     
-        
-    
+
+
+
 }
