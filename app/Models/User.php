@@ -15,11 +15,13 @@ use App\Helpers\UserPackHelper;
 use Modules\Reals\Entities\Real;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Badge\Entities\Badge;
 use Modules\Vip\Entities\UserVip;
 use App\Traits\PaymentGetWayTrait;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Config as ConfigModel;
+use Modules\Badge\Entities\UserBadge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
@@ -82,6 +84,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'salary',
     ];
 
     /**
@@ -102,7 +105,7 @@ class User extends Authenticatable
         //        'user_diamond',
         'total_sender_level',
         'total_received_level',
-        //        'original_uuid',
+        'original_uuid',
         //        'is_frozen',
         //        'total_charge_level',
         //        'photo',
@@ -114,6 +117,7 @@ class User extends Authenticatable
         //        'profile_frame_id'
 
     ];
+
 
 
     /* protected $appends = [
@@ -180,6 +184,13 @@ class User extends Authenticatable
     public function cpsAsOne()
     {
         return $this->hasMany(Cp::class, 'user_one_id');
+    }
+
+    public function userBadges()
+    {
+        return $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
     }
 
     public function cpsAsTwo()
@@ -1678,6 +1689,27 @@ class User extends Authenticatable
 
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
+    }
+
+    public function userBadge()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
     }
 
     public function wallet()

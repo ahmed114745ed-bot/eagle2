@@ -118,7 +118,6 @@ class MyDataResource extends JsonResource
 
         if (self::isStopInvitationValid()) {
             $isStopInvitationValid = true;
-
         }
         $data = [
             'id' => @$this->id,
@@ -289,8 +288,13 @@ class MyDataResource extends JsonResource
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 
+    // private static function isStopInvitationValid()
+    // {
+    //     return settings()->get('stop_invite_code');
+    // }
+
     private static function isStopInvitationValid()
     {
-        return settings()->get('stop_invite_code');
+        return getSettingCash('invite_code') ?? 0;
     }
 }

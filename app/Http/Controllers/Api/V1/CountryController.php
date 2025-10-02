@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Http\Resources\CountrySupportersResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
@@ -19,8 +20,8 @@ class CountryController extends Controller
 
     public function allCountries()
     {
-        $countries = $this->countryService->index();
-        return Common::apiResponse(1, '', CountryResource::collection($countries));
+        $countries = $this->countryService->indexWithSupporters();
+        return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
     }
 
     public function getCountry($id)

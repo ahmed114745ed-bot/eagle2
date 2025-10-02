@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Extensions\UserExporter;
 use App\Admin\Extensions\AgencyExporter;
+use App\Admin\Extensions\FamilyExporter;
 use App\Admin\Extensions\WalletExportUser;
+use App\Admin\Extensions\FamilyLevelExport;
 use App\Admin\Extensions\WalletExportAgency;
 use App\Admin\Extensions\AgencyMangerExporter;
 use App\Admin\Extensions\ChargeAgencyExporter;
@@ -117,8 +119,28 @@ class ExportController extends Controller
         $type = request('filter_type');
 
         return Excel::download(
-            new ExchangeChargeExport($name, $from_date, $to_date, $filtering,$type),
+            new ExchangeChargeExport($name, $from_date, $to_date, $filtering, $type),
             'exchange_charges.csv'
+        );
+    }
+
+    public function familyLevelExcel()
+    {
+        return Excel::download(
+            new FamilyLevelExport(),
+            'family_levels.csv'
+        );
+    }
+
+    public function familiesExcel()
+    {
+        $date = request('date');
+        $id = request('id');
+        $uuid = request('uuid');
+   
+        return Excel::download(
+            new FamilyExporter($date, $id, $uuid),
+            'families.csv'
         );
     }
 }

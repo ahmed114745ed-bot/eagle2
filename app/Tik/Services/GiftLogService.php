@@ -172,27 +172,27 @@ class GiftLogService
                         $q->withoutAppends();
                     }]);
 
-              /*  $fUser = $topUser?->user;
-                if ($room->top_user_id != $userId) {
-                    $room->top_user_id = $fUser->id;
-                    $room->save();
-                    $ms1 = [
-                        'messageContent' => [
-                            'message'        => 'topSendGifts',
-                            'img'            => $fUser?->profile?->avatar,
-                            'id'             => $fUser->id,
-                            'name'           => $fUser->name,
-                            'has_color_name' => Common::hasInPack($fUser->id, 18),
-                            'frame'          => Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true),
-                            'fid'            => @$fUser->dress_1,
-                            'vlev'           => @$fUser->UserVip->level
-                        ]
-                    ];
+                /*  $fUser = $topUser?->user;
+                  if ($room->top_user_id != $userId) {
+                      $room->top_user_id = $fUser->id;
+                      $room->save();
+                      $ms1 = [
+                          'messageContent' => [
+                              'message'        => 'topSendGifts',
+                              'img'            => $fUser?->profile?->avatar,
+                              'id'             => $fUser->id,
+                              'name'           => $fUser->name,
+                              'has_color_name' => Common::hasInPack($fUser->id, 18),
+                              'frame'          => Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true),
+                              'fid'            => @$fUser->dress_1,
+                              'vlev'           => @$fUser->UserVip->level
+                          ]
+                      ];
 
-                    $json = json_encode($ms1);
+                      $json = json_encode($ms1);
 
-                    Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                }*/
+                      Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+                  }*/
             }
             // (new RoomAchievementTargetService)->roomTarget($room);
 
@@ -203,6 +203,7 @@ class GiftLogService
             $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
             if ($totalPrice > $totalGiftPrice) {
+                Log::info('send gift event');
                 $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
             }
             return $message;
@@ -420,7 +421,7 @@ class GiftLogService
             'gift_img'          => $gift->img,
             'gift_id'           => $gift->id,
             'sender_id'         => (int)$user->id,
-            'receiver_id'       => (int)$receivedUser->id,
+            'receiver_id'       => @(int)$receivedUser->id,
             'num_gift'          => $totalPrice,
             "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
             'room_session'      => $room->session_string,
@@ -433,7 +434,7 @@ class GiftLogService
             "room_cover"        => $room->room_cover ?? '',
             "room_background"   => $room->final_room_image ?? '',
             'from_name'         => $user->name,
-            'to_name'           => $receivedUser->name,
+            'to_name'           => @$receivedUser->name,
             'gift_price'        => $gift->price,
             'owner_id'          => $ownerId,
             'number'            => $number,

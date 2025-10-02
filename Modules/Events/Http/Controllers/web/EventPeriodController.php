@@ -18,6 +18,7 @@ use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
 use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Badge\Entities\Badge;
 
 class EventPeriodController extends MainController
 {
@@ -196,10 +197,13 @@ class EventPeriodController extends MainController
                 return $target;
             } elseif ($this->type == "ware") {
                 $ware = Ware::find($target);
-                return $ware->name;
+                return @$ware->name ?? '';
             } elseif ($this->type == "vip") {
                 $vip = OVip::find($target);
-                return $vip->name;
+                return @$vip->name  ?? '';
+            } elseif ($this->type == "badge") {
+                $vip = Badge::find($target);
+                return $vip ? (@$vip->name ?? '') : "";
             } else {
                 $value = getDriverUrl() . $target;
                 return "<img src='$value' width='80' height='80'>";

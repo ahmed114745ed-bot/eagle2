@@ -129,6 +129,12 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->runInBackground();
+        $schedule->command('coin-game:aggregate')
+        ->dailyAt('07:00')
+        ->timezone(getTimezone())
+        ->withoutOverlapping()
+        ->runInBackground();
+    
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())

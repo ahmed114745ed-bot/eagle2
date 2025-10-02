@@ -62,6 +62,12 @@ class RoomComments
 
 //            Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
 
+            \Log::info('🚀 RoomComments started', [
+                'roomID'   => $data['room_id'],
+                'senderId' => $user->id,
+            ]);
+            // AllOpeningRoomsZegoRequest::dispatch($json, $user->id, $data['room_id'])
+            // ->onQueue('zegoRequests');
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
 
             //send comment in queue

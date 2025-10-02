@@ -66,11 +66,15 @@ class UserResourceSerche extends JsonResource
             ], // user data
 
             'profile'=>new ProfileResourceSerche(@$this->profile), // both       ------- img type   oge    contry   reqouerd
-            'level'=>Common::level_centerSerch (@$this->id), // both     ---- resever img   , sendr img  req
+           // 'level'=>Common::level_centerSerch (@$this->id), // both 
+           'level' => [
+                'receiver_img' => $this->receiverLevel?->img,
+                'sender_img'   => $this->senderLevel?->img,
+            ], 
             'vip'=>@Common::ovip_center ($this->resource), // both
             'is_agent'=>$this->is_agent, // both
-            'has_color_name' => $this->getPackWithType(18), // both
-            'country_hidden' => $this->getPackWithType(13), // both
+            'has_color_name' => $this->hasPackOfType(18), // both
+            'country_hidden' => $this->hasPackOfType(13), // both
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             "manger_type"          =>new MangerTypeResource(@$this->mangerType),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
