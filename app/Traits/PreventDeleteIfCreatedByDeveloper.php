@@ -11,7 +11,7 @@ trait PreventDeleteIfCreatedByDeveloper
 {
     public static function preventDeleteByDeveloper()
     {
-    
+
         static::deleting(function ($model) {
             if (self::shouldBlock($model)) {
                 throw new \Exception(__('delete_not_allowed_div'));
@@ -34,8 +34,15 @@ trait PreventDeleteIfCreatedByDeveloper
     public static function preventCreateByDeveloper()
     {
         static::creating(function ($model) {
+            $isSuperAdmin = Request::is('superadmin/*');
+            $isBd = Request::is('bd/*');
             $admin = Admin::user();
             $developerId = env('DEVELOPER_ADMIN_ID', 1);
+
+            if ($isSuperAdmin || $isBd){
+                return true;
+            }
+
             if (!$admin || $admin->id != $developerId) {
                 self::failWithToastr(__('create_not_allowed_dev'));
                 return false;
@@ -46,12 +53,16 @@ trait PreventDeleteIfCreatedByDeveloper
     protected static function shouldBlock($model)
     {
         $isApi = Request::is('api/*');
-        $isSuperAdmin = Request::is('superadmin/*'); 
+        $isSuperAdmin = Request::is('superadmin/*');
+        $isBd = Request::is('bd/*');
         $admin = Admin::user();
-        $developerId = env('DEVELOPER_ADMIN_ID', 1); 
+        $developerId = env('DEVELOPER_ADMIN_ID', 1);
+
+        if ($isSuperAdmin || $isBd){
+            return false;
+        }
 
         return !$isApi &&
-            !$isSuperAdmin &&
             $admin &&
             ($model->created_by == $developerId || is_null($model->created_by)) &&
             intval($admin->id) !== intval($developerId);
