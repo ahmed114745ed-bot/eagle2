@@ -37,7 +37,7 @@ class RoomComments
             $ms = [
                 'messageContent' => [
                     'msg' => 'yellowBanner',
-                    'event' => 'room-comment-event',
+                    'event' => 'room.comment.event',
                     'uId' => $user->id,
                     'umsg' => $data['message'],
                     'oid' => @$room->uid,
@@ -66,6 +66,8 @@ class RoomComments
                 'roomID'   => $data['room_id'],
                 'senderId' => $user->id,
             ]);
+            // AllOpeningRoomsZegoRequest::dispatch($json, $user->id, $data['room_id'])
+            // ->onQueue('zegoRequests');
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
 
             //send comment in queue
