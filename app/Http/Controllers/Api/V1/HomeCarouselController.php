@@ -16,11 +16,12 @@ class HomeCarouselController extends Controller
         $user = Auth::user();
         $displayAt = request('display_at');
 
-             \Log::info('HomeCarousel index called', [
-                    'user_id'   => $user?->id,
-                    'displayAt' => $displayAt,
-                    'request'   => $request->all()
-                ]);
+        \Log::info('HomeCarousel index called', [
+            'user_id'   => $user?->id,
+            'displayAt' => $displayAt,
+            'request'   => $request->all()
+        ]);
+        
         if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->hasHeader('x-notification-id')) {
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
