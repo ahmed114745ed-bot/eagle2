@@ -272,6 +272,16 @@ Route::group(
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
+        Route::resource('auth/users', 'AdminUserController')->names([
+            'index' => 'auth.users.index',
+            'create' => 'auth.users.create',
+            'store' => 'auth.users.store',
+            'show' => 'auth.users.show',
+            'edit' => 'auth.users.edit',
+            'update' => 'auth.users.update',
+            'destroy' => 'auth.users.destroy',
+        ]);
+        
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
