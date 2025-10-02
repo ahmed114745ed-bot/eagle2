@@ -22,13 +22,11 @@ class HomeCarouselController extends Controller
 
         $items = HomeCarousel::query()->with('user','room','generalRole','countriesLite')
                 ->when($displayAt, function ($q) use ($displayAt) {
-                    $q->where(function ($sub) use ($displayAt) {
-                        $sub->where('display_at', $displayAt);
-            
-                        $sub->orWhere(function ($inner) use ($displayAt) {
-                            $inner->orWhereJsonContains('display_at', $displayAt);
-                        });
+                    $sub->where('display_at', $displayAt)
+                    ->orWhere(function ($query) use ($displayAt) {
+                        $query->whereRaw("JSON_VALID(display_at) and JSON_CONTAINS(display_at, '\"$displayAt\"')");
                     });
+                
                 })
             ->where('enable', 1)
             ->orderBy('sort')
