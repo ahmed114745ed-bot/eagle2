@@ -45,7 +45,8 @@ trait WinLuckyGift
             ]
         ];
         $json  = json_encode($d);
-
-        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true ), 'heavyProcessing');
+        AllOpeningRoomsZegoRequest::dispatch($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true )
+        ->onQueue('zegoRequests');
+        // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true ), 'heavyProcessing');
     }
 }
