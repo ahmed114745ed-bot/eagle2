@@ -22,7 +22,7 @@ trait WinLuckyGift
         $d     = [
             "messageContent" => [
                 "msg"     => "SHBL",
-                'event' => 'win-lucky-gift-event',
+                'event' => 'win.lucky.gift.event',
                 'uid' => $zigoData['user_id'],
                 'uImg' => $zigoData['user_image'],
                 'gImg' => $zigoData['gift_image'],
