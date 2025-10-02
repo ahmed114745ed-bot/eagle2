@@ -123,6 +123,8 @@ class LuckyGiftService
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
+            $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $totalGiftPrice, $properties);
+
             \Log::info('⚡ Popular check result', [
                 'isPopular'           => $isPopular,
                 'cashback_percentage' => $cashback_percentage,
