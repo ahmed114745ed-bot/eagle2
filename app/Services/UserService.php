@@ -104,6 +104,15 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+
+    public function bdCountryUsers($key, $page,$country_id)
+    {
+        $perPage = 10;
+        return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
+    }
+
+    
+
     public function user_bd($key, $page)
     {
         $perPage = 10;
