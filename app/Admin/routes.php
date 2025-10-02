@@ -9,6 +9,7 @@ use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\GiftController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
@@ -57,6 +58,7 @@ use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\GiftLogTestController;
+use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
@@ -307,6 +309,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -593,6 +596,7 @@ Route::group(
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
+        Route::resource('zego-feature', FeatureAppController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');

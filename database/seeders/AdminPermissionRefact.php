@@ -302,6 +302,7 @@ class AdminPermissionRefact extends Seeder
 
                     ['key' => 'gift', 'except' => [], 'additional' => []],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => []],
+                    ['key' => 'lucky-gift-setting', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => []],
                 ],
             ],
             [

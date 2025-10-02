@@ -18,6 +18,11 @@ class CountryService
  {
     return $this->countryRepository->getCountries();
  }
+ public function indexWithSupporters()
+ {
+    return $this->countryRepository->getCountriesWithSupporters();
+ }
+
 
  public function findById($id)
  {

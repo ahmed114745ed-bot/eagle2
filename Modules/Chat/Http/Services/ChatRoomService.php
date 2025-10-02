@@ -205,7 +205,7 @@ class ChatRoomService
             ->where('user_id', '!=', $user->id)
             ->where('status', '!=', 'seen')
             ->paginate(20);
-
+           
         return [
             'success' => true,
             'message' => 'successfully',
@@ -345,11 +345,11 @@ class ChatRoomService
 
     public function getRoomData($user2)
     {
-        $room = Room::where('uid', $user2->now_room_uid)->first();
+        $room = Room::where('uid', $user2?->now_room_uid)->first();
         $isHideRoom = $room?->owner->getPackWithType(16);
         $room = !$isHideRoom ? $room : null;
         return [
-            'room_owner_id' => $user2->now_room_uid,
+            'room_owner_id' => $user2?->now_room_uid,
             'owner' => [
                 'uuid' => $user2->uuid ?? 0,
             ],
