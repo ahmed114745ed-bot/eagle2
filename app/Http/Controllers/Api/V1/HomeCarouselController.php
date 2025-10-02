@@ -20,8 +20,13 @@ class HomeCarouselController extends Controller
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
-        $items = HomeCarousel::query()->with('user','room','generalRole')
-            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
+        $items = HomeCarousel::query()->with('user','room','generalRole','countriesLite')
+                ->when($displayAt, function ($q) use ($displayAt) {
+                    $q->where(function ($sub) use ($displayAt) {
+                        $sub->where('display_at', $displayAt) 
+                            ->orWhereJsonContains('display_at', $displayAt); 
+                    });
+                })
             ->where('enable', 1)
             ->orderBy('sort')
             ->when($request->type, fn($q) => $q->where('type', $request->type))
