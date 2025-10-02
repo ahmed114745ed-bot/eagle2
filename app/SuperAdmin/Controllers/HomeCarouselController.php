@@ -40,9 +40,9 @@ class HomeCarouselController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return $content
             ->title(trans('HomeCarousel'))
-            ->body($this->detail($id)));
+            ->body($this->detail($id));
     }
 
     /**
