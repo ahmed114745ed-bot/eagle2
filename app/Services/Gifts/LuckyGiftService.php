@@ -123,15 +123,6 @@ class LuckyGiftService
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
-            $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $totalGiftPrice, $properties);
-
-            \Log::info('⚡ Popular check result', [
-                'isPopular'           => $isPopular,
-                'cashback_percentage' => $cashback_percentage,
-                'isWinner' => $isWinner,
-                'appWalletCoins' => $appWalletCoins,
-                'totalGiftPrice' => $totalGiftPrice,
-            ]);
             if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
                 $properties = $gift->luckyGift?->min_percentage;
 
@@ -162,12 +153,12 @@ class LuckyGiftService
               
                 if ($isPopular) {
 
-                    \Log::info('🚀 Sending Popular To Zego...', [
-                        'user_id'  => $userId,
-                        'owner_id' => $ownerId,
-                        'room_id'  => $room->id ?? null,
-                    ]);
-                
+                     \Log::info('🚀 Sending Popular To Zego...', [
+                            'user_id'  => $userId,
+                            'owner_id' => $ownerId,
+                            'room_id'  => $room->id ?? null,
+                        ]);
+
                     $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
             } else {
