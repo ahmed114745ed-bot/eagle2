@@ -63,8 +63,12 @@ class EnteranceController extends Controller
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
-        $library = Common::getConfig('library');
+        $library = Common::getConfig('video_library');
+        $liveLibrary = Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+
+        $libraries = ['agora', 'zego', 'tencent'];
+        $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -73,9 +77,9 @@ class EnteranceController extends Controller
                 'app_id' => $zego_app_id,
                 'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
-                'live_type' => 'RTC', // CDN, L3
+                'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
-            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
+            'library' => $libraries[$library],
 
         ];
         return Common::apiResponse(1, '', $data);
@@ -231,15 +235,21 @@ class EnteranceController extends Controller
     }
 
 
-
+    /**
+     * @throws \Exception
+     */
     public function enter_room(Request $request): JsonResponse
     {
+        $app_feature = \Cache::get('zego_feature');
+        if (!$app_feature && !is_null($app_feature)) {
+            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        }
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');
 
         if (!$roomId) {
-            return $this->errorResponse(__('Please provide a room_id.'), 422);
+            return $this->errorResponse(__('Please provide a room id.'), 422);
         }
 
         $room = $this->findRoom($roomId);

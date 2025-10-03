@@ -31,9 +31,10 @@ enum UserCoinLogType: string
     case CREATE_ROOM = 'create_room';
     case INVITATION_CODE = 'invitation_code';
     case ROOM_BOOM = 'room_boom';
+    case MILESTONE = 'milestone';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
     
-    public function meta(): array
+     public function meta(): array
     {
         return match ($this) {
             self::ADMIN_CHARGES => [
@@ -185,6 +186,11 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
             
+            self::MILESTONE => [
+                'sub_type' => 'milestones',
+                'item_name' => 'milestone',
+                'queue_job' => null,
+            ],
             
             
             

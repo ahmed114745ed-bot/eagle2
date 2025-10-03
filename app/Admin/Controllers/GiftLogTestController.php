@@ -5,10 +5,12 @@ namespace App\Admin\Controllers;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\DataUserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\RoomSearchResource;
+use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserResourceSearchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
@@ -19,10 +21,13 @@ use App\Services\ProfileService;
 use App\Services\UserService;
 use App\Tik\Services\GiftLogService;
 use App\Tik\Services\RoomRepoService;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class GiftLogTestController extends Controller
 {
@@ -54,7 +59,7 @@ class GiftLogTestController extends Controller
 
         try {
             $message = $this->giftLogService->sendTestGift($request, $updateUserWhenSendGift);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('test.gifts-test', [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -98,7 +103,7 @@ class GiftLogTestController extends Controller
             $data = (new MyDataResource($userWithMedals))
                 ->resolve();
 
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $success = false;
             $message = $exception->getMessage();
             $data = null;
@@ -165,7 +170,7 @@ class GiftLogTestController extends Controller
 
     public function getAdmins(Request $request)
     {
-        $admins = $this->roomService->roomAdmins(1206);
+        $admins = $this->roomService->roomAdmins(1075);
 
         $data = RoomAdminsResource::collection($admins);
 
@@ -225,6 +230,31 @@ class GiftLogTestController extends Controller
             'success' => true,
             'message' => '',
             'data'    => $result,
+        ]);
+    }
+
+    public function showNotifications()
+    {
+        return view('test.notifications');
+    }
+
+    public function officialMessages(Request $request)
+    {
+        $userId = 303;
+        $user = User::whereId(303)->first();
+        if (!$userId) return Common::apiResponse(0, 'un_auth');
+
+        $page = $request->page ?: 1;
+        $data = (new SearchRepository())->getOfficialMessages($userId, $page);
+
+        // Update user counters
+        (new UserCounterServices)->UpgradeDateForType($user, 'official_message');
+        (new UserCounterServices)->UpgradeDateForType($user, 'system_message');
+
+        return view('test.notifications', [
+            'success' => true,
+            'message' => '',
+            'data'    => $data,
         ]);
     }
 

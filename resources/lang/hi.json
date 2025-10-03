@@ -15,6 +15,12 @@
     "Charge Reports": "चार्ज रिपोर्ट",
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
+    "Luck gift Settings": "लक गिफ्ट सेटिंग्स",
+"application wallet percentage from the lucky gift": "लकी गिफ्ट से एप्लिकेशन वॉलेट का प्रतिशत",
+"owner percentage from the lucky gift": "लकी गिफ्ट से मालिक का प्रतिशत",
+"host percentage from the lucky gift": "लकी गिफ्ट से होस्ट का प्रतिशत",
+"Lucky Gift Setting": "लकी गिफ्ट सेटिंग",
+"Browse lucky gift setting": "लकी गिफ्ट सेटिंग ब्राउज़ करें",
     "Delete profile switch users": "प्रोफ़ाइल स्विच उपयोगकर्ताओं को हटाएं",
     "Profile Images": "प्रोफ़ाइल छवियाँ",
     "Charged by dash": "सिस्टम से चार्ज",
@@ -2921,7 +2927,9 @@
   "invitation.invitee_reward_help": "कॉइन की संख्या जो आमंत्रित व्यक्ति कोड का उपयोग करने पर प्राप्त करता है।",
     "Show Image": "छवि दिखाएँ",
     "Alternative Image": "वैकल्पिक छवि",
-  "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं"
+    "Live System Setting:": "लाइव सिस्टम सेटिंग",
+    "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
+    "invite code": "आमंत्रण कोड"
 
 
 

@@ -70,7 +70,7 @@ class PackService
         return  $data;
     }
 
-  
+
     public function usedPack($user, $itemId)
     {
         $supportedTypes = [4, 5, 6, 7, 28];
@@ -95,7 +95,7 @@ class PackService
         $this->packRepository->updateIsUsedByType($user->id, $pack->type);
 
         // Calculate expire timestamp
-        $expire = $pack->expire ?: ($pack->days ? now()->addDays($pack->days)->timestamp : 0);
+        $expire = $pack->expire ? $pack->expire : ($pack->days ? now()->addDays($pack->days)->timestamp : 0);
 
         // Mark selected pack as used
         $this->packRepository->updateIsUsedByPackId($user->id, $itemId, $expire);

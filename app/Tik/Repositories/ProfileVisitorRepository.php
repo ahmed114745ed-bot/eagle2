@@ -20,8 +20,11 @@ class ProfileVisitorRepository extends AbstractRepository
 
     public function checkVisit($authId,$userId)
     {
-        return $this->model->where('visitor_id', $authId)->where('user_id', $userId)
-        ->whereDate('profile_visitors.created_at', today())->whereDate('profile_visitors.updated_at', today())
-        ->exists();
+        return $this->model
+            ->where('visitor_id', $authId)
+            ->where('user_id', $userId)
+            ->whereBetween('profile_visitors.created_at', [now()->startOfDay(), now()->endOfDay()])
+            ->whereBetween('profile_visitors.updated_at', [now()->startOfDay(), now()->endOfDay()])
+            ->exists();
     }
 }

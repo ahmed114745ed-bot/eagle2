@@ -269,6 +269,8 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
+    
+
     public function getVisitorsImages()
     {
         $visitors = $this->roomVisitorUsers;
@@ -289,13 +291,13 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-    
+        // dd($this->background?->img);
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
             ?? request()->default_background;
     }
-    
+
     public function defaultBackground()
     {
         return $this->hasOne(Background::class, 'id')->where('enable', 1)->orderBy('id');
@@ -353,5 +355,10 @@ class Room extends Model
         }
 
         return collect(self::$microphoneCache)->only($ids);
+    }
+
+    public function scopeAudio(Builder $query)
+    {
+        return $query->where('rooms.type', 'audio');
     }
 }

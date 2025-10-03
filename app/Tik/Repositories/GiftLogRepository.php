@@ -36,13 +36,19 @@ class GiftLogRepository extends AbstractRepository
         return $this->model->query()->selectRaw('sender_id, SUM(giftNum * giftPrice) AS total')->where('roomowner_id', $ownerId)->groupBy('sender_id')->orderByDesc('total')->first();
     }
 
-    public function getByAgency($rel, $month, $year, $agencyId, $keywords, $perPage, $page)
+    public function getByAgency($rel, $start, $end, $agencyId, $keywords, $perPage, $page)
     {
-        return  $this->model->where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
+        return $this->model
+            ->where('agency_id', $agencyId)
+            ->whereHas($rel)
+            ->with($rel)
+            ->whereBetween('created_at', [$start, $end])
             ->selectRaw("sum(giftPrice) as exp, $keywords")
-            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->groupBy($keywords)
+            ->orderByRaw("exp desc")
             ->paginate($perPage, ['*'], 'page', $page);
     }
+    
 
     public function getSumOfReceiverObtain($userId)
     {

@@ -22,57 +22,46 @@ use Modules\Events\Transformers\WeeklyStarGift;
 
 class WeeklyStarController extends Controller
 {
-
     public function previousWeeklyEvent(Request $request)
     {
+        $user = $request->user();
+        $userId = $user->id;
+    
         $weeklyEvent = WeeklyStar::previousEvent()->weeklyStar()->latest()->first();
-
         if (!$weeklyEvent) {
             return Common::apiResponse(0, __('no weekly star'), null, 422);
         }
-
+    
         $giftIds = $weeklyEvent->gifts->pluck('id')->toArray();
-        $userId  = $request->user()->id;
-
-        // Top 10 senders during the event
-        $topSenders = GiftLog::whereIn('giftId', $giftIds)
+    
+        $allSenders = GiftLog::whereIn('giftId', $giftIds)
             ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
             ->select(DB::raw('SUM(giftPrice) as totalGiftNum'), 'sender_id')
             ->with('sender')
             ->groupBy('sender_id')
             ->orderByDesc('totalGiftNum')
-            ->take(10)
             ->get();
-
-        // Check if authenticated user is among top senders
-        $isUserInTop = $topSenders->contains('sender_id', $userId);
-
-        // If not in top 10, fetch their own rank if available and append
-        if (!$isUserInTop) {
-            $userLog = GiftLog::where('sender_id', $userId)
-                ->whereIn('giftId', $giftIds)
-                ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
-                ->select(DB::raw('SUM(giftPrice) as totalGiftNum'), 'sender_id')
-                ->with('sender')
-                ->groupBy('sender_id')
-                ->first();
-
-            if ($userLog) {
-                $topSenders->push($userLog);
-            }
+    
+        if ($allSenders->isEmpty()) {
+            return Common::apiResponse(1, '', [
+                'top' => [],
+                'user' => new UserWeeklyStar($user, null),
+            ]);
         }
-
-        // Final result: top 10 list + user data if outside top
-        $top10 = $topSenders->take(10);
-        $userData = $top10->contains('sender_id', $userId)
-            ? (object)[]
-            : new UserWeeklyStar($request->user(), $topSenders->where('sender_id', $userId)->first());
-
+    
+        $top10 = $allSenders->take(10);
+    
+        $userLog = $allSenders->firstWhere('sender_id', $userId);
+        $userData = in_array($userId, $top10->pluck('sender_id')->toArray())
+            ? (object)[] 
+            : new UserWeeklyStar($user, $userLog);
+    
         return Common::apiResponse(1, '', [
             'top'  => TopWeeklyStarUsersResource::collection($top10),
             'user' => $userData,
         ]);
     }
+    
 
     public function topUsersEvent(Request $request)
     {

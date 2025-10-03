@@ -113,4 +113,21 @@ class CommunityController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function notifications(Request $request): JsonResponse
+    {
+        // 0 => 'agency', 1 => 'sys', 2 => 'official',
+        $data = $request->validate([
+            'type' => 'required|integer|in:0,1,2',
+        ]);
+
+        $userId = $request->user()->id;
+        if (!$userId) return Common::apiResponse(0, 'un_auth');
+
+        $data = $this->searchRepository->getNotifications($userId,$data['type']);
+
+        (new UserCounterServices)->UpgradeDateForType($request->user(), 'official_message');
+        (new UserCounterServices)->UpgradeDateForType($request->user(), 'system_message');
+
+        return Common::apiResponse(1, '', $data);
+    }
 }

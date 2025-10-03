@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use function Laravel\Prompts\select;
+
 class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
@@ -68,7 +69,7 @@ class UserRepository extends Repository
     {
 
         return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
-          ->where(function ($query) {
+            ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })
@@ -112,11 +113,11 @@ class UserRepository extends Repository
     public function user_bd2($key, $page, $perPage)
     {
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
-                    ->where(function ($query) use ($key) {
+            ->where(function ($query) use ($key) {
 
-                            $query->orWhere('id', 'like', '%' . $key . '%');
-                    })
-                   ->paginate($perPage, ['*'], 'page', $page);
+                $query->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
 
@@ -163,16 +164,21 @@ class UserRepository extends Repository
 
     public function searchUserFamily($key, $page, $perPage)
     {
-        return User::selectRaw('concat(name, " - ", uuid) as name, id')
+        return User::select('id', 'name','uuid') // keep light select
             ->where(function ($query) {
                 $query->where('family_id', 0)
                     ->orWhereNull('family_id');
             })
             ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
+                $query->fitterByUuid($key)
+                    ->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(fn($user) => [
+                'id'   => $user->id,
+                'name' => $user->uuid . ' - ' . $user->name, // accessor used here
+            ]);
     }
 
     public function updateDeviceToken($user, $deviceToken = null)
@@ -193,7 +199,7 @@ class UserRepository extends Repository
     public function getUserWithMedals($userId)
     {
         return User::with([
-            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17])
+            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
                 ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                 ->where('is_used', 1)
                 ->with(['ware']),
@@ -442,27 +448,27 @@ class UserRepository extends Repository
     {
         $targetPackTypes = [4, 5, 6, 15, 16, 17, 18, 19, 20, 25];
 
-        $user = User::
-        select(  [ 'id',
-                        'uuid',
-                        'color_id',
-                        'chat_id',
-                        'notification_id',
-                        'name',
-                        'number_of_fans',
-                        'number_of_followings',
-                        'number_of_friends',
-                        'family_id',
-                        'total_diamond_received',
-                        'bio',
-                        'type_user',
-              ] )
-        ->with([
+        $user = User::select([
+            'id',
+            'uuid',
+            'color_id',
+            'chat_id',
+            'notification_id',
+            'name',
+            'number_of_fans',
+            'number_of_followings',
+            'number_of_friends',
+            'family_id',
+            'total_diamond_received',
+            'bio',
+            'type_user',
+        ])
+            ->with([
                 'packs' => fn($q) => $q->where('is_used', 1)
-                                       ->whereIn('type', $targetPackTypes)
-                                       ->where(fn($q) => $q->where('expire', 0)
-                                                           ->orWhere('expire', '>=', now()->timestamp))
-                                       ->with('ware'),
+                    ->whereIn('type', $targetPackTypes)
+                    ->where(fn($q) => $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp))
+                    ->with('ware'),
                 'profile',
                 'room.backgroundImage',
                 'room.background',
@@ -487,9 +493,9 @@ class UserRepository extends Repository
             ])
             ->withCount(['profileVisits as profile_visitors'])
             ->findOrFail($id);
-        
 
-            return $user;
+
+        return $user;
     }
 
 
@@ -567,7 +573,4 @@ class UserRepository extends Repository
         $earning->update(['is_claimed' => true]);
         return $earning;
     }
-
-
-
 }

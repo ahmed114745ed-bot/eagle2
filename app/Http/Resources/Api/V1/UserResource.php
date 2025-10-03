@@ -42,7 +42,7 @@ class UserResource extends JsonResource
              'is_followed'          => $this->is_followed,
              'is_follow'            => $this->is_follow,
              'is_friend'            => $this->isFriends(),
-             'room'                 => ! (bool) $packsByType->get(16)?->firstWhere('is_used', 1) ? new UserDataRoomResource($this->room) : (object)[],
+             'room'                 => ($this->room && ! ((bool) $packsByType->get(16)?->firstWhere('is_used', 1)) ) ? new UserDataRoomResource($this->room) : (object)[],
              'now_room'             => $this->formatNowRoom(),
              'agency'               => $this->formatAgency(),
              'family_id'            => $this->family_id,
@@ -88,7 +88,7 @@ class UserResource extends JsonResource
 
              'profile_frame'        => $this->profile_frame,
              'profile_frame_id'     => $this->getProfileFrame()?->id ?? '',
-             'multi_images'         => $this->images?->pluck("img"),
+             'multi_images'         => MultiImageUserResource::collection($this->images),
              'user_types'           => $this->user_types,
              'shipping_agency'      => $this->formatShippingAgency(),
              'has_anti_ban'         => $this->getPackWithType(15),
@@ -151,8 +151,11 @@ class UserResource extends JsonResource
 
          if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-         return new NowRoomResource($this) ?? (object)[];
-     }
+         $resource = (new NowRoomResource($this))->toArray(request());
+
+         return empty($resource) ? (object)[] : $resource;
+        
+        }
 
 
      private function formatShippingAgency()

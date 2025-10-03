@@ -8,6 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Setting;
 //use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
@@ -15,6 +16,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Encore\Admin\Auth\Permission;
 
 class GiftController extends MainController
 {
@@ -25,9 +27,7 @@ class GiftController extends MainController
     {
         return parent::index($content
             ->title(__($this->title))
-            // ->row(function (Row $row) {
-            //     $row->column(12, $this->grid2());
-            // })
+
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
@@ -258,9 +258,9 @@ class GiftController extends MainController
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
-            if ($type == 6 || !$form->isEditing()) {
+                if ($type == 6 || !$form->isEditing()) {
 
-                $form->html(<<<'HTML'
+                    $form->html(<<<'HTML'
                     <script>
 
                         (function () {
@@ -320,7 +320,7 @@ class GiftController extends MainController
                         </script>
 
                     HTML);
-                    }
+                }
             })
             ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
@@ -368,5 +368,14 @@ class GiftController extends MainController
             }
         });
         return $form;
+    }
+
+    public function luckyGiftSettings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' .'lucky-gift-setting');
+        }
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        return $content->view('lucky_gift', compact('config'));
     }
 }

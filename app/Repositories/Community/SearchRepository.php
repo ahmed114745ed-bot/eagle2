@@ -7,6 +7,7 @@ use App\Models\OfficialMessage;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -305,5 +306,16 @@ class SearchRepository implements SearchRepositoryInterface
             'official' => CommunityResource::collection($official),
             'agency' => CommunityResource::collection($agency),
         ];
+    }
+
+    public function getNotifications(int $userId, int $type): AnonymousResourceCollection
+    {
+        $messages = OfficialMessage::query()
+            ->whereIn('user_id', [0, $userId])
+            ->where('type', $type)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return CommunityResource::collection($messages);
     }
 }

@@ -24,8 +24,6 @@ use Illuminate\Log\Logger;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
-use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -45,13 +43,15 @@ use Illuminate\Support\Facades\Log;
 use Modules\Events\Entities\Winner;
 use App\Models\NotificationTemplate;
 use App\Tik\DTO\NotificationPayload;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-
 use Modules\Events\Entities\PkEvent;
+
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Notifications\AgencyOwnerRole;
@@ -68,6 +68,7 @@ use Modules\CP\Entities\WeeklyCpWinner;
 use Modules\Events\Entities\WeeklyStar;
 use App\Traits\HelperTraits\FilterTrait;
 use App\Jobs\SendFirebaseNotificationJob;
+use Illuminate\Pagination\CursorPaginator;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -144,13 +145,13 @@ class Common
             if ($event) {
                 $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')->where('weekly_cp_id', $event->id)
                     ->where('level', 1)->first();
-                    if ($weekly_star) {
-                        $avatar = @$weekly_star->userOne->profile->avatar;
-                        $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
-                        $nameCpTwo = @$weekly_star->userTwo->name;
-                        $nameCpOne = @$weekly_star->userOne->name;
-                    }
+                if ($weekly_star) {
+                    $avatar = @$weekly_star->userOne->profile->avatar;
+                    $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
+                    $nameCpTwo = @$weekly_star->userTwo->name;
+                    $nameCpOne = @$weekly_star->userOne->name;
                 }
+            }
         }
 
         return [$avatar, $avatarCp2, $nameCpOne, $nameCpTwo];
@@ -254,15 +255,19 @@ class Common
             if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
                 $resourceData = $data->resource;
 
-                if ($resourceData instanceof LengthAwarePaginator ||
+                if (
+                    $resourceData instanceof LengthAwarePaginator ||
                     $resourceData instanceof Paginator ||
-                    $resourceData instanceof CursorPaginator) {
+                    $resourceData instanceof CursorPaginator
+                ) {
                     $paginationData = self::paginationData($resourceData);
                     $data = $resourceData->getCollection();
                 }
-            } elseif ($resourceData instanceof LengthAwarePaginator ||
+            } elseif (
+                $resourceData instanceof LengthAwarePaginator ||
                 $resourceData instanceof Paginator ||
-                $resourceData instanceof CursorPaginator) {
+                $resourceData instanceof CursorPaginator
+            ) {
                 $paginationData = self::paginationData($data);
                 $data = $data->getCollection();
             }
@@ -274,15 +279,19 @@ class Common
             if ($dataForPagination instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
                 $resourceData = $dataForPagination->resource;
 
-                if ($resourceData instanceof LengthAwarePaginator ||
+                if (
+                    $resourceData instanceof LengthAwarePaginator ||
                     $resourceData instanceof Paginator ||
-                    $resourceData instanceof CursorPaginator) {
+                    $resourceData instanceof CursorPaginator
+                ) {
                     $paginationData = self::paginationData($resourceData);
                     $data[$paginationKey] = $dataForPagination->getCollection();
                 }
-            } elseif ($resourceData instanceof LengthAwarePaginator ||
+            } elseif (
+                $resourceData instanceof LengthAwarePaginator ||
                 $resourceData instanceof Paginator ||
-                $resourceData instanceof CursorPaginator) {
+                $resourceData instanceof CursorPaginator
+            ) {
                 $paginationData = self::paginationData($dataForPagination);
                 $data[$paginationKey] = $dataForPagination->getCollection();
             }
@@ -290,9 +299,11 @@ class Common
         if ($paginates) {
 
             foreach ($paginates as $paginationKey => $paginationCollection) {
-                if ($paginationCollection instanceof LengthAwarePaginator ||
+                if (
+                    $paginationCollection instanceof LengthAwarePaginator ||
                     $paginationCollection instanceof Paginator ||
-                    $paginationCollection instanceof CursorPaginator) {
+                    $paginationCollection instanceof CursorPaginator
+                ) {
 
                     $paginationData = self::paginationData($paginationCollection);
                     $data[$paginationKey] = $paginationCollection->getCollection();
@@ -555,9 +566,7 @@ class Common
             return "true";
         }
 
-        $configs = cache()->remember('all_configs', now()->addMinutes(10), function () {
-            return DB::table('configs')->pluck('value', 'name')->toArray();
-        });
+        $configs = Cache::get('all_configs');
 
         return $configs[$name] ?? null;
     }
@@ -1878,7 +1887,7 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-                   
+
 
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
@@ -1888,7 +1897,7 @@ class Common
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' =>  '' ,
+                    'colored_name' =>  '',
 
                 ];
             case 'user':
@@ -2061,5 +2070,25 @@ class Common
     public static function bannedResponse(): JsonResponse
     {
         return Common::apiResponse(1, __('banned_from_action'), [], 377);
+    }
+
+
+    public static function userBadge($userId, $badgeId, $days, $type)
+    {
+        $badgeUser = UserBadge::where('user_id', $userId)->where('badge_id', $badgeId)->active()->first();
+        if ($badgeUser && $badgeUser->expire != 0) {
+            $badgeUser->expire += (($days) * 86400);
+            $badgeUser->receive_type = $type;
+            $badgeUser->save();
+        } elseif (!$badgeUser) {
+            $data = [
+                'user_id' => $userId,
+                'badge_id' => $badgeId,
+                'expire' => time() + (($days) * 86400),
+                'receive_type' => $type,
+            ];
+
+            UserBadge::query()->create($data);
+        }
     }
 }
