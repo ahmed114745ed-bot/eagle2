@@ -30,7 +30,7 @@ class CoinController extends Controller
     public function buyCoins(Request $request)
     {
         if (!$request->coin_id) return Common::apiResponse(0, 'missing param', null, 422);
-        
+
 
         try {
             return  $this->coinService->buyCoins( $request );
@@ -106,6 +106,13 @@ class CoinController extends Controller
             $type = 'shipping_agency';
         }
         $data =  $this->coinService->paymentCoin($type);
+
+        $data->map(function ($item) {
+            if (isset($item->coins) && isset($item->coins->usd)) {
+                $item->coins->usd = (int) $item->coins->usd;
+            }
+            return $item;
+        });
         return Common::apiResponse(1, '', $data);
     }
 
