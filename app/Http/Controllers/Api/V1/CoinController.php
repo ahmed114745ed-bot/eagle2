@@ -107,12 +107,6 @@ class CoinController extends Controller
         }
         $data =  $this->coinService->paymentCoin($type);
 
-        $data->map(function ($item) {
-            if (isset($item->coins) && isset($item->coins->usd)) {
-                $item->coins->usd = (int) $item->coins->usd;
-            }
-            return $item;
-        });
         return Common::apiResponse(1, '', $data);
     }
 
