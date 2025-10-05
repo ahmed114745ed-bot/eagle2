@@ -89,8 +89,43 @@ class HomeCarouselController extends MainController
         $grid = new Grid(new HomeCarousel);
     
         $grid->id(__('ID'));
-        $grid->column('img', trans('img'))->image('', 235, 77);
-        $grid->column('url', trans('url'))->url();
+        $grid->column('img', 'Image')->display(function ($img) {
+            $id = "imgModal{$this->id}";
+
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($img) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return <<<HTML
+        <style>
+        .modal-img {
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-img {
+            transform: scale(1.05);
+        }
+        </style>
+        
+        <img src="{$url}" width="235" height="77" style="cursor:pointer;" onclick="document.getElementById('{$id}').style.display='block';" />
+        
+        <!-- Modal -->
+        <div id="{$id}" class="modal" style="display:none; position:fixed; z-index:1050; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.7);">
+            <span style="position:absolute; top:20px; right:35px; color:white; font-size:40px; cursor:pointer;" onclick="document.getElementById('{$id}').style.display='none';">&times;</span>
+            <div style="margin:5% auto; display:block; width:80%; max-width:800px; text-align:center;">
+                <img src="{$url}" class="modal-img" style="width:100%; height:auto;" />
+            </div>
+        </div>
+        HTML;
+        });
+        
+    
+    
+    
+
+        // $grid->column('url', trans('url'))->url();
 
         foreach (['display_discover' => 'Display Discover',
         'display_home_top' => 'Display Home Top',
@@ -233,21 +268,11 @@ class HomeCarouselController extends MainController
             $form->ignore('display_at');
             $form->belongsToMany('countries', Countries::class, trans('Country'));
 
-        $form->select('type', trans('type'))
-            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events')])
-            ->when('room', function (Form $form) {
-                $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
-            })->when('link', function (Form $form) {
-                $form->url('url', trans('url'))->rules('required|url');
-            })->when('event', function (Form $form) {
-                $form->select('event_type', trans('events'))->options(['event' => __('events'), 'pk_event' => __('pk_event'), 'weekly_star' => __('weekly_star'), 'charge_event' => __('charge_event'), 'event_period' => __('event_period'), 'weekly_cp' => __('weekly_cp')])->when('event', function (Form $form) {
-                    $form->url('url', trans('url'));
-                });
-            });
-            if ($form->isCreating()) {
-                $form->model()->created_by = auth()->id();
-            }
-            $form->model()->updated_by = auth()->id();
+            // $form->multipleSelect('countries', __('Country'))
+            //     ->options(Country::all()->pluck('name', 'id'))
+            //     ->rules(['array'])
+            //     ->attribute('id', 'countries_select');
+        
 
 
             $form->html('<style>#countries_select { display:none; }</style>');

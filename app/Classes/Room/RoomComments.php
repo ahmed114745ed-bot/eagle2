@@ -66,9 +66,9 @@ class RoomComments
                 'roomID'   => $data['room_id'],
                 'senderId' => $user->id,
             ]);
-            AllOpeningRoomsZegoRequest::dispatch($json, $user->id, $data['room_id'])
-            ->onQueue('zegoRequests');
-            // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
+            // AllOpeningRoomsZegoRequest::dispatch($json, $user->id, $data['room_id'])
+            // ->onQueue('zegoRequests');
+            dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
 
             //send comment in queue
             //            dispatch(new SendCustomToZend($user->id, $data['room_id'], $data['message'], $rooms))->onQueue('sendComment');

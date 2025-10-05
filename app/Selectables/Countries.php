@@ -10,6 +10,7 @@ class Countries extends Selectable
 {
     public $model = Country::class;
 
+    
     public function make()
     {
         $this->column('id', 'ID');
