@@ -92,31 +92,13 @@ class BannerServices
 
     public function index2($ids)
     {
-        $timezone = Common::timeZone();
-
-        $now = now($timezone);
         $query = Banner::query()
             ->where('is_active', true)
             ->whereNotNull('publish_at')
-            ->where(function($q) use ($now) {
-                $q->where(function($q2) use ($now) {
-                    $q2->where('expire', '>', 0)
-                    ->where('publish_at', '<=', $now)
-                    ->where(function($q3) use ($now) {
-                        $q3->where('publish_at', '<=', $now)
-                            ->whereRaw("publish_at + INTERVAL expire DAY > ?", [$now]);
-                    });
-                })
-                ->orWhereNull('expire')
-                ->orWhere('expire', 0);
-            })
-            ->whereNotIn('id', $ids)
+            ->whereNotIn("id",$ids)
             ->inRandomOrder()
             ->take(1);
-    
 
-          
-              
         // if (Banner::query()->count() > 1) {
         //     if ($ids != null && $query->count() > 1) $query->where('id', '!=', $ids->banner_id)->get();
         // }
