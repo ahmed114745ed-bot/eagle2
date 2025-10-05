@@ -148,7 +148,7 @@ class MicService
             return true;
         }
 
-        $userSeats = $this->getUserNearby($position, mode: $room->mode);
+        $userSeats = $this->getUserNearby($position, $room->mode);
 
        Log::info("📍 [CP] Nearby positions", [
            'position' => $position,
