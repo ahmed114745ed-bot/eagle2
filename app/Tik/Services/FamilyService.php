@@ -15,6 +15,7 @@ use App\Tik\Repositories\FamilyRepository;
 use App\Http\Resources\Api\V2\FamilyResource;
 use App\Tik\Repositories\FamilyRankRepository;
 use App\Tik\Repositories\FamilyUserRepository;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class FamilyService
 {
@@ -79,7 +80,8 @@ class FamilyService
         );
         $this->userRepository->decrementCoins($user->id, $price);
         $this->userRepository->updateFamilyId($user, $family->id);
-       
+        MilestoneHelper::grantMilestoneToUser($user, 'family-owner');
+
         return $family;
     }
 

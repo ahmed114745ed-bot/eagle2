@@ -39,6 +39,7 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -674,7 +675,7 @@ class AgencyController extends MainController
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
-                $row->width(12)->switch('status', __('status'));
+                $row->width(12)->hidden('status', __('status'))->default(1);
                 $row->width(12)->hidden('bd_id')->default(Auth::id());
             });
         } else {
@@ -684,7 +685,7 @@ class AgencyController extends MainController
     
             $form->row(function ($row) {
                 $row->width(12)->text('name', __('agency name'))->rules('required');
-                $row->width(12)->switch('status', __('status'));
+                $row->width(12)->hidden('status', __('status'))->default(1);
             });
         }
     }
@@ -743,8 +744,9 @@ class AgencyController extends MainController
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
                     form.addEventListener('submit', function(){
-                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                         hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                     });
                     form.classList.add('phone-init');
         }
@@ -797,6 +799,9 @@ class AgencyController extends MainController
                 'agency_id' => $form->model()->id,
             ]);
     
+
+            $user = User::find($appOwnerId);  
+            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,

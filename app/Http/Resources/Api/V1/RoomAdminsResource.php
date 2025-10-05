@@ -3,12 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\ChatSettingResource;
-use App\Http\Resources\Api\V1\MangerTypeResource;
-use App\Models\Follow;
-use App\Models\User;
 
 class RoomAdminsResource extends JsonResource
 {
@@ -92,7 +87,8 @@ class RoomAdminsResource extends JsonResource
     private function getUserDress($type, $dress, $item = 'img1')
     {
         $key = $type . '_' . $dress;
-        return $this->userDresses[$key]?->ware->{$item} ?? '';
+
+        return $this->userDresses[$key]?->ware->img2 ?? $this->userDresses[$key]?->ware->img1 ?? '';
     }
 
     private function getVip()

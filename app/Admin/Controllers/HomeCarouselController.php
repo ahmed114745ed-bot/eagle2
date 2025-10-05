@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Country;
+use App\Selectables\Countries;
 use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
 use Encore\Admin\Form;
@@ -12,7 +14,7 @@ use App\Models\HomeCarousel;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
 use Illuminate\Validation\Rule;
-
+use Encore\Admin\Facades\Admin;
 class HomeCarouselController extends MainController
 {
     use HasResourceActions;
@@ -68,19 +70,73 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-
+    
         $grid->id(__('ID'));
-        $grid->column('img', trans('img'))->image('', 235, 77);
-        $grid->column('url', trans('url'))->url();
-        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates())->display(function ($enable, $column) {
-            if ($this->duration > Carbon::now()->timestamp || $this->duration == null) {
-                return $enable;
+        $grid->column('img', 'Image')->display(function ($img) {
+            $id = "imgModal{$this->id}";
+
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($img) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
             }
-            return null;
+
+            return <<<HTML
+        <style>
+        .modal-img {
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-img {
+            transform: scale(1.05);
+        }
+        </style>
+        
+        <img src="{$url}" width="235" height="77" style="cursor:pointer;" onclick="document.getElementById('{$id}').style.display='block';" />
+        
+        <!-- Modal -->
+        <div id="{$id}" class="modal" style="display:none; position:fixed; z-index:1050; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.7);">
+            <span style="position:absolute; top:20px; right:35px; color:white; font-size:40px; cursor:pointer;" onclick="document.getElementById('{$id}').style.display='none';">&times;</span>
+            <div style="margin:5% auto; display:block; width:80%; max-width:800px; text-align:center;">
+                <img src="{$url}" class="modal-img" style="width:100%; height:auto;" />
+            </div>
+        </div>
+        HTML;
         });
+        
+    
+    
+    
+
+        // $grid->column('url', trans('url'))->url();
+
+        foreach (['display_discover' => 'Display Discover',
+        'display_home_top' => 'Display Home Top',
+        'display_home_middle' => 'Display Home Middle',
+        'display_live' => 'Display Live',
+        'display_country' => 'Display Country'] as $field => $label) {
+  
+            $grid->column($field, __($label))
+                ->switch([
+                    'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
+                ]);
+            }
+        $grid->column('enable', trans('enable'))
+            ->switch(Common::getSwitchStates())
+            ->display(function ($enable) {
+                if ($this->duration > Carbon::now()->timestamp || $this->duration == null) {
+                    return $enable;
+                }
+                return null;
+            });
+    
         $grid->column('sort', trans('sort'))->editable();
+    
         $this->extendGrid($grid);
         $grid->disableExport();
+    
+        
         return $grid;
     }
 
@@ -111,56 +167,144 @@ class HomeCarouselController extends MainController
      *
      * @return Form
      */
-    protected function form()
-    {
-        $form = new Form(new HomeCarousel);
-        $this->disableFormTools($form);
 
-        $form->display(__('admin.ID'));
-        $form->number('sort', __('sort'));
-        $form->imagePath('img', trans('img'))->setResolution(80)->required();
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-        $form->select('form', trans('time view type'))->options([0 => __(''), 1 => __('hours'), 2 => __('days'), 3 => __('month')])
-            ->when(1, function (Form $form) {
+        protected function form()
+        {
+            $form = new Form(new HomeCarousel);
+            $this->disableFormTools($form);
+        
+            // hidden fields
+            $form->hidden('display_discover')->default(0);
+            $form->hidden('display_home_top')->default(0);
+            $form->hidden('display_home_middle')->default(0);
+            $form->hidden('display_live')->default(0);
+            $form->hidden('display_country')->default(0);
+        
+            $form->display(__('admin.ID'));
+            $form->number('sort', __('sort'));
+             $form->imagePath('img', trans('img'))->setResolution(80)->required();
+
+            $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
+       
+            $form->select('form', trans('time view type'))->options([
+                0 => __(''),
+                1 => __('hours'),
+                2 => __('days'),
+                3 => __('month')
+            ])->when(1, function (Form $form) {
                 $form->text('input', trans('input'));
             })->when(2, function (Form $form) {
                 $form->text('input', trans('input'));
             })->when(3, function (Form $form) {
                 $form->text('input', trans('input'));
             });
+        
+            $form->select('type', trans('type'))
+                ->options([
+                    'room'   => __('Room'),
+                    'normal' => __('normal'),
+                    'link'   => __('url'),
+                    'event'  => __('events')
+                ])
+                ->when('room', fn(Form $form) =>
+                    $form->select('owner_id', __('owner'))
+                        ->options('/api/search/users2')
+                        ->ajax('/api/search/users2', 'id', 'name')
+                )
+                ->when('link', fn(Form $form) =>
+                    $form->url('url', trans('url'))->rules('required|url')
+                )
+                ->when('event', fn(Form $form) =>
+                    $form->select('event_type', trans('events'))
+                        ->options([
+                            'event'        => __('events'),
+                            'pk_event'     => __('pk_event'),
+                            'weekly_star'  => __('weekly_star'),
+                            'charge_event' => __('charge_event'),
+                            'event_period' => __('event_period'),
+                            'weekly_cp'    => __('weekly_cp'),
+                        ])
+                        ->when('event', fn(Form $form) => $form->url('url', trans('url')))
+                );
+        
+            // display_at options
+            $form->multipleSelect('display_at', __('Display At'))
+                ->options([
+                    'discover'    => __('Discover'),
+                    'home_top'    => __('Home Top'),
+                    'home_middle' => __('Home Middle'),
+                    'live'        => __('Live'),
+                    'country'     => __('Country'),
+                ])
+                ->rules(['array'])
+                ->attribute('id', 'display_at_select');
+        
+            $form->ignore('display_at');
+            $form->belongsToMany('countries', Countries::class, trans('Country'));
 
-        $form->select('type', trans('type'))
-            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events')])
-            ->when('room', function (Form $form) {
-                $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
-            })->when('link', function (Form $form) {
-                $form->url('url', trans('url'))->rules('required|url');
-            })->when('event', function (Form $form) {
-                $form->select('event_type', trans('events'))->options(['event' => __('events'), 'pk_event' => __('pk_event'), 'weekly_star' => __('weekly_star'), 'charge_event' => __('charge_event'), 'event_period' => __('event_period'), 'weekly_cp' => __('weekly_cp')])->when('event', function (Form $form) {
-                    $form->url('url', trans('url'));
-                });
-            });
+            // $form->multipleSelect('countries', __('Country'))
+            //     ->options(Country::all()->pluck('name', 'id'))
+            //     ->rules(['array'])
+            //     ->attribute('id', 'countries_select');
+        
 
-        $form->select('display_at', __('Display At'))
-            ->options([
-                'discover' => __('Discover'),
-                'home_top' => __('Home Top'),
-                'home_middle' => __('Home Middle'),
-                'live' => __('Live')
-            ])
-            ->default('discover')->rules(['required', Rule::in(['home_top', 'home_middle', 'discover','live'])]);
 
-        $form->saving(function (Form $form) {
-            /*if (request()->hasFile('img')) {
-                $file = request()->file('img');
-                $toWebpAndUpload = ImageConverter::toWebpAndUpload($file, 'banners');
-                if ($toWebpAndUpload) {
-                    $form->img = $toWebpAndUpload;
+            $form->html('<style>#countries_select { display:none; }</style>');
+        
+            // script to toggle
+            Admin::script("
+                function toggleCountriesField() {
+                    var displayAt = document.getElementById('display_at_select');
+                    var countriesField = document.querySelector('#countries_select').closest('.form-group');
+                    if (!countriesField) return;
+        
+                    var values = Array.from(displayAt.selectedOptions).map(o => o.value);
+                    countriesField.style.display = values.includes('country') ? 'block' : 'none';
                 }
-
-            }*/
+        
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('display_at_select').addEventListener('change', toggleCountriesField);
+                    toggleCountriesField();
+                });
+            ");
+        
+            // before save
+            $form->saving(function (Form $form) {
+                $displays = request('display_at', []);
+                if (request()->has('display_at')) {
+                    
+        
+                $form->model()->display_discover    = in_array('discover', $displays);
+                $form->display_discover    = in_array('discover', $displays);
+                $form->model()->display_home_top    = in_array('home_top', $displays);
+                $form->display_home_top    = in_array('home_top', $displays);
+                $form->model()->display_home_middle = in_array('home_middle', $displays);
+                $form->display_home_middle = in_array('home_middle', $displays);
+                $form->model()->display_live        = in_array('live', $displays);
+                $form->display_live        = in_array('live', $displays);
+                $form->model()->display_country     = in_array('country', $displays);
+                $form->display_country     = in_array('country', $displays);
+        
+                $form->model()->display_at = json_encode($displays);
+            }
         });
+        
+            $form->saved(function (Form $form) {
 
-        return $form;
-    }
+                if (request()->has('display_at')) {
+                    $displays = json_decode($form->model()->display_at ?? '[]', true);
+        
+                    if (in_array('country', $displays)) {
+                        $countries = array_filter(request('countries', []));
+                        $form->model()->countries()->sync($countries);
+                    } else {
+                        $form->model()->countries()->detach();
+                    }
+                }
+            });
+        
+            return $form;
+        }
+        
+    
 }

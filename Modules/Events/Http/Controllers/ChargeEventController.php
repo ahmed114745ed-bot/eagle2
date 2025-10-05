@@ -75,12 +75,12 @@ class ChargeEventController extends Controller
     {
         $start = now()->startOfMonth();
         $end = now()->endOfMonth();
-    
+
         $user = Auth::user()->load([
-            'charges' => fn ($q) => $q->whereBetween('created_at', [$start, $end]),
-            'coinLogs' => fn ($q) => $q->whereBetween('created_at', [$start, $end])->where('status', 1),
+            'charges' => fn($q) => $q->whereBetween('created_at', [$start, $end]),
+            'coinLogs' => fn($q) => $q->whereBetween('created_at', [$start, $end])->where('status', 1),
         ]);
-    
+
         return Common::apiResponse(1, '', new UserChargeResource($user));
     }
     public function targets()
@@ -141,26 +141,28 @@ class ChargeEventController extends Controller
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
-                    $user->id ,
+                    $user->id,
                     $reward->target,
                     $amountBefore,
                     UserCoinLogType::CHARGE_EVENT,
                 );
-    
+
                 $user->di += $reward->target;
                 $user->save();
             } elseif ($reward->type == "vip") {
                 $vip = OVip::query()->find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire,null,'charge-event');
+                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire,null,'charge-event');
+                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,
                     'custom_image' => $reward->target,
                 ];
                 UserAchievementLevel::create($attributes);
+            } elseif ($reward->type == 'badge') {
+                Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
             }
         }
         return Common::apiResponse(1, __('تم الاضافه بنجاح'));

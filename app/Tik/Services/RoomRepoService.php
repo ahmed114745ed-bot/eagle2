@@ -126,6 +126,11 @@ class RoomRepoService
         return $this->repository->findRoomUser($userId);
     }
 
+    public function findAudioRoomUser($userId)
+    {
+        return $this->repository->findAudioRoomUser($userId);
+    }
+
     public function findRoomUserByType($userId, $type)
     {
         return $this->repository->findRoomUserByType($userId, $type);
@@ -214,9 +219,12 @@ class RoomRepoService
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
     }
 
-    public function roomAdmins($ownerId)
+    /**
+     * @throws \Exception
+     */
+    public function roomAdmins($id)
     {
-        $room = $this->repository->findRoomAdmins($ownerId, true);
+        $room = $this->repository->findRoomId($id, true);
         if (!$room) throw new \Exception(__('room not found'));
 
         if (empty($room->room_admin)) return collect();
@@ -382,7 +390,10 @@ class RoomRepoService
     public function changeMode($request, $currentMode)
     {
         $user = request()->user();
-        $room =  $this->findRoomUser($request->owner_id);
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
+        $room =  $this->findAudioRoomUser($request->owner_id);
+        \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
+
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         $youtubeStatus =  (bool)(getSettingCash('youtube_status') ?? true);
@@ -417,8 +428,9 @@ class RoomRepoService
             } else {
                 $mode = 'topCenter';
             }
-            $room =  $this->findRoomUser($request->owner_id);
         } catch (\Throwable $e) {
+            \Log::error("changeMode: Exception - " . $e->getMessage());
+
             return Common::apiResponse(0, $e->getMessage());
         }
         $ms   = [
@@ -429,19 +441,24 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
             Utils::unwrap($promises);
         } catch (\Throwable $e) {
+            \Log::error("changeMode: Zego send failed - " . $e->getMessage());
+
         }
+                \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+
 
         return Common::apiResponse(1, 'done', null, 201);
     }
     public function getRoomBackground(?Room $room)
     {
         if ($room == null) return '';
-        return $room->final_room_image ?? '' ;
+        return $room->final_room_image ?? '';
     }
 
     // public function changeMode($request, $currentMode, $userId = null)

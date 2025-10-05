@@ -3,22 +3,23 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Selectables\Gifts;
 use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Services\AppFeatureService;
 use Modules\Events\Entities\Reward;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
-use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class WeeklyEventNController extends MainController
@@ -184,7 +185,7 @@ class WeeklyEventNController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content->title(__('weekly-events-new'))
-        
+
             ->row("<h3>" . __('weekly Star') . "</h3>")->row(function ($row) use ($id) {
                 $row->column(12, $this->weeklyStar($id));
             })
@@ -239,12 +240,15 @@ class WeeklyEventNController extends MainController
             } elseif ($this->type == "vip") {
                 $vip = OVip::find($target);
                 return  $vip ? ($vip->name ?? '') : "";
+            } elseif ($this->type == "badge") {
+                $vip = Badge::find($target);
+                return $vip ? (@$vip->name ?? '') : "";
             } else {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-         $grid->column('expire', trans('expire'));
+        $grid->column('expire', trans('expire'));
 
         $grid->disableActions();
         $grid->disableCreateButton();

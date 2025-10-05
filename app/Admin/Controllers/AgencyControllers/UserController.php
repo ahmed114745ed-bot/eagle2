@@ -2,32 +2,34 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
+use Session;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Country;
+use App\Facades\UserHandling;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use App\Admin\Services\UserService;
+use Illuminate\Support\Facades\App;
+use App\Admin\Selectable\ImageColors;
+use App\Admin\Services\AgencyService;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
-use App\Admin\Selectable\ImageColors;
-use App\Facades\UserHandling;
-use App\Models\Country;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use App\Admin\Actions\CanPlaySwitchAction;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use Session;
 
 class UserController extends MainController
 {
@@ -54,7 +56,7 @@ class UserController extends MainController
             ->row(function ($row) {
                 $row->column(12, $this->grid());
                 //$row->column(2, view('admin.grid.users.actions'));
-            }));
+            })->row(view('admin.same_device_users_modal')));
     }
 
     /**
@@ -276,7 +278,20 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->ofAgency()->with("ownerRoom")->where('is_host', 1);
+        $grid->model()->ofAgency()->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
+            ->with([
+                'ownerRoom:id,uid',
+                'profile:id,user_id,avatar',
+                'agency:id,name,img',
+                'userSetting',
+                'senderLevel:id,level',
+                'receiverLevel:id,level',
+                'monthlyDiamondReceive',
+                'country',
+                'packs' => fn($q) => $q->where('is_used', true)
+                    ->whereIn('type', [25])
+                    ->with('ware:id,value'),
+            ])->where('is_host', 1)->withCount('sameDeviceUsers');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -301,83 +316,25 @@ class UserController extends MainController
 
         $grid->column('name', __('Name'))
             ->display(function ($name) {
-                if (request()->filled('_export_')) {
-                    return $this->name;
+
+                $user = $this;
+                if (! $user) {
+                    return __('No User');
                 }
-                $uid = @$this->uuid;
-                $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                //                $senderLevel = @$this->total_sender_level;
-                //                $receivedLevel = @$this->total_received_level;
-
-                $receiver_img = @$this->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
-                $receiverImg = getImagePath($receiver_img) ?? $defaultImage;
-
-                $sender_img = @$this->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-                $senderImg = getImagePath($sender_img) ?? $defaultImage;
-
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 50, 50);
-                $showUrl = url("admin/users/{$this->id}");
-
-                return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                <strong>$name</strong><br>
-                                <span style='font-size: smaller;'>UID: $uid</span><br>
-                                <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <span style='font-size: smaller;'>Receiver Level</span><br>
-                                <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <span style='font-size: smaller;'>Sender Level</span>
-                            </div>
-                        </div>
-                        ";
+                return app(UserService::class)->adminUserAvatar($user);
             });
 
-        $grid->column('agency', __('Agency'))
+        $grid->column('agency_id', __('Agency'))
             ->display(function () {
-                if (request()->filled('_export_')) {
-                    return $this?->agency?->name ?: __('No agency');
-                }
-                if (!$this->agency) {
-                    return "<span style='color: #aaa;'>No agency</span>";
+                $agency = $this->agency;
+                if (! $agency) {
+                    return '';
                 }
 
-                $name = $this->agency->name ?? '';
-
-                $cacheKey = "agency_image_{$this->agency_id}";
-                $image = Cache::remember($cacheKey, 3600, function () {
-                    $path = $this->agency->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
-
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
-                });
-
-                $profileUrl = route('admin.agency.profile', ['id' => $this->agency_id]);
-
-                return "
-                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div style='display: flex; flex-direction: column;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                                <span style='font-size: smaller;'>ID: {$this->agency_id}</span>
-                            </div>
-                        </div>
-                    </a>
-                ";
+                return app(AgencyService::class)->adminAgencyData($agency);
             });
+
+
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
@@ -396,56 +353,65 @@ class UserController extends MainController
             }
         ");
 
-        $col = $grid->column('custom_button2', __('Accounts number'))->display(function () {
-            $id           = $this->id;
-            $device_token = $this->device_token;
-            $users        = User::where('device_token', $device_token)->where('device_token', '!=', null)->get();
-            $class        = 1 == 0 ? 'btn-danger' : 'btn-success';
-            if (request()->filled('_export_')) {
-                return $users->map(function ($user) {
-                    return "{$user->name} (UUID: {$user->uuid}) (phone: {$user?->phone})";
-                })->implode("\n");
-            }
-            return $users->count();
+      $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+            $count = $this->same_device_users_count;
+            
+            return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
-        if (! request()->filled('_export_')) {
-            $col->modal('حسابات اخري علي نفس الجهاز', function ($model) {
-                $device_token  = $this->device_token;
-                $users = User::select(['id', 'name', 'uuid', 'phone'])->where('device_token', $device_token)->where('device_token', '!=', null)->get();
 
-                $rows = $users->map(function ($user) {
-                    $path = $user->profile?->avatar;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+        Admin::script("
+                    $(document).on('click', '.show-same-device-modal', function() {
+                        console.log('here');
+                        var userId = $(this).data('user-id');
+                        $('#sameDeviceUsersModal .modal-body').html('Loading...');
+                        $('#sameDeviceUsersModal').modal('show');
+                        $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
+                            $('#sameDeviceUsersModal .modal-body').html(html);
+                        });
+                    });
+        ");
+        
+        // if (!request()->filled('_export_')) {
+        //     $col->modal(__('Other accounts on same device'), function () {
+        //         $users = User::with('profile:id,user_id,avatar')
+        //             ->select(['id', 'name', 'uuid', 'phone', 'device_token'])
+        //             ->where('device_token', $this->device_token)
+        //             ->whereNotNull('device_token')
+        //             ->get();
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+        //         $rows = $users->map(function ($user) {
+        //             $path = $user->profile?->avatar;
+        //             $defaultImage = asset("images/businessman-icon.jpg");
+        //             $url = getImagePath($path) ?? $defaultImage;
 
-                    $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                    $showUrl = $user ? url("admin/users/{$user->id}") : 0;
+        //             if (!isImageExists($url)) {
+        //                 $url = $defaultImage;
+        //             }
 
-                    $nameColumn = "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
-                        </div>
-                    </div>
-                ";
+        //             $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+        //             $showUrl = url("admin/users/{$user->id}");
 
-                    return [
-                        'name' => $nameColumn,
-                        'phone' => $user->phone,
-                    ];
-                });
+        //             $nameColumn = "
+        //             <div style='display: flex; align-items: center; gap: 10px;'>
+        //                 $image
+        //                 <div>
+        //                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+        //                         <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
+        //                     </a>
+        //                     <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
+        //                 </div>
+        //             </div>
+        //         ";
 
-                return new Table([__('Name'), __('phone')], $rows->toArray());
-            });
-        }
+        //             return [
+        //                 'name' => $nameColumn,
+        //                 'phone' => $user->phone,
+        //             ];
+        //         });
+
+        //         return new Table([__('Name'), __('phone')], $rows->toArray());
+        //     });
+        // }
 
         $permission = $this->permission_name;
 
@@ -477,6 +443,7 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
         });
+       
 
         $grid->disableCreateButton();
 

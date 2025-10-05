@@ -33,7 +33,7 @@ class PKEventWinnerCommand extends Command
         $this->processEventParticipants($pkEvent, 'receiver', 'pk-star');
         $this->processEventParticipants($pkEvent, 'roomowner', 'pk-room');
 
-//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 
     protected function getCurrentPkEvent()
@@ -114,11 +114,14 @@ class PKEventWinnerCommand extends Command
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);
-                    UserCommon::addVipToUser($user, $vip, $reward->expire,null,'pk-event');
+                    UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'pk-event');
                     break;
                 case "ware":
                     $ware = Ware::find($reward->target);
-                    UserCommon::addWareToUser($user, $ware, $reward->expire , null ,'pk-event');
+                    UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'pk-event');
+                    break;
+                case "badge":
+                    Common::userBadge($user->id, $reward->target, $reward->expire, 'pk-event');
                     break;
                 case "achievement":
                     $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");

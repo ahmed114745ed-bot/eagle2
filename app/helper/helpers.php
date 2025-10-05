@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
@@ -514,12 +515,20 @@ if (!function_exists('getFileExtension')) {
     }
 }
 if (!function_exists('handleShowImageWithTypes')) {
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50): string
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
-
+            if ($objectFit !== 'cover') {
+                return "<div class='rtlSvga' id='$model'
+            style='width: {$width}px;
+                   height: {$height}px;
+                   object-fit: {$objectFit};
+                   border-radius: {$borderRadius}px;
+                   margin-right: 4px;'>
+             </div>";
+            }
             return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
@@ -530,11 +539,16 @@ if (!function_exists('handleShowImageWithTypes')) {
                     Your browser does not support the video tag.
                  </video>
                 ";
+        } elseif ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
         }
 
-        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: cover;' alt='' />";
+
+
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
 }
+
 if (!function_exists('userType')) {
     function userType($type)
     {
@@ -803,5 +817,97 @@ if (!function_exists('bd_url')) {
         }
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+
+
+    if (!function_exists('getGiftPercentage')) {
+        /**
+         * Get gift percentage by key from cache or DB
+         * and return it as decimal out of 10.
+         *
+         * @param string $key
+         * @return float
+         */
+        function getGiftPercentage(string $key): float
+        {
+            $cacheKey = "percentage_{$key}";
+
+            $value = Cache::get($cacheKey);
+
+            if ($value === null) {
+                $value = \App\Models\Setting::where('key', $key)->value('value');
+                if ($value !== null) {
+                    Cache::put($cacheKey, $value);
+                }
+            }
+            if ($value === null) {
+                $value = match ($key) {
+                    'app_wallet_lucky_gift' => 80,
+                    'owner_lucky_gift'      => 10,
+                    'host_lucky_gift'       => 10,
+                    default                  => 0,
+                };
+            }
+
+            $percentage = round(((float) $value) / 10, 2);
+
+
+            return $percentage;
+
+
+        }
+    }
+}
+
+if (!function_exists('getCountryIdFromLatLong')) {
+    function getCountryIdFromLatLong($lat, $lon)
+    {
+        $responseEn = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'en',
+        ]);
+
+        if (!$responseEn->ok()) {
+            return null;
+        }
+
+        $dataEn = $responseEn->json();
+        $countryCode = $dataEn['address']['country_code'] ?? null;
+        $countryNameEn = $dataEn['address']['country'] ?? null;
+
+        $country = Country::where('iso', $countryCode)->first();
+        if ($country) {
+            return $country->id;
+        }
+
+        $responseAr = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'ar',
+        ]);
+
+        $countryNameAr = null;
+        if ($responseAr->ok()) {
+            $dataAr = $responseAr->json();
+            $countryNameAr = $dataAr['address']['country'] ?? null;
+        }
+
+        $country = Country::create([
+            'iso' => $countryCode,
+            'e_name' => $countryNameEn,
+            'name' => $countryNameAr,
+            'status' => 1,
+        ]);
+
+        return $country->id;
     }
 }

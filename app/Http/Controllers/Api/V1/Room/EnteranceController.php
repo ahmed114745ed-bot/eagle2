@@ -68,7 +68,7 @@ class EnteranceController extends Controller
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
 
         $libraries = ['agora', 'zego', 'tencent'];
-        $liveTypes = ['rtc', 'cdn', 'l3'];
+        $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -77,7 +77,7 @@ class EnteranceController extends Controller
                 'app_id' => $zego_app_id,
                 'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
-                'live_type' => $liveTypes[$liveLibrary]
+                'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
 
@@ -235,15 +235,21 @@ class EnteranceController extends Controller
     }
 
 
-
+    /**
+     * @throws \Exception
+     */
     public function enter_room(Request $request): JsonResponse
     {
+        $app_feature = \Cache::get('zego_feature');
+        if (!$app_feature && !is_null($app_feature)) {
+            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        }
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');
 
         if (!$roomId) {
-            return $this->errorResponse(__('Please provide a room_id.'), 422);
+            return $this->errorResponse(__('Please provide a room id.'), 422);
         }
 
         $room = $this->findRoom($roomId);
