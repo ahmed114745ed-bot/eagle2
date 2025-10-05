@@ -25,11 +25,9 @@ class ZegoActionCommand extends Command
     public function handle()
     {
         $url = config('app.utd_url');
-        dd($url);
+       
         $fullUrl = $url . 'zego-action';
         $baseUrl =  config('app.url');
-
-
 
         $response = Http::get($fullUrl, [
             'base_url' => $baseUrl,
@@ -38,9 +36,8 @@ class ZegoActionCommand extends Command
         if ($response->successful()) {
             $data = $response->json();
             $isActive = $data['data'];
-            dd($isActive);
 
-            $keys = ['zego_feature'];
+            $keys = 'zego_feature';
 
             $setting =   Setting::where('key', $keys)->first();
             if ($setting) {
