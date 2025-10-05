@@ -1790,7 +1790,7 @@
                                     $imagePath = getImagePath($image);
                                     $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                    $nameRaw = optional($admin)->name ?? $admin->username;
+                                    $nameRaw = optional($admin)->name ?? @$admin->username;
                                     $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
 
                                     $uid = optional($admin)->id ?? 0;
