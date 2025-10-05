@@ -187,24 +187,23 @@ class MicService
         return true;
     }
 
-    public function getUserNearby($index, $mode, $rowSize = 4)
+    public function getUserNearby($index, $mode, $micSeats)
     {
         $neighbors = [];
-
-        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
+        $rowSize = count($micSeats); 
+        $rowStart = intdiv($index - 1, $rowSize) * $rowSize;
         $rowEnd = $rowStart + $rowSize - 1;
-
+    
         if ($index - 1 >= $rowStart) {
             $neighbors[] = $index - 1;
         }
-
         if ($index + 1 <= $rowEnd) {
             $neighbors[] = $index + 1;
         }
-
+    
         return $neighbors;
     }
-
+    
 
 
     public function sendCpLovelyMessage($room, $user)
