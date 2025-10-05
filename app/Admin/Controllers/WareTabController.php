@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -355,59 +356,7 @@ class WareTabController extends MainController
                 'id' => 'file-input-img2'
             ])->hidePreview();
 
-//        $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            })
-//            ->options([
-//                'showPreview' => false,
-////                'showCaption' => false,
-////                'showRemove'  => false,
-////                'showUpload'  => false,
-////                'showCancel'  => false,
-////                'dropZoneEnabled' => false,     // no drag & drop area
-//                'initialPreview' => [],         // don’t render existing file
-//                'initialPreviewConfig' => [],
-//            ])
-//            ->hidePreview();
 
-//        \Encore\Admin\Form::extend('customfile', CustomFile::class);
-//        $form->customfile('img2', 'Upload Image/Animation');
-//
-
-        // build preview (for edit mode when a value exists)
-//         $previewHtml = '';
-//         if ($form->model() && $form->model()->img2) {
-//             $url = getImagePath($form->model()->img2) ?? asset('images/image.png');
-//             $uniqueId = 'media_' . ($form->model()->id ?? uniqid());
-
-//             // wrap with a box that visually matches the image field
-//             $previewHtml = sprintf(
-//                 '<div class="kv-preview-thumb" style="display:inline-block;border:1px solid #e5e5e5;border-radius:6px;width:160px;height:160px;overflow:hidden;margin-bottom:8px;padding:6px;background:#f7f7f7;">
-//             %s
-//          </div>',
-//                 handleShowImageWithTypes($uniqueId, $url, 148, 148, 10) // inner size a bit smaller due to padding
-//             );
-//         }
-
-//         // give the input a unique id so we can target only this field
-//         $inputId = 'img2_input_' . Str::random(8);
-
-//         $form->file('img2', trans('svg'))
-//             ->attribute(['id' => $inputId])
-//             ->name(function ($file) {
-//                 return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//             })
-
-//             ->help($previewHtml);
-
-//         // hide the default built-in file preview **only for this field**
-//         Admin::script("
-//     $(function () {
-//         var box = $('#{$inputId}').closest('.file-input');
-//         box.find('.file-preview').remove(); // remove grey icon preview
-//     });
-// ");
 
         if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
@@ -468,7 +417,14 @@ class WareTabController extends MainController
                 $hasShowImg = $form->show_img || $form->model()->show_img;
                 $img2 = $form->img2;
                 $wareId = $form->model()->id;
-
+                Log::info('🟢 [Form Saving Started]', [
+                    'model_id' => $form->model()->id,
+                    'has_show_img' => (bool) $form->show_img,
+                    'has_existing_show_img' => (bool) $form->model()->show_img,
+                    'has_img2' => (bool) $form->img2,
+                    'has_existing_img2' => (bool) $form->model()->img2,
+                ]);
+        
                 $hasImg2 = $img2 || $form->model()->img2;
 
                 if (!$hasShowImg && !$hasImg2) {
@@ -482,7 +438,10 @@ class WareTabController extends MainController
 
                 if ($form->show_img instanceof UploadedFile) {
                     $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
-
+                    Log::info('🖼 show_img uploaded', [
+                        'original_name' => $form->show_img->getClientOriginalName(),
+                        'mime' => $form->show_img->getMimeType(),
+                    ]);
                     $ext = strtolower($form->show_img->guessExtension());
 
                     if (!in_array($ext, $allowedExtensions)) {
@@ -495,6 +454,13 @@ class WareTabController extends MainController
                 }
 
                 if ($img2 instanceof UploadedFile) {
+            
+
+                    Log::info('🖼 img2 uploaded', [
+                        'original_name' => $img2->getClientOriginalName(),
+                        'mime' => $img2->getMimeType(),
+                    ]);
+        
                     /** @var FileService $fileService*/
                     $fileService = app(FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
@@ -525,6 +491,7 @@ class WareTabController extends MainController
             if (request('get_type') == 4) {
                 $form->model()->expire = 0;
             }
+        
         });
 
         $form->saved(function (Form $form) {
