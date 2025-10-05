@@ -348,13 +348,14 @@ class WareTabController extends MainController
             </div>";
         });
 
-        $form->file('img2', trans('svg'))
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })
-            ->attribute([
-                'id' => 'file-input-img2'
-            ])->hidePreview();
+      $form->file('img2', trans('svg'))
+    ->name(function ($file) {
+        return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+    })
+    ->attribute(['id' => 'file-input-img2'])
+    ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
+    ->hidePreview();
+
 
 
 
