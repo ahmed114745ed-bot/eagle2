@@ -74,7 +74,13 @@ class HomeCarouselController extends MainController
         $grid->id(__('ID'));
         $grid->column('img', 'Image')->display(function ($img) {
             $id = "imgModal{$this->id}";
-            $image = handleShowImageWithTypes($this->id, $img, 40, 40);
+
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($img) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
 
             return <<<HTML
         <style>
@@ -86,13 +92,13 @@ class HomeCarouselController extends MainController
         }
         </style>
         
-        <img src="{$image}" width="235" height="77" style="cursor:pointer;" onclick="document.getElementById('{$id}').style.display='block';" />
+        <img src="{$url}" width="235" height="77" style="cursor:pointer;" onclick="document.getElementById('{$id}').style.display='block';" />
         
         <!-- Modal -->
         <div id="{$id}" class="modal" style="display:none; position:fixed; z-index:1050; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.7);">
             <span style="position:absolute; top:20px; right:35px; color:white; font-size:40px; cursor:pointer;" onclick="document.getElementById('{$id}').style.display='none';">&times;</span>
             <div style="margin:5% auto; display:block; width:80%; max-width:800px; text-align:center;">
-                <img src="{$image}" class="modal-img" style="width:100%; height:auto;" />
+                <img src="{$url}" class="modal-img" style="width:100%; height:auto;" />
             </div>
         </div>
         HTML;
