@@ -442,7 +442,7 @@ class RoomRepository extends AbstractRepository
             ])
             ->withCount('roomVisitors')
             ->whereHas('owner')
-            // ->whereNotIn('uid', $blockedUserIds)
+            ->whereNotIn('uid', $blockedUserIds)
             ->whereHas('roomVisitors', function ($query) {
                 $query->whereColumn('user_id', 'rooms.uid'); 
             })
