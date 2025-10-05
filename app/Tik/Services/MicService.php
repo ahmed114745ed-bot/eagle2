@@ -191,7 +191,6 @@ class MicService
     {
         $neighbors = [];
     
-        // تحديد عدد الكراسي في الصف حسب المود
         $rowSize = match ($mode) {
             1 => 16,
             2 => 12,
@@ -200,7 +199,11 @@ class MicService
     
         $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         $rowEnd = $rowStart + $rowSize - 1;
-    
+        if ($rowSize <= 1) {
+            return []; 
+        }
+
+        
         if ($index - 1 >= $rowStart) {
             $neighbors[] = $index - 1;
         }
