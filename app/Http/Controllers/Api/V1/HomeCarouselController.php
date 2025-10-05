@@ -19,7 +19,7 @@ class HomeCarouselController extends Controller
         $timezone = getTimezone();
 
         $now = Carbon::now($timezone);
-
+        $offset = Carbon::now($timezone)->format('P');
 
 
         if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->hasHeader('x-notification-id')) {
@@ -36,46 +36,47 @@ class HomeCarouselController extends Controller
                 })->orWhere("display_$displayAt", 1);
             })
             ->where('enable', 1)
-            ->where(function($q) use ($now) {
-                $q->where(function($sub) use ($now) {
-                    $sub->where('form', 1) // ساعات
-                        ->whereRaw("DATE_ADD(created_at, INTERVAL input HOUR) > ?", [$now]);
+            // ->where(function($q) use ($now) {
+            //     $q->where(function($sub) use ($now) {
+            //         $sub->where('form', 1) // ساعات
+            //             ->whereRaw("DATE_ADD(created_at, INTERVAL input HOUR) > ?", [$now]);
+            //     })
+            //     ->orWhere(function($sub) use ($now) {
+            //         $sub->where('form', 2) // أيام
+            //             ->whereRaw("DATE_ADD(created_at, INTERVAL input DAY) > ?", [$now]);
+            //     })
+            //     ->orWhere(function($sub) use ($now) {
+            //         $sub->where('form', 3) // شهور
+            //             ->whereRaw("DATE_ADD(created_at, INTERVAL input MONTH) > ?", [$now]);
+            //     })
+            //     ->orWhere('form', 0); // إذا form = 0 اعتبرها أبدية
+            // })
+
+            ->where(function ($q) use ($now, $offset) {
+                $q->where(function ($sub) use ($now, $offset) {
+                    // form = 1 => Hours
+                    $sub->where('form', 1)
+                        ->whereRaw("
+                    DATE_ADD(CONVERT_TZ(created_at, '+00:00', ?), INTERVAL input HOUR) > ?
+                ", [$offset, $now]);
                 })
-                ->orWhere(function($sub) use ($now) {
-                    $sub->where('form', 2) // أيام
-                        ->whereRaw("DATE_ADD(created_at, INTERVAL input DAY) > ?", [$now]);
-                })
-                ->orWhere(function($sub) use ($now) {
-                    $sub->where('form', 3) // شهور
-                        ->whereRaw("DATE_ADD(created_at, INTERVAL input MONTH) > ?", [$now]);
-                })
-                ->orWhere('form', 0); // إذا form = 0 اعتبرها أبدية
+                    ->orWhere(function ($sub) use ($now, $offset) {
+                        // form = 2 => Days
+                        $sub->where('form', 2)
+                            ->whereRaw("
+                    DATE_ADD(CONVERT_TZ(created_at, '+00:00', ?), INTERVAL input DAY) > ?
+                ", [$offset, $now]);
+                    })
+                    ->orWhere(function ($sub) use ($now, $offset) {
+                        // form = 3 => Months
+                        $sub->where('form', 3)
+                            ->whereRaw("
+                    DATE_ADD(CONVERT_TZ(created_at, '+00:00', ?), INTERVAL input MONTH) > ?
+                ", [$offset, $now]);
+                    })
+                    ->orWhere('form', 0); // permanent
             })
 
-            // ->where(function ($q) use ($now) {
-            //     $q->where(function ($sub) use ($now) {
-            //         $sub->where('form', 1) // ساعات
-            //             ->where(function ($inner) use ($now) {
-            //                 $inner->whereRaw("DATE_ADD(created_at, INTERVAL input HOUR) > ?", [$now])
-            //                     ->orWhere('input', '>', $now->timestamp); // if input is timestamp
-            //             });
-            //     })
-            //         ->orWhere(function ($sub) use ($now) {
-            //             $sub->where('form', 2) // أيام
-            //                 ->where(function ($inner) use ($now) {
-            //                     $inner->whereRaw("DATE_ADD(created_at, INTERVAL input DAY) > ?", [$now])
-            //                         ->orWhere('input', '>', $now->timestamp); // if input is timestamp
-            //                 });
-            //         })
-            //         ->orWhere(function ($sub) use ($now) {
-            //             $sub->where('form', 3) // شهور
-            //                 ->where(function ($inner) use ($now) {
-            //                     $inner->whereRaw("DATE_ADD(created_at, INTERVAL input MONTH) > ?", [$now])
-            //                         ->orWhere('input', '>', $now->timestamp); // if input is timestamp
-            //                 });
-            //         })
-            //         ->orWhere('form', 0); // أبدية
-            // })
 
             ->orderBy('sort')
             ->when($request->type, fn($q) => $q->where('type', $request->type))
