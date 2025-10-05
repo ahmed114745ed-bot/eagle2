@@ -3348,9 +3348,12 @@
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
     "Live System Setting:": "Canlı Sistem Ayarı",
-    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
 
-
+"Are you sure?": "Emin misiniz?",
+"This action cannot be undone!": "Bu işlem geri alınamaz!",
+"Yes, delete it!": "Evet, sil!",
+"Cancel": "İptal"
 
 
 
