@@ -349,17 +349,17 @@ class WareTabController extends MainController
         });
 
       $form->file('img2', trans('svg'))
-    ->name(function ($file) {
-        return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-    })
-    ->attribute(['id' => 'file-input-img2'])
-    ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
-    ->hidePreview();
+        ->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })
+        ->attribute(['id' => 'file-input-img2'])
+        ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
+        ->hidePreview();
 
 
 
 
-        if ($form->isEditing()) {
+        // if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
                 [
                     'svga' => __('svga'),
@@ -370,7 +370,7 @@ class WareTabController extends MainController
 
                 ]
             )->attribute(['id' => 'image_type1']);
-        }
+        // }
 
         $script = <<<SCRIPT
              $(document).ready(function() {

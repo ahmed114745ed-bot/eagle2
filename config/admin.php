@@ -201,8 +201,6 @@ return [
             'image' => 'images',
             'file'  => 'files',
         ],
-         'extensions' => ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'svga', 'mp4', 'mov', 'avi', 'mkv', 'zip'],
-        'mime_types' => ['image/*', 'video/*', 'application/zip'],
     ],
 
     /*
