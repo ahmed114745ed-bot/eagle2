@@ -187,7 +187,7 @@ class MicService
         return true;
     }
 
-    public function getUserNearby($index, $mode, $micSeats)
+    public function getUserNearby($index, $micSeats)
     {
         $neighbors = [];
         $rowSize = count($micSeats); 
