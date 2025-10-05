@@ -1785,12 +1785,12 @@
                                @php 
                                         $admin = $badge->admin;
 
-                                    $image = optional($admin)->avatar ?? '';
+                                    $image = $admin->avatar ?? '';
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $imagePath = getImagePath($image);
                                     $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                    $nameRaw = optional($admin)->name;
+                                    $nameRaw = optional($admin)->name ?? $admin->username;
                                     $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
 
                                     $uid = optional($admin)->id ?? 0;
