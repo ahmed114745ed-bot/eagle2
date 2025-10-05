@@ -38,16 +38,9 @@ class CountryService
  {
     $country = $this->findById($id);
     if ($country) {
-        $html = "
-            <div style='font-family:Arial;padding:10px;'>
-                <h2>{$country->name}</h2>
-                <p><strong>Code:</strong> {$country->code}</p>
-                <p><strong>Capital:</strong> {$country->capital}</p>
-                <p><strong>Population:</strong> {$country->population}</p>
-            </div>
-        ";
+        $bladeUrl = url("/countries/{$id}");
 
-        return Common::apiResponse(1, 'success', ['html' => $html]);
+        return Common::apiResponse(1, 'success', $bladeUrl, 200);
     }
 
     return Common::apiResponse(0, __('not found'), null, 404);
