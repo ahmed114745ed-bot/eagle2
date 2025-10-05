@@ -3821,7 +3821,13 @@
   "role rewards" : "هدايا القواعد",
   "Milestones":"الانجازات ",
   "milestones":"الانجازات ",
- "invite code": "رمز الدعوة"
+ "invite code": "رمز الدعوة",
+ "Luck gift Settings": "إعدادات هدية الحظ",
+"application wallet percentage from the lucky gift": "نسبة محفظة التطبيق من هدية الحظ",
+"owner percentage from the lucky gift": "نسبة المالك من هدية الحظ",
+"host percentage from the lucky gift": "نسبة المضيف من هدية الحظ",
+"Lucky Gift Setting": "إعداد هدية الحظ",
+"Browse lucky gift setting": "تصفح إعداد هدية الحظ"
 
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ZegoFeatureEvent;
 use Log;
 use Cache;
 use Carbon\Carbon;
@@ -163,6 +164,15 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
+        if ($request->has('zego_feature')) {
+            if ($request->zego_feature == 0) {
+                $zegoFeature = [
+                    'zego_feature' => (bool)0,
+                ];
+                event(new ZegoFeatureEvent($zegoFeature));
+            }
+        }
+
         if ($request->brand_background_type == 'color') {
             $data['brand_background_image'] = null;
         }
@@ -230,10 +240,33 @@ class SettingsController extends Controller
         return back();
     }
 
+    public function settingGift(Request $request)
+    {
+        $sum = $request->app_wallet_lucky_gift
+            + $request->owner_lucky_gift
+            + $request->host_lucky_gift;
+         
+        if ($sum !== 100) {
+            return back()->withErrors([
+                'gift_percentage' => 'The total gift percentage must equal 100.'
+            ])->withInput();
+        }
+
+        $data = $request->all();
+
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            $cacheKey = "percentage_{$key}";
+            Cache::put($cacheKey, $value);    
+        }
+
+        return back();
+    }
+
+
 
     public function updateAppConfig(Request $request)
     {
-
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }

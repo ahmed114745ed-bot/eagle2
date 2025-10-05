@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
@@ -520,11 +521,11 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
             if ($objectFit !== 'cover') {
-                return "<div class='rtlSvga' id='$model' 
-            style='width: {$width}px; 
-                   height: {$height}px; 
-                   object-fit: {$objectFit}; 
-                   border-radius: {$borderRadius}px; 
+                return "<div class='rtlSvga' id='$model'
+            style='width: {$width}px;
+                   height: {$height}px;
+                   object-fit: {$objectFit};
+                   border-radius: {$borderRadius}px;
                    margin-right: 4px;'>
              </div>";
             }
@@ -816,5 +817,97 @@ if (!function_exists('bd_url')) {
         }
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+
+
+    if (!function_exists('getGiftPercentage')) {
+        /**
+         * Get gift percentage by key from cache or DB
+         * and return it as decimal out of 10.
+         *
+         * @param string $key
+         * @return float
+         */
+        function getGiftPercentage(string $key): float
+        {
+            $cacheKey = "percentage_{$key}";
+
+            $value = Cache::get($cacheKey);
+
+            if ($value === null) {
+                $value = \App\Models\Setting::where('key', $key)->value('value');
+                if ($value !== null) {
+                    Cache::put($cacheKey, $value);
+                }
+            }
+            if ($value === null) {
+                $value = match ($key) {
+                    'app_wallet_lucky_gift' => 80,
+                    'owner_lucky_gift'      => 10,
+                    'host_lucky_gift'       => 10,
+                    default                  => 0,
+                };
+            }
+
+            $percentage = round(((float) $value) / 10, 2);
+
+
+            return $percentage;
+
+
+        }
+    }
+}
+
+if (!function_exists('getCountryIdFromLatLong')) {
+    function getCountryIdFromLatLong($lat, $lon)
+    {
+        $responseEn = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'en',
+        ]);
+
+        if (!$responseEn->ok()) {
+            return null;
+        }
+
+        $dataEn = $responseEn->json();
+        $countryCode = $dataEn['address']['country_code'] ?? null;
+        $countryNameEn = $dataEn['address']['country'] ?? null;
+
+        $country = Country::where('iso', $countryCode)->first();
+        if ($country) {
+            return $country->id;
+        }
+
+        $responseAr = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'ar',
+        ]);
+
+        $countryNameAr = null;
+        if ($responseAr->ok()) {
+            $dataAr = $responseAr->json();
+            $countryNameAr = $dataAr['address']['country'] ?? null;
+        }
+
+        $country = Country::create([
+            'iso' => $countryCode,
+            'e_name' => $countryNameEn,
+            'name' => $countryNameAr,
+            'status' => 1,
+        ]);
+
+        return $country->id;
     }
 }

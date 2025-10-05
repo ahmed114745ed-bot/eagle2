@@ -63,7 +63,6 @@ class AuthService
         return $payload ? $payload : false;
     }
 
-
     /**
      * @throws \Throwable
      */
@@ -77,6 +76,8 @@ class AuthService
 
         DB::beginTransaction();
         try {
+            $lat = $request->lat;
+            $long = $request->long;
             if ($trashedUser) {
                 $trashedUser->restore();
 
@@ -89,6 +90,11 @@ class AuthService
                     'password' => $request->password,
                     'status' => 1
                 ];
+
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
 
                 $user = $this->userRepository->create($data);
             }
@@ -133,8 +139,6 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        
-
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
@@ -180,6 +184,15 @@ class AuthService
                     'is_points_first' => 1,
                     'status' => true,
                 ];
+
+                $lat = $request['lat'];
+                $long = $request['long'];
+
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
+
                 $user = $this->userRepository->create($data);
                 $is_new = true;
                 $this->storeImage($request, $data, $user);
@@ -204,7 +217,7 @@ class AuthService
      */
     public function storeImage($request, $data, $user)
     {
-        
+
         if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
@@ -244,6 +257,15 @@ class AuthService
                 'email' => $request['email'],
                 'apple_id' => $unique_id,
             ];
+
+            $lat = $request['lat'];
+            $long = $request['long'];
+
+            if ($lat && $long){
+                $countryId = getCountryIdFromLatLong($lat, $long);
+                $data['country_id'] = $countryId;
+            }
+
             $user = $this->userRepository->create($data);
         }
         $this->rule($user, '', @$request['device_token'], $request);
@@ -272,6 +294,15 @@ class AuthService
                     'country_id' => @$country->id ?: 0,
                     'is_points_first' => 1,
                 ];
+
+                $lat = $data['lat'];
+                $long = $data['long'];
+
+                if ($lat && $long){
+                    $countryId = getCountryIdFromLatLong($lat, $long);
+                    $data['country_id'] = $countryId;
+                }
+
                 $user = $this->userRepository->create($dataUser);
             }
         }

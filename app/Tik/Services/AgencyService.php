@@ -171,16 +171,26 @@ class AgencyService
 
     public function stars($agencyId, $request)
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id', 10, $request->page);
+        $timezone = getTimezone(); 
+        $year = $request->year ?? Carbon::now($timezone)->year;
+        $month = $request->month ?? Carbon::now($timezone)->month;
+    
+        $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
+        $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
+    
+        return $this->giftLogRepository->getByAgency('receiver', $start, $end, $agencyId, 'receiver_id', 10, $request->page);
     }
-
+    
     public function heroes($agencyId, $request)
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id', 10, $request->page);
+        $timezone = getTimezone();
+        $year = $request->year ?? Carbon::now($timezone)->year;
+        $month = $request->month ?? Carbon::now($timezone)->month;
+    
+        $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
+        $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
+    
+        return $this->giftLogRepository->getByAgency('sender', $start, $end, $agencyId, 'sender_id', 10, $request->page);
     }
 
     public function agencyMembers($agencyId)
