@@ -125,12 +125,12 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
-//        Log::info("🚀 [CP] handleCpLovely called", [
-//            'user_id' => $user->id,
-//            'room_id' => $room->id,
-//            'position' => $position,
-//            'mode' => $room->mode,
-//        ]);
+       Log::info("🚀 [CP] handleCpLovely called", [
+           'user_id' => $user->id,
+           'room_id' => $room->id,
+           'position' => $position,
+           'mode' => $room->mode,
+       ]);
 
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
@@ -150,10 +150,10 @@ class MicService
 
         $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-//        Log::info("📍 [CP] Nearby positions", [
-//            'position' => $position,
-//            'neighbors' => $userSeats,
-//        ]);
+       Log::info("📍 [CP] Nearby positions", [
+           'position' => $position,
+           'neighbors' => $userSeats,
+       ]);
 
         $micSeats = array_map(function ($v) {
             return is_numeric($v) ? (int)$v : null;
@@ -163,17 +163,17 @@ class MicService
 
             $userOtherId = $micSeats[$neighborPosition] ?? null;
 
-//            Log::info("👥 [CP] Checking neighbor", [
-//                'neighbor_position' => $neighborPosition,
-//                'user_other_id' => $userOtherId,
-//            ]);
+           Log::info("👥 [CP] Checking neighbor", [
+               'neighbor_position' => $neighborPosition,
+               'user_other_id' => $userOtherId,
+           ]);
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-//                Log::info("💖 [CP] CP found with neighbor", [
-//                    'user_id' => $user->id,
-//                    'user_other_id' => $userOtherId,
-//                ]);
+               Log::info("💖 [CP] CP found with neighbor", [
+                   'user_id' => $user->id,
+                   'user_other_id' => $userOtherId,
+               ]);
                 $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
 
