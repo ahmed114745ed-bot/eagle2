@@ -96,7 +96,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-
+    'utd_url' => env('UTD_URL', 'http://127.0.0.1:8082/api/'),
     'asset_url' => env('ASSET_URL', null),
 
     /*
