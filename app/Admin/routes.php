@@ -241,6 +241,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
+         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
