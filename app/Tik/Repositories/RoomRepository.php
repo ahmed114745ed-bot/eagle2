@@ -606,7 +606,7 @@ class RoomRepository extends AbstractRepository
             $query->whereIn('uid', $ids);
         }
         return RoomResource::collection(
-            $query->where('type', 'live')->paginate()
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
         );
     }
 

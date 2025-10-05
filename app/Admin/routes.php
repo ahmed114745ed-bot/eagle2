@@ -665,6 +665,9 @@ Route::group(
 
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
+
+            Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
+            Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
         });
     });
 
