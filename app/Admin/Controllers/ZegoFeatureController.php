@@ -7,6 +7,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use App\Models\Config;
 use App\Models\Language;
+use Illuminate\Http\Request;
 
 class ZegoFeatureController extends MainController
 {
@@ -32,5 +33,22 @@ class ZegoFeatureController extends MainController
                 'zegoFeature' => $settings['zego_feature'] ?? 1,
             ])
         );
+    }
+
+
+    public function zegoKey(Request $request)
+    {
+        $keys = 'zego_feature';
+
+        $setting =   Setting::where('key', $keys)->first();
+        if ($setting) {
+            $setting->value = $request->is_active;
+            $setting->save();
+        } else {
+            Setting::create([
+                'key' => $keys,
+                'value' => $request->is_active,
+            ]);
+        }
     }
 }
