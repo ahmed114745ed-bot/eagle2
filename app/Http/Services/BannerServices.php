@@ -92,7 +92,9 @@ class BannerServices
 
     public function index2($ids)
     {
-        $now = now();
+        $timezone = Common::timeZone();
+
+        $now = now($timezone);
 
         $query = Banner::query()
             ->where('is_active', true)
