@@ -278,6 +278,7 @@ class WareTabController extends MainController
 
     protected function form($id = null)
     {
+        dd("ddddddddd");
         $form = new Form(new Ware());
         $this->disableFormTools($form);
 
