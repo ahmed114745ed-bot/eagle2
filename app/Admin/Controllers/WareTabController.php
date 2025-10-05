@@ -350,7 +350,9 @@ class WareTabController extends MainController
 
       $form->file('img2', trans('svg'))
         ->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            // استخدم getClientOriginalExtension للحصول على الامتداد الحقيقي
+            $extension = $file->getClientOriginalExtension();
+            return 'svga_' . Str::random(6) . '.' . $extension;
         })
         ->attribute(['id' => 'file-input-img2'])
         ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
@@ -439,11 +441,22 @@ class WareTabController extends MainController
 
                 if ($form->show_img instanceof UploadedFile) {
                     $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
+                    
+                    // استخدم getClientOriginalExtension بدلاً من guessExtension للحصول على الامتداد الحقيقي
+                    $ext = strtolower($form->show_img->getClientOriginalExtension());
+                    
+                    // إذا كان الامتداد فارغاً، استخدم guessExtension كبديل
+                    if (empty($ext)) {
+                        $ext = strtolower($form->show_img->guessExtension());
+                    }
+                    
                     Log::info('🖼 show_img uploaded', [
                         'original_name' => $form->show_img->getClientOriginalName(),
+                        'original_extension' => $form->show_img->getClientOriginalExtension(),
+                        'guessed_extension' => $form->show_img->guessExtension(),
+                        'final_extension' => $ext,
                         'mime' => $form->show_img->getMimeType(),
                     ]);
-                    $ext = strtolower($form->show_img->guessExtension());
 
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
@@ -455,16 +468,19 @@ class WareTabController extends MainController
                 }
 
                 if ($img2 instanceof UploadedFile) {
-            
-
                     Log::info('🖼 img2 uploaded', [
                         'original_name' => $img2->getClientOriginalName(),
+                        'original_extension' => $img2->getClientOriginalExtension(),
                         'mime' => $img2->getMimeType(),
                     ]);
         
-                    /** @var FileService $fileService*/
-                    $fileService = app(FileService::class);
-                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
+                    // استخدم getClientOriginalExtension للحصول على الامتداد الحقيقي
+                    $ext = strtolower($img2->getClientOriginalExtension());
+                    
+                    // إذا كان الامتداد فارغاً، استخدم guessExtension كبديل
+                    if (empty($ext)) {
+                        $ext = strtolower($img2->guessExtension());
+                    }
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
