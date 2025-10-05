@@ -120,6 +120,7 @@ use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
+use App\Admin\Controllers\ZegoFeatureController;
 
 Route::group(
     [
@@ -596,7 +597,7 @@ Route::group(
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
-        Route::resource('zego-feature', FeatureAppController::class);
+        Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
