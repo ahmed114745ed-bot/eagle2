@@ -39,12 +39,11 @@ class ZegoFeatureController extends MainController
 
     public function zegoKey(Request $request)
     {
-                       Log::info("call endpoint");
+
         $keys = 'zego_feature';
 
         $setting =   Setting::where('key', $keys)->first();
         if ($setting) {
-             Log::info($request->is_active);
             $setting->value = $request->is_active;
             $setting->save();
         } else {
