@@ -72,8 +72,36 @@ class HomeCarouselController extends MainController
         $grid = new Grid(new HomeCarousel);
     
         $grid->id(__('ID'));
-        $grid->column('img', trans('img'))->image('', 235, 77);
-        $grid->column('url', trans('url'))->url();
+        $grid->column('img', 'Image')->display(function ($img) {
+            $id = "imgModal{$this->id}";
+        
+            return <<<HTML
+        <style>
+        .modal-img {
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-img {
+            transform: scale(1.05);
+        }
+        </style>
+        
+        <img src="{$img}" width="235" height="77" style="cursor:pointer;" onclick="document.getElementById('{$id}').style.display='block';" />
+        
+        <!-- Modal -->
+        <div id="{$id}" class="modal" style="display:none; position:fixed; z-index:1050; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.7);">
+            <span style="position:absolute; top:20px; right:35px; color:white; font-size:40px; cursor:pointer;" onclick="document.getElementById('{$id}').style.display='none';">&times;</span>
+            <div style="margin:5% auto; display:block; width:80%; max-width:800px; text-align:center;">
+                <img src="{$img}" class="modal-img" style="width:100%; height:auto;" />
+            </div>
+        </div>
+        HTML;
+        });
+        
+    
+    
+    
+
+        // $grid->column('url', trans('url'))->url();
 
         foreach (['display_discover' => 'Display Discover',
         'display_home_top' => 'Display Home Top',
