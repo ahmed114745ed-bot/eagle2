@@ -99,17 +99,18 @@ class BannerServices
         $query = Banner::query()
             ->where('is_active', true)
             ->whereNotNull('publish_at')
-            ->where(function ($q) use ($now) {
+            ->where(function($q) use ($now) {
                 $q->where(function($q2) use ($now) {
-                    $q2->whereRaw("DATE_ADD(publish_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
-                        ->orWhere(function($q3) {
-                            $q3->whereNull('expire')->orWhere('expire', 0);
-                        });
+                    $q2->whereRaw("DATE_ADD(publish_at, INTERVAL expire DAY) > ?", [$now])
+                    ->where('expire', '>', 0)
+                    ->orWhereNull('expire')
+                    ->orWhere('expire', 0);
                 });
             })
-            ->whereNotIn("id",$ids)
+            ->whereNotIn("id", $ids)
             ->inRandomOrder()
             ->take(1);
+    
 
           
               
