@@ -1790,7 +1790,7 @@
                                     $imagePath = getImagePath($image);
                                     $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                    $nameRaw = optional($admin)->name ?? $admin->username;
+                                    $nameRaw = optional($admin)->name ?? @$admin->username;
                                     $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
 
                                     $uid = optional($admin)->id ?? 0;
@@ -2976,11 +2976,11 @@
             let itemId = $(this).data('id');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone!",
+                 title: "{{ __('Are you sure?') }}",
+                text: "{{ __('This action cannot be undone!') }}",
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: "{{ __('Yes, delete it!') }}",
+                cancelButtonText: "{{ __('Cancel') }}",
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {

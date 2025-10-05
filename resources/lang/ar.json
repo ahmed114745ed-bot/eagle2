@@ -2781,7 +2781,10 @@
   "congratulations": "تهانينا",
   "vip_gift_message": "لقد حصلت على مستوى VIP جديد كهدية",
   "default_status":"BD افتراضي",
-
+ "Are you sure?": "هل أنت متأكد؟",
+"This action cannot be undone!": "لا يمكن التراجع عن هذا الإجراء!",
+"Yes, delete it!": "نعم، احذفه!",
+"Cancel": "إلغاء",
 
 
 
