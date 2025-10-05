@@ -2,12 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Setting;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
 use App\Models\Config;
+use App\Models\Setting;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Log;
+use App\Admin\Controllers\MainController;
 
 class ZegoFeatureController extends MainController
 {
@@ -38,6 +39,7 @@ class ZegoFeatureController extends MainController
 
     public function zegoKey(Request $request)
     {
+
         $keys = 'zego_feature';
 
         $setting =   Setting::where('key', $keys)->first();
