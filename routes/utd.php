@@ -4,9 +4,12 @@
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
+use App\Http\Controllers\utd\BoxController;
 use App\Http\Controllers\utd\RoomController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
+use App\Http\Controllers\utd\EmojiController;
+use App\Http\Controllers\utd\ImageController;
 use App\Http\Controllers\utd\LevelController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
@@ -24,10 +27,12 @@ use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\BoxUserController;
 use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\MomentsController;
 use App\Http\Controllers\utd\PkEventController;
+use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
@@ -54,6 +59,7 @@ use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\DedicateVipController;
+use App\Http\Controllers\utd\EventPeriodController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
@@ -85,20 +91,15 @@ use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\SallariesHistoryController;
+use App\Http\Controllers\utd\SpecialIdRequestController;
 use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
-use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-use App\Http\Controllers\utd\BoxController;
-use App\Http\Controllers\utd\BoxUserController;
-use App\Http\Controllers\utd\EmojiController;
-use App\Http\Controllers\utd\EventPeriodController;
-use App\Http\Controllers\utd\ImageController;
-use App\Http\Controllers\utd\SpecialIdRequestController;
 use App\Http\Controllers\Api\V1\RoomController as RoomControllerVi;
+use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -109,6 +110,7 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
+    Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
 
     Route::prefix('families')->group(function () {
         Route::get('/', [FamilyController::class, 'index']);
