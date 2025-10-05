@@ -187,11 +187,18 @@ class MicService
         return true;
     }
 
-    public function getUserNearby($index, $micSeats)
+    public function getUserNearby($index, $mode)
     {
         $neighbors = [];
-        $rowSize = count($micSeats); 
-        $rowStart = intdiv($index - 1, $rowSize) * $rowSize;
+    
+        // تحديد عدد الكراسي في الصف حسب المود
+        $rowSize = match ($mode) {
+            1 => 16,
+            2 => 12,
+            default => 9,
+        };
+    
+        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         $rowEnd = $rowStart + $rowSize - 1;
     
         if ($index - 1 >= $rowStart) {
