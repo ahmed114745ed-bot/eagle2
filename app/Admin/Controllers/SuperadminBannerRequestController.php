@@ -144,13 +144,10 @@ class SuperadminBannerRequestController extends AdminController
     public function approve($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);
-
         $homeCarousel = $request->homeCarousel;
-        $homeCarousel->status = 1; 
-        $homeCarousel->{$request->note} = 1; 
+        $homeCarousel->enable = 1; 
+        $homeCarousel->{$request->notes} = 1; 
         $homeCarousel->save();
-
-
         $request->status = 'approved';
         $request->save();
 
