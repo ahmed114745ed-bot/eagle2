@@ -492,11 +492,6 @@ class WareTabController extends MainController
                         $ext = 'svg';
                     }
 
-                    \Log::info('✅ Stored img2', [
-                        'original_name' => $originalName,
-                        'disk_path' => $filePath,
-                    ]);
-
                     Log::info('🖼 img2 uploaded - AFTER PROCESSING', [
                         'original_extension' => $originalExt,
                         'guessed_extension' => $guessedExt,
