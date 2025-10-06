@@ -281,7 +281,7 @@ class HomeCarouselController extends MainController
      public function storeBannerRequest(HomeCarousel $banner, Request $request)
     {
         $user = auth()->user();
-        $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner);
+        $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner,$request->field);
 
 
         // if ($user->di < $deductAmount) {

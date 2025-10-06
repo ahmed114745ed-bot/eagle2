@@ -3,6 +3,7 @@
 namespace App\helper;
 
 use App\Models\HomeCarousel;
+use App\Models\Setting;
 use App\Models\SuperAdmin;
 use Exception;
 use App\Helpers\Common;
@@ -17,10 +18,12 @@ class SuperAdminHelper
         $user->save();
 
     }
-    public static function bannerDeductAmount(HomeCarousel $banner)
+    public static function bannerDeductAmount(HomeCarousel $banner, $type = null)
     {
-        $hourlyPrice = 10; 
+        
     
+        $hourlyPrice = self::getHourlyBannerPrice($type); 
+
         $form  = $banner->form;  
         $input = $banner->input; 
     
@@ -40,6 +43,31 @@ class SuperAdminHelper
     
         return $hours * $hourlyPrice;
     }
+
+    public static function getHourlyBannerPrice(?string $type = null): float
+    {
+        $defaultPrices = [
+            'live' => 10,
+            'home_middle' => 15,
+            'home_top' => 20,
+            'discover' => 12,
+        ];
+
+        $settings = Setting::whereIn('key', array_keys($defaultPrices))
+            ->pluck('value', 'key')
+            ->toArray();
+
+        $prices = array_merge($defaultPrices, $settings);
+
+        if (empty($type)) {
+            return (float) $defaultPrices['live'];
+        }
+
+        $cleanType = str_replace('display_', '', $type);
+
+        return (float) ($prices[$cleanType] ?? $defaultPrices['live']);
+    }
+
 
 }
 
