@@ -125,12 +125,12 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
-//        Log::info("🚀 [CP] handleCpLovely called", [
-//            'user_id' => $user->id,
-//            'room_id' => $room->id,
-//            'position' => $position,
-//            'mode' => $room->mode,
-//        ]);
+       Log::info("🚀 [CP] handleCpLovely called", [
+           'user_id' => $user->id,
+           'room_id' => $room->id,
+           'position' => $position,
+           'mode' => $room->mode,
+       ]);
 
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
@@ -148,12 +148,13 @@ class MicService
             return true;
         }
 
-        $userSeats = $this->getUserNearby($position, mode: $room->mode);
+   
+        $userSeats = $this->getUserNearby($position, $room->mode);
 
-//        Log::info("📍 [CP] Nearby positions", [
-//            'position' => $position,
-//            'neighbors' => $userSeats,
-//        ]);
+       Log::info("📍 [CP] Nearby positions", [
+           'position' => $position,
+           'neighbors' => $userSeats,
+       ]);
 
         $micSeats = array_map(function ($v) {
             return is_numeric($v) ? (int)$v : null;
@@ -163,17 +164,17 @@ class MicService
 
             $userOtherId = $micSeats[$neighborPosition] ?? null;
 
-//            Log::info("👥 [CP] Checking neighbor", [
-//                'neighbor_position' => $neighborPosition,
-//                'user_other_id' => $userOtherId,
-//            ]);
+           Log::info("👥 [CP] Checking neighbor", [
+               'neighbor_position' => $neighborPosition,
+               'user_other_id' => $userOtherId,
+           ]);
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-//                Log::info("💖 [CP] CP found with neighbor", [
-//                    'user_id' => $user->id,
-//                    'user_other_id' => $userOtherId,
-//                ]);
+               Log::info("💖 [CP] CP found with neighbor", [
+                   'user_id' => $user->id,
+                   'user_other_id' => $userOtherId,
+               ]);
                 $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
 
@@ -187,24 +188,55 @@ class MicService
         return true;
     }
 
-    public function getUserNearby($index, $mode, $rowSize = 4)
+    public function getUserNearby($index, $mode)
     {
-        $neighbors = [];
+        // $neighbors = [];
+    
+        // $rowSize = match ($mode) {
+        //     1 => 16,
+        //     2 => 12,
+        //     default => 9,
+        // };
+    
+        // $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
+        // $rowEnd = $rowStart + $rowSize - 1;
+        // if ($rowSize <= 1) {
+        //     return []; 
+        // }
 
-        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
+        
+        // if ($index - 1 >= $rowStart) {
+        //     $neighbors[] = $index - 1;
+        // }
+        // if ($index + 1 <= $rowEnd) {
+        //     $neighbors[] = $index + 1;
+        // }
+    
+        // return $neighbors;
+
+        $rowSize = 4;
+
+        $rowStart = intdiv($index, $rowSize) * $rowSize;
         $rowEnd = $rowStart + $rowSize - 1;
-
-        if ($index - 1 >= $rowStart) {
-            $neighbors[] = $index - 1;
+    
+        $neighbors = [];
+    
+        for ($i = $rowStart; $i <= $rowEnd; $i++) {
+            if ($i !== $index) {
+                $neighbors[] = $i;
+            }
         }
-
-        if ($index + 1 <= $rowEnd) {
-            $neighbors[] = $index + 1;
-        }
-
+    
+        Log::info("🪑 [Nearby] Row positions", [
+            'index' => $index,
+            'row_start' => $rowStart,
+            'row_end' => $rowEnd,
+            'neighbors' => $neighbors,
+        ]);
+    
         return $neighbors;
     }
-
+    
 
 
     public function sendCpLovelyMessage($room, $user)

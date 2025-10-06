@@ -1231,7 +1231,7 @@
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-
+            <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
 
     </div>
     <div id="tab-loading" style="
@@ -1756,7 +1756,95 @@
             </div>
         </div>
     </div>
+     
+     <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('badges') }}</h4>
+            </div>
+           
 
+            <div class="table-responsive">
+                <div class="box-body ">
+                    <table class="table table-bordered table-hover align-middle data-table" id="badge">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Admin') }}</th>
+                            <th>{{ __('expire') }}</th>
+                            <th>{{ __('receive_type') }}</th>
+                            <th>{{ __('created_at') }}</th>
+                            <th>{{ __('action') }}</th>
+
+                        </tr>
+                        </thead>
+                        @if($badges && $badges->count())
+
+                            <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($badges as $index => $badge)
+                               @php 
+                                        $admin = $badge->admin;
+
+                                    $image = $admin->avatar ?? '';
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $imagePath = getImagePath($image);
+                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+
+                                    $nameRaw = optional($admin)->name ?? @$admin->username;
+                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+
+                                    $uid = optional($admin)->id ?? 0;
+                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
+                                @endphp
+                                <tr>
+                                    <td>{{ $badges->firstItem() + $index }}</td>
+                                    <td>
+                                        @if ($admin )
+                                            <a href="{{ $url ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ $image }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                        @else
+
+                                        @endif
+
+                                </td>
+                                    <td>{{ (!empty($badge->expire) && $badge->expire !== '0') ? \Carbon\Carbon::parse($badge->expire)->format('Y-m-d H:i:s') :$badge->days  }}</td>
+                                   
+                                        
+                                 <td>{{ $badge->receive_type }}</td>
+                                   <td>{{ $badge->created_at }}</td>
+                                    <td>
+                                         @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp) )
+                                        <div class="d-flex">
+                                            <button class="btn btn-danger delete-badge-btn" data-id="{{ @$badge->id }}">
+                                                {{ __('dashboard.delete') }}
+                                            </button>
+                                        </div>
+                                         @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        @endif
+
+                    </table>
+                </div>
+            </div>
+
+            <div class="pagination-wrapper">
+                {{ $badges?->appends([
+                     'type'        => $type, 
+                    'badges_page' => $badges?->currentPage(),
+                ])->links('vendor.pagination.default') }}
+            </div>
+
+
+        </div>
+
+    </div>
 
 <div class="tab-content" id="user-agency-tab" style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
     <div class="card">
@@ -2560,6 +2648,7 @@
         </div>
     </div>
 
+     
 
 
 <!-- jQuery أولاً -->
@@ -2862,6 +2951,41 @@
                 if (result.value) {
                     $.ajax({
                         url: '/admin/delete-pack/' + itemId,
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (response) {
+                            Swal.fire('Deleted!', response.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'An error occurred.'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-badge-btn', function () {
+            let itemId = $(this).data('id');
+
+            Swal.fire({
+                 title: "{{ __('Are you sure?') }}",
+                text: "{{ __('This action cannot be undone!') }}",
+                showCancelButton: true,
+                confirmButtonText: "{{ __('Yes, delete it!') }}",
+                cancelButtonText: "{{ __('Cancel') }}",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url: '/admin/delete-badge/' + itemId,
                         type: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

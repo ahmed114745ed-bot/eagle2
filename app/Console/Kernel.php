@@ -118,10 +118,6 @@ class Kernel extends ConsoleKernel
             ->everyThirtySeconds()
             ->runInBackground();
 
-        $schedule->command('zego-action')
-            ->everyTenMinutes()
-            ->runInBackground();
-
         $schedule->command('weekly-cp-winner')
             ->weekly()
             ->timezone(getTimezone())
