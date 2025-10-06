@@ -370,6 +370,7 @@ class WareTabController extends MainController
             })
             ->attribute(['id' => 'file-input-img2'])
             ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
+            ->removable(false)
             ->hidePreview();
 
         $form->select('image_type1', __('image_type'))->options([
