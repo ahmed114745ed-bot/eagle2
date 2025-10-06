@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Room;
+use Illuminate\Support\Facades\Log;
 
 class RoomObserver
 {
@@ -40,8 +41,15 @@ class RoomObserver
     {
         if ($room->isDirty('mode')) {
             $mics = explode(',', $room->all_microphone);
-
             $count = count($mics);
+            Log::info("ChangeMode started", [
+                'room_id' => $room->id,
+                'old_mode' => $room->getOriginal('mode'),
+                'new_mode' => $room->mode,
+                'all_microphone' => $room->all_microphone,
+                'count_before' => $count
+            ]);
+           
             if ($room->mode == '0') {
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));
@@ -50,6 +58,8 @@ class RoomObserver
                     $m = array_slice($mics, 0, 10);
                     $room->microphone = implode(',', $m);
                 }
+                Log::info("Adding seats", ['added' => $m  ]);
+
             } elseif ($room->mode == '1') { //16 seats
                 if ($count <= 17) {
                     $m = array_merge($mics, array_fill(0, 17 - $count, '0'));
@@ -63,6 +73,8 @@ class RoomObserver
                     $m = array_slice($mics, 0, 15);
                     $room->microphone = implode(',', $m);
                 }
+                Log::info("Adding seats", ['added' => $m  ]);
+
             } elseif ($room->mode == '3') { //9 seats
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));
