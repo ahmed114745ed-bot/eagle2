@@ -57,7 +57,20 @@ class SuperadminBannerRequestController extends AdminController
     
         $grid->column('coins_deducted', __('Coins Deducted'));
         $grid->column('status', __('Status'));
-        $grid->column('notes', __('Type'));
+        $grid->column('notes', __('Type'))->display(function ($value) {
+            if ($value === 'display_discover') {
+                return __('Display Discover');
+            } elseif ($value === 'display_home_top') {
+                return __('Display Home Top');
+            } elseif ($value === 'display_home_middle') {
+                return __('Display Home Middle');
+            } elseif ($value === 'display_live') {
+                return __('Display Live');
+            } 
+            else {
+                return $value; 
+            }
+        });
         $grid->column('created_at', __('Created At'))
         ->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
@@ -69,11 +82,11 @@ class SuperadminBannerRequestController extends AdminController
             $rejectUrl  = route('admin.superadmin-banner.reject', $this->id);
     
             if ($this->status === 'rejected') {
-                return '<span class="text-danger">Rejected</span>';
+                return '<span class="text-danger">' . __('Rejected') . '</span>';
             }
     
             if ($this->status === 'approved') {
-                return '<span class="text-success">Approved</span>';
+                return '<span class="text-success">' . __('Approved') . '</span>';
             }
     
             return <<<HTML
@@ -148,7 +161,7 @@ class SuperadminBannerRequestController extends AdminController
     {
         $request = SuperadminBannerRequest::findOrFail($id);
 
-        // SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
+        SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
 
         $request->status = 'rejected';
         $request->save();

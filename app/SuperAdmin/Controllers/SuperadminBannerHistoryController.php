@@ -67,8 +67,20 @@ class SuperadminBannerHistoryController extends MainController
             }
         });
     
-        $grid->column('notes', __('Type'));
-    
+        $grid->column('notes', __('Type'))->display(function ($value) {
+            if ($value === 'display_discover') {
+                return __('Display Discover');
+            } elseif ($value === 'display_home_top') {
+                return __('Display Home Top');
+            } elseif ($value === 'display_home_middle') {
+                return __('Display Home Middle');
+            } elseif ($value === 'display_live') {
+                return __('Display Live');
+            } 
+            else {
+                return $value; 
+            }
+        });
         $grid->column('created_at', __('Created At'))->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
         });
@@ -78,7 +90,7 @@ class SuperadminBannerHistoryController extends MainController
                         return  '<button class="btn btn-sm btn-primary resend-btn" 
                         data-id="' . $this->home_carousel_id . '" 
                         data-notes="' . e($this->notes) . '">
-                    <i class="fa fa-redo"></i> Resend
+                    <i class="fa fa-redo"></i> ' . __('Resend') . '
                 </button>';
             }
     

@@ -3091,7 +3091,9 @@
     "offline_users": "ऑफ़लाइन उपयोगकर्ता",
     "Total BD Salary": "कुल बीडी वेतन",
     "Total Cut Amount": "कुल कटौती राशि",
-    "Average Agencies Per BD": "प्रति BD औसत एजेंसियों की संख्या"
+    "Average Agencies Per BD": "प्रति BD औसत एजेंसियों की संख्या",
+    "insufficient_balance": "आपकी शेष राशि पर्याप्त नहीं है!",
+    "request_sent_success": "अनुरोध सफलतापूर्वक भेजा गया और राशि घटा दी गई!"
 
 
 
