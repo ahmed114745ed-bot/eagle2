@@ -308,6 +308,11 @@ class RoomController extends Controller
             }
             $this->handleLeaveCp($user, $roomId);
             $room = Room::find($roomId);
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+                $room->save();
+    
+            }
             $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {

@@ -63,7 +63,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
-            $schedule->command('update-room-ban')
+        $schedule->command('update-room-ban')
             ->everyFiveMinutes()
             ->appendOutputTo(storage_path('logs/update-room-ban'))
             ->runInBackground();
@@ -130,18 +130,18 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->runInBackground();
         $schedule->command('coin-game:aggregate')
-        ->dailyAt('07:00')
-        ->timezone(getTimezone())
-        ->withoutOverlapping()
-        ->runInBackground();
-    
+            ->dailyAt('07:00')
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->runInBackground();
+
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())
         //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
         //     ->runInBackground();
 
-       /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
+        /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
 
         $schedule->job(new AgencyTribeRewardJob())
             ->daily()->when(function (){
@@ -158,7 +158,7 @@ class Kernel extends ConsoleKernel
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
 }

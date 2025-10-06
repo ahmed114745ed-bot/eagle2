@@ -7,6 +7,7 @@ use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 use App\Jobs\UpdateUserFollowCountsJob;
 use App\Models\Ban;
 use App\Models\CoinLog;
@@ -446,6 +447,9 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
+
+Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index']);
+Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
 
 Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');

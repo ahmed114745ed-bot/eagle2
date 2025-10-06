@@ -3524,10 +3524,14 @@
     "offline_users": "Çevrimdışı Kullanıcılar",
     "Total BD Salary": "Toplam BD Maaşı",
     "Total Cut Amount": "Toplam Kesilen Miktar",
-    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı"
-
-
-
+    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı",
+"Are you sure?": "Emin misiniz?",
+"This action cannot be undone!": "Bu işlem geri alınamaz!",
+"Yes, delete it!": "Evet, sil!",
+"banner Settings": "Afiş ayarları",
+"Banner Setting": "Afiş ayarı",
+"Price for 1 day": "1 günlük fiyat",
+"Browse banner setting": "Afiş ayarlarını gözat"
 
 
 

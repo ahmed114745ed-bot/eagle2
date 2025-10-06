@@ -443,6 +443,9 @@ class RoomRepository extends AbstractRepository
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->whereNotIn('uid', $blockedUserIds)
+            ->whereHas('roomVisitors', function ($query) {
+                $query->whereColumn('user_id', 'rooms.uid'); 
+            })
             ->where('room_status', 1)
             ->orderByDesc('pin')
             ->orderByDesc('room_visitors_count')
@@ -603,7 +606,7 @@ class RoomRepository extends AbstractRepository
             $query->whereIn('uid', $ids);
         }
         return RoomResource::collection(
-            $query->where('type', 'live')->paginate()
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
         );
     }
 

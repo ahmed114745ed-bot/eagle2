@@ -153,15 +153,15 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
+                <button onclick="showSection('carouselSetting')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('banner Settings') }}</button>
             </div>
         </div>
 
         <div class="settings-content">
-            <div id="VipSettings" class="settings-section active">
-                <h3>{{ __('Luck gift Settings') }}</h3>
+            <div id="carouselSetting" class="settings-section active">
+                <h3>{{ __('banner Settings') }}</h3>
 
-                <form action="{{ route('admin.lucky.gift.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     {{-- Show global errors --}}
@@ -182,37 +182,53 @@
                     <div class="form">
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
-                            <label for="app_wallet_lucky_gift">{{ __('application wallet percentage from the lucky gift') }}</label>
+                            <label for="discover">{{ __('Discover') }}</label>
                             <input type="number" 
-                                id="app_wallet_lucky_gift" 
-                                name="app_wallet_lucky_gift" 
+                                id="discover" 
+                                name="discover" 
                                 min="1" 
-                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" 
+                                value="{{ $config['discover'] ?? 0 }}" 
                                 class="form-control" 
-                                placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
+                                placeholder="{{ __('Discover value') }}" required />
+                               <span class="form-text text-muted" > {{ __('Price for 1 day') }}</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="owner_lucky_gift">{{ __('owner percentage from the lucky gift') }}</label>
+                            <label for="home_top">{{ __('Home Top') }}</label>
                             <input type="number" 
-                                id="owner_lucky_gift" 
-                                name="owner_lucky_gift" 
+                                id="home_top" 
+                                name="home_top" 
                                 min="1" 
-                                value="{{ $config['owner_lucky_gift'] ?? 0 }}" 
+                                value="{{ $config['home_top'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}"  required/>
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
 
                         
                         <div class="form-group">
-                            <label for="host_lucky_gift">{{ __('host percentage from the lucky gift') }}</label>
+                            <label for="home_middle">{{ __('Home Middle') }}</label>
                             <input type="number" 
-                                id="host_lucky_gift" 
-                                name="host_lucky_gift" 
+                                id="home_middle" 
+                                name="home_middle" 
                                 min="1" 
-                                value="{{ $config['host_lucky_gift'] ?? 0 }}" 
+                                value="{{ $config['home_middle'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}" required />
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
+                        </div>
+
+                         <div class="form-group">
+                            <label for="live">{{ __('Live') }}</label>
+                            <input type="number" 
+                                id="live" 
+                                name="live" 
+                                min="1" 
+                                value="{{ $config['live'] ?? 0 }}" 
+                                class="form-control" 
+                                placeholder="{{ __('Enter  value') }}" required />
+                                 
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
                         
 
@@ -239,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-    const activeTab = getQueryParam("firsttab") || "VipSettings";
+    const activeTab = getQueryParam("firsttab") || "carouselSetting";
 
     // Show the selected tab
     showSection(activeTab);

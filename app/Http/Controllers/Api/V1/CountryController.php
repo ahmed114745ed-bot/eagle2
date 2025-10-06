@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\DB;
 class CountryController extends Controller
 {
 
-    public function __construct(private CountryService $countryService)
-    {
-    }
+    public function __construct(private CountryService $countryService) {}
 
     public function allCountries()
     {
@@ -33,22 +31,28 @@ class CountryController extends Controller
         return Common::apiResponse(0, __('not found'), null, 404);
     }
 
+    public function getCountryByHtml($id)
+    {
+        return $this->countryService->countryDetails($id);
+    }
+
     public function index()
     {
         return $this->countryService->index2();
     }
 
-    public function countries(){
+    public function countries()
+    {
 
         $allTypesWithCountries = DB::table('countries')
-        ->leftJoin('users', 'users.country_id', '=', 'countries.id')
-        ->select(
-            'countries.name as country_name',
-            'countries.flag as image',
-            DB::raw('COUNT(users.id) as user_count')
-        )
-        ->groupBy('countries.id', 'countries.name', 'countries.flag')
-        ->get();
+            ->leftJoin('users', 'users.country_id', '=', 'countries.id')
+            ->select(
+                'countries.name as country_name',
+                'countries.flag as image',
+                DB::raw('COUNT(users.id) as user_count')
+            )
+            ->groupBy('countries.id', 'countries.name', 'countries.flag')
+            ->get();
 
         // تقسيم النتائج إلى المصفوفتين
         $allCountriesSortedByName = $allTypesWithCountries->sortBy('country_name')->values();
@@ -59,6 +63,6 @@ class CountryController extends Controller
             'hot' => $hotCountries,
         ];
 
-        return Common::apiResponse(1,'', $data);
+        return Common::apiResponse(1, '', $data);
     }
 }

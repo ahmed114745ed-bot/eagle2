@@ -97,10 +97,18 @@
     "App Feature": "ऐप सुविधा",
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
+    "banner Settings": "बैनर सेटिंग्स",
+    "Banner Setting": "बैनर सेटिंग",
+"Browse banner setting": "बैनर सेटिंग्स ब्राउज़ करें",
+"Price for 1 day": "1 दिन की कीमत",
 
     "Agencies Count": "एजेंसियों की संख्या",
     "BD Wallet": "बीडी वॉलेट",
     "My Wallet": "मेरा वॉलेट",
+    "Are you sure?": "क्या आप निश्चित हैं?",
+"This action cannot be undone!": "इस क्रिया को पूर्ववत नहीं किया जा सकता!",
+"Yes, delete it!": "हाँ, इसे हटा दें!",
+"Cancel": "रद्द करें",
 
     "App": "एप्लिकेशन",
     "Achievement Id": "उपलब्धि आईडी",
