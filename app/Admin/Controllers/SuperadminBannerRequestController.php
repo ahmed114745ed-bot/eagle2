@@ -52,7 +52,7 @@ class SuperadminBannerRequestController extends AdminController
         });
     
         // Banner Image
-        $grid->column('homeCarousel.image', __('Banner'))->display(function ($image) {
+        $grid->column('homeCarousel.img', __('Banner'))->display(function ($image) {
             return $image ? "<img src='{$image}' style='width:100px;height:50px;' />" : '';
         });
     
