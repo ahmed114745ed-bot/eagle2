@@ -353,21 +353,21 @@ class WareTabController extends MainController
 
         // تحسين حقل img2 بشكل كامل
         $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                // الحصول على الامتداد الحقيقي مع fallback
-//                $extension = $file->getClientOriginalExtension();
-//                if (empty($extension)) {
-//                    $extension = $file->guessExtension();
-//                }
-//
-//                // تطبيع الامتدادات
-//                $extension = strtolower($extension);
-//                if ($extension === 'svg') {
-//                    return 'svga_' . Str::random(8) . '.svg';
-//                }
-//
-//                return 'svga_' . Str::random(8) . '.' . $extension;
-//            })
+            ->name(function ($file) {
+                // الحصول على الامتداد الحقيقي مع fallback
+                $extension = $file->getClientOriginalExtension();
+                if (empty($extension)) {
+                    $extension = $file->guessExtension();
+                }
+
+                // تطبيع الامتدادات
+                $extension = strtolower($extension);
+                if ($extension === 'svg') {
+                    return 'svga_' . Str::random(8) . '.svg';
+                }
+
+                return 'svga_' . Str::random(8) . '.' . $extension;
+            })
             ->attribute(['id' => 'file-input-img2'])
             ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
             ->hidePreview();
@@ -511,6 +511,15 @@ class WareTabController extends MainController
         }
 
         $form->saving(function (Form $form) {
+            if ($form->img2 instanceof UploadedFile) {
+                $path = $form->img2->store('images', 'public');
+
+                info('saving tessst', [$form->img2->getClientOriginalName()]);
+                $form->model()->img2 = $form->img2->getClientOriginalName();
+
+                // $form->model()->img2_path = $path;
+            }
+
             $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
