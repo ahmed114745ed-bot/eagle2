@@ -370,8 +370,6 @@ class WareTabController extends MainController
             })
             ->attribute(['id' => 'file-input-img2'])
             ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
-            ->removable(false)
-            ->retainable()
             ->hidePreview();
 
         $form->select('image_type1', __('image_type'))->options([
@@ -500,15 +498,6 @@ class WareTabController extends MainController
                         'final_extension' => $ext,
                     ]);
 
-                    $img2 = $form->img2;
-
-                    $originalName = $img2->getClientOriginalName();
-                    $path = $img2->storeAs('images', $originalName, 'public');
-                    $form->model()->img2 = $originalName;
-                    info('saving original name', [$originalName]);
-                    info('saving model name', [$form->model()->img2]);
-
-
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
 
@@ -544,6 +533,24 @@ class WareTabController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            if (!empty($form->img2_original_name)) {
+                $model = $form->model();
+
+                $model->img2 = $form->img2_original_name;
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    \DB::table($model->getTable())
+                        ->where('id', $model->getKey())
+                        ->update(['img2' => $form->img2_original_name]);
+                }
+
+                \Log::info('Overwrote img2 after saved()', [
+                    'db_value' => $form->img2_original_name,
+                    'model_id' => $model->getKey(),
+                ]);
+            }
+
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
