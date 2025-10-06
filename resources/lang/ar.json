@@ -2787,6 +2787,11 @@
     "Default Super Admin has been set successfully": "تم تعيين سوبر ادمن الافتراضي بنجاح",
 "set_superadmin_as_default": "تعيين كسوبر ادمن افتراضي",
 "back": "رجوع",
+"banner Settings": "إعدادات البانر",
+"Banner Setting": "إعداد البانر",
+"Browse banner setting": "تصفح إعدادات اللافتة",
+"Price for 1 day": "السعر ليوم واحد !",
+
 "edit updates_family config": "تعديل إعدادات عائلة التحديثات",
 "Charge Switch": "زر الشحن",
   "browse charge switch": "استعراض زر الشحن",
