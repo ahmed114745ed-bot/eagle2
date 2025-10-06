@@ -35,3 +35,61 @@ $(document).on('ajaxComplete', function (event, xhr, settings) {
         }
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    function sendRequest(url) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': LA.token,
+                'Accept': 'application/json',
+            },
+        }).then(res => res.json());
+    }
+
+    function handleAction(button, actionType) {
+        button.addEventListener('click', function(e){
+            e.preventDefault();
+            const actionText = actionType === 'approve' ? 'الموافقة' : 'الرفض';
+            const actionColor = actionType === 'approve' ? '#28a745' : '#dc3545';
+
+            Swal.fire({
+                title: `هل أنت متأكد من ${actionText} على هذا الطلب؟`,
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: actionColor,
+                cancelButtonColor: '#6c757d',
+            }).then((result) => {
+
+                console.log(result);
+                
+                if(result.value){
+                    const url = button.dataset.url;
+                    sendRequest(url).then(res => {
+                console.log(res);
+
+                        if(res.success){
+                            Swal.fire({
+                                title: res.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            button.closest('tr').remove(); // إزالة الصف بعد العملية
+                        } else {
+                            Swal.fire('خطأ', 'حدث خطأ أثناء العملية', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+
+});
+

@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -684,6 +685,9 @@ Route::group(
 
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
+            Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
+            Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
+            Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
     }
 );
