@@ -153,7 +153,8 @@
     "notice": "تنويه",
     "Notice": "تنويه",
     "Go Back":"رجوع",
-
+    "Select Country...": "اختر الدولة...",
+    "Select Country": "اختر الدولة",
     "number of people": "عدد الاشخاص",
     "user id": "معرف المستخدم",
     "speak switch": "حظر الاعضاء",
@@ -2790,7 +2791,7 @@
 "banner Settings": "إعدادات البانر",
 "Banner Setting": "إعداد البانر",
 "Browse banner setting": "تصفح إعدادات اللافتة",
-"Price for 1 day": "السعر ليوم واحد !",
+"Price for 1 day": "السعر لساعه واحده !",
 
 "edit updates_family config": "تعديل إعدادات عائلة التحديثات",
 "Charge Switch": "زر الشحن",
@@ -4018,7 +4019,7 @@
 "History": "السجل",
 "SweetAlert2 is not loaded!": "لم يتم تحميل SweetAlert2!"
 
- 
+
 
 
 
