@@ -82,7 +82,8 @@ class SuperadminBannerRequestController extends AdminController
                 <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ Reject</button>
             HTML;
         });
-    
+    $grid->disableActions();
+    $grid->disableCreation();
         return $grid;
     }
     
