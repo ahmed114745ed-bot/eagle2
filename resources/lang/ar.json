@@ -2840,6 +2840,7 @@
   "Delete BD": "حذف BD",
   "Edit BD": "تعديل BD",
   "Show BD": " عرض  تفاصيلBD",
+  "Show": "عرض ",
   "Create request backgrounds image": "إنشاء صورة خلفيات الطلبات",
   "Delete request backgrounds image": "حذف صورة خلفيات الطلبات",
   "Edit request backgrounds image": "تعديل صورة خلفيات الطلبات",
@@ -3551,7 +3552,8 @@
 "vips": "العضوية المميزة",
 "coins": "العملات",
 "image": "الصورة",
-"expire": "الانتهاء",
+    "Sorry, you can only manage users in your own country.": "عذرًا، يمكنك فقط إدارة المستخدمين في بلدك.",
+    "expire": "الانتهاء",
 "is required": "مطلوب",
 "is required and must be numeric": "مطلوب ويجب أن يكون رقمًا",
 "Validation error": "خطأ في التحقق",
@@ -4065,7 +4067,16 @@
  "title_user": "📊 إحصائيات المستخدمين (النشطين / الغير نشطين)",
  "online_users": "المستخدمون النشطون",
  "offline_users": "المستخدمون غير النشطين",
- "Top Users Visits" :"الاكثر تفاعلا"
+ "Top Users Visits" :"الاكثر تفاعلا",
+ "Banner Request History":"سجل الطلبات",
+ "Back":"عودة",
+ "home-carousel" :"السلايدر الرئيسي",
+ "Home-carousel" :"السلايدر الرئيسي",
+ "SuperadminBannerRequest":"طلبات السلايدر الرئيسي",
+ "superadmin-banner-requests":"طلبات السلايدر الرئيسي",
+ "Superadmin-banner-requests":"طلبات السلايدر الرئيسي"
+
+ 
 
 
 

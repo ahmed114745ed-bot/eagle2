@@ -182,6 +182,7 @@ class EncorUsersController extends AdminController
 
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
+                ->where('type', '!=', 'superadmin')
                 ->orWhereNull('type');
         })
             ->where('is_preview', 0)

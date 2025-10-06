@@ -37,10 +37,9 @@ class SuperAdminDedicateRewardAction extends Action
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();
         }
-        
+
         if ($user->country_id != auth()->user()->country_id) {
-            return $this->response()->error(__('you do not have permission to dedicate this user'))->refresh();
-        }
+            return $this->response()->error(__('Sorry, you can only manage users in your own country.'))->refresh();        }
 
         $reward = SuperAdminReward::find($request->id);
         $rewardNom =  $reward->no_reward -  $reward->gave_reward_no;

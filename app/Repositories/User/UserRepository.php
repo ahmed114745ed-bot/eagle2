@@ -12,6 +12,7 @@ use App\Models\ShippingAgency;
 use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\UserEarnInvitation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
 use Exception;
@@ -91,6 +92,36 @@ class UserRepository extends Repository
 
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function bdCountryUsers($key, $page, $perPage,$country_id)
+    {
+
+        return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
+        ->where('country_id',$country_id)    
+        ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            ->where(function ($query) {
+                $query->where('is_bd', 0)
+                    ->orWhereNull('is_bd');
+            })
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            //            ->whereDoesntHave('shippingAgency')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%')
+                    ->orWhere('special_id', 'like', '%' . $key . '%');
+            })
+
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+    
     public function user_bd($key, $page, $perPage)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')

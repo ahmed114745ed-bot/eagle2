@@ -222,7 +222,7 @@ class HomeController extends Controller
             ->sum('achieved_diamond');
 
         //others
-        $bdCount = Bd::where('parent_id', auth()->id())->count();
+        $bdCount = Bd::where('parent_id', auth()->id())->where('country_id', $countryID)->count();
         $diAuth = Auth::user()->di;
         $totals = Charge::selectRaw("
                 SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
@@ -238,15 +238,15 @@ class HomeController extends Controller
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
 
-        $totals = BD::where('country_id', $countryID)
+        $totalSalaries = BD::where('parent_id', auth()->id())->where('country_id', $countryID)
             ->withSum('salaries', 'salary')
             ->withSum('salaries', 'cut_amount')
             ->withCount('agencies')
             ->get();
 
-        $totalBDSalary = $totals->sum('salaries_sum_salary');
-        $totalBDCut = $totals->sum('salaries_sum_cut_amount');
-        $averageAgenciesPerBD = $totals->avg('agencies_count');
+        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
+        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
+        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
         return $content
             ->title(__('Home'))
@@ -634,9 +634,9 @@ class HomeController extends Controller
 
                     $column->row(function (Row $row) use ($game) {
                         $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue',"" ,number_format($game->total_played ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red',"", number_format($game->total_loss ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange',"", number_format($game->total_win ?? 0, 2)));
-                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red',"", number_format($game->total_loss ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange',"", number_format($game->total_win ?? 0, 2)));
+//                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
                     });
                 });
             });
