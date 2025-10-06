@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
 use Modules\CP\Entities\Cp;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\Vip\Entities\Vip;
 use App\Traits\User\UserLevel;
 use Modules\Vip\Entities\OVip;
@@ -708,6 +709,11 @@ class User extends Authenticatable
     public function bans()
     {
         return $this->hasMany(Ban::class, 'uid', 'uuid');
+    }
+
+    public function salaryRequests(): HasMany
+    {
+        return $this->hasMany(SalaryRequest::class, 'host_id', 'id');
     }
 
     public function getFollowDate($id)

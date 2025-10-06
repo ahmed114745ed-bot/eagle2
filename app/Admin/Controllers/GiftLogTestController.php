@@ -14,6 +14,7 @@ use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserResourceSearchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
+use App\Models\Ban;
 use App\Models\Room;
 use App\Models\User;
 use App\Repositories\Community\SearchRepository;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Http\Services\UserCounterServices;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
 
 class GiftLogTestController extends Controller
 {
@@ -252,6 +254,53 @@ class GiftLogTestController extends Controller
         (new UserCounterServices)->UpgradeDateForType($user, 'system_message');
 
         return view('test.notifications', [
+            'success' => true,
+            'message' => '',
+            'data'    => $data,
+        ]);
+    }
+
+    public function showAppSettings()
+    {
+        return view('test.app_settings');
+    }
+
+    public function app_setting()
+    {
+        $user = auth()->user();
+        $chat_status = settings()->get('chat_status');
+        $showChat = $user->userSetting?->hide_chat ?? $chat_status;
+        // $stop_invite_code = settings()->get('stop_invite_code');
+        $stop_invite_code = getSettingCash('invite_code') ?? 0;
+        if ($stop_invite_code == 1) {
+            $invite_code = true;
+        } else {
+            $invite_code = false;
+            if ($user->userSetting && $user->userSetting->show_invite_code == 1) {
+                $invite_code = true;
+            }
+        }
+        //        $shared = Common::getConfig('shared') ?? '1234';
+        $now = now();
+
+        $ban = Ban::where('ban_type_id', 7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
+            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
+
+        $data = [
+            'version' => [
+                'android_version'   => settings()->get('android_current_version'),
+                'ios_version'       => settings()->get('ios_current_version'),
+                'huawei_version'    => settings()->get('huawei_current_version'),
+            ],
+            'hide_invite'       => $invite_code,
+            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
+            'shared_key' => Common::getConfig('shared') ?? '1234',
+            'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
+            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
+            'group_ban' => $ban != null ? true : false,
+        ];
+
+        return view('test.app_settings', [
             'success' => true,
             'message' => '',
             'data'    => $data,
