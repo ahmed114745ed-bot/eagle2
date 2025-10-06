@@ -51,7 +51,9 @@ class HomeCarouselController extends Controller
             //     })
             //     ->orWhere('form', 0); // إذا form = 0 اعتبرها أبدية
             // })
-
+            ->where(function ($q) {
+                $q->where('display_discover', 1)->orWhere('display_home_top', 1)->orWhere('display_home_middle', 1)->orWhere('display_live', 1);
+            })
             ->where(function ($q) use ($now, $offset) {
                 $q->where(function ($sub) use ($now, $offset) {
                     // form = 1 => Hours
