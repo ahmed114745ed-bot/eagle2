@@ -20,6 +20,9 @@ class RoomObserver
         if (!$room->enableSaving) return;
 
         if($room->type  == 'audio'){
+            Log::info("ChangeMode", [
+                '$room->type' => $room->type,
+            ]);
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
