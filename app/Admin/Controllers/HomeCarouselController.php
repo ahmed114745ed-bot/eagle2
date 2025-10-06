@@ -2,19 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Country;
-use App\Selectables\Countries;
-use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Country;
+use App\Models\Setting;
 use App\Models\HomeCarousel;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Layout\Content;
-use Illuminate\Validation\Rule;
+use App\Selectables\Countries;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
+use Encore\Admin\Layout\Content;
+use App\Tik\Services\Files\ImageConverter;
+use Encore\Admin\Controllers\HasResourceActions;
+
 class HomeCarouselController extends MainController
 {
     use HasResourceActions;
@@ -271,5 +273,12 @@ class HomeCarouselController extends MainController
             return $form;
         }
         
-    
+     public function homeCarouselSettings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'banner-setting');
+        }
+        $config = Setting::whereIn('key', ['live', 'home_middle', 'home_top', 'discover'])->pluck('value', 'key')->toArray();
+        return $content->view('homeCarouselSetting', compact('config'));
+    }
 }

@@ -105,7 +105,7 @@ class SuperAdminRewardController extends MainController
         $grid->disableCreateButton();
 
         $grid->tools(function (Grid\Tools $tools) {
-            $url = '/admin/super-admin-rewards-history';
+            $url = '/admin/super-admin-rewards-history' . "?type=" . request('type');
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
             $tools->append($button);
         });
@@ -122,24 +122,16 @@ class SuperAdminRewardController extends MainController
     {
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->equal('get_type', __('get_type'))->select([
-                4 => trans('purchase'),
-                6 => trans('limited time purchase'),
-
-            ]);
-
-            // $filter->column(1 / 2, function ($filter) {
-
-            //     $filter->equal('type', __('type'))->select(TYPE_WARE);
-            // });
             $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        $from = request('type-ware');
-                    }, __('type'), 'type-ware')->select(WARE_DEDICATE);
-                });
+                $filter->where(function ($query) {
+                    if ($this->input !== null) {
+                        $query->where('type', $this->input);
+                    }
+                }, __('Type'), 'type-ware')->select(getTranslatedWare());
+            });
         });
 
-        
+        $grid->model()->whereIn('type', [4, 5, 6, 28]);
         $grid->column('name', __('name'));
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2', __('show_img'))->display(function ($path) {
@@ -152,11 +144,16 @@ class SuperAdminRewardController extends MainController
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');
-
+        $grid->column('name', __('name'));
+        $grid->column('priority', __('Priority'));
         $grid->column('image', __('image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->filter(function ($filter) {
+            $filter->like('name', 'Name');
+            $filter->equal('priority', 'Priority');
         });
     }
 

@@ -16,6 +16,10 @@
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
     "App": "التطبيق",
+   "Dedicated successfully": "تم الإهداء بنجاح",
+"Something went wrong": "حدث خطأ ما",
+
+"Select Super Admins": "اختر المشرفين العامين",
     "Email": "بريد الكتروني",
     "cancel cp":"إلغاء العلاقة",
     "Cp Report": "تقرير CP",
@@ -2786,6 +2790,11 @@
     "Default Super Admin has been set successfully": "تم تعيين سوبر ادمن الافتراضي بنجاح",
 "set_superadmin_as_default": "تعيين كسوبر ادمن افتراضي",
 "back": "رجوع",
+"banner Settings": "إعدادات البانر",
+"Banner Setting": "إعداد البانر",
+"Browse banner setting": "تصفح إعدادات اللافتة",
+"Price for 1 day": "السعر ليوم واحد !",
+
 "edit updates_family config": "تعديل إعدادات عائلة التحديثات",
 "Charge Switch": "زر الشحن",
   "browse charge switch": "استعراض زر الشحن",

@@ -9,13 +9,14 @@ use App\Models\SuperAdminReward;
 
 class DedicateSuperAdminRewardAction extends Action
 {
-    public $name = 'Dedicate';
+    public $name;
     protected $selector = '.salary_action';
     public $id;
     public $type;
 
     public function __construct($id = 0, $type = '')
     {
+         $this->name = __('dedicate');
         $this->id = $id;
         $this->type = $type;
         parent::__construct();
@@ -42,7 +43,7 @@ class DedicateSuperAdminRewardAction extends Action
 
             return $this->response()->success(__('Dedicated successfully'))->refresh();
         } catch (\Exception $exception) {
-            return $this->response()->error(__('Something went wrong: ') . $exception->getMessage());
+            return $this->response()->error(__('Something went wrong') . $exception->getMessage());
         }
     }
 
