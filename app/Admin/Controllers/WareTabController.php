@@ -369,7 +369,7 @@ class WareTabController extends MainController
                 return 'svga_' . Str::random(8) . '.' . $extension;
             })
             ->attribute(['id' => 'file-input-img2'])
-            ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
+            ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp,webm')
             ->hidePreview();
 
         $form->select('image_type1', __('image_type'))->options([
@@ -534,15 +534,10 @@ class WareTabController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            if ($form->img2 instanceof \Illuminate\Http\UploadedFile) {
+            if ($form->img2 instanceof UploadedFile) {
                 $originalName = $form->img2->getClientOriginalName();
 
                 $model->update(['img2' => $originalName]);
-
-                \Log::info('✅ Overwrote img2 after save', [
-                    'original_name' => $originalName,
-                    'id' => $model->id,
-                ]);
             }
 
             $type = $form->model()->type;
