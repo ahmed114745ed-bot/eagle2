@@ -47,7 +47,7 @@ class SuperadminBannerHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-   
+        $grid->model()->with(['homeCarousel:home_carousel_id.img']);
         $grid->model()->where('user_id', Auth::user()->id);
     
         $grid->column('id', __('ID'));
