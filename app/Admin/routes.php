@@ -62,6 +62,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -307,6 +308,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
