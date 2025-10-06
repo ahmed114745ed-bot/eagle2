@@ -3835,7 +3835,20 @@
 "owner percentage from the lucky gift": "نسبة المالك من هدية الحظ",
 "host percentage from the lucky gift": "نسبة المضيف من هدية الحظ",
 "Lucky Gift Setting": "إعداد هدية الحظ",
-"Browse lucky gift setting": "تصفح إعداد هدية الحظ"
+"Browse lucky gift setting": "تصفح إعداد هدية الحظ",
+"Timing settings": "إعدادات الوقت",
+"Time zone:": "المنطقة الزمنية:",
+"Start of week:": "بداية الأسبوع:",
+"End of week:": "نهاية الأسبوع:",
+"Save": "حفظ",
+"Sunday": "الأحد",
+"Monday": "الاثنين",
+"Tuesday": "الثلاثاء",
+"Wednesday": "الأربعاء",
+"Thursday": "الخميس",
+"Friday": "الجمعة",
+"Saturday": "السبت",
+"Settings updated successfully.": "تم تحديث الإعدادات بنجاح."
 
 
 

@@ -3357,7 +3357,20 @@
 "banner Settings": "Afiş ayarları",
 "Banner Setting": "Afiş ayarı",
 "Price for 1 day": "1 günlük fiyat",
-"Browse banner setting": "Afiş ayarlarını gözat"
+"Browse banner setting": "Afiş ayarlarını gözat",
+"Timing settings": "Zaman ayarları",
+    "Time zone:": "Zaman dilimi:",
+    "Start of week:": "Hafta başlangıcı:",
+    "End of week:": "Hafta sonu:",
+    "Save": "Kaydet",
+    "Sunday": "Pazar",
+    "Monday": "Pazartesi",
+    "Tuesday": "Salı",
+    "Wednesday": "Çarşamba",
+    "Thursday": "Perşembe",
+    "Friday": "Cuma",
+    "Saturday": "Cumartesi",
+    "Settings updated successfully.": "Ayarlar başarıyla güncellendi."
 
 
 

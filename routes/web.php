@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\BdController;
 use App\Exports\AgencyChargeTransactions;
+use  App\helper\TimeHelper;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -528,3 +529,20 @@ Route::get('/fix-bans-user-id', function () {
 
     return "done";
 });
+
+
+
+
+Route::get('/week-zone', function () {
+
+
+
+    $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
+    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+
+    return response()->json([
+        'start_of_week'  => $startOfWeek,
+        'end_of_week'    => $endOfWeek,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
