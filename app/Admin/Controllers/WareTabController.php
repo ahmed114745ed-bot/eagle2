@@ -497,7 +497,7 @@ class WareTabController extends MainController
                         $originalName .= '.' . $ext;
                     }
                     $filePath = $img2->storeAs('', $originalName, config('admin.upload.disk'));
-                    $model->update(['img2' => $originalName]);
+                    $form->model()->update(['img2' => $originalName]);
 
                     \Log::info('✅ Stored img2', [
                         'original_name' => $originalName,
