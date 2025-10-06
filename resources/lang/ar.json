@@ -156,7 +156,8 @@
     "notice": "تنويه",
     "Notice": "تنويه",
     "Go Back":"رجوع",
-
+    "Select Country...": "اختر الدولة...",
+    "Select Country": "اختر الدولة",
     "number of people": "عدد الاشخاص",
     "user id": "معرف المستخدم",
     "speak switch": "حظر الاعضاء",
@@ -4097,7 +4098,7 @@
 "History": "السجل",
 "SweetAlert2 is not loaded!": "لم يتم تحميل SweetAlert2!"
 
- 
+
 
 
 
