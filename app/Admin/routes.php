@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -112,6 +111,8 @@ use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
+use App\Admin\Controllers\SuperadminBannerRequestController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
@@ -603,6 +604,7 @@ Route::group(
             }
             dD("goold");
         });
+        Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::get('background-count', function () {
             $backgrounds = \App\Models\Background::get();
