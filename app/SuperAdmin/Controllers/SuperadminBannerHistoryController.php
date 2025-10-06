@@ -52,7 +52,7 @@ class SuperadminBannerHistoryController extends MainController
     
         $grid->column('id', __('ID'));
     
-        $grid->column('homeCarousel.image', __('Banner'))->display(function ($image) {
+        $grid->column('homeCarousel.img', __('Banner'))->display(function ($image) {
             return $image ? "<img src='{$image}' style='width:100px;height:50px;' />" : '';
         });
     
