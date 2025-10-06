@@ -9,7 +9,7 @@ class RoomObserver
 {
     public function creating(Room $room)
     {
-        if($room  == 'audio'){
+        if($room->type == 'audio'){
             $room->mode = 3;
         }
         $room->muted_users = '';
@@ -20,9 +20,7 @@ class RoomObserver
         if (!$room->enableSaving) return;
 
         if($room->type  == 'audio'){
-            Log::info("ChangeMode", [
-                '$room->type' => $room->type,
-            ]);
+        
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
@@ -45,13 +43,7 @@ class RoomObserver
         if ($room->isDirty('mode')) {
             $mics = explode(',', $room->all_microphone);
             $count = count($mics);
-            Log::info("ChangeMode started", [
-                'room_id' => $room->id,
-                'old_mode' => $room->getOriginal('mode'),
-                'new_mode' => $room->mode,
-                'all_microphone' => $room->all_microphone,
-                'count_before' => $count
-            ]);
+    
            
             if ($room->mode == '0') {
                 if ($count <= 10) {
@@ -61,7 +53,6 @@ class RoomObserver
                     $m = array_slice($mics, 0, 10);
                     $room->microphone = implode(',', $m);
                 }
-                Log::info("Adding seats", ['added' => $m  ]);
 
             } elseif ($room->mode == '1') { //16 seats
                 if ($count <= 17) {
@@ -76,7 +67,6 @@ class RoomObserver
                     $m = array_slice($mics, 0, 15);
                     $room->microphone = implode(',', $m);
                 }
-                Log::info("Adding seats", ['added' => $m  ]);
 
             } elseif ($room->mode == '3') { //9 seats
                 if ($count <= 10) {
