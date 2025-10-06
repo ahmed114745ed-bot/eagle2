@@ -30,6 +30,11 @@ class SuperAdminRewardController extends MainController
     public $permission_name = 'super-admin-reward';
     public function index(Content $content)
     {
+
+        if (!request()->has('type')) {
+            return redirect()->to(url()->current() . '?type=vip');
+        }
+
         session(['last_ware_type' => request()->get('type', 'vip')]);
         return parent::index($content
             ->title(trans('Super Admin Reward'))
@@ -99,9 +104,9 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools){
+        $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/super-admin-rewards-history';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
             $tools->append($button);
         });
         Admin::script("
@@ -127,7 +132,14 @@ class SuperAdminRewardController extends MainController
 
             //     $filter->equal('type', __('type'))->select(TYPE_WARE);
             // });
+            $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $from = request('type-ware');
+                    }, __('type'), 'type-ware')->select(WARE_DEDICATE);
+                });
         });
+
+        
         $grid->column('name', __('name'));
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2', __('show_img'))->display(function ($path) {
