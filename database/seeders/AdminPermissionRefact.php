@@ -173,6 +173,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 8,
                 'permissions' => [
                     ['key' => 'banner', 'except' => [], 'additional' => []],
+                    ['key' => 'banner-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'splash', 'except' => [], 'additional' => []],
                     ['key' => 'official-messages', 'except' => [], 'additional' => []],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => []],
