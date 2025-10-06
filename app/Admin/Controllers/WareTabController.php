@@ -492,6 +492,12 @@ class WareTabController extends MainController
                         $ext = 'svg';
                     }
 
+                    $originalName = $img2->getClientOriginalName();
+                    if (!\Illuminate\Support\Str::endsWith($originalName, '.' . $ext)) {
+                        $originalName .= '.' . $ext;
+                    }
+                    $form->model()->img2 = $originalName;
+
                     Log::info('🖼 img2 uploaded - AFTER PROCESSING', [
                         'original_extension' => $originalExt,
                         'guessed_extension' => $guessedExt,
