@@ -370,7 +370,22 @@ class WareTabController extends MainController
             })
             ->attribute(['id' => 'file-input-img2'])
             ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
-            ->hidePreview();
+            ->hidePreview()->saving(function ($file) {
+                if ($file instanceof UploadedFile) {
+                    $originalName = $file->getClientOriginalName();
+
+                    $extension = strtolower($file->getClientOriginalExtension() ?: $file->guessExtension());
+                    if (!Str::endsWith($originalName, '.' . $extension)) {
+                        $originalName .= '.' . $extension;
+                    }
+
+                    $path = $file->storeAs('', $originalName, config('admin.upload.disk'));
+
+                    return $path;
+                }
+
+                return $file;
+            });
 
         $form->select('image_type1', __('image_type'))->options([
             'svga' => __('svga'),
@@ -529,6 +544,7 @@ class WareTabController extends MainController
             if (request('get_type') == 4) {
                 $form->model()->expire = 0;
             }
+
         });
 
         $form->saved(function (Form $form) {
