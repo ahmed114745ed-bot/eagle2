@@ -533,21 +533,15 @@ class WareTabController extends MainController
         });
 
         $form->saved(function (Form $form) {
-            if (!empty($form->img2_original_name)) {
-                $model = $form->model();
+            $model = $form->model();
+            if ($form->img2 instanceof \Illuminate\Http\UploadedFile) {
+                $originalName = $form->img2->getClientOriginalName();
 
-                $model->img2 = $form->img2_original_name;
-                if (method_exists($model, 'saveQuietly')) {
-                    $model->saveQuietly();
-                } else {
-                    \DB::table($model->getTable())
-                        ->where('id', $model->getKey())
-                        ->update(['img2' => $form->img2_original_name]);
-                }
+                $model->update(['img2' => $originalName]);
 
-                \Log::info('Overwrote img2 after saved()', [
-                    'db_value' => $form->img2_original_name,
-                    'model_id' => $model->getKey(),
+                \Log::info('✅ Overwrote img2 after save', [
+                    'original_name' => $originalName,
+                    'id' => $model->id,
                 ]);
             }
 
