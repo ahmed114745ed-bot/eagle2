@@ -19,7 +19,7 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
 
-        if($room  == 'audio'){
+        if($room->type  == 'audio'){
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
@@ -29,7 +29,7 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
         
-        if($room  == 'audio'){
+        if($room->type  == 'audio'){
             $this->changeMode($room);
         }
         //        $this->resetRoomSession ($room);
