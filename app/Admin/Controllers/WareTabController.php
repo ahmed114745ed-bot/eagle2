@@ -511,26 +511,6 @@ class WareTabController extends MainController
         }
 
         $form->saving(function (Form $form) {
-            $img2 = $form->img2;
-
-            if (is_string($img2) && str_contains($img2, '/tmp/')) {
-                $disk = config('admin.upload.disk');
-                $directory = config('admin.upload.directory.image', 'images');
-
-                $filename = basename($img2);
-                $newPath = $directory . '/' . $filename;
-
-                Storage::disk($disk)->put($newPath, file_get_contents(public_path($img2)));
-
-                $form->model()->img2 = $filename;
-
-                Log::info('✅ moved tmp file to permanent storage', [
-                    'from' => $img2,
-                    'to' => $newPath,
-                    'disk' => $disk
-                ]);
-            }
-
             $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
