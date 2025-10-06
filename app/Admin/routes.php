@@ -62,7 +62,9 @@ use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
+use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -113,7 +115,6 @@ use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
 
 Route::group(
@@ -308,6 +309,7 @@ Route::group(
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
