@@ -3995,7 +3995,18 @@
  "Home-carousel" :"السلايدر الرئيسي",
  "SuperadminBannerRequest":"طلبات السلايدر الرئيسي",
  "superadmin-banner-requests":"طلبات السلايدر الرئيسي",
- "Superadmin-banner-requests":"طلبات السلايدر الرئيسي"
+ "Superadmin-banner-requests":"طلبات السلايدر الرئيسي",
+"insufficient_balance": "رصيدك غير كافي!",
+"request_sent_success": "تم إرسال الطلب بنجاح وتم خصم الرصيد!" ,
+"Confirm Deduction": "تأكيد الخصم",
+    "coins will be deducted to send the display request: ": "سيتم خصم :count كوينز لإرسال طلب العرض: "
+,"Yes, deduct and send request": "نعم، خصم وأرسل الطلب",
+"Cancel": "إلغاء",
+"Done!": "تم!",
+"An error occurred while processing": "حدث خطأ أثناء تنفيذ العملية",
+"Error": "خطأ",
+"History": "السجل",
+"SweetAlert2 is not loaded!": "لم يتم تحميل SweetAlert2!"
 
  
 
