@@ -41,7 +41,7 @@ class SuperadminBannerRequestController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-        $grid->model()->with('superAdmin');
+        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img']);
         $grid->column('id', __('ID'));
   
         $userService = $this->userService;
