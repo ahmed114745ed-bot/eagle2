@@ -84,7 +84,7 @@ class SuperAdminRewardControllerHistory extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdminReward());
-
+        $type = request('type') ?? 'vip';
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -96,7 +96,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('username'))->placeholder(__('search for host by username'));
             });
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('type', __('status'))->select(['ware' => __('ware'), "vip" => __('vip'), 'coin' => __('coin'), 'badge' => __("badge"), 'achievement' => __('achievement')]);
+                $filter->equal('type', __('status'))->select(['ware' => __('ware'), "vip" => __('vip'), 'badge' => __("badge")]);
             });
 
 
@@ -107,7 +107,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('Created At'))->date();
             });
         });
-
+        $grid->model()->where('type', $type);
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
             $name = @$this->superAdmin->name ?? '';
@@ -173,10 +173,10 @@ class SuperAdminRewardControllerHistory extends MainController
         $grid->column('expire', __('Expire'));
         $grid->column('no_reward', __('No reward'));
         $grid->column('created_at', __('created_at'));
-          $grid->tools(function (Grid\Tools $tools)  {
+        $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/super-admin-rewards?type=vip');
             $back = __(' back');
-          
+
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">

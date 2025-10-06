@@ -16,6 +16,10 @@
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
     "App": "التطبيق",
+   "Dedicated successfully": "تم الإهداء بنجاح",
+"Something went wrong": "حدث خطأ ما",
+
+"Select Super Admins": "اختر المشرفين العامين",
     "Email": "بريد الكتروني",
     "cancel cp":"إلغاء العلاقة",
     "Cp Report": "تقرير CP",
