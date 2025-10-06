@@ -370,6 +370,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
+                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
