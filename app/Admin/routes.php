@@ -65,7 +65,6 @@ use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
-use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
