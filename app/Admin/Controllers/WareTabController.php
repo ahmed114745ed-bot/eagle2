@@ -498,6 +498,15 @@ class WareTabController extends MainController
                         'final_extension' => $ext,
                     ]);
 
+                    $img2 = $form->img2;
+
+                    $originalName = $img2->getClientOriginalName();
+                    $path = $img2->storeAs('images', $originalName, 'public');
+                    $form->model()->img2 = $originalName;
+                    info('saving original name', [$originalName]);
+                    info('saving model name', [$form->model()->img2]);
+
+
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
 
@@ -511,15 +520,6 @@ class WareTabController extends MainController
         }
 
         $form->saving(function (Form $form) {
-            if ($form->img2 instanceof UploadedFile) {
-                $path = $form->img2->store('images', 'public');
-
-                info('saving tessst', [$form->img2->getClientOriginalName()]);
-                $form->model()->img2 = $form->img2->getClientOriginalName();
-
-                // $form->model()->img2_path = $path;
-            }
-
             $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
