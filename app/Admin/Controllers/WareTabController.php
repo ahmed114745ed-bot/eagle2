@@ -353,24 +353,24 @@ class WareTabController extends MainController
 
         // تحسين حقل img2 بشكل كامل
         $form->file('img2', trans('svg'))
-            ->name(function ($file) {
-                // الحصول على الامتداد الحقيقي مع fallback
-                $extension = $file->getClientOriginalExtension();
-                if (empty($extension)) {
-                    $extension = $file->guessExtension();
-                }
-
-                // تطبيع الامتدادات
-                $extension = strtolower($extension);
-                if ($extension === 'svg') {
-                    return 'svga_' . Str::random(8) . '.svg';
-                }
-
-                return 'svga_' . Str::random(8) . '.' . $extension;
-            })
+//            ->name(function ($file) {
+//                // الحصول على الامتداد الحقيقي مع fallback
+//                $extension = $file->getClientOriginalExtension();
+//                if (empty($extension)) {
+//                    $extension = $file->guessExtension();
+//                }
+//
+//                // تطبيع الامتدادات
+//                $extension = strtolower($extension);
+//                if ($extension === 'svg') {
+//                    return 'svga_' . Str::random(8) . '.svg';
+//                }
+//
+//                return 'svga_' . Str::random(8) . '.' . $extension;
+//            })
             ->attribute(['id' => 'file-input-img2'])
             ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp')
-            ->hidePreview()->uniqueName();;
+            ->hidePreview();
 
         $form->select('image_type1', __('image_type'))->options([
             'svga' => __('svga'),
