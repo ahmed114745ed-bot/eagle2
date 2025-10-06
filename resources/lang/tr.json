@@ -3575,7 +3575,10 @@
     "offline_users": "Çevrimdışı Kullanıcılar",
     "Total BD Salary": "Toplam BD Maaşı",
     "Total Cut Amount": "Toplam Kesilen Miktar",
-    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı"
+    "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı",
+    "insufficient_balance": "Bakiyeniz yetersiz!",
+    "request_sent_success": "Talep başarıyla gönderildi ve bakiye düşüldü!"
+
 
 
 

@@ -2,6 +2,7 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\helper\SuperAdminHelper;
 use App\Models\Country;
 use App\Models\SuperadminBannerRequest;
 use App\Selectables\Countries;
@@ -15,6 +16,7 @@ use App\Models\HomeCarousel;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
@@ -83,24 +85,24 @@ class HomeCarouselController extends MainController
         });
     
         $grid->id(__('ID'));
-        $grid->column('img', __('img'))->image('', 235, 77);
+        $grid->column('img', __('Image'))->image('', 235, 77);
     
-        $grid->column('actions', __('Show'))->display(function () {
+        $grid->column('actions', __('Actions'))->display(function () {
+
+           
             $types = [
-                'display_discover' => 'Display Discover',
-                'display_home_top' => 'Display Home Top',
-                'display_home_middle' => 'Display Home Middle',
-                'display_live' => 'Display Live',
-                // 'display_country' => 'Display Country',
+                'display_discover' => __('Display Discover'),
+                'display_home_top' => __('Display Home Top'),
+                'display_home_middle' => __('Display Home Middle'),
+                'display_live' => __('Display Live'),
             ];
     
             $buttons = '';
             foreach ($types as $type => $label) {
                 $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
-                                onclic 
                                 data-id="' . $this->id . '" 
                                 data-type="' . $type . '">
-                                <i class="fa fa-bullhorn"></i> ' . __($label) . '
+                                <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
             }
             return $buttons;
@@ -108,75 +110,82 @@ class HomeCarouselController extends MainController
     
         $grid->disableExport();
         $grid->disableActions();
-    
-        Admin::script(<<<'JS'
-        console.log('✅ Banner request script loaded');
+        // $deductAmount = SuperAdminHelper::bannerDeductAmount( );
+        $deductAmount = 1;
+
+        $translations = [
+            'confirm_deduction' => __('Confirm Deduction'),
+            'deduct_text' => __('coins will be deducted to send the display request: ', ['count' => $deductAmount]),
+            'yes_deduct' => __('Yes, deduct and send request'),
+            'cancel' => __('Cancel'),
+            'done' => __('Done!'),
+            'error_text' => __('An error occurred while processing'),
+            'error' => __('Error'),
+            'sweetalert_missing' => __('SweetAlert2 is not loaded!'),
+            'display_types' => [
+                'display_discover' => __('Display Discover'),
+                'display_home_top' => __('Display Home Top'),
+                'display_home_middle' => __('Display Home Middle'),
+                'display_live' => __('Display Live'),
+                // 'display_country' => __('عرض الدولة'),
+            ],
+        ];
         
+        Admin::script("
+        const translations = " . json_encode($translations) . ";
+    
         function bindBannerRequestButtons() {
             $(document).off('click', '.request-banner').on('click', '.request-banner', function() {
                 var bannerId = $(this).data('id');
                 var displayType = $(this).data('type');
-                console.log('Clicked banner', bannerId, displayType);
-        
+                var displayLabel = translations.display_types[displayType] || displayType;
+    
                 if (typeof Swal === 'undefined') {
-                    alert('SweetAlert2 غير متوفر على الصفحة!');
+                    alert(translations.sweetalert_missing);
                     return;
                 }
-        
+    
                 Swal.fire({
-                    title: 'تأكيد الخصم',
-                    text: "سيتم خصم 10 كوينز من محفظتك لإرسال طلب عرض (" + displayType + ").",
-                    type: 'warning',
+                    title: translations.confirm_deduction,
+                    text: translations.deduct_text + displayLabel,
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'نعم، خصم وأرسل الطلب',
-                    cancelButtonText: 'إلغاء'
+                    confirmButtonText: translations.yes_deduct,
+                    cancelButtonText: translations.cancel
                 }).then((result) => {
-                    console.log('Clicked banner', result);
-
                     if (result.value) {
                         $.ajax({
                             url: '/superadmin/banner-request/' + bannerId,
                             type: 'POST',
-                            data: {
-                                _token: LA.token,
-                                field: displayType
-                            },
+                            data: { _token: LA.token, field: displayType },
                             success: function(response) {
                                 Swal.fire({
-                                    title: 'تم!',
+                                    title: translations.done,
                                     text: response.message,
                                     icon: 'success'
-                                }).then(() => {
-                                    $.pjax.reload('#pjax-container');
-                                });
+                                }).then(() => { $.pjax.reload('#pjax-container'); });
                             },
                             error: function(xhr) {
-                                let msg = xhr.responseJSON?.message || 'حدث خطأ أثناء تنفيذ العملية';
-                                Swal.fire('خطأ', msg, 'error');
+                                let msg = xhr.responseJSON?.message || translations.error_text;
+                                Swal.fire(translations.error, msg, 'error');
                             }
                         });
                     }
                 });
             });
         }
-        
-        $(function() {
-            bindBannerRequestButtons();
-            console.log('✅ Bound banner buttons');
-        });
-        
-        $(document).on('pjax:complete', function() {
-            bindBannerRequestButtons();
-            console.log('🔁 Rebound after PJAX');
-        });
-        JS);
-        $grid->tools(function (Tools $tools) {
-       
-            $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+    
+        $(function() { bindBannerRequestButtons(); });
+        $(document).on('pjax:complete', function() { bindBannerRequestButtons(); });
+    ");
+    $grid->tools(function (Tools $tools) {
 
-        });
+        $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+
+    });
         return $grid;
     }
+    
     
     
 
@@ -270,25 +279,29 @@ class HomeCarouselController extends MainController
 
 
      public function storeBannerRequest(HomeCarousel $banner, Request $request)
-     {
-         $user = auth()->user();
-    
-        //  if ($user->wallet_balance < 10) {
-        //      return response()->json(['message' => 'رصيدك غير كافي!'], 422);
-        //  }
- 
-        //  $user->wallet_balance -= 10;
-        //  $user->save();
- 
-         SuperadminBannerRequest::create([
-             'user_id' => $user->id,
-             'home_carousel_id' => $banner->id,
-             'coins_deducted' => 10,
-             'status' => 'pending',
-             'notes' =>  $request->field
-         ]);
- 
-         return response()->json(['message' => 'تم إرسال الطلب بنجاح!']);
-     }
+    {
+        $user = auth()->user();
+        $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner);
 
+
+        // if ($user->di < $deductAmount) {
+        //     return response()->json(['message' => __('insufficient_balance')], 422);
+        // }
+
+        \DB::transaction(function () use ($user, $banner, $request, $deductAmount) {
+            // $user->di -= $deductAmount;
+            // $user->save();
+
+            SuperadminBannerRequest::create([
+                'user_id' => $user->id,
+                'home_carousel_id' => $banner->id,
+                'coins_deducted' => $deductAmount,
+                'status' => 'pending',
+                'notes' => $request->field,
+            ]);
+        });
+
+        return response()->json(['message' => __('request_sent_success')]);
+    }
 }
+
