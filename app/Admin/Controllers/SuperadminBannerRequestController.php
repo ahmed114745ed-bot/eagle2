@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\UserSuperAdminService;
+use App\Admin\Services\SuperAdminService;
 use App\Models\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -22,7 +22,7 @@ class SuperadminBannerRequestController extends AdminController
     protected $title = 'SuperadminBannerRequest';
 
 
-    public function __construct(UserSuperAdminService $userService)
+    public function __construct(SuperAdminService $userService)
     {
         $this->userService = $userService;
     }
@@ -52,9 +52,8 @@ class SuperadminBannerRequestController extends AdminController
         });
     
         // Banner Image
-        $grid->column('homeCarousel.img', __('Banner'))->display(function ($image) {
-            return $image ? "<img src='{$image}' style='width:100px;height:50px;' />" : '';
-        });
+        $grid->column('homeCarousel.img', __('img'))->image('', 235, 77);
+
     
         $grid->column('coins_deducted', __('Coins Deducted'));
         $grid->column('status', __('Status'));
