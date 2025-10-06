@@ -7,7 +7,17 @@
     </div>
 </div>
 
-@if(request()->is('superadmin'))
+@php
+    if (request()->is('admin/*')) {
+        $fetchUrl = admin_url('superadmin/users-online-stats');
+    } elseif (request()->is('superadmin/*')) {
+        $fetchUrl = superAdmin_url('users-online-stats');
+    } else {
+        $fetchUrl = url('users-online-stats');
+    }
+@endphp
+
+@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -62,7 +72,7 @@
             });
 
             function fetchData() {
-                fetch("{{ superAdmin_url('users-online-stats') }}", {
+                fetch("{{ $fetchUrl }}", {
                     headers: { 'Accept': 'application/json' }
                 })
                     .then(async res => {

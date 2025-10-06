@@ -276,9 +276,13 @@ class UserController extends MainController
      */
     protected function grid()
     {
+        $countryID = request('country_id');
+
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->ofAgency()->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
+        $grid->model()->ofAgency()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'ownerRoom:id,uid',
                 'profile:id,user_id,avatar',
@@ -355,7 +359,7 @@ class UserController extends MainController
 
       $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             $count = $this->same_device_users_count;
-            
+
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
@@ -370,7 +374,7 @@ class UserController extends MainController
                         });
                     });
         ");
-        
+
         // if (!request()->filled('_export_')) {
         //     $col->modal(__('Other accounts on same device'), function () {
         //         $users = User::with('profile:id,user_id,avatar')
@@ -443,7 +447,7 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
         });
-       
+
 
         $grid->disableCreateButton();
 

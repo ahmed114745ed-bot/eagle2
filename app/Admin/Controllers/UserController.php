@@ -156,11 +156,14 @@ class UserController extends MainController
 
     protected function grid()
     {
+        $countryID = request('country_id');
+
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
 
         // Optimize eager loading
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
