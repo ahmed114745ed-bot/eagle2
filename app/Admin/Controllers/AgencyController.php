@@ -579,8 +579,11 @@ class AgencyController extends MainController
 
     protected function grid()
     {
+        $countryID = request('country_id');
+
         $grid = new Grid(new Agency);
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
             ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {

@@ -5,12 +5,23 @@
     </div>
 </div>
 
+@php
+    if (request()->is('admin/*')) {
+        $fetchUrl = admin_url('superadmin/top-users-visits');
+    } elseif (request()->is('superadmin/*')) {
+        $fetchUrl = superAdmin_url('top-users-visits');
+    } else {
+        $fetchUrl = url('top-users-visits');
+    }
+@endphp
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let topUsersChart;
 
     function loadTopUsers() {
-        fetch("{{ superAdmin_url('top-users-visits') }}", {
+        fetch("{{ $fetchUrl  }}", {
             headers: { 'Accept': 'application/json' }
         })
         .then(res => res.json())
