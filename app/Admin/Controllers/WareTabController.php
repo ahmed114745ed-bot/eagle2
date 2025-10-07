@@ -334,7 +334,7 @@ class WareTabController extends MainController
             })
             ->default('1.png');
 
-        $form->display('img2', 'Preview')->with(function ($value) {
+       /* $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return "<div id='preview-display-img2'></div>";
 
             $url = \Storage::disk(config('admin.upload.disk'))->url($value);
@@ -350,7 +350,7 @@ class WareTabController extends MainController
             return "<div id='preview-display-img2'>
                 <img src='{$url}' style='max-height:150px' class='img img-thumbnail' />
             </div>";
-        });
+        });*/
 
         // تحسين حقل img2 بشكل كامل
         $form->file('img2', trans('svg'))
@@ -367,11 +367,8 @@ class WareTabController extends MainController
                     return 'svga_' . Str::random(8) . '.svg';
                 }
 
-                return 'svga_' . Str::random(8) . '.' . $extension;
-            })
-            ->attribute(['id' => 'file-input-img2'])
-            ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp,webm')
-            ->hidePreview();
+                return 'animation_' . Str::random(8) . '.' . $extension;
+            });
 
         $form->select('image_type1', __('image_type'))->options([
             'svga' => __('svga'),

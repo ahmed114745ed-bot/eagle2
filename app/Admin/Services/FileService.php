@@ -53,7 +53,6 @@ class FileService
             )->post('https://dashboard.utdsoftware.com/api/analyze-media');
 
             $responseData = $response->json();
-            LogHelper::info('This image ', ["imagePath" => $imagePath, '$responseData' => $responseData]);
 
             if ($response->successful() && isset($responseData['data']['video_type'])) {
                 $ext = mb_strtolower(explode('-', $responseData['data']['video_type'])[0]);
