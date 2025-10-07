@@ -93,8 +93,13 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
+        $countryID = request('country_id');
+        if ($countryID){
+            $superAdmin = SuperAdmin::select('id')->where('country_id', $countryID)->first();
+        }
 
         $grid->model()
+            ->where('parent_id', $superAdmin->id)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')

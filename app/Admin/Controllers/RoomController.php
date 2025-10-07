@@ -378,6 +378,10 @@ class RoomController extends MainController
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
+        if (request()->online == 1) {
+            $grid->model()->whereHas('roomVisitors');
+        }
+
         $grid->model()->orderByRaw(implode(', ', $orderSql));
     }
 
