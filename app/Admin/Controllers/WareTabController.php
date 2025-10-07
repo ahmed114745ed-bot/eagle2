@@ -534,14 +534,11 @@ class WareTabController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-//            if ($form->img2 instanceof UploadedFile) {
-//                $originalName = $form->img2->getClientOriginalName();
-//
-////                $path = $form->img2->storeAs('images', $originalName, 'public');
-////                $url = Storage::disk('public')->url('images/' . $originalName);
-//
-//                $model->update(['img2' => $originalName]);
-//            }
+            if ($form->img2 instanceof UploadedFile) {
+                $originalName = $form->img2->getClientOriginalName();
+
+                $model->update(['img2' => $originalName]);
+            }
 
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
