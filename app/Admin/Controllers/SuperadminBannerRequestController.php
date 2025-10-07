@@ -56,7 +56,15 @@ class SuperadminBannerRequestController extends AdminController
 
     
         $grid->column('coins_deducted', __('Coins Deducted'));
-        $grid->column('status', __('Status'));
+        $grid->column('status', __('Status'))->display(function ($status) {
+            switch ($status) {
+                case 'pending': return '<span class="text-warning">'. __('Pending') .'</span>';
+                case 'approved': return '<span class="text-success">'. __('Approved') .'</span>';
+                case 'rejected': return '<span class="text-danger">'. __('Rejected') .'</span>';
+                default: return $status;
+            }
+        });
+        
         $grid->column('notes', __('Type'))->display(function ($value) {
             if ($value === 'display_discover') {
                 return __('Display Discover');
@@ -88,10 +96,12 @@ class SuperadminBannerRequestController extends AdminController
             if ($this->status === 'approved') {
                 return '<span class="text-success">' . __('Approved') . '</span>';
             }
-    
+            $approveText = __('Approved');
+            $rejectText  = __('Reject');
+            
             return <<<HTML
-                <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">✔ Approve</button>
-                <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ Reject</button>
+            <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
+            <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
             HTML;
         });
     $grid->disableActions();

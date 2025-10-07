@@ -102,6 +102,7 @@ class HomeCarouselController extends MainController
                 $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
                                 data-id="' . $this->id . '" 
                                 data-type="' . $type . '">
+
                                 <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
             }
@@ -110,12 +111,15 @@ class HomeCarouselController extends MainController
     
         $grid->disableExport();
         $grid->disableActions();
-        // $deductAmount = SuperAdminHelper::bannerDeductAmount( );
-        $deductAmount = 1;
+        $display_discover = SuperAdminHelper::getHourlyBannerPrice('display_discover');
+        $display_home_top = SuperAdminHelper::getHourlyBannerPrice('display_home_top');
+        $display_home_middle = SuperAdminHelper::getHourlyBannerPrice('display_home_middle');
+        $display_live = SuperAdminHelper::getHourlyBannerPrice('display_live');
+
 
         $translations = [
             'confirm_deduction' => __('Confirm Deduction'),
-            'deduct_text' => __('coins will be deducted to send the display request: ', ['count' => $deductAmount]),
+            'deduct_text' => __('coins will be deducted to send the display request: ', ['count' =>  '']),
             'yes_deduct' => __('Yes, deduct and send request'),
             'cancel' => __('Cancel'),
             'done' => __('Done!'),
@@ -133,21 +137,46 @@ class HomeCarouselController extends MainController
         
         Admin::script("
         const translations = " . json_encode($translations) . ";
-    
+        const display_discover = " . $display_discover . ";
+        const display_home_top = " . $display_home_top . ";
+        const display_home_middle = " . $display_home_middle . ";
+        const display_live = " . $display_live . ";
+
         function bindBannerRequestButtons() {
             $(document).off('click', '.request-banner').on('click', '.request-banner', function() {
                 var bannerId = $(this).data('id');
                 var displayType = $(this).data('type');
                 var displayLabel = translations.display_types[displayType] || displayType;
-    
+                var deductAmount = 0;
+
+                switch(displayType) {
+                    case 'display_discover':
+                        deductAmount = display_discover;
+                        break;
+                    case 'display_home_top':
+                        deductAmount = display_home_top;
+                        break;
+                    case 'display_home_middle':
+                        deductAmount = display_home_middle;
+                        break;
+                    case 'display_live':
+                        deductAmount = display_live;
+                        break;
+                    default:
+                        deductAmount = 0;
+                        break;
+                }
+
+ 
                 if (typeof Swal === 'undefined') {
                     alert(translations.sweetalert_missing);
                     return;
                 }
-    
+                 var message = translations.deduct_text.replace(':count', deductAmount) + deductAmount + 'coins';
+
                 Swal.fire({
                     title: translations.confirm_deduction,
-                    text: translations.deduct_text + displayLabel,
+                    text: message,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: translations.yes_deduct,
@@ -284,13 +313,13 @@ class HomeCarouselController extends MainController
         $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner,$request->field);
 
 
-        // if ($user->di < $deductAmount) {
-        //     return response()->json(['message' => __('insufficient_balance')], 422);
-        // }
+        if ($user->di < $deductAmount) {
+            return response()->json(['message' => __('insufficient_balance')], 422);
+        }
 
         \DB::transaction(function () use ($user, $banner, $request, $deductAmount) {
-            // $user->di -= $deductAmount;
-            // $user->save();
+            $user->di -= $deductAmount;
+            $user->save();
 
             SuperadminBannerRequest::create([
                 'user_id' => $user->id,
