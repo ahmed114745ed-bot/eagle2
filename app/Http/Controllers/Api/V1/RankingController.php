@@ -123,7 +123,7 @@ class RankingController extends Controller
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
-        if (!$request->roomId) {
+        if (!$request->room_id && !$request->roomId) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
