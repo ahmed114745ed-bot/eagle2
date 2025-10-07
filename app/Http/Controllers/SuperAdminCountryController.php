@@ -40,7 +40,10 @@ class SuperAdminCountryController extends Controller
             ->groupBy('sender_id')
             ->orderByDesc('total_sent')
             ->take(3)
-            ->with('sender:id,name')
+            ->with([
+                'sender:id,name,country_id',
+                'sender.profile:id,user_id,avatar'
+            ])
             ->get()
             ->filter(fn($s) => $s->total_sent > 0);
 
@@ -67,7 +70,10 @@ class SuperAdminCountryController extends Controller
             ->groupBy('sender_id')
             ->orderByDesc('total_sent')
             ->take(3)
-            ->with('sender:id,name')
+            ->with([
+                'sender:id,name,country_id',
+                'sender.profile:id,user_id,avatar'
+            ])
             ->get()
             ->filter(fn($s) => $s->total_sent > 0);
 
@@ -117,6 +123,7 @@ class SuperAdminCountryController extends Controller
         $languages = MultiLanguage::config('languages');
 
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
+
         if (array_key_exists($locale, $languages)) {
 
             return response('ok')->cookie($cookie_name, $locale);

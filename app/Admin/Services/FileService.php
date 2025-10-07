@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Helpers\LogHelper;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,7 @@ class FileService
     public static function getExtension(UploadedFile $img2, mixed $wareId, bool $getFromService = false): ?string
     {
 
+        if ($wareId == null) $wareId = \Str::random(10);
         $urlVideo = upload($img2);
 
         $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
@@ -48,7 +50,7 @@ class FileService
                 'image',
                 Storage::disk('gcs')->get($imagePath),
                 $wareId.'.jpg'
-            )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+            )->post('https://dashboard.utdsoftware.com/api/analyze-media');
 
             $responseData = $response->json();
 
@@ -63,6 +65,7 @@ class FileService
             ]);
         }
 
+        deleteFile($urlVideo);
         return $ext;
     }
 }
