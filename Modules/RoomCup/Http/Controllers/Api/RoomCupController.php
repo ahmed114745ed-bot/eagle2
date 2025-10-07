@@ -71,6 +71,7 @@ class RoomCupController extends Controller
                 'admins' => $currentQueryTotal['admin'] ?? 0,
             ],
             'trophies' => [
+                'level' => @$currentData->room->level->level ?? 0,
                 'type'  =>  $type,
                 'current' => [
                     'total_current'  => $currentData->total_current ?? 0,
@@ -81,7 +82,7 @@ class RoomCupController extends Controller
                 ],
             ],
             'room' => [
-                'level' => @$currentData->room->level->level ?? 0,
+                
                 'admin_count' => count(array_filter(explode(',', $currentData->room->room_admin))),
             ]
 
