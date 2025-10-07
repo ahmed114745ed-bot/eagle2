@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\AgencySallary;
 use App\Models\Bd;
+use App\Models\Charge;
+use App\Models\CoinGameUser;
+use App\Models\CoinGameUserMergedMonthly;
 use App\Models\Country;
 use App\Models\GiftLog;
+use App\Models\GiftRanking;
 use App\Models\Room;
 use App\Models\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Request;
 use KevinSoft\MultiLanguage\MultiLanguage;
@@ -21,6 +27,10 @@ class SuperAdminCountryController extends Controller
         $country = Country::findOrFail($id);
         $countryID = $country->id;
 
+        $timezone = Common::timeZone();
+        $from = Carbon::now($timezone)->subDays(30)->startOfDay();
+        $to   = Carbon::now($timezone)->endOfDay();
+
         $onlineUsers = User::select(['id', 'country_id', 'online'])->where([
             'country_id' => $countryID,
             'online' => 1,
@@ -31,11 +41,21 @@ class SuperAdminCountryController extends Controller
             'type' => 'super_admin',
         ])->first();
 
+        $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
+            ->with(['owner:id,name,country_id'])
+            ->withCount(['roomVisitors' => function ($q) use ($from, $to) {
+                $q->whereBetween('created_at', [$from, $to]);
+            }])
+            ->orderByDesc('room_visitors_count')
+            ->take(3)
+            ->get(['id', 'name', 'uid']);
+
         $topSenders = GiftLog::whereHas(
             'sender',
             fn($q) =>
             $q->where('country_id', $countryID)
         )
+            ->whereBetween('created_at', [$from, $to])
             ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
             ->groupBy('sender_id')
             ->orderByDesc('total_sent')
@@ -47,12 +67,22 @@ class SuperAdminCountryController extends Controller
             ->get()
             ->filter(fn($s) => $s->total_sent > 0);
 
-        $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-            ->with(['owner:id,name,country_id'])
-            ->withCount('roomVisitors')
-            ->orderByDesc('room_visitors_count')
+        $topReceivers = GiftLog::whereHas(
+            'receiver',
+            fn($q) =>
+            $q->where('country_id', $countryID)
+        )
+            ->whereBetween('created_at', [$from, $to])
+            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+            ->groupBy('sender_id')
+            ->orderByDesc('total_sent')
             ->take(3)
-            ->get(['id', 'name', 'uid']);
+            ->with([
+                'sender:id,name,country_id',
+                'sender.profile:id,user_id,avatar'
+            ])
+            ->get()
+            ->filter(fn($s) => $s->total_sent > 0);
 
         $topAgencies = Agency::where('country_id', $countryID)
             ->withCount('members')
@@ -60,23 +90,19 @@ class SuperAdminCountryController extends Controller
             ->take(3)
             ->get(['id', 'name']);
 
-        $topReceivers = GiftLog::whereHas(
-            'receiver',
-            fn($q) =>
-            $q->where('country_id', $countryID)
-        )
-            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('sender_id')
-            ->orderByDesc('total_sent')
-            ->take(3)
+        $topChargeAgencies = Charge::where('charger_type', 'agency')
+            ->whereHas('senderShippingAgency', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+            ->whereBetween('created_at', [$from, $to])
             ->with([
-                'sender:id,name,country_id',
-                'sender.profile:id,user_id,avatar'
+                'senderShippingAgency:id,name,country_id,img'
             ])
-            ->get()
-            ->filter(fn($s) => $s->total_sent > 0);
+            ->orderByDesc('amount')
+            ->take(3)
+            ->get();
 
-        $topBds = Bd::where('country_id', $countryID)->whereHas('agencies', function ($a) use ($countryID) {
+        $topBds = Bd::whereHas('agencies', function ($a) use ($countryID) {
             $a->where('country_id', $countryID)
                 ->whereHas('members');
         })
@@ -86,21 +112,16 @@ class SuperAdminCountryController extends Controller
             }])
             ->get(['id', 'name']);
 
-        $topChargeAgencies = AgencySallary::whereHas('agency', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID)
-                ->where('type', 2);
-        })
-            ->select(
-                'agency_id',
-                DB::raw('SUM(sallary) - SUM(cut_amount) AS total_due')
-            )
-            ->where('is_paid', 0)
-            ->where(DB::raw('CONCAT(year,"-",month)'), '<=', now()->year . '-' . now()->month)
-            ->groupBy('agency_id')
-            ->havingRaw('total_due > 0')
-            ->orderByDesc('total_due')
-            ->take(3)
-            ->with('agency:id,name,type')
+        $topGamers = CoinGameUser::query()
+            ->whereBetween('created_at', [$from, $to])
+            ->where('type', 1)
+            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->with([
+                'user:id,name,country_id',
+                'user.profile:id,user_id,avatar'
+            ])
+            ->orderByDesc('coins')
+            ->limit(3)
             ->get();
 
         return view('super_admin_country', compact([
@@ -113,6 +134,7 @@ class SuperAdminCountryController extends Controller
             'topReceivers',
             'topBds',
             'topChargeAgencies',
+            'topGamers'
         ]));
     }
 
