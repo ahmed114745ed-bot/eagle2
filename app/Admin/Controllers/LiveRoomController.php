@@ -365,9 +365,19 @@ class LiveRoomController extends MainController
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
+        if (request()->online == 1) {
+            $grid->model()->whereHas('roomVisitors');
+        }
+
+        if (request()->is_live == 1) {
+            $grid->model()->where('is_live', 1);
+        }
+
+        if (request()->is_live == 0 && !is_null(request()->is_live)) {
+            $grid->model()->where('is_live', 0);
+        }
+
         $grid->model()->orderByRaw(implode(', ', $orderSql));
-
-
     }
 
 

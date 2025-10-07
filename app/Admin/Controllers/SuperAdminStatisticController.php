@@ -272,8 +272,8 @@ class SuperAdminStatisticController extends MainController
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
                     $column->row(function (Row $row) use ($countryID, $usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
-                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', "admin/users?countryID=$countryID", $usersCount));
-                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users?online=1', $onlineUser));
+                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', admin_url("users?country_id=$countryID"), $usersCount));
+                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', admin_url("users?online=1&country_id=$countryID"), $onlineUser));
                         if ($peakHours) {
                             $time = Carbon::createFromTime($peakHours->hour);
                             $time->locale(app()->getLocale());
@@ -283,16 +283,16 @@ class SuperAdminStatisticController extends MainController
                         } else {
                             $value = 0;
                         }
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'superadmin/users', $value));
-                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users?signups=today', $newSignUpsToday));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users?signups=week', $newSignUpsThisWeek));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users?signups=month', $newSignUpsThisMonth));
-                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', 'superadmin/users?messages=today', $messagesToday));
-                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', 'superadmin/users?messages=month', $messagesThisMonth));
-                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', 'superadmin/users?sent_messages=1', $usersWhoSend));
-                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', 'superadmin/users?never_send=1', $usersWhoNeverSend));
-                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', 'superadmin/users', $openConversationsToday));
-                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration)));
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', admin_url("users?country_id=$countryID"), $value));
+                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', admin_url("users?signups=today&country_id=$countryID"), $newSignUpsToday));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', admin_url("users?signups=week&country_id=$countryID"), $newSignUpsThisWeek));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', admin_url("users?signups=month&country_id=$countryID"), $newSignUpsThisMonth));
+                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', admin_url("users?messages=today&country_id=$countryID"), $messagesToday));
+                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', admin_url("users?messages=month&country_id=$countryID"), $messagesThisMonth));
+                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', admin_url("users?sent_messages=1&country_id=$countryID"), $usersWhoSend));
+                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', admin_url("users?never_send=1&country_id=$countryID"), $usersWhoNeverSend));
+                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', admin_url("users?country_id=$countryID"), $openConversationsToday));
+                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', admin_url("users?country_id=$countryID"), round($avgConversationDuration)));
                     });
 
                     $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
@@ -395,16 +395,16 @@ class SuperAdminStatisticController extends MainController
                 $row->column(12, function ($column) use ($countryID, $roomCounts, $totalRoomsJoined, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $liveRoomsTrue, $liveRoomsFalse,) {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
-                    $column->row(function (Row $row) use ($roomCounts, $totalRoomsJoined, $liveRoomsTrue, $liveRoomsFalse, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
-                        $row->column(3, new InfoBox(__('Audio Rooms'), 'headphones', 'blue', 'superadmin/rooms?online=1', $roomCounts['audio'] ?? 0));
-                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'green', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
+                    $column->row(function (Row $row) use ($countryID, $roomCounts, $totalRoomsJoined, $liveRoomsTrue, $liveRoomsFalse, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
+                        $row->column(3, new InfoBox(__('Audio Rooms'), 'headphones', 'blue', admin_url("rooms?online=1&country_id=$countryID"), $roomCounts['audio'] ?? 0));
+                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'green', admin_url("live-rooms?online=1&country_id=$countryID"), $roomCounts['live'] ?? 0));
                         //                        $row->column(3, new InfoBox(__('Total Rooms Joined By Visitors'), 'building', 'yellow', 'superadmin/rooms', $totalRoomsJoined));
                         //                        $row->column(3, new InfoBox(__('Top Room Messages'), 'commenting', 'teal', 'superadmin/rooms/' . ($topRoom ? $topRoom->id : '#'), $topRoom ? $topRoom->messages_count : 0));
-                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'purple', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
+                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'purple', admin_url("live-rooms?online=1&country_id=$countryID"), $roomCounts['live'] ?? 0));
 //                        $row->column(3, new InfoBox(__('Total Rooms Joined By Visitors'), 'building', 'yellow', 'superadmin/rooms', $totalRoomsJoined));
 //                        $row->column(3, new InfoBox(__('Top Room Messages'), 'commenting', 'teal', 'superadmin/rooms/' . ($topRoom ? $topRoom->id : '#'), $topRoom ? $topRoom->messages_count : 0));
-                        $row->column(3, new InfoBox(__('Live Rooms (Active)'), 'microphone', 'green', 'superadmin/live-rooms?is_live=1', $liveRoomsTrue));
-                        $row->column(3, new InfoBox(__('Live Rooms (Inactive)'), 'microphone-slash', 'red', 'superadmin/live-rooms?is_live=0', $liveRoomsFalse));
+                        $row->column(3, new InfoBox(__('Live Rooms (Active)'), 'microphone', 'green', admin_url("live-rooms?is_live=1&country_id=$countryID"), $liveRoomsTrue));
+                        $row->column(3, new InfoBox(__('Live Rooms (Inactive)'), 'microphone-slash', 'red', admin_url("live-rooms?is_live=0&country_id=$countryID"), $liveRoomsFalse));
                         //                        $row->column(3, new InfoBox(__('Most Visited Room (visitors)'), 'users', 'lime', 'superadmin/rooms', $mostVisitedRoomCount));
                         //                        $row->column(3, new InfoBox(__('Avg Visitors Per Room'), 'user-plus', 'gray', 'superadmin/rooms', round($avgVisitorsPerRoom, 2)));
                         //                        $row->column(3, new InfoBox(__('Longest Active Room (days)'), 'clock-o', 'yellow', 'superadmin/rooms', $longestActiveRoom));
@@ -514,18 +514,18 @@ class SuperAdminStatisticController extends MainController
                 $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
-                        $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
-                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies', round($agency_salaries)));
-                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', round($user_salaries)));
-                        $row->column(3, new InfoBox(__('Active Agencies'), 'building', 'red', 'superadmin/agencies?active=true', $activeAgencies));
-                        $row->column(3, new InfoBox(__('New Agencies Today'), 'plus', 'teal', 'superadmin/agencies?created=today', $newAgenciesToday));
-                        $row->column(3, new InfoBox(__('New Agencies This Month'), 'calendar', 'orange', 'superadmin/agencies?created=month', $newAgenciesMonth));
-                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', 'superadmin/agencies', round($avgAgencyWallet)));
-                        $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/users?agencyMembers=1', $totalMembers));
-                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency)));
-                        $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies?pending=1', $pendingJoins));
-                        $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
+                    $column->row(function (Row $row) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
+                        $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', admin_url("agencies?country_id=$countryID"), $agencyCount));
+                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', admin_url("agencies?country_id=$countryID"), round($agency_salaries)));
+                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', admin_url("ag/users?country_id=$countryID"), round($user_salaries)));
+                        $row->column(3, new InfoBox(__('Active Agencies'), 'building', 'red', admin_url("agencies?active=true&country_id=$countryID"), $activeAgencies));
+                        $row->column(3, new InfoBox(__('New Agencies Today'), 'plus', 'teal', admin_url("agencies?created=today&country_id=$countryID"), $newAgenciesToday));
+                        $row->column(3, new InfoBox(__('New Agencies This Month'), 'calendar', 'orange', admin_url("agencies?created=month&country_id=$countryID"), $newAgenciesMonth));
+                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', admin_url("agencies?country_id=$countryID"), round($avgAgencyWallet)));
+                        $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', admin_url("users?agencyMembers=1&country_id=$countryID"), $totalMembers));
+                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', admin_url("agencies?country_id=$countryID"), round($avgMembersPerAgency)));
+                        $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', admin_url("agencies?pending=1&country_id=$countryID"), $pendingJoins));
+                        $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', admin_url("ag/users?country_id=$countryID")   , $diamondsAchieved));
                     });
 
                     $column->row(function (Row $row) use ($countryID) {
@@ -630,14 +630,14 @@ class SuperAdminStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                $row->column(12, function ($column) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
-                    $column->row(function (Row $row) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'superadmin/usersBD', $bdCount));
-                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'superadmin/bd-salaries', number_format($totalBDSalary)));
-                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'superadmin/bd-salaries', number_format($totalBDCut)));
-                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'superadmin/usersBD', number_format($averageAgenciesPerBD)));
+                    $column->row(function (Row $row) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', admin_url("usersBD?country_id=$countryID"), $bdCount));
+                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', admin_url("bd-salaries?country_id=$countryID"), number_format($totalBDSalary)));
+                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', admin_url("bd-salaries?country_id=$countryID"), number_format($totalBDCut)));
+                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', admin_url("bd-salaries?country_id=$countryID"), number_format($averageAgenciesPerBD)));
                     });
                 });
 

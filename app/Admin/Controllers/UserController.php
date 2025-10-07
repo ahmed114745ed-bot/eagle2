@@ -176,9 +176,46 @@ class UserController extends MainController
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])->withCount('sameDeviceUsers');
 
+        if (request()->signups == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->signups == 'week') {
+            $grid->model()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        }
+
+        if (request()->signups == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
+        }
+
+        if (request()->messages == 'today') {
+            $grid->model()->whereHas('chatMessages', fn($q) => $q->whereDate('created_at', today()));
+        }
+
+        if (request()->messages == 'month') {
+            $grid->model()->whereHas('chatMessages', fn($q) =>
+            $q->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+            );
+        }
+
+        if (request()->never_send == 1) {
+            $grid->model()->doesntHave('chatMessages');
+        }
+
+        if (request()->sent_messages == 1) {
+            $grid->model()->has('chatMessages');
+        }
+
+        if (request()->agencyMembers == 1) {
+            $grid->model()->where('agency_id', '!=', 0)
+                ->whereHas('agency', function ($q) use ($countryID){
+                    $q->where('country_id', $countryID);
+                });
+        }
+
         if (request()->online == 1) {
-            $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
-                ->where('online_time', '<=', now()->timestamp);
+            $grid->model()->where('online', 1);
         } else if ($haveCoins) {
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
