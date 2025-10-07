@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\SuperadminBannerRequestController;
+use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -364,6 +365,14 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+
+        Route::prefix('superadmin')->name('superadmin.')->group(function () {
+            Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
+            Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
+            Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
+            Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+        });
 
         Route::get('/soon', 'AllStatisticController@index2');
         Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');

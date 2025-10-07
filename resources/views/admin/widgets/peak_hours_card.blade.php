@@ -12,6 +12,16 @@
     </div>
 </div>
 
+@php
+    if (request()->is('admin/*')) {
+        $fetchUrl = admin_url('superadmin/peak-hours');
+    } elseif (request()->is('superadmin/*')) {
+        $fetchUrl = superAdmin_url('peak-hours');
+    } else {
+        $fetchUrl = url('peak-hours');
+    }
+@endphp
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -56,7 +66,7 @@
 
     function loadPeakData(period = 'day') {
         $.ajax({
-            url: "{{ superadmin_url('peak-hours') }}",
+            url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function (res) {
                 if (res.success) {
