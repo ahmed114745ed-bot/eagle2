@@ -3848,6 +3848,31 @@
 "Thursday": "الخميس",
 "Friday": "الجمعة",
 "Saturday": "السبت",
+
+    "Open Profile": "فتح الملف الشخصي",
+    "Sending Level": "مستوى الإرسال",
+    "Receiving Level": "مستوى الاستقبال",
+    "Recharge Level": "مستوى الشحن",
+    "Active Users": "المستخدمون النشطون",
+    "Top 3 Entertainment Rooms": "أشهر 3 غرف ترفيهية",
+    "Top 3 Generous Supporters": "أكثر 3 داعمين سخاءً",
+    "Top 3 Star Hosts": "أفضل 3 مضيفين نجوم",
+    "Top 3 Host Agencies": "أقوى 3 وكالات مضيفين",
+    "Top 3 Recharge Agencies": "أضخم 3 وكالات شحن",
+    "Top 3 Most Active BD": "أنشط 3 BD",
+    "clients": "عميل",
+    "Gaming Champions": "محترفو الألعاب",
+    "Epic Message to Heroes of :country": "رسالة نارية لأبطال :country",
+    "TEMPO LIFE Legends": "أساطير تيمبو لايف",
+    "You are not just players... You are the Entertainment Army!": "أنتم لستم مجرد لاعبين... أنتم جيش الترفيه والمتعة!",
+    "Every room you open becomes an arena of joy and laughter!": "كل غرفة تفتحونها تصبح ساحة للفرح والضحكات!",
+    "Every gift you send plants smiles on faces!": "كل هدية ترسلونها تزرع البسمة على الوجوه!",
+    "Every game you play writes :country's name in golden letters!": "كل لعبة تلعبونها تكتب اسم :country بأحرف من ذهب!",
+    "Make the World Dance to :country's rhythm": "اجعلوا العالم يرقص على إيقاع :country",
+    "Play... Dance... Sing... Laugh... Spread Happiness!": "العبوا... ارقصوا... غنوا... اضحكوا... انشروا السعادة!",
+    "Make every minute in TEMPO LIFE an authentic celebration!": "اجعلوا كل دقيقة في تيمبو لايف احتفالاً أصيلاً!",
+    ":country is strong with you... First place awaits!": ":country قوية بكم، والمركز الأول في انتظاركم!",
+
 "Settings updated successfully.": "تم تحديث الإعدادات بنجاح."
 
 
