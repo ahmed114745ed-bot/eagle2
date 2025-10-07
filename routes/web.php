@@ -437,7 +437,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
-Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index']);
+Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview');
 Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
 
 Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
