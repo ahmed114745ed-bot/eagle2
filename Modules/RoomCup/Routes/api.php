@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\RoomCup\Http\Controllers\Api\RoomCupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +13,11 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::middleware('auth:api')->get('/roomcup', function (Request $request) {
-    return $request->user();
+Route::group([
+    'prefix' => 'room-cup',
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']
+], function (){
+    Route::get('/report/{room_id}', [RoomCupController::class, 'myReward']);
+    Route::get('/history/{room_id}', [RoomCupController::class, 'roomAdministratorManagement']);
+    
 });
