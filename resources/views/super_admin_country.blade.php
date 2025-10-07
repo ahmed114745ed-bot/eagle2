@@ -1003,10 +1003,10 @@
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topReceiver->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                             style="background-image:url('{{ getImagePath($topReceiver->receiver?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
                                 background-size:cover;background-position:center;">
                         </div>
-                        <div class="top-name">{{ $topReceiver->sender->name }}</div>
+                        <div class="top-name">{{ $topReceiver->receiver->name }}</div>
                         <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
                     </div>
                 @endforeach
