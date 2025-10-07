@@ -80,12 +80,11 @@ class RoomCupController extends Controller
                     'total_current'  => $lastData->total_current ?? 0,
                 ],
             ],
-            'owner' => [
-                'name' => $currentData->room->owner->name,
-                'uuid' => $currentData->room->owner->uuid,
-                'image' => $currentData->room->owner->profile->avatar,
-            ],
-            'level' => @$currentData->room->level->level ?? 0,
+            'room' => [
+                'level' => @$currentData->room->level->level ?? 0,
+                'admin_count' => count(array_filter(explode(',', $currentData->room->room_admin))),
+            ]
+
 
         ];
         return Common::apiResponse(true, '', $data, 200);
