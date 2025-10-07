@@ -14,7 +14,7 @@ class SuperAdminHelper
     public static function addCoins($userID,  $coins_deducted)
     {
         $user = SuperAdmin::find($userID);
-        $user->di -=  $coins_deducted;
+        $user->di +=  $coins_deducted;
         $user->save();
 
     }
@@ -26,7 +26,6 @@ class SuperAdminHelper
 
         $form  = $banner->form;  
         $input = $banner->input; 
-    
         switch ($form) {
             case 1:
                 $hours = $input;

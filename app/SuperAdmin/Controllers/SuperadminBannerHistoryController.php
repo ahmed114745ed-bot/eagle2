@@ -60,9 +60,9 @@ class SuperadminBannerHistoryController extends MainController
     
         $grid->column('status', __('Status'))->display(function ($status) {
             switch ($status) {
-                case 'pending': return '<span class="text-warning">Pending</span>';
-                case 'approved': return '<span class="text-success">Approved</span>';
-                case 'rejected': return '<span class="text-danger">Rejected</span>';
+                case 'pending': return '<span class="text-warning">'. __('Pending') .'</span>';
+                case 'approved': return '<span class="text-success">'. __('Approved') .'</span>';
+                case 'rejected': return '<span class="text-danger">'. __('Rejected') .'</span>';
                 default: return $status;
             }
         });
@@ -94,7 +94,7 @@ class SuperadminBannerHistoryController extends MainController
                 </button>';
             }
     
-            return $this->status;
+            return __( $this->status);
         });
     
         $grid->disableActions();
