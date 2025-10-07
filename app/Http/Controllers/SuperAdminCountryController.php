@@ -78,8 +78,8 @@ class SuperAdminCountryController extends Controller
             ->orderByDesc('total_sent')
             ->take(3)
             ->with([
-                'sender:id,name,country_id',
-                'sender.profile:id,user_id,avatar'
+                'receiver:id,name,country_id',
+                'receiver.profile:id,user_id,avatar'
             ])
             ->get()
             ->filter(fn($s) => $s->total_sent > 0);
