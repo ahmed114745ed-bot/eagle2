@@ -7,32 +7,46 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\HomeCarouselResource;
 use App\Models\HomeCarousel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
+    
         $user = Auth::user();
-        $displayAt = request('display_at');
+        $displayType = $request->get('display_type'); 
+        $timezone = getTimezone();
+        $now = Carbon::now($timezone);
+        $offset = $now->format('P');
 
-        if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->hasHeader('x-notification-id')) {
+        if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->header('x-notification-id')) {
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
-        $items = HomeCarousel::query()->with('user','room','generalRole','countriesLite')
-                ->when($displayAt, function ($q) use ($displayAt) {
-                    $q->where(function ($sub) use ($displayAt) {
-                        $sub->where('display_at', $displayAt) // دعم القديم
-                            ->orWhereJsonContains('display_at', $displayAt); // دعم الجديد
-                    });
-                })
+        $items = HomeCarousel::query()
+            ->with(['user', 'room', 'generalRole', 'countriesLite'])
             ->where('enable', 1)
-            ->orderBy('sort')
+
+            ->when($displayType, function ($q) use ($displayType, $now, $offset) {
+                $q->whereHas('displays', function ($sub) use ($displayType, $now, $offset) {
+                    $sub->where('display_type', $displayType)
+                        ->where(function ($inner) use ($now, $offset) {
+                            $inner->whereRaw("
+                                CONVERT_TZ(end_at, '+00:00', ?) > ?
+                            ", [$offset, $now]);
+                        });
+                });
+            })
+
             ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
+            ->orderBy('sort')
             ->get();
 
         return Common::apiResponse(1, '', HomeCarouselResource::collection($items));
+    
     }
 }
+
