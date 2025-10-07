@@ -473,7 +473,13 @@ class WareTabController extends MainController
 
                 // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
-                    Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
+                    /** @var FileService $fileService*/
+                    $fileService = app(new FileService());
+                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
+
+                    $form->input('detected_profile_frame_type', $ext);
+                    $form->profile_frame_type = $ext;
+                    /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
                         'original_name' => $img2->getClientOriginalName(),
                         'original_extension' => $img2->getClientOriginalExtension(),
                         'mime_type' => $img2->getMimeType(),
@@ -505,7 +511,7 @@ class WareTabController extends MainController
                     // /** @var FileService $fileService*/
                     // $fileService = app(FileService::class);
                     // $extFromService = $fileService->getExtension($img2, $wareId, getFromService: true);
-                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);
+                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);*/
                 }
             });
         }
