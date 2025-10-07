@@ -84,16 +84,15 @@ class SuperAdminCountryController extends Controller
             ->get()
             ->filter(fn($s) => $s->total_sent > 0);
 
-        $topAgencies = Agency::
-//        where('country_id', $countryID)
-            withCount('members')
+        $topAgencies = Agency::where('country_id', $countryID)
+            ->withCount('members')
             ->orderByDesc('members_count')
             ->take(3)
             ->get(['id', 'name']);
 
         $topChargeAgencies = Charge::where('charger_type', 'agency')
             ->whereHas('senderShippingAgency', function ($q) use ($countryID) {
-//                $q->where('country_id', $countryID);
+                $q->where('country_id', $countryID);
             })
             ->whereBetween('created_at', [$from, $to])
             ->with([
@@ -104,21 +103,21 @@ class SuperAdminCountryController extends Controller
             ->get();
 
         $topBds = Bd::whereHas('agencies', function ($a) use ($countryID) {
-//            $a->where('country_id', $countryID)
-//                ->whereHas('members');
+            $a->where('country_id', $countryID)
+                ->whereHas('members');
         })
             ->withCount(['agencies as total_members' => function ($agency) use ($countryID) {
-//                $agency->where('country_id', $countryID)
-//                    ->withCount('members');
+                $agency->where('country_id', $countryID)
+                    ->withCount('members');
             }])
             ->orderByDesc('total_members')
             ->take(3)
             ->get(['id', 'name']);
 
         $topGamers = CoinGameUser::query()
-//            ->whereBetween('created_at', [$from, $to])
+            ->whereBetween('created_at', [$from, $to])
             ->where('type', 1)
-//            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
             ->with([
                 'user:id,name,country_id',
                 'user.profile:id,user_id,avatar'
