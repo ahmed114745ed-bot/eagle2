@@ -15,7 +15,7 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
-    "Price for 1 day": "Price for one hour!"و
+    "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
     "Create Ticket": "Create Complaint",
     "delete Ticket": "delete Complaint ",
@@ -1200,6 +1200,9 @@
     "Interval (days)": "Interval (days)",
     "wait-2-minutes" : "please wait 2 minutes",
   "roomTarget": "Room Cup Target: Gifts and visitors help reach the target. When reached, the room owner and admins receive coin profits.",
+
+
+
   "dashboard.login.loading.check_code":"check code ...",
   "change password": "Change Password",
   "please enter new password": "Please enter new password",
