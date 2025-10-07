@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Helpers\LogHelper;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -48,9 +49,10 @@ class FileService
                 'image',
                 Storage::disk('gcs')->get($imagePath),
                 $wareId.'.jpg'
-            )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+            )->post('https://dashboard.utdsoftware.com/api/analyze-media');
 
             $responseData = $response->json();
+            LogHelper::info('This image ', ["imagePath" => $imagePath, '$responseData' => $responseData]);
 
             if ($response->successful() && isset($responseData['data']['video_type'])) {
                 $ext = mb_strtolower(explode('-', $responseData['data']['video_type'])[0]);
