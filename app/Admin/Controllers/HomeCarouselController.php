@@ -76,14 +76,14 @@ class HomeCarouselController extends MainController
     
         $grid->id(__('ID'));
             $grid->column('img', __('img'))->image('', 235, 77);
-            $grid->column('url', __('url'))->url();
-
+            // $grid->column('url', __('url'))->url();
+         
             $types = [
-                'displayDiscover' => 'discover',
-                'displayHomeTop'  => 'home_top',
-                'displayHomeMiddle'=> 'home_middle',
-                'displayLive'     => 'live',
-                'displayCountry'  => 'country',
+                'displayDiscover' => __('Display Discover'),
+                'displayHomeTop'  => __('Display Home Top'),
+                'displayHomeMiddle'=> __('Display Home Middle'),
+                'displayLive'     => __('Display Live'),
+                'displayCountry'  => __('country'),
             ];
 
             foreach ($types as $attr => $type) {
@@ -98,8 +98,8 @@ class HomeCarouselController extends MainController
             }
 
 
-        $grid->column('enable', __('Enable'))->switch();
-        $grid->column('sort', __('Sort'))->editable();
+        $grid->column('enable', __('enable'))->switch();
+        $grid->column('sort', __('sort'))->editable();
     
         return $grid;
     }
@@ -155,7 +155,7 @@ class HomeCarouselController extends MainController
      {
          $form->display(__('admin.ID'));
          $form->number('sort', __('sort'));
-        //  $form->image('img', trans('img'))->setResolution(80)->required();
+         $form->image('img', trans('img'))->setResolution(80)->required();
          $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
      }
      

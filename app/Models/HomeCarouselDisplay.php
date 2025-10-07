@@ -79,16 +79,38 @@ class HomeCarouselDisplay extends Model
     {
         parent::boot();
 
+      
         self::creating(function ($model) {
-            // dd($model);
-        });
+            $model->created_at = $model->created_at ?? Carbon::now();
 
-        self::saving(function ($model) {
-            // dd($model);
+            if (!$model->end_at) {
+                $endAt = clone $model->created_at;
+
+                match ($model->duration_unit) {
+                    'hours'  => $endAt->addHours($model->duration),
+                    'days'   => $endAt->addDays($model->duration),
+                    'months' => $endAt->addMonths($model->duration),
+                    default  => $endAt->addHours($model->duration),
+                };
+
+                $model->end_at = $endAt;
+            }
         });
 
         self::updating(function ($model) {
-        //   dd($model);
+            if ($model->isDirty(['duration', 'duration_unit'])) {
+                $startAt = $model->created_at ?? Carbon::now();
+                $endAt = clone $startAt;
+
+                match ($model->duration_unit) {
+                    'hours'  => $endAt->addHours($model->duration),
+                    'days'   => $endAt->addDays($model->duration),
+                    'months' => $endAt->addMonths($model->duration),
+                    default  => $endAt->addHours($model->duration),
+                };
+
+                $model->end_at = $endAt;
+            }
         });
     }
 }
