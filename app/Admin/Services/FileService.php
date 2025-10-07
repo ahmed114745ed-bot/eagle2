@@ -20,9 +20,7 @@ class FileService
     {
 
         if ($wareId == null) $wareId = \Str::random(10);
-        $urlVideo = $img2->path();
-
-        LogHelper::info("this video path ", $urlVideo);
+        $urlVideo = upload($img2);
 
         $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
         $allowedImageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'svg', 'heic', 'heif'];
@@ -67,6 +65,7 @@ class FileService
             ]);
         }
 
+        deleteFile($urlVideo);
         return $ext;
     }
 }
