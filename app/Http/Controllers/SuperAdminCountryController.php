@@ -73,8 +73,8 @@ class SuperAdminCountryController extends Controller
             $q->where('country_id', $countryID)
         )
             ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('sender_id')
+            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_sent')
+            ->groupBy('receiver_id')
             ->orderByDesc('total_sent')
             ->take(3)
             ->with([
