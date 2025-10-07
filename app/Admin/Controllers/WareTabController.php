@@ -536,8 +536,10 @@ class WareTabController extends MainController
             $model = $form->model();
             if ($form->img2 instanceof UploadedFile) {
                 $originalName = $form->img2->getClientOriginalName();
-                info('form image', [$form->img2]);
-                info('originalName', [$originalName]);
+
+                $path = $form->img2->storeAs('images', $originalName, 'public');
+                $url = Storage::disk('public')->url('images/' . $originalName);
+
                 $model->update(['img2' => $originalName]);
             }
 
