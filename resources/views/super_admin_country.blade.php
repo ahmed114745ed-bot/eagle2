@@ -999,15 +999,15 @@
         <div class="top-section">
             <h3 class="section-title">🎤 {{ __('Top 3 Star Hosts') }} ⭐</h3>
             <div class="top-list">
-                @foreach($topAgencySenders as $index => $topAgencySender)
+                @foreach($topReceivers as $index => $topReceiver)
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topAgencySender->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                             style="background-image:url('{{ getImagePath($topReceiver->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
                                 background-size:cover;background-position:center;">
                         </div>
-                        <div class="top-name">{{ $topAgencySender->sender->name }}</div>
-                        <div class="top-value">{{ number_format($topAgencySender->total_sent / 1000, 1) }}K 💎</div>
+                        <div class="top-name">{{ $topReceiver->sender->name }}</div>
+                        <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
                     </div>
                 @endforeach
             </div>

@@ -60,11 +60,10 @@ class SuperAdminCountryController extends Controller
             ->take(3)
             ->get(['id', 'name']);
 
-        $topAgencySenders = GiftLog::whereHas(
-            'sender',
+        $topReceivers = GiftLog::whereHas(
+            'receiver',
             fn($q) =>
             $q->where('country_id', $countryID)
-                ->whereHas('agency', fn($a) => $a->where('country_id', $countryID))
         )
             ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
             ->groupBy('sender_id')
