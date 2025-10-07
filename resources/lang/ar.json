@@ -4093,14 +4093,21 @@
 "insufficient_balance": "رصيدك غير كافي!",
 "request_sent_success": "تم إرسال الطلب بنجاح وتم خصم الرصيد!" ,
 "Confirm Deduction": "تأكيد الخصم",
-    "coins will be deducted to send the display request: ": "سيتم خصم :count كوينز لإرسال طلب العرض: "
+    "coins will be deducted to send the display request: ": "سيتم خصم  كوينز لإرسال طلب العرض: "
 ,"Yes, deduct and send request": "نعم، خصم وأرسل الطلب",
 "Cancel": "إلغاء",
 "Done!": "تم!",
 "An error occurred while processing": "حدث خطأ أثناء تنفيذ العملية",
 "Error": "خطأ",
 "History": "السجل",
-"SweetAlert2 is not loaded!": "لم يتم تحميل SweetAlert2!"
+"SweetAlert2 is not loaded!": "لم يتم تحميل SweetAlert2!",
+"request_sent_success": "تم إرسال طلب العرض بنجاح.",
+"insufficient_balance": "رصيدك غير كافٍ لإتمام هذا الطلب.",
+"A display of this type is already active for this banner.": "يوجد بالفعل عرض نشط من نفس النوع لهذا البنر.",
+"You already have a pending request for this banner and display type.": "لديك بالفعل طلب معلق لهذا البنر ولنفس نوع العرض.",
+"confirm_resend": "تأكيد إعادة الإرسال",
+    "deduct_text": "سيتم خصم العملات لإعادة إرسال طلب البانر:"
+
 
 
 

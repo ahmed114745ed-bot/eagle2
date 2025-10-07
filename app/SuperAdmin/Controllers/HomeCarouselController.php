@@ -88,8 +88,7 @@ class HomeCarouselController extends MainController
         $grid->column('img', __('Image'))->image('', 235, 77);
     
         $grid->column('actions', __('Actions'))->display(function () {
-
-           
+    
             $types = [
                 'display_discover' => __('Display Discover'),
                 'display_home_top' => __('Display Home Top'),
@@ -102,7 +101,6 @@ class HomeCarouselController extends MainController
                 $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
                                 data-id="' . $this->id . '" 
                                 data-type="' . $type . '">
-
                                 <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
             }
@@ -111,15 +109,17 @@ class HomeCarouselController extends MainController
     
         $grid->disableExport();
         $grid->disableActions();
-        $display_discover = SuperAdminHelper::getHourlyBannerPrice('display_discover');
-        $display_home_top = SuperAdminHelper::getHourlyBannerPrice('display_home_top');
-        $display_home_middle = SuperAdminHelper::getHourlyBannerPrice('display_home_middle');
-        $display_live = SuperAdminHelper::getHourlyBannerPrice('display_live');
-
-
+    
+        $display_prices = [
+            'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
+            'display_home_top' => SuperAdminHelper::getHourlyBannerPrice('display_home_top'),
+            'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
+            'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
+        ];
+    
         $translations = [
             'confirm_deduction' => __('Confirm Deduction'),
-            'deduct_text' => __('coins will be deducted to send the display request: ', ['count' =>  '']),
+            'deduct_text' => __('coins will be deducted to send the display request: '),
             'yes_deduct' => __('Yes, deduct and send request'),
             'cancel' => __('Cancel'),
             'done' => __('Done!'),
@@ -131,67 +131,73 @@ class HomeCarouselController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
-                // 'display_country' => __('عرض الدولة'),
             ],
         ];
-        
+        $translationsJson = json_encode($translations);
+        $displayPricesJson = json_encode($display_prices);
         Admin::script("
-        const translations = " . json_encode($translations) . ";
-        const display_discover = " . $display_discover . ";
-        const display_home_top = " . $display_home_top . ";
-        const display_home_middle = " . $display_home_middle . ";
-        const display_live = " . $display_live . ";
+        const translations = $translationsJson;
+        const display_prices = $displayPricesJson;
 
         function bindBannerRequestButtons() {
             $(document).off('click', '.request-banner').on('click', '.request-banner', function() {
                 var bannerId = $(this).data('id');
                 var displayType = $(this).data('type');
                 var displayLabel = translations.display_types[displayType] || displayType;
-                var deductAmount = 0;
+                var deductAmount = display_prices[displayType] || 0;
 
-                switch(displayType) {
-                    case 'display_discover':
-                        deductAmount = display_discover;
-                        break;
-                    case 'display_home_top':
-                        deductAmount = display_home_top;
-                        break;
-                    case 'display_home_middle':
-                        deductAmount = display_home_middle;
-                        break;
-                    case 'display_live':
-                        deductAmount = display_live;
-                        break;
-                    default:
-                        deductAmount = 0;
-                        break;
-                }
-
- 
                 if (typeof Swal === 'undefined') {
                     alert(translations.sweetalert_missing);
                     return;
                 }
-                 var message = translations.deduct_text.replace(':count', deductAmount) + deductAmount + 'coins';
-
                 Swal.fire({
                     title: translations.confirm_deduction,
-                    text: message,
-                    icon: 'warning',
+                    html: '<p id=\"deduct_message\">' + translations.deduct_text + ' ' + deductAmount + ' coins per hour</p>' +
+                        '<label>' + displayLabel + ' Hours:</label>' +
+                        '<input type=\"number\" id=\"banner_hours\" class=\"swal2-input\" min=\"1\" value=\"1\">',
+                    type: 'warning', // في الإصدارات الحديثة استعمل icon بدل type
                     showCancelButton: true,
                     confirmButtonText: translations.yes_deduct,
-                    cancelButtonText: translations.cancel
+                    cancelButtonText: translations.cancel,
+                    onOpen: function() { // بدل didOpen
+                        var hoursInput = document.getElementById('banner_hours');
+                        var message = document.getElementById('deduct_message');
+
+                        hoursInput.addEventListener('input', function() {
+                            var hours = parseFloat(hoursInput.value);
+                            if (isNaN(hours) || hours < 1) hours = 1;
+                            var total = hours * deductAmount;
+                            message.textContent = translations.deduct_text + ' ' + total + ' coins';
+                        });
+                    },
+                    preConfirm: function() {
+                        var hours = parseInt(document.getElementById('banner_hours').value);
+                        if (isNaN(hours) || hours < 1) {
+                            Swal.showValidationMessage('Please enter a valid number of hours');
+                            return false;
+                        }
+                        return hours;
+                    }
+
+
                 }).then((result) => {
                     if (result.value) {
+                        const hours = result.value;
+                        const totalDeduct = hours * deductAmount;
                         $.ajax({
                             url: '/superadmin/banner-request/' + bannerId,
                             type: 'POST',
-                            data: { _token: LA.token, field: displayType },
+                            data: { 
+                                _token: LA.token, 
+                                field: displayType,
+                                hours: hours,
+                                total: totalDeduct
+                            },
                             success: function(response) {
                                 Swal.fire({
                                     title: translations.done,
                                     text: response.message,
-                                    icon: 'success'
+                                    type: 'success'
                                 }).then(() => { $.pjax.reload('#pjax-container'); });
                             },
                             error: function(xhr) {
@@ -203,17 +209,20 @@ class HomeCarouselController extends MainController
                 });
             });
         }
-    
+
         $(function() { bindBannerRequestButtons(); });
         $(document).on('pjax:complete', function() { bindBannerRequestButtons(); });
     ");
-    $grid->tools(function (Tools $tools) {
 
-        $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
-
-    });
+        
+        
+        $grid->tools(function (Tools $tools) {
+            $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+        });
+    
         return $grid;
     }
+    
     
     
     
@@ -307,30 +316,136 @@ class HomeCarouselController extends MainController
 
 
 
-     public function storeBannerRequest(HomeCarousel $banner, Request $request)
+     public function storeBannerRequest($bannerId, Request $request)
+     {
+         $banner = HomeCarousel::findOrFail($bannerId);
+         $user   = auth()->user();
+         $field  = $request->field;
+         $hours  = $request->hours;
+         
+     
+         if ($this->hasActiveDisplay($banner, $field)) {
+             return $this->errorResponse(__('A display of this type is already active for this banner.'));
+         }
+     
+         if ($this->hasPendingRequest($user, $banner, $field)) {
+             return $this->errorResponse(__('You already have a pending request for this banner and display type.'));
+         }
+     
+         $totalDeduct = $this->calculateDeduction($request, $field);
+     
+         if ($user->di < $totalDeduct) {
+             return $this->errorResponse(__('insufficient_balance'));
+         }
+     
+         $this->processBannerRequest($user, $banner, $field, $totalDeduct ,$hours);
+     
+         return response()->json(['message' => __('request_sent_success')]);
+     }
+     
+     protected function hasActiveDisplay($banner, $field)
+     {
+         return $banner->displays()
+             ->where('display_type', $field)
+             ->where(function ($q) {
+                 $q->where('end_at', '>', now())
+                   ->orWhereNull('end_at');
+             })
+             ->exists();
+     }
+     
+     protected function hasPendingRequest($user, $banner, $field)
+     {
+         return SuperadminBannerRequest::where('user_id', $user->id)
+             ->where('home_carousel_id', $banner->id)
+             ->where('notes', $field)
+             ->where('status', 'pending')
+             ->exists();
+     }
+     
+     protected function calculateDeduction(Request $request, $field)
+     {
+         $hours       = (int) $request->input('hours', 1);
+         $hourlyPrice = SuperAdminHelper::getHourlyBannerPrice($field);
+         return $hours * $hourlyPrice;
+     }
+     
+     protected function processBannerRequest($user, $banner, $field, $totalDeduct ,$hours)
+     {
+         \DB::transaction(function () use ($user, $banner, $field, $totalDeduct,$hours) {
+             $user->decrement('di', $totalDeduct);
+     
+             SuperadminBannerRequest::create([
+                 'user_id'          => $user->id,
+                 'home_carousel_id' => $banner->id,
+                 'coins_deducted'   => $totalDeduct,
+                 'status'           => 'pending',
+                 'notes'            => $field,
+                 'hours'            => $hours,
+             ]);
+         });
+     }
+     
+     protected function errorResponse($message)
+     {
+         return response()->json(['message' => $message], 422);
+     }
+    
+
+     
+     
+     public function resendBannerRequest($bannerId, Request $request)
     {
+        $bannerRequest = $this->getLatestBannerRequest($bannerId);
         $user = auth()->user();
-        $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner,$request->field);
 
-
-        if ($user->di < $deductAmount) {
-            return response()->json(['message' => __('insufficient_balance')], 422);
+        if (!$bannerRequest) {
+            return $this->errorResponse(__('No previous banner request found.'));
         }
 
-        \DB::transaction(function () use ($user, $banner, $request, $deductAmount) {
-            $user->di -= $deductAmount;
-            $user->save();
+        $field = $bannerRequest->notes;
+        $hours = (int) ($bannerRequest->hours ?? 1);
+        $totalDeduct = $this->calculateDeductionForResend($field, $hours);
 
-            SuperadminBannerRequest::create([
-                'user_id' => $user->id,
-                'home_carousel_id' => $banner->id,
-                'coins_deducted' => $deductAmount,
-                'status' => 'pending',
-                'notes' => $request->field,
+        if ($user->di < $totalDeduct) {
+            return $this->errorResponse(__('insufficient_balance'));
+        }
+
+        $this->processResendRequest($user, $bannerRequest, $totalDeduct);
+
+        return response()->json(['message' => __('Banner request resent successfully.')]);
+    }
+
+    protected function getLatestBannerRequest($bannerId)
+    {
+        return SuperadminBannerRequest::where('home_carousel_id', $bannerId)
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->first();
+    }
+
+    protected function calculateDeductionForResend($field, $hours)
+    {
+        $hourlyPrice = SuperAdminHelper::getHourlyBannerPrice($field);
+        return $hours * $hourlyPrice;
+    }
+
+    protected function processResendRequest($user, $bannerRequest, $totalDeduct)
+    {
+        \DB::transaction(function () use ($user, $bannerRequest, $totalDeduct) {
+            $user->decrement('di', $totalDeduct);
+
+            $bannerRequest->update([
+                'status'         => 'pending',
+                'coins_deducted' => $totalDeduct,
+                'created_at'     => now(),
+                'updated_at'     => now(),
             ]);
         });
-
-        return response()->json(['message' => __('request_sent_success')]);
     }
+
+   
+
+     
 }
 

@@ -592,11 +592,25 @@ class AgencyController extends MainController
                     ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
             ->orderByDesc('id');
-        if (request()->has('active')) {
-            $grid->model()->whereHas('agencySalaries', function ($q) {
+
+        if (request("active") == true) {
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
                     ->where('year', now()->year);
             });
+        }
+
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
         }
 
         // --- Agency name column ---
