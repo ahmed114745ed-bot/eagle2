@@ -16,8 +16,7 @@ use Illuminate\Log\LogManager;
 use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
 use Illuminate\Pagination\Paginator;
-use App\Repositories\RankingRepository;
-
+use App\Repositories\RankingRepositoryV2;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
@@ -31,13 +30,12 @@ use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 
-class RankingService
+class rankingServiceV2
 {
     protected $rankingRepo, $cpRepository;
-
     
     public function __construct(
-        RankingRepository $rankingRepo,
+        RankingRepositoryV2 $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementService $achievementService,
