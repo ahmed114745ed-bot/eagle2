@@ -181,7 +181,7 @@ if (!function_exists('upload')) {
         $extension      = $file->getClientOriginalExtension();
         $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
         $file->storeAs('videos', $uniqueFileName, 'gcs');
-        return 'videos/' . $uniqueFileName;
+        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
     }
 }
 
