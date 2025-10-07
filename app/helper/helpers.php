@@ -180,10 +180,8 @@ if (!function_exists('upload')) {
     {
         $extension      = $file->getClientOriginalExtension();
         $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
-        $path = $file->storeAs('videos', $uniqueFileName, 'gcs');
-
-        return Storage::disk('gcs')->url($path);
-//        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
+        $file->storeAs('videos', $uniqueFileName, 'gcs');
+        return 'videos/' . $uniqueFileName;
     }
 }
 
