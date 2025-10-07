@@ -51,7 +51,7 @@ class GiftLogService
             $data    = $request;
             $user    = $request->user();
             $userId  = $user->id;
-            $ownerId = $data['owner_id'];
+            $ownerId = $data['owner_id'] ?? $data['room_id'];
             $giftId  = $data['id'];
             $number  = $data['num'];
             $type  = $data['type'];
@@ -77,6 +77,11 @@ class GiftLogService
 
             // Get Room Data
             $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+           
+            if (!$room) {
+                $room =  $this->repository->findUserRoomById($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+            }
+            
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
