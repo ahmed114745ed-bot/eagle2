@@ -492,10 +492,6 @@ class WareTabController extends MainController
                         $ext = 'svg';
                     }
 
-                    $originalName = $form->img2->getClientOriginalName();
-                    $safeName = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $originalName);
-                    $path = $form->img2->storeAs('images', $safeName, 'public');
-
                     Log::info('🖼 img2 uploaded - AFTER PROCESSING', [
                         'original_extension' => $originalExt,
                         'guessed_extension' => $guessedExt,
@@ -540,6 +536,10 @@ class WareTabController extends MainController
             $model = $form->model();
             if ($form->img2 instanceof UploadedFile) {
                 $originalName = $form->img2->getClientOriginalName();
+
+                $originalName = $form->img2->getClientOriginalName();
+                $path = $form->img2->storeAs('images', $originalName, 'public');
+                $url = Storage::disk('public')->url('images/' . $originalName);
 
                 $model->update(['img2' => $originalName]);
             }
