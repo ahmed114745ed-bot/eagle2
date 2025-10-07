@@ -77,7 +77,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
 
 Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => '', 'middleware' => [
     'web',
-    'admin',
+   // 'admin',
     'multiLanguage',
 ], 'as' => config('admin.route.prefix') . '.',], function () {
     Route::post('login', App\Admin\Controllers\Preview\AuthController::class . '@postLogin');
