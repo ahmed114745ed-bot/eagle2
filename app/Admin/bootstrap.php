@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Schema;
 //Admin::js('/packages/customization/js/main.js');
 
 Admin::favicon(getFavIcon());
-
+\App\Helpers\LogHelper::info('This fac', getFavIcon());
 
 Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));
