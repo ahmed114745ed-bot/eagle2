@@ -80,8 +80,8 @@
 
                 @if ($showCountriesSelect)
                     <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
-                        <select id="country-select" class="form-control" style="width:200px;">
-                            <option value="">Select Country...</option>
+                        <select id="country-select" class="form-control" style="width:190px;">
+                            <option value="">{{ __('Select Country...') }}</option>
                             @foreach($countries as $currentCountry)
                                 <option value="{{ $currentCountry->id }}"
                                     {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
@@ -89,12 +89,6 @@
                                 </option>
                             @endforeach
                         </select>
-
-                        @if ($selectedCountry)
-                            <span id="country-name" style="font-weight:600;">{{ $selectedCountry->name }}</span>
-                        @else
-                            <span id="country-name" style="font-weight:600; color:#999;">No country selected</span>
-                        @endif
                     </li>
 
                     <script> window.enableCountryHeader = true; </script>
@@ -116,7 +110,7 @@
 
         if ($countrySelect.length) {
             $countrySelect.select2({
-                placeholder: 'Select Country',
+                placeholder: "{{ __('Select Country') }}",
                 allowClear : true
             });
 
@@ -153,3 +147,12 @@
         };
     });
 </script>
+
+<style>
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 25px;
+    }
+    .rtl .select2-container--default .select2-selection--single .select2-selection__clear{
+        left: 5px !important;
+    }
+</style>

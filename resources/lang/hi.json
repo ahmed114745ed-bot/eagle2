@@ -19,6 +19,8 @@
     "Sorry, you can only manage users in your own country.": "क्षमा करें, आप केवल अपने देश के उपयोगकर्ताओं का प्रबंधन कर सकते हैं।",
     "Delete profile switch users": "प्रोफ़ाइल स्विच उपयोगकर्ताओं को हटाएं",
     "Dedicated successfully": "सफलतापूर्वक समर्पित किया गया",
+    "Select Country...": "देश चुनें...",
+    "Select Country": "देश चुनें",
 "Something went wrong": "कुछ गलत हो गया",
 "Select Super Admins": "सुपर एडमिन चुनें",
     "Profile Images": "प्रोफ़ाइल छवियाँ",
