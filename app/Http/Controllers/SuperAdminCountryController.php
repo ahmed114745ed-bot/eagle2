@@ -116,7 +116,7 @@ class SuperAdminCountryController extends Controller
             ->get(['id', 'name']);
 
         $topGamers = CoinGameUser::query()
-            ->whereBetween('created_at', [$from, $to])
+//            ->whereBetween('created_at', [$from, $to])
             ->where('type', 1)
 //            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
             ->with([
