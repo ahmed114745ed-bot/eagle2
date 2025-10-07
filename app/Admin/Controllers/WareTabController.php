@@ -534,10 +534,8 @@ class WareTabController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            if ($form->img2 instanceof UploadedFile) {
+            if ($form->isCreating() && $form->img2 instanceof \Illuminate\Http\UploadedFile) {
                 $originalName = $form->img2->getClientOriginalName();
-                info('form image', [$form->img2]);
-                info('originalName', [$originalName]);
                 $model->update(['img2' => $originalName]);
             }
 
