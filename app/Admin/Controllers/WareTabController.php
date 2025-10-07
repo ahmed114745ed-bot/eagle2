@@ -476,7 +476,7 @@ class WareTabController extends MainController
                 if ($img2 instanceof UploadedFile) {
                     /** @var FileService $fileService*/
                     $fileService = app(new FileService());
-                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
+                    $ext = (new FileService)->getExtension($img2, $wareId, getFromService: true);
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
