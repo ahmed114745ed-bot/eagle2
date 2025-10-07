@@ -117,6 +117,34 @@ function getTranslatedUsedWare()
         28 => __('profile frame'),
     ];
 }
+
+function getTranslatedWare()
+{
+    return [
+        1  => __('Gemstone'),
+        3  => __('Card Scroll'),
+        4  => __('Avatar Frame'),
+        5  => __('Bubble Frame'),
+        6  => __('Entering Special Effects'),
+        7  => __('Microphone Aperture'),
+        8  => __('Badge'),
+        9  => __('NoKick'),
+        10 => __('Icon'),
+        11 => __('Intro Animation'),
+        12 => __('Wapel'),
+        13 => __('Hide Country'),
+        14 => __('VIP Gifts'),
+        15 => __('No Pan'),
+        16 => __('Hidden Room'),
+        17 => __('Anonymous Man'),
+        18 => __('Colored Name'),
+        19 => __('Profile Visitors Hidden'),
+        20 => __('Hide Last Active'),
+        21 => __('Sound Effect'),
+        22 => __('Upload GIF Image'),
+    ];
+}
+
 const PACK_USER =
 [
     4 => 'Avatar Frame',

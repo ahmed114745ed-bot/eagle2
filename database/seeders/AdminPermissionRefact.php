@@ -173,6 +173,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 8,
                 'permissions' => [
                     ['key' => 'banner', 'except' => [], 'additional' => []],
+                    ['key' => 'banner-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'splash', 'except' => [], 'additional' => []],
                     ['key' => 'official-messages', 'except' => [], 'additional' => []],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => []],
@@ -302,6 +303,7 @@ class AdminPermissionRefact extends Seeder
 
                     ['key' => 'gift', 'except' => [], 'additional' => []],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => []],
+                    ['key' => 'lucky-gift-setting', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => []],
                 ],
             ],
             [
@@ -447,12 +449,21 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
+
             [
-                'name' => 'Super Admin',
-                'sort' => 36,
+                'name' => 'reward',
+                'sort' => 37,
                 'permissions' => [
-                    ['key' => 'superadmin', 'except' => [], 'additional' => []],
-                    ['key' => 'superadmin-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                    ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+
+                ],
+            ],
+            [
+                'name' => 'Milestone',
+                'sort' => 38,
+                'permissions' => [
+                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
+
                 ],
             ],
         ];
