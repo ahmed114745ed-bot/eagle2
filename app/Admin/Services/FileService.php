@@ -19,6 +19,7 @@ class FileService
     public static function getExtension(UploadedFile $img2, mixed $wareId, bool $getFromService = false): ?string
     {
 
+        if ($wareId == null) $wareId = \Str::random(10);
         $urlVideo = upload($img2);
 
         $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
