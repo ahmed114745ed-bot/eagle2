@@ -22,7 +22,11 @@ class HomeCarousel extends Model
         'display_home_middle' => 'integer',
         'display_live' => 'integer',
         'display_country' => 'integer',
+        'display_at' => 'array',
+
     ];
+
+    
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');

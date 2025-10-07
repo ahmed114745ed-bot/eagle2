@@ -251,69 +251,122 @@ class HomeCarouselController extends MainController
      protected function form()
      {
          $form = new Form(new HomeCarousel);
+     
          $this->disableFormTools($form);
-
-         $form->number('sort', __('sort'));
-         $form->imagePath('img', trans('img'))->setResolution(80)->required();
-         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-
-         $form->select('form', trans('time view type'))->options([
-             0 => __(''),
-             1 => __('hours'),
-             2 => __('days'),
-             3 => __('month')
-         ])->when(1, fn(Form $form) => $form->text('input', trans('input')))
-           ->when(2, fn(Form $form) => $form->text('input', trans('input')))
-           ->when(3, fn(Form $form) => $form->text('input', trans('input')));
-
-         $form->select('type', trans('type'))
-             ->options([
-                 'room'   => __('Room'),
-                 'normal' => __('normal'),
-                 'link'   => __('url'),
-                 'event'  => __('events')
-             ])
-             ->when('room', fn(Form $form) =>
-                 $form->select('owner_id', __('owner'))
-                     ->options('/api/search/users2')
-                     ->ajax('/api/search/users2', 'id', 'name')
-             )
-             ->when('link', fn(Form $form) =>
-                 $form->url('url', trans('url'))->rules('required|url')
-             )
-             ->when('event', fn(Form $form) =>
-                 $form->select('event_type', trans('events'))
-                     ->options([
-                         'event'        => __('events'),
-                         'pk_event'     => __('pk_event'),
-                         'weekly_star'  => __('weekly_star'),
-                         'charge_event' => __('charge_event'),
-                         'event_period' => __('event_period'),
-                         'weekly_cp'    => __('weekly_cp'),
-                     ])
-                     ->when('event', fn(Form $form) => $form->url('url', trans('url')))
-             );
-
-         $form->hidden('display_at')->default(json_encode(['country']));
-
-         $form->hidden('countries');
-
-         $form->saving(function (Form $form) {
-             $form->model()->display_at = json_encode(['country']);
-             $form->model()->display_country = 1;
-             $form->display_country = 1;
-         });
-
-         $form->saved(function (Form $form) {
-             $userCountryId = auth()->user()->country_id ?? null;
-             if ($userCountryId) {
-                 $form->model()->countries()->sync([$userCountryId]);
-             }
-         });
-
+     
+         $this->addBasicFields($form);
+         $this->addTimeSettings($form);
+         $this->addContentType($form);
+         $this->addCountryDisplay($form);
+     
+         $this->syncCountryDisplayBeforeSave($form);
+         $this->syncCountryRelationsAfterSave($form);
+     
          return $form;
      }
-
+     
+   
+     protected function addBasicFields(Form $form)
+     {
+         $form->display(__('admin.ID'));
+         $form->number('sort', __('Sort'))->default(1);
+        //  $form->image('img', __('Image'))->uniqueName()->required();
+         $form->switch('enable', __('Enable'))->states(Common::getSwitchStates())->default(true);
+     }
+     
+   
+     protected function addTimeSettings(Form $form)
+     {
+         $form->select('form', __('Time View Type'))->options([
+             0 => __(''),
+             1 => __('Hours'),
+             2 => __('Days'),
+             3 => __('Months')
+         ])->when('1', fn(Form $form) => $form->number('input', __('Input'))->min(1))
+           ->when('2', fn(Form $form) => $form->number('input', __('Input'))->min(1))
+           ->when('3', fn(Form $form) => $form->number('input', __('Input'))->min(1));
+     }
+     
+    
+     protected function addContentType(Form $form)
+     {
+         $form->select('type', __('Type'))->options([
+             'room'   => __('Room'),
+             'normal' => __('Normal'),
+             'link'   => __('URL'),
+             'event'  => __('Events'),
+         ])->when('room', function (Form $form) {
+             $form->select('owner_id', __('Owner'))
+                 ->options('/api/search/users2')
+                 ->ajax('/api/search/users2', 'id', 'name');
+         })->when('link', function (Form $form) {
+             $form->url('url', __('URL'))->rules('required|url');
+         })->when('event', function (Form $form) {
+             $form->select('event_type', __('Events'))->options([
+                 'event'        => __('events'),
+                 'pk_event'     => __('pk_event'),
+                 'weekly_star'  => __('weekly_star'),
+                 'charge_event' => __('charge_event'),
+                 'event_period' => __('event_period'),
+                 'weekly_cp'    => __('weekly_cp'),
+             ]);
+         });
+     }
+  
+     protected function addCountryDisplay(Form $form)
+     {
+         $form->hidden('display_at')->default(json_encode(['country']));
+     
+         $form->belongsToMany('countries', Countries::class, __('Country'))->required();
+     }
+     
+  
+     protected function syncCountryDisplayBeforeSave(Form $form)
+     {
+         $form->saving(function (Form $form) {
+             $form->model()->display_at = json_encode(['country']);
+             $form->display_at = json_encode(['country']);
+         });
+     }
+     
+   
+     protected function syncCountryRelationsAfterSave(Form $form)
+     {
+         $form->saved(function (Form $form) {
+             $model = $form->model();
+     
+             $formInput = request('input') ?? $model->input ?? 0;
+             $formForm  = request('form') ?? $model->form ?? 1;
+     
+             $unit = match ($formForm) {
+                 1 => 'hours',
+                 2 => 'days',
+                 3 => 'months',
+                 default => 'hours',
+             };
+     
+             $start = now();
+             $endAt = match ($unit) {
+                 'hours'  => $start->copy()->addHours($formInput),
+                 'days'   => $start->copy()->addDays($formInput),
+                 'months' => $start->copy()->addMonths($formInput),
+                 default  => $start->copy()->addHours($formInput),
+             };
+     
+             $display = $model->displays()->firstOrNew(['display_type' => 'country']);
+             $display->fill([
+                 'duration'      => $formInput,
+                 'duration_unit' => $unit,
+                 'created_at'    => $start,
+                 'end_at'        => $endAt,
+             ]);
+             $display->save();
+     
+             $countries = array_filter(request('countries', []));
+             $model->countries()->sync($countries);
+         });
+     }
+     
 
 
      public function storeBannerRequest($bannerId, Request $request)
