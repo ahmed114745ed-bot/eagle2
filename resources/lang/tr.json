@@ -3348,9 +3348,29 @@
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
     "Live System Setting:": "Canlı Sistem Ayarı",
-    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount."
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
 
-
+"Are you sure?": "Emin misiniz?",
+"This action cannot be undone!": "Bu işlem geri alınamaz!",
+"Yes, delete it!": "Evet, sil!",
+"Cancel": "İptal",
+"banner Settings": "Afiş ayarları",
+"Banner Setting": "Afiş ayarı",
+"Price for 1 day": "1 günlük fiyat",
+"Browse banner setting": "Afiş ayarlarını gözat",
+"Timing settings": "Zaman ayarları",
+    "Time zone:": "Zaman dilimi:",
+    "Start of week:": "Hafta başlangıcı:",
+    "End of week:": "Hafta sonu:",
+    "Save": "Kaydet",
+    "Sunday": "Pazar",
+    "Monday": "Pazartesi",
+    "Tuesday": "Salı",
+    "Wednesday": "Çarşamba",
+    "Thursday": "Perşembe",
+    "Friday": "Cuma",
+    "Saturday": "Cumartesi",
+    "Settings updated successfully.": "Ayarlar başarıyla güncellendi."
 
 
 

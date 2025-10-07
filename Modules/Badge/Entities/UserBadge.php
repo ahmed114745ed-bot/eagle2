@@ -3,6 +3,7 @@
 namespace Modules\Badge\Entities;
 
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 
 class UserBadge extends Model
@@ -18,7 +19,12 @@ class UserBadge extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'auth_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where(function ($q) {

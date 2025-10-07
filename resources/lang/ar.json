@@ -2781,6 +2781,14 @@
   "congratulations": "تهانينا",
   "vip_gift_message": "لقد حصلت على مستوى VIP جديد كهدية",
   "default_status":"BD افتراضي",
+ "Are you sure?": "هل أنت متأكد؟",
+"This action cannot be undone!": "لا يمكن التراجع عن هذا الإجراء!",
+"Yes, delete it!": "نعم، احذفه!",
+"Cancel": "إلغاء",
+"banner Settings": "إعدادات البانر",
+"Banner Setting": "إعداد البانر",
+"Browse banner setting": "تصفح إعدادات اللافتة",
+"Price for 1 day": "السعر ليوم واحد !",
 
 
 
@@ -3827,7 +3835,20 @@
 "owner percentage from the lucky gift": "نسبة المالك من هدية الحظ",
 "host percentage from the lucky gift": "نسبة المضيف من هدية الحظ",
 "Lucky Gift Setting": "إعداد هدية الحظ",
-"Browse lucky gift setting": "تصفح إعداد هدية الحظ"
+"Browse lucky gift setting": "تصفح إعداد هدية الحظ",
+"Timing settings": "إعدادات الوقت",
+"Time zone:": "المنطقة الزمنية:",
+"Start of week:": "بداية الأسبوع:",
+"End of week:": "نهاية الأسبوع:",
+"Save": "حفظ",
+"Sunday": "الأحد",
+"Monday": "الاثنين",
+"Tuesday": "الثلاثاء",
+"Wednesday": "الأربعاء",
+"Thursday": "الخميس",
+"Friday": "الجمعة",
+"Saturday": "السبت",
+"Settings updated successfully.": "تم تحديث الإعدادات بنجاح."
 
 
 

@@ -50,10 +50,18 @@
     "App Feature": "ऐप सुविधा",
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
+    "banner Settings": "बैनर सेटिंग्स",
+    "Banner Setting": "बैनर सेटिंग",
+"Browse banner setting": "बैनर सेटिंग्स ब्राउज़ करें",
+"Price for 1 day": "1 दिन की कीमत",
 
     "Agencies Count": "एजेंसियों की संख्या",
     "BD Wallet": "बीडी वॉलेट",
     "My Wallet": "मेरा वॉलेट",
+    "Are you sure?": "क्या आप निश्चित हैं?",
+"This action cannot be undone!": "इस क्रिया को पूर्ववत नहीं किया जा सकता!",
+"Yes, delete it!": "हाँ, इसे हटा दें!",
+"Cancel": "रद्द करें",
 
     "App": "एप्लिकेशन",
     "Achievement Id": "उपलब्धि आईडी",
@@ -2929,7 +2937,20 @@
     "Alternative Image": "वैकल्पिक छवि",
     "Live System Setting:": "लाइव सिस्टम सेटिंग",
     "invitation.saved_successfully": "आमंत्रण सेटिंग्स सफलतापूर्वक सहेजी गईं",
-    "invite code": "आमंत्रण कोड"
+    "invite code": "आमंत्रण कोड",
+    "Timing settings": "समय सेटिंग्स",
+    "Time zone:": "समय क्षेत्र:",
+    "Start of week:": "सप्ताह की शुरुआत:",
+    "End of week:": "सप्ताह का अंत:",
+    "Save": "सहेजें",
+    "Sunday": "रविवार",
+    "Monday": "सोमवार",
+    "Tuesday": "मंगलवार",
+    "Wednesday": "बुधवार",
+    "Thursday": "गुरुवार",
+    "Friday": "शुक्रवार",
+    "Saturday": "शनिवार",
+    "Settings updated successfully.": "सेटिंग्स सफलतापूर्वक अपडेट की गईं।"
 
 
 
