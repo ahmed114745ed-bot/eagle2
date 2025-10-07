@@ -38,7 +38,7 @@ class LuckyGiftService
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
-        $ownerId  = $data['owner_id'];
+        $ownerId = $data['owner_id'] ?? $data['room_id'];
         $giftId   = $data['id'];
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
@@ -72,6 +72,14 @@ class LuckyGiftService
             ->where('uid', $ownerId)
             ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
             ->first();
+
+        if (!$room){
+            $room = Room::withoutAppends()
+            ->where('id', $ownerId)
+            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+            ->first();
+        } 
+        
         if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
 
         $roomId   = $room->id;

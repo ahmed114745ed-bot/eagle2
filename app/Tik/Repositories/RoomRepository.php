@@ -95,6 +95,14 @@ class RoomRepository extends AbstractRepository
         return $this->model->withoutAppends()->where(['uid' => $ownerId])->selectRaw($selectRow)->first();
     }
 
+    public function findUserRoomById($ownerId, $selectRow = "*")
+    {
+        return $this->model
+        ->withoutAppends()
+        ->where(['id' => $ownerId])
+        ->selectRaw($selectRow)
+        ->first();
+    }
     public function updateRoom($room)
     {
         $room->update();

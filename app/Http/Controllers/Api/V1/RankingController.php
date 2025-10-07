@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use App\helper\RankingHelper;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use App\Services\RankingService;
+use App\Services\RankingServiceV2;
 use App\Http\Controllers\Controller;
 use Mockery\Exception;
 use Modules\Vip\Services\Api\VipService;
@@ -20,7 +20,7 @@ class RankingController extends Controller
     protected $rankingService;
     protected $userService;
 
-    public function __construct(RankingService $rankingService, UserService $userService)
+    public function __construct(RankingServiceV2 $rankingService, UserService $userService)
     {
         $this->rankingService = $rankingService;
         $this->userService = $userService;
@@ -123,7 +123,7 @@ class RankingController extends Controller
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
-        if (!$request->room_id) {
+        if (!$request->room_id && !$request->roomId) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
