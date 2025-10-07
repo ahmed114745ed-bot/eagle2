@@ -190,6 +190,7 @@
                                 value="{{ $config['discover'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Discover value') }}" required />
+                               <span class="form-text text-muted" > {{ __('Price for 1 day') }}</span>
                         </div>
 
                         <div class="form-group">
@@ -201,6 +202,7 @@
                                 value="{{ $config['home_top'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}"  required/>
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
 
                         
@@ -213,6 +215,7 @@
                                 value="{{ $config['home_middle'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}" required />
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
 
                          <div class="form-group">
@@ -224,6 +227,8 @@
                                 value="{{ $config['live'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}" required />
+                                 
+                                 <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
                         
 
