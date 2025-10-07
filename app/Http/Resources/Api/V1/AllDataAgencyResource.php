@@ -101,8 +101,8 @@ class AllDataAgencyResource extends JsonResource
 //            'members' => MyDataForAgancyNewResource::collection(@$this->mempers),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'admins' => AdminsAgencyResource::collection($this->admins),
-            'star' => ReceiverGiftLogResource::collection($giftLog),
-            'heroes' => SenderGiftLogResource::collection($heroGiftLog),
+            'heroes' => ReceiverGiftLogResource::collection($giftLog),
+            'star' => SenderGiftLogResource::collection($heroGiftLog),
             'bio'               => $this->contents,
         ];
     }
