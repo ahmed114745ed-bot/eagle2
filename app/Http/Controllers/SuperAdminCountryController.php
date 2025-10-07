@@ -110,7 +110,7 @@ class SuperAdminCountryController extends Controller
             'topSenders',
             'topRooms',
             'topAgencies',
-            'topAgencySenders',
+            'topReceivers',
             'topBds',
             'topChargeAgencies',
         ]));
