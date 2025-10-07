@@ -167,10 +167,10 @@ class GiftLogService
 
             if ($room->mode != '1' && $room->mode != '2') {
                 $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
-                $topUser =
+                /*$topUser =
                     $this->roomTopUsersRepository->getRoomTopUser($room->id, ['user' => function ($q) {
                         $q->withoutAppends();
-                    }]);
+                    }]);*/
 
                 /*  $fUser = $topUser?->user;
                   if ($room->top_user_id != $userId) {
@@ -204,7 +204,11 @@ class GiftLogService
 
             if ($totalPrice > $totalGiftPrice) {
                 Log::info('send gift event');
-                $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+                try {
+                    $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+                } catch (\Exception $e) {
+
+                }
             }
             return $message;
         });
