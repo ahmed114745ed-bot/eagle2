@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
@@ -479,6 +480,7 @@ class WareTabController extends MainController
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
+                    LogHelper::info('This ext ', $ext);
                     /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
                         'original_name' => $img2->getClientOriginalName(),
                         'original_extension' => $img2->getClientOriginalExtension(),
