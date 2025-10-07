@@ -29,7 +29,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#file-input-img2').on('change', function (event) {
+        $('#file-input-img2_preview').on('change', function (event) {
             let file = event.target.files[0];
             if (!file) return;
 
