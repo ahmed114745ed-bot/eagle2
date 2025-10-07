@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\ZegoFeatureController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -243,7 +242,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
-         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
+        Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -294,7 +293,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
-         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -310,7 +309,7 @@ Route::group(
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+        Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
@@ -438,7 +437,7 @@ Route::group(
         Route::resource('usersBd-settings', BdSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])
-        ->name('bd.toggle-salary-transfer');
+            ->name('bd.toggle-salary-transfer');
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
@@ -467,9 +466,9 @@ Route::group(
         // Route::prefix('ware-gifts')->group(function () {
 
 
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
@@ -609,8 +608,8 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
+            ->except(['update'])
+            ->names('admin.settings');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -640,7 +639,7 @@ Route::group(
         Route::get('coin-game-users/details', [CoinGameUserAllController::class,'index_details']);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
-    ->name('coin-game-users.ajax');
+            ->name('coin-game-users.ajax');
 
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
