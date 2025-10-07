@@ -72,40 +72,38 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
+        $grid ->model()->with('displays');
     
         $grid->id(__('ID'));
-        $grid->column('img', trans('img'))->image('', 235, 77);
-        $grid->column('url', trans('url'))->url();
+            $grid->column('img', __('img'))->image('', 235, 77);
+            $grid->column('url', __('url'))->url();
 
-        foreach (['display_discover' => 'Display Discover',
-        'display_home_top' => 'Display Home Top',
-        'display_home_middle' => 'Display Home Middle',
-        'display_live' => 'Display Live',
-        'display_country' => 'Display Country'] as $field => $label) {
-  
-            $grid->column($field, __($label))
-                ->switch([
-                    'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
-                    'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
-                ]);
+            $types = [
+                'displayDiscover' => 'discover',
+                'displayHomeTop'  => 'home_top',
+                'displayHomeMiddle'=> 'home_middle',
+                'displayLive'     => 'live',
+                'displayCountry'  => 'country',
+            ];
+
+            foreach ($types as $attr => $type) {
+                $grid->column($attr, ucfirst($type))
+                    ->display(function () use ($type) {
+                        return $this->displays->pluck('display_type')->contains($type) ? 1 : 0; // switch needs 1/0
+                    })
+                    ->switch([
+                        'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
+                        'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
+                    ]);
             }
-        $grid->column('enable', trans('enable'))
-            ->switch(Common::getSwitchStates())
-            ->display(function ($enable) {
-                if ($this->duration > Carbon::now()->timestamp || $this->duration == null) {
-                    return $enable;
-                }
-                return null;
-            });
+
+
+        $grid->column('enable', __('Enable'))->switch();
+        $grid->column('sort', __('Sort'))->editable();
     
-        $grid->column('sort', trans('sort'))->editable();
-    
-        $this->extendGrid($grid);
-        $grid->disableExport();
-    
-        
         return $grid;
     }
+    
 
     /**
      * Make a show builder.
@@ -135,143 +133,228 @@ class HomeCarouselController extends MainController
      * @return Form
      */
 
-        protected function form()
-        {
-            $form = new Form(new HomeCarousel);
-            $this->disableFormTools($form);
-        
-            // hidden fields
-            $form->hidden('display_discover')->default(0);
-            $form->hidden('display_home_top')->default(0);
-            $form->hidden('display_home_middle')->default(0);
-            $form->hidden('display_live')->default(0);
-            $form->hidden('display_country')->default(0);
-        
-            $form->display(__('admin.ID'));
-            $form->number('sort', __('sort'));
-             $form->imagePath('img', trans('img'))->setResolution(80)->required();
+     protected function form()
+     {
+         $form = new Form(new HomeCarousel);
+     
+         $this->disableFormTools($form);
+         $this->addBasicFields($form);
+         $this->addTimeSettings($form);
+         $this->addContentType($form);
+         $this->addDisplayLocations($form);
 
-            $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-       
-            $form->select('form', trans('time view type'))->options([
-                0 => __(''),
-                1 => __('hours'),
-                2 => __('days'),
-                3 => __('month')
-            ])->when(1, function (Form $form) {
-                $form->text('input', trans('input'));
-            })->when(2, function (Form $form) {
-                $form->text('input', trans('input'));
-            })->when(3, function (Form $form) {
-                $form->text('input', trans('input'));
-            });
-        
-            $form->select('type', trans('type'))
-                ->options([
-                    'room'   => __('Room'),
-                    'normal' => __('normal'),
-                    'link'   => __('url'),
-                    'event'  => __('events')
-                ])
-                ->when('room', fn(Form $form) =>
-                    $form->select('owner_id', __('owner'))
-                        ->options('/api/search/users2')
-                        ->ajax('/api/search/users2', 'id', 'name')
-                )
-                ->when('link', fn(Form $form) =>
-                    $form->url('url', trans('url'))->rules('required|url')
-                )
-                ->when('event', fn(Form $form) =>
-                    $form->select('event_type', trans('events'))
-                        ->options([
-                            'event'        => __('events'),
-                            'pk_event'     => __('pk_event'),
-                            'weekly_star'  => __('weekly_star'),
-                            'charge_event' => __('charge_event'),
-                            'event_period' => __('event_period'),
-                            'weekly_cp'    => __('weekly_cp'),
-                        ])
-                        ->when('event', fn(Form $form) => $form->url('url', trans('url')))
-                );
-        
-            // display_at options
-            $form->multipleSelect('display_at', __('Display At'))
-                ->options([
-                    'discover'    => __('Discover'),
-                    'home_top'    => __('Home Top'),
-                    'home_middle' => __('Home Middle'),
-                    'live'        => __('Live'),
-                    'country'     => __('Country'),
-                ])
-                ->rules(['array'])
-                ->attribute('id', 'display_at_select');
-        
-            $form->ignore('display_at');
-            $form->belongsToMany('countries', Countries::class, trans('Country'));
+         $this->syncDisplaysBeforeSave($form);
+         $this->syncCountriesAfterSave($form);
 
-            // $form->multipleSelect('countries', __('Country'))
-            //     ->options(Country::all()->pluck('name', 'id'))
-            //     ->rules(['array'])
-            //     ->attribute('id', 'countries_select');
-        
-
-
-            $form->html('<style>#countries_select { display:none; }</style>');
-        
-            // script to toggle
-            Admin::script("
-                function toggleCountriesField() {
-                    var displayAt = document.getElementById('display_at_select');
-                    var countriesField = document.querySelector('#countries_select').closest('.form-group');
-                    if (!countriesField) return;
-        
-                    var values = Array.from(displayAt.selectedOptions).map(o => o.value);
-                    countriesField.style.display = values.includes('country') ? 'block' : 'none';
-                }
-        
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('display_at_select').addEventListener('change', toggleCountriesField);
-                    toggleCountriesField();
-                });
-            ");
-        
-            // before save
-            $form->saving(function (Form $form) {
-                $displays = request('display_at', []);
-                if (request()->has('display_at')) {
-                    
-        
-                $form->model()->display_discover    = in_array('discover', $displays);
-                $form->display_discover    = in_array('discover', $displays);
-                $form->model()->display_home_top    = in_array('home_top', $displays);
-                $form->display_home_top    = in_array('home_top', $displays);
-                $form->model()->display_home_middle = in_array('home_middle', $displays);
-                $form->display_home_middle = in_array('home_middle', $displays);
-                $form->model()->display_live        = in_array('live', $displays);
-                $form->display_live        = in_array('live', $displays);
-                $form->model()->display_country     = in_array('country', $displays);
-                $form->display_country     = in_array('country', $displays);
-        
-                $form->model()->display_at = json_encode($displays);
-            }
+     
+         return $form;
+     }
+     
+    
+     protected function addBasicFields(Form $form)
+     {
+         $form->display(__('admin.ID'));
+         $form->number('sort', __('sort'));
+        //  $form->image('img', trans('img'))->setResolution(80)->required();
+         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
+     }
+     
+    
+     protected function addTimeSettings(Form $form)
+     {
+        $form->select('form', trans('time view type'))->options([
+            0 => __(''),
+            1 => __('hours'),
+            2 => __('days'),
+            3 => __('months')
+        ])->when('1', function (Form $form) {
+            $form->number('input', trans('input'))->min(1);
+        })->when('2', function (Form $form) {
+            $form->number('input', trans('input'))->min(1);
+        })->when('3', function (Form $form) {
+            $form->number('input', trans('input'))->min(1);
         });
         
-            $form->saved(function (Form $form) {
+     }
+     
+  
+     protected function addContentType(Form $form)
+     {
+         $form->select('type', trans('type'))->options([
+             'room'   => __('Room'),
+             'normal' => __('Normal'),
+             'link'   => __('URL'),
+             'event'  => __('Events')
+         ])->when('room', function (Form $form) {
+             $form->select('owner_id', __('Owner'))
+                 ->options('/api/search/users2')
+                 ->ajax('/api/search/users2', 'id', 'name');
+         })->when('link', function (Form $form) {
+             $form->url('url', trans('url'))->rules('required|url');
+         })->when('event', function (Form $form) {
+             $form->select('event_type', trans('events'))->options([
+                 'event'        => __('events'),
+                 'pk_event'     => __('pk_event'),
+                 'weekly_star'  => __('weekly_star'),
+                 'charge_event' => __('charge_event'),
+                 'event_period' => __('event_period'),
+                 'weekly_cp'    => __('weekly_cp'),
+             ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
+         });
+     }
+     
+ 
+     protected function addDisplayLocations(Form $form)
+     {
+         $form->multipleSelect('display_at', __('Display At'))
+             ->options([
+                 'discover'    => __('Discover'),
+                 'home_top'    => __('Home Top'),
+                 'home_middle' => __('Home Middle'),
+                 'live'        => __('Live'),
+                 'country'     => __('Country'),
+             ])
+             ->rules(['array'])
+             ->attribute('id', 'display_at_select');
+     
+         $form->belongsToMany('countries', Countries::class, trans('Country'));
+     
+         $form->html('<style>#countries_select { display:none; }</style>');
+     
+         Admin::script("
+             function toggleCountriesField() {
+                 var displayAt = document.getElementById('display_at_select');
+                 var countriesField = document.querySelector('#countries_select').closest('.form-group');
+                 if (!countriesField) return;
+                 var values = Array.from(displayAt.selectedOptions).map(o => o.value);
+                 countriesField.style.display = values.includes('country') ? 'block' : 'none';
+             }
+             document.addEventListener('DOMContentLoaded', function() {
+                 document.getElementById('display_at_select').addEventListener('change', toggleCountriesField);
+                 toggleCountriesField();
+             });
+         ");
+     }
+     
+ 
+     protected function syncDisplaysBeforeSave(Form $form)
+     {
+        $form->ignore(['duration']);
 
-                if (request()->has('display_at')) {
-                    $displays = json_decode($form->model()->display_at ?? '[]', true);
+     }
+     
+   
+   
+     protected function syncCountriesAfterSave(Form $form)
+     {
+        $form->saved(function (Form $form) {
+            $types = [
+                'displayDiscover'   => 'discover',
+                'displayHomeTop'    => 'home_top',
+                'displayHomeMiddle' => 'home_middle',
+                'displayLive'       => 'live',
+                'displayCountry'    => 'country',
+            ];
         
-                    if (in_array('country', $displays)) {
-                        $countries = array_filter(request('countries', []));
-                        $form->model()->countries()->sync($countries);
+    
+            $existing = $form->model()->displays()->pluck('display_type')->toArray();
+            $formInput = request('input') ?? $form->model()->input ?? 0;
+            $formForm  = request('form') ?? $form->model()->form ?? 1;
+            $displays =$form->display_at ??$form->model()->display_at;
+           
+            if (!empty($displays)) {
+                $toDelete = array_diff($existing, $displays);
+                if ($toDelete) {
+                    $form->model()->displays()->whereIn('display_type', $toDelete)->delete();
+                }
+    
+                $toAdd = array_diff($displays, $existing);
+              
+                $toAdd = array_filter($toAdd);
+                foreach ($toAdd as $type) {
+                    $display = $form->model()->displays()->where('display_type', $type)->first();
+
+                    if ($display) {
+                        $display->update([
+                            'duration'      => $formInput,
+                            'duration_unit' => match($formForm) {
+                                1 => 'hours',
+                                2 => 'days',
+                                3 => 'months',
+                                default => 'hours',
+                            }
+                        ]);
                     } else {
-                        $form->model()->countries()->detach();
+                        $form->model()->displays()->create([
+                            'display_type'  => $type,
+                            'duration'      => $formInput,
+                            'duration_unit' => match($formForm) {
+                                1 => 'hours',
+                                2 => 'days',
+                                3 => 'months',
+                                default => 'hours',
+                            }
+                        ]);
                     }
                 }
-            });
-        
-            return $form;
-        }
+                
+            } else {
+                dd($formForm, $formInput  );
+
+                foreach ($types as $key => $type) {
+                    if (request()->has($key)) {
+                        $value = request($key);
+                
+                        $display = $form->model()->displays()->where('display_type', $type)->first();
+                
+                        if ($value) {
+                            if ($display) {
+                                $display->update([
+                                    'duration'      => $formInput,
+                                    'duration_unit' => match($formForm) {
+                                        1 => 'hours',
+                                        2 => 'days',
+                                        3 => 'months',
+                                        default => 'hours',
+                                    }
+                                ]);
+                            } else {
+                                // إنشاء سجل جديد إذا لم يكن موجود
+                                $form->model()->displays()->create([
+                                    'display_type'  => $type,
+                                    'duration'      => $formInput,
+                                    'duration_unit' => match($formForm) {
+                                        1 => 'hours',
+                                        2 => 'days',
+                                        3 => 'months',
+                                        default => 'hours',
+                                    }
+                                ]);
+                            }
+                        } else {
+                            // إذا القيمة 0، امسح السجل إن وجد
+                            if ($display) {
+                                $display->delete();
+                            }
+                        }
+                    }
+                }
+            }
+    
+            if (in_array('country', $displays ?? [])) {
+                $countries = array_filter(request('countries', []));
+                $form->model()->countries()->sync($countries);
+            } elseif (!empty(request('displayCountry'))) {
+                if (request('displayCountry')) {
+                    $countries = array_filter(request('countries', []));
+                    $form->model()->countries()->sync($countries);
+                } else {
+                    $form->model()->countries()->detach();
+                }
+            }
+        });
+     }
+     
         
      public function homeCarouselSettings(Content $content)
     {

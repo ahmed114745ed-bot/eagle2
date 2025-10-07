@@ -1269,7 +1269,13 @@
   "An error occurred while processing": "An error occurred while processing",
   "Error": "Error",
   "History": "History",
-  "SweetAlert2 is not loaded!": "SweetAlert2 is not loaded!"
+  "SweetAlert2 is not loaded!": "SweetAlert2 is not loaded!",
+  "request_sent_success": "Your display request has been sent successfully.",
+"insufficient_balance": "You do not have enough coins to complete this request.",
+"A display of this type is already active for this banner.": "A display of this type is already active for this banner.",
+"You already have a pending request for this banner and display type.": "You already have a pending request for this banner and display type.",
+"confirm_resend": "Confirm Resend",
+"deduct_text": "Coins will be deducted to resend the banner request:"
 
 
 

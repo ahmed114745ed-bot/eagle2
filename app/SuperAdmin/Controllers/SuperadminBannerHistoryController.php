@@ -47,7 +47,7 @@ class SuperadminBannerHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-        $grid->model()->with(['homeCarousel:home_carousel_id.img']);
+        $grid->model()->with(['homeCarousel:home_carousel_id.img'])->latest();
         $grid->model()->where('user_id', Auth::user()->id);
     
         $grid->column('id', __('ID'));
@@ -81,73 +81,114 @@ class SuperadminBannerHistoryController extends MainController
                 return $value; 
             }
         });
+        $grid->column('hours', __('hours'));
+
         $grid->column('created_at', __('Created At'))->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
         });
     
+  
         $grid->column('actions', __('Actions'))->display(function () {
             if ($this->status === 'rejected') {
-                        return  '<button class="btn btn-sm btn-primary resend-btn" 
-                        data-id="' . $this->home_carousel_id . '" 
-                        data-notes="' . e($this->notes) . '">
-                    <i class="fa fa-redo"></i> ' . __('Resend') . '
-                </button>';
+                return  '<button class="btn btn-sm btn-primary resend-btn" 
+                            data-id="' . $this->home_carousel_id . '" 
+                            data-notes="' . e($this->notes) . '" 
+                            data-hours="' . e($this->hours) . '">
+                        <i class="fa fa-redo"></i> ' . __('Resend') . '
+                    </button>';
             }
-    
             return __( $this->status);
         });
+    
+        // === الأسعار لكل نوع عرض ===
+        $display_prices = [
+            'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
+            'display_home_top' => SuperAdminHelper::getHourlyBannerPrice('display_home_top'),
+            'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
+            'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
+        ];
+    
+        // === الترجمات ===
+        $translations = [
+            'confirm_resend' => __('confirm_resend'),
+            'deduct_text' => __('deduct_text'),
+            'yes_resend' => __('Yes, deduct and send request'),
+            'cancel' => __('Cancel'),
+            'done' => __('Done!'),
+            'error_text' => __('An error occurred while processing'),
+            'error' => __('Error'),
+            'sweetalert_missing' => __('SweetAlert2 is not loaded!'),
+            'display_types' => [
+                'display_discover' => __('Display Discover'),
+                'display_home_top' => __('Display Home Top'),
+                'display_home_middle' => __('Display Home Middle'),
+                'display_live' => __('Display Live'),
+            ],
+            'total' => __('Total'),
+            'hours' => __('Hours'),
+        ];
+    
+        $translationsJson = json_encode($translations);
+        $displayPricesJson = json_encode($display_prices);
     
         $grid->disableActions();
         $grid->disableCreateButton();
     
-        Admin::script(<<<'JS'
-        // ✅ تأكيد تحميل السكريبت
+        Admin::script(<<<JS
         console.log('✅ Resend banner script loaded');
+        const translations = $translationsJson;
+        const display_prices = $displayPricesJson;
     
-        // 🔁 دالة ربط زر إعادة الإرسال
         function bindResendButtons() {
             $(document).off('click', '.resend-btn').on('click', '.resend-btn', function() {
                 var bannerId = $(this).data('id');
-                var notes = $(this).data('notes');
+                var displayType = $(this).data('notes');
+                var displayLabel = translations.display_types[displayType] || displayType;
+                var hours = parseInt($(this).data('hours')) || 1;
+                var pricePerHour = display_prices[displayType] || 0;
+                var total = pricePerHour * hours;
     
-                // تأكد أن SweetAlert موجود
                 if (typeof Swal === 'undefined') {
-                    alert('SweetAlert2 غير متوفر على الصفحة!');
+                    alert(translations.sweetalert_missing);
                     return;
                 }
     
-                // ✅ SweetAlert2
                 Swal.fire({
-                    title: 'تأكيد إعادة الإرسال',
-                    text: "سيتم خصم 10 كوينز لإعادة إرسال الطلب بنفس الملاحظة.",
+                    title: translations.confirm_resend,
+                    html: `
+                        <p><strong>\${displayLabel}</strong></p>
+                        <p>\${translations.hours}: <strong>\${hours}</strong></p>
+                        <p>\${translations.total}: <strong>\${total}</strong> coins</p>
+                        <p>\${translations.deduct_text}</p>
+                    `,
                     type: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'نعم، خصم وأرسل',
-                    cancelButtonText: 'إلغاء'
+                    confirmButtonText: translations.yes_resend,
+                    cancelButtonText: translations.cancel,
                 }).then((result) => {
-                    if(result.value){
+                    if (result.value) {
                         $.ajax({
-                            url: '/superadmin/banner-request/' + bannerId,
+                            url: 'resend-banner-request/' + bannerId,
                             type: 'POST',
                             data: {
                                 _token: LA.token,
-                                field: notes ,
-                                id :bannerId
+                                field: displayType,
+                                id: bannerId
                             },
-                            success: function(res){
+                            success: function(res) {
                                 Swal.fire({
-                                    title: 'تم!',
+                                    title: translations.done,
                                     text: res.message,
-                                    icon: 'success',
+                                    type: 'success',
                                     timer: 2000,
                                     showConfirmButton: false
                                 }).then(() => {
-                                    $.pjax.reload('#pjax-container'); // إعادة تحميل الجدول
+                                    $.pjax.reload('#pjax-container');
                                 });
                             },
-                            error: function(xhr){
-                                let msg = xhr.responseJSON?.message || 'حدث خطأ أثناء العملية';
-                                Swal.fire('خطأ', msg, 'error');
+                            error: function(xhr) {
+                                let msg = xhr.responseJSON?.message || translations.error_text;
+                                Swal.fire(translations.error, msg, 'error');
                             }
                         });
                     }
@@ -155,18 +196,19 @@ class SuperadminBannerHistoryController extends MainController
             });
         }
     
-        // ⏳ عند تحميل الصفحة
         $(function() {
             bindResendButtons();
             console.log('✅ Bound resend buttons');
         });
     
-        // 🔁 عند أي PJAX إعادة تحميل
         $(document).on('pjax:complete', function() {
             bindResendButtons();
             console.log('🔁 Rebound resend buttons after PJAX');
         });
-    JS);
+        JS);
+    
+        
+        
     
     $grid->tools(function (Tools $tools) {
         $tools->append('<a href="' . superadmin_url('home-carousel') . '" class="btn btn-sm btn-default">

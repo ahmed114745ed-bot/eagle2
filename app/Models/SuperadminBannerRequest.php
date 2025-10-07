@@ -10,7 +10,7 @@ class SuperadminBannerRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'home_carousel_id', 'coins_deducted', 'status', 'notes'
+        'user_id', 'home_carousel_id', 'coins_deducted', 'status', 'notes','hours'
     ];
 
     public function superAdmin()

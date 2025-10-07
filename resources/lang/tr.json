@@ -3530,7 +3530,13 @@
     "Total Cut Amount": "Toplam Kesilen Miktar",
     "Average Agencies Per BD": "Her BD için Ortalama Ajans Sayısı",
     "insufficient_balance": "Bakiyeniz yetersiz!",
-    "request_sent_success": "Talep başarıyla gönderildi ve bakiye düşüldü!"
+    "request_sent_success": "Talep başarıyla gönderildi ve bakiye düşüldü!",
+    "request_sent_success": "Görünüm isteğiniz başarıyla gönderildi.",
+    "insufficient_balance": "Bu işlemi tamamlamak için yeterli bakiyeniz yok.",
+    "A display of this type is already active for this banner.": "Bu afiş için bu türde zaten aktif bir gösterim var.",
+    "You already have a pending request for this banner and display type.": "Bu afiş ve gösterim türü için zaten bekleyen bir isteğiniz var.",
+      "confirm_resend": "Yeniden Gönderimi Onayla",
+    "deduct_text": "Banner isteğini yeniden göndermek için jetonlar düşülecektir:"
 
 
 

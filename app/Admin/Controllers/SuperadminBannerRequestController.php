@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\SuperAdminService;
+use App\Models\HomeCarouselDisplay;
 use App\Models\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -41,7 +42,7 @@ class SuperadminBannerRequestController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img']);
+        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
         $grid->column('id', __('ID'));
   
         $userService = $this->userService;
@@ -79,6 +80,7 @@ class SuperadminBannerRequestController extends AdminController
                 return $value; 
             }
         });
+        $grid->column('hours', __('hours'));
         $grid->column('created_at', __('Created At'))
         ->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
@@ -150,25 +152,85 @@ class SuperadminBannerRequestController extends AdminController
         return $form;
     }
 
-
     public function approve($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);
         $homeCarousel = $request->homeCarousel;
-        $homeCarousel->enable = 1; 
-        $homeCarousel->{$request->notes} = 1; 
-        $homeCarousel->save();
-        $request->status = 'approved';
-        $request->save();
-
-        return response()->json(['success' => true, 'message' => 'Banner approved successfully']);
+        $user = $request->user;
+        $displayType = preg_replace('/^display_/', '', (string) $request->notes);
+       
+        $hours = (int) ($request->hours ?? 1);
+    
+        $now = now();
+    
+        $homeCarousel->update([
+            'enable' => 1,
+        ]);
+    
+        $display = HomeCarouselDisplay::where('home_carousel_id', $homeCarousel->id)
+            ->where('display_type', $displayType)
+            ->first();
+    
+        if ($display) {
+            if ($display->end_at && $display->end_at->isFuture()) {
+                $existingHours = $this->convertToHours($display->duration, $display->duration_unit);
+    
+                $totalHours = $existingHours + $hours;
+    
+                $newEndAt = $display->end_at->copy()->addHours($hours);
+    
+                $display->update([
+                    'duration'      => $totalHours,
+                    'duration_unit' => 'hours', 
+                    'end_at'        => $newEndAt,
+                ]);
+            } else {
+                $newEndAt = $now->copy()->addHours($hours);
+    
+                $display->update([
+                    'duration'      => $hours,
+                    'duration_unit' => 'hours',
+                    'created_at'    => $now,
+                    'end_at'        => $newEndAt,
+                ]);
+            }
+        } else {
+            $newEndAt = $now->copy()->addHours($hours);
+    
+            HomeCarouselDisplay::create([
+                'home_carousel_id' => $homeCarousel->id,
+                'display_type'     => $displayType,
+                'duration'         => $hours,
+                'duration_unit'    => 'hours',
+                'created_at'       => $now,
+                'end_at'           => $newEndAt,
+            ]);
+        }
+    
+        $request->update(['status' => 'approved']);
+    
+        return response()->json([
+            'success' => true,
+            'message' => __('Banner approved successfully'),
+        ]);
     }
-
+    
+   
+    protected function convertToHours(int $value, string $unit): int
+    {
+        return match ($unit) {
+            'hours'  => $value,
+            'days'   => $value * 24,
+            'months' => $value * 30 * 24, 
+            default  => $value,
+        };
+    }
+    
     public function reject($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);
 
-        SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
+        // SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
 
         $request->status = 'rejected';
         $request->save();
