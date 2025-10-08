@@ -58,7 +58,7 @@ class MicService
         $user = $this->userRepository->findById($data['user_id']);
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
-        $room = $this->roomRepository->findRoomTypeUser($data['owner_id'], false);
+        $room = $this->roomRepository->findRoomTypeUser($data['owner_id'], withoutAppends: false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
         //

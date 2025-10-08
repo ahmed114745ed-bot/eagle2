@@ -93,6 +93,7 @@ class Kernel extends HttpKernel
         'configM' => ConfigMiddleware::class,
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
+        'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
 //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
