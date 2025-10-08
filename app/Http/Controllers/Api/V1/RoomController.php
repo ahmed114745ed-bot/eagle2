@@ -249,7 +249,7 @@ class RoomController extends Controller
     public function getAdmins(Request $request)
     {
 
-        if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
+        //if (!$request->owner_id && !$request->room_id) return Common::apiResponse(0, 'missing params', null, 422);
         try {
             $admins = $this->roomService->roomAdmins($request->id);
         } catch (Exception $e) {
