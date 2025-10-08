@@ -206,16 +206,17 @@ class HomeCarouselController extends MainController
  
      protected function addDisplayLocations(Form $form)
      {
-         $form->multipleSelect('display_at', __('Display At'))
-             ->options([
-                 'discover'    => __('Discover'),
-                 'home_top'    => __('Home Top'),
-                 'home_middle' => __('Home Middle'),
-                 'live'        => __('Live'),
-                 'country'     => __('Country'),
-             ])
-             ->rules(['array'])
-             ->attribute('id', 'display_at_select');
+        $form->multipleSelect('display_at', __('Display At'))
+        ->options([
+            'discover'    => __('Discover'),
+            'home_top'    => __('Home Top'),
+            'home_middle' => __('Home Middle'),
+            'live'        => __('Live'),
+            'country'     => __('Country'),
+        ])
+        ->rules(['array'])
+        ->attribute('id', 'display_at_select');
+    
      
          $form->belongsToMany('countries', Countries::class, trans('Country'));
      
