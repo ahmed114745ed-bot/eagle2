@@ -175,5 +175,28 @@ class HomeCarousel extends Model
     }
 
 
+    protected function displayAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->decodeDisplayAt($value),
+    
+            set: fn($value) => json_encode(array_filter((array)$value))
+        );
+    }
+    
+
+    protected function decodeDisplayAt($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+    
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+    
+        return [];
+    }
 
 }
