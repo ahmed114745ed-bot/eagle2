@@ -956,7 +956,7 @@ class rankingServiceV2
         }
         return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
     }
-    public function getRankingOneRoom($class, $type, $user, $limit, $room_id, $sent_to_owner)
+    public function getRankingOneRoom($class, $type, $user, $limit, $room_id, $sent_to_owner )
     {
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
