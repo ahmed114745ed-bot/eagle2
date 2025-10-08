@@ -120,6 +120,8 @@ class PaymentMethodController extends Controller
                 'orderStatus'
             ]);
 
+            info('orderStatus', [$query['orderStatus']]);
+
             // Validate required parameters
             if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
