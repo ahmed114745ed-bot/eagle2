@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use App\helper\RankingHelper;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use App\Services\RankingServiceV2;
 use App\Services\RankingService;
 use App\Http\Controllers\Controller;
 use Mockery\Exception;
@@ -18,11 +19,13 @@ class RankingController extends Controller
 {
 
     protected $rankingService;
+    protected $rankingServiceV2;
     protected $userService;
 
-    public function __construct(RankingService $rankingService, UserService $userService)
+    public function __construct(RankingService $rankingService, RankingServiceV2 $rankingServiceV2, UserService $userService)
     {
         $this->rankingService = $rankingService;
+        $this->rankingServiceV2 = $rankingServiceV2;
         $this->userService = $userService;
 
     }
@@ -123,12 +126,19 @@ class RankingController extends Controller
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
-        if (!$request->room_id) {
+        if (!$request->room_id && !$request->roomId) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
         $limit = $request->is_home ? 3 : 20;
-        $data = $this->rankingService->getRankingOneRoom($class, $type, $request->user(), $limit, $request->room_id, $request->sent_to_owner);
+
+        if ($request->roomId) {
+            $data = $this->rankingServiceV2->getRankingOneRoom($class, $type, $request->user(), $limit, $request->roomId, $request->sent_to_owner);
+        }
+
+        if ($request->room_id ) {
+            $data = $this->rankingService->getRankingOneRoom($class, $type, $request->user(), $limit, $request->room_id, $request->sent_to_owner );
+        }
         return Common::apiResponse(1, '', $data);
     }
 }

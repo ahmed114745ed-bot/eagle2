@@ -999,15 +999,15 @@
         <div class="top-section">
             <h3 class="section-title">🎤 {{ __('Top 3 Star Hosts') }} ⭐</h3>
             <div class="top-list">
-                @foreach($topAgencySenders as $index => $topAgencySender)
+                @foreach($topReceivers as $index => $topReceiver)
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topAgencySender->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                             style="background-image:url('{{ getImagePath($topReceiver->receiver?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
                                 background-size:cover;background-position:center;">
                         </div>
-                        <div class="top-name">{{ $topAgencySender->sender->name }}</div>
-                        <div class="top-value">{{ number_format($topAgencySender->total_sent / 1000, 1) }}K 💎</div>
+                        <div class="top-name">{{ $topReceiver->receiver->name }}</div>
+                        <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
                     </div>
                 @endforeach
             </div>
@@ -1037,18 +1037,23 @@
         <div class="top-section">
             <h3 class="section-title">💰 {{ __('Top 3 Recharge Agencies') }} 💵</h3>
             <div class="top-list">
-                @foreach($topChargeAgencies as $index => $topChargeAgency)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar agency-avatar"
-                             style="background-image:url('{{ getImagePath($topChargeAgency->agency->img) ?? asset("images/icon-agency.jpg") }}');
-                                background-size:cover;background-position:center;">
+                @foreach($topChargeAgencies as $index => $charge)
+                    @php
+                        $agency = $charge->senderShippingAgency;
+                    @endphp
+                    @if($agency)
+                        <div class="top-item">
+                            <span class="top-rank">{{ $index + 1 }}</span>
+                            <div class="top-avatar agency-avatar"
+                                 style="background-image:url('{{ getImagePath($agency->img ?? null) ?? asset("images/icon-agency.jpg") }}');
+                            background-size:cover;background-position:center;">
+                            </div>
+                            <div class="top-name">{{ $agency->name }}</div>
+                            <div class="top-value">
+                                {{ number_format($charge->amount ?? 0, 2) }} 💵
+                            </div>
                         </div>
-                        <div class="top-name">{{ $topChargeAgency->agency->name }}</div>
-                        <div class="top-value">
-                            {{ number_format($topChargeAgency->total_due, 2) }} 💵
-                        </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -1061,34 +1066,27 @@
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-name">{{ $bd->name }}</div>
-                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('clients') }}</div>
+                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('agency') }}</div>
                     </div>
                 @endforeach
             </div>
         </div>
 
-        {{-- Gaming Champions --}}
+        {{-- Top Gamers --}}
         <div class="top-section">
-            <h3 class="section-title">🎮 {{ __('Gaming Champions') }} 🏅</h3>
+            <h3 class="section-title">🎮 {{ __('Top 3 Gamers') }} 🏅</h3>
             <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#fbc2eb,#a6c1ee);"></div>
-                    <div class="top-name">{{ __('Youssef Ahmed') }}</div>
-                    <div class="top-value">98,500 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#84fab0,#8fd3f4);"></div>
-                    <div class="top-name">{{ __('Mariam Samy') }}</div>
-                    <div class="top-value">87,200 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb);"></div>
-                    <div class="top-name">{{ __('Hossam Ali') }}</div>
-                    <div class="top-value">76,800 🏆</div>
-                </div>
+                @foreach($topGamers as $index => $gamer)
+                    <div class="top-item">
+                        <span class="top-rank">{{ $index + 1 }}</span>
+                        <div class="top-avatar"
+                             style="background-image:url('{{ getImagePath($gamer->user?->profile?->avatar) ?? asset('images/default-avatar.jpg') }}');
+                            background-size:cover;background-position:center;">
+                        </div>
+                        <div class="top-name">{{ $gamer->user?->name }}</div>
+                        <div class="top-value">{{ number_format($gamer->coins / 1000, 1) }}K ⚡</div>
+                    </div>
+                @endforeach
             </div>
         </div>
 

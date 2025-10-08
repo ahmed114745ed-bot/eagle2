@@ -27,35 +27,55 @@ class UpdateUserWhenSendGift
 
     public function update(int $totalCoins, User $receivedUser)
     {
-
-
-        DB::transaction(function () use ($totalCoins, $receivedUser) {
-
+        $diamondUser = 0;
+    
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
-            $diamondUser =  $user->monthly_diamond_received + $totalCoins;
+    
+            $diamondUser = $user->monthly_diamond_received + $totalCoins;
+    
             $user->salary_is_updated = true;
-
             $user->total_diamond_received += $totalCoins;
-
+    
             if ($user->type_user == 0 && $user->agency_id == 0) {
                 $user->exchange_diamonds += $totalCoins;
             }
-
+    
             $lastReceivedLevel = $user->total_received_level;
-
+    
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
-
+    
                 if ($user->total_received_level != $lastReceivedLevel) {
-                    dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+                    dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
+                        ->onQueue('notification');
                 }
             } catch (\Exception $e) {
+                Log::build([
+                    'driver' => 'single',
+                    'path' => storage_path('logs/diamond_upgrade.log'),
+                ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
             }
-
+    
             $user->save();
-            uploadMonthlyDiamondReceive($user->id, $diamondUser);
-        });
+    
+    
+        try {
+            uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
+    
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/monthly_diamond.log'),
+            ])->info("MonthlyDiamondReceive updated for user {$receivedUser->id}: {$diamondUser}");
+    
+        } catch (\Exception $e) {
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/monthly_diamond.log'),
+            ])->error("Failed to update MonthlyDiamondReceive for user {$receivedUser->id}: " . $e->getMessage());
+        }
     }
+    
+    
     public function updateUsers(int $totalCoins, array $userIds)
     {
         // DB::table('users')->whereIn('id', $userIds)->update([

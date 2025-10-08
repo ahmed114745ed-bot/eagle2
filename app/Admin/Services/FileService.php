@@ -25,7 +25,7 @@ class FileService
         $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
         $allowedImageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'svg', 'heic', 'heif'];
 
-        $ext = mb_strtolower($img2->guessExtension());
+        $ext = mb_strtolower($img2->getClientOriginalExtension());
         $originalExt = mb_strtolower($img2->getClientOriginalExtension());
 
         if ($ext === 'zz' && $originalExt === 'svga') {
