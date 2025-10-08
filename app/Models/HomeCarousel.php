@@ -83,6 +83,13 @@ class HomeCarousel extends Model
                     // $model->duration = $duration->timestamp;
                 }
             }
+
+            static::saving(function ($model) {
+                if (is_array($model->display_at)) {
+                    $model->display_at = json_encode($model->display_at);
+                }
+            });
+    
         });
 
         self::updating(function ($model) {
