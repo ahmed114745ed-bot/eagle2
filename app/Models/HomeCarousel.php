@@ -16,6 +16,9 @@ class HomeCarousel extends Model
 
     protected $guarded = [];
 
+
+    protected $appends = ['display_at'];
+
     protected $casts = [
         'display_discover' => 'integer',
         'display_home_top' => 'integer',
@@ -188,7 +191,7 @@ class HomeCarousel extends Model
     protected function getDisplayAtAttribute($value)
     {
         $decoded = $this->displays?->pluck('display_type')->toArray();
-        return $decoded->toString();
+        return is_array($decoded) ? $decoded : [];
     }
 
 
