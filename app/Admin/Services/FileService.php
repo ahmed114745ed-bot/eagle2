@@ -46,11 +46,6 @@ class FileService
 
             $imagePath = (config('app.env') !== 'production' ? '' : 'test-').'frames/'.$wareId.'.jpg';
 
-            info($imagePath);
-            if (!Storage::disk('gcs')->exists($imagePath)) {
-                info("Frame image not found on GCS: {$imagePath}");
-            }
-
             $response = Http::attach(
                 'image',
                 Storage::disk('gcs')->get($imagePath),
