@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\LeaderCCgameController;
+
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'generalBan'])
     ->group(function () {
 
@@ -24,3 +26,8 @@ Route::prefix('baishun')->middleware('verify.signature')->group(function () {
     Route::post('change-balance', [\App\Http\Controllers\Api\V1\BaishunGameController::class, 'changeBalance']);
 });
 
+Route::prefix('leader-cc-game')->middleware('verify.game.signature')->group(function () {
+
+    Route::post('get-user-info', [LeaderCCgameController::class, 'userInformation']);
+    Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin']);
+});
