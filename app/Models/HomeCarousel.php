@@ -89,7 +89,7 @@ class HomeCarousel extends Model
                     $model->display_at = json_encode($model->display_at);
                 }
             });
-    
+
         });
 
         self::updating(function ($model) {
@@ -194,16 +194,14 @@ class HomeCarousel extends Model
 
     protected function decodeDisplayAt($value): array
     {
-        if (is_array($value)) {
-            return $value;
-        }
 
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
+
+
+            $decoded = json_decode($this->displays?->pluck('type')->toArray(), true);
             return is_array($decoded) ? $decoded : [];
-        }
 
-        return [];
+
+
     }
 
 }
