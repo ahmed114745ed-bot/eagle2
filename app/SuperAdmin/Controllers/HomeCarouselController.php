@@ -270,7 +270,7 @@ class HomeCarouselController extends MainController
      {
          $form->display(__('admin.ID'));
          $form->number('sort', __('Sort'))->default(1);
-        //  $form->image('img', __('Image'))->uniqueName()->required();
+         $form->image('img', __('Image'))->uniqueName()->required();
          $form->switch('enable', __('Enable'))->states(Common::getSwitchStates())->default(true);
      }
      
