@@ -266,9 +266,22 @@ class HomeCarouselController extends MainController
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? $form->model()->input ?? 0;
             $formForm  = request('form') ?? $form->model()->form ?? 1;
-            $displays =$form->display_at ?? $form->model()->display_at;
+            $displaysOrg =$form->display_at ?? $form->model()->display_at;
 
-
+            if (is_array($displaysOrg)) {
+                $displays = $displaysOrg;
+            } elseif (is_string($displaysOrg)) {
+                $decoded = json_decode($displaysOrg, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $displays = $decoded;
+                } else {
+                    $displays = array_map('trim', explode(',', $displaysOrg));
+                }
+            } else {
+                $displays = [];
+            }            
+   
+         
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
                 $toDelete = array_diff($existing, $displays);
                 if ($toDelete) {
@@ -339,7 +352,7 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             }
-
+                             
                             $existingDisplayAt = $form->model()->display_at ?? [];
 
                             if (!is_array($existingDisplayAt)) {
@@ -348,21 +361,25 @@ class HomeCarouselController extends MainController
 
                             if (!in_array($type, $existingDisplayAt)) {
                                 $existingDisplayAt[] = $type;
-                                $form->model()->update(['display_at' => $existingDisplayAt]);
+                                $form->model()->display_at = $existingDisplayAt; // ← احفظ كمصفوفة مباشرة
+                                $form->model()->save();
                             }
+
+                      
 
                         } else {
                             if ($display) {
                                 $display->delete();
                             }
-
                             $existingDisplayAt = $form->model()->display_at ?? [];
+
                             if (!is_array($existingDisplayAt)) {
                                 $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
                             }
 
                             $existingDisplayAt = array_values(array_diff($existingDisplayAt, [$type]));
-                            $form->model()->update(['display_at' => $existingDisplayAt]);
+                            $form->model()->display_at = $existingDisplayAt; // ← نحفظ كمصفوفة مباشرة
+                            $form->model()->save();
                         }
                     }
                 }
