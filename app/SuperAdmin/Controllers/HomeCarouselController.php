@@ -384,6 +384,10 @@ class HomeCarouselController extends MainController
          if ($this->hasPendingRequest($user, $banner, $field)) {
              return $this->errorResponse(__('You already have a pending request for this banner and display type.'));
          }
+
+         if ($this->hasViewRequest($user, $banner, $field)) {
+            return $this->errorResponse(__('This banner is already displayed in the selected section.'));
+        }
      
          $totalDeduct = $this->calculateDeduction($request, $field);
      
@@ -413,6 +417,18 @@ class HomeCarouselController extends MainController
              ->where('home_carousel_id', $banner->id)
              ->where('notes', $field)
              ->where('status', 'pending')
+             ->exists();
+     }
+
+     protected function hasViewRequest($user, $banner, $field)
+     {
+        $field = str_replace('display_', '', $field);
+
+         return HomeCarousel::query()
+             ->where('id', $banner->id)
+             ->whereHas('displays', function ($q) use ($field) {
+                 $q->where('display_type', $field);
+             })
              ->exists();
      }
      
