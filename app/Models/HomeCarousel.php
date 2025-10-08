@@ -188,11 +188,11 @@ class HomeCarousel extends Model
 
 
 
-    protected function getDisplayAtAttribute($value)
+  /*  protected function getDisplayAtAttribute($value)
     {
         $decoded = $this->displays?->pluck('display_type')->toArray();
         return '['. implode(',', $decoded) . ']';
-    }
+    }*/
 
 
 
