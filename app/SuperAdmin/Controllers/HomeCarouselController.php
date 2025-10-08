@@ -270,7 +270,7 @@ class HomeCarouselController extends MainController
      {
          $form->display(__('admin.ID'));
          $form->number('sort', __('Sort'))->default(1);
-         $form->image('img', __('Image'))->uniqueName()->required();
+        //  $form->image('img', __('Image'))->uniqueName()->required();
          $form->switch('enable', __('Enable'))->states(Common::getSwitchStates())->default(true);
      }
      
@@ -317,7 +317,7 @@ class HomeCarouselController extends MainController
      {
          $form->hidden('display_at')->default(json_encode(['country']));
      
-         $form->belongsToMany('countries', Countries::class, __('Country'))->required();
+        //  $form->belongsToMany('countries', Countries::class, __('Country'))->required();
      }
      
   
@@ -361,8 +361,8 @@ class HomeCarouselController extends MainController
                  'end_at'        => $endAt,
              ]);
              $display->save();
-     
-             $countries = array_filter(request('countries', []));
+
+             $countries = Auth::user()->country_id;
              $model->countries()->sync($countries);
          });
      }
