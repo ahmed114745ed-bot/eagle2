@@ -230,7 +230,7 @@ class SuperadminBannerRequestController extends AdminController
     {
         $request = SuperadminBannerRequest::findOrFail($id);
 
-        // SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
+        SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
 
         $request->status = 'rejected';
         $request->save();
