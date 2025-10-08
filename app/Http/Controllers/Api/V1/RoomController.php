@@ -106,17 +106,17 @@ class RoomController extends Controller
 
     public function mine(Request $request)
     {
-        $user_id = request('user_id') ?? Auth::user()->id ;
+        $user_id = request('user_id') ?? Auth::user()->id;
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
-        $rooms = $this->roomService->getAllMine($request ,$user_id);
+        $rooms = $this->roomService->getAllMine($request, $user_id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
-    public function userRoom($id ,Request $request)
+    public function userRoom($id, Request $request)
     {
 
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
-        $rooms = $this->roomService->getUserRooms($request ,$id);
+        $rooms = $this->roomService->getUserRooms($request, $id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
@@ -162,7 +162,6 @@ class RoomController extends Controller
             $room = $this->roomService->create($request, $user);
 
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
-
         } catch (Exception $exception) {
             Log::error("Failed to create room", [
                 'user_id' => $user->id,
@@ -214,7 +213,7 @@ class RoomController extends Controller
             ->whereDoesntHave('picks', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
-            ->where('is_closed',0)
+            ->where('is_closed', 0)
             ->get();
     }
 
@@ -311,7 +310,6 @@ class RoomController extends Controller
             if ($user->id === $room->uid) {
                 $room->is_afk = 0;
                 $room->save();
-    
             }
             $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
@@ -1276,17 +1274,19 @@ class RoomController extends Controller
     {
         $uid      = $request->owner_id;
         $admin_id = $request->user_id;
-        if ($request->user()->id != $uid) {
-            return Common::apiResponse(0, 'not allowed', null, 403);
-        }
-        if (!$uid || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        if ($uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        $room = Room::query()->where('uid',  $uid)->where('type',  'audio')->first();
-        if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
+        $roomId = $request->room_id;
+        if ((!$uid || !$roomId) && !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
 
+        $room = $roomId
+            ? Room::find($roomId)
+            : Room::where('uid', $uid)->where('type', 'audio')->first();
+
+        if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
+        $uid  = $room->uid;
+        if ($room->uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
         $roomVisitor = $room->room_visitor;
         $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
-        if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
+         if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
         $roomAdmin = $room->room_admin;
         $roomMax   = $room->max_admin;
@@ -1319,7 +1319,7 @@ class RoomController extends Controller
 
         if ($res) {
 
-            $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
+            $resu = Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($ms));
             return Common::apiResponse(1, 'Set administrator successfully', $adm_arr, 200);
         } else {
             return Common::apiResponse(0, 'Failed to set administrator', null, 400);
