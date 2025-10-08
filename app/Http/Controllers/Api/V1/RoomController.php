@@ -287,13 +287,13 @@ class RoomController extends Controller
 
     public function quit_room(Request $request)
     {
-        if (!$request->owner_id) {
+        if (!$request->owner_id && !$request->room_id) {
 
-            return Common::apiResponse(false, __('missing owner_id'), null, 422);
+            return Common::apiResponse(false, __('missing parameter'), null, 422);
         }
         try {
             $user            = $request->user();
-            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user);
+            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user,$request->room_id);
             if ($isToZegoCharisma && isset($userDataWithCharisma)) {
                 $ms = [
                     'messageContent' => [

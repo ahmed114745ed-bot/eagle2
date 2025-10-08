@@ -244,9 +244,11 @@ class RoomRepoService
         return  $room;
     }
 
-    public function quiteRoom($ownerId, User $user)
+    public function quiteRoom($ownerId = null, User $user, $roomId = null)
     {
-        $room  = $this->findRoomUser($ownerId);
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
         if (!$room)  throw new \Exception(__("Room not found for this owner."));
         $isToZegoCharisma = false;
         $userDataWithCharisma = [];
