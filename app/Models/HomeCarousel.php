@@ -197,7 +197,7 @@ class HomeCarousel extends Model
 
 
 
-            $decoded = $this->displays?->pluck('type')->toArray();
+            $decoded = $this->displays?->pluck('display_type')->toArray();
             return is_array($decoded) ? $decoded : [];
 
 
