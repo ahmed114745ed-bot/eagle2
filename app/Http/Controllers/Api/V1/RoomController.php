@@ -1338,9 +1338,13 @@ class RoomController extends Controller
         $user = $request->user();
         $uid      = $request->owner_id;
         $admin_id = $request->user_id;
-        if (!$uid || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        $room = Room::where('uid', $uid)->first();
+        $roomId = $request->room_id;
+        if ((!$uid && !$roomId) || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
+        $room = $roomId
+            ? Room::find($roomId)
+            : Room::where('uid', $uid)->where('type', 'audio')->first();
         if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
+        $uid      = $room->uid;
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
 
         $roomAdmin = $room->room_admin;
