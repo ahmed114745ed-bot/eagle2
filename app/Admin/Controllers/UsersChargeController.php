@@ -7,8 +7,16 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\Setting;
+use App\Helpers\UserCommon;
+use App\Models\UserSallary;
+use App\Enums\UserCoinLogType;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use App\Helpers\UserCoinLogHelper;
+use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\UsersChargeAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -159,48 +167,65 @@ class UsersChargeController extends MainController
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
+    public function chargeUser()
     {
-        $show = new Show(Charge::findOrFail($id));
+        $userSalaries = UserSallary::where('month', 9)->with('user')->where('year', 2025)->where('remaining_diamond', '!=', 0)->get();
+        foreach ($userSalaries as $userSalary) {
+            $coin = $userSalary->remaining_diamond * 0.5;
 
-        //        $show->id('ID');
-        //        $show->charger_id('charger_id');
-        //        $show->charger_type('charger_type');
-        //        $show->user_id('user_id');
-        //        $show->user_type('user_type');
-        //        $show->amount('amount');
-        //        $show->amount_type('amount_type');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow($show);
-        return $show;
+            // $userCoins = \Cache::rememberForever('user_coins', function () {
+            //     $setting =   Setting::where('key', 'user_coins')->first();
+            //     return $setting?->value;
+            // });
+
+            // $coin = $coin * $userCoins;
+            if ($userSalary->user) {
+                $user = $userSalary->user;
+                $amountBefore =  Common::getCurrentBalance($userSalary->user->id);
+
+                UserCoinLogHelper::logByType(
+                    $userSalary->user->id,
+                    $coin,
+                    $amountBefore,
+                    UserCoinLogType::ADMIN_CHARGES,
+                );
+                $userSalary->user->di += $coin;
+                $userSalary->user->save();
+                $this->createChargeRecord($user, $coin, $coin, $coin);
+            }
+
+
+            UserCommon::addChargeLevel($user->id, $coin);
+
+
+
+            $title =  'Coins Added';
+
+            $body = 'You have received :coins coins from admin.';
+
+
+            CustomNotification::charges($user, $title, $body, ['coins' => $coin]);
+        }
+
+        return response()->json([
+            'message' => 'User charge process completed successfully.',
+            'count' => $userSalaries->count(),
+        ]);
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
+    private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
     {
-        $form = new Form(new Charge);
+        $charge = new Charge();
+        $charge->charger_id = 1;
+        $charge->charger_type =  'dash';
+        $charge->user_id = $user->id;
+        $charge->agency_id =   null;
+        $charge->user_type = 'user';
+        $charge->amount = $coins;
+        $charge->usd = $usdAmount;
+        $charge->balance_before =  $user->di  - $coins;
+        $charge->save();
 
-        //        $form->display('ID');
-        //        $form->text('charger_id', 'charger_id');
-        //        $form->text('charger_type', 'charger_type');
-        //        $form->text('user_id', 'user_id');
-        //        $form->text('user_type', 'user_type');
-        //        $form->text('amount', 'amount');
-        //        $form->text('amount_type', 'amount_type');
-        //        $form->display(trans('admin.created_at'));
-        //        $form->display(trans('admin.updated_at'));
-
-        return $form;
+        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
     }
 }
