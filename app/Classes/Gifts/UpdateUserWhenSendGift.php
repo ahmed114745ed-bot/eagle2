@@ -29,7 +29,6 @@ class UpdateUserWhenSendGift
     {
         $diamondUser = 0;
     
-        DB::transaction(function () use ($totalCoins, $receivedUser, &$diamondUser) {
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
     
             $diamondUser = $user->monthly_diamond_received + $totalCoins;
@@ -58,7 +57,7 @@ class UpdateUserWhenSendGift
             }
     
             $user->save();
-        });
+    
     
         try {
             uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
