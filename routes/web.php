@@ -33,6 +33,8 @@ use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
+use App\Admin\Controllers\AppearChargerAgencyController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -478,13 +480,6 @@ Route::get('/test-games', function () {
 
     return $records;
 })->name('test-games');
-
-use App\Http\Controllers\SuperAdminCountryController;
-use App\Admin\Controllers\AppearChargerAgencyController;
-
-
-
-
 
 
 Route::get('/archive-old-coin-games', function () {
