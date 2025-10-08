@@ -197,7 +197,7 @@ class HomeCarousel extends Model
 
 
 
-            $decoded = json_decode($this->displays?->pluck('type')->toArray(), true);
+            $decoded = $this->displays?->pluck('type')->toArray();
             return is_array($decoded) ? $decoded : [];
 
 
