@@ -146,7 +146,7 @@ class PaymentMethodController extends Controller
 
                 $signature = hash('sha256', $merchantCode . $merchantRefNumber . $secureKey);
 
-                $response = Http::get('https://atfawry.fawrystaging.com/ECommerceWeb/Fawry/payments/status/v2', [
+                $response = Http::get('https://atfawry.com/ECommerceWeb/Fawry/payments/status/v2', [
                     'merchantCode' => $merchantCode,
                     'merchantRefNumber' => $merchantRefNumber,
                     'signature' => $signature,
