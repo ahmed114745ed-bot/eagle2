@@ -28,13 +28,20 @@ class RoomRepository extends AbstractRepository
         if ($withoutAppends) $model = $model->withoutAppends();
         return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
+
+    public function findRoomTypeUser($userId, $type = 'audio', $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type', $type)->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
     public function findAudioRoomUser($userId, $withoutAppends = true)
     {
         $model = $this->model;
         if ($withoutAppends) $model = $model->withoutAppends();
         return $model->where('type' ,'audio')->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
-    
+
     public function findRoomId($id, $withoutAppends = true)
     {
         $query = $this->model;
@@ -452,7 +459,7 @@ class RoomRepository extends AbstractRepository
             ->whereHas('owner')
             ->whereNotIn('uid', $blockedUserIds)
             ->whereHas('roomVisitors', function ($query) {
-                $query->whereColumn('user_id', 'rooms.uid'); 
+                $query->whereColumn('user_id', 'rooms.uid');
             })
             ->where('room_status', 1)
             ->orderByDesc('pin')
