@@ -186,6 +186,14 @@ if (!function_exists('upload')) {
 }
 
 
+if (!function_exists('deleteFile')) {
+    function deleteFile($path): ?string
+    {
+        return Storage::disk('gcs')->delete($path);
+    }
+}
+
+
 if (!function_exists('uploadMonthlyDiamondReceive')) {
     function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
     {

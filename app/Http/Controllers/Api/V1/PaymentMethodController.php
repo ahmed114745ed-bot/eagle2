@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Http;
 use Throwable;
 use App\Helpers\Common;
 use App\Models\CoinLog;
@@ -78,6 +79,7 @@ class PaymentMethodController extends Controller
     public function utdCallback(Request $request)
     {
         $callbackData = $request->all();
+        info('webhook return data', [$callbackData]);
         $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
@@ -110,13 +112,15 @@ class PaymentMethodController extends Controller
 
     public function success(Request $request): JsonResponse
     {
-        try {
+//        try {
             $query = Arr::only($request->query(), [
                 'statusCode',
                 'statusDescription',
                 'merchantRefNumber',
                 'orderStatus'
             ]);
+
+            info('orderStatus', [$query['orderStatus']]);
 
             // Validate required parameters
             if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
@@ -138,6 +142,26 @@ class PaymentMethodController extends Controller
             }
 
             if ($query['statusCode'] == 200 && $query['orderStatus'] == 'UNPAID'){
+                $merchantCode = config('services.fawry.merchant_code');
+                $secureKey = config('services.fawry.secure_key');
+                $merchantRefNumber = $query['merchantRefNumber'];
+
+                $signature = hash('sha256', $merchantCode . $merchantRefNumber . $secureKey);
+
+                $response = Http::get('https://atfawry.com/ECommerceWeb/Fawry/payments/status/v2', [
+                    'merchantCode' => $merchantCode,
+                    'merchantRefNumber' => $merchantRefNumber,
+                    'signature' => $signature,
+                ]);
+
+                $data = $response->json();
+
+                info($data);
+
+                if (!empty($data['paymentStatus'])) {
+                    info('ECommerceWeb', [$data]);
+                }
+
                 return response()->json([
                     'status' => true,
                     'trx' => $query['merchantRefNumber'],
@@ -150,13 +174,13 @@ class PaymentMethodController extends Controller
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
-        } catch (Throwable $e) {
-            return response()->json([
-                'status' => false,
-                'trx' => null,
-                'message' => 'An error occurred: ' . $e->getMessage(),
-            ]);
-        }
+//        } catch (Throwable $e) {
+//            return response()->json([
+//                'status' => false,
+//                'trx' => null,
+//                'message' => 'An error occurred: ' . $e->getMessage(),
+//            ]);
+//        }
     }
 
 }

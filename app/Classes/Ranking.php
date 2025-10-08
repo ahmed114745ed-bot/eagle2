@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Classes;
+use App\helper\TimeHelper;
 use App\Models\UserLuckyGift;
 use Carbon\Carbon;
 use App\Models\Code;
@@ -102,14 +103,28 @@ class Ranking
 
     private function applyDateFilters($query, $type)
     {
-        if ($type == 0) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfHour(), Carbon::now()->endOfHour()]);
-        } elseif ($type == 1) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
-        } elseif ($type == 2) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-        } elseif ($type == 3) {
-            $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+ 
+        $timezone = Common::timeZone();
+        $now = Carbon::now($timezone);
+
+
+
+        [$start, $end] = match ($type) {
+            0 => [$now->copy()->startOfHour(), $now->copy()->endOfHour()],
+            1 => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
+            2 => [
+                $now->copy()->startOfWeek(),
+                $now->copy()->endOfWeek(),
+            ],
+            3 => [
+                $now->copy()->startOfMonth(),
+                $now->copy()->endOfMonth(),
+            ],
+            default => [null, null],
+        };
+
+        if ($start && $end) {
+            $query->whereBetween('created_at', [$start, $end]);
         }
     }
 

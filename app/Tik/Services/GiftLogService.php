@@ -48,10 +48,13 @@ class GiftLogService
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
+            // room_id 1
+            // owner id 1
             $data    = $request;
             $user    = $request->user();
             $userId  = $user->id;
             $ownerId = $data['owner_id'];
+            $roomId = $data['room_id'];
             $giftId  = $data['id'];
             $number  = $data['num'];
             $type  = $data['type'];
@@ -74,9 +77,15 @@ class GiftLogService
                 return $check;
             }
 
-
             // Get Room Data
-            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+            if (isset($ownerId)){
+                $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+
+            }else{
+                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $ownerId = $room?->uid;
+            }
+
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
@@ -167,10 +176,10 @@ class GiftLogService
 
             if ($room->mode != '1' && $room->mode != '2') {
                 $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
-                $topUser =
+                /*$topUser =
                     $this->roomTopUsersRepository->getRoomTopUser($room->id, ['user' => function ($q) {
                         $q->withoutAppends();
-                    }]);
+                    }]);*/
 
                 /*  $fUser = $topUser?->user;
                   if ($room->top_user_id != $userId) {
@@ -204,7 +213,11 @@ class GiftLogService
 
             if ($totalPrice > $totalGiftPrice) {
                 Log::info('send gift event');
-                $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+                try {
+                    $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+                } catch (\Exception $e) {
+
+                }
             }
             return $message;
         });
@@ -426,9 +439,9 @@ class GiftLogService
             "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
             'room_session'      => $room->session_string,
             'is_password'       => (bool)(@$room->room_pass),
-            'room_owner_id'     => $room->uid ?: 0,
             'room_uuid'         => $room->owner?->uuid ?: 0,
             'room_id'           => (string)($room->id ?: 0),
+            'room_owner_id'     => $room->uid ?: 0,
             'room_name'         => $room->room_name ?: '',
             "room_mode"         => $room->mode,
             "room_cover"        => $room->room_cover ?? '',

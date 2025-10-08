@@ -1195,8 +1195,8 @@
     "Interval (days)": "Interval (days)",
     "wait-2-minutes" : "please wait 2 minutes",
 
-    
-  
+
+
   "dashboard.login.loading.check_code":"check code ...",
   "change password": "Change Password",
   "please enter new password": "Please enter new password",
@@ -1253,9 +1253,20 @@
   "Top Users Visits":"Most interactive",
   "Total BD Salary": "Total BD Salary",
     "Total Cut Amount": "Total Cut Amount",
-    "Average Agencies Per BD": "Average Agencies Per BD"
-
-
+    "Average Agencies Per BD": "Average Agencies Per BD",
+  "Timing settings": "Timing settings",
+    "Time zone:": "Time zone:",
+    "Start of week:": "Start of week:",
+    "End of week:": "End of week:",
+    "Save": "Save",
+    "Sunday": "Sunday",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday",
+    "Settings updated successfully.": "Settings updated successfully."
 
 
 

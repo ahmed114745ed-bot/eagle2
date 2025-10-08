@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    @php
+        $countryName = app()->getLocale() == 'ar' ? $country->name : $country->e_name;
+    @endphp
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>TEMPO LIFE - Country Details</title>
+    <title>
+        {{ config('app.name') }} – {{ $countryName }}
+    </title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 
@@ -846,6 +851,16 @@
                 flex-direction: column;
             }
         }
+
+        .page-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffd700;
+            margin-top: 40px;
+            margin-bottom: 70px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -859,11 +874,31 @@
 <div class="lightning" style="left: 20%;"></div>
 <div class="lightning" style="left: 50%; animation-delay: 2s;"></div>
 <div class="lightning" style="left: 80%; animation-delay: 3s;"></div>
+<h1 class="page-title">
+    {{ config('app.name') }} – {{ $countryName }}
+</h1>
 <!-- زر تبديل اللغة -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
 <div class="language-switcher">
-    <button class="lang-btn active" onclick="switchLanguage('ar')">العربية</button>
-    <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+    @php
+        $languages = \App\Models\Language::where('is_enabled', 1)->pluck('name', 'code');
+    @endphp
+
+    @foreach($languages as $key => $language)
+        <button
+            type="button"
+            class="language lang-btn {{ app()->getLocale() === $key ? 'active' : '' }}"
+            data-id="{{ $key }}">
+            {{ $language }}
+            @if(app()->getLocale() === $key)
+                <i class="fa fa-check"></i>
+            @endif
+        </button>
+    @endforeach
 </div>
+
 <div class="container">
     <!-- النسخة العربية -->
     <div id="ar-content">
@@ -876,9 +911,12 @@
                 </div>
                 <div class="country-flag">{{ $country->iso }}</div>
             </div>
-            <h1 class="country-name">{{ $country->name }}</h1>
+            <h1 class="country-name">
+                {{ $countryName }}
+            </h1>
         </div>
-        <div class="super-admin-card" onclick="alert('فتح البروفايل')">
+
+        <div class="super-admin-card" onclick="alert('{{ __('Open Profile') }}')">
             <div class="admin-crown">👑</div>
             <div class="admin-header">
                 <img
@@ -887,80 +925,68 @@
                     class="admin-avatar"
                 />
                 <div class="admin-info">
-                    <h3>🌟 السوبر أدمن 🌟</h3>
-                    <p style="color: #fff; font-size: 18px; font-weight: bold;">{{ @$superAdmin->name }}</p>
+                    <h3>🌟 {{ __('Super Admin') }} 🌟</h3>
+                    <p style="color: #fff; font-size: 18px; font-weight: bold;">
+                        {{ @$superAdmin->name }}
+                    </p>
                     <p style="color: #ffd700;">ID: {{ @$superAdmin->id }}</p>
                 </div>
             </div>
+
             <div class="admin-levels">
                 <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">مستوى الإرسال</div>
+                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Sending Level') }}</div>
                     <div class="level-value">75</div>
                 </div>
                 <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">مستوى الاستقبال</div>
+                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Receiving Level') }}</div>
                     <div class="level-value">82</div>
                 </div>
                 <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">مستوى الشحن</div>
+                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Recharge Level') }}</div>
                     <div class="level-value">90</div>
                 </div>
             </div>
         </div>
+
         <div class="stats-section">
-            <h2 class="stats-title">🎮 المستخدمون النشطون 🎮</h2>
-            <div class="stats-grid" style="display: flex; justify-content: center; align-items: center;">
-                <div class="stat-card"><span class="stat-number">{{$onlineUsers}}</span> <span
-                        style="color: #fff;"></span></div>
+            <h2 class="stats-title">🎮 {{ __('Active Users') }} 🎮</h2>
+            <div class="stats-grid" style="display:flex;justify-content:center;align-items:center;">
+                <div class="stat-card">
+                    <span class="stat-number">{{ $onlineUsers }}</span>
+                    <span style="color: #fff;"></span>
+                </div>
             </div>
         </div>
-        @php
-            $gradients = [
-                'linear-gradient(135deg, #667eea, #764ba2)',
-                'linear-gradient(135deg, #f093fb, #f5576c)',
-                'linear-gradient(135deg, #4facfe, #00f2fe)',
-            ];
-        @endphp
+
+        {{-- Top Rooms --}}
         <div class="top-section">
-            <h3 class="section-title">🏆 أشهر 3 غرف ترفيهية 🎉</h3>
+            <h3 class="section-title">🏆 {{ __('Top 3 Entertainment Rooms') }} 🎉</h3>
             <div class="top-list">
                 @foreach($topRooms as $index => $room)
-                    @php
-                        $defaultImage = asset("images/background_room.jpg");
-                        $path = @$room->room_cover;
-                        $ownerRoom = @$room->uid ?? 0;
-                        $url = getImagePath($path) ?? $defaultImage;
-                        if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                        }
-                    @endphp
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar room-avatar"
-                             style="background-image: url('{{ $url }}');background-size: cover;background-position: center;      border-radius: 15px;">
+                             style="background-image:url('{{ getImagePath($room->room_cover) ?? asset("images/background_room.jpg") }}');
+                                background-size:cover;background-position:center;">
                         </div>
                         <div class="top-name">{{ $room->room_name }}</div>
-                        <div class="top-value">{{ number_format($room->room_visitors_count) }} عضو</div>
+                        <div class="top-value">{{ number_format($room->room_visitors_count) }} {{ __('members') }}</div>
                     </div>
                 @endforeach
             </div>
         </div>
+
+        {{-- Top Supporters --}}
         <div class="top-section">
-            <h3 class="section-title">💎 أكثر 3 داعمين سخاءً 💰</h3>
+            <h3 class="section-title">💎 {{ __('Top 3 Generous Supporters') }} 💰</h3>
             <div class="top-list">
                 @foreach($topSenders as $index => $topSender)
-                    @php
-                        $userImageDefault = asset('images/businessman-icon.jpg');
-                        $avatar = $topSender->sender?->profile?->avatar;
-                        $image  = getImagePath($avatar) ?? $userImageDefault;
-                        if (!isImageExists($image)) {
-                            $image = $userImageDefault;
-                        }
-                    @endphp
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image: url('{{ $image }}');background-size: cover;background-position: center;border-radius: 15px;">
+                             style="background-image:url('{{ getImagePath($topSender->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                                background-size:cover;background-position:center;">
                         </div>
                         <div class="top-name">{{ $topSender->sender->name }}</div>
                         <div class="top-value">{{ number_format($topSender->total_sent / 1000, 1) }}K 💎</div>
@@ -968,376 +994,132 @@
                 @endforeach
             </div>
         </div>
+
+        {{-- Star Hosts --}}
         <div class="top-section">
-            <h3 class="section-title">🎤 أفضل 3 مضيفين نجوم ⭐</h3>
+            <h3 class="section-title">🎤 {{ __('Top 3 Star Hosts') }} ⭐</h3>
             <div class="top-list">
-                @foreach($topAgencySenders as $index => $topAgencySender)
-                    @php
-                        $userImageDefault = asset('images/businessman-icon.jpg');
-                        $avatar = $topAgencySender->sender?->profile?->avatar;
-                        $image  = getImagePath($avatar) ?? $userImageDefault;
-                        if (!isImageExists($image)) {
-                            $image = $userImageDefault;
-                        }
-                    @endphp
+                @foreach($topReceivers as $index => $topReceiver)
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image: url('{{ $image }}');background-size: cover;background-position: center;border-radius: 15px;">
+                             style="background-image:url('{{ getImagePath($topReceiver->receiver?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                                background-size:cover;background-position:center;">
                         </div>
-                        <div class="top-name">{{ $topAgencySender->sender->name }}</div>
-                        <div class="top-value">{{ number_format($topAgencySender->total_sent / 1000, 1) }}K 💎</div>
+                        <div class="top-name">{{ $topReceiver->receiver->name }}</div>
+                        <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
                     </div>
                 @endforeach
             </div>
         </div>
+
+        {{-- Top Agencies --}}
         <div class="top-section">
-            <h3 class="section-title">🏢 أقوى 3 وكالات مضيفين 🚀</h3>
+            <h3 class="section-title">🏢 {{ __('Top 3 Host Agencies') }} 🚀</h3>
             <div class="top-list">
                 @foreach($topAgencies as $index => $agency)
-                    @php
-                        $agencyDefaultImage = asset("images/icon-agency.jpg");
-                        $agencyImage =getImagePath(@$agency->img) ?? $agencyDefaultImage;
-                        if (!isImageExists($agencyImage)) {
-                            $agencyImage = $agencyDefaultImage;
-                        }
-                    @endphp
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar agency-avatar"
-                             style="background-image: url('{{ $agencyImage }}');background-size: cover;background-position: center;border-radius: 15px;">
+                             style="background-image:url('{{ getImagePath($agency->img) ?? asset("images/icon-agency.jpg") }}');
+                                background-size:cover;background-position:center;">
                         </div>
                         <div class="top-name">{{ $agency->name }}</div>
                         <div class="top-value">
-                            {{ number_format($agency->members_count) }} مضيف
+                            {{ number_format($agency->members_count) }} {{ __('hosts') }}
                         </div>
                     </div>
                 @endforeach
             </div>
         </div>
+
+        {{-- Top Charge Agencies --}}
         <div class="top-section">
-            <h3 class="section-title">💰 أضخم 3 وكالات شحن 💵</h3>
+            <h3 class="section-title">💰 {{ __('Top 3 Recharge Agencies') }} 💵</h3>
             <div class="top-list">
-                @foreach($topChargeAgencies as $index => $topChargeAgency)
+                @foreach($topChargeAgencies as $index => $charge)
                     @php
-                        $chargeAgencyDefaultImage = asset("images/icon-agency.jpg");
-                        $chargeAgencyImage =getImagePath(@$topChargeAgency->agency->img) ?? $agencyDefaultImage;
-                        if (!isImageExists($agencyImage)) {
-                            $chargeAgencyImage = $chargeAgencyDefaultImage;
-                        }
+                        $agency = $charge->senderShippingAgency;
                     @endphp
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar agency-avatar"
-                             style="background-image: url('{{ $chargeAgencyImage }}');background-size: cover;background-position: center;border-radius: 15px;">
+                    @if($agency)
+                        <div class="top-item">
+                            <span class="top-rank">{{ $index + 1 }}</span>
+                            <div class="top-avatar agency-avatar"
+                                 style="background-image:url('{{ getImagePath($agency->img ?? null) ?? asset("images/icon-agency.jpg") }}');
+                            background-size:cover;background-position:center;">
+                            </div>
+                            <div class="top-name">{{ $agency->name }}</div>
+                            <div class="top-value">
+                                {{ number_format($charge->amount ?? 0, 2) }} 💵
+                            </div>
                         </div>
-                        <div class="top-name">{{ $topChargeAgency->agency->name }}</div>
-                        <div class="top-value">
-                            {{ number_format($topChargeAgency->total_due, 2) }} 💵
-                        </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>
+
+        {{-- Top BD --}}
         <div class="top-section">
-            <h3 class="section-title">👥 أنشط 3 BD 🎯</h3>
+            <h3 class="section-title">👥 {{ __('Top 3 Most Active BD') }} 🎯</h3>
             <div class="top-list">
                 @foreach($topBds as $index => $bd)
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-name">{{ $bd->name }}</div>
-                        <div class="top-value">{{ number_format($bd->total_members) }} عميل</div>
+                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('agency') }}</div>
                     </div>
                 @endforeach
             </div>
         </div>
+
+        {{-- Top Gamers --}}
         <div class="top-section">
-            <h3 class="section-title">🎮 محترفي الألعاب 🏅</h3>
+            <h3 class="section-title">🎮 {{ __('Top 3 Gamers') }} 🏅</h3>
             <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #fbc2eb, #a6c1ee);"></div>
-                    <div class="top-name">يوسف أحمد</div>
-                    <div class="top-value">98,500 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #84fab0, #8fd3f4);"></div>
-                    <div class="top-name">مريم سامي</div>
-                    <div class="top-value">87,200 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);"></div>
-                    <div class="top-name">حسام علي</div>
-                    <div class="top-value">76,800 🏆</div>
-                </div>
+                @foreach($topGamers as $index => $gamer)
+                    <div class="top-item">
+                        <span class="top-rank">{{ $index + 1 }}</span>
+                        <div class="top-avatar"
+                             style="background-image:url('{{ getImagePath($gamer->user?->profile?->avatar) ?? asset('images/default-avatar.jpg') }}');
+                            background-size:cover;background-position:center;">
+                        </div>
+                        <div class="top-name">{{ $gamer->user?->name }}</div>
+                        <div class="top-value">{{ number_format($gamer->coins / 1000, 1) }}K ⚡</div>
+                    </div>
+                @endforeach
             </div>
         </div>
+
+        {{-- Motivational Message --}}
         <div class="motivational-message">
-            <h2 class="message-title">{{$country->iso}} رسالة نارية لأبطال {{$country->name}} {{$country->iso}}</h2>
+            <h2 class="message-title">
+                <small>{{ $country->iso }}</small> {{ __('Epic Message to Heroes of :country', ['country' => $countryName]) }} <small>{{ $country->iso }}</small>            </h2>
             <p class="message-text">
-                <span class="fire-emoji">🔥</span> يا أساطير تيمبو لايف <span class="fire-emoji">🔥</span><br/>
-                <br/>
-                أنتم لستم مجرد لاعبين... أنتم جيش الترفيه والمتعة! 🎮<br/>
-                كل غرفة تفتحونها تصبح ساحة للفرح والضحكات 🎉<br/>
-                كل هدية ترسلونها تزرع البسمة على الوجوه 💝<br/>
-                كل لعبة تلعبونها تكتب اسم مصر بأحرف من ذهب! ⚡<br/>
-                <br/>
-                <strong style="font-size: 24px; color: #ffd700;"> 🏆 هيا اجعلوا العالم يرقص على إيقاع {{$country->name}}
-                    🏆 </strong><br/>
-                <br/>
-                العبوا... ارقصوا... غنوا... اضحكوا... انشروا السعادة! 🎊<br/>
-                خلوا كل دقيقة في تيمبو لايف تكون احتفال مصري أصيل! 🎪<br/>
-                <br/>
-                <strong style="font-size: 20px;"> {{$country->name}} قوية بيكم... والمركز الأول في انتظاركم! 🦅 </strong>
-            </p>
-        </div>
-    </div>
-    <!-- النسخة الإنجليزية -->
-    <div id="en-content" class="hidden" lang="en">
-        <div class="header">
-            <div class="country-flag-container">
-                <div class="glow-rings">
-                    <div class="glow-ring"></div>
-                    <div class="glow-ring"></div>
-                    <div class="glow-ring"></div>
-                </div>
-                <div class="country-flag">{{ $country->name }}</div>
-            </div>
-            <h1 class="country-name">{{ $country->e_name }}</h1>
-        </div>
-        <div class="super-admin-card" onclick="alert('Open Profile')">
-            <div class="admin-crown">👑</div>
-            <div class="admin-header">
-                <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23FFD700'/%3E%3Cstop offset='1' stop-color='%23FF6B6B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='90' height='90' fill='url(%23g)'/%3E%3C/svg%3E"
-                    alt="Super Admin"
-                    class="admin-avatar"
-                />
-                <div class="admin-info">
-                    <h3>🌟 Super Admin 🌟</h3>
-                    <p style="color: #fff; font-size: 18px; font-weight: bold;">{{ @$superAdmin->name }}</p>
-                    <p style="color: #ffd700;">ID: {{ @$superAdmin->id }}</p>
-                </div>
-            </div>
-            <div class="admin-levels">
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">Sending Level</div>
-                    <div class="level-value">75</div>
-                </div>
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">Receiving Level</div>
-                    <div class="level-value">82</div>
-                </div>
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">Recharge Level</div>
-                    <div class="level-value">90</div>
-                </div>
-            </div>
-        </div>
-        <div class="stats-section">
-            <h2 class="stats-title">🎮 Active Users 🎮</h2>
-            <div class="stats-grid">
-                <div class="stat-card"><span class="stat-number">5,432</span> <span style="color: #fff;">Today</span>
-                </div>
-                <div class="stat-card"><span class="stat-number">4,876</span> <span
-                        style="color: #fff;">Yesterday</span></div>
-                <div class="stat-card"><span class="stat-number">28,945</span> <span
-                        style="color: #fff;">Last Week</span></div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">🏆 Top 3 Entertainment Rooms 🎉</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar room-avatar"
-                         style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
-                    <div class="top-name">Friends Room</div>
-                    <div class="top-value">15.2K Members</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar room-avatar"
-                         style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
-                    <div class="top-name">Fun Room</div>
-                    <div class="top-value">12.8K Members</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar room-avatar"
-                         style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
-                    <div class="top-name">Gaming Room</div>
-                    <div class="top-value">10.5K Members</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">💎 Top 3 Generous Supporters 💰</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #FFD700, #FFA500);"></div>
-                    <div class="top-name">Mohamed Ahmed</div>
-                    <div class="top-value">500K 💎</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #C0C0C0, #808080);"></div>
-                    <div class="top-name">Sara Ali</div>
-                    <div class="top-value">350K 💎</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #CD7F32, #8B4513);"></div>
-                    <div class="top-name">Ahmed Samir</div>
-                    <div class="top-value">280K 💎</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">🎤 Top 3 Star Hosts ⭐</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #a8edea, #fed6e3);"></div>
-                    <div class="top-name">Mona Elsayed</div>
-                    <div class="top-value">450K 🌟</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #d299c2, #fef9d7);"></div>
-                    <div class="top-name">Yasmin Mohamed</div>
-                    <div class="top-value">380K 🌟</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #89f7fe, #66a6ff);"></div>
-                    <div class="top-name">Nour Eldin</div>
-                    <div class="top-value">320K 🌟</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">🏢 Top 3 Host Agencies 🚀</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #fa709a, #fee140);"></div>
-                    <div class="top-name">Stars Agency</div>
-                    <div class="top-value">85 Hosts</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #30cfd0, #330867);"></div>
-                    <div class="top-name">Champions Agency</div>
-                    <div class="top-value">72 Hosts</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #a8edea, #fed6e3);"></div>
-                    <div class="top-name">Pros Agency</div>
-                    <div class="top-value">65 Hosts</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">💰 Top 3 Recharge Agencies 💵</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #f83600, #f9d423);"></div>
-                    <div class="top-name">Gold Agency</div>
-                    <div class="top-value">2.5M 💵</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #0ba360, #3cba92);"></div>
-                    <div class="top-name">Diamond Agency</div>
-                    <div class="top-value">1.8M 💵</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar agency-avatar"
-                         style="background: linear-gradient(135deg, #ee0979, #ff6a00);"></div>
-                    <div class="top-name">Pearl Agency</div>
-                    <div class="top-value">1.2M 💵</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">👥 Top 3 Most Active BD 🎯</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #13547a, #80d0c7);"></div>
-                    <div class="top-name">Karim Hassan</div>
-                    <div class="top-value">450 Clients</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #ff758c, #ff7eb3);"></div>
-                    <div class="top-name">Hoda Mahmoud</div>
-                    <div class="top-value">380 Clients</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #7028e4, #e5b2ca);"></div>
-                    <div class="top-name">Omar Khaled</div>
-                    <div class="top-value">320 Clients</div>
-                </div>
-            </div>
-        </div>
-        <div class="top-section">
-            <h3 class="section-title">🎮 Gaming Champions 🏅</h3>
-            <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #fbc2eb, #a6c1ee);"></div>
-                    <div class="top-name">Youssef Ahmed</div>
-                    <div class="top-value">98,500 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #84fab0, #8fd3f4);"></div>
-                    <div class="top-name">Mariam Samy</div>
-                    <div class="top-value">87,200 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);"></div>
-                    <div class="top-name">Hossam Ali</div>
-                    <div class="top-value">76,800 🏆</div>
-                </div>
-            </div>
-        </div>
-        <div class="motivational-message">
-            <h2 class="message-title">🇪🇬 Epic Message to Egypt's Heroes 🇪🇬</h2>
-            <p class="message-text">
-                <span class="fire-emoji">🔥</span> TEMPO LIFE Legends <span class="fire-emoji">🔥</span><br/>
-                <br/>
-                You're not just players... You're the Entertainment Army! 🎮<br/>
-                Every room you open becomes an arena of joy and laughter 🎉<br/>
-                Every gift you send plants smiles on faces 💝<br/>
-                Every game you play writes Egypt's name in golden letters! ⚡<br/>
-                <br/>
-                <strong style="font-size: 24px; color: #ffd700;"> 🏆 Make the World Dance to Egypt's Rhythm
-                    🏆 </strong><br/>
-                <br/>
-                Play... Dance... Sing... Laugh... Spread Happiness! 🎊<br/>
-                Make every minute in TEMPO LIFE an authentic Egyptian celebration! 🎪<br/>
-                <br/>
-                <strong style="font-size: 20px;"> Egypt is Strong with You... First Place Awaits! 🦅 </strong>
+                <span class="fire-emoji">🔥</span> {{ __('TEMPO LIFE Legends') }} <span class="fire-emoji">🔥</span><br/><br/>
+                {{ __('You are not just players... You are the Entertainment Army!') }} 🎮<br/>
+                {{ __('Every room you open becomes an arena of joy and laughter!') }} 🎉<br/>
+                {{ __('Every gift you send plants smiles on faces!') }} 💝<br/>
+                {{ __('Every game you play writes :country\'s name in golden letters!', ['country' => $countryName]) }} ⚡<br/><br/>
+                <strong style="font-size:24px;color:#ffd700;">🏆 {{ __('Make the World Dance to :country\'s rhythm', ['country' => $countryName]) }} 🏆</strong><br/><br/>
+                {{ __('Play... Dance... Sing... Laugh... Spread Happiness!') }} 🎊<br/>
+                {{ __('Make every minute in TEMPO LIFE an authentic celebration!') }} 🎪<br/><br/>
+                <strong style="font-size:20px;">{{ __(':country is strong with you... First place awaits!', ['country' => $countryName]) }} 🦅</strong>
             </p>
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $.ajaxSetup({
+        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
+    });
+
+    $(".language").click(function() {
+        let id = $(this).data('id');
+        let url = "{{ url('/locale') }}"; // or {{ admin_url('/locale') }} etc.
+        $.post(url, { locale: id }, () => location.reload());
+    });
+</script>
 <script>
     // إنشاء الجزيئات المتحركة function createParticles() { const particlesContainer = document.getElementById('particles'); for (let i = 0; i < 50; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 15 + 's'; particle.style.animationDuration = (15 + Math.random() * 10) + 's'; particlesContainer.appendChild(particle); } } // إنشاء النجوم function createStars() { const body = document.body; for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%'; star.style.animationDelay = Math.random() * 3 + 's'; body.appendChild(star); } } // تبديل اللغة function switchLanguage(lang) { const arContent = document.getElementById('ar-content'); const enContent = document.getElementById('en-content'); const langBtns = document.querySelectorAll('.lang-btn'); langBtns.forEach(btn => btn.classList.remove('active')); if (lang === 'ar') { arContent.classList.remove('hidden'); enContent.classList.add('hidden'); langBtns[0].classList.add('active'); document.dir = 'rtl'; } else { arContent.classList.add('hidden'); enContent.classList.remove('hidden'); langBtns[1].classList.add('active'); document.dir = 'ltr'; } } // تأثيرات صوتية عند الضغط document.querySelectorAll('.top-item, .stat-card, .level-item').forEach(item => { item.addEventListener('click', function() { this.style.animation = 'none'; setTimeout(() => { this.style.animation = ''; }, 10); // تأثير موجة عند الضغط const ripple = document.createElement('div'); ripple.style.position = 'absolute'; ripple.style.width = '100px'; ripple.style.height = '100px'; ripple.style.borderRadius = '50%'; ripple.style.background = 'rgba(255, 255, 255, 0.5)'; ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.pointerEvents = 'none'; ripple.style.animation = 'ripple 0.6s ease-out'; const rect = this.getBoundingClientRect(); ripple.style.left = event.clientX - rect.left + 'px'; ripple.style.top = event.clientY - rect.top + 'px'; this.style.position = 'relative'; this.style.overflow = 'hidden'; this.appendChild(ripple); setTimeout(() => ripple.remove(), 600); }); }); // تأثير الكتابة المتحركة للأرقام function animateNumbers() { document.querySelectorAll('.stat-number').forEach(element => { const target = parseInt(element.textContent.replace(',', '')); let current = 0; const increment = target / 50; const timer = setInterval(() => { current += increment; if (current >= target) { current = target; clearInterval(timer); } element.textContent = Math.floor(current).toLocaleString(); }, 30); }); } // تحديث الإحصائيات بشكل دوري setInterval(() => { const statNumbers = document.querySelectorAll('.stat-number'); statNumbers.forEach(num => { const current = parseInt(num.textContent.replace(',', '')); const variation = Math.floor(Math.random() * 100) - 50; num.textContent = (current + variation).toLocaleString(); }); }, 10000); // تهيئة الصفحة createParticles(); createStars(); setTimeout(animateNumbers, 500); // إضافة تأثير ripple CSS const style = document.createElement('style'); style.textContent = ` @keyframes ripple { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 200px; height: 200px; opacity: 0; } } `; document.head.appendChild(style);
 </script>

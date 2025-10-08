@@ -15,13 +15,13 @@ use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
+use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
-use Modules\LuckyBox\Entities\UserLuckyGift;
 
-class RankingRepository
+class RankingRepositoryV2
 {
     public function getUserLuckyGifts($type, $limit)
     {
@@ -253,7 +253,7 @@ class RankingRepository
 
     public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit, $room_id, $keywords)
     {
-        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
+        $query = GiftLog::query()->where('room_id', $room_id)->whereHas($rel)
 
             ->when($class != 3, fn($q) => $q->with($rel));
 
@@ -268,7 +268,7 @@ class RankingRepository
 
     public function getGiftLogsUserForRoomOwnerId($class, $rel, $type, $userId, $room_id, $keywords)
     {
-        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
+        $query = GiftLog::query()->where('room_id', $room_id)->whereHas($rel)
 
             ->when($class != 3, fn($q) => $q->with($rel));
 

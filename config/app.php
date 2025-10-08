@@ -206,7 +206,12 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         App\Bd\BdServiceProvider::class,
+        App\Providers\TimeServiceProvider::class,
         App\SuperAdmin\SuperAdminServiceProvider::class,
+
+
+
+
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 
