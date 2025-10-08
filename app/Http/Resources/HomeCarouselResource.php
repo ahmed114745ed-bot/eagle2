@@ -81,10 +81,9 @@ class HomeCarouselResource extends JsonResource
         
         ];
 
-            if (\Str::contains($this->display_at, 'country')) {
-                $data['countries'] = $this->countriesLite()->get();
-                    
-            }        
+        if ($this->displayCountry) {
+            $data['countries'] = $this->countriesLite()->get();
+        }      
         if ($this->event_type === 'weekly_cp') {
             $data += [
                 'cp_winner_name_one' => $nameOne,
