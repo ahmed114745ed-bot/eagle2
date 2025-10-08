@@ -154,6 +154,8 @@ class PaymentMethodController extends Controller
 
                 $data = $response->json();
 
+                info($data);
+
                 if (!empty($data['paymentStatus'])) {
                     info('ECommerceWeb', [$data]);
                 }
