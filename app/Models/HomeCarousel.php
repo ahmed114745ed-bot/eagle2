@@ -175,28 +175,31 @@ class HomeCarousel extends Model
     }
 
 
-    protected function displayAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value) => $this->decodeDisplayAt($value),
-    
-            set: fn($value) => json_encode(array_filter((array)$value))
-        );
-    }
-    
 
-    protected function decodeDisplayAt($value): array
+
+
+    protected function getDisplayAtAttribute($value)
     {
-        if (is_array($value)) {
-            return $value;
-        }
-    
         if (is_string($value)) {
             $decoded = json_decode($value, true);
-            return is_array($decoded) ? $decoded : [];
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
         }
-    
-        return [];
+
+        $legacy = [];
+        foreach (['discover', 'home_top', 'home_middle', 'live', 'country'] as $type) {
+            if (!empty($this->attributes["display_{$type}"])) {
+                $legacy[] = $type;
+            }
+        }
+
+        return $legacy;
+    }
+
+    protected function setDisplayAtAttribute($value)
+    {
+        $this->attributes['display_at'] = json_encode(array_filter((array)$value));
     }
 
 }
