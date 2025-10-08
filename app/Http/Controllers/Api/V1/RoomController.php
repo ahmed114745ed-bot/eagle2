@@ -1319,7 +1319,7 @@ class RoomController extends Controller
 
         if ($res) {
 
-            $resu = Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($ms));
+            $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
             return Common::apiResponse(1, 'Set administrator successfully', $adm_arr, 200);
         } else {
             return Common::apiResponse(0, 'Failed to set administrator', null, 400);
