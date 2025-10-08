@@ -22,7 +22,6 @@ class HomeCarousel extends Model
         'display_home_middle' => 'integer',
         'display_live' => 'integer',
         'display_country' => 'integer',
-        'display_at' => 'array',
 
     ];
 
@@ -188,7 +187,7 @@ class HomeCarousel extends Model
     protected function getDisplayAtAttribute($value)
     {
         $decoded = $this->displays?->pluck('display_type')->toArray();
-        return implode(',',$decoded);
+        return $decoded;
     }
 
 
