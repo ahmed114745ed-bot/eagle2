@@ -268,8 +268,18 @@ class HomeCarouselController extends MainController
             $formForm  = request('form') ?? $form->model()->form ?? 1;
             $displaysOrg =$form->display_at ?? $form->model()->display_at;
 
-            $displays = [];
-            
+            if (is_array($displaysOrg)) {
+                $displays = $displaysOrg;
+            } elseif (is_string($displaysOrg)) {
+                $decoded = json_decode($displaysOrg, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $displays = $decoded;
+                } else {
+                    $displays = array_map('trim', explode(',', $displaysOrg));
+                }
+            } else {
+                $displays = [];
+            }            
    
          
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
