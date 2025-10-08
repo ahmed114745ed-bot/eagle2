@@ -1286,7 +1286,7 @@ class RoomController extends Controller
         if ($room->uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
         $roomVisitor = $room->room_visitor;
         $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
-         if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
+        if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
         $roomAdmin = $room->room_admin;
         $roomMax   = $room->max_admin;
@@ -1590,7 +1590,7 @@ class RoomController extends Controller
     public function changeMode(Request $request)
     {
         $currentMode = $request->mode;
-        if ($currentMode == null || !$request->owner_id) return Common::apiResponse(0, 'missing param', null, 422);
+        if ($currentMode == null || (!$request->owner_id && !$request->room_id)) return Common::apiResponse(0, 'missing param', null, 422);
         return $this->roomService->changeMode($request, $currentMode);
     }
 

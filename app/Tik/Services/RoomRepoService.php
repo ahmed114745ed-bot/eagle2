@@ -390,8 +390,10 @@ class RoomRepoService
     public function changeMode($request, $currentMode)
     {
         $user = request()->user();
-        if (!$request->owner_id) return Common::apiResponse(0, 'missing parameter', null, 404);
-        $room =  $this->findAudioRoomUser($request->owner_id);
+        $roomId = $request->room_id;
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($request->owner_id);
         \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
@@ -440,7 +442,7 @@ class RoomRepoService
         $jsons[] = $json;
 
 
-        $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
         \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
@@ -448,9 +450,8 @@ class RoomRepoService
             Utils::unwrap($promises);
         } catch (\Throwable $e) {
             \Log::error("changeMode: Zego send failed - " . $e->getMessage());
-
         }
-                \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
 
         return Common::apiResponse(1, 'done', null, 201);
