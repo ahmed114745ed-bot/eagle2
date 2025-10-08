@@ -417,11 +417,15 @@ class MicService
     {
         $user = request()->user();
         $position = $data['position'];
-        $room = $this->roomRepository->findRoomUser($data['owner_id']);
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
         if (!$room) throw new Exception(__('room fot found'));
         if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
             throw new Exception(__('you do not have permission'));
         }
+        $data['owner_id'] = $room->uid;
 
         if ($room['mode'] == 0) {
             if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
