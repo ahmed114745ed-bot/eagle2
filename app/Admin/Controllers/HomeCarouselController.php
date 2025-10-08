@@ -76,26 +76,26 @@ class HomeCarouselController extends MainController
     
         $grid->id(__('ID'));
             $grid->column('img', __('img'))->image('', 235, 77);
-            // $grid->column('url', __('url'))->url();
          
             $types = [
-                'displayDiscover' => __('Display Discover'),
-                'displayHomeTop'  => __('Display Home Top'),
-                'displayHomeMiddle'=> __('Display Home Middle'),
-                'displayLive'     => __('Display Live'),
-                'displayCountry'  => __('country'),
+                'displayDiscover' => 'Discover',
+                'displayHomeTop'  => 'Home Top',
+                'displayHomeMiddle'=> 'Home Middle',
+                'displayLive'     => 'Live',
+                'displayCountry'  => 'Country',
             ];
-
-            foreach ($types as $attr => $type) {
-                $grid->column($attr, ucfirst($type))
-                    ->display(function () use ($type) {
-                        return $this->displays->pluck('display_type')->contains($type) ? 1 : 0; // switch needs 1/0
+            
+            foreach ($types as $attr => $label) {
+                $grid->column($attr, __($label))
+                    ->display(function () use ($attr) {
+                        return $this->{$attr} ? 1 : 0;
                     })
                     ->switch([
                         'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
                         'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
                     ]);
             }
+            
 
 
         $grid->column('enable', __('enable'))->switch();
@@ -255,14 +255,20 @@ class HomeCarouselController extends MainController
                 'displayLive'       => 'live',
                 'displayCountry'    => 'country',
             ];
-        
-    
+            $reqKeys = array_keys($types);
+
+            $foundKeys = array_filter($reqKeys, function($key) {
+                return request()->has($key);
+            });
+          
+
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? $form->model()->input ?? 0;
             $formForm  = request('form') ?? $form->model()->form ?? 1;
-            $displays =$form->display_at ??$form->model()->display_at;
+            $displays =$form->display_at ?? $form->model()->display_at;
            
-            if (!empty($displays)) {
+         
+            if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
                 $toDelete = array_diff($existing, $displays);
                 if ($toDelete) {
                     $form->model()->displays()->whereIn('display_type', $toDelete)->delete();
@@ -299,7 +305,7 @@ class HomeCarouselController extends MainController
                 }
                 
             } else {
-                dd($formForm, $formInput  );
+             
 
                 foreach ($types as $key => $type) {
                     if (request()->has($key)) {
@@ -319,7 +325,6 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             } else {
-                                // إنشاء سجل جديد إذا لم يكن موجود
                                 $form->model()->displays()->create([
                                     'display_type'  => $type,
                                     'duration'      => $formInput,
