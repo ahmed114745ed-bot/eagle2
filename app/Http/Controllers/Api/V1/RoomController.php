@@ -293,7 +293,7 @@ class RoomController extends Controller
         }
         try {
             $user            = $request->user();
-            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user,$request->room_id);
+            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user, $request->room_id);
             if ($isToZegoCharisma && isset($userDataWithCharisma)) {
                 $ms = [
                     'messageContent' => [
@@ -1004,15 +1004,21 @@ class RoomController extends Controller
     public function out_room(Request $request)
     {
         $uid      = $request->owner_id ?: 0;
+        $roomId = $request->room_id;
         $black_id = $request->user_id ?: 0;
         $duration = $request->minutes ?: 5;
         // if vip 8 not allawed to kickout
 
-        if (!$uid || !$black_id) return Common::apiResponse(0, 'invalid data', null, 422);
+        if ((!$uid && !$roomId) || !$black_id) return Common::apiResponse(0, 'invalid data', null, 422);
         if (Common::pack_get(9, $black_id)) return Common::apiResponse(0, 'cant kick this user', null, 422);
         //        if (!Common::can_kick ($black_id)) return Common::apiResponse (0,'cant kick this user',null,403);
-        $black_list = @DB::table('rooms')->where('uid', $uid)->first()->room_black;
-        $room_id    = @DB::table('rooms')->where('uid', $uid)->first()->id;
+        $room = $roomId
+            ? Room::find($roomId)
+            : Room::where('uid', $uid)->where('type', 'audio')->first();
+        if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
+        $uid = $room->uid;
+        $black_list = @$room->room_black;
+        $room_id    = @$room->id;
         if ($black_list == null) {
             $black_list = $black_id . '#' . time() . '#' . ($duration * 60);
         } else {
