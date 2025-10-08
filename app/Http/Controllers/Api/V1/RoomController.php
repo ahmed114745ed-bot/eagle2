@@ -202,6 +202,35 @@ class RoomController extends Controller
         return Common::apiResponse(true, 'successfully', $collections);
     }
 
+    public function extraDataRoom(Request $request)
+    {
+
+        $roomId = $request->room_id;
+        $room = $roomId
+            ? Room::find($roomId)
+            : Room::where('uid', $request->owner_id)->where('type', 'audio')->first();
+        if (!$room) return Common::apiResponse(false, 'No Room Founded');
+        $owner_id = $room->uid;
+        $tz = getTimezone();
+        $today = Carbon::today($tz);
+
+        $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
+            $q->where('room_id', $room->id);
+        })
+            ->whereNull('ended_at')
+            ->whereNotNull('started_at')
+            ->whereDate('started_at', $today)
+            ->first();
+
+        $collections = [
+            'charisma'          => $this->roomCharisma($owner_id),
+            'achievements'      => $this->achievementLevels($owner_id),
+            'boxes'             => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
+            'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
+        ];
+        return Common::apiResponse(true, 'successfully', $collections);
+    }
+
     private function getBoxes($ownerId, $userId)
     {
         return BoxUse::query()
