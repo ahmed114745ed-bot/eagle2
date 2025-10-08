@@ -16,11 +16,19 @@ class VerifyGameLeaderCCMiddleWare
      */
     public function handle(Request $request, Closure $next)
     {
-         if ($request->has('orderId')) {
+        $key = config('games.leader_CC_game_key');
+        if (!$key) {
+            return response()->json([
+                'errorCode' => 4005,
+                'errorMsg'  => 'Missing or invalid parameters key',
+
+            ], 4005);
+        }
+        if ($request->has('orderId')) {
             $orderId = $request->orderId;
             if (Cache::has("order_$orderId")) {
                 return [
-                   
+
                     'response' => response()->json([
                         'errorCode' => 10003,
                         'message' => 'Order already exists'

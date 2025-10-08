@@ -36,7 +36,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 4005);
         }
         $key = config('games.leader_CC_game_key');
 
