@@ -188,7 +188,7 @@ class HomeCarousel extends Model
     protected function getDisplayAtAttribute($value)
     {
         $decoded = $this->displays?->pluck('display_type')->toArray();
-        return '["discover","home_top"]';
+        return '"discover","home_top"';
     }
 
 
