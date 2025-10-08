@@ -190,7 +190,7 @@ class HomeCarouselController extends MainController
                  ->options('/api/search/users2')
                  ->ajax('/api/search/users2', 'id', 'name');
          })->when('link', function (Form $form) {
-             $form->url('url', trans('url'))->rules('required|url');
+             $form->url('url', trans('url'))->rules('nullable|url');
          })->when('event', function (Form $form) {
              $form->select('event_type', trans('events'))->options([
                  'event'        => __('events'),
