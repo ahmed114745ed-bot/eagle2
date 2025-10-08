@@ -112,7 +112,7 @@ class PaymentMethodController extends Controller
 
     public function success(Request $request): JsonResponse
     {
-        try {
+//        try {
             $query = Arr::only($request->query(), [
                 'statusCode',
                 'statusDescription',
@@ -174,13 +174,13 @@ class PaymentMethodController extends Controller
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
-        } catch (Throwable $e) {
-            return response()->json([
-                'status' => false,
-                'trx' => null,
-                'message' => 'An error occurred: ' . $e->getMessage(),
-            ]);
-        }
+//        } catch (Throwable $e) {
+//            return response()->json([
+//                'status' => false,
+//                'trx' => null,
+//                'message' => 'An error occurred: ' . $e->getMessage(),
+//            ]);
+//        }
     }
 
 }
