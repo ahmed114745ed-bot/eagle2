@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Http;
 use Throwable;
 use App\Helpers\Common;
 use App\Models\CoinLog;
@@ -139,6 +140,24 @@ class PaymentMethodController extends Controller
             }
 
             if ($query['statusCode'] == 200 && $query['orderStatus'] == 'UNPAID'){
+                $merchantCode = config('services.fawry.merchant_code');
+                $secureKey = config('services.fawry.secure_key');
+                $merchantRefNumber = $query['merchantRefNumber'];
+
+                $signature = hash('sha256', $merchantCode . $merchantRefNumber . $secureKey);
+
+                $response = Http::get('https://atfawry.fawrystaging.com/ECommerceWeb/Fawry/payments/status/v2', [
+                    'merchantCode' => $merchantCode,
+                    'merchantRefNumber' => $merchantRefNumber,
+                    'signature' => $signature,
+                ]);
+
+                $data = $response->json();
+
+                if (!empty($data['paymentStatus'])) {
+                    info($data);
+                }
+
                 return response()->json([
                     'status' => true,
                     'trx' => $query['merchantRefNumber'],
