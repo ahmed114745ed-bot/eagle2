@@ -16,7 +16,7 @@ class HomeCarouselController extends Controller
     {
     
         $user = Auth::user();
-        $displayType = $request->get('display_type'); 
+        $displayType = $request->get('display_at'); 
         $timezone = getTimezone();
         $now = Carbon::now($timezone);
         $offset = $now->format('P');
