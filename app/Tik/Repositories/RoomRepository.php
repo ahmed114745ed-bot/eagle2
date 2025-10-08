@@ -141,8 +141,7 @@ class RoomRepository extends AbstractRepository
     public function updateMicRoom($room, $mic)
     {
         $room->microphone = $mic;
-        $this->updateRoomUser($room);
-        return true;
+        return $room->save();
     }
 
     public function updateRoomStatus($userId, $isAvailable)
