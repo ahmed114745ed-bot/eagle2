@@ -58,9 +58,13 @@ class MicService
         $user = $this->userRepository->findById($data['user_id']);
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
-        $room = $this->roomRepository->findRoomTypeUser($data['owner_id'], withoutAppends: false);
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
+        
         if (!$room)  throw new Exception(__('room does not exist'));
-
+       $data['owner_id'] = $room->uid;
         //
         $position = $data['position']; // mic index
         $mic_arr = explode(',', $room->microphone);
