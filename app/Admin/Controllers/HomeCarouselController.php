@@ -339,30 +339,34 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             }
-
+                             
                             $existingDisplayAt = $form->model()->display_at ?? [];
-                
+
                             if (!is_array($existingDisplayAt)) {
                                 $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
                             }
                         
                             if (!in_array($type, $existingDisplayAt)) {
                                 $existingDisplayAt[] = $type;
-                                $form->model()->update(['display_at' => $existingDisplayAt]);
+                                $form->model()->display_at = $existingDisplayAt; // ← احفظ كمصفوفة مباشرة
+                                $form->model()->save();
                             }
+
+                      
 
                         } else {
                             if ($display) {
                                 $display->delete();
                             }
-
                             $existingDisplayAt = $form->model()->display_at ?? [];
+
                             if (!is_array($existingDisplayAt)) {
                                 $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
                             }
                         
                             $existingDisplayAt = array_values(array_diff($existingDisplayAt, [$type]));
-                            $form->model()->update(['display_at' => $existingDisplayAt]);
+                            $form->model()->display_at = $existingDisplayAt; // ← نحفظ كمصفوفة مباشرة
+                            $form->model()->save();
                         }
                     }
                 }
