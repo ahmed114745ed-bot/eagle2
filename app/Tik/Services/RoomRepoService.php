@@ -233,9 +233,11 @@ class RoomRepoService
         return $this->userRepository->getAdmins($adminIds);
     }
 
-    public function changePasswordRoom($ownerId)
+    public function changePasswordRoom($ownerId = null, $roomId = null)
     {
-        $room =  $this->findAudioRoomUser($ownerId);
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
         if ($room) {
             $room->room_pass = '';
             $this->repository->updateRoomUser($room);
