@@ -12,6 +12,16 @@
     </div>
 </div>
 
+@php
+    if (request()->is('admin/*')) {
+        $fetchUrl = admin_url('superadmin/rooms-activity');
+    } elseif (request()->is('superadmin/*')) {
+        $fetchUrl = superAdmin_url('rooms-activity');
+    } else {
+        $fetchUrl = url('rooms-activity');
+    }
+@endphp
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let roomsActivityChart;
@@ -64,7 +74,7 @@
 
     function loadRoomsActivity(period = 'day') {
         $.ajax({
-            url: "{{ superadmin_url('rooms-activity') }}",
+            url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function(res) {
                 if (res.success) {

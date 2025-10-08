@@ -670,9 +670,10 @@ class AgencyController extends MainController
 
     protected function addMainFields(Form $form)
     {
+        
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/get-country-users?country_id='.Auth::user()->country_id, 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->hidden('status', __('status'))->default(1);

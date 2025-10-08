@@ -579,8 +579,11 @@ class AgencyController extends MainController
 
     protected function grid()
     {
+        $countryID = request('country_id');
+
         $grid = new Grid(new Agency);
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
             ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
@@ -589,11 +592,25 @@ class AgencyController extends MainController
                     ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
             ->orderByDesc('id');
-        if (request()->has('active')) {
-            $grid->model()->whereHas('agencySalaries', function ($q) {
+
+        if (request("active") == true) {
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
                     ->where('year', now()->year);
             });
+        }
+
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
         }
 
         // --- Agency name column ---

@@ -106,7 +106,7 @@ class SuperAdminRewardController extends MainController
         // Define your type mapping
         $typeMap = SELECTED_USED_WARE;
 
-        $types =  ['vip', 'ware', 'coin', 'badge', 'achievement'];
+        $types =  ['vip', 'ware',  'badge', /** 'achievement'*/];
         $currentType = request()->get('type', 'vip');
 
         $box = new Box(content: view('admin.grid.Form.rewardTabs', [

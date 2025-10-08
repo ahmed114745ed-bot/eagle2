@@ -15,6 +15,7 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
     "Create Ticket": "Create Complaint",
     "delete Ticket": "delete Complaint ",
@@ -1266,7 +1267,28 @@
     "Thursday": "Thursday",
     "Friday": "Friday",
     "Saturday": "Saturday",
-    "Settings updated successfully.": "Settings updated successfully."
+    "Settings updated successfully.": "Settings updated successfully.",
+  "Total Cut Amount": "Total Cut Amount",
+  "Average Agencies Per BD": "Average Agencies Per BD",
+  "insufficient_balance": "Insufficient balance!",
+  "request_sent_success": "Request sent successfully and balance deducted!",
+  "Confirm Deduction": "Confirm Deduction",
+  "coins will be deducted to send the display request: ": ":count coins will be deducted to send the display request: "
+,  "Yes, deduct and send request": "Yes, deduct and send request",
+  "Cancel": "Cancel",
+  "Done!": "Done!",
+  "An error occurred while processing": "An error occurred while processing",
+  "Error": "Error",
+  "History": "History",
+  "SweetAlert2 is not loaded!": "SweetAlert2 is not loaded!",
+  "request_sent_success": "Your display request has been sent successfully.",
+"insufficient_balance": "You do not have enough coins to complete this request.",
+"A display of this type is already active for this banner.": "A display of this type is already active for this banner.",
+"You already have a pending request for this banner and display type.": "You already have a pending request for this banner and display type.",
+"confirm_resend": "Confirm Resend",
+"deduct_text": "Coins will be deducted to resend the banner request:"
+
+
 
 
 

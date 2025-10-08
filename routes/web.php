@@ -552,18 +552,38 @@ Route::get('/fix-agencies-bd', function () {
 
 
 
+Route::get('/migrate-home-carousel', function () {
 
-Route::get('/week-zone', function () {
+    $carousels = DB::table('home_carousels')->get();
 
+    foreach ($carousels as $carousel) {
 
+        $displayTypes = [];
 
-    $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
-    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+        if ($carousel->display_home_top) $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle) $displayTypes[] = 'home_middle';
+        if ($carousel->display_live) $displayTypes[] = 'live';
+        if ($carousel->display_country) $displayTypes[] = 'country';
+        if ($carousel->display_discover) $displayTypes[] = 'discover';
 
-    return response()->json([
-        'start_of_week'  => $startOfWeek,
-        'end_of_week'    => $endOfWeek,
-    ], 200, [], JSON_PRETTY_PRINT);
+        foreach ($displayTypes as $type) {
+            foreach ($displayTypes as $type) {
+                DB::table('home_carousel_displays')->updateOrInsert(
+                    [
+                        'home_carousel_id' => $carousel->id,
+                        'display_type'     => $type,
+                    ],
+                    [
+                        'end_at'        => now()->addDays(30), 
+                        'duration'      => 30,               
+                        'duration_unit' => 'days',
+                        'created_at'    => $carousel->created_at,
+                        'updated_at'    => $carousel->updated_at,
+                    ]
+                );
+            }            
+        }
+    }
+
+    return "Migration completed successfully!";
 });
-
-

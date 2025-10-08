@@ -4,7 +4,6 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
-use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
@@ -422,7 +421,6 @@ class WareTabController extends MainController
                 $hasShowImg = $form->show_img || $form->model()->show_img;
                 $img2 = $form->img2;
                 $wareId = $form->model()->id;
-
                 Log::info('🟢 [Form Saving Started]', [
                     'model_id' => $form->model()->id,
                     'has_show_img' => (bool) $form->show_img,
@@ -430,7 +428,6 @@ class WareTabController extends MainController
                     'has_img2' => (bool) $form->img2,
                     'has_existing_img2' => (bool) $form->model()->img2,
                 ]);
-
                 $hasImg2 = $img2 || $form->model()->img2;
 
                 if (!$hasShowImg && !$hasImg2) {
@@ -471,6 +468,13 @@ class WareTabController extends MainController
 
                 // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
+            
+
+                    Log::info('🖼 img2 uploaded', [
+                        'original_name' => $img2->getClientOriginalName(),
+                        'mime' => $img2->getMimeType(),
+                    ]);
+        
                     /** @var FileService $fileService*/
                     $fileService = app( FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
@@ -534,7 +538,6 @@ class WareTabController extends MainController
             if (request('get_type') == 4) {
                 $form->model()->expire = 0;
             }
-
         });
 
         $form->saved(function (Form $form) {

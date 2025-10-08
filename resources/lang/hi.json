@@ -24,6 +24,11 @@
 "Browse lucky gift setting": "लकी गिफ्ट सेटिंग ब्राउज़ करें",
     "Sorry, you can only manage users in your own country.": "क्षमा करें, आप केवल अपने देश के उपयोगकर्ताओं का प्रबंधन कर सकते हैं।",
     "Delete profile switch users": "प्रोफ़ाइल स्विच उपयोगकर्ताओं को हटाएं",
+    "Dedicated successfully": "सफलतापूर्वक समर्पित किया गया",
+    "Select Country...": "देश चुनें...",
+    "Select Country": "देश चुनें",
+"Something went wrong": "कुछ गलत हो गया",
+"Select Super Admins": "सुपर एडमिन चुनें",
     "Profile Images": "प्रोफ़ाइल छवियाँ",
     "Charged by dash": "सिस्टम से चार्ज",
     "Top Gift": "शीर्ष उपहार",
@@ -59,7 +64,12 @@
 "charges": "शुल्क",
 "appear-charger-agency": "चार्जर एजेंसी दिखाई दे",
 "Shipping Agencies": "शिपिंग एजेंसियाँ",
+"Super Admin Reward History": "सुपर एडमिन पुरस्कार इतिहास",
 "UUID": "यूयूआईडी",
+"banner Settings": "बैनर सेटिंग्स",
+"Banner Setting": "बैनर सेटिंग",
+"Browse banner setting": "बैनर सेटिंग ब्राउज़ करें",
+"Price for 1 day": "1 घंटे की कीमत!",
 "HomeCarousel": "होम कैरोसेल",
 "achievement": "उपलब्धि",
 "ID": "आईडी",
@@ -3140,7 +3150,17 @@
     "Thursday": "गुरुवार",
     "Friday": "शुक्रवार",
     "Saturday": "शनिवार",
-    "Settings updated successfully.": "सेटिंग्स सफलतापूर्वक अपडेट की गईं।"
+    "Settings updated successfully.": "सेटिंग्स सफलतापूर्वक अपडेट की गईं।",
+    "insufficient_balance": "आपकी शेष राशि पर्याप्त नहीं है!",
+    "request_sent_success": "अनुरोध सफलतापूर्वक भेजा गया और राशि घटा दी गई!",
+    "request_sent_success": "आपका प्रदर्शन अनुरोध सफलतापूर्वक भेजा गया है।",
+    "insufficient_balance": "इस अनुरोध को पूरा करने के लिए आपके पास पर्याप्त सिक्के नहीं हैं।",
+    "A display of this type is already active for this banner.": "इस बैनर के लिए इस प्रकार का प्रदर्शन पहले से सक्रिय है।",
+    "You already have a pending request for this banner and display type.": "आपके पास पहले से ही इस बैनर और प्रदर्शन प्रकार के लिए एक लंबित अनुरोध है।",
+       "confirm_resend": "पुनः भेजने की पुष्टि करें",
+    "deduct_text": "बैनर अनुरोध को पुनः भेजने के लिए सिक्के काटे जाएंगे:"
+
+
 
 
 

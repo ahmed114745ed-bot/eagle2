@@ -265,7 +265,17 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    public function bdCountryUsers(Request $request)
+    {
+        $key = $request->q;
+        $country_id = $request->country_id;
+        $page = $request->get('page', 1);
+        $users = $this->userService->bdCountryUsers($key, $page,$country_id);
 
+        return response()->json($users);
+    }
+
+    
     public function user_bd(Request $request)
     {
         $key = $request->q;

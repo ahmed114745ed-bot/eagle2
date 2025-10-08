@@ -2,6 +2,8 @@
 
 use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\UserHistoryRewardController;
+use App\Admin\Controllers\SuperadminBannerRequestController;
+use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -116,6 +118,7 @@ use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
@@ -313,6 +316,7 @@ Route::group(
             ]
         ]);
          Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -371,6 +375,14 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+
+        Route::prefix('superadmin')->name('superadmin.')->group(function () {
+            Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
+            Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
+            Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
+            Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+        });
 
         Route::get('/soon', 'AllStatisticController@index2');
         Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');
@@ -611,6 +623,7 @@ Route::group(
             }
             dD("goold");
         });
+        Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::get('background-count', function () {
             $backgrounds = \App\Models\Background::get();
@@ -696,6 +709,9 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+            Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
+            Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
+            Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
     }
 );

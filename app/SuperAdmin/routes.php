@@ -1,5 +1,6 @@
 <?php
 
+use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
@@ -102,7 +103,10 @@ Route::group(
         ]);
 
         Route::resource('rooms', RoomController::class);
+        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
+
         Route::resource('home-carousel', HomeCarouselController::class);
+
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
 
@@ -117,5 +121,8 @@ Route::group(
             ->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
+        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
+        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
+        ->name('banner.resend');
     }
 );

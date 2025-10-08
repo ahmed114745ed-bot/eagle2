@@ -327,6 +327,8 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
+        $countryID = request('country_id');
+
         $grid->model()
             ->audio()
             ->select(
@@ -353,13 +355,15 @@ class RoomController extends MainController
             )
 
             ->with([
-
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar'
                 ])->select(['id', 'uuid', 'special_id', 'name']),
 
             ])
+            ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
+                $q->where('id',  $countryID);
+            }))
             ->withCount('roomVisitors');
 
         // ✅ كاش make_rooms_top
@@ -375,6 +379,10 @@ class RoomController extends MainController
         $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
+
+        if (request()->online == 1) {
+            $grid->model()->whereHas('roomVisitors');
+        }
 
         $grid->model()->orderByRaw(implode(', ', $orderSql));
     }
