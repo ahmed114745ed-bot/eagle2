@@ -1458,7 +1458,7 @@ class RoomController extends Controller
 
     public function removeRoomPass(Request $request)
     {
-        $room = $this->roomService->changePasswordRoom($request->owner_id);
+        $room = $this->roomService->changePasswordRoom($request->owner_id, $request->room_id);
 
         $data = [
             "messageContent" => [
