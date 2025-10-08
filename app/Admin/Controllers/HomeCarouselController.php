@@ -303,10 +303,12 @@ class HomeCarouselController extends MainController
                         ]);
                     }
                 }
+
+
+      
                 
             } else {
              
-
                 foreach ($types as $key => $type) {
                     if (request()->has($key)) {
                         $value = request($key);
@@ -336,14 +338,35 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             }
+
+                            $existingDisplayAt = $form->model()->display_at ?? [];
+                
+                            if (!is_array($existingDisplayAt)) {
+                                $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
+                            }
+                        
+                            if (!in_array($type, $existingDisplayAt)) {
+                                $existingDisplayAt[] = $type;
+                                $form->model()->update(['display_at' => $existingDisplayAt]);
+                            }
+
                         } else {
-                            // إذا القيمة 0، امسح السجل إن وجد
                             if ($display) {
                                 $display->delete();
                             }
+
+                            $existingDisplayAt = $form->model()->display_at ?? [];
+                            if (!is_array($existingDisplayAt)) {
+                                $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
+                            }
+                        
+                            $existingDisplayAt = array_values(array_diff($existingDisplayAt, [$type]));
+                            $form->model()->update(['display_at' => $existingDisplayAt]);
                         }
                     }
                 }
+
+           
             }
     
             if (in_array('country', $displays ?? [])) {
