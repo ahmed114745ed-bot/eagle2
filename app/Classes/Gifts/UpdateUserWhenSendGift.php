@@ -51,7 +51,10 @@ class UpdateUserWhenSendGift
                         ->onQueue('notification');
                 }
             } catch (\Exception $e) {
-                Log::error("Error in checkUserLevelUpgrated: " . $e->getMessage());
+                Log::build([
+                    'driver' => 'single',
+                    'path' => storage_path('logs/diamond_upgrade.log'),
+                ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
             }
     
             $user->save();
@@ -59,10 +62,20 @@ class UpdateUserWhenSendGift
     
         try {
             uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
+    
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/monthly_diamond.log'),
+            ])->info("MonthlyDiamondReceive updated for user {$receivedUser->id}: {$diamondUser}");
+    
         } catch (\Exception $e) {
-            Log::error("Failed to update MonthlyDiamondReceive for user {$receivedUser->id}: " . $e->getMessage());
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/monthly_diamond.log'),
+            ])->error("Failed to update MonthlyDiamondReceive for user {$receivedUser->id}: " . $e->getMessage());
         }
     }
+    
     
     public function updateUsers(int $totalCoins, array $userIds)
     {
