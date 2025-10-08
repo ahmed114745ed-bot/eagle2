@@ -22,7 +22,6 @@ class HomeCarousel extends Model
         'display_home_middle' => 'integer',
         'display_live' => 'integer',
         'display_country' => 'integer',
-        'display_at' => 'array',
 
     ];
 
@@ -178,25 +177,13 @@ class HomeCarousel extends Model
 
 
 
+
+
+
     protected function getDisplayAtAttribute($value)
     {
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $decoded;
-            }
-        }
-
-        $legacy = [];
-        foreach (['discover', 'home_top', 'home_middle', 'live', 'country'] as $type) {
-            if (!empty($this->attributes["display_{$type}"])) {
-                $legacy[] = $type;
-            }
-        }
-
-        return $legacy;
+        $decoded = $this->displays?->pluck('display_type')->toArray();
+        return implode(',',$decoded);
     }
-
-
 
 }

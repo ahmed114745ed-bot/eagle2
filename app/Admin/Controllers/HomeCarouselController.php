@@ -266,8 +266,11 @@ class HomeCarouselController extends MainController
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? $form->model()->input ?? 0;
             $formForm  = request('form') ?? $form->model()->form ?? 1;
-            $displays =$form->display_at ?? $form->model()->display_at;
-           
+            $displaysOrg =$form->display_at ?? $form->model()->display_at;
+
+            $displays = [];
+            
+   
          
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
                 $toDelete = array_diff($existing, $displays);
