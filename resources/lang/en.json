@@ -1276,9 +1276,22 @@
 "A display of this type is already active for this banner.": "A display of this type is already active for this banner.",
 "You already have a pending request for this banner and display type.": "You already have a pending request for this banner and display type.",
 "confirm_resend": "Confirm Resend",
-"deduct_text": "Coins will be deducted to resend the banner request:"
+"deduct_text": "Coins will be deducted to resend the banner request:",
 
 
+  "Timing settings": "Timing settings",
+    "Time zone:": "Time zone:",
+    "Start of week:": "Start of week:",
+    "End of week:": "End of week:",
+    "Save": "Save",
+    "Sunday": "Sunday",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday",
+    "Settings updated successfully.": "Settings updated successfully."
 
 
 

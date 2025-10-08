@@ -63,7 +63,6 @@ class AuthService
         return $payload ? $payload : false;
     }
 
-
     /**
      * @throws \Throwable
      */

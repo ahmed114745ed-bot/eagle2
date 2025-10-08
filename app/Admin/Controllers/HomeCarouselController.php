@@ -364,4 +364,14 @@ class HomeCarouselController extends MainController
         $config = Setting::whereIn('key', ['live', 'home_middle', 'home_top', 'discover'])->pluck('value', 'key')->toArray();
         return $content->view('homeCarouselSetting', compact('config'));
     }
+
+
+    public function homeCarouselSettings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'banner-setting');
+        }
+        $config = Setting::whereIn('key', ['live', 'home_middle', 'home_top', 'discover'])->pluck('value', 'key')->toArray();
+        return $content->view('homeCarouselSetting', compact('config'));
+    }
 }

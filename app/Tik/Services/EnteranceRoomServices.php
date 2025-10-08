@@ -151,6 +151,7 @@ class EnteranceRoomServices
         $userId = $request->user_account;
         Log::info('zego req 2',['req' => $request->all()]);
 
+        /** @var Room $room */
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
@@ -167,6 +168,10 @@ class EnteranceRoomServices
             $user->now_room_uid = 0;
         }
         if ($event == 'room_logout' ){
+
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+            }
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
@@ -176,6 +181,9 @@ class EnteranceRoomServices
             $this->handleCharismaStatusOnLogout($room, $user, $request->owner_id);
         }
         $user->save();
+        $room->save();
+       
+
 
 //        $count = RoomVisitor::query()->where('room_id', $room->id)->count();
 //        DB::table('rooms')->where('id', $roomId)->update(['count_room_socket' => $count, 'room_visitor' => implode(",", $visitors)]);

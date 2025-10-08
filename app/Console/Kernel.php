@@ -64,7 +64,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
-            $schedule->command('update-room-ban')
+        $schedule->command('update-room-ban')
             ->everyFiveMinutes()
             ->appendOutputTo(storage_path('logs/update-room-ban'))
             ->runInBackground();
@@ -145,7 +145,7 @@ class Kernel extends ConsoleKernel
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
 

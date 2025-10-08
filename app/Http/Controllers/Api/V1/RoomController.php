@@ -310,6 +310,11 @@ class RoomController extends Controller
             }
             $this->handleLeaveCp($user, $roomId);
             $room = Room::find($roomId);
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+                $room->save();
+    
+            }
             $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
@@ -1278,7 +1283,7 @@ class RoomController extends Controller
         }
         if (!$uid || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
         if ($uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        $room = Room::query()->where('uid',  $uid)->first();
+        $room = Room::query()->where('uid',  $uid)->where('type',  'audio')->first();
         if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
 
         $roomVisitor = $room->room_visitor;

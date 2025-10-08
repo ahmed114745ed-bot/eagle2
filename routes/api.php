@@ -197,7 +197,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
-            Route::get('user-app-setting', [UserController::class, 'app_setting']);
+            Route::get('user-app-setting', [UserController::class, 'appSetting']);
 
             Route::post('auth/logout', [UserController::class, 'logout']);
             Route::post('/change-room-effect', [UserController::class, 'showSetting']);
@@ -377,6 +377,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
+                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);

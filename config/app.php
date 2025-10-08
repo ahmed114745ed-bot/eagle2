@@ -96,7 +96,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-
+    'utd_url' => env('UTD_URL', 'http://127.0.0.1:8082/api/'),
     'asset_url' => env('ASSET_URL', null),
 
     /*
@@ -207,6 +207,8 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         App\Bd\BdServiceProvider::class,
         App\SuperAdmin\SuperAdminServiceProvider::class,
+        App\Providers\TimeServiceProvider::class,
+
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 

@@ -235,9 +235,15 @@ class EnteranceController extends Controller
     }
 
 
-
+    /**
+     * @throws \Exception
+     */
     public function enter_room(Request $request): JsonResponse
     {
+        $app_feature = \Cache::get('zego_feature');
+        if (!$app_feature && !is_null($app_feature)) {
+            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        }
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');

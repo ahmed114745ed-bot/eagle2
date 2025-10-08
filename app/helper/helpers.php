@@ -186,6 +186,14 @@ if (!function_exists('upload')) {
 }
 
 
+if (!function_exists('deleteFile')) {
+    function deleteFile($path): ?string
+    {
+        return Storage::disk('gcs')->delete($path);
+    }
+}
+
+
 if (!function_exists('uploadMonthlyDiamondReceive')) {
     function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
     {
@@ -521,11 +529,11 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
             if ($objectFit !== 'cover') {
-                return "<div class='rtlSvga' id='$model' 
-            style='width: {$width}px; 
-                   height: {$height}px; 
-                   object-fit: {$objectFit}; 
-                   border-radius: {$borderRadius}px; 
+                return "<div class='rtlSvga' id='$model'
+            style='width: {$width}px;
+                   height: {$height}px;
+                   object-fit: {$objectFit};
+                   border-radius: {$borderRadius}px;
                    margin-right: 4px;'>
              </div>";
             }
@@ -832,9 +840,9 @@ if (!function_exists('bd_url')) {
         function getGiftPercentage(string $key): float
         {
             $cacheKey = "percentage_{$key}";
-    
+
             $value = Cache::get($cacheKey);
-    
+
             if ($value === null) {
                 $value = \App\Models\Setting::where('key', $key)->value('value');
                 if ($value !== null) {
@@ -843,15 +851,15 @@ if (!function_exists('bd_url')) {
             }
             if ($value === null) {
                 $value = match ($key) {
-                    'app_wallet_lucky_gift' => 80,  
-                    'owner_lucky_gift'      => 10,  
-                    'host_lucky_gift'       => 10, 
+                    'app_wallet_lucky_gift' => 80,
+                    'owner_lucky_gift'      => 10,
+                    'host_lucky_gift'       => 10,
                     default                  => 0,
                 };
             }
 
             $percentage = round(((float) $value) / 10, 2);
-            
+
 
             return $percentage;
 

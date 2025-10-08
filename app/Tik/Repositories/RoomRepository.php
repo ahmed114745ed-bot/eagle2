@@ -29,6 +29,19 @@ class RoomRepository extends AbstractRepository
         return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
 
+    public function findRoomTypeUser($userId, $type = 'audio', $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type', $type)->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
+    public function findAudioRoomUser($userId, $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type' ,'audio')->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
+
     public function findRoomId($id, $withoutAppends = true)
     {
         $query = $this->model;
@@ -89,6 +102,14 @@ class RoomRepository extends AbstractRepository
         return $this->model->withoutAppends()->where(['uid' => $ownerId])->selectRaw($selectRow)->first();
     }
 
+    public function findUserRoomById($ownerId, $selectRow = "*")
+    {
+        return $this->model
+        ->withoutAppends()
+        ->where(['id' => $ownerId])
+        ->selectRaw($selectRow)
+        ->first();
+    }
     public function updateRoom($room)
     {
         $room->update();
@@ -120,8 +141,7 @@ class RoomRepository extends AbstractRepository
     public function updateMicRoom($room, $mic)
     {
         $room->microphone = $mic;
-        $this->updateRoomUser($room);
-        return true;
+        return $room->save();
     }
 
     public function updateRoomStatus($userId, $isAvailable)
@@ -437,6 +457,9 @@ class RoomRepository extends AbstractRepository
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->whereNotIn('uid', $blockedUserIds)
+            ->whereHas('roomVisitors', function ($query) {
+                $query->whereColumn('user_id', 'rooms.uid');
+            })
             ->where('room_status', 1)
             ->orderByDesc('pin')
             ->orderByDesc('room_visitors_count')
@@ -597,7 +620,7 @@ class RoomRepository extends AbstractRepository
             $query->whereIn('uid', $ids);
         }
         return RoomResource::collection(
-            $query->where('type', 'live')->paginate()
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
         );
     }
 
