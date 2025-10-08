@@ -39,7 +39,7 @@ class FfmpegService
         if (!file_exists($tempDir)) {
             mkdir($tempDir, 0777, true);
         }
-        
+
         $imagePath = storage_path("app/temp_frames/{$id}.jpg"); // Adjust path as needed
         $ffprobe = FFProbe::create();
 
@@ -69,8 +69,9 @@ class FfmpegService
 
         shell_exec($ffmpegCommand);
 
+        $prefix = config('app.env') !== 'production' ? '' : 'test-';
         // Upload image to GCS
-        \Storage::disk('gcs')->put("frames/{$id}.jpg", file_get_contents($imagePath));
+        \Storage::disk('gcs')->put("{$prefix}frames/{$id}.jpg", file_get_contents($imagePath));
         unlink($imagePath); // optional: clean up
     }
 
