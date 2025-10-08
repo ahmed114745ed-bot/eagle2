@@ -204,9 +204,6 @@ class HomeCarousel extends Model
         return $legacy;
     }
 
-    protected function setDisplayAtAttribute($value)
-    {
-        $this->attributes['display_at'] = json_encode(array_filter((array)$value));
-    }
+
 
 }
