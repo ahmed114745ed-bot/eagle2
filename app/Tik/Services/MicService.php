@@ -58,7 +58,7 @@ class MicService
         $user = $this->userRepository->findById($data['user_id']);
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
-        $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
+        $room = $this->roomRepository->findRoomTypeUser($data['owner_id'], withoutAppends: false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
         //
@@ -148,7 +148,7 @@ class MicService
             return true;
         }
 
-   
+
         $userSeats = $this->getUserNearby($position, $room->mode);
 
        Log::info("📍 [CP] Nearby positions", [
@@ -191,52 +191,52 @@ class MicService
     public function getUserNearby($index, $mode)
     {
         // $neighbors = [];
-    
+
         // $rowSize = match ($mode) {
         //     1 => 16,
         //     2 => 12,
         //     default => 9,
         // };
-    
+
         // $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         // $rowEnd = $rowStart + $rowSize - 1;
         // if ($rowSize <= 1) {
-        //     return []; 
+        //     return [];
         // }
 
-        
+
         // if ($index - 1 >= $rowStart) {
         //     $neighbors[] = $index - 1;
         // }
         // if ($index + 1 <= $rowEnd) {
         //     $neighbors[] = $index + 1;
         // }
-    
+
         // return $neighbors;
 
         $rowSize = 4;
 
         $rowStart = intdiv($index, $rowSize) * $rowSize;
         $rowEnd = $rowStart + $rowSize - 1;
-    
+
         $neighbors = [];
-    
+
         for ($i = $rowStart; $i <= $rowEnd; $i++) {
             if ($i !== $index) {
                 $neighbors[] = $i;
             }
         }
-    
+
         Log::info("🪑 [Nearby] Row positions", [
             'index' => $index,
             'row_start' => $rowStart,
             'row_end' => $rowEnd,
             'neighbors' => $neighbors,
         ]);
-    
+
         return $neighbors;
     }
-    
+
 
 
     public function sendCpLovelyMessage($room, $user)
