@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -73,10 +74,10 @@ class HomeCarouselController extends MainController
     {
         $grid = new Grid(new HomeCarousel);
         $grid ->model()->with('displays');
-    
+
         $grid->id(__('ID'));
             $grid->column('img', __('img'))->image('', 235, 77);
-         
+
             $types = [
                 'displayDiscover' => 'Discover',
                 'displayHomeTop'  => 'Home Top',
@@ -84,7 +85,7 @@ class HomeCarouselController extends MainController
                 'displayLive'     => 'Live',
                 'displayCountry'  => 'Country',
             ];
-            
+
             foreach ($types as $attr => $label) {
                 $grid->column($attr, __($label))
                     ->display(function () use ($attr) {
@@ -95,15 +96,15 @@ class HomeCarouselController extends MainController
                         'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
                     ]);
             }
-            
+
 
 
         $grid->column('enable', __('enable'))->switch();
         $grid->column('sort', __('sort'))->editable();
-    
+
         return $grid;
     }
-    
+
 
     /**
      * Make a show builder.
@@ -136,7 +137,7 @@ class HomeCarouselController extends MainController
      protected function form()
      {
          $form = new Form(new HomeCarousel);
-     
+
          $this->disableFormTools($form);
          $this->addBasicFields($form);
          $this->addTimeSettings($form);
@@ -146,11 +147,11 @@ class HomeCarouselController extends MainController
          $this->syncDisplaysBeforeSave($form);
          $this->syncCountriesAfterSave($form);
 
-     
+
          return $form;
      }
-     
-    
+
+
      protected function addBasicFields(Form $form)
      {
          $form->display(__('admin.ID'));
@@ -158,8 +159,8 @@ class HomeCarouselController extends MainController
          $form->image('img', trans('img'))->setResolution(80)->required();
          $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
      }
-     
-    
+
+
      protected function addTimeSettings(Form $form)
      {
         $form->select('form', trans('time view type'))->options([
@@ -174,10 +175,10 @@ class HomeCarouselController extends MainController
         })->when('3', function (Form $form) {
             $form->number('input', trans('input'))->min(1);
         });
-        
+
      }
-     
-  
+
+
      protected function addContentType(Form $form)
      {
          $form->select('type', trans('type'))->options([
@@ -202,8 +203,8 @@ class HomeCarouselController extends MainController
              ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
          });
      }
-     
- 
+
+
      protected function addDisplayLocations(Form $form)
      {
         $form->multipleSelect('display_at', __('Display At'))
@@ -216,12 +217,12 @@ class HomeCarouselController extends MainController
         ])
         ->rules(['array'])
         ->attribute('id', 'display_at_select');
-    
-     
+
+
          $form->belongsToMany('countries', Countries::class, trans('Country'));
-     
+
          $form->html('<style>#countries_select { display:none; }</style>');
-     
+
          Admin::script("
              function toggleCountriesField() {
                  var displayAt = document.getElementById('display_at_select');
@@ -236,16 +237,16 @@ class HomeCarouselController extends MainController
              });
          ");
      }
-     
- 
+
+
      protected function syncDisplaysBeforeSave(Form $form)
      {
         $form->ignore(['duration']);
 
      }
-     
-   
-   
+
+
+
      protected function syncCountriesAfterSave(Form $form)
      {
         $form->saved(function (Form $form) {
@@ -261,7 +262,7 @@ class HomeCarouselController extends MainController
             $foundKeys = array_filter($reqKeys, function($key) {
                 return request()->has($key);
             });
-          
+
 
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? $form->model()->input ?? 0;
@@ -279,17 +280,17 @@ class HomeCarouselController extends MainController
                 }
             } else {
                 $displays = [];
-            }            
-   
-         
+            }
+
+
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
                 $toDelete = array_diff($existing, $displays);
                 if ($toDelete) {
                     $form->model()->displays()->whereIn('display_type', $toDelete)->delete();
                 }
-    
+
                 $toAdd = array_diff($displays, $existing);
-              
+
                 $toAdd = array_filter($toAdd);
                 foreach ($toAdd as $type) {
                     $display = $form->model()->displays()->where('display_type', $type)->first();
@@ -319,16 +320,16 @@ class HomeCarouselController extends MainController
                 }
 
 
-      
-                
+
+
             } else {
-             
+
                 foreach ($types as $key => $type) {
                     if (request()->has($key)) {
                         $value = request($key);
-                
+
                         $display = $form->model()->displays()->where('display_type', $type)->first();
-                
+
                         if ($value) {
                             if ($display) {
                                 $display->update([
@@ -352,20 +353,20 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             }
-                             
+
                             $existingDisplayAt = $form->model()->display_at ?? [];
 
                             if (!is_array($existingDisplayAt)) {
                                 $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
                             }
-                        
+
                             if (!in_array($type, $existingDisplayAt)) {
                                 $existingDisplayAt[] = $type;
                                 $form->model()->display_at = $existingDisplayAt; // ← احفظ كمصفوفة مباشرة
                                 $form->model()->save();
                             }
 
-                      
+
 
                         } else {
                             if ($display) {
@@ -376,7 +377,7 @@ class HomeCarouselController extends MainController
                             if (!is_array($existingDisplayAt)) {
                                 $existingDisplayAt = json_decode($existingDisplayAt, true) ?: [];
                             }
-                        
+
                             $existingDisplayAt = array_values(array_diff($existingDisplayAt, [$type]));
                             $form->model()->display_at = $existingDisplayAt; // ← نحفظ كمصفوفة مباشرة
                             $form->model()->save();
@@ -384,9 +385,9 @@ class HomeCarouselController extends MainController
                     }
                 }
 
-           
+
             }
-    
+
             if (in_array('country', $displays ?? [])) {
                 $countries = array_filter(request('countries', []));
                 $form->model()->countries()->sync($countries);
@@ -400,8 +401,8 @@ class HomeCarouselController extends MainController
             }
         });
      }
-     
-        
+
+
      public function homeCarouselSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
