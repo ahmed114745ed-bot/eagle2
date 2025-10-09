@@ -53,8 +53,8 @@ class GiftLogService
             $data    = $request;
             $user    = $request->user();
             $userId  = $user->id;
-            $ownerId = $data['owner_id'];
-            $roomId = $data['room_id'];
+            $ownerId = @$data['owner_id'];
+            $roomId = @$data['room_id'];
             $giftId  = $data['id'];
             $number  = $data['num'];
             $type  = $data['type'];

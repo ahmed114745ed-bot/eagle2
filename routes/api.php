@@ -4,7 +4,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Events\PublicTestEvent;
 use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
@@ -12,7 +11,6 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
-use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\AppFeatureController;
@@ -63,7 +61,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\MallController as ControllersMallController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -95,9 +92,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
     Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
 
-    Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
-    
-    Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
@@ -122,19 +116,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
-        Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
-        Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
-        Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
-        Route::get('superadmin-agencies', [UserController::class, 'superAdminAgencies'])->name('superadmin-agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
-        Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
-
     });
 
     // authorization

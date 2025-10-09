@@ -38,8 +38,8 @@ class LuckyGiftService
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
-        $ownerId = $data['owner_id'];
-        $roomId = $data['room_id'];
+        $ownerId = @$data['owner_id'];
+        $roomId = @$data['room_id'];
         $giftId   = $data['id'];
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
@@ -69,8 +69,8 @@ class LuckyGiftService
             throw  new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
-       
-           
+
+
 
 
         if (isset($ownerId)){
@@ -85,7 +85,7 @@ class LuckyGiftService
             ->first();
             $ownerId = $room?->uid;
         }
-        
+
         if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
 
         $roomId   = $room->id;
@@ -163,8 +163,8 @@ class LuckyGiftService
                     'isPopular'           => $isPopular,
                     'cashback_percentage' => $cashback_percentage,
                 ]);
-                
-              
+
+
                 if ($isPopular) {
 
                      \Log::info('🚀 Sending Popular To Zego...', [
