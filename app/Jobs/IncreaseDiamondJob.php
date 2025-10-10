@@ -25,6 +25,7 @@ class IncreaseDiamondJob implements ShouldQueue
 
     public function handle(): void
     {
-       incrementMonthlyDiamond($this->userId, $this->value);
+        \DB::transaction(fn() => incrementMonthlyDiamond($this->userId, $this->value));
+
     }
 }
