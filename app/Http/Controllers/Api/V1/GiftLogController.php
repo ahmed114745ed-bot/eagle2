@@ -293,6 +293,15 @@ class GiftLogController extends Controller
             return Common::apiResponse(false, $e->getMessage());
         }
 
+        if ($totalPrice > $totalGiftPrice) {
+            Log::info('send gift event');
+            try {
+
+            } catch (\Exception $e) {
+
+            }
+        }
+
         settings()->set('gift_send', true);
 
         respond_and_continue(
@@ -301,7 +310,8 @@ class GiftLogController extends Controller
                 $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
                 if ($totalPrice > $totalGiftPrice) {
-                    $event = new GiftBannerEvent(...$args);
+                    $giftData = $this->giftLogService->giftEvent(...$args);
+                    $event = new GiftBannerEvent($giftData);
                     (new \App\Listeners\SendGiftBanner())->handle($event);
                 }
             }

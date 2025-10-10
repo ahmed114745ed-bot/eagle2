@@ -508,7 +508,8 @@ class GiftLogService
             'room_type'  => @$room->type,
         ];
 
-        event(new GiftBannerEvent($gift_data));
+        return $gift_data;
+//        event(new GiftBannerEvent($gift_data));
     }
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {
