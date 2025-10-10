@@ -214,8 +214,21 @@ class GiftLogService
 
             $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
 
-            $args = [$gift, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $number];
-            return [$message,$totalPrice, $args];
+
+            $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
+
+
+            if ($totalPrice >= $totalGiftPrice) {
+                try {
+                    $gift_data = $this->giftEvent($gift, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $number);
+                    event(new GiftBannerEvent($gift_data));
+                } catch (\Exception $e) {
+
+                }
+
+            }
+
+            return $message;
         });
     }
 
@@ -509,7 +522,6 @@ class GiftLogService
         ];
 
         return $gift_data;
-//        event(new GiftBannerEvent($gift_data));
     }
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {
