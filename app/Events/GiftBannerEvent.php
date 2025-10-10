@@ -28,7 +28,7 @@ class GiftBannerEvent implements ShouldBroadcast //ShouldBroadcast
     public function __construct($gift)
     {
         $this->gift = $gift;
-        $this->broadcastQueue = getLeastBusyQueue();
+        $this->broadcastQueue = getLeastBusyQueue('heavyProcessing');
 
     }
 
