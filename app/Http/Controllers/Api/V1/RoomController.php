@@ -179,7 +179,7 @@ class RoomController extends Controller
 
     public function extraRoomData($owner_id): JsonResponse
     {
-        $room = $this->roomService->findRoomUser($owner_id);
+        $room = $this->roomService->findAudioRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
 
         $tz = getTimezone();
