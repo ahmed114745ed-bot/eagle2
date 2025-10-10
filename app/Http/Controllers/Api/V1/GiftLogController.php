@@ -293,8 +293,6 @@ class GiftLogController extends Controller
             return Common::apiResponse(false, $e->getMessage());
         }
 
-        app()->afterResponse(fn() => Log::info('Ran after response'));
-
         settings()->set('gift_send', true);
 
         register_shutdown_function(function () use ($totalPrice,$args) {
@@ -305,7 +303,7 @@ class GiftLogController extends Controller
                 event(new GiftBannerEvent($giftData));
             }
         });
-        
+
         return Common::apiResponse(true, $message);
     }
 
