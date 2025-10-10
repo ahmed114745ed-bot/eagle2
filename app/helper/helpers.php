@@ -300,6 +300,27 @@ if (!function_exists('get_file_details')) {
         }
     }
 
+    if (!function_exists('getLeastBusyQueue')) {
+        function getLeastBusyQueue($queueConnection = 'database')
+        {
+            $connection = config('queue.default');
+            $queueNames = config("queue.connections.$queueConnection.queue");
+
+            $minQueueSize  = null;
+            $selectedQueue = null;
+
+            foreach ($queueNames as $queueName) {
+                $queueSize = Queue::connection($connection)->size($queueName);
+                if ($minQueueSize === null || $queueSize < $minQueueSize) {
+                    $minQueueSize  = $queueSize;
+                    $selectedQueue = $queueName;
+                }
+            }
+
+            return $selectedQueue ?? 'default';
+        }
+    }
+
     if (!function_exists('settings')) {
 
         function settings(): AppSetting

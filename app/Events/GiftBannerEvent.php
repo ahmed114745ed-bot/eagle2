@@ -11,12 +11,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
+class GiftBannerEvent implements ShouldBroadcast //ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     // use InteractsWithSockets;
 
     public $gift;
+
+    public string $broadcastQueue;
 
     /**
      * Create a new event instance.
@@ -26,6 +28,8 @@ class GiftBannerEvent implements ShouldBroadcastNow //ShouldBroadcast
     public function __construct($gift)
     {
         $this->gift = $gift;
+        $this->broadcastQueue = getLeastBusyQueue();
+
     }
 
     /**

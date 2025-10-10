@@ -295,15 +295,12 @@ class GiftLogController extends Controller
 
         settings()->set('gift_send', true);
 
-        register_shutdown_function(function () use ($totalPrice,$args) {
-            $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
+        $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
-            if ($totalPrice > $totalGiftPrice) {
-                $giftData = $this->giftLogService->giftEvent(...$args);
-                event(new GiftBannerEvent($giftData));
-            }
-        });
-
+        if ($totalPrice > $totalGiftPrice) {
+            $giftData = $this->giftLogService->giftEvent(...$args);
+            event(new GiftBannerEvent($giftData));
+        }
         return Common::apiResponse(true, $message);
     }
 
