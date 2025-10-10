@@ -293,9 +293,10 @@ class GiftLogController extends Controller
             return Common::apiResponse(false, $e->getMessage());
         }
 
+        app()->afterResponse(fn() => Log::info('Ran after response'));
 
         settings()->set('gift_send', true);
-
+        
         respond_and_continue(
             response: Common::apiResponse(true, $message),
             callback: function () use ($totalPrice,$args) {
