@@ -292,15 +292,7 @@ class GiftLogController extends Controller
         } catch (\Exception $e) {
             return Common::apiResponse(false, $e->getMessage());
         }
-
-        if ($totalPrice > $totalGiftPrice) {
-            Log::info('send gift event');
-            try {
-
-            } catch (\Exception $e) {
-
-            }
-        }
+        
 
         settings()->set('gift_send', true);
 
