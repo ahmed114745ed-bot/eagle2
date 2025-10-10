@@ -469,7 +469,7 @@ class GiftLogService
     public function giftEvent($gift, $user, $totalPrice, $receivedUser, $receiversIds, $room, $number)
     {
 
-        $receiverGiftDTO = (count($receiversIds) > 1)? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromRoom($receivedUser);
+        $receiverGiftDTO = (count($receiversIds) > 1)? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromUser($receivedUser);
 
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
