@@ -292,7 +292,7 @@ class GiftLogController extends Controller
         } catch (\Exception $e) {
             return Common::apiResponse(false, $e->getMessage());
         }
-        
+
 
         settings()->set('gift_send', true);
 
@@ -303,8 +303,7 @@ class GiftLogController extends Controller
 
                 if ($totalPrice > $totalGiftPrice) {
                     $giftData = $this->giftLogService->giftEvent(...$args);
-                    $event = new GiftBannerEvent($giftData);
-                    (new \App\Listeners\SendGiftBanner())->handle($event);
+                    event(new GiftBannerEvent($giftData));
                 }
             }
         );
