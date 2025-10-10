@@ -140,38 +140,35 @@ class UpdateUserWhenSendGift
      */
     public function send(int $totalCoins, User $senderUser)
     {
-//        $updated = DB::transaction(function () use ($totalCoins, $senderUser) {
-            // Atomically decrement `di` only if user has enough balance
-            $affected = User::where('id', $senderUser->id)
-                ->where('di', '>=', $totalCoins)
-                ->update([
-                    'di' => DB::raw("di - {$totalCoins}"),
-                    'monthly_diamond_send' => DB::raw("monthly_diamond_send + {$totalCoins}"),
-                    'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}")
-                ]);
 
-            if ($affected === 0) {
-                throw new NotInfMoneyException();
-            }
+        $affected = User::where('id', $senderUser->id)
+            ->where('di', '>=', $totalCoins)
+            ->update([
+                'di' => DB::raw("di - {$totalCoins}"),
+                'monthly_diamond_send' => DB::raw("monthly_diamond_send + {$totalCoins}"),
+                'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}")
+            ]);
 
-            // Re-fetch latest user state
-            $senderUser->refresh();
+        if ($affected === 0) {
+            throw new NotInfMoneyException();
+        }
 
-            $lastLevel = $senderUser->total_sender_level;
+        // Re-fetch latest user state
+        $senderUser->refresh();
 
-            (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
+        $lastLevel = $senderUser->total_sender_level;
 
-            if ($senderUser->total_sender_level != $lastLevel) {
-                dispatch(
-                    new SendCustomOfficialMessageToUser(
-                        $senderUser->id,
-                        NotificationType::SENDER_LEVEL
-                    )
-                )->onQueue('notification');
-            }
+        (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
 
-           /* return true;
-        });*/
+        if ($senderUser->total_sender_level != $lastLevel) {
+            dispatch(
+                new SendCustomOfficialMessageToUser(
+                    $senderUser->id,
+                    NotificationType::SENDER_LEVEL
+                )
+            )->onQueue('notification');
+        }
+
 
         return $senderUser->fresh();
     }

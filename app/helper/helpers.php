@@ -944,3 +944,20 @@ if (!function_exists('getCountryIdFromLatLong')) {
         return $country->id;
     }
 }
+
+
+if (!function_exists('respond_and_continue')) {
+    function respond_and_continue($response, callable $callback)
+    {
+        $response->send();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        try {
+            $callback();
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage());
+        }
+        exit; // ensure no further output
+    }
+}
