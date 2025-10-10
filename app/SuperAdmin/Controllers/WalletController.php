@@ -367,7 +367,7 @@ class WalletController extends MainController
 
     private function performAgencyCharge(SuperAdmin $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
-        $fromUser->decrement('di', $usd);
+        $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
 
         WalletService::storeTransaction(
