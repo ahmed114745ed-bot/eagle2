@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\GiftBannerEvent;
 use App\Jobs\CleanGiftLogsJob;
 use App\Models\Cp;
 use App\Models\Pk;
@@ -300,7 +301,8 @@ class GiftLogController extends Controller
                 $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
                 if ($totalPrice > $totalGiftPrice) {
-                    $this->giftLogService->giftEvent(...$args);
+                    $event = new GiftBannerEvent(...$args);
+                    (new \App\Listeners\SendGiftBanner())->handle($event);
                 }
             }
         );
