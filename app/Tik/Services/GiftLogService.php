@@ -80,7 +80,7 @@ class GiftLogService
 
             // Get Room Data
             if (isset($ownerId)){
-                $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
 
             }else{
                 $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
