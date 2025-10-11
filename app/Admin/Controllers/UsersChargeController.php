@@ -169,7 +169,7 @@ class UsersChargeController extends MainController
 
         return $grid;
     }
-    
+
 
     public function chargeUser()
     {
@@ -177,70 +177,82 @@ class UsersChargeController extends MainController
         $year = 2025;
         $reason = self::reason;
 
-        $userSalaries = UserSallary::with('user:id,di,notification_id,is_logout')
+        $chunkSize = 500; // adjust based on memory/performance
+
+        $processedCount = 0;
+
+        UserSallary::with('user:id,di,notification_id,is_logout')
             ->where('month', $month)
             ->where('year', $year)
             ->where('remaining_diamond', '!=', 0)
-            ->get(['id', 'user_id', 'remaining_diamond']);
+            ->select(['id', 'user_id', 'remaining_diamond'])
+            ->chunk($chunkSize, function ($userSalaries) use (&$processedCount, $reason) {
 
-        $chargedUserIds = Charge::whereIn('user_id', $userSalaries->pluck('user_id'))
-            ->where('reason_en', $reason)
-            ->pluck('user_id')
-            ->toArray();
+                // Get all charged user IDs in this chunk only
+                $chargedUserIds = Charge::whereIn('user_id', $userSalaries->pluck('user_id'))
+                    ->where('reason_en', $reason)
+                    ->pluck('user_id')
+                    ->toArray();
 
-        $charges = [];
+                $charges = [];
 
-        foreach ($userSalaries as $userSalary) {
-            $user = $userSalary->user;
+                foreach ($userSalaries as $userSalary) {
+                    $user = $userSalary->user;
 
-            if (!$user || in_array($user->id, $chargedUserIds)) {
-                continue;
-            }
+                    if (!$user || in_array($user->id, $chargedUserIds)) {
+                        continue;
+                    }
 
-            $coin = $userSalary->remaining_diamond * 0.5;
-            $amountBefore = $user->di;
+                    $coin = $userSalary->remaining_diamond * 0.5;
+                    $amountBefore = $user->di;
 
-            UserCoinLogHelper::logByType(
-                $user->id,
-                $coin,
-                $amountBefore,
-                UserCoinLogType::ADMIN_CHARGES,
-            );
+                    // Log coins
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        $coin,
+                        $amountBefore,
+                        UserCoinLogType::ADMIN_CHARGES,
+                    );
 
-            $user->increment('di', $coin);
+                    // Update user balance
+                    $user->increment('di', $coin);
 
-            $charges[] = [
-                'charger_id'      => 1,
-                'charger_type'    => 'dash',
-                'user_id'         => $user->id,
-                'agency_id'       => null,
-                'user_type'       => 'user',
-                'amount'          => $coin,
-                'usd'             => 0,
-                'balance_before'  => $amountBefore,
-                'reason_en'       => $reason,
-                'created_at'      => now(),
-                'updated_at'      => now(),
-            ];
+                    $charges[] = [
+                        'charger_id'      => 1,
+                        'charger_type'    => 'dash',
+                        'user_id'         => $user->id,
+                        'agency_id'       => null,
+                        'user_type'       => 'user',
+                        'amount'          => $coin,
+                        'usd'             => 0,
+                        'balance_before'  => $amountBefore,
+                        'reason_en'       => $reason,
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
+                    ];
 
-            // Dispatch job for notification
-            SendChargeNotificationJob::dispatch(
-                $user,
-                'Coins Added',
-                "You have received {$coin} coins from admin.",
-                ['coins' => $coin]
-            )->onQueue('notifications');
-        }
+                    // Dispatch queued job for notification
+                    SendChargeNotificationJob::dispatch(
+                        $user,
+                        'Coins Added',
+                        "You have received {$coin} coins from admin.",
+                        ['coins' => $coin]
+                    )->onQueue('notifications');
+                }
 
-        if (!empty($charges)) {
-            Charge::insert($charges);
-        }
+                // Bulk insert charges for this chunk
+                if (!empty($charges)) {
+                    Charge::insert($charges);
+                    $processedCount += count($charges);
+                }
+            });
 
         return response()->json([
             'message' => 'User charge process completed successfully.',
-            'count'   => count($charges),
+            'count'   => $processedCount,
         ]);
     }
+
 
 
     private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
