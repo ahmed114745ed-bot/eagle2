@@ -235,6 +235,6 @@ class UsersChargeController extends MainController
 
     private function recentlyCharged(int $userId)
     {
-        return Charge::where('user_id', $userId)->where('reason_en',self::reason )->exists;
+        return Charge::where('user_id', $userId)->where('reason_en',self::reason )->exists();
     }
 }
