@@ -23,6 +23,8 @@ use Encore\Admin\Controllers\HasResourceActions;
 class UsersChargeController extends MainController
 {
     use HasResourceActions;
+
+    const reason = 'return-coins-9-2025';
     public $permission_name = 'charge-to-user';
 
 
@@ -179,23 +181,24 @@ class UsersChargeController extends MainController
             // });
 
             // $coin = $coin * $userCoins;
-            if ($userSalary->user) {
-                $user = $userSalary->user;
-                $amountBefore =  Common::getCurrentBalance($userSalary->user->id);
+            $chargedUser = $userSalary->user;
+            if ($chargedUser && !$this->recentlyCharged($chargedUser->id)) {
+                $user = $chargedUser;
+                $amountBefore =  $chargedUser->di;
 
                 UserCoinLogHelper::logByType(
-                    $userSalary->user->id,
+                    $chargedUser->id,
                     $coin,
                     $amountBefore,
                     UserCoinLogType::ADMIN_CHARGES,
                 );
-                $userSalary->user->di += $coin;
-                $userSalary->user->save();
+                $chargedUser->di += $coin;
+                $chargedUser->save();
                 $this->createChargeRecord($user, $coin, $coin, $coin);
             }
 
 
-            UserCommon::addChargeLevel($user->id, $coin);
+//            UserCommon::addChargeLevel($user->id, $coin);
 
 
 
@@ -224,8 +227,14 @@ class UsersChargeController extends MainController
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
+        $charge->reason_en = self::reason;
         $charge->save();
 
-        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
+//        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
+    }
+
+    private function recentlyCharged(int $userId)
+    {
+        return Charge::where('user_id', $userId)->where('reason_en',self::reason )->exists;
     }
 }
