@@ -175,12 +175,6 @@ class UsersChargeController extends MainController
         foreach ($userSalaries as $userSalary) {
             $coin = $userSalary->remaining_diamond * 0.5;
 
-            // $userCoins = \Cache::rememberForever('user_coins', function () {
-            //     $setting =   Setting::where('key', 'user_coins')->first();
-            //     return $setting?->value;
-            // });
-
-            // $coin = $coin * $userCoins;
             $chargedUser = $userSalary->user;
             if ($chargedUser && !$this->recentlyCharged($chargedUser->id)) {
                 $user = $chargedUser;
@@ -192,22 +186,24 @@ class UsersChargeController extends MainController
                     $amountBefore,
                     UserCoinLogType::ADMIN_CHARGES,
                 );
-                $chargedUser->di += $coin;
-                $chargedUser->save();
+                // increment coins 
+                $chargedUser->increment($coin);
+
                 $this->createChargeRecord($user, $coin, $coin, 0);
+
+                $title =  'Coins Added';
+
+                $body = 'You have received :coins coins from admin.';
+
+
+                try {
+                    CustomNotification::charges($user, $title, $body, ['coins' => $coin]);
+                } catch (\Exception $e) {
+
+                }
             }
 
 
-//            UserCommon::addChargeLevel($user->id, $coin);
-
-
-
-            $title =  'Coins Added';
-
-            $body = 'You have received :coins coins from admin.';
-
-
-            CustomNotification::charges($user, $title, $body, ['coins' => $coin]);
         }
 
         return response()->json([
