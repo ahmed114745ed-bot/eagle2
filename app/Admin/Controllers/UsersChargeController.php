@@ -187,7 +187,7 @@ class UsersChargeController extends MainController
                     UserCoinLogType::ADMIN_CHARGES,
                 );
                 // increment coins
-                $chargedUser->increment(['di' => $coin]);
+                $chargedUser->increment('di', $coin);
 
                 $this->createChargeRecord($user, $coin, $coin, 0);
 
