@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\GiftBannerEvent;
 use App\Jobs\CleanGiftLogsJob;
 use App\Models\Cp;
 use App\Models\Pk;
@@ -293,6 +294,7 @@ class GiftLogController extends Controller
         }
 
         settings()->set('gift_send', true);
+
 
         return Common::apiResponse(true, $message);
     }

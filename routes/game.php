@@ -11,6 +11,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'general
         });
     });
 
+Route::post('update-room-count-zego', [\App\Http\Controllers\Api\V1\Room\EnteranceController::class, 'updateRoomCountFromZego']);
 
 
 // BAISHUN games
