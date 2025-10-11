@@ -194,7 +194,7 @@ class UsersChargeController extends MainController
                 );
                 $chargedUser->di += $coin;
                 $chargedUser->save();
-                $this->createChargeRecord($user, $coin, $coin, $coin);
+                $this->createChargeRecord($user, $coin, $coin, 0);
             }
 
 
