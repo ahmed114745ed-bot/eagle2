@@ -1035,6 +1035,7 @@ if (!function_exists('getCountryIdFromLatLong')) {
         ]);
 
         return $country->id;
+    }
 }
 
 if (!function_exists('respond_and_continue')) {
