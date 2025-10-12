@@ -64,6 +64,12 @@ class SuperAdminController extends MainController
             ->body($this->profile($id)));
     }
 
+    public function showPreview(Content $content)
+    {
+        return $content
+            ->title(trans('Super Admin'))
+            ->body($this->profilePreview());
+    }
     /**
      * Edit interface.
      *
@@ -306,7 +312,7 @@ class SuperAdminController extends MainController
                 return back()->with(compact('error'))->withInput();
             }
 
-            
+
             $isEditing = $form->isEditing();
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
@@ -477,9 +483,8 @@ class SuperAdminController extends MainController
         }
 
         return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
-        
-    }
 
+    }
 
     protected function detail($id)
     {
