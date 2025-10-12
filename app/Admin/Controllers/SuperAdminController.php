@@ -482,7 +482,37 @@ class SuperAdminController extends MainController
                 //                break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies'));
+    }
+
+    public function profilePreview()
+    {
+        if (!session('preview_superadmin') || !session('country_id')){
+            abort(404, __('not found'));
+        }
+
+        $tab = request()->query('tab', 'agencies');
+        $countryID = session('country_id');
+
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default','country_id'])
+            ->with('country')->where('country_id', $countryID)->firstOrFail();
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+        }
+
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies'));
 
     }
 
