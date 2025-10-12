@@ -483,6 +483,48 @@ class SuperAdminController extends MainController
         }
 
         return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
+    }
+
+    public function profilePreview()
+    {
+        if (!session('preview_superadmin') || !session('country_id')){
+            abort(404, __('not found'));
+        }
+
+        $tab = request()->query('tab', 'agencies');
+        $countryID = session('country_id');
+
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default','country_id'])
+            ->with('country')->where('country_id', $countryID)->firstOrFail();
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+        }
+
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
 
     }
 

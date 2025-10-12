@@ -14,7 +14,7 @@
 
         @php
             $country   = \App\Models\Country::find(Admin::user()->country_id);
-            $countries = \App\Models\Country::select(['id', 'name'])->get();
+            $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
@@ -37,12 +37,13 @@
             @endif
             <script>window.enableCountryHeader = true;</script>
         @endif
+
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
         @if (!Admin::user()->type || Admin::user()->type == '')
                 <li class="nav-item dropdown" id="notificationsDropdown">
                     <a href="#" class="nav-link" onclick="openModal(event)" style="position: relative;">
                         <i class="fa fa-bell" style="font-size: 20px;"></i>
-                        <span id="notificationsCount" 
+                        <span id="notificationsCount"
                             style="position:absolute; top:5px; right:5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:11px; display:none;">
                         </span>
                     </a>
@@ -71,19 +72,19 @@
                         markReadUrl: "{{ admin_url('notifications/mark-all-read') }}"
                     };
                 </script>
-              
+
                 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
                 <script src="{{ asset('js/modal.js') }}"></script>
                 @endif
 
-                
+
 
             </ul>
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
         {!! Admin::getNavbar()->render('left') !!}
 
-       
+
 
         </ul>
 
