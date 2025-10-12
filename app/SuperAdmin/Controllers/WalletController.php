@@ -325,11 +325,7 @@ class WalletController extends MainController
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
-
-//        if (settings()->get("bd_stop_charge", 0)) {
-//
-//            throw new \Exception(__('api_responses.freez_charge'));
-//        }
+        
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
@@ -339,7 +335,11 @@ class WalletController extends MainController
             throw new \Exception(__('This value is not allowed'));
         }
 
-        $to = ShippingAgency::find($toId);
+        $to = ShippingAgency::where('country_id', $from->country?->id)->find($toId);
+
+        if (!$to ) {
+            throw new \Exception(__('This agency not found in your country'));
+        }
 
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('it_agency_freez_charge'));
@@ -367,7 +367,7 @@ class WalletController extends MainController
 
     private function performAgencyCharge(SuperAdmin $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
-        $fromUser->decrement('di', $usd);
+        $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
 
         WalletService::storeTransaction(

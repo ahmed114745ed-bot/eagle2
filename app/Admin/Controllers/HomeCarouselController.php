@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -279,9 +280,9 @@ class HomeCarouselController extends MainController
                 }
             } else {
                 $displays = [];
-            }            
-   
-         
+            }
+
+
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
                 $toDelete = array_diff($existing, $displays);
                 if ($toDelete) {
@@ -352,7 +353,7 @@ class HomeCarouselController extends MainController
                                     }
                                 ]);
                             }
-                             
+
                             $existingDisplayAt = $form->model()->display_at ?? [];
 
                             if (!is_array($existingDisplayAt)) {
@@ -365,7 +366,7 @@ class HomeCarouselController extends MainController
                                 $form->model()->save();
                             }
 
-                      
+
 
                         } else {
                             if ($display) {
