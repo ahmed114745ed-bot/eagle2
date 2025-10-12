@@ -15,7 +15,7 @@
         @php
             $country   = \App\Models\Country::find(Admin::user()->country_id);
             $countries = \App\Models\Country::select(['id', 'name'])->get();
-            $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
+            $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
 
@@ -123,20 +123,16 @@
                 allowClear : true
             });
 
-            $countrySelect.on('change', function () {
-                const countryId   = $(this).val();
-                const selectedTxt = $(this).find('option:selected').text();
-
-                if ($countryName.length) {
-                    $countryName.text(selectedTxt || 'No country selected');
-                }
-
+            $countrySelect.on('change select2:clear', function () {
+                const countryId = $(this).val();
                 const url = new URL(window.location.href);
-                if (countryId) {
+
+                if (countryId && countryId !== 'null') {
                     url.searchParams.set('country_id', countryId);
                 } else {
-                    url.searchParams.delete('country_id');
+                    url.searchParams.set('country_id', 'null');
                 }
+
                 window.location.href = url.toString();
             });
         }
@@ -147,10 +143,15 @@
 
             if (window.enableCountryHeader) {
                 const countryId = $countrySelect.val();
-                if (countryId) options.headers['X-Country-ID'] = countryId;
+                if (countryId) {
+                    options.headers['X-Country-ID'] = countryId;
+                } else {
+                    options.headers['X-Country-ID'] = '';
+                }
             }
 
-            if (!options.headers['Accept']) options.headers['Accept'] = 'application/json';
+            if (!options.headers['Accept'])
+                options.headers['Accept'] = 'application/json';
 
             return originalFetch(url, options);
         };
@@ -158,7 +159,6 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         const csrf = '{{ csrf_token() }}';
-
         const previewBtn = document.getElementById('preview-superadmin-btn');
         const exitBtn = document.getElementById('exit-preview-btn');
 
