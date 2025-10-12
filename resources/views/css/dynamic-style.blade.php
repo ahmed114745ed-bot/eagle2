@@ -1291,7 +1291,8 @@ html.ltr .dropdown-menu {
         right: 2px;
     }
 
-    .rtl .go-superadmin {
+    .preview-superadmin-btn,
+    .exit-preview-btn{
         border: none;
         border-radius: 4px;
         padding: 4px 14px;
