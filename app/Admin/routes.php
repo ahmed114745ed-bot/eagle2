@@ -682,14 +682,11 @@ Route::group(
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
         Route::post('/set-preview-superadmin', function () {
-            info('yes');
             session(['preview_superadmin' => true]);
-            return response()->json(['status' => 'ok']);
         });
 
         Route::post('/unset-preview-superadmin', function () {
             session()->forget('preview_superadmin');
-            return response()->json(['status' => 'ok']);
         });
 
         Route::group(['middleware' => 'local'], function () {
