@@ -22,6 +22,8 @@ class HomeCarousel extends Model
         'display_home_middle' => 'integer',
         'display_live' => 'integer',
         'display_country' => 'integer',
+        'display_at' => 'array',
+
 
     ];
 
@@ -169,6 +171,15 @@ class HomeCarousel extends Model
     }
 
 
+    public function displayRoom(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'room')->exists(),
+            set: fn($value) => $this->syncDisplay('room', $value)
+        );
+    }
+
+    
 
 
     protected function syncDisplay(string $type, $value)

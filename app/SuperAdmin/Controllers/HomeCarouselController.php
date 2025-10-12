@@ -94,6 +94,7 @@ class HomeCarouselController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Rooms'),
             ];
     
             $buttons = '';

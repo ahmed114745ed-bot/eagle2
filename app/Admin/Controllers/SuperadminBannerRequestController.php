@@ -76,7 +76,11 @@ class SuperadminBannerRequestController extends AdminController
                 return __('Display Home Middle');
             } elseif ($value === 'display_live') {
                 return __('Display Live');
+            } elseif ($value === 'display_room') {
+                return __('Display Room');
             } 
+
+
             else {
                 return $value; 
             }
