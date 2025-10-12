@@ -419,7 +419,7 @@ class SuperAdminController extends MainController
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default'])->findOrFail($id);
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default','country_id'])->with('country')->findOrFail($id);
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
