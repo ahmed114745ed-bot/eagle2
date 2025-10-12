@@ -96,6 +96,13 @@
                     <script> window.enableCountryHeader = false; </script>
                 @endif
 
+                @if (request()->is('admin*'))
+                    <li style="padding: 10px;">
+                        <button id="go-superadmin" class="btn btn-default">
+                            <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                        </button>
+                    </li>
+                @endif
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
             </ul>
@@ -145,6 +152,18 @@
 
             return originalFetch(url, options);
         };
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const btn = document.getElementById("go-superadmin");
+        if (!btn) return;
+
+        btn.addEventListener("click", function () {
+            const select = document.getElementById("country-select");
+            const countryId = select ? select.value : "";
+            const url = "/superadmin" + (countryId ? ("?country_id=" + countryId) : "");
+            window.location.href = url;
+        });
     });
 </script>
 

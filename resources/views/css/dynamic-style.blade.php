@@ -1290,4 +1290,19 @@ html.ltr .dropdown-menu {
         top: 25px;
         right: 2px;
     }
+
+    #go-superadmin {
+        border: none;
+        border-radius: 4px;
+        padding: 3px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+    }
+    #go-superadmin i {
+        font-size: 15px;
+    }
 </style>

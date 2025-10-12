@@ -1,3 +1,8 @@
+@php
+    $currentUrl = request()->path();
+    $isSuperAdminRoute = Str::startsWith($currentUrl, 'superadmin');
+@endphp
+
 <aside id="main-sidebar" class="main-sidebar">
 
     <!-- sidebar: style can be found in sidebar.less -->
@@ -40,7 +45,7 @@
 
                     @endif
 
-                        @if (Admin::user()->type == 'superadmin')
+                        @if (Admin::user()->type == 'superadmin' || $isSuperAdminRoute)
 
                             @foreach(Admin::menuLinks() as $link)
                                 <li>
@@ -49,7 +54,7 @@
                             @endforeach
                         @endif
 
-                    @if (Admin::user()->type != 'bd' || Admin::user()->type != 'superadmin')
+                        @if (Admin::user()->type != 'bd' && !$isSuperAdminRoute && Admin::user()->type != 'superadmin')
 
                         @foreach(Admin::menuLinks() as $link)
                             <li>
@@ -102,7 +107,7 @@
                 @endforeach
                 @endif
 
-                @if (Admin::user()->type == 'superadmin')
+                @if (Admin::user()->type == 'superadmin' || $isSuperAdminRoute)
                     @php
                         $superadminLinks = [
                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
@@ -166,7 +171,7 @@
 {{--                    @endforeach--}}
                 @endif
 
-                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin')
+                @if (Admin::user()->type != 'bd' && !$isSuperAdminRoute && Admin::user()->type != 'superadmin')
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @endif
             </ul>

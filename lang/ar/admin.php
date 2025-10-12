@@ -102,4 +102,5 @@ return [
     'prev'                   => 'السابق',
     'next'                   => 'التالي',
     'quick_create'           => 'إضافة سريعة',
+    'Preview Super Admin' => 'معاينة المدير العام',
 ];
