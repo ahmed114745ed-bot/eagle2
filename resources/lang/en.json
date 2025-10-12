@@ -1277,7 +1277,9 @@
 "A display of this type is already active for this banner.": "A display of this type is already active for this banner.",
 "You already have a pending request for this banner and display type.": "You already have a pending request for this banner and display type.",
 "confirm_resend": "Confirm Resend",
-"deduct_text": "Coins will be deducted to resend the banner request:"
+"deduct_text": "Coins will be deducted to resend the banner request:",
+"banner_request_title": "New Banner Display Request",
+"banner_request_message": "Admin :name (ID: :id) has requested a new banner display worth :coins coins."
 
 
 

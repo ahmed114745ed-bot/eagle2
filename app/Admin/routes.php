@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminStatisticController;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -712,6 +713,15 @@ Route::group(
             Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
             Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [AdminNotificationController::class, 'count']);
+            Route::get('list', [AdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [AdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [AdminNotificationController::class, 'markAllRead']); // ✅ أضف هذا
+
+        });
+
     }
 );
 

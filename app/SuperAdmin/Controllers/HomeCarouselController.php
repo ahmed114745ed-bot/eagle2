@@ -2,7 +2,10 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Enums\AdminNotificationLink;
+use App\Enums\AdminNotificationType;
 use App\helper\SuperAdminHelper;
+use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
 use App\Models\SuperadminBannerRequest;
 use App\Selectables\Countries;
@@ -453,6 +456,28 @@ class HomeCarouselController extends MainController
                  'notes'            => $field,
                  'hours'            => $hours,
              ]);
+             AdminNotificationHelper::notify(
+                type: AdminNotificationType::NEW_ORDER,
+                title: 'banner_request_title',
+                message: __(
+                    'banner_request_message',
+                    [
+                        'name' => auth()->user()->name,
+                        'id' => auth()->user()->id,
+                        'coins' => $totalDeduct,
+                    ]
+                ),
+                model: $banner,
+                data: [
+                    'requested_by' => auth()->user()->name,
+                    'requested_by_id' =>auth()->user()->id,
+                    'banner_id' => $banner->id,
+                    'coins_deducted' => $totalDeduct,
+                    'hours' => $hours,
+                    'notes' => $field,
+                    'preview_url' => AdminNotificationLink::BANNER_SHOW,
+                ]
+            );
          });
      }
      

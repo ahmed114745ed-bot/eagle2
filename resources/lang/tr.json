@@ -3536,7 +3536,11 @@
     "A display of this type is already active for this banner.": "Bu afiş için bu türde zaten aktif bir gösterim var.",
     "You already have a pending request for this banner and display type.": "Bu afiş ve gösterim türü için zaten bekleyen bir isteğiniz var.",
       "confirm_resend": "Yeniden Gönderimi Onayla",
-    "deduct_text": "Banner isteğini yeniden göndermek için jetonlar düşülecektir:"
+    "deduct_text": "Banner isteğini yeniden göndermek için jetonlar düşülecektir:",
+    "banner_request_title": "Yeni Afiş Gösterim Talebi",
+    "banner_request_message": "Yönetici :name (ID: :id), :coins madeni para değerinde yeni bir afiş gösterimi talep etti."
+
+  
 
 
 
