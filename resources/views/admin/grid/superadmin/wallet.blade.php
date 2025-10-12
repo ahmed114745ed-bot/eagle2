@@ -348,6 +348,11 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                 dropdownParent: $('#chargeModal'), // ✅ ensures dropdown stays inside modal
                 placeholder: '{{ __("Select agency") }}',
                 allowClear: true,
+                 language: {
+                    noResults: function() {
+                        return "{{ __('not_in_same_country') }}";
+                    }
+                },
                 ajax: {
                     url: '/api/search/superadmin-agencies',
                     dataType: 'json',
