@@ -17,6 +17,7 @@ return [
     'list'                  => 'القائمة',
     'new'                   => 'جديد',
     'create'                => 'انشاء',
+    'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
     'percent_total_error' => '❌ يجب أن يكون مجموع النسب 100٪ بالضبط. الحالي: :total٪',
     'remove'                => 'حذف',

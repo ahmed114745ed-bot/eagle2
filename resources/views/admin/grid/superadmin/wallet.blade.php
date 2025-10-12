@@ -405,7 +405,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     }
 
     let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
-
+    const NOT_IN_SAME_COUNTRY = "{{ __('admin.not_in_same_country') }}";
     searchTimeout = setTimeout(() => {
         fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
             .then(res => res.json())
@@ -414,7 +414,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
                 resultsDiv.innerHTML = '';
                 if (data.length === 0) {
-                    resultsDiv.innerHTML = `<div class="list-group-item2">No results found</div>`;
+                   resultsDiv.innerHTML = `<div class="list-group-item2">${NOT_IN_SAME_COUNTRY}</div>`;
                     resultsDiv.style.display = 'block';
                     return;
                 }
