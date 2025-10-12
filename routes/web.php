@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\BdController;
+use App\Enums\AdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
 use  App\helper\TimeHelper;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Jobs\UpdateUserFollowCountsJob;
+use App\Models\AdminNotification;
 use App\Models\Ban;
 use App\Models\CoinLog;
 use App\Models\PaymentCoin;
@@ -597,4 +599,18 @@ Route::get('/migrate-home-carousel', function () {
     }
 
     return "Migration completed successfully!";
+});
+
+
+
+Route::get('admin/notifications/test', function () {
+    $notification = AdminNotification::create([
+        'title' => 'إشعار تجريبي 🎉',
+        'message' => 'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        'type' => AdminNotificationType::SYSTEM->value,
+        'data' => json_encode(['created_at' => Carbon::now()->toDateTimeString()]),
+        'is_read' => false,
+    ]);
+
+    return redirect()->back()->with('status', "تم إنشاء إشعار تجريبي (ID: {$notification->id})");
 });

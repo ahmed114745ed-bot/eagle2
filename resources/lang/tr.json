@@ -638,6 +638,9 @@
     "hide country": "Ülkeyi Gizle",
     "vip gifts": "VIP Hediyeleri",
     "no pan": "Geçiş Yok",
+    "go to the country": "ülkeye git",
+    "Back to the main dashboard": "ana kontrol paneline dön",
+    "Super Admin Profile": "Süper Yönetici Profili",
     "hidden room": "Gizli Oda" ,
     "anonymous man": "Anonim adam",
     "colored name": "Renkli isim",
@@ -3617,10 +3620,14 @@
     "You already have a pending request for this banner and display type.": "Bu afiş ve gösterim türü için zaten bekleyen bir isteğiniz var.",
       "confirm_resend": "Yeniden Gönderimi Onayla",
     "deduct_text": "Banner isteğini yeniden göndermek için jetonlar düşülecektir:",
+    "banner_request_title": "Yeni Afiş Gösterim Talebi",
+    "banner_request_message": "Yönetici :name (ID: :id), :coins madeni para değerinde yeni bir afiş gösterimi talep etti."
+
+  
 
 
 
-    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    ,"wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
 
 "Are you sure?": "Emin misiniz?",
 "This action cannot be undone!": "Bu işlem geri alınamaz!",

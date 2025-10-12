@@ -14,7 +14,7 @@
 
         @php
             $country   = \App\Models\Country::find(Admin::user()->country_id);
-            $countries = \App\Models\Country::select(['id', 'name'])->get();
+            $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
@@ -25,7 +25,9 @@
                     <select id="country-select" class="form-control" style="width:190px;">
                         <option value="">{{ __('Select Country...') }}</option>
                         @foreach($countries as $currentCountry)
-                            <option value="{{ $currentCountry->id }}"
+                            <option
+                                value="{{ $currentCountry->id }}"
+                                data-flag="{{ getImagePath($currentCountry->flag) }}"
                                 {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
                                 {{ $currentCountry->name }}
                             </option>
@@ -33,11 +35,11 @@
                     </select>
                 </a>
             @endif
-            <script> window.enableCountryHeader = true; </script>
+            <script>window.enableCountryHeader = true;</script>
         @endif
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
-            {!! Admin::getNavbar()->render('left') !!}
+        {!! Admin::getNavbar()->render('left') !!}
         </ul>
 
         <div class="navbar-custom-menu">
@@ -51,6 +53,48 @@
 
             <ul class="nav navbar-nav">
 
+            <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
+        @if (!Admin::user()->type || Admin::user()->type == '')
+                <li class="nav-item dropdown" id="notificationsDropdown">
+                    <a href="#" class="nav-link" onclick="openModal(event)" style="position: relative;">
+                        <i class="fa fa-bell" style="font-size: 20px;"></i>
+                        <span id="notificationsCount"
+                            style="position:absolute; top:5px; right:5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:11px; display:none;">
+                        </span>
+                    </a>
+                </li>
+
+                <!-- المودال -->
+                <div class="modal-overlay" id="myModal">
+                    <div class="modal-no">
+                        <div class="modal-header">
+                            <h5>الإشعارات</h5>
+                            <button type="button" class="close-btn" id="closeModalBtn">×</button>
+                        </div>
+                        <div class="modal-body2" id="notificationsContent">
+                            <div class="text-center text-muted p-3">جاري تحميل الإشعارات...</div>
+                        </div>
+                        <div class="modal-footer" style="text-align: center; padding: 10px;">
+                            <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">تمييز الكل كمقروء</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    window.NOTIFICATIONS_API = {
+                        countUrl: "{{ admin_url('notifications/count') }}",
+                        listUrl: "{{ admin_url('notifications/list') }}",
+                        markReadUrl: "{{ admin_url('notifications/mark-all-read') }}"
+                    };
+                </script>
+
+                <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
+                <script src="{{ asset('js/modal.js') }}"></script>
+                @endif
+
+
+
+            </ul>
                 {!! Admin::getNavbar()->render() !!}
 
                 <li class="dropdown user user-menu">
@@ -89,7 +133,7 @@
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
-                                <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
                             </button>
                         </li>
                     @endif
@@ -99,7 +143,7 @@
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                            <i class="fa fa-times"></i> {{ __('Exit Preview') }}
+                            <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
                             </button>
                         </li>
                     @endif
@@ -184,6 +228,33 @@
             });
         }
     });
+
+    $(document).ready(function() {
+        $('#country-select').select2({
+            templateResult: formatCountry,
+            templateSelection: formatCountry,
+            escapeMarkup: function (markup) { return markup; }
+        });
+
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+
+            let flag = $(country.element).data('flag');
+            let name = country.text;
+
+            if (flag) {
+                return `
+                <span>
+                    <img src="${flag}" style="width:20px; height:14px; margin-right:5px; vertical-align:middle;">
+                    ${name}
+                </span>
+            `;
+            }
+            return name;
+        }
+    });
 </script>
 
 <style>
@@ -193,4 +264,9 @@
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear{
         left: 5px !important;
     }
+    .select2-container .select2-selection--single .select2-selection__rendered img {
+        margin-right: 5px;
+        vertical-align: middle;
+    }
 </style>
+

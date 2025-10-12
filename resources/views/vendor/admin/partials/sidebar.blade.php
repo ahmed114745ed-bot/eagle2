@@ -172,6 +172,7 @@
                     @php
                         $superadminPreviewLinks = [
                             ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/superadmin/profile','icon' => 'fa-home','title' => __('Super Admin Profile')],
                             ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
                             ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
                             [

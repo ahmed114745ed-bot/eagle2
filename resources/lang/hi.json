@@ -424,6 +424,9 @@
     "try to remove your self": "अपने आप को हटाने की कोशिश करें",
     "cant follow your self": "अपना अनुसरण नहीं कर सकते",
     "this user not found": "इस उपयोगकर्ता को नहीं मिला",
+    "go to the country": "देश में जाओ",
+    "Back to the main dashboard": "मुख्य डैशबोर्ड पर वापस जाएं",
+    "Super Admin Profile": "सुपर एडमिन प्रोफ़ाइल",
     "follow done": "अनुसरण किया गया",
     "unFollow done": "अनुसरण रद्द किया गया",
     "room does not exist": "कमरा मौजूद नहीं है",
@@ -3205,9 +3208,12 @@
     "You already have a pending request for this banner and display type.": "आपके पास पहले से ही इस बैनर और प्रदर्शन प्रकार के लिए एक लंबित अनुरोध है।",
        "confirm_resend": "पुनः भेजने की पुष्टि करें",
     "deduct_text": "बैनर अनुरोध को पुनः भेजने के लिए सिक्के काटे जाएंगे:",
+    "banner_request_title": "नया बैनर प्रदर्शन अनुरोध",
+    "banner_request_message": "प्रशासक :name (आईडी: :id) ने :coins सिक्कों के लिए नया बैनर प्रदर्शन अनुरोध किया है।"
 
 
-    "invite code": "आमंत्रण कोड",
+
+    ,"invite code": "आमंत्रण कोड",
     "Timing settings": "समय सेटिंग्स",
     "Time zone:": "समय क्षेत्र:",
     "Start of week:": "सप्ताह की शुरुआत:",

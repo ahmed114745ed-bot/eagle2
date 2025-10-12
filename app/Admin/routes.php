@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminStatisticController;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -382,6 +383,7 @@ Route::group(
             Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
             Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
             Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+            Route::get('profile', [SuperAdminController::class, 'showPreview']);
         });
 
         Route::get('/soon', 'AllStatisticController@index2');
@@ -720,6 +722,15 @@ Route::group(
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
         });
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [AdminNotificationController::class, 'count']);
+            Route::get('list', [AdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [AdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [AdminNotificationController::class, 'markAllRead']); // ✅ أضف هذا
+
+        });
+
     }
 );
 
