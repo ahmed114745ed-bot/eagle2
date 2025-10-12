@@ -12,6 +12,14 @@
             <span class="sr-only">Toggle navigation</span>
         </a>
 
+        @if (request()->is('admin*'))
+            <a style="padding: 10px;">
+                <button id="go-superadmin" class="go-superadmin btn btn-default">
+                    <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                </button>
+            </a>
+        @endif
+
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
             {!! Admin::getNavbar()->render('left') !!}
         </ul>
@@ -67,42 +75,23 @@
                 </li>
 
                 @php
-                    $showCountriesSelect = request()->is('admin/superadmin/statistics')
-                        || request()->is('admin/users')
-                        || request()->is('admin/rooms')
-                        || request()->is('admin/live-rooms')
-                        || request()->is('admin/agencies')
-                        || request()->is('admin/ag/users');
-
                     $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
                     $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
                 @endphp
 
-                @if ($showCountriesSelect)
-                    <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
-                        <select id="country-select" class="form-control" style="width:190px;">
-                            <option value="">{{ __('Select Country...') }}</option>
-                            @foreach($countries as $currentCountry)
-                                <option value="{{ $currentCountry->id }}"
-                                    {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                    {{ $currentCountry->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </li>
+                <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
+                    <select id="country-select" class="form-control" style="width:190px;">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option value="{{ $currentCountry->id }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{ $currentCountry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </li>
+                <script> window.enableCountryHeader = true; </script>
 
-                    <script> window.enableCountryHeader = true; </script>
-                @else
-                    <script> window.enableCountryHeader = false; </script>
-                @endif
-
-                @if (request()->is('admin*'))
-                    <li style="padding: 10px;">
-                        <button id="go-superadmin" class="btn btn-default">
-                            <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
-                        </button>
-                    </li>
-                @endif
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
             </ul>
