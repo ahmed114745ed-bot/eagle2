@@ -1301,8 +1301,12 @@ html.ltr .dropdown-menu {
         display: inline-flex;
         align-items: center;
         gap: 6px;
+    }
+
+    .select-country .select2-container{
         margin-top: 12px;
     }
+
     #go-superadmin i {
         font-size: 15px;
     }

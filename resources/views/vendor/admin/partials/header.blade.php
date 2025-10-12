@@ -12,22 +12,26 @@
             <span class="sr-only">Toggle navigation</span>
         </a>
 
-        @if(!session('preview_superadmin'))
-            @if (request()->is('admin*'))
-                <a style="padding: 10px;">
-                    <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
-                        <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
-                    </button>
-                </a>
-            @endif
-        @endif
+        @php
+            $country   = \App\Models\Country::find(Admin::user()->country_id);
+            $countries = \App\Models\Country::select(['id', 'name'])->get();
+            $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
+            $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
+        @endphp
 
-        @if(session('preview_superadmin'))
-            <a style="padding: 10px;">
-                <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                    <i class="fa fa-times"></i> {{ __('Exit Preview') }}
-                </button>
+        @if(!session('preview_superadmin'))
+            <a class="nav-item select-country">
+                <select id="country-select" class="form-control" style="width:190px;">
+                    <option value="">{{ __('Select Country...') }}</option>
+                    @foreach($countries as $currentCountry)
+                        <option value="{{ $currentCountry->id }}"
+                            {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                            {{ $currentCountry->name }}
+                        </option>
+                    @endforeach
+                </select>
             </a>
+            <script> window.enableCountryHeader = true; </script>
         @endif
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
@@ -35,11 +39,6 @@
         </ul>
 
         <div class="navbar-custom-menu">
-
-            @php
-                $country   = \App\Models\Country::find(Admin::user()->country_id);
-                $countries = \App\Models\Country::select(['id', 'name'])->get();
-            @endphp
 
             @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
                 <img src="{{ getImagePath($country->flag) }}"
@@ -84,23 +83,23 @@
                     </ul>
                 </li>
 
-                @php
-                    $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
-                    $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
-                @endphp
+                @if(!session('preview_superadmin') && session('country_id'))
+                    @if (request()->is('admin*'))
+                        <li style="padding: 10px;">
+                            <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                                <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                            </button>
+                        </li>
+                    @endif
+                @endif
 
-                <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
-                    <select id="country-select" class="form-control" style="width:190px;">
-                        <option value="">{{ __('Select Country...') }}</option>
-                        @foreach($countries as $currentCountry)
-                            <option value="{{ $currentCountry->id }}"
-                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                {{ $currentCountry->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </li>
-                <script> window.enableCountryHeader = true; </script>
+                @if(session('preview_superadmin'))
+                    <li style="padding: 10px;">
+                        <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                        <i class="fa fa-times"></i> {{ __('Exit Preview') }}
+                        </button>
+                    </li>
+                @endif
 
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
