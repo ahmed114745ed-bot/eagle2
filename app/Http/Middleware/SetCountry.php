@@ -15,12 +15,14 @@ class SetCountry
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($countryId = $request->header('X-Country-ID')) {
-            session(['country_id' => $countryId]);
-        } elseif ($request->has('country_id')) {
-            session(['country_id' => $request->get('country_id')]);
-        } else {
-            session()->forget('country_id');
+        $countryId = $request->get('country_id');
+
+        if ($request->has('country_id')) {
+            if ($countryId === null || $countryId === '' || $countryId === 'null') {
+                session()->forget('country_id');
+            } else {
+                session(['country_id' => $countryId]);
+            }
         }
 
         return $next($request);

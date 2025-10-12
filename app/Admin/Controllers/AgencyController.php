@@ -579,7 +579,7 @@ class AgencyController extends MainController
 
     protected function grid()
     {
-        $countryID = request('country_id');
+        $countryID = session('country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
