@@ -25,7 +25,9 @@
                     <select id="country-select" class="form-control" style="width:190px;">
                         <option value="">{{ __('Select Country...') }}</option>
                         @foreach($countries as $currentCountry)
-                            <option value="{{ $currentCountry->id }}"
+                            <option
+                                value="{{ $currentCountry->id }}"
+                                data-flag="{{ getImagePath($currentCountry->flag) }}"
                                 {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
                                 {{ $currentCountry->name }}
                             </option>
@@ -33,7 +35,7 @@
                     </select>
                 </a>
             @endif
-            <script> window.enableCountryHeader = true; </script>
+            <script>window.enableCountryHeader = true;</script>
         @endif
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
@@ -89,7 +91,7 @@
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
-                                <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
                             </button>
                         </li>
                     @endif
@@ -99,7 +101,7 @@
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                            <i class="fa fa-times"></i> {{ __('Exit Preview') }}
+                            <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
                             </button>
                         </li>
                     @endif
@@ -184,6 +186,33 @@
             });
         }
     });
+
+    $(document).ready(function() {
+        $('#country-select').select2({
+            templateResult: formatCountry,
+            templateSelection: formatCountry,
+            escapeMarkup: function (markup) { return markup; }
+        });
+
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+
+            let flag = $(country.element).data('flag');
+            let name = country.text;
+
+            if (flag) {
+                return `
+                <span>
+                    <img src="${flag}" style="width:20px; height:14px; margin-right:5px; vertical-align:middle;">
+                    ${name}
+                </span>
+            `;
+            }
+            return name;
+        }
+    });
 </script>
 
 <style>
@@ -192,5 +221,9 @@
     }
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear{
         left: 5px !important;
+    }
+    .select2-container .select2-selection--single .select2-selection__rendered img {
+        margin-right: 5px;
+        vertical-align: middle;
     }
 </style>

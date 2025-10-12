@@ -375,6 +375,7 @@ Route::group(
             Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
             Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
             Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+            Route::get('profile', [SuperAdminController::class, 'showPreview']);
         });
 
         Route::get('/soon', 'AllStatisticController@index2');
