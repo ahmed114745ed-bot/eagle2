@@ -20,17 +20,19 @@
         @endphp
 
         @if(!session('preview_superadmin'))
-            <a class="nav-item select-country">
-                <select id="country-select" class="form-control" style="width:190px;">
-                    <option value="">{{ __('Select Country...') }}</option>
-                    @foreach($countries as $currentCountry)
-                        <option value="{{ $currentCountry->id }}"
-                            {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
+            @if (request()->is('admin*'))
+                <a class="nav-item select-country">
+                    <select id="country-select" class="form-control" style="width:190px;">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option value="{{ $currentCountry->id }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{ $currentCountry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </a>
+            @endif
             <script> window.enableCountryHeader = true; </script>
         @endif
 
@@ -94,11 +96,13 @@
                 @endif
 
                 @if(session('preview_superadmin'))
-                    <li style="padding: 10px;">
-                        <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                        <i class="fa fa-times"></i> {{ __('Exit Preview') }}
-                        </button>
-                    </li>
+                    @if (request()->is('admin*'))
+                        <li style="padding: 10px;">
+                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                            <i class="fa fa-times"></i> {{ __('Exit Preview') }}
+                            </button>
+                        </li>
+                    @endif
                 @endif
 
                 <!-- Control Sidebar Toggle Button -->
