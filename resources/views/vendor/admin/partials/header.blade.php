@@ -12,6 +12,24 @@
             <span class="sr-only">Toggle navigation</span>
         </a>
 
+        @if(!session('preview_superadmin'))
+            @if (request()->is('admin*'))
+                <a style="padding: 10px;">
+                    <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                        <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                    </button>
+                </a>
+            @endif
+        @endif
+
+        @if(session('preview_superadmin'))
+            <a style="padding: 10px;">
+                <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                    <i class="fa fa-times"></i> {{ __('Exit Preview') }}
+                </button>
+            </a>
+        @endif
+
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
             {!! Admin::getNavbar()->render('left') !!}
         </ul>
@@ -67,42 +85,23 @@
                 </li>
 
                 @php
-                    $showCountriesSelect = request()->is('admin/superadmin/statistics')
-                        || request()->is('admin/users')
-                        || request()->is('admin/rooms')
-                        || request()->is('admin/live-rooms')
-                        || request()->is('admin/agencies')
-                        || request()->is('admin/ag/users');
-
                     $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
                     $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
                 @endphp
 
-                @if ($showCountriesSelect)
-                    <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
-                        <select id="country-select" class="form-control" style="width:190px;">
-                            <option value="">{{ __('Select Country...') }}</option>
-                            @foreach($countries as $currentCountry)
-                                <option value="{{ $currentCountry->id }}"
-                                    {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                    {{ $currentCountry->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </li>
+                <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
+                    <select id="country-select" class="form-control" style="width:190px;">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option value="{{ $currentCountry->id }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{ $currentCountry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </li>
+                <script> window.enableCountryHeader = true; </script>
 
-                    <script> window.enableCountryHeader = true; </script>
-                @else
-                    <script> window.enableCountryHeader = false; </script>
-                @endif
-
-                @if (request()->is('admin*'))
-                    <li style="padding: 10px;">
-                        <button id="go-superadmin" class="btn btn-default">
-                            <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
-                        </button>
-                    </li>
-                @endif
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
             </ul>
@@ -154,16 +153,33 @@
         };
     });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const btn = document.getElementById("go-superadmin");
-        if (!btn) return;
+    document.addEventListener("DOMContentLoaded", function () {
+        const csrf = '{{ csrf_token() }}';
 
-        btn.addEventListener("click", function () {
-            const select = document.getElementById("country-select");
-            const countryId = select ? select.value : "";
-            const url = "/superadmin" + (countryId ? ("?country_id=" + countryId) : "");
-            window.location.href = url;
-        });
+        const previewBtn = document.getElementById('preview-superadmin-btn');
+        const exitBtn = document.getElementById('exit-preview-btn');
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (exitBtn) {
+            exitBtn.addEventListener('click', function () {
+                fetch('/admin/unset-preview-superadmin', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    }
+                }).then(() => window.location.reload());
+            });
+        }
     });
 </script>
 

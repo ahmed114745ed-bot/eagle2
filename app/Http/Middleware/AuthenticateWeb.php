@@ -41,7 +41,7 @@ class AuthenticateWeb
 
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
-                (Str::startsWith($uri, 'superadmin') && !in_array($userType, ['superadmin', 'admin'])) ||
+                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
                 Admin::guard()->logout();

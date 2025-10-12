@@ -671,8 +671,18 @@ Route::group(
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
             ->name('coin-game-users.ajax');
 
-
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
+
+        Route::post('/set-preview-superadmin', function () {
+            info('yes');
+            session(['preview_superadmin' => true]);
+            return response()->json(['status' => 'ok']);
+        });
+
+        Route::post('/unset-preview-superadmin', function () {
+            session()->forget('preview_superadmin');
+            return response()->json(['status' => 'ok']);
+        });
 
         Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
