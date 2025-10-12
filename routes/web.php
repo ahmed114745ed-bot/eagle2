@@ -320,7 +320,7 @@ Route::get('/clear-admin-error', function () {
 });
 
 
-Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
+//Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
