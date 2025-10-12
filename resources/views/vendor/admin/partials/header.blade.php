@@ -12,10 +12,20 @@
             <span class="sr-only">Toggle navigation</span>
         </a>
 
-        @if (request()->is('admin*'))
+        @if(!session('preview_superadmin'))
+            @if (request()->is('admin*'))
+                <a style="padding: 10px;">
+                    <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                        <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                    </button>
+                </a>
+            @endif
+        @endif
+
+        @if(session('preview_superadmin'))
             <a style="padding: 10px;">
-                <button id="go-superadmin" class="go-superadmin btn btn-default">
-                    <i class="fa fa-eye"></i> {{ __('Preview Super Admin') }}
+                <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                    <i class="fa fa-times"></i> {{ __('Exit Preview') }}
                 </button>
             </a>
         @endif
@@ -143,16 +153,33 @@
         };
     });
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const btn = document.getElementById("go-superadmin");
-        if (!btn) return;
+    document.addEventListener("DOMContentLoaded", function () {
+        const csrf = '{{ csrf_token() }}';
 
-        btn.addEventListener("click", function () {
-            const select = document.getElementById("country-select");
-            const countryId = select ? select.value : "";
-            const url = "/superadmin" + (countryId ? ("?country_id=" + countryId) : "");
-            window.location.href = url;
-        });
+        const previewBtn = document.getElementById('preview-superadmin-btn');
+        const exitBtn = document.getElementById('exit-preview-btn');
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (exitBtn) {
+            exitBtn.addEventListener('click', function () {
+                fetch('/admin/unset-preview-superadmin', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    }
+                }).then(() => window.location.reload());
+            });
+        }
     });
 </script>
 
