@@ -128,7 +128,17 @@ class SuperadminBannerHistoryController extends MainController
                             data-hours="' . e($this->hours) . '">
                         <i class="fa fa-redo"></i> ' . __('Resend') . '
                     </button>';
-            }
+            }else{
+            return '
+    <button class="btn btn-sm btn-info refresh-btn"
+        data-id="' . $this->home_carousel_id . '"
+        title="' . __('Refresh') . '">
+        <i class="fa fa-refresh"></i>
+    </button>
+';
+
+    }  
+           
             return __($this->status);
         });
 
