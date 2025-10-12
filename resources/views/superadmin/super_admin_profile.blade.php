@@ -811,7 +811,7 @@
         <img src="{{ getImagePath($superAdmin->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $superAdmin->username ??'' }}</h1>
+        <h1 class="agency-name">{{ $superAdmin->name ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -822,7 +822,21 @@
                 <span class="meta-value">{{ $superAdmin->username ?? '' }}</span>
             </div>
         </div>
+        <div class="agency-meta">
+            <div class="meta-item">
+                <span class="meta-label">{{ __("salary") }}:</span>
+                <span class="meta-value">{{ $superAdmin->di }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">{{ __("country") }}:</span>
+                 <img src="{{ getImagePath(@$superAdmin->country->flag) }}" alt="Agency Logo">
+            </div>
+        </div>
     </div>
+ 
+        
+        
+ 
     <a href="{{ url('admin/usersBd') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
     </a>
