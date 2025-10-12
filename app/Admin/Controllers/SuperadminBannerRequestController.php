@@ -3,8 +3,10 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\SuperAdminService;
+use App\Models\HomeCarouselDisplay;
 use App\Models\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -41,7 +43,7 @@ class SuperadminBannerRequestController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img']);
+        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
         $grid->column('id', __('ID'));
   
         $userService = $this->userService;
@@ -74,11 +76,16 @@ class SuperadminBannerRequestController extends AdminController
                 return __('Display Home Middle');
             } elseif ($value === 'display_live') {
                 return __('Display Live');
+            } elseif ($value === 'display_room') {
+                return __('Display Room');
             } 
+
+
             else {
                 return $value; 
             }
         });
+        $grid->column('hours', __('hours'));
         $grid->column('created_at', __('Created At'))
         ->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
@@ -102,8 +109,96 @@ class SuperadminBannerRequestController extends AdminController
             return <<<HTML
             <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
             <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
-            HTML;
+           
+         
+
+           
+           HTML;
         });
+
+        Admin::script("
+                  document.addEventListener('DOMContentLoaded', function () {
+
+                    function sendRequest(url) {
+                        return fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': LA.token,
+                                'Accept': 'application/json',
+                            },
+                        }).then(res => res.json());
+                    }
+
+                    function handleAction(button, actionType) {
+                        button.addEventListener('click', function(e){
+                            e.preventDefault();
+
+                            // رسائل متعددة اللغات
+                            const messages = {
+                                approve: {
+                                    title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                                    confirm: 'نعم',
+                                    cancel: 'إلغاء',
+                                    color: '#28a745'
+                                },
+                                reject: {
+                                    title: 'هل أنت متأكد من الرفض على هذا الطلب؟',
+                                    confirm: 'نعم',
+                                    cancel: 'إلغاء',
+                                    color: '#dc3545'
+                                },
+                                success: {
+                                    en: 'Action completed successfully!',
+                                    ar: 'تمت العملية بنجاح!',
+                                    hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                                    tr: 'İşlem başarıyla tamamlandı!'
+                                },
+                                error: {
+                                    en: 'An error occurred!',
+                                    ar: 'حدث خطأ أثناء العملية',
+                                    hi: 'एक त्रुटि हुई!',
+                                    tr: 'İşlem sırasında hata oluştu!'
+                                }
+                            };
+
+                            const locale = document.documentElement.lang || 'ar'; // افتراض لغة الموقع
+
+                            Swal.fire({
+                                title: messages[actionType].title,
+                                type: 'question',
+                                showCancelButton: true,
+                                confirmButtonText: messages[actionType].confirm,
+                                cancelButtonText: messages[actionType].cancel,
+                                confirmButtonColor: messages[actionType].color,
+                                cancelButtonColor: '#6c757d',
+                            }).then((result) => {
+
+                                if(result.value){
+                                    const url = button.dataset.url;
+                                    sendRequest(url).then(res => {
+                                        if(res.success){
+                                            Swal.fire({
+                                                title: res.message || messages.success[locale],
+                                                icon: 'success',
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+                                            button.closest('tr').remove(); // إزالة الصف بعد العملية
+                                        } else {
+                                            Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                        }
+                                    }).catch(() => {
+                                        Swal.fire('خطأ', messages.error[locale], 'error');
+                                    });
+                                }
+                            });
+                        });
+                    }
+
+                    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+                    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+                    });
+    ");
     $grid->disableActions();
     $grid->disableCreation();
         return $grid;
@@ -150,20 +245,80 @@ class SuperadminBannerRequestController extends AdminController
         return $form;
     }
 
-
     public function approve($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);
         $homeCarousel = $request->homeCarousel;
-        $homeCarousel->enable = 1; 
-        $homeCarousel->{$request->notes} = 1; 
-        $homeCarousel->save();
-        $request->status = 'approved';
-        $request->save();
-
-        return response()->json(['success' => true, 'message' => 'Banner approved successfully']);
+        $user = $request->user;
+        $displayType = preg_replace('/^display_/', '', (string) $request->notes);
+       
+        $hours = (int) ($request->hours ?? 1);
+    
+        $now = now();
+    
+        $homeCarousel->update([
+            'enable' => 1,
+        ]);
+    
+        $display = HomeCarouselDisplay::where('home_carousel_id', $homeCarousel->id)
+            ->where('display_type', $displayType)
+            ->first();
+    
+        if ($display) {
+            if ($display->end_at && $display->end_at->isFuture()) {
+                $existingHours = $this->convertToHours($display->duration, $display->duration_unit);
+    
+                $totalHours = $existingHours + $hours;
+    
+                $newEndAt = $display->end_at->copy()->addHours($hours);
+    
+                $display->update([
+                    'duration'      => $totalHours,
+                    'duration_unit' => 'hours', 
+                    'end_at'        => $newEndAt,
+                ]);
+            } else {
+                $newEndAt = $now->copy()->addHours($hours);
+    
+                $display->update([
+                    'duration'      => $hours,
+                    'duration_unit' => 'hours',
+                    'created_at'    => $now,
+                    'end_at'        => $newEndAt,
+                ]);
+            }
+        } else {
+            $newEndAt = $now->copy()->addHours($hours);
+    
+            HomeCarouselDisplay::create([
+                'home_carousel_id' => $homeCarousel->id,
+                'display_type'     => $displayType,
+                'duration'         => $hours,
+                'duration_unit'    => 'hours',
+                'created_at'       => $now,
+                'end_at'           => $newEndAt,
+            ]);
+        }
+    
+        $request->update(['status' => 'approved']);
+    
+        return response()->json([
+            'success' => true,
+            'message' => __('Banner approved successfully'),
+        ]);
     }
-
+    
+   
+    protected function convertToHours(int $value, string $unit): int
+    {
+        return match ($unit) {
+            'hours'  => $value,
+            'days'   => $value * 24,
+            'months' => $value * 30 * 24, 
+            default  => $value,
+        };
+    }
+    
     public function reject($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);

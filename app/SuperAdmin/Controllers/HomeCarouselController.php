@@ -88,13 +88,13 @@ class HomeCarouselController extends MainController
         $grid->column('img', __('Image'))->image('', 235, 77);
     
         $grid->column('actions', __('Actions'))->display(function () {
-
-           
+    
             $types = [
                 'display_discover' => __('Display Discover'),
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Rooms'),
             ];
     
             $buttons = '';
@@ -102,7 +102,6 @@ class HomeCarouselController extends MainController
                 $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
                                 data-id="' . $this->id . '" 
                                 data-type="' . $type . '">
-
                                 <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
             }
@@ -111,15 +110,17 @@ class HomeCarouselController extends MainController
     
         $grid->disableExport();
         $grid->disableActions();
-        $display_discover = SuperAdminHelper::getHourlyBannerPrice('display_discover');
-        $display_home_top = SuperAdminHelper::getHourlyBannerPrice('display_home_top');
-        $display_home_middle = SuperAdminHelper::getHourlyBannerPrice('display_home_middle');
-        $display_live = SuperAdminHelper::getHourlyBannerPrice('display_live');
-
-
+    
+        $display_prices = [
+            'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
+            'display_home_top' => SuperAdminHelper::getHourlyBannerPrice('display_home_top'),
+            'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
+            'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
+        ];
+    
         $translations = [
             'confirm_deduction' => __('Confirm Deduction'),
-            'deduct_text' => __('coins will be deducted to send the display request: ', ['count' =>  '']),
+            'deduct_text' => __('coins will be deducted to send the display request: '),
             'yes_deduct' => __('Yes, deduct and send request'),
             'cancel' => __('Cancel'),
             'done' => __('Done!'),
@@ -131,67 +132,73 @@ class HomeCarouselController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
-                // 'display_country' => __('عرض الدولة'),
             ],
         ];
-        
+        $translationsJson = json_encode($translations);
+        $displayPricesJson = json_encode($display_prices);
         Admin::script("
-        const translations = " . json_encode($translations) . ";
-        const display_discover = " . $display_discover . ";
-        const display_home_top = " . $display_home_top . ";
-        const display_home_middle = " . $display_home_middle . ";
-        const display_live = " . $display_live . ";
+        const translations = $translationsJson;
+        const display_prices = $displayPricesJson;
 
         function bindBannerRequestButtons() {
             $(document).off('click', '.request-banner').on('click', '.request-banner', function() {
                 var bannerId = $(this).data('id');
                 var displayType = $(this).data('type');
                 var displayLabel = translations.display_types[displayType] || displayType;
-                var deductAmount = 0;
+                var deductAmount = display_prices[displayType] || 0;
 
-                switch(displayType) {
-                    case 'display_discover':
-                        deductAmount = display_discover;
-                        break;
-                    case 'display_home_top':
-                        deductAmount = display_home_top;
-                        break;
-                    case 'display_home_middle':
-                        deductAmount = display_home_middle;
-                        break;
-                    case 'display_live':
-                        deductAmount = display_live;
-                        break;
-                    default:
-                        deductAmount = 0;
-                        break;
-                }
-
- 
                 if (typeof Swal === 'undefined') {
                     alert(translations.sweetalert_missing);
                     return;
                 }
-                 var message = translations.deduct_text.replace(':count', deductAmount) + deductAmount + 'coins';
-
                 Swal.fire({
                     title: translations.confirm_deduction,
-                    text: message,
-                    icon: 'warning',
+                    html: '<p id=\"deduct_message\">' + translations.deduct_text + ' ' + deductAmount + ' coins per hour</p>' +
+                        '<label>' + displayLabel + ' Hours:</label>' +
+                        '<input type=\"number\" id=\"banner_hours\" class=\"swal2-input\" min=\"1\" value=\"1\">',
+                    type: 'warning', // في الإصدارات الحديثة استعمل icon بدل type
                     showCancelButton: true,
                     confirmButtonText: translations.yes_deduct,
-                    cancelButtonText: translations.cancel
+                    cancelButtonText: translations.cancel,
+                    onOpen: function() { // بدل didOpen
+                        var hoursInput = document.getElementById('banner_hours');
+                        var message = document.getElementById('deduct_message');
+
+                        hoursInput.addEventListener('input', function() {
+                            var hours = parseFloat(hoursInput.value);
+                            if (isNaN(hours) || hours < 1) hours = 1;
+                            var total = hours * deductAmount;
+                            message.textContent = translations.deduct_text + ' ' + total + ' coins';
+                        });
+                    },
+                    preConfirm: function() {
+                        var hours = parseInt(document.getElementById('banner_hours').value);
+                        if (isNaN(hours) || hours < 1) {
+                            Swal.showValidationMessage('Please enter a valid number of hours');
+                            return false;
+                        }
+                        return hours;
+                    }
+
+
                 }).then((result) => {
                     if (result.value) {
+                        const hours = result.value;
+                        const totalDeduct = hours * deductAmount;
                         $.ajax({
                             url: '/superadmin/banner-request/' + bannerId,
                             type: 'POST',
-                            data: { _token: LA.token, field: displayType },
+                            data: { 
+                                _token: LA.token, 
+                                field: displayType,
+                                hours: hours,
+                                total: totalDeduct
+                            },
                             success: function(response) {
                                 Swal.fire({
                                     title: translations.done,
                                     text: response.message,
-                                    icon: 'success'
+                                    type: 'success'
                                 }).then(() => { $.pjax.reload('#pjax-container'); });
                             },
                             error: function(xhr) {
@@ -203,17 +210,20 @@ class HomeCarouselController extends MainController
                 });
             });
         }
-    
+
         $(function() { bindBannerRequestButtons(); });
         $(document).on('pjax:complete', function() { bindBannerRequestButtons(); });
     ");
-    $grid->tools(function (Tools $tools) {
 
-        $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
-
-    });
+        
+        
+        $grid->tools(function (Tools $tools) {
+            $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+        });
+    
         return $grid;
     }
+    
     
     
     
@@ -242,95 +252,270 @@ class HomeCarouselController extends MainController
      protected function form()
      {
          $form = new Form(new HomeCarousel);
+     
          $this->disableFormTools($form);
-
-         $form->number('sort', __('sort'));
-         $form->imagePath('img', trans('img'))->setResolution(80)->required();
-         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-
-         $form->select('form', trans('time view type'))->options([
-             0 => __(''),
-             1 => __('hours'),
-             2 => __('days'),
-             3 => __('month')
-         ])->when(1, fn(Form $form) => $form->text('input', trans('input')))
-           ->when(2, fn(Form $form) => $form->text('input', trans('input')))
-           ->when(3, fn(Form $form) => $form->text('input', trans('input')));
-
-         $form->select('type', trans('type'))
-             ->options([
-                 'room'   => __('Room'),
-                 'normal' => __('normal'),
-                 'link'   => __('url'),
-                 'event'  => __('events')
-             ])
-             ->when('room', fn(Form $form) =>
-                 $form->select('owner_id', __('owner'))
-                     ->options('/api/search/users2')
-                     ->ajax('/api/search/users2', 'id', 'name')
-             )
-             ->when('link', fn(Form $form) =>
-                 $form->url('url', trans('url'))->rules('required|url')
-             )
-             ->when('event', fn(Form $form) =>
-                 $form->select('event_type', trans('events'))
-                     ->options([
-                         'event'        => __('events'),
-                         'pk_event'     => __('pk_event'),
-                         'weekly_star'  => __('weekly_star'),
-                         'charge_event' => __('charge_event'),
-                         'event_period' => __('event_period'),
-                         'weekly_cp'    => __('weekly_cp'),
-                     ])
-                     ->when('event', fn(Form $form) => $form->url('url', trans('url')))
-             );
-
-         $form->hidden('display_at')->default(json_encode(['country']));
-
-         $form->hidden('countries');
-
-         $form->saving(function (Form $form) {
-             $form->model()->display_at = json_encode(['country']);
-             $form->model()->display_country = 1;
-             $form->display_country = 1;
-         });
-
-         $form->saved(function (Form $form) {
-             $userCountryId = auth()->user()->country_id ?? null;
-             if ($userCountryId) {
-                 $form->model()->countries()->sync([$userCountryId]);
-             }
-         });
-
+     
+         $this->addBasicFields($form);
+         $this->addTimeSettings($form);
+         $this->addContentType($form);
+         $this->addCountryDisplay($form);
+     
+         $this->syncCountryDisplayBeforeSave($form);
+         $this->syncCountryRelationsAfterSave($form);
+     
          return $form;
      }
+     
+   
+     protected function addBasicFields(Form $form)
+     {
+         $form->display(__('admin.ID'));
+         $form->number('sort', __('Sort'))->default(1);
+         $form->image('img', __('Image'))->uniqueName()->required();
+         $form->switch('enable', __('Enable'))->states(Common::getSwitchStates())->default(true);
+     }
+     
+   
+     protected function addTimeSettings(Form $form)
+     {
+         $form->select('form', __('Time View Type'))->options([
+             0 => __(''),
+             1 => __('Hours'),
+             2 => __('Days'),
+             3 => __('Months')
+         ])->when('1', fn(Form $form) => $form->number('input', __('Input'))->min(1))
+           ->when('2', fn(Form $form) => $form->number('input', __('Input'))->min(1))
+           ->when('3', fn(Form $form) => $form->number('input', __('Input'))->min(1));
+     }
+     
+    
+     protected function addContentType(Form $form)
+     {
+         $form->select('type', __('Type'))->options([
+             'room'   => __('Room'),
+             'normal' => __('Normal'),
+             'link'   => __('URL'),
+             'event'  => __('Events'),
+         ])->when('room', function (Form $form) {
+             $form->select('owner_id', __('Owner'))
+                 ->options('/api/search/users2')
+                 ->ajax('/api/search/users2', 'id', 'name');
+         })->when('link', function (Form $form) {
+             $form->url('url', __('URL'))->rules('required|url');
+         })->when('event', function (Form $form) {
+             $form->select('event_type', __('Events'))->options([
+                 'event'        => __('events'),
+                 'pk_event'     => __('pk_event'),
+                 'weekly_star'  => __('weekly_star'),
+                 'charge_event' => __('charge_event'),
+                 'event_period' => __('event_period'),
+                 'weekly_cp'    => __('weekly_cp'),
+             ]);
+         });
+     }
+  
+     protected function addCountryDisplay(Form $form)
+     {
+         $form->hidden('display_at')->default(json_encode(['country']));
+     
+        //  $form->belongsToMany('countries', Countries::class, __('Country'))->required();
+     }
+     
+  
+     protected function syncCountryDisplayBeforeSave(Form $form)
+     {
+         $form->saving(function (Form $form) {
+             $form->model()->display_at = json_encode(['country']);
+             $form->display_at = json_encode(['country']);
+         });
+     }
+     
+   
+     protected function syncCountryRelationsAfterSave(Form $form)
+     {
+         $form->saved(function (Form $form) {
+             $model = $form->model();
+     
+             $formInput = request('input') ?? $model->input ?? 0;
+             $formForm  = request('form') ?? $model->form ?? 1;
+     
+             $unit = match ($formForm) {
+                 1 => 'hours',
+                 2 => 'days',
+                 3 => 'months',
+                 default => 'hours',
+             };
+     
+             $start = now();
+             $endAt = match ($unit) {
+                 'hours'  => $start->copy()->addHours($formInput),
+                 'days'   => $start->copy()->addDays($formInput),
+                 'months' => $start->copy()->addMonths($formInput),
+                 default  => $start->copy()->addHours($formInput),
+             };
+     
+             $display = $model->displays()->firstOrNew(['display_type' => 'country']);
+             $display->fill([
+                 'duration'      => $formInput,
+                 'duration_unit' => $unit,
+                 'created_at'    => $start,
+                 'end_at'        => $endAt,
+             ]);
+             $display->save();
+
+             $countries = Auth::user()->country_id;
+             $model->countries()->sync($countries);
+         });
+     }
+     
 
 
+     public function storeBannerRequest($bannerId, Request $request)
+     {
+         $banner = HomeCarousel::findOrFail($bannerId);
+         $user   = auth()->user();
+         $field  = $request->field;
+         $hours  = $request->hours;
+         
+     
+         if ($this->hasActiveDisplay($banner, $field)) {
+             return $this->errorResponse(__('A display of this type is already active for this banner.'));
+         }
+     
+         if ($this->hasPendingRequest($user, $banner, $field)) {
+             return $this->errorResponse(__('You already have a pending request for this banner and display type.'));
+         }
 
-     public function storeBannerRequest(HomeCarousel $banner, Request $request)
+         if ($this->hasViewRequest($user, $banner, $field)) {
+            return $this->errorResponse(__('This banner is already displayed in the selected section.'));
+        }
+     
+         $totalDeduct = $this->calculateDeduction($request, $field);
+     
+         if ($user->di < $totalDeduct) {
+             return $this->errorResponse(__('insufficient_balance'));
+         }
+     
+         $this->processBannerRequest($user, $banner, $field, $totalDeduct ,$hours);
+     
+         return response()->json(['message' => __('request_sent_success')]);
+     }
+     
+     protected function hasActiveDisplay($banner, $field)
+     {
+         return $banner->displays()
+             ->where('display_type', $field)
+             ->where(function ($q) {
+                 $q->where('end_at', '>', now())
+                   ->orWhereNull('end_at');
+             })
+             ->exists();
+     }
+     
+     protected function hasPendingRequest($user, $banner, $field)
+     {
+         return SuperadminBannerRequest::where('user_id', $user->id)
+             ->where('home_carousel_id', $banner->id)
+             ->where('notes', $field)
+             ->where('status', 'pending')
+             ->exists();
+     }
+
+     protected function hasViewRequest($user, $banner, $field)
+     {
+        $field = str_replace('display_', '', $field);
+
+         return HomeCarousel::query()
+             ->where('id', $banner->id)
+             ->whereHas('displays', function ($q) use ($field) {
+                 $q->where('display_type', $field);
+             })
+             ->exists();
+     }
+     
+     protected function calculateDeduction(Request $request, $field)
+     {
+         $hours       = (int) $request->input('hours', 1);
+         $hourlyPrice = SuperAdminHelper::getHourlyBannerPrice($field);
+         return $hours * $hourlyPrice;
+     }
+     
+     protected function processBannerRequest($user, $banner, $field, $totalDeduct ,$hours)
+     {
+         \DB::transaction(function () use ($user, $banner, $field, $totalDeduct,$hours) {
+             $user->decrement('di', $totalDeduct);
+     
+             SuperadminBannerRequest::create([
+                 'user_id'          => $user->id,
+                 'home_carousel_id' => $banner->id,
+                 'coins_deducted'   => $totalDeduct,
+                 'status'           => 'pending',
+                 'notes'            => $field,
+                 'hours'            => $hours,
+             ]);
+         });
+     }
+     
+     protected function errorResponse($message)
+     {
+         return response()->json(['message' => $message], 422);
+     }
+    
+
+     
+     
+     public function resendBannerRequest($bannerId, Request $request)
     {
+        $bannerRequest = $this->getLatestBannerRequest($bannerId);
         $user = auth()->user();
-        $deductAmount = SuperAdminHelper::bannerDeductAmount( $banner,$request->field);
 
-
-        if ($user->di < $deductAmount) {
-            return response()->json(['message' => __('insufficient_balance')], 422);
+        if (!$bannerRequest) {
+            return $this->errorResponse(__('No previous banner request found.'));
         }
 
-        \DB::transaction(function () use ($user, $banner, $request, $deductAmount) {
-            $user->di -= $deductAmount;
-            $user->save();
+        $field = $bannerRequest->notes;
+        $hours = (int) ($bannerRequest->hours ?? 1);
+        $totalDeduct = $this->calculateDeductionForResend($field, $hours);
 
-            SuperadminBannerRequest::create([
-                'user_id' => $user->id,
-                'home_carousel_id' => $banner->id,
-                'coins_deducted' => $deductAmount,
-                'status' => 'pending',
-                'notes' => $request->field,
+        if ($user->di < $totalDeduct) {
+            return $this->errorResponse(__('insufficient_balance'));
+        }
+
+        $this->processResendRequest($user, $bannerRequest, $totalDeduct);
+
+        return response()->json(['message' => __('Banner request resent successfully.')]);
+    }
+
+    protected function getLatestBannerRequest($bannerId)
+    {
+        return SuperadminBannerRequest::where('home_carousel_id', $bannerId)
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->first();
+    }
+
+    protected function calculateDeductionForResend($field, $hours)
+    {
+        $hourlyPrice = SuperAdminHelper::getHourlyBannerPrice($field);
+        return $hours * $hourlyPrice;
+    }
+
+    protected function processResendRequest($user, $bannerRequest, $totalDeduct)
+    {
+        \DB::transaction(function () use ($user, $bannerRequest, $totalDeduct) {
+            $user->decrement('di', $totalDeduct);
+
+            $bannerRequest->update([
+                'status'         => 'pending',
+                'coins_deducted' => $totalDeduct,
+                'created_at'     => now(),
+                'updated_at'     => now(),
             ]);
         });
-
-        return response()->json(['message' => __('request_sent_success')]);
     }
+
+   
+
+     
 }
 

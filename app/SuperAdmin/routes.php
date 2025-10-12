@@ -123,7 +123,7 @@ Route::group(
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
-        Route::post('superadmin/banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest'])
-        ->name('superadmin.banner.resend');
+        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
+        ->name('banner.resend');
     }
 );

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Events\Entities\GeneralRole;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class HomeCarousel extends Model
 {
@@ -21,7 +22,12 @@ class HomeCarousel extends Model
         'display_home_middle' => 'integer',
         'display_live' => 'integer',
         'display_country' => 'integer',
+        'display_at' => 'array',
+
+
     ];
+
+    
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -61,7 +67,7 @@ class HomeCarousel extends Model
                     '3' => $newDuration->addMonths($model->input),
                     default => null
                 };
-                $model->duration = $duration->timestamp;
+                // $model->duration = $duration->timestamp;
             }
         });
 
@@ -75,7 +81,7 @@ class HomeCarousel extends Model
                         '3' => $newDuration->addMonths($model->input),
                         default => null
                     };
-                    $model->duration = $duration->timestamp;
+                    // $model->duration = $duration->timestamp;
                 }
             }
         });
@@ -90,12 +96,105 @@ class HomeCarousel extends Model
                         '3' => $newDuration->addMonths($model->input),
                         default => null
                     };
-                    $model->duration = $duration->timestamp;
+                    // $model->duration = $duration->timestamp;
                 }
             }
         });
     }
 
 
+    public function displays()
+    {
+        return $this->hasMany(HomeCarouselDisplay::class, 'home_carousel_id');
+    }
+
+    public function getIsActiveAttribute()
+    {
+        return is_null($this->duration) || $this->duration > Carbon::now()->timestamp;
+    }
+
+    public function setDurationAttribute($value)
+    {
+        $this->attributes['duration'] = $value;
+    }
+
+    public function getDurationAttribute($value)
+    {
+        return $value;
+    }
+
+    public function displayDiscover(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'discover')->exists(),
+            set: fn($value) => $this->syncDisplay('discover', $value)
+        );
+    }
+
+    public function displayHomeTop(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'home_top')->exists(),
+            set: fn($value) => $this->syncDisplay('home_top', $value)
+        );
+    }
+
+    public function displayHomeMiddle(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'home_middle')->exists(),
+            set: fn($value) => $this->syncDisplay('home_middle', $value)
+        );
+    }
+
+    public function displayLive(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'live')->exists(),
+            set: fn($value) => $this->syncDisplay('live', $value)
+        );
+    }
+
+    public function displayCountry(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'country')->exists(),
+            set: fn($value) => $this->syncDisplay('country', $value)
+        );
+    }
+
+
+    public function displayRoom(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->displays()->where('display_type', 'room')->exists(),
+            set: fn($value) => $this->syncDisplay('room', $value)
+        );
+    }
+
+    
+
+
+    protected function syncDisplay(string $type, $value)
+    {
+        if ($value) {
+            $this->displays()->firstOrCreate(['display_type' => $type]);
+        } else {
+            $this->displays()->where('display_type', $type)->delete();
+        }
+    }
+
+
+
+
+
+
+
+
+    protected function getDisplayAtAttribute($value)
+    {
+        $decoded = $this->displays?->pluck('display_type')->toArray();
+        return implode(',',$decoded);
+    }
 
 }
