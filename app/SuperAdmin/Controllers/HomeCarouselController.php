@@ -448,7 +448,7 @@ class HomeCarouselController extends MainController
          \DB::transaction(function () use ($user, $banner, $field, $totalDeduct,$hours) {
              $user->decrement('di', $totalDeduct);
      
-             SuperadminBannerRequest::create([
+            $req = SuperadminBannerRequest::create([
                  'user_id'          => $user->id,
                  'home_carousel_id' => $banner->id,
                  'coins_deducted'   => $totalDeduct,
@@ -471,7 +471,7 @@ class HomeCarouselController extends MainController
                 data: [
                     'requested_by' => auth()->user()->name,
                     'requested_by_id' =>auth()->user()->id,
-                    'banner_id' => $banner->id,
+                    'item_id' => $req->id,
                     'coins_deducted' => $totalDeduct,
                     'hours' => $hours,
                     'notes' => $field,

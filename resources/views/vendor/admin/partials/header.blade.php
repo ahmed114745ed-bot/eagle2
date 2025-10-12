@@ -35,7 +35,24 @@
             @endif
             <script> window.enableCountryHeader = true; </script>
         @endif
+   
+
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
+        {!! Admin::getNavbar()->render('left') !!}
+        </ul>
+
+        <div class="navbar-custom-menu">
+
+            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
+                <img src="{{ getImagePath($country->flag) }}"
+                     class="flag-image"
+                     alt="flag Image"
+                     title="{{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}">
+            @endif
+
+            <ul class="nav navbar-nav">
+
+            <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
         @if (!Admin::user()->type || Admin::user()->type == '')
                 <li class="nav-item dropdown" id="notificationsDropdown">
                     <a href="#" class="nav-link" onclick="openModal(event)" style="position: relative;">
@@ -77,25 +94,6 @@
                 
 
             </ul>
-
-        <ul class="nav navbar-nav hidden-sm visible-lg-block">
-        {!! Admin::getNavbar()->render('left') !!}
-
-       
-
-        </ul>
-
-        <div class="navbar-custom-menu">
-
-            @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
-                <img src="{{ getImagePath($country->flag) }}"
-                     class="flag-image"
-                     alt="flag Image"
-                     title="{{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}">
-            @endif
-
-            <ul class="nav navbar-nav">
-
                 {!! Admin::getNavbar()->render() !!}
 
                 <li class="dropdown user user-menu">

@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .listen('AdminNotificationCreated', (e) => {
                 console.log("📬 إشعار جديد وصل:", e);
 
+                try {
+                    const audio = new Audio('/sounds/notification.mp3'); 
+                    audio.volume = 0.6; 
+                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
+                } catch (error) {
+                    console.warn('خطأ في تشغيل الصوت:', error);
+                }
+
                 const notifCountEl = document.getElementById('notificationsCount');
                 if (notifCountEl) {
                     const current = parseInt(notifCountEl.textContent || '0', 10);
