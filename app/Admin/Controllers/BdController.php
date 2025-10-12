@@ -94,12 +94,16 @@ class BdController extends MainController
     {
         $grid = new Grid(new Bd());
         $countryID = request('country_id');
-        if ($countryID){
+        $superAdmin = [];
+        if ($countryID) {
             $superAdmin = SuperAdmin::select('id')->where('country_id', $countryID)->first();
         }
 
         $grid->model()
-            ->where('parent_id', $superAdmin->id)
+            ->when(isset($countryID), function ($query) use ($superAdmin) {
+                $query->where('parent_id', $superAdmin->id);
+            })
+
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -322,37 +326,37 @@ class BdController extends MainController
 
         $form->hidden('transfer_salary', __('transfer_salary'));
 
-//        $form->select('super_admin_id', 'Select Super Admin')
-//            ->options(function ($value) {
-//                $ops = [];
-//                foreach (SuperAdmin::where('id', $value)->get() as $admin) {
-//                    $ops[$admin->id] = $admin->username;
-//                }
-//                return $ops;
-//            })
-//            ->ajax('/api/search/users-superadmin', 'id', 'name')
-//            ->rules('required')
-//            ->when('!=', null, function ($form) {
-//
-//                $form->select('app_id', __('validation.select_user'))
-//                    ->options(function ($value) {
-//                        $ops2 = [];
-//                        foreach (\App\Models\User::where('id', $value)->get() as $user) {
-//                            $ops2[$user->id] = $user->uuid . '_' . $user->name;
-//                        }
-//                        return $ops2;
-//                    })
-//                    ->ajax('/api/search/users-by-country', 'id', 'name')
-//                    ->rules('required');
-//
-//                $form->switch('default', __('set_as_default'))
-//                    ->help(__('make_bd_default'));
-//
-//                if ($form->isEditing()) {
-//                    $form->select('app_id', __('validation.select_user'))
-//                        ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
-//                }
-//            });
+        //        $form->select('super_admin_id', 'Select Super Admin')
+        //            ->options(function ($value) {
+        //                $ops = [];
+        //                foreach (SuperAdmin::where('id', $value)->get() as $admin) {
+        //                    $ops[$admin->id] = $admin->username;
+        //                }
+        //                return $ops;
+        //            })
+        //            ->ajax('/api/search/users-superadmin', 'id', 'name')
+        //            ->rules('required')
+        //            ->when('!=', null, function ($form) {
+        //
+        //                $form->select('app_id', __('validation.select_user'))
+        //                    ->options(function ($value) {
+        //                        $ops2 = [];
+        //                        foreach (\App\Models\User::where('id', $value)->get() as $user) {
+        //                            $ops2[$user->id] = $user->uuid . '_' . $user->name;
+        //                        }
+        //                        return $ops2;
+        //                    })
+        //                    ->ajax('/api/search/users-by-country', 'id', 'name')
+        //                    ->rules('required');
+        //
+        //                $form->switch('default', __('set_as_default'))
+        //                    ->help(__('make_bd_default'));
+        //
+        //                if ($form->isEditing()) {
+        //                    $form->select('app_id', __('validation.select_user'))
+        //                        ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
+        //                }
+        //            });
 
         $form->select('parent_id', __('select super admin'))->options(function ($value) {
             $ops = [];
