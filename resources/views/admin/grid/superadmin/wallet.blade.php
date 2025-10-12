@@ -197,7 +197,7 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     border-radius: 0 0 10px 10px;
     z-index: 10000;
-    background-color;:var(--box-background-color);
+    background-color:var(--box-background-color);
 
 
 }
@@ -239,9 +239,9 @@
 
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
 <!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 <!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 
 <!-- <div class="card bg-primary" style="
    background: var(--secondary-color);
@@ -291,12 +291,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
-            <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('Search') }}" oninput="searchTarget()" autocomplete="off">
-            <input type="hidden" name="target_id" id="target_id" required>
+            <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
 
-            <div id="searchResults" class="list-group" style="
-             background-color:var(--box-background-color);
-            position: absolute; z-index: 9999; width: 67%; display: none;"></div>
         </div>
         <br>
         <div class="form-group">
@@ -318,10 +314,19 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998;"></div>
 
 {{-- JS --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+
 <script>
     function openChargeModal() {
         document.getElementById('chargeModal').style.display = 'block';
         document.getElementById('chargeOverlay').style.display = 'block';
+
+        // Initialize Select2 only when modal opens
+        initSelect2();
     }
 
     function closeChargeModal() {
@@ -335,117 +340,49 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         fields.style.display = type ? 'block' : 'none';
     }
 
-    let searchTimeout;
-
-    function toggleTargetFields() {
-        const type = document.getElementById('target_type').value;
-        const fields = document.getElementById('target_fields');
-        const inputSearch = document.getElementById('target_id_search');
-        const hiddenInput = document.getElementById('target_id');
-
-        fields.style.display = type ? 'block' : 'none';
-
-        // Reset input values
-        inputSearch.value = '';
-        hiddenInput.value = '';
-        document.getElementById('searchResults').style.display = 'none';
-    }
-
     const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
 
-    // function searchTarget() {
-    //     clearTimeout(searchTimeout);
+    function initSelect2() {
+        if (!$('#target_id').hasClass('select2-hidden-accessible')) {
+            $('#target_id').select2({
+                dropdownParent: $('#chargeModal'),
+                placeholder: '{{ __("Select agency") }}',
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return "{{ __('not_in_same_country') }}";
+                    }
+                },
+                ajax: {
+                    url: '/api/search/superadmin-agencies',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term || '',
+                            page: params.page || 1,
+                            country_id: AUTH_COUNTRY_ID
+                        };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
 
-    //     const query = document.getElementById('target_id_search').value;
-    //     const targetType = document.getElementById('target_type').value;
-    //     const resultsDiv = document.getElementById('searchResults');
+                        const items = data.data || data || [];
 
-    //     if (!query || !targetType) {
-    //         resultsDiv.style.display = 'none';
-    //         return;
-    //     }
-
-    //     let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
-
-    //     searchTimeout = setTimeout(() => {
-    //         fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
-    //             .then(res => res.json())
-    //             .then(response => {
-    //                 const data = response.data;
-
-    //                 resultsDiv.innerHTML = '';
-    //                 if (!data.length) {
-    //                     resultsDiv.style.display = 'none';
-    //                     return;
-    //                 }
-
-    //                 data.forEach(item => {
-    //                     const div = document.createElement('div');
-    //                     div.className = 'list-group-item list-group-item-action list-group-item2';
-    //                     div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
-    //                     div.onclick = () => selectTarget(item);
-    //                     resultsDiv.appendChild(div);
-    //                 });
-
-    //                 resultsDiv.style.display = 'block';
-    //             });
-    //     }, 300);
-    // }
-
-    function searchTarget() {
-    clearTimeout(searchTimeout);
-
-    const query = document.getElementById('target_id_search').value.trim();
-    const targetType = document.getElementById('target_type').value;
-    const resultsDiv = document.getElementById('searchResults');
-
-    if (!query || !targetType) {
-        resultsDiv.style.display = 'none';
-        return;
-    }
-
-    let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
-    const NOT_IN_SAME_COUNTRY = "{{ __('admin.not_in_same_country') }}";
-    searchTimeout = setTimeout(() => {
-        fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
-            .then(res => res.json())
-            .then(response => {
-                const data = response.data || [];
-
-                resultsDiv.innerHTML = '';
-                if (data.length === 0) {
-                   resultsDiv.innerHTML = `<div class="list-group-item2">${NOT_IN_SAME_COUNTRY}</div>`;
-                    resultsDiv.style.display = 'block';
-                    return;
+                        return {
+                            results: items.map(item => ({
+                                id: item.id,
+                                text: item.name
+                            })),
+                            pagination: {
+                                more: (params.page * 10) < (data.total || 0)
+                            }
+                        };
+                    },
+                    cache: true
                 }
-
-                data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'list-group-item list-group-item2';
-                    div.textContent = item.name ? `${item.name}` : `ID: ${item.id}`;
-                    div.onclick = () => selectTarget(item);
-                    resultsDiv.appendChild(div);
-                });
-
-                resultsDiv.style.display = 'block';
-            })
-            .catch(err => {
-                console.error(err);
-                resultsDiv.style.display = 'none';
             });
-    }, 300);
-}
 
-
-    function selectTarget(item) {
-        document.getElementById('target_id_search').value = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
-        document.getElementById('target_id').value = item.id;
-        document.getElementById('searchResults').style.display = 'none';
-    }
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#searchResults') && e.target.id !== 'target_id_search') {
-            document.getElementById('searchResults').style.display = 'none';
         }
-    });
+    }
 </script>

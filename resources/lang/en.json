@@ -15,6 +15,8 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "not_in_same_country":"not in same country",
+
     "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
     "Create Ticket": "Create Complaint",
