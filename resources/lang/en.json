@@ -1279,9 +1279,11 @@
 "You already have a pending request for this banner and display type.": "You already have a pending request for this banner and display type.",
 "confirm_resend": "Confirm Resend",
 "deduct_text": "Coins will be deducted to resend the banner request:",
+"banner_request_title": "New Banner Display Request",
+"banner_request_message": "Admin :name (ID: :id) has requested a new banner display worth :coins coins."
 
 
-  "Timing settings": "Timing settings",
+  ,"Timing settings": "Timing settings",
     "Time zone:": "Time zone:",
     "Start of week:": "Start of week:",
     "End of week:": "End of week:",
