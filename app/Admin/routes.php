@@ -549,6 +549,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
+            Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
             Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
@@ -675,14 +676,11 @@ Route::group(
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
         Route::post('/set-preview-superadmin', function () {
-            info('yes');
             session(['preview_superadmin' => true]);
-            return response()->json(['status' => 'ok']);
         });
 
         Route::post('/unset-preview-superadmin', function () {
             session()->forget('preview_superadmin');
-            return response()->json(['status' => 'ok']);
         });
 
         Route::group(['middleware' => 'local'], function () {

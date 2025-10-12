@@ -171,10 +171,9 @@
                 @elseif(session('preview_superadmin'))
                     @php
                         $superadminPreviewLinks = [
-                            ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
                             ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
                             ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
-                            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-building',
@@ -188,8 +187,6 @@
                             ],
                             ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
                             ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
-                            ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
-                            ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
                         ];
                     @endphp
 

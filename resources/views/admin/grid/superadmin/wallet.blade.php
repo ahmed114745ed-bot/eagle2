@@ -345,10 +345,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     function initSelect2() {
         if (!$('#target_id').hasClass('select2-hidden-accessible')) {
             $('#target_id').select2({
-                dropdownParent: $('#chargeModal'),
+                dropdownParent: $('#chargeModal'), // ✅ ensures dropdown stays inside modal
                 placeholder: '{{ __("Select agency") }}',
                 allowClear: true,
-                language: {
+                 language: {
                     noResults: function() {
                         return "{{ __('not_in_same_country') }}";
                     }
@@ -359,16 +359,14 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     delay: 250,
                     data: function(params) {
                         return {
-                            q: params.term || '',
+                            q: params.term ,
                             page: params.page || 1,
                             country_id: AUTH_COUNTRY_ID
                         };
                     },
                     processResults: function(data, params) {
                         params.page = params.page || 1;
-
                         const items = data.data || data || [];
-
                         return {
                             results: items.map(item => ({
                                 id: item.id,
@@ -382,7 +380,6 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     cache: true
                 }
             });
-
         }
     }
 </script>

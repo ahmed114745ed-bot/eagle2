@@ -81,19 +81,19 @@ class SuperadminBannerHistoryController extends MainController
         });
 
         $grid->column('status', __('Status'))->display(function ($status) {
-    switch ($status) {
-        case 'approved':
-            return '<span class="text-success">✅ ' . __('Approved') . '</span>';
-        case 'pending':
-            return '<span class="text-warning">⏳ ' . __('Pending') . '</span>';
-        case 'rejected':
-            return '<span class="text-danger">❌ ' . __('Rejected') . '</span>';
-        case 'canceled':
-            return '<span class="text-secondary">🚫 ' . __('Canceled') . '</span>';
-        default:
-            return e($status);
-    }
-});
+            switch ($status) {
+                case 'approved':
+                    return '<span class="text-success">✅ ' . __('Approved') . '</span>';
+                case 'pending':
+                    return '<span class="text-warning">⏳ ' . __('Pending') . '</span>';
+                case 'rejected':
+                    return '<span class="text-danger">❌ ' . __('Rejected') . '</span>';
+                case 'canceled':
+                    return '<span class="text-secondary">🚫 ' . __('Canceled') . '</span>';
+                default:
+                    return e($status);
+            }
+        });
 
         $grid->column('notes', __('Type'))->display(function ($value) {
             if ($value === 'display_discover') {
@@ -106,11 +106,8 @@ class SuperadminBannerHistoryController extends MainController
                 return __('Display Live');
             } elseif ($value === 'display_room') {
                 return __('Display Room');
-            } 
-
-            
-            else {
-                return $value; 
+            } else {
+                return $value;
             }
         });
         $grid->column('hours', __('hours'));
@@ -126,10 +123,11 @@ class SuperadminBannerHistoryController extends MainController
                             data-id="' . $this->home_carousel_id . '" 
                             data-notes="' . e($this->notes) . '" 
                             data-hours="' . e($this->hours) . '">
-                        <i class="fa fa-redo"></i> ' . __('Resend') . '
+                         <i class="fa fa-refresh"></i>  
                     </button>';
-            }
-            return __($this->status);
+            } 
+
+           
         });
 
         // === الأسعار لكل نوع عرض ===
@@ -156,7 +154,7 @@ class SuperadminBannerHistoryController extends MainController
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
                 'display_room' => __('Display Room'),
-                
+
             ],
             'total' => __('Total'),
             'hours' => __('Hours'),

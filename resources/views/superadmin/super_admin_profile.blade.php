@@ -811,7 +811,7 @@
         <img src="{{ getImagePath($superAdmin->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $superAdmin->username ??'' }}</h1>
+        <h1 class="agency-name">{{ $superAdmin->name ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -822,7 +822,24 @@
                 <span class="meta-value">{{ $superAdmin->username ?? '' }}</span>
             </div>
         </div>
+        <div class="agency-meta">
+            <div class="meta-item">
+                <span class="meta-label">{{ __("salary") }}:</span>
+                <span class="meta-value">{{ $superAdmin->di }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">{{ __("country") }}:</span>
+                 <img src="{{ getImagePath(@$superAdmin->country->flag) }}"
+                     class="flag-image"
+                     alt="flag Image"
+                     title="{{ app()->getLocale() === 'ar' ? @$superAdmin->country->name : @$superAdmin->country->e_name }}">
+            </div>
+        </div>
     </div>
+ 
+        
+        
+ 
     <a href="{{ url('admin/usersBd') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
     </a>
@@ -849,12 +866,24 @@
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        {{ __('Agency Count') }}
+                        {{ __('total charges') }}
                     </h2>
                 </div>
                     <div class="avatar-grid">
                             <a href="#" >
-                               {{ $superAdmin->agencies_count  }}
+                               {{ truncateAndTrim($totalCharges ,2) . ' 💰'  }}
+                            </a>
+                    </div>
+            </div>
+            <div class="performers-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        {{ __('total spent') }}
+                    </h2>
+                </div>
+                    <div class="avatar-grid">
+                            <a href="#" >
+                               {{ truncateAndTrim($totalSpent,2) }}
                             </a>
                     </div>
             </div>

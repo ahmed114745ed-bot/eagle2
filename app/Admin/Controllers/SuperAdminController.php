@@ -2,21 +2,23 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DeleteSuperAdminAction;
-use App\Models\Country;
-use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Carbon;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Country;
+use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
+use App\Admin\Actions\DeleteSuperAdminAction;
 
 class SuperAdminController extends MainController
 {
@@ -419,7 +421,7 @@ class SuperAdminController extends MainController
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default'])->findOrFail($id);
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di','default','country_id'])->with('country')->findOrFail($id);
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
@@ -429,7 +431,17 @@ class SuperAdminController extends MainController
         $superAdmin->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
+         $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+        ])
+            ->first();
 
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -464,7 +476,8 @@ class SuperAdminController extends MainController
                 //                break;
         }
 
-        return view('admin.superAdmin.super_admin_profile', compact('superAdmin', 'agencies'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
+        
     }
 
 
