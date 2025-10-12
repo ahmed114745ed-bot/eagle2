@@ -561,7 +561,7 @@ Route::group(
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
 
         //    dd( Admin::menu(function ($menu) {
