@@ -13,6 +13,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
@@ -427,7 +428,7 @@ class SuperAdminController extends MainController
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di','default','country_id'])->with('country')->findOrFail($id);
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
@@ -437,12 +438,14 @@ class SuperAdminController extends MainController
         $superAdmin->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
-         $totals = Charge::selectRaw("
+        $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
-            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id
         ])
             ->first();
 
@@ -452,37 +455,14 @@ class SuperAdminController extends MainController
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
-
-                //            case 'transactions':
-                //                $transactions = $superAdmin->transactions()
-                //                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                //                    ->with('receiveragency')
-                //                    ->latest()
-                //                    ->paginate(10, ['*'], 'transactions_page');
-                //                break;
-                //
-                //            case 'target_history':
-                //                $target_history = BdAgencyHostSallary::select(
-                //                    'id',
-                //                    'bd_id',
-                //                    'agency_id',
-                //                    // 'salary',
-                //                    'amount',
-                //                    'month',
-                //                    'year',
-                //                    'bd_user_id',
-                //                    'created_at'
-                //                )
-                //                    ->where('bd_id', $superAdmin->id)
-                //                    ->where('bd_id', $superAdmin->id)
-                //                    ->where('amount', '!=', 0)
-                //                    ->where('year', $year)
-                //                    ->latest()
-                //                    ->paginate(10, ['*'], 'target_history_page');
-                //                break;
+            case 'rewards':
+                $type = request()->get('type', 'vip');
+                $types = ['vip', 'badge', 'ware'];
+                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
+                break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'types', 'rewards'));
     }
 
     public function profilePreview()

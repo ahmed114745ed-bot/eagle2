@@ -894,8 +894,8 @@
 
 <div class="agency-tabs">
     <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
-{{--    <a href="?tab=transactions" class="tab-btn {{ $activeTab === 'transactions' ? 'active' : '' }}">{{ __('transactions') }}</a>--}}
-{{--    <a href="?tab=target_history" class="tab-btn {{ $activeTab === 'target_history' ? 'active' : '' }}">{{ __('Target History') }}</a>--}}
+    <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>
+
 
 
 </div>
@@ -978,6 +978,85 @@
                 <div class="empty-table">
                     <i class="fas fa-users-slash"></i>
                     <p>{{ __('No agencies found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
+
+@if($activeTab === 'agencies')
+    <div class="tab-content active" id="rewards-tab">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('rewards') }}</h3>
+                <span class="badge count-badge">{{ optional($rewards)->total() ?? 0 }}</span>
+            </div>
+
+            <div class="box-body">
+                <div class="nav-scroll-container">
+                  
+                        <ul class="nav nav-pills">
+                            @foreach($types  => $name)
+                                <li class="{{ $type == $name ? 'active' : '' }}">
+                                    <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'pack_page' => 1]) }}" class="charge_action">
+                                        {{ __($name) }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                </div>
+            </div>
+            @if($rewards && $rewards->count())
+                <div class="table-responsive">
+                   
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('image') }}</th>
+                                <th>{{ __('count') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rewards as $index => $reward)
+                                @php
+                                    $name = '';
+                                    $image = '';
+
+                                    if (request('type') == 'ware') {
+                                        $name = @$reward->ware->name ?? '';
+                                        $image = @$reward->ware->image ?? '';
+                                    } elseif (request('type') == 'vip') {
+                                        $name = @$reward->vip->name ?? '';
+                                        $image = @$reward->vip->image ?? '';
+                                    } elseif (request('type') == 'badge') {
+                                        $name = @$reward->badge->name ?? '';
+                                        $image = @$reward->badge->image ?? '';
+                                    }
+                                @endphp
+
+                                <tr>
+                                    <td>{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>
+                                    <td>{{ $name }}</td>
+                                    <td>
+                                        @if($image)
+                                            <img src="{{ getImagePath($image) }}" alt="Image" width="40" height="40">
+                                        @endif
+                                    </td>
+                                    <td>{{ $reward->no_reward }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ $rewards->appends(['tab' => 'rewards'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="empty-table">
+                    <i class="fas fa-users-slash"></i>
+                    <p>{{ __('No reward found') }}</p>
                 </div>
             @endif
         </div>
