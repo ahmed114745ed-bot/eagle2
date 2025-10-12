@@ -295,10 +295,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <input type="hidden" name="target_id" id="target_id" required>
 
             <div id="searchResults" class="list-group" style="
-             background-color;:var(--box-background-color);
+             background-color:var(--box-background-color);
             position: absolute; z-index: 9999; width: 67%; display: none;"></div>
         </div>
-
+        <br>
         <div class="form-group">
             <label for="amount">{{ __('enter_amount') }}</label>
             <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
