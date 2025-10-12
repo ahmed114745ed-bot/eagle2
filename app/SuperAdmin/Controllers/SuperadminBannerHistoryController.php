@@ -76,7 +76,11 @@ class SuperadminBannerHistoryController extends MainController
                 return __('Display Home Middle');
             } elseif ($value === 'display_live') {
                 return __('Display Live');
+            } elseif ($value === 'display_room') {
+                return __('Display Room');
             } 
+
+            
             else {
                 return $value; 
             }
@@ -123,6 +127,8 @@ class SuperadminBannerHistoryController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Room'),
+                
             ],
             'total' => __('Total'),
             'hours' => __('Hours'),

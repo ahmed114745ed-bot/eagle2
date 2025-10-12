@@ -4027,7 +4027,9 @@
 "A display of this type is already active for this banner.": "يوجد بالفعل عرض نشط من نفس النوع لهذا البنر.",
 "You already have a pending request for this banner and display type.": "لديك بالفعل طلب معلق لهذا البنر ولنفس نوع العرض.",
 "confirm_resend": "تأكيد إعادة الإرسال",
-    "deduct_text": "سيتم خصم العملات لإعادة إرسال طلب البانر:"
+"deduct_text": "سيتم خصم العملات لإعادة إرسال طلب البانر:",
+"Display Rooms" :"عرض الغرف",
+"Display Room" :"عرض الغرف"
 
 
 
