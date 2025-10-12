@@ -506,13 +506,25 @@ class SuperAdminController extends MainController
 
         $agencies = $transactions = $target_history = null;
 
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
 
     }
 
