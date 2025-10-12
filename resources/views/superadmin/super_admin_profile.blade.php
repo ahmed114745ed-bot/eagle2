@@ -829,7 +829,10 @@
             </div>
             <div class="meta-item">
                 <span class="meta-label">{{ __("country") }}:</span>
-                 <img src="{{ getImagePath(@$superAdmin->country->flag) }}" alt="Agency Logo">
+                 <img src="{{ getImagePath(@$superAdmin->country->flag) }}"
+                     class="flag-image"
+                     alt="flag Image"
+                     title="{{ app()->getLocale() === 'ar' ? @$superAdmin->country->name : @$superAdmin->country->e_name }}">
             </div>
         </div>
     </div>
