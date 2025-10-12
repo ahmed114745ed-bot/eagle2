@@ -171,7 +171,7 @@
                 @elseif(session('preview_superadmin'))
                     @php
                         $superadminPreviewLinks = [
-                            ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
                             ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
                             ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
                             [

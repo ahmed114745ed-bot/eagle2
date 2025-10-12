@@ -548,6 +548,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
+            Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
             Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');

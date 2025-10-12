@@ -221,10 +221,12 @@ class AppearChargerAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
+        $countryID = session('country_id');
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile')
-             ->orderByDesc('id');  
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -545,7 +547,7 @@ class AppearChargerAgencyController extends MainController
                     ->where('user_type', 'shipping_agency')
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
-                break;     
+                break;
         }
 
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
