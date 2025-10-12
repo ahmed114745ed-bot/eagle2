@@ -289,7 +289,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     </div>
 
     <div id="target_fields" style="display: none;">
-        <div class="form-group position-relative">
+        {{-- <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
             <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('Search') }}" oninput="searchTarget()" autocomplete="off">
             <input type="hidden" name="target_id" id="target_id" required>
@@ -297,7 +297,24 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <div id="searchResults" class="list-group" style="
              background-color;:var(--box-background-color);
             position: absolute; z-index: 9999; width: 67%; display: none;"></div>
+        </div> --}}
+
+        <div class="form-group position-relative">
+            <label for="target_id_search">{{ __('receiver') }}</label>
+            <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('Search') }}" oninput="searchTarget()" autocomplete="off">
+            <input type="hidden" name="target_id" id="target_id" required>
+
+            <div id="searchResults" class="list-group position-absolute w-100" style="
+                background-color: var(--box-background-color);
+                z-index: 9999;
+                display: none;
+                max-height: 200px;
+                overflow-y: auto;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            "></div>
         </div>
+
 
         <div class="form-group">
             <label for="amount">{{ __('enter_amount') }}</label>
@@ -353,27 +370,83 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
     const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
 
+    // function searchTarget() {
+    //     clearTimeout(searchTimeout);
+
+    //     const query = document.getElementById('target_id_search').value;
+    //     const targetType = document.getElementById('target_type').value;
+    //     const resultsDiv = document.getElementById('searchResults');
+
+    //     if (!query || !targetType) {
+    //         resultsDiv.style.display = 'none';
+    //         return;
+    //     }
+
+    //     let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
+
+    //     searchTimeout = setTimeout(() => {
+    //         fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
+    //             .then(res => res.json())
+    //             .then(response => {
+    //                 const data = response.data;
+
+    //                 resultsDiv.innerHTML = '';
+    //                 if (!data.length) {
+    //                     resultsDiv.style.display = 'none';
+    //                     return;
+    //                 }
+
+    //                 data.forEach(item => {
+    //                     const div = document.createElement('div');
+    //                     div.className = 'list-group-item list-group-item-action list-group-item2';
+    //                     div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+    //                     div.onclick = () => selectTarget(item);
+    //                     resultsDiv.appendChild(div);
+    //                 });
+
+    //                 resultsDiv.style.display = 'block';
+    //             });
+    //     }, 300);
+    // }
+
+    // function selectTarget(item) {
+    //     document.getElementById('target_id_search').value = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+    //     document.getElementById('target_id').value = item.id;
+    //     document.getElementById('searchResults').style.display = 'none';
+    // }
+
+    // document.addEventListener('click', function(e) {
+    //     if (!e.target.closest('#searchResults') && e.target.id !== 'target_id_search') {
+    //         document.getElementById('searchResults').style.display = 'none';
+    //     }
+    // });
+
+
+    let searchTimeout;
+
     function searchTarget() {
         clearTimeout(searchTimeout);
 
-        const query = document.getElementById('target_id_search').value;
-        const targetType = document.getElementById('target_type').value;
+        const query = document.getElementById('target_id_search').value.trim();
+        const targetType = document.getElementById('target_type') ? document.getElementById('target_type').value : 'agency';
         const resultsDiv = document.getElementById('searchResults');
 
-        if (!query || !targetType) {
+        if (!query) {
             resultsDiv.style.display = 'none';
             return;
         }
 
-        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
+        const url = targetType === 'user'
+            ? `/api/search/users2?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`
+            : `/api/search/superadmin-agencies?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`;
 
         searchTimeout = setTimeout(() => {
-            fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
+            fetch(url)
                 .then(res => res.json())
                 .then(response => {
-                    const data = response.data;
-
+                    const data = response.data || [];
                     resultsDiv.innerHTML = '';
+
                     if (!data.length) {
                         resultsDiv.style.display = 'none';
                         return;
@@ -382,18 +455,19 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'list-group-item list-group-item-action list-group-item2';
-                        div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+                        div.textContent = item.name ? `${item.name}` : `ID: ${item.id}`;
                         div.onclick = () => selectTarget(item);
                         resultsDiv.appendChild(div);
                     });
 
                     resultsDiv.style.display = 'block';
-                });
+                })
+                .catch(() => resultsDiv.style.display = 'none');
         }, 300);
     }
 
     function selectTarget(item) {
-        document.getElementById('target_id_search').value = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+        document.getElementById('target_id_search').value = item.name || `ID: ${item.id}`;
         document.getElementById('target_id').value = item.id;
         document.getElementById('searchResults').style.display = 'none';
     }
@@ -403,4 +477,5 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             document.getElementById('searchResults').style.display = 'none';
         }
     });
+
 </script>

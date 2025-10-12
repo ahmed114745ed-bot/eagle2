@@ -497,7 +497,7 @@ class RoomController extends MainController
     {
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->disableIdFilter();
+            
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
