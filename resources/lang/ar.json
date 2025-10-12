@@ -4035,7 +4035,12 @@
 "confirm_resend": "تأكيد إعادة الإرسال",
 "deduct_text": "سيتم خصم العملات لإعادة إرسال طلب البانر:",
 "Display Rooms" :"عرض الغرف",
-"Display Room" :"عرض الغرف"
+"Display Room" :"عرض الغرف",
+"banner_request_title": "طلب جديد لعرض بانر",
+"banner_request_message": "قام المشرف :name (المعرف: :id) بطلب عرض بانر جديد بقيمة :coins عملة.",
+"Mark as read" :"تعيين كا مقرؤة"
+
+
 
 
 

@@ -866,12 +866,24 @@
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        {{ __('Agency Count') }}
+                        {{ __('total charges') }}
                     </h2>
                 </div>
                     <div class="avatar-grid">
                             <a href="#" >
-                               {{ $superAdmin->agencies_count  }}
+                               {{ truncateAndTrim($totalCharges ,2) . ' 💰'  }}
+                            </a>
+                    </div>
+            </div>
+            <div class="performers-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        {{ __('total spent') }}
+                    </h2>
+                </div>
+                    <div class="avatar-grid">
+                            <a href="#" >
+                               {{ truncateAndTrim($totalSpent,2) }}
                             </a>
                     </div>
             </div>

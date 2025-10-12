@@ -37,9 +37,54 @@
             @endif
             <script>window.enableCountryHeader = true;</script>
         @endif
+        <ul class="nav navbar-nav hidden-sm visible-lg-block">
+        @if (!Admin::user()->type || Admin::user()->type == '')
+                <li class="nav-item dropdown" id="notificationsDropdown">
+                    <a href="#" class="nav-link" onclick="openModal(event)" style="position: relative;">
+                        <i class="fa fa-bell" style="font-size: 20px;"></i>
+                        <span id="notificationsCount" 
+                            style="position:absolute; top:5px; right:5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:11px; display:none;">
+                        </span>
+                    </a>
+                </li>
+
+                <!-- المودال -->
+                <div class="modal-overlay" id="myModal">
+                    <div class="modal-no">
+                        <div class="modal-header">
+                            <h5>الإشعارات</h5>
+                            <button type="button" class="close-btn" id="closeModalBtn">×</button>
+                        </div>
+                        <div class="modal-body2" id="notificationsContent">
+                            <div class="text-center text-muted p-3">جاري تحميل الإشعارات...</div>
+                        </div>
+                        <div class="modal-footer" style="text-align: center; padding: 10px;">
+                            <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">تمييز الكل كمقروء</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    window.NOTIFICATIONS_API = {
+                        countUrl: "{{ admin_url('notifications/count') }}",
+                        listUrl: "{{ admin_url('notifications/list') }}",
+                        markReadUrl: "{{ admin_url('notifications/mark-all-read') }}"
+                    };
+                </script>
+              
+                <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
+                <script src="{{ asset('js/modal.js') }}"></script>
+                @endif
+
+                
+
+            </ul>
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
-            {!! Admin::getNavbar()->render('left') !!}
+        {!! Admin::getNavbar()->render('left') !!}
+
+       
+
         </ul>
 
         <div class="navbar-custom-menu">
@@ -227,3 +272,4 @@
         vertical-align: middle;
     }
 </style>
+
