@@ -465,6 +465,7 @@ class SuperAdminController extends MainController
         }
 
         return view('admin.superAdmin.super_admin_profile', compact('superAdmin', 'agencies'));
+        
     }
 
 
