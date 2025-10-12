@@ -81,17 +81,19 @@ class SuperadminBannerHistoryController extends MainController
         });
 
         $grid->column('status', __('Status'))->display(function ($status) {
-            switch ($status) {
-                case 'pending':
-                    return '<span class="text-warning">' . __('Pending') . '</span>';
-                case 'approved':
-                    return '<span class="text-success">' . __('Approved') . '</span>';
-                case 'rejected':
-                    return '<span class="text-danger">' . __('Rejected') . '</span>';
-                default:
-                    return $status;
-            }
-        });
+    switch ($status) {
+        case 'approved':
+            return '<span class="text-success">✅ ' . __('Approved') . '</span>';
+        case 'pending':
+            return '<span class="text-warning">⏳ ' . __('Pending') . '</span>';
+        case 'rejected':
+            return '<span class="text-danger">❌ ' . __('Rejected') . '</span>';
+        case 'canceled':
+            return '<span class="text-secondary">🚫 ' . __('Canceled') . '</span>';
+        default:
+            return e($status);
+    }
+});
 
         $grid->column('notes', __('Type'))->display(function ($value) {
             if ($value === 'display_discover') {
