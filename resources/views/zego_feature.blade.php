@@ -230,35 +230,17 @@
     <div class="settings-sidebar">
         <h2>{{ __('Settings') }}</h2>
         <div class="settings-menu">
-            <button onclick="showSection('AppFeature')"
+            <button onclick="showSection('ZegoFeature')"
                     style="background: var(--primary-color); color: var(--text-secondary-color);">
-                {{ __('Agency Feature') }}
-            </button>
-            <button onclick="showSection('ReelSettings')"
-                    style="text-align: right;">
-                {{ __('Reel Settings') }}
-            </button>
-             <button onclick="showSection('YouTubeSettings')"
-                    style="text-align: right;">
-                {{ __('YouTube Settings') }}
-            </button>
-                         <button onclick="showSection('LiveSettings')"
-                    style="text-align: right;">
-                {{ __('Live Settings') }}
-            </button>
-
-            </button>
-                         <button onclick="showSection('InviteCodeSettings')"
-                    style="text-align: right;">
-                {{ __('invitation code setting') }}
+                {{ __('Zego Feature') }}
             </button>
         </div>
     </div>
 
     <div class="settings-content">
-        <div id="AppFeature" class="settings-section active">
-            <h2>{{ __('Agency Feature') }}</h2>
-            <form id="agencyFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+        <div id="ZegoFeature" class="settings-section active">
+            <h2>{{ __('Zego Feature') }}</h2>
+            <form id="zegoFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -269,143 +251,14 @@
 
                 <div class="form">
                     <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
+                        <span class="toggle-label">{{ __('Enable Zego Feature') }}</span>
                         <label class="switch">
-                            <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
-                            onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
-                                document.getElementById('agencyFeatureForm').submit();">
+                            <input type="checkbox" id="zego_toggle" {{ $zegoFeature ? 'checked' : '' }}
+                            onchange="document.getElementById('zego_feature_value').value = this.checked ? '1' : '0';
+                            document.getElementById('zegoFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="host_agency" id="host_agency_value" value="{{ $hostAgencyStatus ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <div id="ReelSettings" class="settings-section">
-            <h2>{{ __('Reel Settings') }}</h2>
-            <form id="reelFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable Reel Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="reel_toggle" {{ $reelSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_reel_value').value = this.checked ? '1' : '0';
-                                document.getElementById('reelFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="reel_status" id="host_reel_value" value="{{ $reelSettings ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div id="YouTubeSettings" class="settings-section">
-            <h2>{{ __('YouTube Settings') }}</h2>
-            <form id="YouTubeFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable youtube Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="youtube_toggle" {{ $youtubeSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_youtube_value').value = this.checked ? '1' : '0';
-                                document.getElementById('YouTubeFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="youtube_status" id="host_youtube_value" value="{{ $youtubeSettings ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div id="LiveSettings" class="settings-section">
-            <h2>{{ __('Live Settings') }}</h2>
-            <form id="inviteCodeFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable live Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="live_toggle" {{ $liveSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_live_value').value = this.checked ? '1' : '0';
-                                document.getElementById('inviteCodeFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="live_status" id="host_live_value" value="{{ $liveSettings ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-         <div id="InviteCodeSettings" class="settings-section">
-            <h2>{{ __('invite code') }}</h2>
-            <form id="liveFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('dashboard.closeCose') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="invite_code_toggle" {{ $invite_code ? 'checked' : '' }}
-                            onchange="document.getElementById('invite_code_value').value = this.checked ? '1' : '0';
-                                document.getElementById('liveFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="invite_code" id="invite_code_value" value="{{ $invite_code ? '1' : '0' }}">
+                        <input type="hidden" name="zego_feature" id="zego_feature_value" value="{{ $zegoFeature ? '1' : '0' }}">
                     </div>
                 </div>
             </form>
@@ -425,7 +278,7 @@
             return urlParams.get(name);
         }
 
-        const activeTab = getQueryParam("firsttab") || "AppFeature";
+        const activeTab = getQueryParam("firsttab") || "ZegoFeature";
         showSection(activeTab);
     });
 
@@ -464,8 +317,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        var agencyHiddenValue = document.getElementById('host_agency_value').value;
-        document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
+        var zegoHiddenValue = document.getElementById('zego_feature_value').value;
+        document.getElementById('zego_toggle').checked = (zegoHiddenValue === '1');
 
         var reelHiddenValue = document.getElementById('host_reel_value').value;
         document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');

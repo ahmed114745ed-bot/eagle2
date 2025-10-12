@@ -62,7 +62,9 @@ use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
+use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -113,7 +115,6 @@ use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
 
 Route::group(
@@ -241,6 +242,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
+         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -307,6 +309,7 @@ Route::group(
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
@@ -558,7 +561,7 @@ Route::group(
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
 
         //    dd( Admin::menu(function ($menu) {
@@ -665,6 +668,9 @@ Route::group(
 
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
+
+            Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
+            Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
         });
     });
 

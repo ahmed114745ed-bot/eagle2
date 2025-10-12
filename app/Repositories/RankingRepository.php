@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\helper\RankingHelper;
+use App\helper\TimeHelper;
 use App\Helpers\Common;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
@@ -278,14 +279,24 @@ class RankingRepository
 
     protected function applyDateFilters(&$query, $type)
     {
-        if ($type == 0) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfHour(), Carbon::now()->endOfHour()]);
-        } elseif ($type == 1) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
-        } elseif ($type == 2) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-        } elseif ($type == 3) {
-            $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+        $timezone = Common::timeZone();
+        $now = Carbon::now($timezone);
+    
+       
+    
+        [$start, $end] = match ($type) {
+            0 => [$now->copy()->startOfHour(), $now->copy()->endOfHour()],
+            1 => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
+            2 => [
+                $now->copy()->startOfWeek(),
+                $now->copy()->endOfWeek(),
+            ],
+            3 => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
+            default => [null, null],
+        };
+    
+        if ($start && $end) {
+            $query->whereBetween('created_at', [$start, $end]);
         }
     }
 
@@ -293,14 +304,15 @@ class RankingRepository
 
     protected function applyDateFiltersV2(&$query, $type)
     {
+        $timezone = Common::timeZone();
         if ($type == 0) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfHour(), Carbon::now()->endOfHour()]);
+            $query->whereBetween('created_at', [Carbon::now($timezone)->startOfHour(), Carbon::now($timezone)->endOfHour()]);
         } elseif ($type == 1) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+            $query->whereBetween('created_at', [Carbon::now($timezone)->startOfDay(), Carbon::now($timezone)->endOfDay()]);
         } elseif ($type == 2) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $query->whereBetween('created_at', [Carbon::now($timezone)->startOfWeek(), Carbon::now($timezone)->endOfWeek()]);
         } elseif ($type == 3) {
-            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+            $query->whereMonth('created_at', Carbon::now($timezone)->month)->whereYear('created_at', Carbon::now($timezone)->year);
         }
     }
 }

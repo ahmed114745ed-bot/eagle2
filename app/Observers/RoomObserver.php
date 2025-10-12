@@ -3,12 +3,13 @@
 namespace App\Observers;
 
 use App\Models\Room;
+use Illuminate\Support\Facades\Log;
 
 class RoomObserver
 {
     public function creating(Room $room)
     {
-        if($room  == 'audio'){
+        if($room->type == 'audio'){
             $room->mode = 3;
         }
         $room->muted_users = '';
@@ -18,7 +19,8 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
 
-        if($room  == 'audio'){
+        if($room->type  == 'audio'){
+        
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
@@ -28,7 +30,7 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
         
-        if($room  == 'audio'){
+        if($room->type  == 'audio'){
             $this->changeMode($room);
         }
         //        $this->resetRoomSession ($room);
@@ -40,8 +42,9 @@ class RoomObserver
     {
         if ($room->isDirty('mode')) {
             $mics = explode(',', $room->all_microphone);
-
             $count = count($mics);
+    
+           
             if ($room->mode == '0') {
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));
@@ -50,6 +53,7 @@ class RoomObserver
                     $m = array_slice($mics, 0, 10);
                     $room->microphone = implode(',', $m);
                 }
+
             } elseif ($room->mode == '1') { //16 seats
                 if ($count <= 17) {
                     $m = array_merge($mics, array_fill(0, 17 - $count, '0'));
@@ -63,6 +67,7 @@ class RoomObserver
                     $m = array_slice($mics, 0, 15);
                     $room->microphone = implode(',', $m);
                 }
+
             } elseif ($room->mode == '3') { //9 seats
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));

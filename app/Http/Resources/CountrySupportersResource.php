@@ -21,6 +21,7 @@ class CountrySupportersResource extends JsonResource
             'lang' => @$this->language ?: '',
             'phone_code' => @$this->phone_code ?: '',
             'iso' => @$this->iso ?: '',
+            'show_url' => route('countries.preview', $this->id),
             'supporters' => $this->whenLoaded('supporters', function () {
                 return $this->supporters->map(function ($supporter) {
                     return [
@@ -28,7 +29,7 @@ class CountrySupportersResource extends JsonResource
                         'uuid'     => $supporter->sender?->uuid ?? 0,
                         'name'   => $supporter->sender?->name ?? '',
                         'avatar' => $supporter->sender?->profile?->avatar ?? '',
-                        'total'  => (int) $supporter->total_sent, 
+                        'total'  => (int) $supporter->total_sent,
                     ];
                 });
             }),

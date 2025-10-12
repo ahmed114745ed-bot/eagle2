@@ -18,7 +18,11 @@ class PkService
 
     public function create($request, $userId)
     {
-        $room =  $this->roomRepository->findRoomUserEnable($request->owner_id);
+        $roomId = $request->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($request->owner_id);
+
         if (!$room) throw new \Exception('not found');
         if ($userId != $room->uid)  throw new \Exception(__('you don not have permission'));
         if ($room->room_visitor = '') throw new \Exception(__('room closed'));
@@ -50,10 +54,13 @@ class PkService
         return $pk;
     }
 
-    public function showPkOrHide($ownerId, $status, bool $isPkCustom = false)
+    public function showPkOrHide($ownerId = null, $status, bool $isPkCustom = false, $roomId = null)
     {
         $user = request()->user();
-        $room =  $this->roomRepository->findRoomUserEnable($ownerId);
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($ownerId);
+            
         if (!$room) throw new \Exception('not found');
         if ($user->id != $room->uid) throw new \Exception(__('you don not have permission'));
 

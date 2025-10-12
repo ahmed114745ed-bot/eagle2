@@ -10,6 +10,7 @@ use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
+use App\Tik\DTO\ReceiverGiftDTO;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
@@ -48,10 +49,13 @@ class GiftLogService
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
+            // room_id 1
+            // owner id 1
             $data    = $request;
             $user    = $request->user();
             $userId  = $user->id;
-            $ownerId = $data['owner_id'];
+            $ownerId = @$data['owner_id'];
+            $roomId = @$data['room_id'];
             $giftId  = $data['id'];
             $number  = $data['num'];
             $type  = $data['type'];
@@ -74,9 +78,15 @@ class GiftLogService
                 return $check;
             }
 
-
             // Get Room Data
-            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+            if (isset($ownerId)){
+                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+
+            }else{
+                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $ownerId = $room?->uid;
+            }
+
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
@@ -143,11 +153,15 @@ class GiftLogService
 
             if ($room->lastPk != null) {
 
-                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
+                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))
+                    ->afterCommit()
+                    ->onQueue('updatePk');
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
+                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
+                    ->afterCommit()
+                    ->onQueue('default');
             }
 
             $realPrice = (int)($number * $gift->price);
@@ -167,10 +181,10 @@ class GiftLogService
 
             if ($room->mode != '1' && $room->mode != '2') {
                 $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
-                $topUser =
+                /*$topUser =
                     $this->roomTopUsersRepository->getRoomTopUser($room->id, ['user' => function ($q) {
                         $q->withoutAppends();
-                    }]);
+                    }]);*/
 
                 /*  $fUser = $topUser?->user;
                   if ($room->top_user_id != $userId) {
@@ -200,12 +214,20 @@ class GiftLogService
 
             $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
 
+
             $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
-            if ($totalPrice > $totalGiftPrice) {
-                Log::info('send gift event');
-                $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+
+            if ($totalPrice >= $totalGiftPrice) {
+                try {
+                    $gift_data = $this->giftEvent($gift, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $number);
+                    event(new GiftBannerEvent($gift_data));
+                } catch (\Exception $e) {
+
+                }
+
             }
+
             return $message;
         });
     }
@@ -426,9 +448,9 @@ class GiftLogService
             "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
             'room_session'      => $room->session_string,
             'is_password'       => (bool)(@$room->room_pass),
-            'room_owner_id'     => $room->uid ?: 0,
             'room_uuid'         => $room->owner?->uuid ?: 0,
             'room_id'           => (string)($room->id ?: 0),
+            'room_owner_id'     => $room->uid ?: 0,
             'room_name'         => $room->room_name ?: '',
             "room_mode"         => $room->mode,
             "room_cover"        => $room->room_cover ?? '',
@@ -454,6 +476,52 @@ class GiftLogService
         ];
 
         event(new GiftBannerEvent($gift_data));
+    }
+
+
+    public function giftEvent($gift, $user, $totalPrice, $receivedUser, $receiversIds, $room, $number)
+    {
+
+        $receiverGiftDTO = (count($receiversIds) > 1)? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromUser($receivedUser);
+
+        $gift_data = [
+            'show_gift'         => $gift->show_img ?: $gift->show_img2,
+            'gift_img'          => $gift->img,
+            'gift_id'           => $gift->id,
+            'sender_id'         => (int)$user->id,
+            'receiver_id'       => $receiverGiftDTO->id,
+            'num_gift'          => $totalPrice,
+            "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
+            'room_session'      => $room->session_string,
+            'is_password'       => (bool)(@$room->room_pass),
+            'room_uuid'         => $room->owner?->uuid ?: 0,
+            'room_id'           => (string)($room->id ?: 0),
+            'room_owner_id'     => $room->uid ?: 0,
+            'room_name'         => $room->room_name ?: '',
+            "room_mode"         => $room->mode,
+            "room_cover"        => $room->room_cover ?? '',
+            "room_background"   => $room->final_room_image ?? '',
+            'from_name'         => $user->name,
+            'to_name'           => $receiverGiftDTO->name,
+            'gift_price'        => $gift->price,
+            'owner_id'          => $room->uid,
+            'number'            => $number,
+            'coins'             => $user->coins_string,
+            'gift_image_type'   => $gift->image_type,
+            's_vip_level'       => @$user->userVip->level ?? 0,
+            's_image'           => @$user->profile->avatar ?? '',
+            's_name'            => @$user->name ?? '',
+            's_sender_level'    => @$user->total_sender_level,
+            's_receiver_level'  => @$user->total_received_level,
+            'r_vip_level'       => $receiverGiftDTO->vipLevel ,
+            'r_name'            => $receiverGiftDTO->name ?? '',
+            'r_image'           => $receiverGiftDTO->avatar ?? '',
+            'r_sender_level'    => $receiverGiftDTO->senderLevel,
+            'r_receiver_level'  => $receiverGiftDTO->receiverLevel,
+            'room_type'  => @$room->type,
+        ];
+
+        return $gift_data;
     }
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {

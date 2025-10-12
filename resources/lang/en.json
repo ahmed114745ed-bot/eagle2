@@ -1160,7 +1160,21 @@
   "invitation.already_registered": "The user is already registered",
   "invitation.device_in_use": "This code has already been used with another account on this device",
   "invitation.stopped": "Sorry, the invitation system is currently disabled",
-  "wallet.insufficient_balance": "You cannot add this amount now. The maximum allowed is :amount."
+  "wallet.insufficient_balance": "You cannot add this amount now. The maximum allowed is :amount.",
+  "Timing settings": "Timing settings",
+    "Time zone:": "Time zone:",
+    "Start of week:": "Start of week:",
+    "End of week:": "End of week:",
+    "Save": "Save",
+    "Sunday": "Sunday",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday",
+    "Settings updated successfully.": "Settings updated successfully."
+
 
 
 

@@ -186,6 +186,14 @@ if (!function_exists('upload')) {
 }
 
 
+if (!function_exists('deleteFile')) {
+    function deleteFile($path): ?string
+    {
+        return Storage::disk('gcs')->delete($path);
+    }
+}
+
+
 if (!function_exists('uploadMonthlyDiamondReceive')) {
     function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
     {
@@ -200,6 +208,31 @@ if (!function_exists('uploadMonthlyDiamondReceive')) {
                 'monthly_diamond_received' => $monthlyDiamondValue,
             ]
         );
+    }
+}
+
+if (!function_exists('incrementMonthlyDiamond')) {
+    function incrementMonthlyDiamond($user_id, $value)
+    {
+        $date = \Carbon\Carbon::now(getTimezone());
+
+        $monthlyRecord = MonthlyDiamondReceive::where('user_id', $user_id)
+            ->where('month', $date->month)
+            ->where('year', $date->year)
+            ->lockForUpdate()
+            ->first();
+
+        if ($monthlyRecord) {
+            $monthlyRecord->increment('monthly_diamond_received', $value);
+        } else {
+            MonthlyDiamondReceive::create([
+                'user_id' => $user_id,
+                'month'   => $date->month,
+                'year'    => $date->year,
+                'monthly_diamond_received' => $value,
+            ]);
+        }
+
     }
 }
 
@@ -264,6 +297,27 @@ if (!function_exists('get_file_details')) {
             }
 
             \Illuminate\Support\Facades\Queue::connection($connection)->pushOn($selectedQueue, $job);
+        }
+    }
+
+    if (!function_exists('getLeastBusyQueue')) {
+        function getLeastBusyQueue($queueConnection = 'database')
+        {
+            $connection = config('queue.default');
+            $queueNames = config("queue.connections.$queueConnection.queue");
+
+            $minQueueSize  = null;
+            $selectedQueue = null;
+
+            foreach ($queueNames as $queueName) {
+                $queueSize = Queue::connection($connection)->size($queueName);
+                if ($minQueueSize === null || $queueSize < $minQueueSize) {
+                    $minQueueSize  = $queueSize;
+                    $selectedQueue = $queueName;
+                }
+            }
+
+            return $selectedQueue ?? 'default';
         }
     }
 
@@ -909,5 +963,22 @@ if (!function_exists('getCountryIdFromLatLong')) {
         ]);
 
         return $country->id;
+    }
+}
+
+
+if (!function_exists('respond_and_continue')) {
+    function respond_and_continue($response, callable $callback)
+    {
+        $response->send();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        try {
+            $callback();
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage());
+        }
+        exit; // ensure no further output
     }
 }
