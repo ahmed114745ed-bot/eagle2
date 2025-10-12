@@ -84,7 +84,7 @@
     .transferModal{
         width: 600px;
         height: 332px;
-        background-color;:var(--box-background-color);
+        background-color:var(--box-background-color);
         display: none;
         position: fixed;
         top: 20%;
@@ -353,44 +353,89 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
     const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
 
+    // function searchTarget() {
+    //     clearTimeout(searchTimeout);
+
+    //     const query = document.getElementById('target_id_search').value;
+    //     const targetType = document.getElementById('target_type').value;
+    //     const resultsDiv = document.getElementById('searchResults');
+
+    //     if (!query || !targetType) {
+    //         resultsDiv.style.display = 'none';
+    //         return;
+    //     }
+
+    //     let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
+
+    //     searchTimeout = setTimeout(() => {
+    //         fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
+    //             .then(res => res.json())
+    //             .then(response => {
+    //                 const data = response.data;
+
+    //                 resultsDiv.innerHTML = '';
+    //                 if (!data.length) {
+    //                     resultsDiv.style.display = 'none';
+    //                     return;
+    //                 }
+
+    //                 data.forEach(item => {
+    //                     const div = document.createElement('div');
+    //                     div.className = 'list-group-item list-group-item-action list-group-item2';
+    //                     div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+    //                     div.onclick = () => selectTarget(item);
+    //                     resultsDiv.appendChild(div);
+    //                 });
+
+    //                 resultsDiv.style.display = 'block';
+    //             });
+    //     }, 300);
+    // }
+
     function searchTarget() {
-        clearTimeout(searchTimeout);
+    clearTimeout(searchTimeout);
 
-        const query = document.getElementById('target_id_search').value;
-        const targetType = document.getElementById('target_type').value;
-        const resultsDiv = document.getElementById('searchResults');
+    const query = document.getElementById('target_id_search').value.trim();
+    const targetType = document.getElementById('target_type').value;
+    const resultsDiv = document.getElementById('searchResults');
 
-        if (!query || !targetType) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
-
-        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
-
-        searchTimeout = setTimeout(() => {
-            fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
-                .then(res => res.json())
-                .then(response => {
-                    const data = response.data;
-
-                    resultsDiv.innerHTML = '';
-                    if (!data.length) {
-                        resultsDiv.style.display = 'none';
-                        return;
-                    }
-
-                    data.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'list-group-item list-group-item-action list-group-item2';
-                        div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
-                        div.onclick = () => selectTarget(item);
-                        resultsDiv.appendChild(div);
-                    });
-
-                    resultsDiv.style.display = 'block';
-                });
-        }, 300);
+    if (!query || !targetType) {
+        resultsDiv.style.display = 'none';
+        return;
     }
+
+    let url = targetType === 'user' ? '/api/search/users2' : '/api/search/superadmin-agencies';
+
+    searchTimeout = setTimeout(() => {
+        fetch(`${url}?q=${encodeURIComponent(query)}&country_id=${AUTH_COUNTRY_ID}`)
+            .then(res => res.json())
+            .then(response => {
+                const data = response.data || [];
+
+                resultsDiv.innerHTML = '';
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = `<div class="list-group-item2">No results found</div>`;
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'list-group-item list-group-item2';
+                    div.textContent = item.name ? `${item.name}` : `ID: ${item.id}`;
+                    div.onclick = () => selectTarget(item);
+                    resultsDiv.appendChild(div);
+                });
+
+                resultsDiv.style.display = 'block';
+            })
+            .catch(err => {
+                console.error(err);
+                resultsDiv.style.display = 'none';
+            });
+    }, 300);
+}
+
 
     function selectTarget(item) {
         document.getElementById('target_id_search').value = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
