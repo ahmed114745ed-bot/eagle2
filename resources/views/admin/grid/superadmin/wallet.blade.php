@@ -287,7 +287,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
-
+<br>
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
