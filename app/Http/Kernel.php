@@ -95,6 +95,7 @@ class Kernel extends HttpKernel
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
 //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
+        'override.country' => \App\Http\Middleware\OverrideCountry::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
         'auth.redirect' => CheckLoginAdmin::class,
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,

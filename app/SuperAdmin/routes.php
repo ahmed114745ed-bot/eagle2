@@ -60,6 +60,7 @@ Route::group(
         'middleware' => [
             'web',
             'admin.auth',
+            'override.country',
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
