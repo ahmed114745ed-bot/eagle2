@@ -16,10 +16,10 @@ class Badges extends Selectable
         $this->column('id', __('ID'));
         $this->column('name', __('name'));
             $this->column('image', __('image'))->display(function ($path) {
-                /** @var Ware $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
-            });
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 10, 10);
+        });
 
         $this->column('priority', __('Priority'))->sortable();
 
