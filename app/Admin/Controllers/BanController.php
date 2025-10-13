@@ -91,11 +91,13 @@ class BanController extends MainController
     {
         $now = now();
         $grid = new Grid(new Ban);
+        $countryID = session('country_id');
         $grid->disableRowSelector();
 
         $reason = app()->getLocale() == 'ar' ? 'description_ar' : 'description_en';
 
-        $grid->model()
+        $grid->model()->whereHas('user')
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->select($reason,'user_id', 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
             ->groupBy([$reason, 'user_id','uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id','img'])->orderByDesc('created_at');
@@ -104,7 +106,7 @@ class BanController extends MainController
         //        $grid->user_type(__('user_type'));
         $grid->column('id', __('Id'));
         $grid->column('user_id', __('User'))->display(function () {
-            $user = $this->user; 
+            $user = $this->user;
             if (!$user) return '-';
 
             $name = $user->name;
