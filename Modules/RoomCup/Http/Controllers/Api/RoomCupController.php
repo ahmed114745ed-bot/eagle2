@@ -84,7 +84,7 @@ class RoomCupController extends Controller
             ],
             'room' => [
 
-                'admin_count' => count(array_filter(explode(',', $currentData->room->room_admin))),
+                'admin_count' => count(array_filter(explode(',', @$currentData->room->room_admin))),
             ],
             'link' => url('/cup-targets-view'),
 
