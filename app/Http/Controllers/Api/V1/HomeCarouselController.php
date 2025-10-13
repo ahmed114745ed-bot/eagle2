@@ -16,6 +16,7 @@ class HomeCarouselController extends Controller
     {
         $user = Auth::user();
         $displayAt = request('display_at');
+        $country = request('country_id');
         $timezone = getTimezone();
 
         $now = Carbon::now($timezone);
@@ -79,6 +80,9 @@ class HomeCarouselController extends Controller
 
             ->orderBy('sort')
             ->when($request->type, fn($q) => $q->where('type', $request->type))
+             ->when($country, fn($q) => $q->whereHas('countries', function ($q) use($country) {
+                    $q->where('country_id', $country);
+                }))
             ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
             ->get();
 
