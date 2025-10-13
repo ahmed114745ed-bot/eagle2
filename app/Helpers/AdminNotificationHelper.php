@@ -8,7 +8,8 @@ use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\Admin;
-
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
 class AdminNotificationHelper
 {
     public static function notify(
@@ -30,6 +31,8 @@ class AdminNotificationHelper
         ]);
 
         broadcast(new AdminNotificationCreated($notification))->toOthers();
+        self::sendFirebaseNotification($title, $message, $data);
+
         return $notification;
 
     }
@@ -49,32 +52,27 @@ class AdminNotificationHelper
             ->count();
     }
 
-    protected static function sendFirebaseNotification(string $title, string $body, ?array $data = [])
+    protected static function sendFirebaseNotification(string $title, ?string $body = null, ?array $data = [])
     {
-        $serverKey = config('services.firebase.server_key', 'AAAA1oVZzQo:APA91bE.....'); // ضع مفتاحك هنا أو في .env
+        try {
+            $factory = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
+            $messaging = $factory->createMessaging();
 
-        $admins = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
-        if (empty($admins)) {
-            return;
+            $tokens = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+            if (empty($tokens)) return;
+
+            $message = CloudMessage::new()
+                ->withNotification([
+                    'title' => $title,
+                    'body'  => $body ?? '',
+                ])
+                ->withData($data ?? []);
+
+            $messaging->sendMulticast($message, $tokens);
+        } catch (\Throwable $e) {
+            \Log::error('Firebase send error: ' . $e->getMessage());
         }
-
-        $payload = [
-            'registration_ids' => $admins,
-            'notification' => [
-                'title' => $title,
-                'body'  => $body,
-                'sound' => 'default',
-                'icon'  => '/logo.png',
-            ],
-            'data' => $data ?? [],
-        ];
-
-        Http::withHeaders([
-            'Authorization' => 'key=' . $serverKey,
-            'Content-Type'  => 'application/json',
-        ])->post('https://fcm.googleapis.com/fcm/send', $payload);
     }
-
 
   
 
