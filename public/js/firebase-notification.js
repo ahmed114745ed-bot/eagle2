@@ -1,14 +1,23 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-messaging.js";
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((registration) => {
+            console.log('✅ Service Worker registered:', registration);
+        })
+        .catch((err) => {
+            console.error('❌ Service Worker registration failed:', err);
+        });
+}
 const firebaseConfig = {
-    apiKey: "6d758cc9885ad14a7b90d0192daa183cd09f773f",
+    apiKey: "AIzaSyCiUC9036VhsL7SzfB2yDgC1YYq9xiWkqQ",
     authDomain: "eagle-24712.firebaseapp.com",
     projectId: "eagle-24712",
     storageBucket: "eagle-24712.appspot.com",
-    messagingSenderId: "817000206466",
-    appId: "1:817000206466:web:eagle24712appcode",
-    measurementId: "G-108333221643033030817"
+    messagingSenderId: "817000206466",  // SENDER_ID من firebase_credentials.json
+    appId: "1:817000206466:web:eagle24712appcode",   // App ID من Firebase Console
+
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
@@ -26,7 +35,6 @@ async function requestPermission() {
 
             console.log("📱 FCM Token:", token);
 
-            // إرسال الـ token إلى السيرفر لحفظه
             await fetch("/admin/save-fcm-token", {
                 method: "POST",
                 headers: {
@@ -41,6 +49,12 @@ async function requestPermission() {
         }
     } catch (error) {
         console.error("❌ Error getting permission:", error);
+        if (error instanceof Error) {
+            console.error("Message:", error.message);
+            console.error("Name:", error.name);
+            console.error("Stack:", error.stack);
+        }
+        console.dir(error);
     }
 }
 
