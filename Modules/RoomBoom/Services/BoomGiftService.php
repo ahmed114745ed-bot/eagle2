@@ -182,7 +182,7 @@ class BoomGiftService
                 ]);
             } else {
                 $totalRoomGift->increment('current_total', $totalPrice);
-                $totalRoomGift->refresh(); // ensure we return updated values
+                $totalRoomGift->refresh(); 
             }
 
             return $totalRoomGift->current_total;

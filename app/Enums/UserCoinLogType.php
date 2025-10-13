@@ -33,6 +33,10 @@ enum UserCoinLogType: string
     case ROOM_BOOM = 'room_boom';
     case MILESTONE = 'milestone';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
+    case MILESTONE = 'milestone';
+    case ROOM_CUP = 'room_cup';
+    
+    
     
      public function meta(): array
     {
@@ -192,6 +196,17 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
             
+            self::MILESTONE => [
+                'sub_type' => 'milestones',
+                'item_name' => 'milestone',
+                'queue_job' => null,
+            ],
+       
+            self::ROOM_CUP => [
+                'sub_type' => 'room_cup',
+                'item_name' => 'room_cup',
+                'queue_job' => null,
+            ],
             
             
         };

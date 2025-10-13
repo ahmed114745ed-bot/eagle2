@@ -1174,8 +1174,43 @@
     "Friday": "Friday",
     "Saturday": "Saturday",
     "Settings updated successfully.": "Settings updated successfully.",
-    "live":"live"
+    "live":"live",
 
+  "Number of Visitors": "Number of Visitors",
+  "Number of Admins": "Number of Admins",
+  "Owner Profit": "Owner Profit",
+  "Admin Profit": "Admin Profit",
+      "Room Cup Targets": "Room Cup Targets",
+    "room-cup-target": "Room Cup Target",
+    "Room Cup Daily Rewards": "Room Cup Daily Rewards",
+    "Owner Name": "Owner Name",
+    "Owner ID": "Owner ID",
+    "Room ID": "Room ID",
+    "Room Name": "Room Name",
+    "Daily Gain": "Daily Gain",
+    "Profit Coins": "Profit Coins",
+    "Date": "Date",
+    "Gain >= X": "Gain >= X",
+    "ID": "ID",
+    "User ID": "User ID",
+    "Amount": "Amount",
+    "Type": "Type",
+    "Created At": "Created At",
+    "Updated At": "Updated At",
+    "Gain >": "Gain >",
+    "Schedule Type": "Schedule Type",
+    "Daily": "Daily",
+    "Every X Days": "Every X Days",
+    "Weekly": "Weekly",
+    "Monthly": "Monthly",
+    "Execution Time": "Execution Time",
+    "Day (0=Sunday,1=Monday,...)": "Day (0=Sunday,1=Monday,...)",
+    "Interval (days)": "Interval (days)",
+  "roomTarget": "Room Cup Target: Gifts and visitors help reach the target. When reached, the room owner and admins receive coin profits."
+
+    
+  
+  
 
 
 

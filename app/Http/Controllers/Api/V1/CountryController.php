@@ -65,4 +65,12 @@ class CountryController extends Controller
 
         return Common::apiResponse(1, '', $data);
     }
+
+    public function searchCountries(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $countries = $this->countryService->searchCountries($key, $page);
+        return response()->json($countries);
+    }
 }

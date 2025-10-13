@@ -19,6 +19,7 @@ return [
     'country_title'        => 'Ülke Başlığı',
     'last_active_title'    => 'Son Aktif',
     'visit_title'          => 'Ziyaret',
+    'admins_greater_than' => 'Yönetici sayısı :limit değerinden büyük olmalıdır.',
     'room_title'           => 'Odayı Gizle',
     'spechEfeect_title'    => 'Özel Efekt',
     'chat_with_friends_title'    => "Arkadaşlarla Sohbet",
