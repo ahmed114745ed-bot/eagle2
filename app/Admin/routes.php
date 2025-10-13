@@ -644,6 +644,8 @@ Route::group(
         Route::resource('settings', SettingController::class)
         ->except(['update'])
         ->names('admin.settings');
+         Route::resource('helper-links', LinkViewController::class);
+
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');

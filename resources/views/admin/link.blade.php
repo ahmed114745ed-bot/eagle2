@@ -311,7 +311,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
+    <script>
+    // Pass Laravel translations into JavaScript variables
+    const copiedMessage = "{{ __('Link copied successfully!') }}";
+</script>
     <script>
         $(document).ready(function() {
             // Initialize Select2 for country dropdown
@@ -404,7 +407,7 @@
         const input = document.getElementById('zego_client_id');
         input.select();
         document.execCommand('copy');
-        alert('Link copied: ' + input.value);
+         toastr.success(copiedMessage);
     });
 
 
@@ -427,7 +430,7 @@
         }
         input.select();
         document.execCommand('copy');
-        alert('Link copied: ' + input.value);
+         toastr.success(copiedMessage);
     });
 
 
