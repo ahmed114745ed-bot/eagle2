@@ -126,7 +126,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
-         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
     });
 
     // authorization
@@ -286,7 +287,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
                 Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
                 Route::get('/frames/{id?}', [UserController::class, 'frames']);
-
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -303,7 +303,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('search')->group(function () {
-//                Route::get('/', [CommunityController::class, 'merge_search']);
+                //                Route::get('/', [CommunityController::class, 'merge_search']);
                 Route::get('/', [CommunityController::class, 'mergeSearchV2']);
                 Route::get('user-friends', [CommunityController::class, 'user_friends']);
                 Route::get('/history', [CommunityController::class, 'searchList']);
@@ -706,7 +706,3 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
-
-
-
-

@@ -19,16 +19,9 @@ class LinkViewController extends MainController
 
     public function index(Content $content)
     {
-
-        $enabledLanguages = Cache::rememberForever('languages', function () {
-            return Language::where('is_enabled', true)
-                ->pluck('name', 'code')
-                ->toArray();
-        });
-        
         return parent::index($content
             ->title(trans('helper links'))
-            ->body(view('admin.link', compact(['enabledLanguages']))));
+            ->body(view('admin.link')));
     }
 
 
