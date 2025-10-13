@@ -72,13 +72,6 @@ class HomeCarouselResource extends JsonResource
             'avatar'     => $avatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
             'display_at' => @$this->display_at,
-            // 'display_discover' => @$this->display_discover ?? 0,
-            // 'display_home_top' => @$this->display_home_top ?? 0,
-            // 'display_home_middle' => @$this->display_home_middle ?? 0,
-            // 'display_live' => @$this->display_live ?? 0,
-            // 'display_country' => @$this->display_country ?? 0,
-
-        
         ];
 
             if (\Str::contains($this->display_at, 'country')) {

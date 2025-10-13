@@ -3041,8 +3041,16 @@
     "Execution Time": "निष्पादन समय",
     "Day (0=Sunday,1=Monday,...)": "दिन (0=रविवार,1=सोमवार, ...)",
     "Interval (days)": "अंतराल (दिन)",
-    "Gain >": "लाभ >"
+    "Gain >": "लाभ >",
 
+    "url": "लिंक",
+    "Display Discover": "डिस्कवर दिखाएँ",
+    "Display Home Top": "होम टॉप दिखाएँ",
+    "Display Home Middle": "होम मिडल दिखाएँ",
+    "Display Live": "लाइव दिखाएँ",
+    "Display Country": "देश दिखाएँ",
+    "ON": "चालू",
+    "OFF": "बंद"
 
 
 

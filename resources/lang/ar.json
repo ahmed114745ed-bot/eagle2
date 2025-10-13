@@ -3915,7 +3915,15 @@
     "Make every minute in TEMPO LIFE an authentic celebration!": "اجعلوا كل دقيقة في تيمبو لايف احتفالاً أصيلاً!",
     ":country is strong with you... First place awaits!": ":country قوية بكم، والمركز الأول في انتظاركم!",
 
-"Settings updated successfully.": "تم تحديث الإعدادات بنجاح."
+"Settings updated successfully.": "تم تحديث الإعدادات بنجاح.",
+ "url": "الرابط",
+ "Display Discover": "عرض الاستكشاف",
+ "Display Home Top": "عرض أعلى الصفحة الرئيسية",
+ "Display Home Middle": "عرض منتصف الصفحة الرئيسية",
+ "Display Live": "عرض البث المباشر",
+ "Display Country": "عرض الدول",
+ "ON": "مفعل",
+ "OFF": "معطل"
 
 
 
