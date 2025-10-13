@@ -783,6 +783,23 @@
             border: 1px solid var(--primary-hover-alpha) !important;
             border-radius: 4px;
         }
+        nav-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* For Arabic (Right aligned) */
+.nav-right .nav {
+    justify-content: flex-end;  /* Move to right side */
+    direction: rtl;
+}
+
+/* For English (Left aligned) */
+.nav-left .nav {
+    justify-content: flex-start; /* Move to left side */
+    direction: ltr;
+}
 
         .card-target-filter-phone .filter-form {
             border-radius: 13px;
@@ -984,7 +1001,7 @@
     </div>
 @endif
 
-@if($activeTab === 'agencies')
+@if($activeTab === 'rewards')
     <div class="tab-content active" id="rewards-tab">
         <div class="card">
             <div class="card-header">
@@ -993,17 +1010,16 @@
             </div>
 
             <div class="box-body">
-                <div class="nav-scroll-container">
-                  
-                        <ul class="nav nav-pills">
-                            @foreach($types  => $name)
-                                <li class="{{ $type == $name ? 'active' : '' }}">
-                                    <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'pack_page' => 1]) }}" class="charge_action">
-                                        {{ __($name) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
+                <div class="nav-scroll-container {{ app()->getLocale() == 'ar' ? 'nav-right' : 'nav-left' }}">
+                    <ul class="nav nav-pills">
+                        @foreach($types as $name)
+                            <li class="{{ $type == $name ? 'active' : '' }}">
+                                <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}" class="charge_action">
+                                    {{ __($name) }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
             @if($rewards && $rewards->count())
