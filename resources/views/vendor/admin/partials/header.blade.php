@@ -68,18 +68,28 @@
                 <div class="modal-overlay" id="myModal">
                     <div class="modal-no">
                         <div class="modal-header">
-                            <h5>الإشعارات</h5>
+                            <h5>{{ __('Notifications') }}</h5>
                             <button type="button" class="close-btn" id="closeModalBtn">×</button>
                         </div>
                         <div class="modal-body2" id="notificationsContent">
-                            <div class="text-center text-muted p-3">جاري تحميل الإشعارات...</div>
+                            <div class="text-center text-muted p-3">{{ __('dashboard.login.loading.prepare') }}</div>
                         </div>
                         <div class="modal-footer" style="text-align: center; padding: 10px;">
-                            <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">تمييز الكل كمقروء</button>
+                            <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">{{ __('Mark all as read') }}</button>
+                        </div>
+                        <div class="modal-footer" style="text-align: center; padding: 10px;">
+                            <button type="button" class="see-more btn btn-sm btn-outline-secondary load-more-btn" id="loadMoreBtn">
+                            <a href="{{ route('admin.notifications.grid') }}" 
+                                    class="see-more btn btn-sm btn-outline-secondary load-more-btn" 
+                                    id="loadMoreBtn">
+                                        {{ __('Show more') }}
+                                    </a>
+                            </button>
                         </div>
                     </div>
                 </div>
-
+                <audio id="notificationSound" src="{{ asset('sounds/notification.mp3') }}" preload="auto" style="display:none;"></audio>
+    
                 <script>
                     window.NOTIFICATIONS_API = {
                         countUrl: "{{ admin_url('notifications/count') }}",
