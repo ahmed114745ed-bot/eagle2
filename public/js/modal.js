@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("📬 إشعار جديد وصل:", e);
+    console.log("📬 إشعار جديد وصل:");
     if (window.Echo) {
-        console.log("📬 إشعار جديد وصل:", e);
+        console.log("📬 إشعار جديد وصل:");
         window.Echo.private('admin.notifications')
             .listen('AdminNotificationCreated', (e) => {
-                console.log("📬 إشعار جديد وصل:", e);
+                console.log("📬 إشعار جديد وصل:");
 
                 try {
 
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         notifCountEl.style.display = 'none';
                     }
                 }
-                console.log("📬 إشعار جديد وصل:22222", e);
+                console.log("📬 إشعار جديد وصل:22222");
 
                 NotificationBus.emit('notifications:count', { count: data.count });
             })
