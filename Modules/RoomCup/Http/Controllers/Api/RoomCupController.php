@@ -85,7 +85,8 @@ class RoomCupController extends Controller
             'room' => [
 
                 'admin_count' => count(array_filter(explode(',', $currentData->room->room_admin))),
-            ]
+            ],
+            'link' => url('/cup-targets-view'),
 
 
         ];
@@ -159,7 +160,7 @@ class RoomCupController extends Controller
 
     public function cupTargetHtml(Request $request)
     {
-       $link = url('/cup-targets-view');
+        $link = url('/cup-targets-view');
         return Common::apiResponse(true, '', $link, 200);
     }
 }
