@@ -82,6 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         notifCountEl.style.display = 'none';
                     }
                 }
+                console.log("📬 إشعار جديد وصل:22222", e);
+
                 NotificationBus.emit('notifications:count', { count: data.count });
             })
             .catch(() => {
