@@ -1,19 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("📬 إشعار جديد وصل:", e);
+    console.log("📬 إشعار جديد وصل:");
     if (window.Echo) {
-        console.log("📬 إشعار جديد وصل:", e);
+        console.log("📬 إشعار جديد وصل:");
         window.Echo.private('admin.notifications')
             .listen('AdminNotificationCreated', (e) => {
-                console.log("📬 إشعار جديد وصل:", e);
+                console.log("📬 إشعار جديد وصل:");
 
-                try {
-
-                    const audio = document.getElementById('notificationSound');
-                    audio.volume = 0.6; 
-                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
-                } catch (error) {
-                    console.warn('خطأ في تشغيل الصوت:', error);
-                }
 
                 const notifCountEl = document.getElementById('notificationsCount');
                 if (notifCountEl) {
@@ -81,6 +73,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     } else {
                         notifCountEl.style.display = 'none';
                     }
+                }
+                console.log("📬 إشعار جديد وصل:22222");
+
+                try {
+
+                    const audio = document.getElementById('notificationSound');
+                    audio.volume = 0.6; 
+                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
+                } catch (error) {
+                    console.warn('خطأ في تشغيل الصوت:', error);
                 }
                 NotificationBus.emit('notifications:count', { count: data.count });
             })
@@ -223,17 +225,22 @@ function handleNotificationClick(id, url) {
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.body.addEventListener('click', () => {
-        const audio = document.getElementById('notificationSound');
-        if (audio && audio.paused) {
-            audio.volume = 0.0;
-            audio.play().then(() => {
-                console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
-            }).catch(err => console.warn("🚫 لا يمكن تشغيل الصوت:", err));
-        }
-    }, { once: true });
-});
+
+
+document.addEventListener("click", function enableSound() {
+    const audio = document.getElementById("notif-sound");
+    if (audio) {
+      audio.muted = false;
+      audio.volume = 0.0;
+      audio.play().then(() => {
+        console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
+      }).catch((err) => {
+        console.warn("تعذر تشغيل الصوت:", err);
+      });
+    }
+    // إزالة الحدث حتى لا يتكرر
+    document.removeEventListener("click", enableSound);
+  });
 
 
 
