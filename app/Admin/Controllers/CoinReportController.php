@@ -14,7 +14,7 @@ class CoinReportController extends MainController
      public $permission_name = 'user-coin-report';
     public function index(Content $content)
     {
-        
+
         return $content
             ->title("Reports")
             ->description("Charges")
@@ -46,9 +46,13 @@ class CoinReportController extends MainController
     protected function lucky_gift()
     {
         $grid = new Grid(new UserLuckyGift());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
 
-        $grid->model()->selectRaw(
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->selectRaw(
             'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                 'SUM(user_lucky_gifts.number) as total_number, ' .
                 'user_lucky_gifts.gift_id, ' .
@@ -108,15 +112,19 @@ class CoinReportController extends MainController
     protected function games()
     {
         $grid = new Grid(new CoinGameUser());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
 
-        $grid->model()->with('game')
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->with('game')
             ->selectRaw('
-            MIN(coin_game_users.created_at) as earliest_created_at, 
-            coin_game_users.user_id, 
-            MAX(users.name) as user_name, 
-            games.name as game_name, 
-            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
+            MIN(coin_game_users.created_at) as earliest_created_at,
+            coin_game_users.user_id,
+            MAX(users.name) as user_name,
+            games.name as game_name,
+            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win,
             SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
         ')
             ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
