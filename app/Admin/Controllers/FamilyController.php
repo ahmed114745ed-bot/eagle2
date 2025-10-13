@@ -62,6 +62,7 @@ class FamilyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Family);
+        $countryID = session('country_id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -84,7 +85,9 @@ class FamilyController extends MainController
                 }, __('created_at'), 'date')->date();
             });
         });
-        $grid->model()->with([
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
+            ->with([
             'owner:id,name,uuid', // only needed fields
             'owner.profile:id,user_id,avatar',
             'owner.packs' => fn($q) => $q

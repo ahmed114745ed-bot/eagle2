@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Bd;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -101,6 +102,7 @@ class SuperAdminController extends MainController
     {
         $grid = new Grid(new SuperAdmin());
         $countryID = session('country_id');
+
         $grid->model()->with(['appUser.packs'])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc('id');
@@ -341,6 +343,7 @@ class SuperAdminController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
 
@@ -367,6 +370,20 @@ class SuperAdminController extends MainController
                     ]);
                 }
             }
+
+            $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
+
+            DB::table('admin_users')->insert([
+                'parent_id' => $superAdmin->id,
+                'username' => 'bd'.$countryName.'default',
+                'name' => 'bd'.$countryName.'default',
+                'password' => Hash::make('bd'.$countryName.'default'),
+                'default' => 1,
+                'country_id' => $superAdmin->country_id,
+                'type' => 'bd',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         });
 
         return $form;
@@ -462,8 +479,8 @@ class SuperAdminController extends MainController
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
             case 'rewards':
-                $type = request()->get('type', 'vip');
-                $types = ['vip', 'badge', 'ware'];
+
+
                 $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
                 break;
         }

@@ -54,7 +54,15 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
-        $grid->model()->with([
+        $countryID = session('country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->where('country_id', $countryID)
+                    ->orWhereHas('owner', fn($q) => $q->where('country_id', $countryID));
+            }))
+            ->with([
             'owner:id,name,uuid',
             'owner.profile:id,user_id,avatar',
             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')

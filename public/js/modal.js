@@ -225,17 +225,29 @@ function handleNotificationClick(id, url) {
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.body.addEventListener('click', () => {
-        const audio = document.getElementById('notificationSound');
-        if (audio && audio.paused) {
-            audio.volume = 0.0;
-            audio.play().then(() => {
-                console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
-            }).catch(err => console.warn("🚫 لا يمكن تشغيل الصوت:", err));
-        }
-    }, { once: true });
-});
+
+
+document.addEventListener("click", function enableSound() {
+    const audio = document.getElementById("notif-sound");
+    if (audio) {
+      audio.muted = false;
+      audio.volume = 0.0;
+      audio.play().then(() => {
+        console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
+      }).catch((err) => {
+        console.warn("تعذر تشغيل الصوت:", err);
+      });
+    }
+    document.removeEventListener("click", enableSound);
+  });
 
 
 
+
+
+
+
+
+
+
+ 

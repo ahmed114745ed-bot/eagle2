@@ -6,7 +6,10 @@ use App\Events\AdminNotificationCreated;
 use App\Models\AdminNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Http;
+use App\Models\Admin;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
 class AdminNotificationHelper
 {
     public static function notify(
@@ -28,6 +31,8 @@ class AdminNotificationHelper
         ]);
 
         broadcast(new AdminNotificationCreated($notification))->toOthers();
+        self::sendFirebaseNotification($title, $message, $data);
+
         return $notification;
 
     }
@@ -45,6 +50,28 @@ class AdminNotificationHelper
         return AdminNotification::
             where('is_read', false)
             ->count();
+    }
+
+    protected static function sendFirebaseNotification(string $title, ?string $body = null, ?array $data = [])
+    {
+        try {
+            $factory = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
+            $messaging = $factory->createMessaging();
+
+            $tokens = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+            if (empty($tokens)) return;
+
+            $message = CloudMessage::new()
+                ->withNotification([
+                    'title' => $title,
+                    'body'  => $body ?? '',
+                ])
+                ->withData($data ?? []);
+
+            $messaging->sendMulticast($message, $tokens);
+        } catch (\Throwable $e) {
+            \Log::error('Firebase send error: ' . $e->getMessage());
+        }
     }
 
   
