@@ -248,57 +248,58 @@
                     <!-- Room Cup Target Section -->
                     <div class="section-header">
                         
-                        <h2 class="section-title">Room Cup Target Settings</h2>
+                        <h2 class="section-title">{{__('Room Cup Target Settings')}}</h2>
                     </div>
                     
                     <div class="settings-grid">
                         <div class="card">
                             <br>
                             <div class="form-group">
-                                <label class="form-label" for="lang_id">Language</label>
+                                <label class="form-label" for="lang_id">{{__('Language')}}</label>
                                 <select id="lang_id" name="lang_id" class="form-control" style="width: 100%;" required></select>
                             </div>
                         </div>
                         
                         <div class="card">
-                            <div class="card-title">Room Cup Target Details</div>
+                            <div class="card-title">{{__('Room Cup Target Details')}}</div>
                             <div class="form-group">
-                                <label class="form-label">Link</label>
+                                <label class="form-label">{{__('Link')}}</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="zego_client_id" readonly>
-                                    <button type="button" class="btn btn-outline-secondary btn-copy" id="copy-zego-id">Copy</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-copy" id="copy-zego-id">{{__('Copy')}}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="divider">
-                        <span class="divider-text">Super Admin Configuration</span>
+                        <span class="divider-text">{{__('Super Admin Configuration')}}</span>
                     </div>
                     
                     <!-- Super Admin Section -->
                     <div class="section-header">
-                        <h2 class="section-title">Super Admin Details</h2>
+                        <h2 class="section-title">{{__('Super Admin Details')}}</h2>
                     </div>
                     
                     <div class="settings-grid">
                         <div class="card">
                             <br>
                             <div class="form-group">
-                                <label for="target_id" class="form-label">Countries</label>
+                                <label for="target_id" class="form-label">{{__('Countries')}}</label>
                                 <select id="target_id" name="country_id" class="form-control" style="width: 100%;" required></select>
                             </div>
                             
                         </div>
                         
                         <div class="card">
-                            <div class="card-title">Super Admin Details</div>
+                            <div class="card-title">{{__('Super Admin Details')}}</div>
                             <div class="form-group">
-                                <label class="form-label">Link</label>
+                                <label class="form-label">{{__('Link')}}</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="super_admin_link" id="super_admin_link" readonly value="https://example.com/super-admin">
-                                    <button type="button" class="btn btn-outline-secondary btn-copy" id="copy-admin-link">Copy</button>
+                                    <input type="text" class="form-control" id="super_admin_link" readonly>
+                                    <button type="button" class="btn btn-outline-secondary btn-copy" id="copy-admin-link">{{__('Copy')}}</button>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -401,6 +402,29 @@
     // Copy button
     $('#copy-zego-id').on('click', function() {
         const input = document.getElementById('zego_client_id');
+        input.select();
+        document.execCommand('copy');
+        alert('Link copied: ' + input.value);
+    });
+
+
+    function updateCountryLink() {
+        const selectedCountry = $('#target_id').val();
+        const baseUrl = `${window.location.origin}/countries`;
+        const fullLink = selectedCountry ? `${baseUrl}/${selectedCountry}` : '';
+        $('#super_admin_link').val(fullLink);
+    }
+
+    // When user selects or clears a country
+    $('#target_id').on('change', updateCountryLink);
+
+    // Copy link button
+    $('#copy-admin-link').on('click', function() {
+        const input = document.getElementById('super_admin_link');
+        if (input.value.trim() === '') {
+            alert('Please select a country first!');
+            return;
+        }
         input.select();
         document.execCommand('copy');
         alert('Link copied: ' + input.value);
