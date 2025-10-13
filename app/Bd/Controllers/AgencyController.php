@@ -670,11 +670,12 @@ class AgencyController extends MainController
 
     protected function addMainFields(Form $form)
     {
-        
+
         if (!$form->isEditing()) {
             $form->row(function ($row) {
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/get-country-users?country_id='.Auth::user()->country_id, 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
+                $row->width(12)->hidden('country_id', __('Country'))->value(auth()->user()->country_id);
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->hidden('bd_id')->default(Auth::id());
@@ -735,12 +736,12 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
@@ -753,7 +754,7 @@ class AgencyController extends MainController
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
