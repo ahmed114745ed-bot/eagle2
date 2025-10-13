@@ -1,10 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("📬 إشعار جديد وصل:", e);
     if (window.Echo) {
+        console.log("📬 إشعار جديد وصل:", e);
         window.Echo.private('admin.notifications')
             .listen('AdminNotificationCreated', (e) => {
                 console.log("📬 إشعار جديد وصل:", e);
 
                 try {
+
                     const audio = document.getElementById('notificationSound');
                     audio.volume = 0.6; 
                     audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
