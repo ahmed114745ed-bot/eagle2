@@ -724,6 +724,13 @@ Route::group(
 
 
         });
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
+    
 
     }
 );

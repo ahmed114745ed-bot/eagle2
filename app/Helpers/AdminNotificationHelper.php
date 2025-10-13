@@ -6,6 +6,8 @@ use App\Events\AdminNotificationCreated;
 use App\Models\AdminNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use App\Models\Admin;
 
 class AdminNotificationHelper
 {
@@ -46,6 +48,33 @@ class AdminNotificationHelper
             where('is_read', false)
             ->count();
     }
+
+    protected static function sendFirebaseNotification(string $title, string $body, ?array $data = [])
+    {
+        $serverKey = config('services.firebase.server_key', 'AAAA1oVZzQo:APA91bE.....'); // ضع مفتاحك هنا أو في .env
+
+        $admins = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+        if (empty($admins)) {
+            return;
+        }
+
+        $payload = [
+            'registration_ids' => $admins,
+            'notification' => [
+                'title' => $title,
+                'body'  => $body,
+                'sound' => 'default',
+                'icon'  => '/logo.png',
+            ],
+            'data' => $data ?? [],
+        ];
+
+        Http::withHeaders([
+            'Authorization' => 'key=' . $serverKey,
+            'Content-Type'  => 'application/json',
+        ])->post('https://fcm.googleapis.com/fcm/send', $payload);
+    }
+
 
   
 
