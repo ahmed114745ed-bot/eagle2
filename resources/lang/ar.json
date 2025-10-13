@@ -4038,5 +4038,7 @@
 "Display Room" :"عرض الغرف",
 "banner_request_title": "طلب جديد لعرض بانر",
 "banner_request_message": "قام المشرف :name (المعرف: :id) بطلب عرض بانر جديد بقيمة :coins عملة.",
-"Mark as read" :"تعيين كا مقرؤة"
+"Mark as read" :"تعيين كا مقرؤة",
+"Mark all as read":"تمييز الكل كمقروء",
+"Read":"مقرؤء"
 }

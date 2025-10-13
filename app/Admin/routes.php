@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\AdminNotification;
+use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
@@ -717,7 +719,9 @@ Route::group(
             Route::get('count', [AdminNotificationController::class, 'count']);
             Route::get('list', [AdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [AdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [AdminNotificationController::class, 'markAllRead']); // ✅ أضف هذا
+            Route::post('mark-all-read', [AdminNotificationController::class, 'markAllRead']); 
+            Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
+
 
         });
 

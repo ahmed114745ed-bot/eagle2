@@ -1280,6 +1280,7 @@
 "deduct_text": "Coins will be deducted to resend the banner request:",
 "banner_request_title": "New Banner Display Request",
 "banner_request_message": "Admin :name (ID: :id) has requested a new banner display worth :coins coins."
+,"Mark all as read":"Mark all as read"
 
 
 
