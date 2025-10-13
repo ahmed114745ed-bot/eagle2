@@ -42,7 +42,12 @@ class SuperadminBannerRequestController extends AdminController
      */
     protected function grid()
     {
+        $itemNotification = request('itemNotification');
         $grid = new Grid(new SuperadminBannerRequest());
+        $grid->model()->when($itemNotification, function ($query, $itemNotification) {
+            $query->where('id', $itemNotification);
+        });
+        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
         $countryID = session('country_id');
         $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('superAdmin', fn($q) => $q->where('country_id', $countryID)))

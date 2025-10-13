@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .listen('AdminNotificationCreated', (e) => {
                 console.log("📬 إشعار جديد وصل:", e);
 
+                try {
+                    const audio = document.getElementById('notificationSound');
+                    audio.volume = 0.6; 
+                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
+                } catch (error) {
+                    console.warn('خطأ في تشغيل الصوت:', error);
+                }
+
                 const notifCountEl = document.getElementById('notificationsCount');
                 if (notifCountEl) {
                     const current = parseInt(notifCountEl.textContent || '0', 10);
@@ -83,6 +91,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event) event.preventDefault();
         if (!modal) return;
 
+
+        
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
@@ -207,5 +217,20 @@ function handleNotificationClick(id, url) {
     })
     .catch(err => console.error('Error marking notification:', err));
 }
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('click', () => {
+        const audio = document.getElementById('notificationSound');
+        if (audio && audio.paused) {
+            audio.volume = 0.0;
+            audio.play().then(() => {
+                console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
+            }).catch(err => console.warn("🚫 لا يمكن تشغيل الصوت:", err));
+        }
+    }, { once: true });
+});
+
 
 
