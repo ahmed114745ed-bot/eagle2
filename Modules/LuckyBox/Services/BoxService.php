@@ -13,6 +13,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Resources\Api\V1\BoxUseResource;
 
@@ -139,6 +140,16 @@ class BoxService
             $box_use_data
         );
 
+        $params           = [
+            'Action'           => 'winnerLuckyBox',
+            'RoomId'           => $room->id,
+            'FromUserId'       => $user->id,
+          
+        ];
+
+        Log::info('🛰️ Sending Zego request', [
+            'params' => $params,
+        ]);
         dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
 
         $key  = 'BoxUse_' . $boxUser->id;

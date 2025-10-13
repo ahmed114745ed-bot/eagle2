@@ -2,6 +2,9 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Country;
+use App\Selectables\Countries;
+use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -9,12 +12,12 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\HomeCarousel;
-use App\Selectables\Countries;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
 
+use Illuminate\Validation\Rule;
+use Encore\Admin\Facades\Admin;
 class HomeCarouselController extends MainController
 {
     use HasResourceActions;
@@ -70,7 +73,7 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-
+    
         $grid->id(__('ID'));
         $grid->column('img', 'Image')->display(function ($img) {
             $id = "imgModal{$this->id}";
@@ -312,17 +315,23 @@ class HomeCarouselController extends MainController
                 }
             }
         });
+        
+            $form->saved(function (Form $form) {
 
-        return $form;
-    }
-
-
-    public function homeCarouselSettings(Content $content)
-    {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-' . 'banner-setting');
+                if (request()->has('display_at')) {
+                    $displays = json_decode($form->model()->display_at ?? '[]', true);
+        
+                    if (in_array('country', $displays)) {
+                        $countries = array_filter(request('countries', []));
+                        $form->model()->countries()->sync($countries);
+                    } else {
+                        $form->model()->countries()->detach();
+                    }
+                }
+            });
+        
+            return $form;
         }
-        $config = Setting::whereIn('key', ['live', 'home_middle', 'home_top', 'discover'])->pluck('value', 'key')->toArray();
-        return $content->view('homeCarouselSetting', compact('config'));
-    }
+        
+    
 }

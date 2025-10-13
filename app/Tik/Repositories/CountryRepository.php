@@ -7,7 +7,7 @@ use App\Models\Country;
 class CountryRepository extends AbstractRepository
 {
 
-    
+
     /**
      * @param Model $model
      */
@@ -39,7 +39,7 @@ class CountryRepository extends AbstractRepository
 
     public function countryGet()
     {
-        return $this->model->select('id', 'name', 'e_name', 'flag','iso')->orderByDesc('id')->get();
+        return $this->model->select('id', 'name', 'e_name', 'flag', 'iso')->orderByDesc('id')->get();
     }
 
     public function findById($id)
@@ -50,5 +50,14 @@ class CountryRepository extends AbstractRepository
     public function findByPhoneCode($phoneCode)
     {
         return $this->model->query()->where('phone_code', $phoneCode)->first();
+    }
+
+    public function searchCountry($key, $page, $perPage)
+    {
+        return $this->model->query()->selectRaw('concat(name, " - ", e_name) as name, id')
+            ->where('name', 'like', '%' . $key . '%')
+            ->orWhere('e_name', 'like', '%' . $key . '%')
+            ->orWhere('id', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 }

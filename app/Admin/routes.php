@@ -35,6 +35,7 @@ use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\LinkViewController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -561,7 +562,7 @@ Route::group(
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
 
         //    dd( Admin::menu(function ($menu) {
@@ -610,6 +611,8 @@ Route::group(
         Route::resource('settings', SettingController::class)
         ->except(['update'])
         ->names('admin.settings');
+         Route::resource('helper-links', LinkViewController::class);
+
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');

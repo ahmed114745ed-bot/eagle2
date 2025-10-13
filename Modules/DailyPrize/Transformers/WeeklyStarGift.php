@@ -28,6 +28,12 @@ class WeeklyStarGift extends JsonResource
                 $type = $this->vip?->name ?? 'VIP';
                 $image = $this->vip?->img;
                 break;
+                
+            case "badge":
+                $expire = $this->expire . ' days';
+                $type = $this->badge?->name ?? '';
+                $image = $this->badge?->image ?? '';
+                break;
 
             case 'achievement':
                 $expire = ($this->expire ?? 0) . ' days';
