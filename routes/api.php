@@ -126,6 +126,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
+         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
     });
 
     // authorization

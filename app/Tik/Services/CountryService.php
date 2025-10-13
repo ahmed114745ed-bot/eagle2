@@ -11,20 +11,25 @@ class CountryService
 {
     public function __construct(
         private readonly CountryRepository $countryRepository,
-    ) {
+    ) {}
+
+    public function index()
+    {
+        return $this->countryRepository->getCountries();
     }
 
- public function index()
- {
-    return $this->countryRepository->getCountries();
- }
+    public function findById($id)
+    {
+        return $this->countryRepository->findById($id);
+    }
+    public function index2()
+    {
+        return $this->countryRepository->countryGet();
+    }
 
- public function findById($id)
- {
-    return $this->countryRepository->findById($id);
- }
- public function index2()
- {
-    return $this->countryRepository->countryGet();
- }
+    public function searchCountries($key, $page)
+    {
+        $perPage = 10;
+        return $this->countryRepository->searchCountry($key, $page, $perPage);
+    }
 }
