@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use Illuminate\Support\Facades\Storage;
+use Modules\RoomCup\Entities\RoomCupTarget;
 use Modules\RoomCup\Http\Resources\RoomCupRewardResource;
 
 class RoomCupController extends Controller
@@ -82,7 +83,7 @@ class RoomCupController extends Controller
                 ],
             ],
             'room' => [
-                
+
                 'admin_count' => count(array_filter(explode(',', $currentData->room->room_admin))),
             ]
 
@@ -154,5 +155,11 @@ class RoomCupController extends Controller
         $settings = json_decode(Storage::disk('local')->get('roomcup_settings.json'), true);
 
         return array_merge($default, $settings);
+    }
+
+    public function cupTargetHtml(Request $request)
+    {
+       $link = url('/cup-targets-view');
+        return Common::apiResponse(true, '', $link, 200);
     }
 }
