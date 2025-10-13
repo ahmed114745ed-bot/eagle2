@@ -131,7 +131,7 @@ class GiftLogService
                 if($room->type == "audio"){
                     $to    = 'الغرفة';
                 }else{
-                    $to    = 'اللايف';
+                    $to    = __('live');
                 }
                
             } else {
