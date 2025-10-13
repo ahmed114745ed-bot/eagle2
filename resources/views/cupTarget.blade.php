@@ -224,8 +224,8 @@
                 <tbody>
                     @foreach($cupTargets as $index =>$cupTarget)
                        @php
-                       $totalAdminProfit = $cupTarget->admin_profit / $cupTarget->number_of_admins;
-                       $total =  $totalAdminProfit + $cupTarget->number_of_admins;
+                       $totalAdminProfit = ($cupTarget->admin_profit / $cupTarget->number_of_admins);
+                       $total =  $cupTarget->admin_profit + $cupTarget->owner_profit;
                         @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>

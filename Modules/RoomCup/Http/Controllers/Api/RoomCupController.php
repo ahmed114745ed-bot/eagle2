@@ -39,8 +39,9 @@ class RoomCupController extends Controller
         return  in_array($admin_id, $adm_arr);
     }
 
-    public function roomAdministratorManagement($roomId)
+    public function roomAdministratorManagement($roomId, Request $request)
     {
+        $langCode = $request->header('X-localization', 'en');
         $settings = $this->getSettings();
         $type = $settings['type'] ?? 'daily';
         $totals = RoomCupReward::where('room_id', $roomId);
@@ -86,8 +87,7 @@ class RoomCupController extends Controller
 
                 'admin_count' => count(array_filter(explode(',', @$currentData->room->room_admin))),
             ],
-            'link' => url('/cup-targets-view'),
-
+            'link' => url('/cup-targets-view?lang=' . $langCode),
 
         ];
         return Common::apiResponse(true, '', $data, 200);
