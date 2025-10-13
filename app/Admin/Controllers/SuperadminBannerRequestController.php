@@ -43,20 +43,23 @@ class SuperadminBannerRequestController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new SuperadminBannerRequest());
-        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
+        $countryID = session('country_id');
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('superAdmin', fn($q) => $q->where('country_id', $countryID)))
+            ->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();
         $grid->column('id', __('ID'));
-  
+
         $userService = $this->userService;
-    
+
         // Super Admin
         $grid->column('user_id', __('Super Admin'))->display(function () use ($userService) {
             return $userService->adminUserAvatar($this->superAdmin ?? null, withoutLevels: true);
         });
-    
+
         // Banner Image
         $grid->column('homeCarousel.img', __('img'))->image('', 235, 77);
 
-    
+
         $grid->column('coins_deducted', __('Coins Deducted'));
         $grid->column('status', __('Status'))->display(function ($status) {
             switch ($status) {
@@ -66,7 +69,7 @@ class SuperadminBannerRequestController extends AdminController
                 default: return $status;
             }
         });
-        
+
         $grid->column('notes', __('Type'))->display(function ($value) {
             if ($value === 'display_discover') {
                 return __('Display Discover');
@@ -78,11 +81,11 @@ class SuperadminBannerRequestController extends AdminController
                 return __('Display Live');
             } elseif ($value === 'display_room') {
                 return __('Display Room');
-            } 
+            }
 
 
             else {
-                return $value; 
+                return $value;
             }
         });
         $grid->column('hours', __('hours'));
@@ -90,29 +93,29 @@ class SuperadminBannerRequestController extends AdminController
         ->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
         });
-        
+
         // Actions
         $grid->column('actions', __('Actions'))->display(function () {
             $approveUrl = route('admin.superadmin-banner.approve', $this->id);
             $rejectUrl  = route('admin.superadmin-banner.reject', $this->id);
-    
+
             if ($this->status === 'rejected') {
                 return '<span class="text-danger">' . __('Rejected') . '</span>';
             }
-    
+
             if ($this->status === 'approved') {
                 return '<span class="text-success">' . __('Approved') . '</span>';
             }
             $approveText = __('Approved');
             $rejectText  = __('Reject');
-            
+
             return <<<HTML
             <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
             <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
-           
-         
 
-           
+
+
+
            HTML;
         });
 
@@ -203,7 +206,7 @@ class SuperadminBannerRequestController extends AdminController
     $grid->disableCreation();
         return $grid;
     }
-    
+
 
     /**
      * Make a show builder.
@@ -251,35 +254,35 @@ class SuperadminBannerRequestController extends AdminController
         $homeCarousel = $request->homeCarousel;
         $user = $request->user;
         $displayType = preg_replace('/^display_/', '', (string) $request->notes);
-       
+
         $hours = (int) ($request->hours ?? 1);
-    
+
         $now = now();
-    
+
         $homeCarousel->update([
             'enable' => 1,
         ]);
-    
+
         $display = HomeCarouselDisplay::where('home_carousel_id', $homeCarousel->id)
             ->where('display_type', $displayType)
             ->first();
-    
+
         if ($display) {
             if ($display->end_at && $display->end_at->isFuture()) {
                 $existingHours = $this->convertToHours($display->duration, $display->duration_unit);
-    
+
                 $totalHours = $existingHours + $hours;
-    
+
                 $newEndAt = $display->end_at->copy()->addHours($hours);
-    
+
                 $display->update([
                     'duration'      => $totalHours,
-                    'duration_unit' => 'hours', 
+                    'duration_unit' => 'hours',
                     'end_at'        => $newEndAt,
                 ]);
             } else {
                 $newEndAt = $now->copy()->addHours($hours);
-    
+
                 $display->update([
                     'duration'      => $hours,
                     'duration_unit' => 'hours',
@@ -289,7 +292,7 @@ class SuperadminBannerRequestController extends AdminController
             }
         } else {
             $newEndAt = $now->copy()->addHours($hours);
-    
+
             HomeCarouselDisplay::create([
                 'home_carousel_id' => $homeCarousel->id,
                 'display_type'     => $displayType,
@@ -299,26 +302,26 @@ class SuperadminBannerRequestController extends AdminController
                 'end_at'           => $newEndAt,
             ]);
         }
-    
+
         $request->update(['status' => 'approved']);
-    
+
         return response()->json([
             'success' => true,
             'message' => __('Banner approved successfully'),
         ]);
     }
-    
-   
+
+
     protected function convertToHours(int $value, string $unit): int
     {
         return match ($unit) {
             'hours'  => $value,
             'days'   => $value * 24,
-            'months' => $value * 30 * 24, 
+            'months' => $value * 30 * 24,
             default  => $value,
         };
     }
-    
+
     public function reject($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);

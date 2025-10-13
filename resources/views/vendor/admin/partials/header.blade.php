@@ -161,17 +161,19 @@
 </header>
 
 <script>
-    $(function () {
+    $(document).ready(function () {
         const $countrySelect = $('#country-select');
-        const $countryName   = $('#country-name');
 
         if ($countrySelect.length) {
             $countrySelect.select2({
                 placeholder: "{{ __('Select Country') }}",
-                allowClear : true
+                allowClear: true,
+                templateResult: formatCountry,
+                templateSelection: formatCountry,
+                escapeMarkup: function (markup) { return markup; }
             });
 
-            $countrySelect.on('change select2:clear', function () {
+            $countrySelect.on('change', function () {
                 const countryId = $(this).val();
                 const url = new URL(window.location.href);
 
@@ -183,71 +185,23 @@
 
                 window.location.href = url.toString();
             });
-        }
 
-        const originalFetch = window.fetch;
-        window.fetch = function (url, options = {}) {
-            options.headers = options.headers || {};
+            $(document).on('click', '.select2-selection__clear', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            if (window.enableCountryHeader) {
-                const countryId = $countrySelect.val();
-                if (countryId) {
-                    options.headers['X-Country-ID'] = countryId;
-                } else {
-                    options.headers['X-Country-ID'] = '';
-                }
-            }
-
-            if (!options.headers['Accept'])
-                options.headers['Accept'] = 'application/json';
-
-            return originalFetch(url, options);
-        };
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const csrf = '{{ csrf_token() }}';
-        const previewBtn = document.getElementById('preview-superadmin-btn');
-        const exitBtn = document.getElementById('exit-preview-btn');
-
-        if (previewBtn) {
-            previewBtn.addEventListener('click', function () {
-                fetch('/admin/set-preview-superadmin', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf
-                    }
-                }).then(() => window.location.reload());
+                const url = new URL(window.location.href);
+                url.searchParams.set('country_id', 'null');
+                window.location.href = url.toString();
             });
         }
-
-        if (exitBtn) {
-            exitBtn.addEventListener('click', function () {
-                fetch('/admin/unset-preview-superadmin', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf
-                    }
-                }).then(() => window.location.reload());
-            });
-        }
-    });
-
-    $(document).ready(function() {
-        $('#country-select').select2({
-            templateResult: formatCountry,
-            templateSelection: formatCountry,
-            escapeMarkup: function (markup) { return markup; }
-        });
 
         function formatCountry(country) {
             if (!country.id) {
                 return country.text;
             }
-
-            let flag = $(country.element).data('flag');
-            let name = country.text;
-
+            const flag = $(country.element).data('flag');
+            const name = country.text;
             if (flag) {
                 return `
                 <span>
@@ -257,6 +211,43 @@
             `;
             }
             return name;
+        }
+
+        const originalFetch = window.fetch;
+        window.fetch = function (url, options = {}) {
+            options.headers = options.headers || {};
+
+            if (window.enableCountryHeader) {
+                const countryId = $('#country-select').val();
+                options.headers['X-Country-ID'] = countryId ? countryId : 'null';
+            }
+
+            if (!options.headers['Accept'])
+                options.headers['Accept'] = 'application/json';
+
+            return originalFetch(url, options);
+        };
+
+        const csrf = '{{ csrf_token() }}';
+        const previewBtn = document.getElementById('preview-superadmin-btn');
+        const exitBtn = document.getElementById('exit-preview-btn');
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (exitBtn) {
+            exitBtn.addEventListener('click', function () {
+                fetch('/admin/unset-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
         }
     });
 </script>
