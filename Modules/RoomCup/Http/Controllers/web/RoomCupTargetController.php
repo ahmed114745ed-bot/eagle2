@@ -158,8 +158,9 @@ class RoomCupTargetController extends MainController
 
     public function cupTargetHtml(Request $request)
     {
+        $lang = $request->get('lang', 'en');
+        app()->setLocale($lang);
         $cupTargets = RoomCupTarget::get();
         return view('cupTarget', compact("cupTargets"));
-       
     }
 }
