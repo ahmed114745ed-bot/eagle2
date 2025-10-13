@@ -603,7 +603,7 @@ Route::get('/migrate-home-carousel', function () {
 
 
 
-Route::get('admin/notifications/test', function () {
+Route::get('notifications/test', function () {
     $notification = AdminNotification::create([
         'title' => 'إشعار تجريبي 🎉',
         'message' => 'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
@@ -612,5 +612,5 @@ Route::get('admin/notifications/test', function () {
         'is_read' => false,
     ]);
 
-    return redirect()->back()->with('status', "تم إنشاء إشعار تجريبي (ID: {$notification->id})");
+    return 'done';
 });

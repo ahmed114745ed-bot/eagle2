@@ -6,14 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .listen('AdminNotificationCreated', (e) => {
                 console.log("📬 إشعار جديد وصل:");
 
-                try {
-
-                    const audio = document.getElementById('notificationSound');
-                    audio.volume = 0.6; 
-                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
-                } catch (error) {
-                    console.warn('خطأ في تشغيل الصوت:', error);
-                }
 
                 const notifCountEl = document.getElementById('notificationsCount');
                 if (notifCountEl) {
@@ -84,6 +76,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 console.log("📬 إشعار جديد وصل:22222");
 
+                try {
+
+                    const audio = document.getElementById('notificationSound');
+                    audio.volume = 0.6; 
+                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
+                } catch (error) {
+                    console.warn('خطأ في تشغيل الصوت:', error);
+                }
                 NotificationBus.emit('notifications:count', { count: data.count });
             })
             .catch(() => {
