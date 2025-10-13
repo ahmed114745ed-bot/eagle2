@@ -17,6 +17,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\LuckyBox\Entities\BoxUse;
 use Modules\LuckyBox\Entities\PickBoxList;
 use Modules\LuckyBox\Entities\UserBoxGift;
@@ -169,7 +170,9 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'winners' => $winners,
             ],
         ];
-
+        Log::info('🛰️ Sending Zego request', [
+            'payload' => $payload,
+        ]);
         return json_encode($payload);
 
     }
@@ -187,7 +190,9 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'numOfBoxes' => $remaining,
             ],
         ];
-
+     
+      
+     
         return json_encode($payload);
 
     }

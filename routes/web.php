@@ -1,30 +1,36 @@
 <?php
 
-use App\Admin\Controllers\BdController;
-use App\Exports\AgencyChargeTransactions;
-use App\Http\Controllers\Api\V1\GiftLogController;
-use App\Http\Controllers\PayPalController;
-use App\Http\Controllers\BdSalaryMigrationController;
-use App\Jobs\UpdateUserFollowCountsJob;
+use Carbon\Carbon;
+use App\Models\Ban;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Models\CoinLog;
+use  App\helper\TimeHelper;
+use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
-use Carbon\Carbon;
-use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
+use App\Models\CoinGameUserAll;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
+use Modules\Vip\Entities\VipPrivilege;
+use App\Admin\Controllers\BdController;
+use App\Jobs\UpdateUserFollowCountsJob;
 use App\Admin\Controllers\UserController;
+use App\Exports\AgencyChargeTransactions;
+use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\AppearChargerAgencyController;
-use App\Facades\CustomNotification;
+use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -266,6 +272,7 @@ Route::group(
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
+         Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
@@ -312,6 +319,9 @@ Route::get('/clear-admin-error', function () {
     session()->flush();   // Or session()->forget('error');
     return 'Session cleared!';
 });
+
+
+//Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
@@ -431,6 +441,9 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
+Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
+Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
+
 Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
@@ -455,7 +468,7 @@ Route::get('/test-games', function () {
     return $records;
 })->name('test-games');
 
-use App\Models\CoinGameUserAll;
+
 
 
 
@@ -500,5 +513,40 @@ Route::get('/update-user-follow-counts', function () {
 });
 
 
+//Route::get('delete-payment', function (){
+//    $paymentTypes = PaymentCoin::pluck('type')->toArray();
+//    CoinLog::whereIn('method', $paymentTypes)->delete();
+//});
 
+
+Route::get('/fix-bans-user-id', function () {
+    $bans = Ban::all();
+
+    foreach ($bans as $ban) {
+        $user = User::where('uuid', $ban->uid)->first();
+
+        if ($user) {
+            $ban->user_id = $user->id;
+            $ban->save();
+        }
+    }
+
+    return "done";
+});
+
+
+
+
+Route::get('/week-zone', function () {
+
+
+
+    $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
+    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+
+    return response()->json([
+        'start_of_week'  => $startOfWeek,
+        'end_of_week'    => $endOfWeek,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
 

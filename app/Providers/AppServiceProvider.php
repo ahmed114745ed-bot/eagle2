@@ -70,7 +70,7 @@ class AppServiceProvider extends ServiceProvider
         Form::extend('imagePath', ImagePath::class);
 
         if ($this->app->isLocal()) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+//            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }

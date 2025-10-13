@@ -29,6 +29,8 @@ use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Modules\CP\Entities\CpRoomHistory;
+use Modules\RoomCup\Helpers\RoomCupHelper;
 
 class EnteranceRoomServices
 {
@@ -151,6 +153,7 @@ class EnteranceRoomServices
         $roomId = $request->room_id;
         $userId = $request->user_account;
 
+        /** @var Room $room */
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
@@ -166,7 +169,11 @@ class EnteranceRoomServices
         } elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid) {
             $user->now_room_uid = 0;
         }
-        if ($event == 'room_logout') {
+        if ($event == 'room_logout' ){
+
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+            }
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
         }
@@ -175,6 +182,9 @@ class EnteranceRoomServices
             $this->handleCharismaStatusOnLogout($room, $user, $request->owner_id);
         }
         $user->save();
+        $room->save();
+       
+
 
         //        $count = RoomVisitor::query()->where('room_id', $room->id)->count();
         //        DB::table('rooms')->where('id', $roomId)->update(['count_room_socket' => $count, 'room_visitor' => implode(",", $visitors)]);
@@ -506,16 +516,20 @@ class EnteranceRoomServices
     }
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
-        EnteredRoom::query()->updateOrCreate(
+        $timezone = Common::timeZone();
+
+        EnteredRoom::query ()->updateOrCreate (
             [
                 'uid' => $user_id,
                 'ruid' => $owner_id,
                 'rid' => $room_id
             ],
             [
-                'entered_at' => now()
+                'entered_at'=>now($timezone)
             ]
         );
+        RoomCupHelper::updateRoomVisitors($room_id);
+
     }
 
 

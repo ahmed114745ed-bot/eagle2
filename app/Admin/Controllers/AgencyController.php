@@ -577,47 +577,47 @@ class AgencyController extends MainController
 
 
     protected function grid()
-{
-    $grid = new Grid(new Agency);
-    $grid->model()
-        ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-        ->with([
-            'owner:id,name,uuid', // only needed fields
-            'owner.profile:id,user_id,avatar',
-            'owner.packs' => fn($q) => $q
-                ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->with('ware:id,value'),
-        ])
-        ->available()
-        ->orderByDesc('id');
-    if (request()->has('active')) {
-        $grid->model()->whereHas('agencySalaries', function ($q) {
-            $q->where('month', now()->month)
-              ->where('year', now()->year);
-        });
-    }
+    {
+        $grid = new Grid(new Agency);
+        $grid->model()
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
+            ->with([
+                'owner:id,name,uuid', // only needed fields
+                'owner.profile:id,user_id,avatar',
+                'owner.packs' => fn($q) => $q
+                    ->select('id', 'user_id', 'type', 'is_used', 'target_id')
+                    ->where('type', 25)
+                    ->where('is_used', true)
+                    ->with('ware:id,value'),
+            ])
+            ->available()
+            ->orderByDesc('id');
+        if (request()->has('active')) {
+            $grid->model()->whereHas('agencySalaries', function ($q) {
+                $q->where('month', now()->month)
+                    ->where('year', now()->year);
+            });
+        }
 
-    // --- Agency name column ---
-    $grid->column('name', __('Agency'))->display(function ($name) {
-        $cacheKey = "agency_image_{$this->id}";
+        // --- Agency name column ---
+        $grid->column('name', __('Agency'))->display(function ($name) {
+            $cacheKey = "agency_image_{$this->id}";
 
-        $image = Cache::remember($cacheKey, 3600, function () {
-            $path = $this->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $image = Cache::remember($cacheKey, 3600, function () {
+                $path = $this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
-        });
+                return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
+            });
 
-        $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+            $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
-        return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+            return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         {$image}
                         <div style='display: flex; flex-direction: column;'>
@@ -626,23 +626,23 @@ class AgencyController extends MainController
                         </div>
                     </div>
                 </a>";
-    });
+        });
 
-    // --- Owner column ---
-    $grid->column('owner.name', trans('owner'))->display(function ($name) {
-        $uid = $this->owner?->uuid;
-        $path = $this->owner?->profile?->avatar;
-        $defaultImage = asset('images/businessman-icon.jpg');
-        $url = getImagePath($path) ?? $defaultImage;
+        // --- Owner column ---
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+            $uid = $this->owner?->uuid;
+            $path = $this->owner?->profile?->avatar;
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($path) ?? $defaultImage;
 
-        if (!isImageExists($url)) {
-            $url = $defaultImage;
-        }
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
 
-        $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-        $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
 
-        return "
+            return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
@@ -653,77 +653,77 @@ class AgencyController extends MainController
                 </div>
             </div>
         ";
-    });
+        });
 
-    // --- Phone column ---
-    $grid->column('phone', trans('phone'))->display(function ($number) {
-        if (!$number) return '-';
+        // --- Phone column ---
+        $grid->column('phone', trans('phone'))->display(function ($number) {
+            if (!$number) return '-';
 
-        $iconUrl = asset('images/phone.jpg');
-        $phoneCode = $this->phone_code;
-        $locale = app()->getLocale();
+            $iconUrl = asset('images/phone.jpg');
+            $phoneCode = $this->phone_code;
+            $locale = app()->getLocale();
 
-        $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
-        $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
+            $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
+            $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
 
-        return "
+            return "
             <div style='display: flex; align-items: center; flex-direction: {$direction};'>
                 <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
                 <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
             </div>
         ";
-    });
+        });
 
-    // --- Salary column (using withSum preload) ---
-    $grid->column('salary', __('Agency wallet'))->display(function () {
-        $coin = truncateAndTrim($this->current_salary ?? 0);
-        $icon = asset('images/dollar.jpg');
-        return "<div style='display: flex; align-items: center; gap: 5px;'>
+        // --- Salary column (using withSum preload) ---
+        $grid->column('salary', __('Agency wallet'))->display(function () {
+            $coin = truncateAndTrim($this->current_salary ?? 0);
+            $icon = asset('images/dollar.jpg');
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
                 <span>{$coin}</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>";
-    });
+        });
 
-    // --- Frozen column ---
-    $grid->column('is_frozen', __("frozen"))
-        ->display(fn() => $this->is_frozen ? 1 : 0)
-        ->switch(Common::getSwitchStates());
+        // --- Frozen column ---
+        $grid->column('is_frozen', __("frozen"))
+            ->display(fn() => $this->is_frozen ? 1 : 0)
+            ->switch(Common::getSwitchStates());
 
-    // --- Actions ---
-    $permission = $this->permission_name;
-    $grid->actions(function ($actions) use ($permission) {
-        $model = $actions->row;
-        $actions->disableDelete();
+        // --- Actions ---
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+            $actions->disableDelete();
 
-        if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-            $actions->add(new DeleteAgencyAction());
-        }
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteAgencyAction());
+            }
 
-        if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
-            $actions->add(new ChangeUsersAgencyAction($model->id));
-        }
-    });
+            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new ChangeUsersAgencyAction($model->id));
+            }
+        });
 
-    // --- Misc ---
-    $grid->disableExport();
-    $grid->disableRowSelector();
-    $this->extendGrid($grid);
+        // --- Misc ---
+        $grid->disableExport();
+        $grid->disableRowSelector();
+        $this->extendGrid($grid);
 
-    // --- Filters ---
-    $grid->filter(function (Grid\Filter $filter) {
-        $filter->expand();
-        $filter->disableIdFilter();
-        $filter->equal('id', __('ID'));
+        // --- Filters ---
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->equal('id', __('ID'));
 
-        $filter->where(function ($query) {
-            $query->whereHas('owner', function ($subQuery) {
-                $subQuery->where('uuid', 'like', "%{$this->input}%");
-            });
-        }, __('UUID'))->placeholder(__('search for host by UUID'));
-    });
+            $filter->where(function ($query) {
+                $query->whereHas('owner', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, __('UUID'))->placeholder(__('search for host by UUID'));
+        });
 
-    // --- Styles ---
-    Admin::style("
+        // --- Styles ---
+        Admin::style("
         .box-footer {
             flex-direction: row-reverse;
             flex-wrap: wrap;
@@ -785,8 +785,8 @@ class AgencyController extends MainController
         }
     ");
 
-    return $grid;
-}
+        return $grid;
+    }
 
 
     protected function balance_details($id)
@@ -943,8 +943,9 @@ class AgencyController extends MainController
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
                     form.addEventListener('submit', function(){
-                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                         hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                     });
                     form.classList.add('phone-init');
         }
@@ -1002,8 +1003,8 @@ class AgencyController extends MainController
                 'agency_id' => $form->model()->id,
             ]);
 
-            $user = User::find($appOwnerId)  ;
-            
+            $user = User::find($appOwnerId);
+
             MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
 
             $exists = UsersJoinedAgency::where([

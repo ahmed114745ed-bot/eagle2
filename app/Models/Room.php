@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use DB;
+use Modules\Vip\Entities\Vip;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Traits\TimestampsWithTimezone;
+use Modules\LuckyBox\Traits\RoomBoxes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Modules\LuckyBox\Traits\RoomBoxes;
-use Modules\RoomBoom\Entities\TotalRoomGift;
 
 /**
  * @method static withoutAppends()
@@ -269,6 +270,8 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
+    
+
     public function getVisitorsImages()
     {
         $visitors = $this->roomVisitorUsers;
@@ -289,11 +292,11 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-
+        // dd($this->background?->img);
         return $this->backgroundImage?->img
             ?? $this->background?->img
             ?? $this->defaultBackground?->img
-            ?? (string) (request()->default_background ?? '');
+            ?? request()->default_background;
     }
 
     public function defaultBackground()
@@ -357,6 +360,12 @@ class Room extends Model
 
     public function scopeAudio(Builder $query)
     {
-        return $query->where('type', 'audio');
+        return $query->where('rooms.type', 'audio');
+    }
+
+    public function admins_v2()
+    {
+        return User::whereIn('id', explode(',', $this->room_admin ?? ''))
+                ->get();
     }
 }

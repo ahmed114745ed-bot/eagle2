@@ -1,14 +1,5 @@
 <?php
 
-use App\Admin\Controllers\CoinGameUserAllController;
-use App\Admin\Controllers\CoinLogReportsController;
-use App\Admin\Controllers\GiftLogController;
-use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\InvitationSettingsController;
-use App\Admin\Controllers\PusherStatisticsController;
-use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\SuperBoomRuleController;
-use App\Admin\Controllers\UserHistoryRewardController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +7,7 @@ use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\GiftController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
@@ -34,6 +26,7 @@ use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -42,6 +35,7 @@ use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\LinkViewController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -61,6 +55,7 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
@@ -68,7 +63,9 @@ use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
+use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -79,29 +76,34 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\TimeEnterRoomController;
+use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
+use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
+use App\Admin\Controllers\PusherStatisticsController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserChargeHistoryController;
+use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\ChangeLevelHistoryController;
+use App\Admin\Controllers\InvitationSettingsController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
@@ -110,6 +112,7 @@ use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
@@ -240,6 +243,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
+         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -290,6 +294,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -305,6 +310,7 @@ Route::group(
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
@@ -556,7 +562,7 @@ Route::group(
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
 
         //    dd( Admin::menu(function ($menu) {
@@ -574,6 +580,7 @@ Route::group(
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
+        Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
@@ -604,6 +611,8 @@ Route::group(
         Route::resource('settings', SettingController::class)
         ->except(['update'])
         ->names('admin.settings');
+         Route::resource('helper-links', LinkViewController::class);
+
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -664,6 +673,9 @@ Route::group(
 
             Route::get('/notifications-test', [GiftLogTestController::class, 'showNotifications']);
             Route::post('/notifications-test', [GiftLogTestController::class, 'officialMessages']);
+
+            Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
+            Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
         });
     });
 

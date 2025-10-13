@@ -171,16 +171,26 @@ class AgencyService
 
     public function stars($agencyId, $request)
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id', 10, $request->page);
+        $timezone = getTimezone(); 
+        $year = $request->year ?? Carbon::now($timezone)->year;
+        $month = $request->month ?? Carbon::now($timezone)->month;
+    
+        $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
+        $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
+    
+        return $this->giftLogRepository->getByAgency('receiver', $start, $end, $agencyId, 'receiver_id', 10, $request->page);
     }
-
+    
     public function heroes($agencyId, $request)
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id', 10, $request->page);
+        $timezone = getTimezone();
+        $year = $request->year ?? Carbon::now($timezone)->year;
+        $month = $request->month ?? Carbon::now($timezone)->month;
+    
+        $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
+        $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
+    
+        return $this->giftLogRepository->getByAgency('sender', $start, $end, $agencyId, 'sender_id', 10, $request->page);
     }
 
     public function agencyMembers($agencyId)
@@ -252,7 +262,6 @@ class AgencyService
             // UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
             MilestoneHelper::grantMilestoneToUser($user, 'host');
-
         }
         return true;
     }
@@ -649,8 +658,7 @@ class AgencyService
         UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
         if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
-         $milestone = Milestone::where('slug', 'host')->first();
-            MilestoneHelper::revokeRewardFromUser($user_kicked, $milestone->rewards);
+        MilestoneHelper::removeReward($user_kicked, 'host');
         return true;
     }
 
@@ -672,9 +680,9 @@ class AgencyService
             return [];
         }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest('join_date')
-        ->first();
+            ->where('agency_id', $user->agency_id)
+            ->latest('join_date')
+            ->first();
 
         if (!$joinRecord) {
             $joinRecord =  null;
@@ -686,14 +694,14 @@ class AgencyService
 
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
-      
+
         [$startDate, $endDate, $joinedDate, $leaveDate] = $this->getReportDateRange(
             $year,
             $month,
             $timezone,
             $joinRecord
         );
-        
+
 
 
         $reportStart = 1;
@@ -707,7 +715,7 @@ class AgencyService
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
-   
+
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
             //$data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
@@ -791,10 +799,10 @@ class AgencyService
         $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $startOfMonth  = $firstDayLocal->copy()->startOfDay();
         $endOfMonth    = $firstDayLocal->copy()->endOfMonth()->endOfDay();
-    
+
         if ($joinRecord) {
             $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
-    
+
             $leaveDate  = $joinRecord->leave_date
                 ? Carbon::parse($joinRecord->leave_date, $timezone)
                 : $endOfMonth;
@@ -802,15 +810,15 @@ class AgencyService
             $joinedDate = null;
             $leaveDate  = $endOfMonth;
         }
-    
+
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
             ? $joinedDate
             : $startOfMonth;
-    
+
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
             ? $leaveDate
             : $endOfMonth;
-    
+
         return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 

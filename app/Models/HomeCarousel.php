@@ -15,6 +15,13 @@ class HomeCarousel extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'display_discover' => 'integer',
+        'display_home_top' => 'integer',
+        'display_home_middle' => 'integer',
+        'display_live' => 'integer',
+        'display_country' => 'integer',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -30,6 +37,17 @@ class HomeCarousel extends Model
         return $this->hasOne(GeneralRole::class, 'type', 'event_type');
     }
 
+    public function countries()
+    {
+        return $this->belongsToMany(Country::class, 'banner_country');
+    }
+
+    public function countriesLite()
+    {
+        return $this->belongsToMany(Country::class, 'banner_country', 'home_carousel_id', 'country_id')
+                    ->select(['countries.id', 'countries.name', 'countries.e_name', 'countries.flag'])
+                    ->withPivot('home_carousel_id', 'country_id');
+    }
 
     protected static function boot()
     {
@@ -78,4 +96,7 @@ class HomeCarousel extends Model
             }
         });
     }
+
+
+
 }

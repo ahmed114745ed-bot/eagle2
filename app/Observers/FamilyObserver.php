@@ -20,7 +20,6 @@ class FamilyObserver
         $owner = User::find($family->user_id);
         User::query()->where('family_id', $family->id)->update(['family_id' => null]);
         FamilyUser::query()->where('family_id', $family->id)->delete();
-        $milestone = Milestone::where('slug', 'family-owner')->first();
-        MilestoneHelper::revokeRewardFromUser($owner, $milestone->rewards);
+        MilestoneHelper::removeReward($owner, 'family-owner');
     }
 }

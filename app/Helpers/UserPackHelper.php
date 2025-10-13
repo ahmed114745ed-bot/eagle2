@@ -28,7 +28,7 @@ class UserPackHelper
 
     public static function getProfileFrameId(User $user) : string
     {
-        $ware = self::getFrameWare($user);
+        $ware = self::getProfileFrameWare($user);
         return $ware?->id ?? 0;
     }
 
@@ -115,6 +115,11 @@ class UserPackHelper
     public static function getFrameWare(User $user): mixed
     {
         return self::getWare($user, 4);
+    }
+
+    public static function getProfileFrameWare(User $user): mixed
+    {
+        return self::getWare($user, 28);
     }
 
     /**

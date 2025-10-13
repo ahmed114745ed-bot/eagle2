@@ -44,6 +44,10 @@ class RegisterRequest extends FormRequest
             $rules['phone'] = ['required'];
             $rules['password'] = ['required'];
         }
+
+        $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
+        $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
+
         return $rules;
     }
 

@@ -4,6 +4,8 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
+use App\Helpers\LogHelper;
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -275,7 +277,7 @@ class WareTabController extends MainController
 
 
 
-    protected function form($id = null)
+   protected function form($id = null)
     {
         $form = new Form(new Ware());
         $this->disableFormTools($form);
@@ -290,29 +292,27 @@ class WareTabController extends MainController
             $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
         });
 
-
         if (\Str::contains(request()->fullUrl(), 'edit')) {
-
             $wareType = Ware::find($id)->type;
-
             $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
         } else {
             if (request('type')) {
                 $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
             }
         }
+
         if (!$form->isEditing()) {
             if (request('type')) {
                 $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
             }
         }
+
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
         $form->currency('price', __('price'))->symbol('🪙');
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-
 
         $form->select('level', __('buy with vip'))->options(function ($value) {
             $ops2 = [];
@@ -321,15 +321,20 @@ class WareTabController extends MainController
             }
             return $ops2;
         });
-        $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png');
-//        $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            });
 
-        $form->display('img2', 'Preview')->with(function ($value) {
+        // تحسين حقل show_img
+        $form->image('show_img', trans('img'))
+            ->name(function ($file) {
+                // الحصول على الامتداد الحقيقي مع fallback
+                $extension = $file->getClientOriginalExtension();
+                if (empty($extension)) {
+                    $extension = $file->guessExtension();
+                }
+                return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+            })
+            ->default('1.png');
+
+       /* $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return "<div id='preview-display-img2'></div>";
 
             $url = \Storage::disk(config('admin.upload.disk'))->url($value);
@@ -345,112 +350,61 @@ class WareTabController extends MainController
             return "<div id='preview-display-img2'>
                 <img src='{$url}' style='max-height:150px' class='img img-thumbnail' />
             </div>";
-        });
+        });*/
 
+        // تحسين حقل img2 بشكل كامل
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })
-            ->attribute([
-                'id' => 'file-input-img2'
-            ])->hidePreview();
+                // الحصول على الامتداد الحقيقي مع fallback
+                $extension = $file->getClientOriginalExtension();
+                if (empty($extension)) {
+                    $extension = $file->guessExtension();
+                }
 
-//        $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            })
-//            ->options([
-//                'showPreview' => false,
-////                'showCaption' => false,
-////                'showRemove'  => false,
-////                'showUpload'  => false,
-////                'showCancel'  => false,
-////                'dropZoneEnabled' => false,     // no drag & drop area
-//                'initialPreview' => [],         // don’t render existing file
-//                'initialPreviewConfig' => [],
-//            ])
-//            ->hidePreview();
+                // تطبيع الامتدادات
+                $extension = strtolower($extension);
+                if ($extension === 'svg') {
+                    return 'svga_' . Str::random(8) . '.svg';
+                }
 
-//        \Encore\Admin\Form::extend('customfile', CustomFile::class);
-//        $form->customfile('img2', 'Upload Image/Animation');
-//
+                return 'animation_' . Str::random(8) . '.' . $extension;
+            });
 
-        // build preview (for edit mode when a value exists)
-//         $previewHtml = '';
-//         if ($form->model() && $form->model()->img2) {
-//             $url = getImagePath($form->model()->img2) ?? asset('images/image.png');
-//             $uniqueId = 'media_' . ($form->model()->id ?? uniqid());
-
-//             // wrap with a box that visually matches the image field
-//             $previewHtml = sprintf(
-//                 '<div class="kv-preview-thumb" style="display:inline-block;border:1px solid #e5e5e5;border-radius:6px;width:160px;height:160px;overflow:hidden;margin-bottom:8px;padding:6px;background:#f7f7f7;">
-//             %s
-//          </div>',
-//                 handleShowImageWithTypes($uniqueId, $url, 148, 148, 10) // inner size a bit smaller due to padding
-//             );
-//         }
-
-//         // give the input a unique id so we can target only this field
-//         $inputId = 'img2_input_' . Str::random(8);
-
-//         $form->file('img2', trans('svg'))
-//             ->attribute(['id' => $inputId])
-//             ->name(function ($file) {
-//                 return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//             })
-
-//             ->help($previewHtml);
-
-//         // hide the default built-in file preview **only for this field**
-//         Admin::script("
-//     $(function () {
-//         var box = $('#{$inputId}').closest('.file-input');
-//         box.find('.file-preview').remove(); // remove grey icon preview
-//     });
-// ");
-
-        if ($form->isEditing()) {
-            $form->select('image_type1', __('image_type'))->options(
-                [
-                    'svga' => __('svga'),
-                    'alpha' => __('alpha'),
-                    'mp4' => __('mp4'),
-                    'vap' => __('vap'),
-                    'png' => __('png'),
-
-                ]
-            )->attribute(['id' => 'image_type1']);
-        }
+        $form->select('image_type1', __('image_type'))->options([
+            'svga' => __('svga'),
+            'alpha' => __('alpha'),
+            'mp4' => __('mp4'),
+            'vap' => __('vap'),
+            'png' => __('png'),
+        ])->attribute(['id' => 'image_type1']);
 
         $script = <<<SCRIPT
-             $(document).ready(function() {
-                 function toggleWinProbability() {
-                     var type = $('#type').val();
-                     if(type == '28') {
-                         $('#profile_frame').closest('.form-group').show();
-                         $('#image_type1').closest('.form-group').hide();
-                     } else {
-                         $('#profile_frame').closest('.form-group').hide();
-                         $('#image_type1').closest('.form-group').show();
-
-                     }
-                 }
-                 toggleWinProbability();
-
-                 $('#type').change(function() {
-                     toggleWinProbability();
-                 });
-             });
-             SCRIPT;
+            $(document).ready(function() {
+                function toggleWinProbability() {
+                    var type = $('#type').val();
+                    if(type == '28') {
+                        $('#profile_frame').closest('.form-group').show();
+                        $('#image_type1').closest('.form-group').hide();
+                    } else {
+                        $('#profile_frame').closest('.form-group').hide();
+                        $('#image_type1').closest('.form-group').show();
+                    }
+                }
+                toggleWinProbability();
+                $('#type').change(function() {
+                    toggleWinProbability();
+                });
+            });
+        SCRIPT;
         Admin::script($script);
 
         if ($form->isEditing()) {
             if (Session::has('show_alert')) {
                 $form->html('<script>
-                 $(document).ready(function () {
-                     alert("الرجاء اختيار نوع  الصوره");
-                 });
-             </script>');
+                $(document).ready(function () {
+                    alert("الرجاء اختيار نوع  الصوره");
+                });
+            </script>');
             }
         }
 
@@ -469,6 +423,14 @@ class WareTabController extends MainController
                 $img2 = $form->img2;
                 $wareId = $form->model()->id;
 
+                Log::info('🟢 [Form Saving Started]', [
+                    'model_id' => $form->model()->id,
+                    'has_show_img' => (bool) $form->show_img,
+                    'has_existing_show_img' => (bool) $form->model()->show_img,
+                    'has_img2' => (bool) $form->img2,
+                    'has_existing_img2' => (bool) $form->model()->img2,
+                ]);
+
                 $hasImg2 = $img2 || $form->model()->img2;
 
                 if (!$hasShowImg && !$hasImg2) {
@@ -476,14 +438,27 @@ class WareTabController extends MainController
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
                     ]);
-
                     return back()->with(compact('error'));
                 }
 
+                // معالجة show_img
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
 
-                    $ext = strtolower($form->show_img->guessExtension());
+                    // الحصول على الامتداد الحقيقي
+                    $originalExt = strtolower($form->show_img->getClientOriginalExtension());
+                    $guessedExt = strtolower($form->show_img->guessExtension());
+
+                    // إعطاء الأولوية للامتداد الأصلي
+                    $ext = !empty($originalExt) ? $originalExt : $guessedExt;
+
+                    Log::info('🖼 show_img uploaded', [
+                        'original_name' => $form->show_img->getClientOriginalName(),
+                        'original_extension' => $originalExt,
+                        'guessed_extension' => $guessedExt,
+                        'final_extension' => $ext,
+                        'mime_type' => $form->show_img->getMimeType(),
+                    ]);
 
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
@@ -494,21 +469,55 @@ class WareTabController extends MainController
                     $form->image_type1 = $ext;
                 }
 
+                // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
                     /** @var FileService $fileService*/
-                    $fileService = app(FileService::class);
+                    $fileService = app( FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
+                    LogHelper::info('This ext ', $ext);
+                    /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
+                        'original_name' => $img2->getClientOriginalName(),
+                        'original_extension' => $img2->getClientOriginalExtension(),
+                        'mime_type' => $img2->getMimeType(),
+                        'client_mime' => $img2->getClientMimeType(),
+                    ]);
+
+                    // الحصول على الامتداد الحقيقي من الاسم الأصلي
+                    $originalExt = strtolower($img2->getClientOriginalExtension());
+                    $guessedExt = strtolower($img2->guessExtension());
+
+                    // إعطاء الأولوية للامتداد الأصلي
+                    $ext = !empty($originalExt) ? $originalExt : $guessedExt;
+
+                    // إذا كان الملف SVG، تأكد من أنه يحفظ كـ SVG
+                    if ($img2->getClientMimeType() === 'image/svg+xml' || $originalExt === 'svg') {
+                        $ext = 'svg';
+                    }
+
+                    Log::info('🖼 img2 uploaded - AFTER PROCESSING', [
+                        'original_extension' => $originalExt,
+                        'guessed_extension' => $guessedExt,
+                        'final_extension' => $ext,
+                    ]);
+
+                    $form->input('detected_profile_frame_type', $ext);
+                    $form->profile_frame_type = $ext;
+
+                    // تجاوز FileService إذا كان يسبب المشكلة
+                    // /** @var FileService $fileService*/
+                    // $fileService = app(FileService::class);
+                    // $extFromService = $fileService->getExtension($img2, $wareId, getFromService: true);
+                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);*/
                 }
             });
         }
+
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
-
-
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
 
@@ -525,13 +534,23 @@ class WareTabController extends MainController
             if (request('get_type') == 4) {
                 $form->model()->expire = 0;
             }
+
         });
 
         $form->saved(function (Form $form) {
+            $model = $form->model();
+            /*if ($form->img2 instanceof UploadedFile) {
+                $originalName = $form->img2->getClientOriginalName();
+                info('form image', [$form->img2]);
+                info('originalName', [$originalName]);
+                $model->update(['img2' => $originalName]);
+            }*/
+
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
         });
+
         return $form;
     }
 

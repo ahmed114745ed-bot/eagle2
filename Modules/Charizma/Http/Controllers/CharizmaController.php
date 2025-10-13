@@ -17,7 +17,7 @@ use Modules\Achievement\Http\Services\UserAchievementService;
 class CharizmaController extends Controller
 {
 
-    public function __construct(private UserCharismaService $userCharismaService) { }
+    public function __construct(private UserCharismaService $userCharismaService) {}
 
     /**
      * Display a listing of the resource.
@@ -116,7 +116,7 @@ class CharizmaController extends Controller
     {
         $roomId = $request->room_id;
         $room = Room::find($roomId);
-        
+
         if (!$room) {
             return Common::apiResponse(0, __('api_responses.room_not_found'), null, 404);
         }
@@ -152,24 +152,27 @@ class CharizmaController extends Controller
 
     public function reset(Request $request)
     {
-        $room = Room::withoutAppends()->where('uid', $request->owner_id)->first();
+        $roomId = $request->room_id;
+        $room = $roomId
+            ? Room::find($roomId)
+            : Room::where('uid', $request->owner_id)->where('type', 'audio')->first();
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
 
         ExtraDataInRoom::query()->where('room_id', $room->id)->update(['total' => 0]);
 
         $collections = [
-            'charisma'          => $this->roomCharisma($request->owner_id),
+            'charisma'          => $this->roomCharisma($room->uid),
         ];
 
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",
-                "data" => $this->roomCharisma($request->owner_id),
+                "data" => $this->roomCharisma($room->uid),
             ]
         ];
-        $json = json_encode ($ms);
+        $json = json_encode($ms);
 
-        Common::sendToZego('SendCustomCommand', $room->id,$request->owner_id, $json);
+        Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
         return Common::apiResponse(true, 'successfully', $collections);
     }
 }

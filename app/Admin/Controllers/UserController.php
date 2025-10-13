@@ -161,7 +161,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id','family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -336,9 +336,6 @@ class UserController extends MainController
                         });
                     });
         ");
-
-
-
 
 
 
@@ -586,7 +583,17 @@ class UserController extends MainController
 
         $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
         $countries = $this->countries();
-        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
+        $badges = UserBadge::where('user_id', $id)->with('admin')
+            ->orderByRaw("
+                    CASE 
+                        WHEN expire = 0 THEN 0
+                        WHEN expire >= ? THEN 0
+                        ELSE 1
+                    END
+                ", [now()->timestamp])
+            ->orderByDesc('expire')
+            ->paginate(10, ['*'], 'badges_page');
+        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -1025,6 +1032,12 @@ class UserController extends MainController
         $user->is_bd = 0;
         $user->save();
 
+        return redirect()->back();
+    }
+
+    public function deleteBadge($id)
+    {
+        UserBadge::where('id', $id)->delete();
         return redirect()->back();
     }
 }

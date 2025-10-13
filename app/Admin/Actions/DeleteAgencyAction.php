@@ -44,8 +44,7 @@ class DeleteAgencyAction extends RowAction
             // ]);
             $user = User::find($model->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            $milestone = Milestone::where('slug', 'host-agency-owner')->first();
-            MilestoneHelper::revokeRewardFromUser($user, $milestone->rewards);
+            MilestoneHelper::removeReward($user, 'host-agency-owner');
             $model->delete();
             DB::commit();
             return $this->response()->success(__('dashboard.successful'))->refresh();

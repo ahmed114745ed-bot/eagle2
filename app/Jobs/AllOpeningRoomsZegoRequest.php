@@ -50,16 +50,12 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
      */
     public function handle()
     {
-        /*$rooms = Cache::remember('allRooms', 60, function (){
-            return Room::withoutAppends()->where('room_status', 1)->where(function ($q) {
-                $q->where('is_afk', 1)->orWhere('count_room_socket', '!=', 0);
-            })->select(['id'])->get();
-        });
-
-        foreach ($rooms as $r) {
-            if ($r->id == $this->roomID) continue;
-            Common::sendToZego('SendCustomCommand', $r->id, $this->senderId, $this->json);
-        }*/
+  
+        \Log::info('🚀 AllOpeningRoomsZegoRequest started', [
+            'roomID'   => $this->roomID,
+            'senderId' => $this->senderId,
+        ]);
+        
         $useZego = Config::where('name', 'use_zego')->value('value');
 
         if (!$useZego){

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
@@ -193,6 +194,14 @@ if (!function_exists('upload')) {
 }
 
 
+if (!function_exists('deleteFile')) {
+    function deleteFile($path): ?string
+    {
+        return Storage::disk('gcs')->delete($path);
+    }
+}
+
+
 if (!function_exists('uploadMonthlyDiamondReceive')) {
     function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
     {
@@ -207,6 +216,31 @@ if (!function_exists('uploadMonthlyDiamondReceive')) {
                 'monthly_diamond_received' => $monthlyDiamondValue,
             ]
         );
+    }
+}
+
+if (!function_exists('incrementMonthlyDiamond')) {
+    function incrementMonthlyDiamond($user_id, $value)
+    {
+        $date = \Carbon\Carbon::now(getTimezone());
+
+        $monthlyRecord = MonthlyDiamondReceive::where('user_id', $user_id)
+            ->where('month', $date->month)
+            ->where('year', $date->year)
+            ->lockForUpdate()
+            ->first();
+
+        if ($monthlyRecord) {
+            $monthlyRecord->increment('monthly_diamond_received', $value);
+        } else {
+            MonthlyDiamondReceive::create([
+                'user_id' => $user_id,
+                'month'   => $date->month,
+                'year'    => $date->year,
+                'monthly_diamond_received' => $value,
+            ]);
+        }
+
     }
 }
 
@@ -271,6 +305,27 @@ if (!function_exists('get_file_details')) {
             }
 
             \Illuminate\Support\Facades\Queue::connection($connection)->pushOn($selectedQueue, $job);
+        }
+    }
+
+    if (!function_exists('getLeastBusyQueue')) {
+        function getLeastBusyQueue($queueConnection = 'database')
+        {
+            $connection = config('queue.default');
+            $queueNames = config("queue.connections.$queueConnection.queue");
+
+            $minQueueSize  = null;
+            $selectedQueue = null;
+
+            foreach ($queueNames as $queueName) {
+                $queueSize = Queue::connection($connection)->size($queueName);
+                if ($minQueueSize === null || $queueSize < $minQueueSize) {
+                    $minQueueSize  = $queueSize;
+                    $selectedQueue = $queueName;
+                }
+            }
+
+            return $selectedQueue ?? 'default';
         }
     }
 
@@ -528,11 +583,11 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
             if ($objectFit !== 'cover') {
-                return "<div class='rtlSvga' id='$model' 
-            style='width: {$width}px; 
-                   height: {$height}px; 
-                   object-fit: {$objectFit}; 
-                   border-radius: {$borderRadius}px; 
+                return "<div class='rtlSvga' id='$model'
+            style='width: {$width}px;
+                   height: {$height}px;
+                   object-fit: {$objectFit};
+                   border-radius: {$borderRadius}px;
                    margin-right: 4px;'>
              </div>";
             }
@@ -824,5 +879,114 @@ if (!function_exists('bd_url')) {
         }
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+
+
+    if (!function_exists('getGiftPercentage')) {
+        /**
+         * Get gift percentage by key from cache or DB
+         * and return it as decimal out of 10.
+         *
+         * @param string $key
+         * @return float
+         */
+        function getGiftPercentage(string $key): float
+        {
+            $cacheKey = "percentage_{$key}";
+
+            $value = Cache::get($cacheKey);
+
+            if ($value === null) {
+                $value = \App\Models\Setting::where('key', $key)->value('value');
+                if ($value !== null) {
+                    Cache::put($cacheKey, $value);
+                }
+            }
+            if ($value === null) {
+                $value = match ($key) {
+                    'app_wallet_lucky_gift' => 80,
+                    'owner_lucky_gift'      => 10,
+                    'host_lucky_gift'       => 10,
+                    default                  => 0,
+                };
+            }
+
+            $percentage = round(((float) $value) / 10, 2);
+
+
+            return $percentage;
+
+
+        }
+    }
+}
+
+if (!function_exists('getCountryIdFromLatLong')) {
+    function getCountryIdFromLatLong($lat, $lon)
+    {
+        $responseEn = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'en',
+        ]);
+
+        if (!$responseEn->ok()) {
+            return null;
+        }
+
+        $dataEn = $responseEn->json();
+        $countryCode = $dataEn['address']['country_code'] ?? null;
+        $countryNameEn = $dataEn['address']['country'] ?? null;
+
+        $country = Country::where('iso', $countryCode)->first();
+        if ($country) {
+            return $country->id;
+        }
+
+        $responseAr = Http::withHeaders([
+            'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
+        ])->get('https://nominatim.openstreetmap.org/reverse', [
+            'lat' => $lat,
+            'lon' => $lon,
+            'format' => 'json',
+            'addressdetails' => 1,
+            'accept-language' => 'ar',
+        ]);
+
+        $countryNameAr = null;
+        if ($responseAr->ok()) {
+            $dataAr = $responseAr->json();
+            $countryNameAr = $dataAr['address']['country'] ?? null;
+        }
+
+        $country = Country::create([
+            'iso' => $countryCode,
+            'e_name' => $countryNameEn,
+            'name' => $countryNameAr,
+            'status' => 1,
+        ]);
+
+        return $country->id;
+    }
+}
+
+
+if (!function_exists('respond_and_continue')) {
+    function respond_and_continue($response, callable $callback)
+    {
+        $response->send();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        try {
+            $callback();
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage());
+        }
+        exit; // ensure no further output
     }
 }

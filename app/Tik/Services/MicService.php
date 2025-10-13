@@ -58,9 +58,13 @@ class MicService
         $user = $this->userRepository->findById($data['user_id']);
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
-        $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
-        if (!$room)  throw new Exception(__('room does not exist'));
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
 
+        if (!$room)  throw new Exception(__('room does not exist'));
+        $data['owner_id'] = $room->uid;
         //
         $position = $data['position']; // mic index
         $mic_arr = explode(',', $room->microphone);
@@ -69,7 +73,7 @@ class MicService
 
         if (!isset($mic_arr[$position])) {
             throw new Exception(__('This seat is out of the designated range'));
-        }elseif ($position == 0 && $room->uid != \Auth::id()){
+        } elseif ($position == 0 && $room->uid != \Auth::id()) {
             throw new Exception(__('This seat is for owner'));
         }
 
@@ -87,9 +91,9 @@ class MicService
             $old_status = $current;
         }
 
-         if ($main_mic[$position] == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
-             throw new Exception(__('This microphone is closed and cannot be accessed'));
-         }
+        if ($main_mic[$position] == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
+            throw new Exception(__('This microphone is closed and cannot be accessed'));
+        }
 
 
         if (in_array($user->id, $mic_arr)) {
@@ -125,12 +129,12 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
-//        Log::info("🚀 [CP] handleCpLovely called", [
-//            'user_id' => $user->id,
-//            'room_id' => $room->id,
-//            'position' => $position,
-//            'mode' => $room->mode,
-//        ]);
+        Log::info("🚀 [CP] handleCpLovely called", [
+            'user_id' => $user->id,
+            'room_id' => $room->id,
+            'position' => $position,
+            'mode' => $room->mode,
+        ]);
 
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
@@ -148,12 +152,13 @@ class MicService
             return true;
         }
 
-        $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-//        Log::info("📍 [CP] Nearby positions", [
-//            'position' => $position,
-//            'neighbors' => $userSeats,
-//        ]);
+        $userSeats = $this->getUserNearby($position, $room->mode);
+
+        Log::info("📍 [CP] Nearby positions", [
+            'position' => $position,
+            'neighbors' => $userSeats,
+        ]);
 
         $micSeats = array_map(function ($v) {
             return is_numeric($v) ? (int)$v : null;
@@ -163,44 +168,75 @@ class MicService
 
             $userOtherId = $micSeats[$neighborPosition] ?? null;
 
-//            Log::info("👥 [CP] Checking neighbor", [
-//                'neighbor_position' => $neighborPosition,
-//                'user_other_id' => $userOtherId,
-//            ]);
+            Log::info("👥 [CP] Checking neighbor", [
+                'neighbor_position' => $neighborPosition,
+                'user_other_id' => $userOtherId,
+            ]);
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-//                Log::info("💖 [CP] CP found with neighbor", [
-//                    'user_id' => $user->id,
-//                    'user_other_id' => $userOtherId,
-//                ]);
+                Log::info("💖 [CP] CP found with neighbor", [
+                    'user_id' => $user->id,
+                    'user_other_id' => $userOtherId,
+                ]);
                 $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
 
                 return true;
             }
         }
-//        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
+        //        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
 
         $this->sendCpLovelyMessage($room, $user);
 
         return true;
     }
 
-    public function getUserNearby($index, $mode, $rowSize = 4)
+    public function getUserNearby($index, $mode)
     {
-        $neighbors = [];
+        // $neighbors = [];
 
-        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
+        // $rowSize = match ($mode) {
+        //     1 => 16,
+        //     2 => 12,
+        //     default => 9,
+        // };
+
+        // $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
+        // $rowEnd = $rowStart + $rowSize - 1;
+        // if ($rowSize <= 1) {
+        //     return [];
+        // }
+
+
+        // if ($index - 1 >= $rowStart) {
+        //     $neighbors[] = $index - 1;
+        // }
+        // if ($index + 1 <= $rowEnd) {
+        //     $neighbors[] = $index + 1;
+        // }
+
+        // return $neighbors;
+
+        $rowSize = 4;
+
+        $rowStart = intdiv($index, $rowSize) * $rowSize;
         $rowEnd = $rowStart + $rowSize - 1;
 
-        if ($index - 1 >= $rowStart) {
-            $neighbors[] = $index - 1;
+        $neighbors = [];
+
+        for ($i = $rowStart; $i <= $rowEnd; $i++) {
+            if ($i !== $index) {
+                $neighbors[] = $i;
+            }
         }
 
-        if ($index + 1 <= $rowEnd) {
-            $neighbors[] = $index + 1;
-        }
+        Log::info("🪑 [Nearby] Row positions", [
+            'index' => $index,
+            'row_start' => $rowStart,
+            'row_end' => $rowEnd,
+            'neighbors' => $neighbors,
+        ]);
 
         return $neighbors;
     }
@@ -276,8 +312,10 @@ class MicService
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
 
-
-        $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
         if (!$room) throw new Exception(__('api_responses.room_not_found'));
 
         $this->goMicrophoneHand($user, $room);
@@ -379,11 +417,15 @@ class MicService
     {
         $user = request()->user();
         $position = $data['position'];
-        $room = $this->roomRepository->findRoomUser($data['owner_id']);
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
         if (!$room) throw new Exception(__('room fot found'));
         if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
             throw new Exception(__('you do not have permission'));
         }
+        $data['owner_id'] = $room->uid;
 
         if ($room['mode'] == 0) {
             if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
@@ -400,10 +442,10 @@ class MicService
 
         // $microphone = $room->getOriginal('microphone');
         $microphone = $room->all_microphone;
-//        logger('microphone:', [$microphone]);
+        //        logger('microphone:', [$microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
-//        logger(' end microphone:', [$microphone]);
+        //        logger(' end microphone:', [$microphone]);
 
         $this->updateMic($room, $microphone);
         return $room;
@@ -434,7 +476,7 @@ class MicService
 
         $microphone = explode(',', $microphone);
         $current = $microphone[$position] ?? '0';
-//        logger(' explode microphone:', [$microphone]);
+        //        logger(' explode microphone:', [$microphone]);
 
         $user = '0';
         $status = '0';
@@ -462,7 +504,7 @@ class MicService
         } else {
             $microphone[$position] = $status;
         }
-//        logger('implode microphone:', [implode(',', $microphone)]);
+        //        logger('implode microphone:', [implode(',', $microphone)]);
 
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\AppSettingResource;
 use Auth;
 use Exception;
 use App\Models\Ban;
@@ -195,40 +196,17 @@ class UserController extends Controller
         return Common::apiResponse(true, '', $data, 200);
     }
 
-    public function app_setting()
+    public function appSetting(): JsonResponse
     {
-        $user = auth()->user();
-        $chat_status = settings()->get('chat_status');
-        $showChat = $user->userSetting?->hide_chat ?? $chat_status;
-        $stop_invite_code = settings()->get('stop_invite_code');
-        if ($stop_invite_code == 1) {
-            $invite_code = true;
-        } else {
-            $invite_code = false;
-            if ($user->userSetting && $user->userSetting->show_invite_code == 1) {
-                $invite_code = true;
-            }
-        }
-        //        $shared = Common::getConfig('shared') ?? '1234';
         $now = now();
 
-        $ban = Ban::where('ban_type_id', 7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
-            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
+        $user = auth()->user()
+            ->load([
+                'bans' => fn($q) => $q->where('ban_type_id', 7)->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [$now]),
+                'salaryRequests' => fn($q) => $q->where('status', 2),
+            ]);
 
-        $data = [
-            'version' => [
-                'android_version'   => settings()->get('android_current_version'),
-                'ios_version'       => settings()->get('ios_current_version'),
-                'huawei_version'    => settings()->get('huawei_current_version'),
-            ],
-            'hide_invite'       => $invite_code,
-            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
-            'shared_key' => Common::getConfig('shared') ?? '1234',
-            'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
-            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
-            'group_ban' => $ban != null ? true : false,
-        ];
-        return Common::apiResponse(true, '', $data, 200);
+        return Common::apiResponse(true, '', AppSettingResource::make($user), 200);
     }
 
     public function charges(Request $request): JsonResponse
@@ -752,12 +730,16 @@ class UserController extends Controller
     public function explain_invitation()
     {
         $lang = app()->getLocale();
+
+
+
         if ($lang == "en") {
-            $data = Config::where("name", "explain_invitation_english")->first();
+            $data = Common::getSettingValue('invitation_content_en');
         } else {
-            $data = Config::where("name", "explain_invitation_arabic")->first();
+            $data = Common::getSettingValue('invitation_content_ar');
         }
-        return Common::apiResponse(true, '', $data?->desc, 200);
+
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function UserEarnFromInvitationStatistics()
@@ -833,7 +815,7 @@ class UserController extends Controller
             return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
         }
 
-         $this->createInvitation($userParent->id, $userId);
+        $this->createInvitation($userParent->id, $userId);
 
 
         $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
@@ -849,9 +831,14 @@ class UserController extends Controller
         return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }
 
+    // private static function isStopInvitationValid()
+    // {
+    //     return settings()->get('stop_invite_code');
+    // }
+
     private static function isStopInvitationValid()
     {
-        return settings()->get('stop_invite_code');
+        return getSettingCash('invite_code') ?? 0;
     }
     private function getUserByCode(string $code): ?User
     {
@@ -1304,26 +1291,26 @@ class UserController extends Controller
         return Common::apiResponse(true, 'success', $data);
     }
 
-//    public function dataUser(Request $request)
-//    {
-//        $id = $request->id;
-//        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
-////        $data = $this->userService->dataUser($id);
-//        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
-//            $user = $this->userService->dataUser($id);
-//            return new DataUserResource($user);
-//        });
-//
-//        request()->merge(['user_id' => $id]);
-//        return Common::apiResponse(true, 'done', $data);
-//    }
+    //    public function dataUser(Request $request)
+    //    {
+    //        $id = $request->id;
+    //        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+    ////        $data = $this->userService->dataUser($id);
+    //        $data = Cache::remember("user_data_{$id}",600, function () use ($id) {
+    //            $user = $this->userService->dataUser($id);
+    //            return new DataUserResource($user);
+    //        });
+    //
+    //        request()->merge(['user_id' => $id]);
+    //        return Common::apiResponse(true, 'done', $data);
+    //    }
 
     public function dataUser(Request $request)
     {
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
 
-        return Cache::remember("data_user_{$id}",600, function () use ($id) {
+        return Cache::remember("data_user_{$id}", 600, function () use ($id) {
             $data = $this->userService->dataUser($id);
             request()->merge(['user_id' => $id]);
             return Common::apiResponse(true, 'done', new DataUserResource($data));
@@ -1382,5 +1369,4 @@ class UserController extends Controller
             return $this->userService->claimEarning($parentId, $id);
         });
     }
-
 }

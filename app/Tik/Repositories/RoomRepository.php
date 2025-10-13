@@ -29,6 +29,24 @@ class RoomRepository extends AbstractRepository
         return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
 
+    public function findById($id)
+    {
+        return $this->model->find($id);
+    }
+
+    public function findRoomTypeUser($userId, $type = 'audio', $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type', $type)->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
+    public function findAudioRoomUser($userId, $withoutAppends = true)
+    {
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('type', 'audio')->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+    }
+
     public function findRoomId($id, $withoutAppends = true)
     {
         $query = $this->model;
@@ -74,7 +92,7 @@ class RoomRepository extends AbstractRepository
             $query = $query->withoutAppends();
         }
         $query = $query->select(['id', 'uid', 'room_admin']);
-//        $query = $query->with(['family:id,user_id,name,image']);
+        //        $query = $query->with(['family:id,user_id,name,image']);
         return $query->where('uid', $userId)->first();
     }
 
@@ -84,11 +102,32 @@ class RoomRepository extends AbstractRepository
         return $this->model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->where('room_status', 1)->first();
     }
 
+    public function findRoomUserEnableAudio($userId)
+    {
+        return $this->model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->where('room_status', 1)->where('type', 'audio')->first();
+    }
+
     public function findUserRoom($ownerId, $selectRow = "*")
     {
         return $this->model->withoutAppends()->where(['uid' => $ownerId])->selectRaw($selectRow)->first();
     }
 
+    public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = "*")
+    {
+        return $this->model->withoutAppends()
+            ->where(['uid' => $ownerId])
+            ->where('type', $type)
+            ->selectRaw($selectRow)->first();
+    }
+
+    public function findUserRoomById($ownerId, $selectRow = "*")
+    {
+        return $this->model
+            ->withoutAppends()
+            ->where(['id' => $ownerId])
+            ->selectRaw($selectRow)
+            ->first();
+    }
     public function updateRoom($room)
     {
         $room->update();
@@ -120,8 +159,7 @@ class RoomRepository extends AbstractRepository
     public function updateMicRoom($room, $mic)
     {
         $room->microphone = $mic;
-        $this->updateRoomUser($room);
-        return true;
+        return $room->save();
     }
 
     public function updateRoomStatus($userId, $isAvailable)
@@ -153,12 +191,12 @@ class RoomRepository extends AbstractRepository
             ->pluck('user_id');
 
         $result = $this->model->withLuckyBoxFlag($user->id)
-            ->select(['id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
+            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'defaultBackground:id,img',
                 'lastPk:id,room_id',
-                'background:id',
+                'background:id,img',
                 'roomVisitorUsers' => fn($q) => $q->with('profile')->limit(5),
                 'myClass',
                 'roomCategory:id,type',
@@ -167,7 +205,7 @@ class RoomRepository extends AbstractRepository
                 'boxUse',
                 'owner' => [
                     'enabledMedals',
-//                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
+                    //                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
                     'country',
                     'color_image',
                     'specialId.ware',
@@ -176,24 +214,24 @@ class RoomRepository extends AbstractRepository
                     'medals.achievementLevel.achievement'
                 ],
             ])
-        ->withCount('roomVisitors')
-        ->whereHas('owner')
-        ->whereNotIn('uid', $blockedUserIds)
-//        ->whereDoesntHave('owner.packs', function ($q) {
-//            $q->where('type', 16)
-//                ->where('is_used', 1)
-//                ->where(function ($q) {
-//                    $q->where('expire', 0)
-//                        ->orWhere('expire', '>=', now()->timestamp);
-//                });
-//        })
-        ->where('room_status', 1);
+            ->withCount('roomVisitors')
+            ->whereHas('owner')
+            ->whereNotIn('uid', $blockedUserIds)
+            //        ->whereDoesntHave('owner.packs', function ($q) {
+            //            $q->where('type', 16)
+            //                ->where('is_used', 1)
+            //                ->where(function ($q) {
+            //                    $q->where('expire', 0)
+            //                        ->orWhere('expire', '>=', now()->timestamp);
+            //                });
+            //        })
+            ->where('room_status', 1);
 
         $result->orderByDesc('pin');
 
         if ($topRooms && $roomType != 'live') {
             $result->orderByRaw('is_top = 1 DESC');
-        }else {
+        } else {
             $result->where(function ($query) {
                 $query->whereHas('roomVisitors')->orWhere('pin', 1);
             });
@@ -286,8 +324,8 @@ class RoomRepository extends AbstractRepository
                     ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
                     [$userLat, $userLong, $userLat]
                 )
-                ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-                ->orderBy('distance');
+                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                    ->orderBy('distance');
                 break;
         }
 
@@ -299,7 +337,7 @@ class RoomRepository extends AbstractRepository
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-            })->paginate(10);
+        })->paginate(10);
     }
 
 
@@ -353,7 +391,6 @@ class RoomRepository extends AbstractRepository
                 ? new RoomResource($live)
                 : (object)[],
         ];
-
     }
 
     public function getUserRooms($req, $id)
@@ -363,8 +400,8 @@ class RoomRepository extends AbstractRepository
 
 
         $audio = (clone $query)->where('type', 'audio')->first();
-        $live  = (clone $query)->where('type', 'live')->where('is_live' , true)->first();
-        $nowRooms  = $this->getNowRooms( $user);
+        $live  = (clone $query)->where('type', 'live')->where('is_live', true)->first();
+        $nowRooms  = $this->getNowRooms($user);
 
         return [
             'audio' => $audio
@@ -378,7 +415,6 @@ class RoomRepository extends AbstractRepository
                 ? $nowRooms
                 : (object)[],
         ];
-
     }
     private function getNowRooms($user)
     {
@@ -391,8 +427,9 @@ class RoomRepository extends AbstractRepository
 
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-        return new NowRoomResource($user) ?? (object)[];
+        $resource = (new NowRoomResource($this))->toArray(request());
 
+        return empty($resource) ? (object)[] : $resource;
     }
 
     private function getBlockedUserIds()
@@ -403,7 +440,7 @@ class RoomRepository extends AbstractRepository
             ->where('is_used', 1)
             ->where(function ($q) {
                 $q->where('expire', 0)
-                ->orWhere('expire', '>=', now()->timestamp);
+                    ->orWhere('expire', '>=', now()->timestamp);
             })
             ->pluck('user_id');
     }
@@ -414,11 +451,31 @@ class RoomRepository extends AbstractRepository
             ->where('type', 'live')
             ->where('is_live', true)
             ->select([
-                'id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status',
-                'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak',
-                'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended',
-                'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot',
-                'type', 'mode', 'created_at'
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'type',
+                'mode',
+                'created_at'
             ])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
@@ -439,6 +496,9 @@ class RoomRepository extends AbstractRepository
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->whereNotIn('uid', $blockedUserIds)
+            ->whereHas('roomVisitors', function ($query) {
+                $query->whereColumn('user_id', 'rooms.uid');
+            })
             ->where('room_status', 1)
             ->orderByDesc('pin')
             ->orderByDesc('room_visitors_count')
@@ -448,18 +508,39 @@ class RoomRepository extends AbstractRepository
     private function baseRoomQueryMine($user)
     {
         return $this->model
-        ->where('uid', $user->id)
+            ->where('uid', $user->id)
             ->select([
-                'id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status',
-                'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak',
-                'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended',
-                'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot',
-                'type', 'mode', 'created_at'
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'room_background',
+                'type',
+                'mode',
+                'created_at'
             ])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
-                'background:id',
+                'background:id,img',
                 'roomVisitorUsers' => fn($q) => $q->limit(5),
                 'myClass',
                 'roomCategory:id,type',
@@ -572,8 +653,8 @@ class RoomRepository extends AbstractRepository
             ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
             [$user->lat, $user->long, $user->lat]
         )
-        ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-        ->orderBy('distance');
+            ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+            ->orderBy('distance');
     }
 
 
@@ -593,16 +674,13 @@ class RoomRepository extends AbstractRepository
             $this->applyCountryFilter($query, $req->country_id);
         }
 
-//        $this->applyFilter($query, $req->filter, $user);
+        //        $this->applyFilter($query, $req->filter, $user);
 
         if (!empty($ids)) {
             $query->whereIn('uid', $ids);
         }
         return RoomResource::collection(
-            $query->where('type', 'live')->paginate()
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
         );
     }
-
-
-
 }

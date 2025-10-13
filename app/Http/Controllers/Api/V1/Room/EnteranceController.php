@@ -237,15 +237,21 @@ class EnteranceController extends Controller
     }
 
 
-
+    /**
+     * @throws \Exception
+     */
     public function enter_room(Request $request): JsonResponse
     {
+        $app_feature = \Cache::get('zego_feature');
+        if (!$app_feature && !is_null($app_feature)) {
+            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        }
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');
 
         if (!$roomId) {
-            return $this->errorResponse(__('Please provide a room_id.'), 422);
+            return $this->errorResponse(__('Please provide a room id.'), 422);
         }
 
         $room = $this->findRoom($roomId);

@@ -34,6 +34,16 @@ class CanPlaySwitchAction extends RowAction
 
         $response = $model->can_play == 2 ? 'success' : 'error';
 
+        if($model->online){
+            $can_play = $model->can_play ?? 0;
+            $show_invite_code = $model->show_invite_code ?? 0;
+            broadcast(new UserStatus(
+                $can_play == 2 ? true : false,
+                $show_invite_code == 1 ? true : false,
+                $model->id
+            ));
+        }
+        
         return $this->response()->$response($msg)->refresh();
     }
 
