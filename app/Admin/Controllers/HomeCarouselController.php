@@ -12,8 +12,6 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\HomeCarousel;
-use App\Selectables\Countries;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
