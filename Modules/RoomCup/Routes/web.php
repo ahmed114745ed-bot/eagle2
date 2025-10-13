@@ -32,13 +32,14 @@ Route::group(
         Route::post('room-cup-settings/save', [RoomCupSettingsController::class, 'save']);
 
         Route::resource('room-cup-reports', RoomCupReportsController::class);
+        
  
         
    
     }
 );
 
-
+Route::get('cup-targets-view', [RoomCupTargetController::class,'cupTargetHtml']);
 
 Route::get('/roomcup/calculate-rewards', function () {
 

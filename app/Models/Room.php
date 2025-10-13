@@ -4,14 +4,15 @@ namespace App\Models;
 
 use DB;
 use Modules\Chat\Entities\ChatMessage;
+use Modules\Vip\Entities\Vip;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Traits\TimestampsWithTimezone;
+use Modules\LuckyBox\Traits\RoomBoxes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Modules\LuckyBox\Traits\RoomBoxes;
-use Modules\RoomBoom\Entities\TotalRoomGift;
 
 /**
  * @method static withoutAppends()

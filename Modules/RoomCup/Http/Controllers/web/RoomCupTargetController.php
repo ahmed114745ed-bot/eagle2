@@ -6,11 +6,12 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use Encore\Admin\Layout\Row;
+use Illuminate\Http\Request;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\RoomCup\Entities\RoomCupTarget;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 
 class RoomCupTargetController extends MainController
 {
@@ -153,5 +154,12 @@ class RoomCupTargetController extends MainController
             $form->model()->admin_profit = $form->total_profit * ($adminPercentage / 100);
         });
         return $form;
+    }
+
+    public function cupTargetHtml(Request $request)
+    {
+        $cupTargets = RoomCupTarget::get();
+        return view('cupTarget', compact("cupTargets"));
+       
     }
 }

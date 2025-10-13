@@ -80,7 +80,11 @@
 "total price": "Toplam Fiyat",
   "Sender UUID or Shipping Agency ID": "Gönderici UUID veya Kargo Ajansı Kimliği",
   "Receiver UUID or Shipping Agency ID": "Alıcı UUID veya Kargo Ajansı Kimliği",
-
+  "Weekly Room Support": "Haftalık Oda Desteği",
+"Weekly Condition": "Haftalık Koşul",
+"Total Support": "Toplam Destek",
+"Support Reward": "Destek Ödülü",
+"Trophy": "Kupa",
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
     "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",
