@@ -1088,7 +1088,7 @@ html.ltr .dropdown-menu {
     }
 
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-left,
-    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,
+    /*.rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,*/
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,

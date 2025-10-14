@@ -2,36 +2,84 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Admin\Actions\DeleteBdAction;
+use App\Helpers\Common;
 use App\Models\Bd;
 use App\Models\BdAgencyHostSallary;
-use App\Models\SuperAdmin;
+use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Routing\Controller;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Hash;
 
 
 class ProfessionalBdController extends Controller
 {
-   
+
+    protected $title = 'BD';
+    public $permission_name = 'BD';
 
     public function index(Content $content)
     {
         return $content
-            ->title(__('professional BD'))
-           
+            ->title(__($this->title))
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
     }
 
+    protected function grid2()
+    {
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.bd.description'),
+        ));
+    }
 
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('BD'))
+            ->body($this->profile($id));
+    }
 
-    
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('BD'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('BD'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
@@ -40,14 +88,11 @@ class ProfessionalBdController extends Controller
      */
     protected function grid()
     {
+        $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-         $authCountryId = Admin::user()->country_id;
-        
-
-        $grid->model()->where('country_id','!=',$authCountryId)
-            
-
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs'])
+        $grid->model()->where('parent_id', $authSuperAdmin->id)
+            ->where('country_id','!=', $authSuperAdmin->country_id)
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -74,7 +119,7 @@ class ProfessionalBdController extends Controller
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/usersBd/{$this->id}");
+            $showUrl = url("superadmin/usersBd/{$this->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -88,29 +133,37 @@ class ProfessionalBdController extends Controller
                 </div>
             ";
         });
-        $grid->column('default', __('default_status'))->display(function () {
-            if (request()->filled('_export_')) {
-                return $this->default;
-            }
 
-            if ($this->default == 1) {
-                return <<<HTML
-                    <span style="display: flex; align-items: center;">
-                        <span style="
-                            font-size: smaller;
-                            background: red;
-                            display: inline-block;
-                            border-radius: 50%;
-                            width: 10px;
-                            height: 10px;
-                            margin-left: 5px;
-                        " title=""></span>
-                    </span>
-                HTML;
-            } else {
-                return '<span style="color: #999;"></span>';
-            }
-        });
+
+        $grid->column('default', trans('default_status'))
+            ->switch(Common::getSwitchStates())
+            ->display(function ($enable) {
+                return $enable;
+
+            });
+        // $grid->column('default', __('default_status'))->display(function () {
+        //     if (request()->filled('_export_')) {
+        //         return $this->default;
+        //     }
+
+        //     if ($this->default == 1) {
+        //         return <<<HTML
+        //             <span style="display: flex; align-items: center;">
+        //                 <span style="
+        //                     font-size: smaller;
+        //                     background: red;
+        //                     display: inline-block;
+        //                     border-radius: 50%;
+        //                     width: 10px;
+        //                     height: 10px;
+        //                     margin-left: 5px;
+        //                 " title=""></span>
+        //             </span>
+        //         HTML;
+        //     } else {
+        //         return '<span style="color: #999;"></span>';
+        //     }
+        // });
 
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
@@ -129,41 +182,7 @@ class ProfessionalBdController extends Controller
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-
-        $grid->column('parent.name', __('Super Admin'))->display(function () {
-            $user = $this->parent?->appUser;
-            $name = $user->name ?? '';
-
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
-
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
+            $showUrl = url("superadmin/users/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -199,7 +218,16 @@ class ProfessionalBdController extends Controller
 
         $grid->column('country.name', __('country'));
 
-        
+        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $col = $grid->column('transfer_salary', __("transfer_salary"))
+                ->display(function () {
+                    return $this->transfer_salary ? 1 : 0;
+                });
+
+            if (! request()->filled('_export_')) {
+                $col->switch(Common::getSwitchStates());
+            }
+        }
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -208,23 +236,116 @@ class ProfessionalBdController extends Controller
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
 
-       
-        $grid->disableRowSelector();
-        $grid->disableCreateButton();
-         $grid->disableActions();
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteBdAction());
+            }
+        });
 
-        $this->extendGrid($grid);
+        $grid->disableRowSelector();
+
         return $grid;
     }
 
-   
-    
-
-  public function show($id, Content $content)
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
     {
-        return  $content
-            ->title(trans('BD'))
-            ->body($this->profile($id));
+        $form = new Form(new Bd());
+
+        $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
+        $form->password('password', __('Password'))->rules('required');
+        $form->image('avatar', __('img'));
+
+        $form->hidden('transfer_salary', __('transfer_salary'));
+        $form->hidden('default', __('default'))->default(0);
+
+        if ($form->isEditing()) {
+            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+                $ops2 = [];
+                foreach (User::Where('id', $value)->get() as $user) {
+                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                }
+                return $ops2;
+            })->ajax('/api/search/users-bd', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
+        } else {
+            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+                $ops2 = [];
+                foreach (User::Where('id', $value)->get() as $user) {
+                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                }
+                return $ops2;
+            })->ajax('/api/search/users-bd', 'id', 'name');
+
+//            $form->switch('default', __('set_as_default'))
+//                ->help(__('make_bd_default'));
+        }
+
+        $user = auth()->user();
+        $form->hidden('type', __('Type'))->value('bd');
+        $form->hidden('transfer_salary', __('transfer_salary'));
+        $form->hidden('parent_id', __('Super Admin'))->value($user->id);
+        $form->hidden('country_id', __('country'))->value($user->country_id);
+
+        $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId && $newAppId != null) {
+
+                    $OldUserAppId = \App\Models\User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_bd = 0;
+                        $OldUserAppId->save();
+                    }
+                    $newUserAppId = \App\Models\User::find($newAppId);
+                    $newUserAppId->is_bd = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
+                }
+            }
+
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password   = Hash::make($form->password);
+            }
+        });
+
+        $form->saved(function (Form $form) {
+            $userId = $form->model()->id;
+            $userAppId = $form->model()->app_id;
+
+            $userApp = User::find($userAppId);
+            if (isset($userApp)) {
+                $userApp->is_bd = 1;
+                $userApp->save();
+            }
+
+            $role = DB::table('admin_roles')->where('slug', 'bd')->first();
+
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        });
+
+        return $form;
     }
 
     public function profile($id)
@@ -233,9 +354,8 @@ class ProfessionalBdController extends Controller
         $month = request('month') ?? now()->month;
         $tab = request()->query('tab', 'agencies');
 
-        $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
+        $bd = Bd::select(['id', 'name', 'app_id', 'avatar', 'username', 'default'])->findOrFail($id);
 
-        $id = $bd->id;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
@@ -263,7 +383,6 @@ class ProfessionalBdController extends Controller
                     'id',
                     'bd_id',
                     'agency_id',
-                    // 'salary',
                     'amount',
                     'month',
                     'year',
