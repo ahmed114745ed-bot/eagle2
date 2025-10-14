@@ -5,11 +5,26 @@ namespace Database\Seeders;
 use App\Models\Country;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Storage;
+use Str;
 
 class CleanUpDuplicateCountriesSeeder extends Seeder
 {
     public function run()
     {
+        $flagDir = public_path('images/flags');
+        $flagFiles = glob($flagDir . '/*.svg');
+
+        foreach ($flagFiles as $localPath) {
+            $filename = basename($localPath);
+
+            $gcsPath = 'images/flags/' . $filename;
+
+            if (file_exists($localPath)) {
+                Storage::disk('gcs')->put($gcsPath, file_get_contents($localPath), 'public');
+            }
+        }
+
         $this->command->info("=== Step 1: Cleaning up duplicates ===");
 
         $handledIds = [];
@@ -326,6 +341,8 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             $prettyName = trim($data['name']);
             $prettyArName = trim($data['name_ar']);
             $phone = '+' . trim($data['phonecode']);
+            $lowerIso = Str::lower($iso);
+            $imagePath = "images/flags/{$lowerIso}.svg";
 
             $country = Country::where('iso', $iso)
                 ->orWhere('iso3', $iso3)
@@ -341,6 +358,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'iso3'       => $iso3 ?: $country->iso3,
                     'phone_code' => $phone ?: $country->phone_code,
                     'status'     => 1,
+                    'flag'       => $imagePath,
                 ]);
 
                 $this->command->info("🔄 Updated existing country: {$prettyName} (ID {$country->id})");
@@ -352,6 +370,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'iso3'       => $iso3,
                     'phone_code' => $phone,
                     'status'     => 1,
+                    'flag'       => $imagePath,
                 ]);
 
                 $this->command->info("➕ Created new country: {$prettyName} (ID {$new->id})");
