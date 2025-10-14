@@ -170,9 +170,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'winners' => $winners,
             ],
         ];
-        Log::info('🛰️ Sending Zego request', [
-            'payload' => $payload,
-        ]);
+     
         return json_encode($payload);
 
     }
