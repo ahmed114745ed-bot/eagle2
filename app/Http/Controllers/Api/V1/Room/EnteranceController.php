@@ -25,6 +25,7 @@ use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
+use App\Http\Services\EnterRoomService;
 use App\Tik\Services\EnteranceRoomServices;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
@@ -238,7 +239,7 @@ class EnteranceController extends Controller
     /**
      * @throws \Exception
      */
-    public function enter_room(Request $request): JsonResponse
+    public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
         $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
@@ -258,26 +259,10 @@ class EnteranceController extends Controller
             return $this->errorResponse(__('Room not found.'), 404);
         }
 
-        if ($this->isRoomBanned($room->uid, $room->type) && $room->type === 'audio') {
-            return $this->errorResponse(
-                __('This room has been closed. Wait until moderators lift the ban.'),
-                403,
-                ['ban' => true]
-            );
-        } elseif ($this->isRoomBanned($room->uid, $room->type) && ($user->id == $room->uid)) {
-            [$duration, $remaining] = Common::banDuration($room->uid, $room->type);
-            return $this->errorResponse(
-                __('api.banRoom', ['duration' => $duration, 'remaining' => $remaining]),
-                403,
-                ['ban' => true]
-            );
-        } elseif ($this->isRoomBanned($room->uid, $room->type) && ($user->id != $room->uid)) {
-            return $this->errorResponse(
-                __('This Live is closed'),
-                403,
-                ['ban' => true]
-            );
+        if ($banResponse = $enterRoomServices->checkRoomBan($user, $room)) {
+            return $banResponse;
         }
+
         $type  =  $room->type;
 
 
@@ -285,6 +270,7 @@ class EnteranceController extends Controller
 
         return $this->handleRoomType($type, $user, $request, $roomPass, $room);
     }
+
 
     private function errorResponse(string $message, int $code, array $extra = []): JsonResponse
     {
