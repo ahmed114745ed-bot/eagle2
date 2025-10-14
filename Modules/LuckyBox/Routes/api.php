@@ -73,9 +73,9 @@ Route::get('/test-room-zego', function (Request $request) {
     try {
 
 
-        $promises = Common::sendToZego3('SendCustomCommand', $roomId, 1, $json);
+        Common::sendToZego3('SendCustomCommand', $roomId, 1, $json);
+        Common::sendToZego3('SendCustomCommand', $roomId, 1, $json2);
 
-        Common::sendToZego('SendCustomCommand', $roomId, auth()->id() ?? 0, $json);
 
 
         return response()->json([
@@ -83,6 +83,7 @@ Route::get('/test-room-zego', function (Request $request) {
             'message' => 'Zego test message sent successfully',
             'room_id' => $roomId,
             'payload' => $payload,
+            'payload2' => $payload2,
         ]);
     } catch (\Throwable $th) {
         return response()->json([
