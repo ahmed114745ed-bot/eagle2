@@ -1498,16 +1498,14 @@ class Common
                 $params['MessageContent'] = $messageContent;
                 $promises[rand(1, 999) . ''] = $client->getAsync($url, ['query' => $params]);
             }
-            Log::info('🛰️ Sending Zego request', [
-                'url'    => $url,
-                'params' => $params,
-            ]);
+          
          
     
-    
-            Log::info('📬 Zego response received', [
-                'promises' => $promises,
+            Log::info('🛰️ Sending Zego request', [
+                'sendToZego3' => '',
+                'params' => $params,
             ]);
+          
     
             return $promises;
         } catch (\Exception $e) {
