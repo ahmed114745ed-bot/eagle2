@@ -13,19 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('room_cup_targets', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('total')->default(0);
-            $table->bigInteger('number_of_visitors')->default(0);
-            $table->bigInteger('number_of_admins')->default(0);
-            $table->decimal('owner_profit', 8, 2)->default(0); 
-            $table->decimal('admin_profit', 8, 2)->default(0); 
-            $table->timestamps();
+        // Schema::create('room_cup_targets', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('total')->default(0);
+        //     $table->bigInteger('number_of_visitors')->default(0);
+        //     $table->bigInteger('number_of_admins')->default(0);
+        //     $table->decimal('owner_profit', 8, 2)->default(0); 
+        //     $table->decimal('admin_profit', 8, 2)->default(0); 
+        //     $table->timestamps();
 
-            $table->index('number_of_visitors');
-            $table->index('number_of_admins');
-            $table->index('owner_profit');
-        });
+        //     $table->index('number_of_visitors');
+        //     $table->index('number_of_admins');
+        //     $table->index('owner_profit');
+        // });
     }
 
     /**
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('room_cup_targets');
+        // Schema::dropIfExists('room_cup_targets');
     }
 };
