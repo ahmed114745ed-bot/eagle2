@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\User;
+use App\Models\Country;
 use DB;
 use Google_Client;
 use Mockery\Exception;
@@ -21,6 +22,7 @@ use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
+use function request;
 
 class AuthService
 {
@@ -79,6 +81,9 @@ class AuthService
         try {
             $lat = $request->lat;
             $long = $request->long;
+            $iso = $request->iso;
+            $countryId = null;
+
             if ($trashedUser) {
                 $trashedUser->restore();
 
@@ -92,22 +97,31 @@ class AuthService
                     'status' => 1
                 ];
 
-                if ($lat && $long){
+                if ($iso){
+                    $country = Country::where('iso', strtoupper($iso))->first();
+                    if ($country) {
+                        $countryId = $country->id;
+                    }
+                }
+
+                if (!$countryId && $lat && $long){
                     $countryId = getCountryIdFromLatLong($lat, $long);
+                }
+
+                if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
 
                 $user = $this->userRepository->create($data);
             }
-            if (\request('tags') && is_array(\request('tags'))) {
-                $user->tags()->attach(\request('tags'));
+
+            if (request('tags') && is_array(request('tags'))) {
+                $user->tags()->attach(request('tags'));
             }
-            if (!$lat && !$long){
-                if (!$request->country_id) {
-                    $country = $this->countryRepository->findByPhoneCode('101');
-                    $user->country_id = @$country->id;
-                }
-            }
+//            if (!$request->country_id) {
+//                $country = $this->countryRepository->findByPhoneCode('101');
+//                $user->country_id = @$country->id;
+//            }
             $user->is_points_first = 1;
             if (!$this->checkDeviceToken(@$request->device_token)) {
                 $user->di = 20000;
@@ -200,9 +214,21 @@ class AuthService
 
                 $lat = $request['lat'];
                 $long = $request['long'];
+                $iso = $request['iso'];
+                $countryId = null;
 
-                if ($lat && $long){
+                if ($iso){
+                    $country = Country::where('iso', strtoupper($iso))->first();
+                    if ($country) {
+                        $countryId = $country->id;
+                    }
+                }
+
+                if (!$countryId && $lat && $long){
                     $countryId = getCountryIdFromLatLong($lat, $long);
+                }
+
+                if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
 
@@ -214,8 +240,8 @@ class AuthService
 
                 $this->storeImage($request, $data, $user);
 
-                if (\request('tags') && is_array(\request('tags'))) {
-                    $user->tags()->attach(\request('tags'));
+                if (request('tags') && is_array(request('tags'))) {
+                    $user->tags()->attach(request('tags'));
                 }
 
                 /*$user->country_id = @$country->id ?: null;
@@ -278,9 +304,21 @@ class AuthService
 
             $lat = $request['lat'];
             $long = $request['long'];
+            $iso = $request['iso'];
+            $countryId = null;
 
-            if ($lat && $long){
+            if ($iso){
+                $country = Country::where('iso', strtoupper($iso))->first();
+                if ($country) {
+                    $countryId = $country->id;
+                }
+            }
+
+            if (!$countryId && $lat && $long){
                 $countryId = getCountryIdFromLatLong($lat, $long);
+            }
+
+            if ($countryId) {
                 $data['country_id'] = $countryId;
             }
 
@@ -316,9 +354,21 @@ class AuthService
 
                 $lat = $data['lat'];
                 $long = $data['long'];
+                $iso = $data['iso'];
+                $countryId = null;
 
-                if ($lat && $long){
+                if ($iso){
+                    $country = Country::where('iso', strtoupper($iso))->first();
+                    if ($country) {
+                        $countryId = $country->id;
+                    }
+                }
+
+                if (!$countryId && $lat && $long){
                     $countryId = getCountryIdFromLatLong($lat, $long);
+                }
+
+                if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
 
@@ -373,7 +423,7 @@ class AuthService
         if ($this->checkIsSameAccount($user->id, $data)) {
             throw new \Exception(__($this->getSameAccountMessage()));
         }
-        $message = UserHandling::hasReasonOfBan($user->uuid, \request());
+        $message = UserHandling::hasReasonOfBan($user->uuid, request());
 
         if ($message) {
             throw new \Exception($message);

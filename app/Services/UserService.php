@@ -8,6 +8,7 @@ use App\helper\UserFollowHelper;
 use App\Http\Resources\InvitationEarningResource;
 use App\Jobs\UserVisitJob;
 use App\Models\BlackList;
+use App\Models\Country;
 use DB;
 use Cache;
 use Exception;
@@ -214,8 +215,17 @@ class UserService
         return true;
     }
 
-    public function processUserData($user, $deviceToken, $lat, $long)
+    public function processUserData($user, $deviceToken, $lat, $long, $iso)
     {
+        $countryId = null;
+
+        if ($iso){
+            $country = Country::where('iso', strtoupper($iso))->first();
+            if ($country) {
+                $countryId = $country->id;
+            }
+        }
+
         $this->userRepository->updateDeviceToken($user, $deviceToken);
 
         $currentTime = time();
@@ -225,12 +235,15 @@ class UserService
         // update location
         if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
             $this->userRepository->updateLocation($user->id, $lat, $long);
+            if (!$countryId){
+                $countryId = getCountryIdFromLatLong($lat, $long);
+            }
         }
         // end update location
 
-        $userWithMedals = $this->userRepository->getUserWithMedals($user->id);
+        $this->userRepository->updateCountry($user, $countryId);
 
-        return $userWithMedals;
+        return $this->userRepository->getUserWithMedals($user->id);
     }
 
     public function update_user_multi_images($user, $id, $src)

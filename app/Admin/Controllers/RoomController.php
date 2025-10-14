@@ -897,7 +897,6 @@ class RoomController extends MainController
         $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
         $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
         $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
-        $form->text('max_admin', __('max admin'));
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));

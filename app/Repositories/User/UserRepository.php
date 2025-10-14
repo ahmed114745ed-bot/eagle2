@@ -336,6 +336,13 @@ class UserRepository extends Repository
         ]);
     }
 
+    public function updateCountry($user, $countryId): void
+    {
+        $user->update([
+            "country_id"   => $countryId,
+        ]);
+    }
+
     public function findUserById($id)
     {
         return User::find($id);

@@ -64,20 +64,6 @@ class HomeCarouselController extends MainController
             ->body($this->form()));
     }
 
-    public function update($id)
-    {
-        // $id = request()->route('id');
-        $banner = HomeCarousel::find($id);
-        $admin = \Auth::user();
-        $created = \App\Models\Admin::find($banner->created_by);
-        if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
-            admin_info(trans('messages.denyDelete'));
-            return redirect()->route('admin.home_carousels.index');
-        } else {
-            return $this->form()->update($id);
-        }
-    }
-
 
     /**
      * Make a grid builder.
@@ -89,7 +75,7 @@ class HomeCarouselController extends MainController
         $grid = new Grid(new HomeCarousel);
         $grid ->model()->with('displays');
 
-        $grid->id(__('ID'));
+        $grid->id(('ID'));
             $grid->column('img', __('img'))->image('', 235, 77);
 
             $types = [
@@ -98,6 +84,7 @@ class HomeCarouselController extends MainController
                 'displayHomeMiddle'=> 'Home Middle',
                 'displayLive'     => 'Live',
                 'displayCountry'  => 'Country',
+                'displayRoom'  => 'Room',
             ];
 
             foreach ($types as $attr => $label) {
@@ -168,7 +155,7 @@ class HomeCarouselController extends MainController
 
      protected function addBasicFields(Form $form)
      {
-         $form->display(__('admin.ID'));
+         $form->display(('admin.ID'));
          $form->number('sort', __('sort'));
          $form->image('img', trans('img'))->setResolution(80)->required();
          $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
@@ -183,11 +170,18 @@ class HomeCarouselController extends MainController
             2 => __('days'),
             3 => __('months')
         ])->when('1', function (Form $form) {
-            $form->number('input', trans('input'))->min(1);
+
+            $form->text('input', trans('input'))
+            ->rules('required|regex:/^\d+$/');
+        
         })->when('2', function (Form $form) {
-            $form->number('input', trans('input'))->min(1);
+            $form->text('input', trans('input'))
+            ->rules('required|regex:/^\d+$/');
+        
         })->when('3', function (Form $form) {
-            $form->number('input', trans('input'))->min(1);
+            $form->text('input', trans('input'))
+            ->rules('required|regex:/^\d+$/');
+        
         });
 
      }
@@ -228,6 +222,7 @@ class HomeCarouselController extends MainController
             'home_middle' => __('Home Middle'),
             'live'        => __('Live'),
             'country'     => __('Country'),
+            'room'     => __('Room'),
         ])
         ->rules(['array'])
         ->attribute('id', 'display_at_select');
@@ -257,6 +252,10 @@ class HomeCarouselController extends MainController
      {
         $form->ignore(['duration']);
 
+   
+        // dd($form->display_at , $form->model()->display_at ,request('display_at'));
+
+
      }
 
 
@@ -270,6 +269,8 @@ class HomeCarouselController extends MainController
                 'displayHomeMiddle' => 'home_middle',
                 'displayLive'       => 'live',
                 'displayCountry'    => 'country',
+                'displayRoom'  => 'room',
+
             ];
             $reqKeys = array_keys($types);
 
@@ -277,12 +278,12 @@ class HomeCarouselController extends MainController
                 return request()->has($key);
             });
 
-
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? $form->model()->input ?? 0;
             $formForm  = request('form') ?? $form->model()->form ?? 1;
             $displaysOrg =$form->display_at ?? $form->model()->display_at;
 
+           
             if (is_array($displaysOrg)) {
                 $displays = $displaysOrg;
             } elseif (is_string($displaysOrg)) {

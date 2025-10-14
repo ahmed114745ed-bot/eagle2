@@ -8,6 +8,7 @@ use App\Http\Resources\LanguageResource;
 use Illuminate\Http\Request;
 use App\Models\Language;
 use Illuminate\Http\JsonResponse;
+
 class LanguageController extends Controller
 {
     public function index(): JsonResponse
@@ -16,7 +17,18 @@ class LanguageController extends Controller
             ->select('id', 'name', 'code', 'direction')
             ->get();
 
-            return Common::apiResponse(1, '', LanguageResource::collection($languages));
+        return Common::apiResponse(1, '', LanguageResource::collection($languages));
+    }
 
+    public function searchLanguage(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $perPage = 10;
+        $language =  Language::selectRaw('name as name, code')
+            ->where('is_enabled', true)
+            ->where('name', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
+        return response()->json($language);
     }
 }

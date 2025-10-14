@@ -34,6 +34,9 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -334,7 +337,7 @@ Route::get('/clear-admin-error', function () {
 });
 
 
-Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
+//Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();

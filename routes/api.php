@@ -126,6 +126,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('superadmin-agencies', [UserController::class, 'superAdminAgencies'])->name('superadmin-agencies');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
 
+        Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
     });
 
     // authorization

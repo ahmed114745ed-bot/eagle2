@@ -51,6 +51,5 @@ class HomeCarouselController extends Controller
 
         return Common::apiResponse(1, '', HomeCarouselResource::collection($items));
     
-    }
+   }
 }
-
