@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Common;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Modules\LuckyBox\Http\Controllers\BoxController;
 
@@ -40,11 +41,12 @@ Route::get('/test-room-zego', function (Request $request) {
             'message' => 'room_id is required',
         ], 422);
     }
+    $room =Room::find($roomId);
 
     $payload = [
         'messageContent' => [
             'message' => 'hideluckybox',
-            'ownerBoxId' => $roomId->uid,
+            'ownerBoxId' => $room->uid,
             'ownerBoxName' => 'test',
             'boxCoins' => 'test',
             'boxId' => $roomId,
@@ -58,8 +60,8 @@ Route::get('/test-room-zego', function (Request $request) {
     $payload2 = [
         'messageContent' => [
             'message' => 'winnerLuckyBox',
-            'boxUId' => $roomId->uid,
-            'ownerId' => $roomId->uid,
+            'boxUId' => $room->uid,
+            'ownerId' => $room->uid,
             'ownerName' =>  '',
             'ownerImage' =>  '',
             'ownerUuId' => 1,
