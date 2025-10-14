@@ -1478,6 +1478,15 @@ class Common
                 'promises' => $promises,
             ]);
 
+          
+         
+    
+            Log::info('🛰️ Sending Zego request', [
+                'sendToZego3' => '',
+                'params' => $params,
+            ]);
+          
+    
             return $promises;
         } catch (\Exception $e) {
         }
