@@ -3,13 +3,10 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then((registration) => {
-            console.log('✅ Service Worker registered:', registration);
-        })
-        .catch((err) => {
-            console.error('❌ Service Worker registration failed:', err);
-        });
+        .then((reg) => console.log("✅ SW registered", reg))
+        .catch((err) => console.error("❌ SW registration failed", err));
 }
+
 const firebaseConfig = {
     apiKey: "AIzaSyCiUC9036VhsL7SzfB2yDgC1YYq9xiWkqQ",
     authDomain: "eagle-24712.firebaseapp.com",
