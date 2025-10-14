@@ -115,7 +115,7 @@ Route::group(
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
-        Route::resource('professional-bd', ProfessionalBdController::class, 'roomsActivity');
+        Route::resource('professional-bd', ProfessionalBdController::class);
 
         // ajax
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
