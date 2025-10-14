@@ -8,7 +8,16 @@ firebase.initializeApp({
     storageBucket: "eagle-24712.appspot.com",
     messagingSenderId: "817000206466",
     appId: "1:817000206466:web:eagle24712appcode"
-  });
-  
-  const messaging = firebase.messaging();
+});
 
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function(payload) {
+    console.log('[SW] Received background message ', payload);
+    const notificationTitle = payload.notification?.title || 'Background Message';
+    const notificationOptions = {
+        body: payload.notification?.body,
+        icon: '/images/app-icon.png'
+    };
+    self.registration.showNotification(notificationTitle, notificationOptions);
+});
