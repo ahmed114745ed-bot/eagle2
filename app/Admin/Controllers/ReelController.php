@@ -2,19 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\User;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Modules\Reals\Entities\Real;
-use Encore\Admin\Grid\Displayers\Table;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Form\Field\Table as FieldTable;
-use Encore\Admin\Widgets\Table as WidgetsTable;
 
 class ReelController extends MainController
 {
@@ -64,6 +58,7 @@ class ReelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Real());
+        $countryID = session('country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -78,7 +73,13 @@ class ReelController extends MainController
                 }, __('User'))->placeholder(__('Search by name or UUID'));
             });
         });
-        $grid->model()->orderByDesc('created_at');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                });
+            });
+        })->orderByDesc('created_at');
 
         // $grid->column('description', __('Description'))->display(function ($description) {
         //     $limitedDescription = mb_substr($description, 0, 50);
