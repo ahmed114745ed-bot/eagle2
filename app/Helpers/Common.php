@@ -1696,6 +1696,7 @@ class Common
             $ban = $room->bans()
                 ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
                 ->first();
+            Log::info($ban);
             return $ban ? true : false;
         }
 
