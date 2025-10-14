@@ -65,7 +65,15 @@ class RequestProblemController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AdminCheck());
-        $grid->model()->where("admin_check", '!=', 1);
+        $countryID = session('country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('request.host', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('request.agency', fn($q) => $q->where('country_id', $countryID));
+            }))
+            ->where("admin_check", '!=', 1);
         $grid->column('id', __('Id'));
         $grid->column('request_id', __('requests'))->modal('request info', function ($model) {
             $show = new Show($model);
