@@ -195,11 +195,7 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
 
-            self::MILESTONE => [
-                'sub_type' => 'milestones',
-                'item_name' => 'milestone',
-                'queue_job' => null,
-            ],
+       
 
             self::ROOM_CUP => [
                 'sub_type' => 'room_cup',
