@@ -1471,13 +1471,13 @@ class Common
                 'url'    => $url,
                 'params' => $params,
             ]);
-         
-    
-    
+
+
+
             Log::info('📬 Zego response received', [
                 'promises' => $promises,
             ]);
-    
+
             return $promises;
         } catch (\Exception $e) {
         }
@@ -1679,9 +1679,9 @@ class Common
     }
 
 
-    public static function ifRoomHasband($owner_id)
+    public static function ifRoomHasband($owner_id, $roomType)
     {
-        $room = Room::where('uid', $owner_id)->first();
+        $room = Room::where('uid', $owner_id)->where('type', $roomType)->first();
 
         if ($room) {
             $ban = $room->bans()
@@ -1691,6 +1691,54 @@ class Common
         }
 
         return false;
+    }
+
+
+    public static function banDuration($owner_id, $roomType)
+    {
+        $room = Room::where('uid', $owner_id)->where('type', $roomType)->first();
+        $deuration = 0;
+        $remaining = 0;
+
+        if ($room) {
+            $ban = $room->bans()
+                ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
+                ->first();
+
+            $deuration = $ban->duration;
+            $remaining = self::remaining($ban);
+        }
+
+        return [$deuration, $remaining];
+    }
+
+    public static function remaining($ban)
+    {
+        $timezone = getTimezone();
+
+        // Get raw UTC datetime
+        $createdAt = \Carbon\Carbon::parse($ban->getAttributes()['created_at'], 'UTC');
+
+        // Add ban duration and convert to user's timezone
+        $banExpiration = $createdAt->addHours($ban->duration)->setTimezone($timezone);
+
+        $now = now($timezone);
+
+        // Get total remaining minutes
+        $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+        if ($diffInMinutes <= 0) {
+            return 'منتهي'; // Expired
+        }
+
+        $hours = floor($diffInMinutes / 60);
+        $minutes = $diffInMinutes % 60;
+
+        if ($hours >= 1) {
+            return "{$hours}h:{$minutes}m";
+        } else {
+            return "{$minutes}" . ' ' . __('minute');
+        }
     }
 
 
