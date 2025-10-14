@@ -73,8 +73,8 @@ Route::get('/test-room-zego', function (Request $request) {
     try {
 
 
-        Common::sendToZego3('SendCustomCommand', $roomId, 1, $json);
-        Common::sendToZego3('SendCustomCommand', $roomId, 1, $json2);
+        Common::sendToZego('SendCustomCommand', $roomId, 1, $json);
+        Common::sendToZego('SendCustomCommand', $roomId, 1, $json2);
 
 
 
