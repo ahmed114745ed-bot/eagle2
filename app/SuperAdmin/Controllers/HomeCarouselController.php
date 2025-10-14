@@ -460,7 +460,7 @@ class HomeCarouselController extends MainController
                 type: AdminNotificationType::NEW_ORDER,
                 title: 'banner_request_title',
                 message: __(
-                    'banner_request_message',
+                    'banner_request_message', 
                     [
                         'name' => auth()->user()->name,
                         'id' => auth()->user()->id,

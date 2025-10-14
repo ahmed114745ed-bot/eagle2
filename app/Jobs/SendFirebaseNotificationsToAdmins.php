@@ -44,7 +44,6 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
         $client->fetchAccessTokenWithAssertion();
         $accessToken = $client->getAccessToken()['access_token'];
 
-        // جلب جميع الأدمنز الذين لديهم توكن
         $admins = Admin::whereNotNull('fcm_token')->get();
 
         foreach ($admins as $admin) {
