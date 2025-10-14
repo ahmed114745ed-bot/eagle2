@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Events\AdminNotificationCreated;
+use App\Jobs\SendFirebaseNotificationsToAdmins;
 use App\Models\AdminNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Auth;
@@ -31,12 +32,18 @@ class AdminNotificationHelper
             'admin_id' => $adminId,
         ]);
         $url='';
-        $admins = Admin::where('id',1)->get();
-        $tokens = $admins->pluck('fcm_token')->filter()->all(); 
-        broadcast(new AdminNotificationCreated($notification))->toOthers();
-        foreach ($tokens as $token) {
-            self::sendNotification($token ,$title, $message, $url);
+        $previewUrl = $data['preview_url'] ?? null;
+        if ($previewUrl) {
+            $enum = \App\Enums\AdminNotificationLink::tryFrom($previewUrl?->value);
+            if ($enum) {
+                $url = $enum->url($data);
+            }
         }
+
+        broadcast(new AdminNotificationCreated($notification))->toOthers();
+
+        SendFirebaseNotificationsToAdmins::dispatch($title, $message, $url)->onQueue('notification');
+
 
         return $notification;
 
@@ -89,7 +96,6 @@ class AdminNotificationHelper
             "Content-Type" => "application/json",
         ])->post("https://fcm.googleapis.com/v1/projects/$projectId/messages:send", $payload);
       
-    dd($response->json());
         return $response->json();
     }
 
