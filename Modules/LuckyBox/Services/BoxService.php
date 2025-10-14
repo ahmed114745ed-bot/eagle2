@@ -46,7 +46,7 @@ class BoxService
         $user->decrement('di', $box->coins);
         try {
             DB::commit();
-            $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
+            $c = BoxUse::query()->where('room_id', $room->id)->where('not_used_num', '>', 0)->count();
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
                 Carbon::createFromTimestamp($boxU->end_at)
             );
@@ -139,17 +139,6 @@ class BoxService
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
-
-        $params           = [
-            'Action'           => 'winnerLuckyBox',
-            'RoomId'           => $room->id,
-            'FromUserId'       => $user->id,
-          
-        ];
-
-        Log::info('🛰️ Sending Zego request', [
-            'params' => $params,
-        ]);
         dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
 
         $key  = 'BoxUse_' . $boxUser->id;

@@ -116,6 +116,9 @@ Trait ZegoTrait
 
         ];
         try {
+            Log::info('🛰️ Sending Zego request', [
+                'params' => $params,
+            ]);
             Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
