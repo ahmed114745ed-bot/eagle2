@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
+<script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
 
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class="logo">
@@ -271,3 +274,6 @@
     }
 </style>
 
+<script>
+
+</script>

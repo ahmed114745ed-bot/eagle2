@@ -716,14 +716,21 @@ Route::group(
         });
 
         Route::prefix('notifications')->group(function () {
-            Route::get('count', [AdminNotificationController::class, 'count']);
-            Route::get('list', [AdminNotificationController::class, 'list']);
-            Route::post('mark-as-read/{id}', [AdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [AdminNotificationController::class, 'markAllRead']); 
+            Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
+            Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']); 
             Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
 
 
         });
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
+    
 
     }
 );

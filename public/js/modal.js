@@ -238,9 +238,16 @@ document.addEventListener("click", function enableSound() {
         console.warn("تعذر تشغيل الصوت:", err);
       });
     }
-    // إزالة الحدث حتى لا يتكرر
     document.removeEventListener("click", enableSound);
   });
 
 
 
+
+
+
+
+
+
+
+ 

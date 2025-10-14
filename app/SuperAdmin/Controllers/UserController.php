@@ -72,19 +72,21 @@ class UserController extends MainController
         return $content;
     }
 
-    public function edit($id, Content $content)
-    {
-        return $content
-            ->title(__($this->title))
-            ->body($this->form()->edit($id));
-    }
+    // public function edit($id, Content $content)
+    // {
+    //     return $content
+    //     ->title(__($this->title));
 
-    public function create(Content $content)
-    {
-        return $content
-            ->title(__($this->title))
-            ->body($this->form());
-    }
+    //         // ->body($this->form()->edit($id));
+    // }
+
+    // public function create(Content $content)
+    // {
+    //     return $content
+    //         ->title(__($this->title));
+           
+    //         // ->body($this->form());
+    // }
 
     public function destroy($id)
     {
