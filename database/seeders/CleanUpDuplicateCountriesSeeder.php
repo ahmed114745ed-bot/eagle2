@@ -14,20 +14,16 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
 
         $handledIds = [];
 
-        // نجيب الدول كلها بالترتيب من الأقدم للأحدث
         $countries = Country::orderBy('id')->get();
 
         foreach ($countries as $base) {
-            // لو الدولة دي اتعالجت قبل كده، نتخطاها
             if (in_array($base->id, $handledIds)) {
                 continue;
             }
 
-            // نجيب أي دولة تانية شبهها في الاسم الإنجليزي أو العربي
             $similarOnes = Country::where('id', '!=', $base->id)
                 ->where(function ($query) use ($base) {
-                    $query->where('e_name', 'like', '%' . $base->e_name . '%')
-                        ->orWhere('name', 'like', '%' . $base->name . '%');
+                    $query->where('e_name', 'like', '%' . $base->e_name . '%');
                 })
                 ->orderBy('id')
                 ->get();
@@ -36,37 +32,30 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                 continue;
             }
 
-            // نجهز المجموعة (الأقدم ثم الأحدث)
             $group = collect([$base])->merge($similarOnes)->sortBy('id');
-            $keep = $group->first();       // الأقدم نحتفظ به
-            $remove = $group->slice(1);    // الباقي نحذفه
+            $keep = $group->first();
+            $remove = $group->slice(1);
 
             foreach ($remove as $country) {
-                // محظور نحذف السجل الأساسي (احتياطي)
                 if ($country->id == $keep->id) {
                     $this->command->error("⚠️ Tried to remove kept record ID {$keep->id}!");
                     continue;
                 }
 
-                // ممكن هنا تحدث السجل القديم ببيانات الجديد لو فيه نواقص
                 $keep->iso        = $keep->iso ?: $country->iso;
                 $keep->iso3       = $keep->iso3 ?: $country->iso3;
                 $keep->name       = $keep->name ?: $country->name;
-                $keep->e_name     = strlen($keep->e_name) < strlen($country->e_name)
-                    ? $country->e_name : $keep->e_name;
+                $keep->e_name     = strlen($keep->e_name) < strlen($country->e_name) ? $country->e_name : $keep->e_name;
                 $keep->status     = $keep->status ?: $country->status;
                 $keep->phone_code = $keep->phone_code ?: $country->phone_code;
                 $keep->save();
 
-                // نحذف الدولة المكررة (الأحدث)
                 $country->delete();
                 $this->command->warn("🗑️ Removed duplicate: {$country->e_name} (ID {$country->id})");
 
-                // سجلنا إنها اتعالجت
                 $handledIds[] = $country->id;
             }
 
-            // سجلنا إن الأقدم اتعامل معاه بالفعل
             $handledIds[] = $keep->id;
             $this->command->info("✅ Kept oldest: {$keep->e_name} (ID {$keep->id})");
         }
@@ -338,16 +327,13 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             $prettyArName = trim($data['name_ar']);
             $phone = '+' . trim($data['phonecode']);
 
-            // البحث بمرونة عن تطابقات محتملة
             $country = Country::where('iso', $iso)
                 ->orWhere('iso3', $iso3)
                 ->orWhere('e_name', 'LIKE', "%{$prettyName}%")
-                ->orWhere('name', 'LIKE', "%{$prettyName}%")
-                ->orWhere('phone_code', $phone)
+//                ->orWhere('phone_code', $phone)
                 ->first();
 
             if ($country) {
-                // تحديث السجل القديم مع الحفاظ على البيانات القديمة إن وُجدت
                 $country->update([
                     'e_name'     => $prettyName,
                     'name'       => $prettyArName,
@@ -359,10 +345,9 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
 
                 $this->command->info("🔄 Updated existing country: {$prettyName} (ID {$country->id})");
             } else {
-                // لو الدولة مش موجودة نهائيًا نضيفها كجديدة
                 $new = Country::create([
                     'e_name'     => $prettyName,
-                    'name'       => $prettyName,
+                    'name'       => $prettyArName,
                     'iso'        => $iso,
                     'iso3'       => $iso3,
                     'phone_code' => $phone,
