@@ -170,7 +170,7 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
-        $countryID = session('country_id');
+    
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
                 ->where('type', '!=', 'superadmin')
@@ -179,12 +179,6 @@ class EncorUsersController extends AdminController
             ->where('is_preview', 0)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
-            })->when($countryID, function ($query) use ($countryID) {
-                $query->where(function ($q) use ($countryID) {
-                    $q->whereHas('user', function ($subQuery) use ($countryID) {
-                        $subQuery->where('country_id', $countryID);
-                    });
-                });
             });
 
         $grid->column('id', 'ID')->sortable();
