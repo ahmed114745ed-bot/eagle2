@@ -80,26 +80,8 @@ Trait ZegoTrait
 
         ];
         try {
-            Log::info('🛰️ Sending Zego request', [
-                'url'    => $url,
-                'params' => $params,
-            ]);
-         
-    
-            $response = Http::acceptJson()
-                ->timeout(20)
-                ->get($url, $params);
-    
-            $json = $response->json();
-    
-            Log::info('📬 Zego response received', [
-                'status'   => $response->status(),
-                'response' => $json,
-            ]);
-    
-            return $json;
-          
-           // return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+        
+           return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
     
         }catch (\Exception $exception){
 
