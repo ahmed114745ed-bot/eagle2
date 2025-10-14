@@ -449,20 +449,13 @@ class AdminPermissionRefact extends Seeder
                 ],
             ],
 
-            [
-                'name' => 'reward',
-                'sort' => 37,
-                'permissions' => [
-                    ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
-
-                ],
-            ],
+           
             [
                 'name' => 'Milestone',
-                'sort' => 38,
+                'sort' => 37,
                 'permissions' => [
                     ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
-
+                    ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
         ];
