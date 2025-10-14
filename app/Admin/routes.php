@@ -1,9 +1,9 @@
 <?php
 
-use App\Admin\Controllers\GiftLogController;
-use App\Admin\Controllers\UserHistoryRewardController;
+use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminStatisticController;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -383,6 +383,7 @@ Route::group(
             Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
             Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
             Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+            Route::get('profile', [SuperAdminController::class, 'showPreview']);
         });
 
         Route::get('/soon', 'AllStatisticController@index2');
@@ -556,6 +557,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
+            Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
             Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
@@ -682,8 +684,15 @@ Route::group(
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
             ->name('coin-game-users.ajax');
 
-
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
+
+        Route::post('/set-preview-superadmin', function () {
+            session(['preview_superadmin' => true]);
+        });
+
+        Route::post('/unset-preview-superadmin', function () {
+            session()->forget('preview_superadmin');
+        });
 
         Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
@@ -716,6 +725,24 @@ Route::group(
             Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
             Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
+            Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']); 
+            Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
+
+
+        });
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
+    
+
     }
 );
 

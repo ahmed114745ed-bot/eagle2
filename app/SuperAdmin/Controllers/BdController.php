@@ -95,8 +95,10 @@ class BdController extends AdminController
      */
     protected function grid()
     {
+        $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $grid->model()->where('parent_id', auth()->id())
+        $grid->model()->where('parent_id', $authSuperAdmin->id)
+            ->where('country_id', $authSuperAdmin->country_id)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -144,7 +146,7 @@ class BdController extends AdminController
         ->switch(Common::getSwitchStates())
         ->display(function ($enable) {
                 return $enable;
-            
+
         });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
@@ -277,7 +279,7 @@ class BdController extends AdminController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users-bd', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')->rules('required');
+            })->ajax('/api/search/users-bd', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -285,7 +287,7 @@ class BdController extends AdminController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required');
+            })->ajax('/api/search/users-bd', 'id', 'name');
 
 //            $form->switch('default', __('set_as_default'))
 //                ->help(__('make_bd_default'));
@@ -303,7 +305,7 @@ class BdController extends AdminController
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
                 if ($originalAppId !=  $newAppId && $newAppId != null) {
-                    
+
                     $OldUserAppId = \App\Models\User::find($originalAppId);
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;

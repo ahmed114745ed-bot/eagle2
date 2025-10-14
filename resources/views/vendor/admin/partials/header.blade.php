@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
+<script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
 
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class="logo">
@@ -12,16 +15,37 @@
             <span class="sr-only">Toggle navigation</span>
         </a>
 
+        @php
+            $country   = \App\Models\Country::find(Admin::user()->country_id);
+            $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+            $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
+            $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
+        @endphp
+
+        @if(!session('preview_superadmin'))
+            @if (request()->is('admin*'))
+                <a class="nav-item select-country">
+                    <select id="country-select" class="form-control" style="width:190px;">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option
+                                value="{{ $currentCountry->id }}"
+                                data-flag="{{ getImagePath($currentCountry->flag) }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{ $currentCountry->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </a>
+            @endif
+            <script>window.enableCountryHeader = true;</script>
+        @endif
+
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
-            {!! Admin::getNavbar()->render('left') !!}
+        {!! Admin::getNavbar()->render('left') !!}
         </ul>
 
         <div class="navbar-custom-menu">
-
-            @php
-                $country   = \App\Models\Country::find(Admin::user()->country_id);
-                $countries = \App\Models\Country::select(['id', 'name'])->get();
-            @endphp
 
             @if (Admin::user()->type == 'superadmin' && $country && $country->flag)
                 <img src="{{ getImagePath($country->flag) }}"
@@ -32,6 +56,7 @@
 
             <ul class="nav navbar-nav">
 
+     
                 {!! Admin::getNavbar()->render() !!}
 
                 <li class="dropdown user user-menu">
@@ -66,34 +91,24 @@
                     </ul>
                 </li>
 
-                @php
-                    $showCountriesSelect = request()->is('admin/superadmin/statistics')
-                        || request()->is('admin/users')
-                        || request()->is('admin/rooms')
-                        || request()->is('admin/live-rooms')
-                        || request()->is('admin/agencies')
-                        || request()->is('admin/ag/users');
+                @if(!session('preview_superadmin') && session('country_id'))
+                    @if (request()->is('admin*'))
+                        <li style="padding: 10px;">
+                            <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
+                            </button>
+                        </li>
+                    @endif
+                @endif
 
-                    $selectedCountryId = request('country_id') ?? Admin::user()->country_id;
-                    $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
-                @endphp
-
-                @if ($showCountriesSelect)
-                    <li class="nav-item" style="padding:12px; display:flex; align-items:center; gap:8px;">
-                        <select id="country-select" class="form-control" style="width:190px;">
-                            <option value="">{{ __('Select Country...') }}</option>
-                            @foreach($countries as $currentCountry)
-                                <option value="{{ $currentCountry->id }}"
-                                    {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                    {{ $currentCountry->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </li>
-
-                    <script> window.enableCountryHeader = true; </script>
-                @else
-                    <script> window.enableCountryHeader = false; </script>
+                @if(session('preview_superadmin'))
+                    @if (request()->is('admin*'))
+                        <li style="padding: 10px;">
+                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                            <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
+                            </button>
+                        </li>
+                    @endif
                 @endif
 
                 <!-- Control Sidebar Toggle Button -->
@@ -104,32 +119,56 @@
 </header>
 
 <script>
-    $(function () {
+    $(document).ready(function () {
         const $countrySelect = $('#country-select');
-        const $countryName   = $('#country-name');
 
         if ($countrySelect.length) {
             $countrySelect.select2({
                 placeholder: "{{ __('Select Country') }}",
-                allowClear : true
+                allowClear: true,
+                templateResult: formatCountry,
+                templateSelection: formatCountry,
+                escapeMarkup: function (markup) { return markup; }
             });
 
             $countrySelect.on('change', function () {
-                const countryId   = $(this).val();
-                const selectedTxt = $(this).find('option:selected').text();
-
-                if ($countryName.length) {
-                    $countryName.text(selectedTxt || 'No country selected');
-                }
-
+                const countryId = $(this).val();
                 const url = new URL(window.location.href);
-                if (countryId) {
+
+                if (countryId && countryId !== 'null') {
                     url.searchParams.set('country_id', countryId);
                 } else {
-                    url.searchParams.delete('country_id');
+                    url.searchParams.set('country_id', 'null');
                 }
+
                 window.location.href = url.toString();
             });
+
+            $(document).on('click', '.select2-selection__clear', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('country_id', 'null');
+                window.location.href = url.toString();
+            });
+        }
+
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+            const flag = $(country.element).data('flag');
+            const name = country.text;
+            if (flag) {
+                return `
+                <span>
+                    <img src="${flag}" style="width:20px; height:14px; margin-right:5px; vertical-align:middle;">
+                    ${name}
+                </span>
+            `;
+            }
+            return name;
         }
 
         const originalFetch = window.fetch;
@@ -137,14 +176,37 @@
             options.headers = options.headers || {};
 
             if (window.enableCountryHeader) {
-                const countryId = $countrySelect.val();
-                if (countryId) options.headers['X-Country-ID'] = countryId;
+                const countryId = $('#country-select').val();
+                options.headers['X-Country-ID'] = countryId ? countryId : 'null';
             }
 
-            if (!options.headers['Accept']) options.headers['Accept'] = 'application/json';
+            if (!options.headers['Accept'])
+                options.headers['Accept'] = 'application/json';
 
             return originalFetch(url, options);
         };
+
+        const csrf = '{{ csrf_token() }}';
+        const previewBtn = document.getElementById('preview-superadmin-btn');
+        const exitBtn = document.getElementById('exit-preview-btn');
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (exitBtn) {
+            exitBtn.addEventListener('click', function () {
+                fetch('/admin/unset-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
     });
 </script>
 
@@ -155,4 +217,12 @@
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear{
         left: 5px !important;
     }
+    .select2-container .select2-selection--single .select2-selection__rendered img {
+        margin-right: 5px;
+        vertical-align: middle;
+    }
 </style>
+
+<script>
+
+</script>

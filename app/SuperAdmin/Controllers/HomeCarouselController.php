@@ -2,7 +2,10 @@
 
 namespace App\SuperAdmin\Controllers;
 
+use App\Enums\AdminNotificationLink;
+use App\Enums\AdminNotificationType;
 use App\helper\SuperAdminHelper;
+use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
 use App\Models\SuperadminBannerRequest;
 use App\Selectables\Countries;
@@ -94,6 +97,7 @@ class HomeCarouselController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Rooms'),
             ];
     
             $buttons = '';
@@ -444,7 +448,7 @@ class HomeCarouselController extends MainController
          \DB::transaction(function () use ($user, $banner, $field, $totalDeduct,$hours) {
              $user->decrement('di', $totalDeduct);
      
-             SuperadminBannerRequest::create([
+            $req = SuperadminBannerRequest::create([
                  'user_id'          => $user->id,
                  'home_carousel_id' => $banner->id,
                  'coins_deducted'   => $totalDeduct,
@@ -452,6 +456,28 @@ class HomeCarouselController extends MainController
                  'notes'            => $field,
                  'hours'            => $hours,
              ]);
+             AdminNotificationHelper::notify(
+                type: AdminNotificationType::NEW_ORDER,
+                title: 'banner_request_title',
+                message: __(
+                    'banner_request_message',
+                    [
+                        'name' => auth()->user()->name,
+                        'id' => auth()->user()->id,
+                        'coins' => $totalDeduct,
+                    ]
+                ),
+                model: $banner,
+                data: [
+                    'requested_by' => auth()->user()->name,
+                    'requested_by_id' =>auth()->user()->id,
+                    'item_id' => $req->id,
+                    'coins_deducted' => $totalDeduct,
+                    'hours' => $hours,
+                    'notes' => $field,
+                    'preview_url' => AdminNotificationLink::BANNER_SHOW,
+                ]
+            );
          });
      }
      

@@ -893,7 +893,7 @@ html.ltr .dropdown-menu {
                 position: absolute;
             } */
             .rtl .sidebar-toggle {
-                            direction: rtl !important;
+                direction: rtl !important;
                 float: right !important;
             }
 
@@ -1088,7 +1088,7 @@ html.ltr .dropdown-menu {
     }
 
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-left,
-    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,
+    /*.rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,*/
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,
@@ -1289,5 +1289,25 @@ html.ltr .dropdown-menu {
         font-size: 50px;
         top: 25px;
         right: 2px;
+    }
+
+    .preview-superadmin-btn,
+    .exit-preview-btn{
+        border: none;
+        border-radius: 4px;
+        padding: 4px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .select-country .select2-container{
+        margin-top: 12px;
+    }
+
+    #go-superadmin i {
+        font-size: 15px;
     }
 </style>

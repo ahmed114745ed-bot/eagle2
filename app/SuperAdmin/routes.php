@@ -1,6 +1,5 @@
 <?php
 
-use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
@@ -17,8 +16,10 @@ use App\SuperAdmin\Controllers\BdSalariesController;
 use App\SuperAdmin\Controllers\HomeCarouselController;
 use App\SuperAdmin\Controllers\MultiLanguageController;
 use App\SuperAdmin\Controllers\RequestAgencyController;
+use App\SuperAdmin\Controllers\ProfessionalBdController;
 use App\SuperAdmin\Controllers\SuperAdminRewardController;
 use App\SuperAdmin\Controllers\AppearChargerAgencyController;
+use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -114,6 +115,7 @@ Route::group(
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
+        Route::resource('professional-bd', ProfessionalBdController::class);
 
         // ajax
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
@@ -123,6 +125,6 @@ Route::group(
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
         Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
-        ->name('banner.resend');
+            ->name('banner.resend');
     }
 );

@@ -2,19 +2,20 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Admin\Services\UserSuperAdminService;
-use App\Models\SuperadminBannerRequest;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Facades\Admin;
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\helper\SuperAdminHelper;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Grid\Tools;
+use Encore\Admin\Facades\Admin;
+use App\helper\SuperAdminHelper;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Grid\Tools; 
+use App\Models\SuperadminBannerRequest;
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserSuperAdminService;
+use Encore\Admin\Controllers\AdminController;
 
 
 
@@ -49,24 +50,51 @@ class SuperadminBannerHistoryController extends MainController
         $grid = new Grid(new SuperadminBannerRequest());
         $grid->model()->with(['homeCarousel:home_carousel_id.img'])->latest();
         $grid->model()->where('user_id', Auth::user()->id);
-    
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->expand();
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at',  $start);
+                    }
+                }, __('created_at'), 'from_date')->date();
+            });
+        });
         $grid->column('id', __('ID'));
-    
- 
+
+
         $grid->column('homeCarousel.img', __('img'))->image('', 235, 77);
 
-    
-        $grid->column('coins_deducted', __('Coins Deducted'));
-    
+
+        $grid->column('coins_deducted', __('Coins Deducted'))->display(function ($coins) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coins}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+
         $grid->column('status', __('Status'))->display(function ($status) {
             switch ($status) {
-                case 'pending': return '<span class="text-warning">'. __('Pending') .'</span>';
-                case 'approved': return '<span class="text-success">'. __('Approved') .'</span>';
-                case 'rejected': return '<span class="text-danger">'. __('Rejected') .'</span>';
-                default: return $status;
+                case 'approved':
+                    return '<span class="text-success">✅ ' . __('Approved') . '</span>';
+                case 'pending':
+                    return '<span class="text-warning">⏳ ' . __('Pending') . '</span>';
+                case 'rejected':
+                    return '<span class="text-danger">❌ ' . __('Rejected') . '</span>';
+                case 'canceled':
+                    return '<span class="text-secondary">🚫 ' . __('Canceled') . '</span>';
+                default:
+                    return e($status);
             }
         });
-    
+
         $grid->column('notes', __('Type'))->display(function ($value) {
             if ($value === 'display_discover') {
                 return __('Display Discover');
@@ -76,9 +104,10 @@ class SuperadminBannerHistoryController extends MainController
                 return __('Display Home Middle');
             } elseif ($value === 'display_live') {
                 return __('Display Live');
-            } 
-            else {
-                return $value; 
+            } elseif ($value === 'display_room') {
+                return __('Display Room');
+            } else {
+                return $value;
             }
         });
         $grid->column('hours', __('hours'));
@@ -86,20 +115,21 @@ class SuperadminBannerHistoryController extends MainController
         $grid->column('created_at', __('Created At'))->display(function ($createdAt) {
             return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
         });
-    
-  
+
+
         $grid->column('actions', __('Actions'))->display(function () {
             if ($this->status === 'rejected') {
                 return  '<button class="btn btn-sm btn-primary resend-btn" 
                             data-id="' . $this->home_carousel_id . '" 
                             data-notes="' . e($this->notes) . '" 
                             data-hours="' . e($this->hours) . '">
-                        <i class="fa fa-redo"></i> ' . __('Resend') . '
+                         <i class="fa fa-refresh"></i>  
                     </button>';
-            }
-            return __( $this->status);
+            } 
+
+           
         });
-    
+
         // === الأسعار لكل نوع عرض ===
         $display_prices = [
             'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
@@ -107,7 +137,7 @@ class SuperadminBannerHistoryController extends MainController
             'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
             'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
         ];
-    
+
         // === الترجمات ===
         $translations = [
             'confirm_resend' => __('confirm_resend'),
@@ -123,17 +153,19 @@ class SuperadminBannerHistoryController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Room'),
+
             ],
             'total' => __('Total'),
             'hours' => __('Hours'),
         ];
-    
+
         $translationsJson = json_encode($translations);
         $displayPricesJson = json_encode($display_prices);
-    
+
         $grid->disableActions();
         $grid->disableCreateButton();
-    
+
         Admin::script(<<<JS
         console.log('✅ Resend banner script loaded');
         const translations = $translationsJson;
@@ -206,20 +238,19 @@ class SuperadminBannerHistoryController extends MainController
             console.log('🔁 Rebound resend buttons after PJAX');
         });
         JS);
-    
-        
-        
-    
-    $grid->tools(function (Tools $tools) {
-        $tools->append('<a href="' . superadmin_url('home-carousel') . '" class="btn btn-sm btn-default">
+
+
+
+
+        $grid->tools(function (Tools $tools) {
+            $tools->append('<a href="' . superadmin_url('home-carousel') . '" class="btn btn-sm btn-default">
             <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
-      
-    });
-    
+        });
+
         return $grid;
     }
-    
-    
+
+
 
     /**
      * Make a show builder.
@@ -260,7 +291,4 @@ class SuperadminBannerHistoryController extends MainController
 
         return $form;
     }
-
-
-
 }

@@ -69,7 +69,11 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $grid->model()->where('type', 2)->orderByDesc('id');
+        $countryID = session('country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->where('type', 2)->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {

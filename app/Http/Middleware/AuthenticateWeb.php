@@ -22,13 +22,12 @@ class AuthenticateWeb
         $uri = $request->path();
 
         $user = Admin::user();
-        $userType = $user?->type ?? 'admin'; // normalize null => admin
+        $userType = $user?->type ?? 'admin';
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
         $superadminLogin = 'superadmin/login';
 
-        // If already logged in and tries to access login page
         if ($user) {
             if (Str::is($uri, $adminLogin) && $userType === 'admin') {
                 return redirect('/admin');
@@ -40,7 +39,6 @@ class AuthenticateWeb
                 return redirect('/superadmin');
             }
 
-            // 🚨 If role mismatch
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
                 (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
@@ -60,7 +58,6 @@ class AuthenticateWeb
             }
         }
 
-        // Guest handling
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
         $test = $request->getRequestUri();
 

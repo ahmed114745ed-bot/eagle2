@@ -2,9 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\RoomDeleteAction;
 use App\Admin\Services\UserService;
-use App\Models\Country;
 use App\Models\KickRecord;
 use App\Models\Pk;
 use App\Models\Room;
@@ -26,8 +24,6 @@ use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\RoomPinAction;
-use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -327,7 +323,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = request('country_id');
+        $countryID = session('country_id');
 
         $grid->model()
             ->audio()

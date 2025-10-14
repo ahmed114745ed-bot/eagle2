@@ -2,21 +2,25 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DeleteSuperAdminAction;
-use App\Models\Country;
-use App\Models\SuperAdmin;
+use App\Models\Bd;
 use App\Models\User;
+use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Carbon;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Country;
+use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use App\Models\SuperAdminReward;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
+use App\Admin\Actions\DeleteSuperAdminAction;
 
 class SuperAdminController extends MainController
 {
@@ -62,6 +66,12 @@ class SuperAdminController extends MainController
             ->body($this->profile($id)));
     }
 
+    public function showPreview(Content $content)
+    {
+        return $content
+            ->title(trans('Super Admin'))
+            ->body($this->profilePreview());
+    }
     /**
      * Edit interface.
      *
@@ -91,7 +101,8 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $grid->model()->with(['appUser.packs'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs'])
+            ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -304,7 +315,7 @@ class SuperAdminController extends MainController
                 return back()->with(compact('error'))->withInput();
             }
 
-            
+
             $isEditing = $form->isEditing();
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
@@ -329,6 +340,7 @@ class SuperAdminController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
 
@@ -355,6 +367,20 @@ class SuperAdminController extends MainController
                     ]);
                 }
             }
+
+            $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
+
+            DB::table('admin_users')->insert([
+                'parent_id' => $superAdmin->id,
+                'username' => 'bd'.$countryName.'default',
+                'name' => 'bd'.$countryName.'default',
+                'password' => Hash::make('bd'.$countryName.'default'),
+                'default' => 1,
+                'country_id' => $superAdmin->country_id,
+                'type' => 'bd',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         });
 
         return $form;
@@ -419,7 +445,57 @@ class SuperAdminController extends MainController
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default'])->findOrFail($id);
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+        $rewards= null;
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+         $types = ['vip', 'badge', 'ware'];
+          $type = request()->get('type', 'vip');
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+            case 'rewards':
+
+
+                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
+                break;
+        }
+
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type','types', 'rewards'));
+    }
+
+    public function profilePreview()
+    {
+        if (!session('preview_superadmin') || !session('country_id')){
+            abort(404, __('not found'));
+        }
+
+        $tab = request()->query('tab', 'agencies');
+        $countryID = session('country_id');
+
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default','country_id'])
+            ->with('country')->where('country_id', $countryID)->firstOrFail();
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
@@ -430,43 +506,27 @@ class SuperAdminController extends MainController
 
         $agencies = $transactions = $target_history = null;
 
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
-
-                //            case 'transactions':
-                //                $transactions = $superAdmin->transactions()
-                //                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                //                    ->with('receiveragency')
-                //                    ->latest()
-                //                    ->paginate(10, ['*'], 'transactions_page');
-                //                break;
-                //
-                //            case 'target_history':
-                //                $target_history = BdAgencyHostSallary::select(
-                //                    'id',
-                //                    'bd_id',
-                //                    'agency_id',
-                //                    // 'salary',
-                //                    'amount',
-                //                    'month',
-                //                    'year',
-                //                    'bd_user_id',
-                //                    'created_at'
-                //                )
-                //                    ->where('bd_id', $superAdmin->id)
-                //                    ->where('bd_id', $superAdmin->id)
-                //                    ->where('amount', '!=', 0)
-                //                    ->where('year', $year)
-                //                    ->latest()
-                //                    ->paginate(10, ['*'], 'target_history_page');
-                //                break;
         }
 
-        return view('admin.superAdmin.super_admin_profile', compact('superAdmin', 'agencies'));
-    }
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
 
+    }
 
     protected function detail($id)
     {

@@ -188,7 +188,7 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
-
+    
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
                 ->where('type', '!=', 'superadmin')
