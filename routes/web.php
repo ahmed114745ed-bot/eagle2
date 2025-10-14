@@ -4,6 +4,7 @@ use App\Admin\Controllers\BdController;
 use App\Enums\AdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
 use  App\helper\TimeHelper;
+use App\Helpers\AdminNotificationHelper;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -602,15 +603,15 @@ Route::get('/migrate-home-carousel', function () {
 });
 
 
-
 Route::get('notifications/test', function () {
-    $notification = AdminNotification::create([
-        'title' => 'إشعار تجريبي 🎉',
-        'message' => 'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
-        'type' => AdminNotificationType::SYSTEM->value,
-        'data' => json_encode(['created_at' => Carbon::now()->toDateTimeString()]),
-        'is_read' => false,
-    ]);
+    AdminNotificationHelper::notify(
+        AdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        null
+    );
 
-    return 'done';
+    return 'تم إرسال الإشعار ✉️';
 });

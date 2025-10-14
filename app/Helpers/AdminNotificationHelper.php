@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Admin;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
+use Google_Client;
 class AdminNotificationHelper
 {
     public static function notify(
@@ -29,9 +30,13 @@ class AdminNotificationHelper
             'data' => $data ?? [],
             'admin_id' => $adminId,
         ]);
-
+        $url='';
+        $admins = Admin::where('id',1)->get();
+        $tokens = $admins->pluck('fcm_token')->filter()->all(); 
         broadcast(new AdminNotificationCreated($notification))->toOthers();
-        self::sendFirebaseNotification($title, $message, $data);
+        foreach ($tokens as $token) {
+            self::sendNotification($token ,$title, $message, $url);
+        }
 
         return $notification;
 
@@ -52,26 +57,40 @@ class AdminNotificationHelper
             ->count();
     }
 
-    protected static function sendFirebaseNotification(string $title, ?string $body = null, ?array $data = [])
+    public static function sendNotification($token, $title, $body, $url)
     {
-        try {
-            $factory = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
-            $messaging = $factory->createMessaging();
+        // $projectId = env('FIREBASE_PROJECT_ID'); 
+        $projectId = env('FIREBASE_PROJECT_NAME'); 
 
-            $tokens = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
-            if (empty($tokens)) return;
+        $client = new Google_Client();
+        $firebaseConfigPath = public_path('firebase_credentials.json');
+        $client->setAuthConfig($firebaseConfigPath);
 
-            $message = CloudMessage::new()
-                ->withNotification([
-                    'title' => $title,
-                    'body'  => $body ?? '',
-                ])
-                ->withData($data ?? []);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->fetchAccessTokenWithAssertion();
+        $accessToken = $client->getAccessToken()['access_token'];
 
-            $messaging->sendMulticast($message, $tokens);
-        } catch (\Throwable $e) {
-            \Log::error('Firebase send error: ' . $e->getMessage());
-        }
+        $payload = [
+            "message" => [
+                "token" => $token,
+                "notification" => [
+                    "title" => $title,
+                    "body" => $body,
+                ]
+                ,
+                "data" => [ 
+                    "click_action" => $url
+                ]
+            ]
+        ];
+     
+        $response = Http::withHeaders([
+            "Authorization" => "Bearer $accessToken",
+            "Content-Type" => "application/json",
+        ])->post("https://fcm.googleapis.com/v1/projects/$projectId/messages:send", $payload);
+      
+    dd($response->json());
+        return $response->json();
     }
 
   
