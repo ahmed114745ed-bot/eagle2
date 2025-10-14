@@ -26,7 +26,6 @@ class EnterRoomService
         if ($room->type === 'live') {
             if ($user->id == $room->uid) {
                 [$duration, $remaining] = Common::banDuration($room->uid, $room->type);
-                Log::info(['live']);
                 return $this->errorResponse(
                     __('api.banRoom', ['duration' => $duration, 'remaining' => $remaining]),
                     403,

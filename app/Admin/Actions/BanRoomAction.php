@@ -64,9 +64,7 @@ class BanRoomAction extends Action
                 ]
             );
 
-            $room->room_status = 2;
 
-            $room->save();
         }
 
 
