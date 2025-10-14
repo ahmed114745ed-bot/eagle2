@@ -240,6 +240,7 @@ class EnteranceController extends Controller
      */
     public function enter_room(Request $request): JsonResponse
     {
+        $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
         if (!$app_feature && !is_null($app_feature)) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
@@ -257,9 +258,22 @@ class EnteranceController extends Controller
             return $this->errorResponse(__('Room not found.'), 404);
         }
 
-        if ($this->isRoomBanned($room->uid)) {
+        if ($this->isRoomBanned($room->uid, $room->type) && $room->type === 'audio') {
             return $this->errorResponse(
                 __('This room has been closed. Wait until moderators lift the ban.'),
+                403,
+                ['ban' => true]
+            );
+        } elseif ($this->isRoomBanned($room->uid, $room->type) && ($user->id == $room->uid)) {
+            [$duration, $remaining] = Common::banDuration($room->uid, $room->type);
+            return $this->errorResponse(
+                __('api.banRoom', ['duration' => $duration, 'remaining' => $remaining]),
+                403,
+                ['ban' => true]
+            );
+        } elseif ($this->isRoomBanned($room->uid, $room->type) && ($user->id != $room->uid)) {
+            return $this->errorResponse(
+                __('This Live is closed'),
                 403,
                 ['ban' => true]
             );
@@ -282,9 +296,9 @@ class EnteranceController extends Controller
         return Room::find($roomId);
     }
 
-    private function isRoomBanned(int $ownerId): bool
+    private function isRoomBanned(int $ownerId, string $roomType): bool
     {
-        return Common::ifRoomHasband($ownerId);
+        return Common::ifRoomHasband($ownerId, $roomType);
     }
 
     private function setDefaultBackground(): void
@@ -538,9 +552,9 @@ class EnteranceController extends Controller
 
             if ($type) {
                 $room->type = $type;
-                if ($request->type == 'live' ) {
+                if ($request->type == 'live') {
                     $room->is_live = true;
-                }else{
+                } else {
                     $room->is_live = false;
                 }
             }
