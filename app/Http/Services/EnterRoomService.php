@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Helpers\Common;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class EnterRoomService
 {
@@ -25,6 +26,7 @@ class EnterRoomService
         if ($room->type === 'live') {
             if ($user->id == $room->uid) {
                 [$duration, $remaining] = Common::banDuration($room->uid, $room->type);
+                Log::info(['live']);
                 return $this->errorResponse(
                     __('api.banRoom', ['duration' => $duration, 'remaining' => $remaining]),
                     403,
@@ -38,6 +40,7 @@ class EnterRoomService
                 ['ban' => true]
             );
         }
+                Log::info(['out']);
 
         return null;
     }
