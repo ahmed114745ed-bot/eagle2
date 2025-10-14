@@ -72,6 +72,8 @@ class SalaryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryRequest());
+        $countryID = session('country_id');
+
         $grid->model()->orderByDesc('id');
         $grid->filter (function (Grid\Filter $filter){
             $filter->column(1/2, function ($filter) {
