@@ -107,8 +107,16 @@
                         $superadminLinks = [
                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
                             ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
-                            ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
                             ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-briefcase',
+                                'title' => __('BD'),
+                                'children' => [
+                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')],
+                                    ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD')],
+                                ],
+                            ],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-building',

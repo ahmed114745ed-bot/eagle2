@@ -95,8 +95,10 @@ class BdController extends AdminController
      */
     protected function grid()
     {
+        $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $grid->model()->where('parent_id', auth()->id())
+        $grid->model()->where('parent_id', $authSuperAdmin->id)
+            ->where('country_id', $authSuperAdmin->country_id)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')

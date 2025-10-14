@@ -52,6 +52,7 @@
   "Sender UUID or Shipping Agency ID": "Gönderici UUID veya Kargo Ajansı Kimliği",
   "Receiver UUID or Shipping Agency ID": "Alıcı UUID veya Kargo Ajansı Kimliği",
 "professional BD": "profesyonel BD",
+    "Professional BD": "Profesyonel BD",
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
     "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",
@@ -3544,7 +3545,7 @@
     "banner_request_title": "Yeni Afiş Gösterim Talebi",
     "banner_request_message": "Yönetici :name (ID: :id), :coins madeni para değerinde yeni bir afiş gösterimi talep etti."
 
-  
+
 
 
 
