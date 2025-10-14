@@ -85,7 +85,11 @@ class RequestAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $grid->model()->where('status', 0)->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
+        $countryID = session('country_id');
+
+        $grid->model()->where('status', 0)
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         });
         $grid->filter(function (Grid\Filter $filter) {
