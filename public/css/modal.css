@@ -1,16 +1,14 @@
-/* خلفية المودال (غامقة قليلاً وليست شفافة تماماً) */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   display: none;
-  justify-content: flex-end; /* الافتراضي: جهة اليمين */
+  justify-content: flex-end; 
   align-items: flex-start;
   padding: 80px 20px;
   z-index: 1050;
 }
 
-/* في حال اللغة العربية → المودال يظهر يسار */
 html[lang="ar"] .modal-overlay {
   justify-content: flex-start !important;
 
@@ -19,7 +17,6 @@ html[lang="ar"] .modal-overlay {
 .rtl .modal-no {
   position: fixed;
   top: 40px !important;
-  /* right: 0; */
   bottom: 0 ;
   left: 20px !important;
 }
@@ -29,10 +26,8 @@ html[lang="ar"] .modal-overlay {
   top: 40px !important;
   right: 20px !important; 
   bottom: 0;
-  /* left: 0; */
 }
 
-/* المودال نفسه */
 .modal-no {
   background: #fff;
   border-radius: 10px;
@@ -46,7 +41,6 @@ html[lang="ar"] .modal-overlay {
   flex-direction: column;
 }
 
-/* ترويسة المودال */
 .modal-header {
   background: #007bff;
   color: #fff;
@@ -62,7 +56,6 @@ html[lang="ar"] .modal-overlay {
   font-weight: 600;
 }
 
-/* زر الإغلاق */
 .close-btn {
   border: none;
   background: transparent;
@@ -75,7 +68,6 @@ html[lang="ar"] .modal-overlay {
   transform: rotate(90deg);
 }
 
-/* جسم المودال */
 .modal-body2 {
   padding: 12px;
   overflow-y: auto;
@@ -83,7 +75,6 @@ html[lang="ar"] .modal-overlay {
   flex: 1;
 }
 
-/* عنصر الإشعار */
 .notification-item {
   background: #fff;
   border-radius: 8px;
@@ -101,7 +92,6 @@ html[lang="ar"] .modal-overlay {
   transform: translateY(-2px);
 }
 
-/* محتوى الإشعار */
 .notification-item .title {
   font-weight: 600;
   font-size: 14px;
@@ -119,7 +109,6 @@ html[lang="ar"] .modal-overlay {
   text-align: right;
 }
 
-/* حركة الدخول */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -131,12 +120,10 @@ html[lang="ar"] .modal-overlay {
   }
 }
 
-/* عند التفعيل */
 .modal-overlay.active {
   display: flex;
 }
 
-/* تحسين التمرير */
 .modal-body2::-webkit-scrollbar {
   width: 6px;
 }
@@ -150,7 +137,6 @@ html[lang="ar"] .modal-overlay {
 
 .see-more {
   background-color: transparent;
-  /* border: 1px solid #ccc; */
   color: #555;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -161,5 +147,4 @@ html[lang="ar"] .modal-overlay {
 .see-more:hover {
   background-color: #f0f0f0;
   color: #000;
-  /* border-color: #999; */
 }

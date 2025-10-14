@@ -30,9 +30,7 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
         $this->url = $url ?? '';
     }
 
-    /**
-     * Execute the job.
-     */
+   
     public function handle(): void
     {
         $projectId = env('FIREBASE_PROJECT_NAME');
@@ -44,8 +42,7 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
         $client->fetchAccessTokenWithAssertion();
         $accessToken = $client->getAccessToken()['access_token'];
 
-        // جلب جميع الأدمنز الذين لديهم توكن
-        $admins = Admin::whereNotNull('fcm_token')->get();
+        $admins = Admin::whereNotNull('type')->get();
 
         foreach ($admins as $admin) {
             $token = $admin->fcm_token;
@@ -69,7 +66,7 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
             ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
 
             if (!$response->successful()) {
-                logger()->error('🔴 فشل إرسال إشعار Firebase', [
+                logger()->error('🔴Firebase', [
                     'admin_id' => $admin->id,
                     'token' => $token,
                     'response' => $response->json(),
