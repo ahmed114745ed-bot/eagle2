@@ -39,7 +39,7 @@ class NormalBoxRtmJob implements ShouldQueue
         $user->increment('di', $userBox->unused_coins);
         $userBox->is_closed = true;
         $userBox->save();
-        $room = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
+        $room = Room::withoutAppends()->where('id', $userBox->room_id)->select('id')->first();
         $c = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
         $userWinner = $userBox->userBoxGifts()->pluck('user_id')->toArray();
         $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
