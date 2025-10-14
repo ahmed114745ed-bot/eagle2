@@ -32,7 +32,7 @@ class SuperLuckyBoxJob implements ShouldQueue
     public function __construct(?int $boxUseId = null)
     {
 
-        $this->boxUse = BoxUse::with(['user', 'room.owner'])
+        $this->boxUse = BoxUse::with(['user', 'roomV2.owner'])
             ->findOrFail($boxUseId);
 
 //        LogHelper::info('this is box ', $this->boxUse);
@@ -129,7 +129,7 @@ class SuperLuckyBoxJob implements ShouldQueue
 
         $remainingBoxCount = BoxUse::where('room_uid', $box->room_uid)->where('not_used_num', '>', 0)->count();
 
-        $roomId = $box->room?->id ?? 0;
+        $roomId = $box->roomV2?->id ?? 0;
 
 
         $js[] = $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount);
