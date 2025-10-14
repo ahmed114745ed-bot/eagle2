@@ -29,4 +29,9 @@ class AdminNotification extends Model
     {
         return $this->belongsTo(Admin::class, 'admin_id');
     }
+
+    public function scopeUnreadNotifications($query)
+    {
+        return $query->whereNull('read_at');
+    }
 }
