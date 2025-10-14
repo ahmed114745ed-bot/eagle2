@@ -1696,10 +1696,10 @@ class Common
             $ban = $room->bans()
                 ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
                 ->first();
-            Log::info($ban);
+            Log::info(["ban" => $ban,'rootype' => $roomType , 'uid'=> $owner_id]);
             return $ban ? true : false;
         }
-
+            Log::info(["ban" => false,]);
         return false;
     }
 
