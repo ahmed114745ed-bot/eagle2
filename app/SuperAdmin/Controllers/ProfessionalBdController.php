@@ -3,33 +3,26 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Admin\Actions\DeleteBdAction;
-use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Bd;
 use App\Models\BdAgencyHostSallary;
-use App\Models\Country;
-use App\Models\SuperAdmin;
-use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Illuminate\Routing\Controller;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Hash;
 
-class BdController extends AdminController
+
+class ProfessionalBdController extends Controller
 {
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
+
     protected $title = 'BD';
     public $permission_name = 'BD';
 
@@ -98,7 +91,7 @@ class BdController extends AdminController
         $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
         $grid->model()->where('parent_id', $authSuperAdmin->id)
-            ->where('country_id', $authSuperAdmin->country_id)
+            ->where('country_id','!=', $authSuperAdmin->country_id)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -143,11 +136,11 @@ class BdController extends AdminController
 
 
         $grid->column('default', trans('default_status'))
-        ->switch(Common::getSwitchStates())
-        ->display(function ($enable) {
+            ->switch(Common::getSwitchStates())
+            ->display(function ($enable) {
                 return $enable;
 
-        });
+            });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
         //         return $this->default;
