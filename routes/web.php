@@ -559,3 +559,11 @@ Route::get('/week-zone', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'CleanUpDuplicateCountriesSeeder',
+    ]);
+
+    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
+});
