@@ -38,6 +38,12 @@ class AdminNotificationCreated implements ShouldBroadcastNow
         return new PrivateChannel('admin.notifications');
     }
 
+
+    public function broadcastAs()
+    {
+        return 'AdminNotificationCreated';
+    }
+
     /**
      *
      * @return array

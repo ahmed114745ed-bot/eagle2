@@ -36532,4 +36532,18 @@ var messaging = (0,firebase_messaging__WEBPACK_IMPORTED_MODULE_1__.getMessaging)
 })();
 
 /******/ })()
-;
+
+
+window.Echo = new Echo({
+  broadcaster: 'pusher',
+  key: window.PUSHER_APP_KEY,
+  cluster: window.PUSHER_APP_CLUSTER,
+  forceTLS: true,
+  encrypted: true,
+  authEndpoint: '/broadcasting/auth',
+  auth: {
+      headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+  }
+});
