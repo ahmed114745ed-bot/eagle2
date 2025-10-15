@@ -481,6 +481,8 @@
 
 <script>
     window.handleNotificationClick = function(id, url) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         if (!id) return;
 
