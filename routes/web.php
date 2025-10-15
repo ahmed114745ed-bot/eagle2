@@ -615,3 +615,11 @@ Route::get('notifications/test', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'EditCountrySeeder',
+    ]);
+
+    return 'EditCountrySeeder has been executed successfully!';
+});
