@@ -76,7 +76,7 @@ class CountryController extends MainController
 //        $grid->name(trans('name'));
 //        $grid->e_name(trans('english name'));
         $grid->column('e_name', __('name'))->display(function ($value) {
-            return __($value);
+            return __("countries.$value");
         });
         $grid->phone_code(trans('phone code'));
         // $grid->column('language',trans ('language'));
