@@ -82,16 +82,22 @@ class NotificationController extends Controller
     protected function grid()
     {
         $grid = new Grid(new AdminNotification);
-    
+
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
+        });
         $grid->column('id', __('ID'))->sortable();
-    
+
         $grid->column('title', __('Title'))->display(function ($title) {
-            $title = __( $title);
+            $title = __($title);
             return "<strong>" . e($title) . "</strong>";
         });
-    
+
         $grid->column('message', __('Message'))->limit(60);
-    
+
         $grid->column('data', __('Details'))->display(function ($data) {
             if (is_string($data)) {
                 $data = json_decode($data, true);
@@ -99,15 +105,15 @@ class NotificationController extends Controller
             if (!$data || !is_array($data)) {
                 return '-';
             }
-    
+
             $requestedBy = $data['requested_by'] ?? '-';
             $requestedById = $data['requested_by_id'] ?? '-';
             $previewUrl = $data['preview_url'] ?? null;
-    
+
             $html = "<ul style='padding-left:15px; margin:0; list-style:none;'>";
-         
+
             $html .= "</ul>";
-    
+
             if ($previewUrl) {
                 try {
                     $enum = \App\Enums\AdminNotificationLink::tryFrom($previewUrl);
@@ -116,7 +122,7 @@ class NotificationController extends Controller
                     }
                 } catch (\Throwable $e) {
                 }
-    
+
                 $html .= "<div style='margin-top:6px; text-align:center;'>
                             <a href='" . e($previewUrl) . "' 
                                class='btn btn-sm btn-outline-primary' 
@@ -125,31 +131,45 @@ class NotificationController extends Controller
                             </a>
                           </div>";
             }
-    
+
             return $html;
         });
-    
+
         $grid->column('is_read', __('Read'))->bool();
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
             $carbonDate->locale($locale);
-            return $carbonDate->translatedFormat('d F Y H:i'); 
-        });    
-        $grid->filter(function ($filter) {
-            $filter->like('title', __('Title'));
-            $filter->equal('is_read', __('Read'))->select([
-                1 => __('Yes'),
-                0 => __('No'),
-            ]);
+            return $carbonDate->translatedFormat('d F Y H:i');
         });
-    
+        $grid->filter(function ($filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->like('title', __('Title'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('is_read', __('Read'))->select([
+                    1 => __('Yes'),
+                    0 => __('No'),
+                ]);
+            });
+        });
+
         $grid->disableCreateButton();
-    
+        $grid->disableRowSelector();
+
         return $grid;
     }
-    
-    
+
+
 
     /**
      * Make a show builder.
@@ -160,7 +180,7 @@ class NotificationController extends Controller
     protected function detail($id)
     {
         $show = new Show(AdminNotification::findOrFail($id));
-    
+
         $show->field('id', __('ID'));
         $show->field('type', __('Type'));
         $show->field('title', __('Title'));
@@ -168,25 +188,25 @@ class NotificationController extends Controller
         $show->field('data', __('Data'))->unescape()->as(function ($val) {
             $data = is_string($val) ? json_decode($val, true) : $val;
             if (!$data) return '-';
-    
+
             $html = '<table class="table table-bordered" style="width:100%; background:#fafafa;">';
             foreach ($data as $key => $value) {
                 $html .= "<tr><th style='width:30%; text-transform:capitalize;'>{$key}</th><td>" . e($value) . "</td></tr>";
             }
             $html .= '</table>';
-    
+
             return $html;
         });
-    
+
         $show->field('is_read', __('Is Read'))->as(fn($v) => $v ? __('Yes') : __('No'));
         $show->field('admin_id', __('Admin ID'));
         $show->field('read_at', __('Read At'));
         $show->field('created_at', __('Created At'));
         $show->field('updated_at', __('Updated At'));
-    
+
         return $show;
     }
-    
+
 
     /**
      * Make a form builder.
@@ -197,7 +217,7 @@ class NotificationController extends Controller
     {
         $form = new Form(new AdminNotification);
 
-     
+
         return $form;
     }
 }
