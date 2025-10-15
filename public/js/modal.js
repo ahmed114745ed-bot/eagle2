@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const api = window.NOTIFICATIONS_API;
 
-    // Bus للإشعارات
     window.NotificationBus = {
         emit(eventName, detail = {}) {
             document.dispatchEvent(new CustomEvent(eventName, { detail }));
@@ -20,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // === Pusher مباشر ===
     const pusher = new Pusher('a1eb861ccfcd848b1ba0', {
         cluster: 'mt1',
         encrypted: true
@@ -36,7 +34,6 @@ console.log('oo',e);
             notifCountEl.textContent = current + 1;
         }
 
-        // إضافة الإشعار للمودال
         if (notifContentEl) {
             const newNotif = `
                 <div class="notification-item unread" data-id="${e.id}">
@@ -61,7 +58,6 @@ console.log('oo',e);
         NotificationBus.emit('notifications:new', { notification: e });
     });
 
-    // جلب عدد الإشعارات
     function fetchNotificationsCount() {
         if (!api) return;
         fetch(api.countUrl)
@@ -80,7 +76,6 @@ console.log('oo',e);
             .catch(() => { if (notifCountEl) notifCountEl.style.display = 'none'; });
     }
 
-    // فتح المودال
     window.openModal = function (e) {
         if (e) e.preventDefault();
         if (!modal) return;
@@ -109,7 +104,6 @@ console.log('oo',e);
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-    // تمييز إشعار كمقروء
     window.markAsRead = function (id) {
         return fetch(`/admin/notifications/mark-as-read/${id}`, {
             method: 'POST',
@@ -157,7 +151,6 @@ console.log('oo',e);
     fetchNotificationsCount();
     // setInterval(fetchNotificationsCount, 60000);
 
-    // تشغيل الصوت بعد أول نقرة
     document.addEventListener("click", function enableSound() {
         const audio = document.getElementById("notif-sound");
         if (audio) {
