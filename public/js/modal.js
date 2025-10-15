@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     notifCountEl.style.display = 'inline';
                     notifCountEl.textContent = current + 1;
                 }
-
+                console.log("📬 إشعار جديد وصل:");
                 const notifContentEl = document.getElementById('notificationsContent');
                 if (notifContentEl) {
                     const newNotif = `
