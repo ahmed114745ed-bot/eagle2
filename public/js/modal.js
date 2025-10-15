@@ -23,15 +23,19 @@ document.addEventListener("DOMContentLoaded", function () {
         cluster: window.PUSHER_CONFIG.options.cluster,
         forceTLS: window.PUSHER_CONFIG.options.useTLS
     });
-
+    const adminType = window.ADMIN_TYPE
+   
     const channel = pusher.subscribe('admin.notifications');
     channel.bind('AdminNotificationCreated', function (e) {
-console.log('oo',e);
+
+        if (adminType) return;
+        console.log('oo',e);
 
         if (notifCountEl) {
-            const current = parseInt(notifCountEl.textContent || '0', 10);
-            notifCountEl.style.display = 'inline';
-            notifCountEl.textContent = current + 1;
+                const current = parseInt(notifCountEl.textContent, 10) || 0;
+                notifCountEl.style.display = 'inline';
+                notifCountEl.textContent = current + 1;
+            
         }
 
         if (notifContentEl) {
@@ -54,7 +58,6 @@ console.log('oo',e);
             }
         }
 
-        // تشغيل الصوت
         const audio = document.getElementById('notif-sound');
         if (audio) {
             audio.volume = 0.6;
@@ -155,15 +158,43 @@ console.log('oo',e);
     }
 
     fetchNotificationsCount();
+    handleNotificationClick();
     // setInterval(fetchNotificationsCount, 60000);
 
     document.addEventListener("click", function enableSound() {
         const audio = document.getElementById("notificationSound");
         if (audio) {
             audio.muted = false;
-            audio.volume = 0.6;
+            audio.volume = 0.0;
             audio.play().catch(() => {});
         }
         document.removeEventListener("click", enableSound);
     });
+
+    function handleNotificationClick(id, url) {
+        if (!id) return;
+
+        fetch(`/admin/notifications/mark-as-read/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin', 
+        })
+        .then(res => res.json())
+        .then(data => {
+            const el = document.querySelector(`.notification-item[data-id='${id}']`);
+            if (el) {
+                el.classList.remove('unread');
+                el.classList.add('read');
+            }
+
+            if (url) {
+                window.location.href = url; 
+            }
+        })
+        .catch(err => console.error('Error marking notification:', err));
+    }
 });

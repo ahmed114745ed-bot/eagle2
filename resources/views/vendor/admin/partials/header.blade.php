@@ -2,12 +2,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
-<script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
 <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 
 <script>
     window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
+    window.ADMIN_TYPE = @json(Auth::user()->type);
 </script>
+
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -301,6 +302,8 @@
 
                 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
                 <script src="{{ asset('js/modal.js') }}"></script>
+                <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
+
                 @endif
 
 
@@ -473,4 +476,36 @@
     }
 </style>
 
+
+
+
+
+<script>
+    window.handleNotificationClick = function(id, url) {
+        console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        if (!id) return;
+
+            fetch(`/admin/notifications/mark-as-read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+            })
+            .then(res => res.json())
+            .then(data => {
+                const el = document.querySelector(`.notification-item[data-id='${id}']`);
+                if (el) {
+                    el.classList.remove('unread');
+                    el.classList.add('read');
+                }
+                if (url) {
+                    window.location.href = url;
+                }
+            })
+            .catch(err => console.error('Error marking notification:', err));
+    };
+</script>
 
