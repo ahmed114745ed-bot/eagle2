@@ -369,7 +369,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'iso'        => $iso,
                     'iso3'       => $iso3,
                     'phone_code' => $phone,
-                    'status'     => 1,
+                    'status'     => 0,
                     'flag'       => $imagePath,
                 ]);
 
