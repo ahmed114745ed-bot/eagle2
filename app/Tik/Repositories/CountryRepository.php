@@ -7,7 +7,7 @@ use App\Models\Country;
 class CountryRepository extends AbstractRepository
 {
 
-    
+
     /**
      * @param Model $model
      */
