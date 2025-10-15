@@ -97,15 +97,7 @@ class CharizmaController extends Controller
      * @param int $owner_id
      * @return JsonResponse
      */
-    public function extraDataInRoom(int $room_id): JsonResponse
-    {
-        $room = Room::withoutAppends()->where('id', $room_id)->first();
-        if (!$room) return Common::apiResponse(false, 'No Room Founded');
-        $collections = [
-            'charisma'          => $this->roomCharisma($room_id),
-        ];
-        return Common::apiResponse(true, 'successfully', $collections);
-    }
+
 
     public function roomCharisma(int $room_id)
     {
