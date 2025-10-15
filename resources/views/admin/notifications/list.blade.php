@@ -60,7 +60,11 @@
 </style>
 
 <script>
+
+
 document.addEventListener("DOMContentLoaded", function () {
+
+
     document.querySelectorAll('.mark-read-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const id = this.dataset.id;
@@ -80,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
 
 
 </script>
