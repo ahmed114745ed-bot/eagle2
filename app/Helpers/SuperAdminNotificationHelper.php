@@ -2,54 +2,58 @@
 
 namespace App\Helpers;
 
-use App\Events\AdminNotificationCreated;
+use App\Events\SuperAdminNotificationCreated;
 use App\Jobs\SendFirebaseNotificationsToAdmins;
-use App\Models\AdminNotification;
-use App\Enums\AdminNotificationType;
+use App\Models\SuperAdmin;
+use App\Models\SuperAdminNotification;
+use App\Enums\SuperAdminNotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\Admin;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Google_Client;
-class AdminNotificationHelper
+class SuperAdminNotificationHelper
 {
     public static function notify(
-        AdminNotificationType $type,
+        SuperAdminNotificationType $type,
         string $title,
         ?string $message = null,
         $model = null,
         ?array $data = [],
-        ?int $adminId = null
-    ): AdminNotification {
-        $notification = AdminNotification::create([
+        ?int $superAdminId = null
+    ): SuperAdminNotification {
+        $notification = SuperAdminNotification::create([
             'type' => $type->value,
             'title' => $title,
             'message' => $message,
             'model_id' => $model?->id,
             'model_type' => $model ? get_class($model) : null,
             'data' => $data ?? [],
-            'admin_id' => $adminId,
+            'super_admin_id' => $superAdminId,
         ]);
         $url='';
         $previewUrl = $data['preview_url'] ?? null;
         if ($previewUrl) {
-            $enum = \App\Enums\AdminNotificationLink::tryFrom($previewUrl?->value);
+            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrl?->value);
             if ($enum) {
                 $url = $enum->url($data);
             }
         }
-
-        broadcast(new AdminNotificationCreated($notification))->toOthers();
-
-        SendFirebaseNotificationsToAdmins::dispatch($title, $message, $url)->onQueue('notification');
-
-
+        broadcast(new SuperAdminNotificationCreated($notification))->toOthers();
+        if ($superAdminId) {
+            $superAdmin = SuperAdmin::find($superAdminId);
+            $token = $superAdmin?->fcm_token;
+            if (!empty($token)) {
+                self::sendNotification($token, $title, $message, $url);
+            }
+        }
+    
         return $notification;
 
     }
 
-    public static function markAsRead(AdminNotification $notification): void
+    public static function markAsRead(SuperAdminNotification $notification): void
     {
         $notification->update(['is_read' => true, 'read_at' => now()]);
     }
@@ -59,18 +63,16 @@ class AdminNotificationHelper
     {
         $adminId = $adminId ?? Auth::id();
 
-        return AdminNotification::
+        return SuperAdminNotification::
             where('is_read', false)
             ->count();
     }
 
     public static function sendNotification($token, $title, $body, $url)
     {
-        // $projectId = env('FIREBASE_PROJECT_ID'); 
-        $projectId = env('FIREBASE_PROJECT_NAME'); 
-
-        $client = new Google_Client();
+        $projectId = env('FIREBASE_PROJECT_NAME');
         $firebaseConfigPath = public_path('firebase_credentials.json');
+        $client = new Google_Client();
         $client->setAuthConfig($firebaseConfigPath);
 
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
@@ -96,6 +98,7 @@ class AdminNotificationHelper
             "Content-Type" => "application/json",
         ])->post("https://fcm.googleapis.com/v1/projects/$projectId/messages:send", $payload);
       
+   
         return $response->json();
     }
 

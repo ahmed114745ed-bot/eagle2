@@ -65,8 +65,6 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
                 "Authorization" => "Bearer $accessToken",
                 "Content-Type" => "application/json",
             ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-            dd( $response->json());
-            logger()->info('Firebase Response', ['response' => $response->json()]);
 
             if (!$response->successful()) {
                 logger()->error('🔴Firebase', [

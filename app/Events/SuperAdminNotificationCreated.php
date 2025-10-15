@@ -1,14 +1,14 @@
 <?php
 namespace App\Events;
 
-use App\Models\AdminNotification;
+use App\Models\SuperAdminNotification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdminNotificationCreated implements ShouldBroadcastNow
+class SuperAdminNotificationCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -17,9 +17,9 @@ class AdminNotificationCreated implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param \App\Models\AdminNotification $notification
+     * @param \App\Models\SuperAdminNotification $notification
      */
-    public function __construct(AdminNotification $notification)
+    public function __construct(SuperAdminNotification $notification)
     {
         $this->notification = $notification;
     }
@@ -31,20 +31,14 @@ class AdminNotificationCreated implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        // قناة عامة بدل الخاصة
-        return new Channel('admin.notifications');
+        return new Channel('superAdmin.notifications.' . $this->notification->super_admin_id);
     }
-
-    /**
-     * اسم الحدث عند البث
-     */
+   
     public function broadcastAs()
     {
-        return 'AdminNotificationCreated';
+        return 'SuperAdminNotificationCreated';
     }
-    
     /**
-     * البيانات المرسلة عند البث
      *
      * @return array
      */
@@ -53,7 +47,7 @@ class AdminNotificationCreated implements ShouldBroadcastNow
         \Log::info('📡 Broadcasting AdminNotificationCreated', [
             'id' => $this->notification->id,
             'title' => $this->notification->title,
-            'channel' => 'public-admin.notifications',
+            'channel' => 'superAdmin.notifications.' . $this->notification->super_admin_id,
         ]);
 
         return [
@@ -62,7 +56,9 @@ class AdminNotificationCreated implements ShouldBroadcastNow
             'message'   => $this->notification->message,
             'data'      => $this->notification->data,
             'is_read'   => $this->notification->is_read,
+            'super_admin_id'   => $this->notification->super_admin_id,
             'created_at'=> $this->notification->created_at->toDateTimeString(),
+            
         ];
     }
 }

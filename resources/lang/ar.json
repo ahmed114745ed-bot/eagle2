@@ -4042,5 +4042,8 @@
 "banner_request_message": "قام المشرف :name (المعرف: :id) بطلب عرض بانر جديد بقيمة :coins عملة.",
 "Mark as read" :"تعيين كا مقرؤة",
 "Mark all as read":"تمييز الكل كمقروء",
-"Read":"مقرؤء"
+"Read":"مقرؤء",
+"banner_approved_title": "تمت الموافقة على طلب البانر",
+"banner_approved_message": "قام المشرف :name (رقم المعرف: :id) بالموافقة على طلب البانر وتم خصم :coins عملة."
+
 }
