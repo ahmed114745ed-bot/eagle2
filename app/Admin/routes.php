@@ -305,7 +305,7 @@ Route::group(
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
-        Route::resource('countries', 'CountryController');
+        Route::resource('countries', 'CountryController')->only(['index', 'show']);
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
