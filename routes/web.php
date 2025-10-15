@@ -541,6 +541,8 @@ Route::get('update/countries', function () {
 
     $unique = array_unique($userCountries);
 
+    Country::whereIn('id', $unique)->update(['status' => 1]);
+
     Country::whereNotIn('id', $unique)->update(['status' => 0]);
 
     return 'done';
