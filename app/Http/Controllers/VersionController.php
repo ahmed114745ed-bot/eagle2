@@ -17,7 +17,6 @@ class VersionController extends Controller
 {
     public function versionAndCache(Request $request)
     {
-        die();
         $version = $request->version;
         $currentVersion  = settings()->get($request->OS == 'Huawei' ? 'huawei_current_version' : ($request->OS == 'IOS' ? 'ios_current_version' : 'android_current_version'));
 
