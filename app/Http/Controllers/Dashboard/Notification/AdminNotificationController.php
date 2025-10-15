@@ -16,7 +16,7 @@ class AdminNotificationController extends Controller
 
     public function list()
     {
-        $notifications = AdminNotification::where('is_read', false)->latest()->limit(20)->get();
+        $notifications = AdminNotification::latest()->limit(20)->get();
 
         return view('admin.notifications.list', compact('notifications'));
     }
@@ -30,7 +30,7 @@ class AdminNotificationController extends Controller
     public function markAllRead()
     {
         AdminNotification::unreadNotifications()
-            ->update(['read_at' => now()]);
+            ->update(['read_at' => now(), 'is_read' => true]);
 
         return response()->json(['status' => true, 'message' => 'تم تمييز جميع الإشعارات كمقروءة']);
     }
