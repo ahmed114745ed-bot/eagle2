@@ -1,12 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("📬 إشعار جديد وصل:");
+    const notifCountEl = document.getElementById('notificationsCount');
+    const notifContentEl = document.getElementById('notificationsContent');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const markAllBtn = document.getElementById('markAllReadBtn');
+    const modal = document.getElementById('myModal');
+    const api = window.NOTIFICATIONS_API;
+
+    if (!api) return;
+
+    window.NotificationBus = {
+        emit(eventName, detail = {}) {
+            document.dispatchEvent(new CustomEvent(eventName, { detail }));
+        },
+        on(eventName, callback) {
+            document.addEventListener(eventName, callback);
+        }
+    };
+
+    function getCsrf() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
     if (window.Echo) {
-        console.log("📬 إشعار جديد وصل:");
         window.Echo.private('admin.notifications')
             .listen('AdminNotificationCreated', (e) => {
-                console.log("📬 إشعار جديد وصل:");
-
-
                 const notifCountEl = document.getElementById('notificationsCount');
                 if (notifCountEl) {
                     const current = parseInt(notifCountEl.textContent || '0', 10);
@@ -28,40 +46,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     notifContentEl.insertAdjacentHTML('afterbegin', newNotif);
                 }
 
+                try {
+                    const audio = document.getElementById('notificationSound');
+                    if (audio) {
+                        audio.volume = 0.6;
+                        audio.play().catch(() => {});
+                    }
+                } catch {}
+
                 NotificationBus.emit('notifications:new', { notification: e });
             });
     }
-});
 
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const notifCountEl = document.getElementById('notificationsCount');
-    const notifContentEl = document.getElementById('notificationsContent');
-    const closeBtn = document.getElementById('closeModalBtn');
-    const markAllBtn = document.getElementById('markAllReadBtn');
-    const modal = document.getElementById('myModal');
-    const api = window.NOTIFICATIONS_API;
-
-    if (!api) return;
-
-    /** ---------- Event Bus ---------- */
-    window.NotificationBus = {
-        emit: function(eventName, detail = {}) {
-            document.dispatchEvent(new CustomEvent(eventName, { detail }));
-        },
-        on: function(eventName, callback) {
-            document.addEventListener(eventName, callback);
-        }
-    };
-
-    /** ---------- CSRF ---------- */
-    function getCsrf() {
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        return meta ? meta.getAttribute('content') : '';
-    }
-
-    /** ---------- تحديث عدد الإشعارات ---------- */
     function fetchNotificationsCount() {
         fetch(api.countUrl)
             .then(res => res.json())
@@ -74,16 +70,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         notifCountEl.style.display = 'none';
                     }
                 }
-                console.log("📬 إشعار جديد وصل:22222");
-
-                try {
-
-                    const audio = document.getElementById('notificationSound');
-                    audio.volume = 0.6; 
-                    audio.play().catch(err => console.warn('تعذر تشغيل الصوت:', err));
-                } catch (error) {
-                    console.warn('خطأ في تشغيل الصوت:', error);
-                }
                 NotificationBus.emit('notifications:count', { count: data.count });
             })
             .catch(() => {
@@ -91,13 +77,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    /** ---------- فتح المودال ---------- */
     window.openModal = function (event) {
         if (event) event.preventDefault();
         if (!modal) return;
 
-
-        
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
@@ -108,7 +91,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(html => {
                     notifContentEl.innerHTML = html;
                     attachMarkReadHandlers();
-                    // إطلاق حدث بعد تحميل الإشعارات
                     const notifications = Array.from(notifContentEl.querySelectorAll('.notification-item')).map(el => ({
                         id: el.dataset.id,
                         title: el.querySelector('.title')?.textContent,
@@ -121,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    /** ---------- غلق المودال ---------- */
     function closeModal() {
         if (!modal) return;
         modal.classList.remove('active');
@@ -135,17 +116,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /** ---------- دالة علامة كمقروء ---------- */
-    window.markAsRead = function(id) {
+    window.markAsRead = function (id) {
         const csrf = getCsrf();
         return fetch(`/admin/notifications/mark-as-read/${id}`, {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-        })
-        .then(res => res.json());
+        }).then(res => res.json());
     };
 
-    /** ---------- ربط أزرار mark as read ---------- */
     function attachMarkReadHandlers() {
         notifContentEl.querySelectorAll('.mark-read-btn').forEach(btn => {
             btn.removeEventListener('click', onMarkClick);
@@ -161,7 +139,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(() => {
                 const item = this.closest('.notification-item');
                 if (item) item.classList.remove('unread');
-                // تحديث العداد محليًا
                 const current = parseInt(notifCountEl.textContent || '0', 10);
                 const next = Math.max(0, current - 1);
                 if (next > 0) {
@@ -174,7 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(() => alert('حدث خطأ أثناء تمييز الإشعار كمقروء'));
     }
 
-    /** ---------- زر تمييز الكل كمقروء ---------- */
     if (markAllBtn) {
         markAllBtn.addEventListener('click', function () {
             const csrf = getCsrf();
@@ -189,7 +165,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /** ---------- تشغيل التحديث ---------- */
     fetchNotificationsCount();
     setInterval(fetchNotificationsCount, 60000);
 });
@@ -206,48 +181,28 @@ function handleNotificationClick(id, url) {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        credentials: 'same-origin', 
+        credentials: 'same-origin',
     })
-    .then(res => res.json())
-    .then(data => {
-        const el = document.querySelector(`.notification-item[data-id='${id}']`);
-        if (el) {
-            el.classList.remove('unread');
-            el.classList.add('read');
-        }
-
-        if (url) {
-            window.location.href = url; 
-        }
-    })
-    .catch(err => console.error('Error marking notification:', err));
+        .then(res => res.json())
+        .then(() => {
+            const el = document.querySelector(`.notification-item[data-id='${id}']`);
+            if (el) {
+                el.classList.remove('unread');
+                el.classList.add('read');
+            }
+            if (url) window.location.href = url;
+        })
+        .catch(err => console.error('Error marking notification:', err));
 }
-
-
-
-
 
 document.addEventListener("click", function enableSound() {
     const audio = document.getElementById("notif-sound");
     if (audio) {
-      audio.muted = false;
-      audio.volume = 0.0;
-      audio.play().then(() => {
-        console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
-      }).catch((err) => {
-        console.warn("تعذر تشغيل الصوت:", err);
-      });
+        audio.muted = false;
+        audio.volume = 0.0;
+        audio.play().then(() => {
+            console.log("🔊 تم تفعيل الصوت بنجاح بعد أول نقرة");
+        }).catch(() => {});
     }
     document.removeEventListener("click", enableSound);
-  });
-
-
-
-
-
-
-
-
-
-
- 
+});
