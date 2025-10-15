@@ -19,11 +19,14 @@ class EditCountrySeeder extends Seeder
             ->update(['agencies.country_id' => DB::raw('users.country_id')]);
 
 
-        $bds = Bd::where('country_id', null)->with('appUser')->get();
-       
-        foreach ($bds as $bd) {
-            $bd->country_id = $bd->appUser->country_id;
-            $bd->save();
-        }
+        Bd::whereNull('country_id')
+            ->has('appUser')
+            ->with('appUser')
+            ->chunk(100, function ($bds) {
+                foreach ($bds as $bd) {
+                    $bd->country_id = $bd->appUser->country_id;
+                    $bd->save();
+                }
+            });
     }
 }
