@@ -46,6 +46,12 @@ console.log('oo',e);
                 </div>`;
             notifContentEl.insertAdjacentHTML('afterbegin', newNotif);
             attachMarkReadHandlers();
+            const audio = document.getElementById("notificationSound");
+            if (audio) {
+                audio.muted = false;
+                audio.volume = 0.6;
+                audio.play().catch(() => {});
+            }
         }
 
         // تشغيل الصوت
@@ -152,7 +158,7 @@ console.log('oo',e);
     // setInterval(fetchNotificationsCount, 60000);
 
     document.addEventListener("click", function enableSound() {
-        const audio = document.getElementById("notif-sound");
+        const audio = document.getElementById("notificationSound");
         if (audio) {
             audio.muted = false;
             audio.volume = 0.6;
