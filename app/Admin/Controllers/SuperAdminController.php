@@ -307,8 +307,12 @@ class SuperAdminController extends MainController
         //        $form->hidden('transfer_salary', __('transfer_salary'));
 
         $form->saving(function (Form $form) {
-            $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'))->exists();
-            if ($superAdmin) {
+            $isEditing = $form->isEditing();
+            $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'));
+            if ($isEditing) $superAdmin->where('id', '!=', $form->model()->id);
+            $exists = $superAdmin->exists();
+
+            if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
                     'message' => trans('you used this phone before'),
@@ -317,7 +321,7 @@ class SuperAdminController extends MainController
             }
 
 
-            $isEditing = $form->isEditing();
+
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
@@ -370,20 +374,22 @@ class SuperAdminController extends MainController
                     ]);
                 }
             }
+            $isEditing = $form->isEditing();
+            if (!$isEditing) {
+                $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
 
-            $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
-
-            DB::table('admin_users')->insert([
-                'parent_id' => $superAdmin->id,
-                'username' => 'bd' . $countryName . 'default',
-                'name' => 'bd' . $countryName . 'default',
-                'password' => Hash::make('bd' . $countryName . 'default'),
-                'default' => 1,
-                'country_id' => $superAdmin->country_id,
-                'type' => 'bd',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                DB::table('admin_users')->insert([
+                    'parent_id' => $superAdmin->id,
+                    'username' => 'bd' . $countryName . 'default',
+                    'name' => 'bd' . $countryName . 'default',
+                    'password' => Hash::make('bd' . $countryName . 'default'),
+                    'default' => 1,
+                    'country_id' => $superAdmin->country_id,
+                    'type' => 'bd',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         });
 
         return $form;
