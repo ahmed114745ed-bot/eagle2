@@ -3,35 +3,10 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
+<script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 
-<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.0/dist/echo.iife.js"></script>
 
-<script>
-  window.Pusher = Pusher;
-
-  window.Echo = new window.Echo({
-    broadcaster: 'pusher',
-    key:  "{{ App\Helpers\Common::getConf('pusher_app_key') }}",
-    cluster: "{{ App\Helpers\Common::getConf('pusher_app_cluster') ?? 'mt1' }}",
-    forceTLS: true,
-    encrypted: true,
-    authEndpoint: '/broadcasting/auth',
-    auth: {
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    }
-  });
-
-  window.Echo.connector.pusher.connection.bind('connected', () => {
-    console.log('WebSocket متصل');
-  });
-
-  window.Echo.connector.pusher.connection.bind('disconnected', () => {
-    console.warn('WebSocket غير متصل');
-  });
-</script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 
 
