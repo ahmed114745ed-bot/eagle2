@@ -19,9 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    const pusher = new Pusher('a1eb861ccfcd848b1ba0', {
-        cluster: 'mt1',
-        encrypted: true
+    const pusher = new Pusher(window.PUSHER_CONFIG.key, {
+        cluster: window.PUSHER_CONFIG.options.cluster,
+        forceTLS: window.PUSHER_CONFIG.options.useTLS
     });
 
     const channel = pusher.subscribe('admin.notifications');
