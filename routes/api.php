@@ -122,7 +122,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
         Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
-        Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin');
+        Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');

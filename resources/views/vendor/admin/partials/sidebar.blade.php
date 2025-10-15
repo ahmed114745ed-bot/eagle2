@@ -196,6 +196,7 @@
                             ],
                             ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
                             ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                            ['uri' => '/superadmin/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
                         ];
                     @endphp
 
