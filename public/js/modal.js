@@ -21,7 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
     }
-    console.log(window.Echo);
+
+    window.Echo.connector.socket.on('connect', () => {
+        console.log("✅ WebSocket متصل");
+    });
+    
+    window.Echo.connector.socket.on('disconnect', () => {
+        console.warn("❌ WebSocket غير متصل");
+    });
 
     if (window.Echo) {
         window.Echo.private('admin.notifications')

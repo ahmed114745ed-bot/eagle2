@@ -460,6 +460,8 @@
     }
 </style>
 
-<script>
 
+<script>
+    window.PUSHER_APP_KEY = "{{ App\Helpers\Common::getConf('pusher_app_key') }}";
+    window.PUSHER_APP_CLUSTER = "{{ App\Helpers\Common::getConf('pusher_app_cluster') ?? 'mt1' }}";
 </script>
