@@ -97,19 +97,19 @@ class CharizmaController extends Controller
      * @param int $owner_id
      * @return JsonResponse
      */
-    public function extraDataInRoom(int $owner_id): JsonResponse
+    public function extraDataInRoom(int $room_id): JsonResponse
     {
-        $room = Room::withoutAppends()->where('uid', $owner_id)->first();
+        $room = Room::withoutAppends()->where('id', $room_id)->first();
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
         $collections = [
-            'charisma'          => $this->roomCharisma($owner_id),
+            'charisma'          => $this->roomCharisma($room_id),
         ];
         return Common::apiResponse(true, 'successfully', $collections);
     }
 
-    public function roomCharisma(int $owner_id)
+    public function roomCharisma(int $room_id)
     {
-        return $this->userCharismaService->roomCharisma($owner_id);
+        return $this->userCharismaService->roomCharisma($room_id);
     }
 
     public function changeStatus(Request $request): JsonResponse
@@ -161,13 +161,13 @@ class CharizmaController extends Controller
         ExtraDataInRoom::query()->where('room_id', $room->id)->update(['total' => 0]);
 
         $collections = [
-            'charisma'          => $this->roomCharisma($room->uid),
+            'charisma'          => $this->roomCharisma($room->id),
         ];
 
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",
-                "data" => $this->roomCharisma($room->uid),
+                "data" => $this->roomCharisma($room->id),
             ]
         ];
         $json = json_encode($ms);

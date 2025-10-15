@@ -223,19 +223,19 @@ class RoomController extends Controller
             ->first();
 
         $collections = [
-            'charisma'          => $this->roomCharisma($owner_id),
+            'charisma'          => $this->roomCharisma($room->id ),
             'achievements'      => $this->achievementLevels($owner_id),
-            'boxes'             => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
+            'boxes'             => BoxUseResource::collection($this->getBoxes($room ->id, Auth::id())),
             'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
     }
 
-    private function getBoxes($ownerId, $userId)
+    private function getBoxes($roomId, $userId)
     {
         return BoxUse::query()
             ->with('user', fn($q) => $q->with('profile')->withoutAppends()->select(['id', 'name', 'uuid']))
-            ->where('room_uid', $ownerId)
+            ->where('room_id', $roomId)
             ->where('not_used_num', '>', 0)
             //            ->where('unused_coins', '>', 0)
             ->where('end_at', '>=', now()->timestamp)
@@ -252,9 +252,9 @@ class RoomController extends Controller
         return (new UserAchievementService())->roomAchievement($owner_id);
     }
 
-    private function roomCharisma(int $owner_id)
+    private function roomCharisma(int $room_id)
     {
-        return (new UserCharismaService())->roomCharisma($owner_id);
+        return (new UserCharismaService())->roomCharisma($room_id);
     }
 
 
