@@ -21,11 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
     }
+    console.log(window.Echo);
 
     if (window.Echo) {
         window.Echo.private('admin.notifications')
             .listen('AdminNotificationCreated', (e) => {
                 const notifCountEl = document.getElementById('notificationsCount');
+                console.log(window.Echo);
+
                 if (notifCountEl) {
                     const current = parseInt(notifCountEl.textContent || '0', 10);
                     notifCountEl.style.display = 'inline';
