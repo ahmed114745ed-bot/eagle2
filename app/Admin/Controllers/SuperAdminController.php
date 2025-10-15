@@ -21,6 +21,7 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
 {
@@ -325,6 +326,7 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
+                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -348,6 +350,7 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
+                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
@@ -372,9 +375,9 @@ class SuperAdminController extends MainController
 
             DB::table('admin_users')->insert([
                 'parent_id' => $superAdmin->id,
-                'username' => 'bd'.$countryName.'default',
-                'name' => 'bd'.$countryName.'default',
-                'password' => Hash::make('bd'.$countryName.'default'),
+                'username' => 'bd' . $countryName . 'default',
+                'name' => 'bd' . $countryName . 'default',
+                'password' => Hash::make('bd' . $countryName . 'default'),
                 'default' => 1,
                 'country_id' => $superAdmin->country_id,
                 'type' => 'bd',
@@ -455,7 +458,7 @@ class SuperAdminController extends MainController
         $superAdmin->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
-        $rewards= null;
+        $rewards = null;
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
@@ -469,8 +472,8 @@ class SuperAdminController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-         $types = ['vip', 'badge', 'ware'];
-          $type = request()->get('type', 'vip');
+        $types = ['vip', 'badge', 'ware'];
+        $type = request()->get('type', 'vip');
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -482,19 +485,19 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type','types', 'rewards'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()
     {
-        if (!session('preview_superadmin') || !session('country_id')){
+        if (!session('preview_superadmin') || !session('country_id')) {
             abort(404, __('not found'));
         }
 
         $tab = request()->query('tab', 'agencies');
         $countryID = session('country_id');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default','country_id'])
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();
 
         $defaultImage = asset("images/icon-agency.jpg");
@@ -510,8 +513,10 @@ class SuperAdminController extends MainController
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::SUPER_ADMIN, $superAdmin->id,
-            UserTypeEnum::SUPER_ADMIN, $superAdmin->id
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id
         ])
             ->first();
 
@@ -524,8 +529,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies','totalCharges','totalSpent'));
-
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
     }
 
     protected function detail($id)
