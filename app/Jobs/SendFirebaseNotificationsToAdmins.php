@@ -33,16 +33,17 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
    
     public function handle(): void
     {
+
         $projectId = env('FIREBASE_PROJECT_NAME');
         $firebaseConfigPath = public_path('firebase_credentials.json');
-
         $client = new Google_Client();
         $client->setAuthConfig($firebaseConfigPath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
         $client->fetchAccessTokenWithAssertion();
         $accessToken = $client->getAccessToken()['access_token'];
 
-        $admins = Admin::whereNotNull('type')->whereNotNull('fcm_token')->get();
+        $admins = Admin::whereNull('type')->whereNotNull('fcm_token')->get();
+        logger()->info('Firebase Response', ['response' => $admins]);
 
         foreach ($admins as $admin) {
             $token = $admin->fcm_token;
@@ -64,6 +65,8 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
                 "Authorization" => "Bearer $accessToken",
                 "Content-Type" => "application/json",
             ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+            dd( $response->json());
+            logger()->info('Firebase Response', ['response' => $response->json()]);
 
             if (!$response->successful()) {
                 logger()->error('🔴Firebase', [
