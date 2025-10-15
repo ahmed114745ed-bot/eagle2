@@ -34,13 +34,14 @@ class MessageService
         if ($request->hasFile('file')) {
             $files = $request->file('file');
             $validExtensions = ['jpeg', 'jpg', 'png', 'gif', 'mp4', 'mp3', 'wav', 'pdf'];
-            $count = count($files);
+//            $count = count($files);
 
-            if ($count == 1) {
-                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user, $request->duration);
+            if (!is_array($files)) {
+                $this->processSingleFile($files, $validExtensions, $chatRoom, $message, $user, $request->duration);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
+
         } elseif ($request->video_name) {
 
             $this->processVideoFile($request->video_name, $chatRoom, $message, $user, $request->duration);
