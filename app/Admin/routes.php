@@ -726,7 +726,7 @@ Route::group(
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
             Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']); 
-            Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
+            Route::get('grid', [App\Admin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
 
 
         });
