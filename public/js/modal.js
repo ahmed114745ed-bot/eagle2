@@ -9,11 +9,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const markAllBtn = document.getElementById('markAllReadBtn');
     const modal = document.getElementById('myModal');
     const api = window.NOTIFICATIONS_API;
+
+    window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('WebSocket connected');
+    });
     if (window.Echo && window.Echo.connector) {
         window.Echo.connector.socket.on('connect', () => {
             console.log("✅ WebSocket متصل");
         });
-        // باقي الكود الذي يستخدم Echo
     } else {
         console.warn("window.Echo غير معرّف");
     }
