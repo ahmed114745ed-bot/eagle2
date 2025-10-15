@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -535,7 +536,15 @@ Route::get('/fix-bans-user-id', function () {
 });
 
 
+Route::get('update/countries', function () {
+    $userCountries = User::whereNotNull('country_id')->get()->pluck('country_id')->toArray();
 
+    $unique = array_unique($userCountries);
+
+    Country::whereNotIn('id', $unique)->update(['status' => 0]);
+
+    return 'done';
+});
 
 Route::get('/week-zone', function () {
 

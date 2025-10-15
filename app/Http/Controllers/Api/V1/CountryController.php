@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Resources\CountrySupportersResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
@@ -16,9 +17,9 @@ class CountryController extends Controller
 
     public function __construct(private CountryService $countryService) {}
 
-    public function allCountries()
+    public function allCountries(): JsonResponse
     {
-        $countries = $this->countryService->indexWithSupporters();
+        $countries = $this->countryService->indexByHotAndSupporters();
         return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
     }
 
