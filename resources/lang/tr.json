@@ -51,7 +51,7 @@
 "total price": "Toplam Fiyat",
   "Sender UUID or Shipping Agency ID": "Gönderici UUID veya Kargo Ajansı Kimliği",
   "Receiver UUID or Shipping Agency ID": "Alıcı UUID veya Kargo Ajansı Kimliği",
-
+  "Show more": "Daha fazla göster",
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
     "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",

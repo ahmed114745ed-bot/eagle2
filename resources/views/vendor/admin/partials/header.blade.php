@@ -3,7 +3,184 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
-
+   <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-no {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modal-appear 0.3s ease-out;
+        }
+        
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        
+        .modal-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: #343a40;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: #343a40;
+        }
+        
+        .modal-body2 {
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f1f3f4;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item.unread {
+            background-color: #e7f1ff;
+        }
+        
+        .notification-item.unread:hover {
+            background-color: #dbe9fd;
+        }
+        
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #212529;
+        }
+        
+        .notification-time {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-footer {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.2s;
+        }
+        
+        .btn-mark-all {
+            background-color: var(--primary-color);
+            border: 1px solid #0d6efd;
+            color: white;
+        }
+        
+        .btn-mark-all:hover {
+            background-color: var(--primary-color);
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+        }
+        
+        .btn-show-more {
+            background-color: var(--primary-color);
+            border: 1px solid #6c757d;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn-show-more:hover {
+            background-color:var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+        }
+        
+        .btn-show-more i {
+            margin-left: 6px;
+            font-size: 0.9em;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .p-3 {
+            padding: 1rem !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .modal-no {
+                width: 95%;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn-footer {
+                width: 100%;
+            }
+        }
+    </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class="logo">
         <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
@@ -77,7 +254,7 @@
                         <div class="modal-body2" id="notificationsContent">
                             <div class="text-center text-muted p-3">{{ __('dashboard.login.loading.prepare') }}</div>
                         </div>
-                        <div class="modal-footer" style="text-align: center; padding: 10px;">
+                        {{-- <div class="modal-footer" style="text-align: center; padding: 10px;">
                             <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">{{ __('Mark all as read') }}</button>
                         </div>
                         <div class="modal-footer" style="text-align: center; padding: 10px;">
@@ -88,6 +265,15 @@
                                         {{ __('Show more') }}
                                     </a>
                             </button>
+                        </div> --}}
+
+                         <div class="modal-footer">
+                            <button type="button" class="btn btn-footer btn-mark-all" id="markAllReadBtn">
+                                {{ __('Mark all as read') }}
+                            </button>
+                            <a href="{{ route('admin.notifications.grid') }}" class="btn btn-footer btn-show-more" id="loadMoreBtn">
+                                 {{ __('Show more') }}
+                            </a>
                         </div>
                     </div>
                 </div>
