@@ -357,7 +357,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'iso'        => $iso ?: $country->iso,
                     'iso3'       => $iso3 ?: $country->iso3,
                     'phone_code' => $phone ?: $country->phone_code,
-                    'status'     => $country->statu == 1 ? 1 : 0,
+                    'status'     => $country->status == 1 ? 1 : 0,
                     'flag'       => $imagePath,
                 ]);
 
