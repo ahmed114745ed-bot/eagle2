@@ -37,7 +37,7 @@ class MessageService
 //            $count = count($files);
 
             if (!is_array($files)) {
-                $this->processSingleFile($files, $validExtensions, $chatRoom, $message, $user, $request->duration);
+                $this->processSingleFile($files, $validExtensions, $chatRoom, $message, $user);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
@@ -48,7 +48,7 @@ class MessageService
         }
     }
 
-    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user, $duration)
+    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user, $duration = null)
     {
         $extension = $file->getClientOriginalExtension();
         if (!$this->isValidExtension($extension, $validExtensions)) {
