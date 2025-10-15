@@ -5,6 +5,9 @@
 <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
 <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 
+<script>
+    window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
+</script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
