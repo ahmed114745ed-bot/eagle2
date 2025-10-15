@@ -1,19 +1,4 @@
-import Echo from 'laravel-echo';
-window.Pusher = require('pusher-js');
 
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: window.PUSHER_APP_KEY,
-    cluster: window.PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    encrypted: true,
-    authEndpoint: '/broadcasting/auth',
-    auth: {
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    }
-});
 
 
 
@@ -25,8 +10,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById('myModal');
     const api = window.NOTIFICATIONS_API;
 
+    window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('WebSocket connected');
+    });
+    if (window.Echo && window.Echo.connector) {
+        window.Echo.connector.socket.on('connect', () => {
+            console.log("✅ WebSocket متصل");
+        });
+    } else {
+        console.warn("window.Echo غير معرّف");
+    }
     if (!api) return;
-
+    if (window.Echo && window.Echo.connector) {
+        window.Echo.connector.socket.on('connect', () => {
+            console.log("✅ WebSocket متصل");
+        });
+    } else {
+        console.warn("window.Echo غير معرّف");
+    }
     window.NotificationBus = {
         emit(eventName, detail = {}) {
             document.dispatchEvent(new CustomEvent(eventName, { detail }));
