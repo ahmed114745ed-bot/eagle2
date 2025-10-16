@@ -20,7 +20,8 @@ class CountryResource extends JsonResource
             'flag' => @$this->flag ?: '',
             'lang' => @$this->language ?: '',
             'phone_code' => @$this->phone_code ?: '',
-            'iso' => @$this->iso ?: ''
+            'iso' => @$this->iso ?: '',
+            'total_rooms' => $this->whenHas(),
         ];
     }
 }
