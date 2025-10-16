@@ -295,15 +295,17 @@ class SuperAdminCountryController extends Controller
 
     private function getTopBds($countryID)
     {
-        return Bd::select('bds.id', 'bds.name')
-            ->join('bds', 'bds.id', '=', 'agency_bd.bd_id')
-            ->join('agencies', 'agency_bd.agency_id', '=', 'agencies.id')
-            ->where('agencies.country_id', $countryID)
-            ->selectRaw('COUNT(DISTINCT agencies.id) as total_members')
-            ->groupBy('bds.id', 'bds.name')
+        return Bd::whereHas('agencies', function ($a) use ($countryID) {
+            $a->where('country_id', $countryID)
+                ->whereHas('members');
+        })
+            ->withCount(['agencies as total_members' => function ($agency) use ($countryID) {
+                $agency->where('country_id', $countryID)
+                    ->withCount('members');
+            }])
             ->orderByDesc('total_members')
-            ->limit(3)
-            ->get();
+            ->take(3)
+            ->get(['id', 'name']);
     }
 
     private function getTopGamers($countryID, $from, $to)
