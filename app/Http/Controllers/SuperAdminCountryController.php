@@ -213,8 +213,8 @@ class SuperAdminCountryController extends Controller
 
     private function getTopRooms($countryID, $from, $to)
     {
-        return Room::select('rooms.id', 'rooms.room_name', 'rooms.uid', 'rooms.room_cover', 'rooms.user_id')
-            ->join('users', 'rooms.user_id', '=', 'users.id')
+        return Room::select('rooms.id', 'rooms.room_name', 'rooms.uid', 'rooms.room_cover')
+            ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('users.country_id', $countryID)
             ->with('owner:id,name,country_id')
             ->withCount(['roomVisitors' => function ($q) use ($from, $to) {
