@@ -172,7 +172,8 @@ class AllGameController extends MainController
             [
                 0 => __('joy'),
                 1 => __('OX'),
-                2 => __('Baishun')
+                2 => __('Baishun'),
+                3 => __('Leader cc'),
             ]
         );
         $form->url('mini_url', __('Mini Url'));

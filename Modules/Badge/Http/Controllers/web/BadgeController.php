@@ -90,7 +90,7 @@ class BadgeController extends MainController
             ->rules('required|unique:badges,name,{{id}}');
 
         $form->file('image', __('Default Image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
         })->required();
         $form->select('type', __('Type'))
             ->options(BadgeType::options())

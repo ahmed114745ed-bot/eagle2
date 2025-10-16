@@ -28,5 +28,6 @@
     "RoomBoom": true,
     "Badge": true,
     "RoleRewards": true,
-    "Milestones": true
+    "Milestones": true,
+    "RoomCup": true
 }

@@ -33,16 +33,37 @@ class BadgeDedicateAction extends Action
 
         $badge = Badge::find($request->id);
         $badgeUser = UserBadge::where('user_id', $user->id)->where('badge_id', $badge->id)->active()->first();
-        if($badgeUser) return $this->response()->error(__('dashboard.haveBadges'))->refresh();
+        if ($badgeUser) return $this->response()->error(__('dashboard.haveBadges'))->refresh();
         try {
-           
-            Common::userBadge($user->id, $badge->id, $request->days, 'dedicate');
+
+            $this->userBadge($user->id, $badge->id, $request->days, 'dedicate');
 
             CustomNotification::dedicateBadges($user, $request->days, $badge->name, $badge->image);
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
-           
+
             return $this->response()->error('خطا غير متوقع');
+        }
+    }
+
+    public static function userBadge($userId, $badgeId, $days, $type)
+    {
+        $badgeUser = UserBadge::where('user_id', $userId)->where('badge_id', $badgeId)->active()->first();
+        if ($badgeUser && $badgeUser->expire != 0) {
+            $badgeUser->expire += (($days) * 86400);
+            $badgeUser->receive_type = $type;
+            $badgeUser->auth_id = auth()->id();
+            $badgeUser->save();
+        } elseif (!$badgeUser) {
+            $data = [
+                'user_id' => $userId,
+                'badge_id' => $badgeId,
+                'expire' => time() + (($days) * 86400),
+                'receive_type' => $type,
+                'auth_id' => auth()->id(),
+            ];
+
+            UserBadge::query()->create($data);
         }
     }
 

@@ -48,10 +48,19 @@ class BoxController extends Controller
     {
         $user = $request->user();
         $timestamp = Carbon::now()->timestamp;
+     
+        $roomUid = $request->room_uid;
+        $roomId  = $request->room_id;
 
+        if (!$request->box_id || (!$roomUid && !$roomId)) {
+            return Common::apiResponse(0, 'missing params', null, 422);
+        }
+                
+        $room = Room::when($roomUid, fn($q) => $q->where('uid', $roomUid))
+        ->when($roomId, fn($q) => $q->orWhere('id', $roomId))
+        ->first();
 
-        if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
-        $room = Room::query()->where('uid', $request->room_uid)->first();
+        
         if (!$room)  return Common::apiResponse(0, 'room not found', null, 404);
         $box = Box::query()->find($request->box_id);
         if (!$box) return Common::apiResponse(0, ' box not found', null, 404);

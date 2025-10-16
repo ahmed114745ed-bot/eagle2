@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\ZegoFeatureEvent;
+use App\helper\TimeHelper;
 use Log;
 use Cache;
 use Carbon\Carbon;
@@ -186,6 +187,11 @@ class SettingsController extends Controller
             $data['apple_service_file'] = $file_path;
         }
         unset($data['app_background_image'], $data['brand_background_image_reset']);
+
+        if ($request->has('timezone') || $request->has('week_start') || $request->has('week_end')) {
+            TimeHelper::clearCache();
+
+        }
 
         // Process and save settings
         foreach ($data as $key => $value) {

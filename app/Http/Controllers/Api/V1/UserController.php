@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\AppSettingResource;
 use Auth;
 use Exception;
 use App\Models\Ban;
@@ -195,41 +196,17 @@ class UserController extends Controller
         return Common::apiResponse(true, '', $data, 200);
     }
 
-    public function app_setting()
+    public function appSetting(): JsonResponse
     {
-        $user = auth()->user();
-        $chat_status = settings()->get('chat_status');
-        $showChat = $user->userSetting?->hide_chat ?? $chat_status;
-        // $stop_invite_code = settings()->get('stop_invite_code');
-        $stop_invite_code = getSettingCash('invite_code') ?? 0;
-        if ($stop_invite_code == 1) {
-            $invite_code = true;
-        } else {
-            $invite_code = false;
-            if ($user->userSetting && $user->userSetting->show_invite_code == 1) {
-                $invite_code = true;
-            }
-        }
-        //        $shared = Common::getConfig('shared') ?? '1234';
         $now = now();
 
-        $ban = Ban::where('ban_type_id', 7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
-            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
+        $user = auth()->user()
+            ->load([
+                'bans' => fn($q) => $q->where('ban_type_id', 7)->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [$now]),
+                'salaryRequests' => fn($q) => $q->where('status', 2),
+            ]);
 
-        $data = [
-            'version' => [
-                'android_version'   => settings()->get('android_current_version'),
-                'ios_version'       => settings()->get('ios_current_version'),
-                'huawei_version'    => settings()->get('huawei_current_version'),
-            ],
-            'hide_invite'       => $invite_code,
-            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
-            'shared_key' => Common::getConfig('shared') ?? '1234',
-            'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
-            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
-            'group_ban' => $ban != null ? true : false,
-        ];
-        return Common::apiResponse(true, '', $data, 200);
+        return Common::apiResponse(true, '', AppSettingResource::make($user), 200);
     }
 
     public function charges(Request $request): JsonResponse
@@ -358,7 +335,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
         try {
-            $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
+            $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'), $request->header('iso'));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -722,13 +699,13 @@ class UserController extends Controller
         $lang = app()->getLocale();
 
 
-    
+
         if ($lang == "en") {
             $data = Common::getSettingValue('invitation_content_en');
         } else {
             $data = Common::getSettingValue('invitation_content_ar');
         }
-    
+
         return Common::apiResponse(true, '', $data, 200);
     }
 
