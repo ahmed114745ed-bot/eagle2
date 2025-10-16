@@ -1285,6 +1285,7 @@ class AgencyController extends MainController
         }
         // add vip to user
         // UserCommon::userVip($user,'acceptJoin');
+        MilestoneHelper::grantMilestoneToUser($user, 'host');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
@@ -1335,7 +1336,9 @@ class AgencyController extends MainController
         }
         UserHandling::kickUserFromAgency($user, 0);
         $user->agency_id = 0;
+        $user->type_user = 0;
         $user->save();
+        MilestoneHelper::removeReward($user, 'host');
 
 
         return response()->json([
