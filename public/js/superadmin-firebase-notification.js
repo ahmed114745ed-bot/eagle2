@@ -2,16 +2,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-messaging.js";
 
-const firebaseConfig = {
-  
-    apiKey: "AIzaSyCn9-Z_mz6zlq6A86bvLDkhrrqNuXSd9xg",
-    authDomain: "eagle-24712.firebaseapp.com",
-    projectId: "eagle-24712",
-    storageBucket: "eagle-24712.firebasestorage.app",
-    messagingSenderId: "817000206466",
-    appId: "1:817000206466:web:55bd3dd1ff3848eb91249b"
+const firebaseConfig = window.firebaseConfig;
 
-};
+console.log('Firebase Config:', firebaseConfig);
 
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);

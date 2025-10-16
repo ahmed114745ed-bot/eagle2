@@ -13,6 +13,7 @@ use App\Models\Admin;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Google_Client;
+use Illuminate\Support\Str;
 class SuperAdminNotificationHelper
 {
     public static function notify(
@@ -44,9 +45,13 @@ class SuperAdminNotificationHelper
         if ($superAdminId) {
             $superAdmin = SuperAdmin::find($superAdminId);
             $token = $superAdmin?->fcm_token;
-            if (!empty($token)) {
-                self::sendNotification($token, $title, $message, $url);
-            }
+           
+        if (!empty($token)) {
+           
+            $translatedTitle = __($title);
+            $translatedMessage = __($message);
+            self::sendNotification($token, $translatedTitle, $translatedMessage, $url);
+        }
         }
     
         return $notification;

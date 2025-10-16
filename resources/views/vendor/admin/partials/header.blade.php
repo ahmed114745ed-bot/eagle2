@@ -8,8 +8,16 @@
     window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
     window.ADMIN_TYPE = @json(Auth::user()->type);
     window.ADMIN_ID = @json(Auth::user()->id);
-    
+    window.firebaseConfig = {
+        apiKey: "{{ config('firebase.apiKey') }}",
+        authDomain: "{{ config('firebase.authDomain') }}",
+        projectId: "{{ config('firebase.projectId') }}",
+        storageBucket: "{{ config('firebase.storageBucket') }}",
+        messagingSenderId: "{{ config('firebase.messagingSenderId') }}",
+        appId: "{{ config('firebase.appId') }}"
+    };
 </script>
+
 
 
 <meta name="csrf-token" content="{{ csrf_token() }}">

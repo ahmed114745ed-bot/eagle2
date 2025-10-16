@@ -12,6 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
 class NotificationController extends Controller
 {
@@ -93,12 +94,24 @@ class NotificationController extends Controller
         $grid->column('id', __('ID'))->sortable();
 
         $grid->column('title', __('Title'))->display(function ($title) {
-            $title = __($title);
-            return "<strong>" . e($title) . "</strong>";
+            return '<strong>' . e(__($title)) . '</strong>';
         });
 
-        $grid->column('message', __('Message'))->limit(60);
-
+        $grid->column('message', __('Message'))->display(function ($message) {
+            $data = is_array($this->data) ? $this->data : json_decode($this->data, true);
+        
+            $translated = __(
+                "{$message}",
+                [
+                    'name' => $data['requested_by'] ?? 'غير معروف',
+                    'id' => $data['requested_by_id'] ?? 0,
+                    'coins' => $data['coins_deducted'] ?? 0,
+                ]
+            );
+        
+            return e(Str::limit($translated, 60));
+        });
+        
         $grid->column('data', __('Details'))->display(function ($data) {
             if (is_string($data)) {
                 $data = json_decode($data, true);
