@@ -340,7 +340,7 @@ class BdController extends MainController
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
                 if ($originalAppId !=  $newAppId) {
-                    $OldUserAppId = \App\Models\User::find($originalAppId);
+                    $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
@@ -348,7 +348,7 @@ class BdController extends MainController
 
                     }
 
-                    $newUserAppId = \App\Models\User::find($newAppId);
+                    $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
@@ -370,7 +370,6 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
-
             }
 
 

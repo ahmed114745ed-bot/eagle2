@@ -186,6 +186,20 @@ class MilestoneHelper
     public static function removeReward($user, $slug)
     {
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
-        if ($milestone && $milestone->rewards)  self::revokeRewardFromUser($user, $milestone->rewards);
-    }
+        if ($milestone && $milestone->rewards && $milestone->rewards->count()) {
+            foreach ($milestone->rewards as $reward) {
+                Log::info('Revoking reward from user', [
+                    'user_id' => $user->id,
+                    'milestone_slug' => $slug,
+                    'reward_id' => $reward->id,
+                ]);
+    
+                self::revokeRewardFromUser($user, $reward);
+            }
+        } else {
+            Log::warning('No rewards found for milestone', [
+                'milestone_slug' => $slug,
+                'user_id' => $user->id ?? null,
+            ]);
+        }    }
 }
