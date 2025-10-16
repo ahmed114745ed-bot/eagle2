@@ -61,29 +61,30 @@ class MilestoneHelper
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
-        $exists = UserHistoryReward::where('user_id', $user->id)
+        $existing = UserHistoryReward::withTrashed()
+            ->where('user_id', $user->id)
             ->where('receive_type', $receiveType)
             ->where('rewardable_type', $mr->rewardable_type)
-            ->where('rewardable_id', $mr->rewardable_id)->where('is_deleted', 0)
-            ->exists();
-
-        if ($exists) {
+            ->where('rewardable_id', $mr->rewardable_id)
+            ->first();
+    
+        if ($existing && !$existing->trashed()) {
             return;
         }
-
+    
         UserHistoryReward::create([
-            'user_id'        => $user->id,
-            'receive_type'   => $receiveType,
-            'sub_type'       => 'milestons',
-            'rewardable_id'  => $mr->rewardable_id,
+            'user_id'         => $user->id,
+            'receive_type'    => $receiveType,
+            'sub_type'        => 'milestons',
+            'rewardable_id'   => $mr->rewardable_id,
             'rewardable_type' => $mr->rewardable_type,
-            'extra'          => json_encode([
+            'extra'           => json_encode([
                 'reward' => $mr?->reward,
                 'type'   => $mr?->type,
                 'expire' => $mr?->expire,
             ]),
         ]);
-
+    
         self::applyRewardEffect($user, $mr);
     }
 
