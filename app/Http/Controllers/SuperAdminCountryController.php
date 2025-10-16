@@ -167,7 +167,7 @@ class SuperAdminCountryController extends Controller
         $cacheKey = "country_stats_{$id}";
 
         // Cache for 5 minutes
-        $stats = Cache::remember($cacheKey, 300, function () use ($country) {
+        $stats = \Cache::remember($cacheKey, 300, function () use ($country) {
             return $this->fetchCountryStats($country);
         });
 
