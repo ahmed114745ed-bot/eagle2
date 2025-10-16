@@ -50,7 +50,8 @@ class DeleteBdAction extends RowAction
     
                 Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->app_id]);
             }
-            $owner = User::find($model->app_owner_id);
+            $owner = User::find($model->app_id);
+
             MilestoneHelper::removeReward($owner, 'bd');
 
             $model->delete();
