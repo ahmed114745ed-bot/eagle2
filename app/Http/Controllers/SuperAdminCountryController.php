@@ -296,7 +296,7 @@ class SuperAdminCountryController extends Controller
     private function getTopBds($countryID)
     {
         return Bd::select('bds.id', 'bds.name')
-            ->join('agency_bd', 'bds.id', '=', 'agency_bd.bd_id')
+            ->join('bds', 'bds.id', '=', 'agency_bd.bd_id')
             ->join('agencies', 'agency_bd.agency_id', '=', 'agencies.id')
             ->where('agencies.country_id', $countryID)
             ->selectRaw('COUNT(DISTINCT agencies.id) as total_members')
