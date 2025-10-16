@@ -34,6 +34,10 @@ class BoxUse extends Model
     {
         return $this->belongsTo(Room::class, 'room_uid', 'uid');
     }
+    public function roomV2()
+    {
+        return $this->belongsTo(Room::class, 'room_id', 'id');
+    }
 
     public function userBoxGifts()
     {

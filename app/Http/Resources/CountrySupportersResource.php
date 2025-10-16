@@ -22,6 +22,7 @@ class CountrySupportersResource extends JsonResource
             'phone_code' => @$this->phone_code ?: '',
             'iso' => @$this->iso ?: '',
             'show_url' => route('countries.preview', $this->id),
+            'total_rooms' => $this->whenHas('total_rooms'),
             'supporters' => $this->whenLoaded('supporters', function () {
                 return $this->supporters->map(function ($supporter) {
                     return [

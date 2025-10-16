@@ -4,7 +4,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Events\PublicTestEvent;
 use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
@@ -12,7 +11,6 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
-use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\AppFeatureController;
@@ -63,7 +61,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\MallController as ControllersMallController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -95,7 +92,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
     Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
 
-    Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
@@ -127,6 +123,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
+        Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
     });
 
     // authorization
@@ -211,6 +209,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/create', [RoomController::class, 'store']);
                 Route::get('/{id}', [RoomController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
+                Route::get('/extra-data', [RoomController::class, 'extraDataRoom']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);

@@ -41,6 +41,8 @@
 "owner percentage from the lucky gift": "Şans hediyesinden sahibin yüzdesi",
 "host percentage from the lucky gift": "Şans hediyesinden sunucunun yüzdesi",
     "User Info": "Kullanıcı Bilgisi",
+    "audio": "ses",
+    "This Live is closed": "Bu canlı yayın kapalı",
     "Charge reports": "Şarj raporları",
     "Charge Reports": "Şarj Raporları",
     "Top Gift": "En Çok Gönderilen Hediye",
@@ -48,6 +50,22 @@
     "charge-reports": "Şarj raporları",
     "Achievement Id" : "Başarı Kimliği",
     "Badges" : "rozetler",
+    "dedicate badges": "adama rozetleri",
+"Rules": "kurallar",
+"room boom winners": "oda patlama kazananları",
+"Invitation Code": "davet kodu",
+"Browse super boom rules": "süper boom kurallarına göz at",
+"Create super boom rules": "süper boom kuralları oluştur",
+"Delete super boom rules": "süper boom kurallarını sil",
+"Edit super boom rules": "süper boom kurallarını düzenle",
+"Show super boom rules": "süper boom kurallarını göster",
+    "Room Cup Target Settings": "Oda Kupa Hedefi Ayarları",
+"Room Cup Target Details": "Oda Kupa Hedefi Detayları",
+"Super Admin Configuration": "Süper Yönetici Yapılandırması",
+"Super Admin Details": "Süper Yönetici Detayları",
+"Link": "Bağlantı",
+"Copy": "Kopyala",
+"helper links": "yardımcı bağlantılar",
     "this room has been banned.": "Bu oda yasaklandı.",
     "Owner uuid": "Sahip Kimlik Numarası",
     "YouTube Settings": "YouTube Ayarları",
@@ -70,7 +88,11 @@
 "total price": "Toplam Fiyat",
   "Sender UUID or Shipping Agency ID": "Gönderici UUID veya Kargo Ajansı Kimliği",
   "Receiver UUID or Shipping Agency ID": "Alıcı UUID veya Kargo Ajansı Kimliği",
-
+  "Weekly Room Support": "Haftalık Oda Desteği",
+"Weekly Condition": "Haftalık Koşul",
+"Total Support": "Toplam Destek",
+"Support Reward": "Destek Ödülü",
+"Trophy": "Kupa",
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
     "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",
@@ -3368,10 +3390,76 @@
   "invitation.invitee_reward": "Davetli Ödülü (Coins)",
   "invitation.invitee_reward_help": "Davetli, davet kodunu kullandığında aldığı coin sayısı.",
   "invitation.saved_successfully": "Davet ayarları başarıyla kaydedildi",
+"Show Image": "Resmi Göster",
+"Alternative Image": "Alternatif Resim",
+"Live System Setting:": "Canlı Sistem Ayarı",
+"wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+"Number of Visitors": "Ziyaretçi Sayısı",
+"Number of Admins": "Yönetici Sayısı",
+"Owner Profit": "Sahip Karı",
+"Admin Profit": "Yönetici Karı",
+"Room Cup Targets": "Oda Kupası Hedefleri",
+"room-cup-target": "Oda Kupası Hedefi",
+"Room Cup Settings": "Oda Kupası Ayarları",
+"Enable Room Cup Feature": "Oda Kupası Özelliğini Etkinleştir",
+"ON": "Açık",
+"total profit": "Toplam Kâr",
+"Owner Profit %": "Sahip Kârı %",
+"Admin Profit %": "Yönetici Kârı %",
+"OFF": "Kapalı",
+"Interval (minutes)": "Aralık (dakika)",
+"Save": "Kaydet",
+"Room Cup Daily Rewards": "Oda Kupası Günlük Ödülleri",
+"Owner Name": "Sahip Adı",
+"Owner ID": "Sahip ID",
+"Room ID": "Oda ID",
+"Admin settings": "Yönetici Ayarları",
+ "roomTarget": "Oda Kupası Hedefi: Hediyeler ve ziyaretçiler hedefe ulaşmaya yardımcı olur. Hedefe ulaşıldığında oda sahibi ve yöneticiler coin kazancı alır.",
+"admins number": "Yönetici Sayısı",
+"Room Name": "Oda Adı",
+"Daily Gain": "Günlük Kazanç",
+"Profit Coins": "Kâr (Jeton)",
+"Date": "Tarih",
+"Gain >= X": "Kazanç >= X",
+"ID": "ID",
+"User ID": "Kullanıcı ID",
+"Amount": "Miktar",
+"Type": "Tür",
+"Created At": "Oluşturulma Tarihi",
+"Updated At": "Güncellenme Tarihi",
+
     "Show Image": "Resmi Göster",
     "Alternative Image": "Alternatif Resim",
     "Live System Setting:": "Canlı Sistem Ayarı",
     "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "Select Accounts to Ban": "Yasaklanacak Hesapları Seç",
+    "others": "Diğerleri",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "Gain >": "Kazanç >",
+
+    "Show Image": "Resmi Göster",
+    "Alternative Image": "Alternatif Resim",
+    "Live System Setting:": "Canlı Sistem Ayarı",
+    "Select Accounts to Ban": "Yasaklanacak Hesapları Seç",
+    "others": "Diğerleri",
+    "Schedule Type": "Zamanlama Türü",
+  "Daily": "Günlük",
+  "Every X Days": "Her X Günde",
+  "Weekly": "Haftalık",
+  "Monthly": "Aylık",
+  "Execution Time": "Çalışma Zamanı",
+  "Day (0=Sunday,1=Monday,...)": "Gün (0=Pazar,1=Pazartesi, ...)",
+  "Interval (days)": "Aralık (gün)",
+    "wallet.insufficient_balance": "Bu tutarı şu anda ekleyemezsiniz. İzin verilen en fazla miktar :amount.",
+    "url": "Bağlantı",
+    "Display Discover": "Keşif Göster",
+    "Display Home Top": "Ana Sayfa Üstünü Göster",
+    "Display Home Middle": "Ana Sayfa Ortasını Göster",
+    "Display Live": "Canlı Yayını Göster",
+    "Display Country": "Ülkeleri Göster",
+    "ON": "Açık",
+    "OFF": "Kapalı",
+
 
 "Are you sure?": "Emin misiniz?",
 "This action cannot be undone!": "Bu işlem geri alınamaz!",
@@ -3394,24 +3482,4 @@
     "Friday": "Cuma",
     "Saturday": "Cumartesi",
     "Settings updated successfully.": "Ayarlar başarıyla güncellendi."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

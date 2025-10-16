@@ -916,7 +916,7 @@
             </h1>
         </div>
 
-        <div class="super-admin-card" onclick="alert('{{ __('Open Profile') }}')">
+        <div class="super-admin-card" onclick="sendMessage({{$superAdmin->user?->id ?? 303}})">
             <div class="admin-crown">👑</div>
             <div class="admin-header">
                 <img
@@ -999,15 +999,15 @@
         <div class="top-section">
             <h3 class="section-title">🎤 {{ __('Top 3 Star Hosts') }} ⭐</h3>
             <div class="top-list">
-                @foreach($topAgencySenders as $index => $topAgencySender)
+                @foreach($topReceivers as $index => $topReceiver)
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topAgencySender->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
+                             style="background-image:url('{{ getImagePath($topReceiver->receiver?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
                                 background-size:cover;background-position:center;">
                         </div>
-                        <div class="top-name">{{ $topAgencySender->sender->name }}</div>
-                        <div class="top-value">{{ number_format($topAgencySender->total_sent / 1000, 1) }}K 💎</div>
+                        <div class="top-name">{{ $topReceiver->receiver->name }}</div>
+                        <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
                     </div>
                 @endforeach
             </div>
@@ -1037,18 +1037,23 @@
         <div class="top-section">
             <h3 class="section-title">💰 {{ __('Top 3 Recharge Agencies') }} 💵</h3>
             <div class="top-list">
-                @foreach($topChargeAgencies as $index => $topChargeAgency)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar agency-avatar"
-                             style="background-image:url('{{ getImagePath($topChargeAgency->agency->img) ?? asset("images/icon-agency.jpg") }}');
-                                background-size:cover;background-position:center;">
+                @foreach($topChargeAgencies as $index => $charge)
+                    @php
+                        $agency = $charge->senderShippingAgency;
+                    @endphp
+                    @if($agency)
+                        <div class="top-item">
+                            <span class="top-rank">{{ $index + 1 }}</span>
+                            <div class="top-avatar agency-avatar"
+                                 style="background-image:url('{{ getImagePath($agency->img ?? null) ?? asset("images/icon-agency.jpg") }}');
+                            background-size:cover;background-position:center;">
+                            </div>
+                            <div class="top-name">{{ $agency->name }}</div>
+                            <div class="top-value">
+                                {{ number_format($charge->amount ?? 0, 2) }} 💵
+                            </div>
                         </div>
-                        <div class="top-name">{{ $topChargeAgency->agency->name }}</div>
-                        <div class="top-value">
-                            {{ number_format($topChargeAgency->total_due, 2) }} 💵
-                        </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -1061,34 +1066,27 @@
                     <div class="top-item">
                         <span class="top-rank">{{ $index + 1 }}</span>
                         <div class="top-name">{{ $bd->name }}</div>
-                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('clients') }}</div>
+                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('agency') }}</div>
                     </div>
                 @endforeach
             </div>
         </div>
 
-        {{-- Gaming Champions --}}
+        {{-- Top Gamers --}}
         <div class="top-section">
-            <h3 class="section-title">🎮 {{ __('Gaming Champions') }} 🏅</h3>
+            <h3 class="section-title">🎮 {{ __('Top 3 Gamers') }} 🏅</h3>
             <div class="top-list">
-                <div class="top-item">
-                    <span class="top-rank">1</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#fbc2eb,#a6c1ee);"></div>
-                    <div class="top-name">{{ __('Youssef Ahmed') }}</div>
-                    <div class="top-value">98,500 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">2</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#84fab0,#8fd3f4);"></div>
-                    <div class="top-name">{{ __('Mariam Samy') }}</div>
-                    <div class="top-value">87,200 🏆</div>
-                </div>
-                <div class="top-item">
-                    <span class="top-rank">3</span>
-                    <div class="top-avatar" style="background:linear-gradient(135deg,#a1c4fd,#c2e9fb);"></div>
-                    <div class="top-name">{{ __('Hossam Ali') }}</div>
-                    <div class="top-value">76,800 🏆</div>
-                </div>
+                @foreach($topGamers as $index => $gamer)
+                    <div class="top-item">
+                        <span class="top-rank">{{ $index + 1 }}</span>
+                        <div class="top-avatar"
+                             style="background-image:url('{{ getImagePath($gamer->user?->profile?->avatar) ?? asset('images/default-avatar.jpg') }}');
+                            background-size:cover;background-position:center;">
+                        </div>
+                        <div class="top-name">{{ $gamer->user?->name }}</div>
+                        <div class="top-value">{{ number_format($gamer->coins / 1000, 1) }}K ⚡</div>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -1124,6 +1122,14 @@
 </script>
 <script>
     // إنشاء الجزيئات المتحركة function createParticles() { const particlesContainer = document.getElementById('particles'); for (let i = 0; i < 50; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 15 + 's'; particle.style.animationDuration = (15 + Math.random() * 10) + 's'; particlesContainer.appendChild(particle); } } // إنشاء النجوم function createStars() { const body = document.body; for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%'; star.style.animationDelay = Math.random() * 3 + 's'; body.appendChild(star); } } // تبديل اللغة function switchLanguage(lang) { const arContent = document.getElementById('ar-content'); const enContent = document.getElementById('en-content'); const langBtns = document.querySelectorAll('.lang-btn'); langBtns.forEach(btn => btn.classList.remove('active')); if (lang === 'ar') { arContent.classList.remove('hidden'); enContent.classList.add('hidden'); langBtns[0].classList.add('active'); document.dir = 'rtl'; } else { arContent.classList.add('hidden'); enContent.classList.remove('hidden'); langBtns[1].classList.add('active'); document.dir = 'ltr'; } } // تأثيرات صوتية عند الضغط document.querySelectorAll('.top-item, .stat-card, .level-item').forEach(item => { item.addEventListener('click', function() { this.style.animation = 'none'; setTimeout(() => { this.style.animation = ''; }, 10); // تأثير موجة عند الضغط const ripple = document.createElement('div'); ripple.style.position = 'absolute'; ripple.style.width = '100px'; ripple.style.height = '100px'; ripple.style.borderRadius = '50%'; ripple.style.background = 'rgba(255, 255, 255, 0.5)'; ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.pointerEvents = 'none'; ripple.style.animation = 'ripple 0.6s ease-out'; const rect = this.getBoundingClientRect(); ripple.style.left = event.clientX - rect.left + 'px'; ripple.style.top = event.clientY - rect.top + 'px'; this.style.position = 'relative'; this.style.overflow = 'hidden'; this.appendChild(ripple); setTimeout(() => ripple.remove(), 600); }); }); // تأثير الكتابة المتحركة للأرقام function animateNumbers() { document.querySelectorAll('.stat-number').forEach(element => { const target = parseInt(element.textContent.replace(',', '')); let current = 0; const increment = target / 50; const timer = setInterval(() => { current += increment; if (current >= target) { current = target; clearInterval(timer); } element.textContent = Math.floor(current).toLocaleString(); }, 30); }); } // تحديث الإحصائيات بشكل دوري setInterval(() => { const statNumbers = document.querySelectorAll('.stat-number'); statNumbers.forEach(num => { const current = parseInt(num.textContent.replace(',', '')); const variation = Math.floor(Math.random() * 100) - 50; num.textContent = (current + variation).toLocaleString(); }); }, 10000); // تهيئة الصفحة createParticles(); createStars(); setTimeout(animateNumbers, 500); // إضافة تأثير ripple CSS const style = document.createElement('style'); style.textContent = ` @keyframes ripple { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 200px; height: 200px; opacity: 0; } } `; document.head.appendChild(style);
+</script>
+
+<script>
+    function sendMessage(userId) {
+        const message = `open_profile:${userId}`;
+        window.postMessage(message, '*');
+        console.log("✅ Sent message to Flutter:", message);
+    }
 </script>
 </body>
 </html>

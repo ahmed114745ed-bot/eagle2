@@ -18,9 +18,9 @@ class UserCharismaService
 
     public function __construct() { }
 
-    public function roomCharisma($owner_id)
+    public function roomCharisma($room_id)
     {
-        $room = Room::withoutAppends()->where('charizma_status', true)->where('uid', $owner_id)->first();
+        $room = Room::withoutAppends()->where('charizma_status', true)->where('id', $room_id)->first();
         if (!$room) {
             return [];
         }
@@ -36,6 +36,8 @@ class UserCharismaService
 
         return CharismaResource::collection($charisma);
     }
+
+
 
     public function RemoveUserRoomWhenLeaveMic($userId,$roomId)
     {

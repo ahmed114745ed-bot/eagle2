@@ -2,19 +2,30 @@
 
 namespace App\Admin\Controllers;
 
+use App\Jobs\SendChargeNotificationJob;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\Setting;
+use App\Helpers\UserCommon;
+use App\Models\UserSallary;
+use App\Enums\UserCoinLogType;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use App\Helpers\UserCoinLogHelper;
+use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\UsersChargeAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class UsersChargeController extends MainController
 {
     use HasResourceActions;
+
+    const reason = 'return-coins-9-2025';
     public $permission_name = 'charge-to-user';
 
 
@@ -159,48 +170,110 @@ class UsersChargeController extends MainController
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(Charge::findOrFail($id));
 
-        //        $show->id('ID');
-        //        $show->charger_id('charger_id');
-        //        $show->charger_type('charger_type');
-        //        $show->user_id('user_id');
-        //        $show->user_type('user_type');
-        //        $show->amount('amount');
-        //        $show->amount_type('amount_type');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow($show);
-        return $show;
+    public function chargeUser()
+    {
+        $month = 9;
+        $year = 2025;
+        $reason = self::reason;
+
+        $chunkSize = 500; // adjust based on memory/performance
+
+        $processedCount = 0;
+
+        UserSallary::with('user:id,di,notification_id,is_logout')
+            ->where('month', $month)
+            ->where('year', $year)
+            ->where('remaining_diamond', '!=', 0)
+            ->select(['id', 'user_id', 'remaining_diamond'])
+            ->chunk($chunkSize, function ($userSalaries) use (&$processedCount, $reason) {
+
+                // Get all charged user IDs in this chunk only
+                $chargedUserIds = Charge::whereIn('user_id', $userSalaries->pluck('user_id'))
+                    ->where('reason_en', $reason)
+                    ->pluck('user_id')
+                    ->toArray();
+
+                $charges = [];
+
+                foreach ($userSalaries as $userSalary) {
+                    $user = $userSalary->user;
+
+                    if (!$user || in_array($user->id, $chargedUserIds)) {
+                        continue;
+                    }
+
+                    $coin = $userSalary->remaining_diamond * 0.5;
+                    $amountBefore = $user->di;
+
+                    // Log coins
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        $coin,
+                        $amountBefore,
+                        UserCoinLogType::ADMIN_CHARGES,
+                    );
+
+                    // Update user balance
+                    $user->increment('di', $coin);
+
+                    $charges[] = [
+                        'charger_id'      => 1,
+                        'charger_type'    => 'dash',
+                        'user_id'         => $user->id,
+                        'agency_id'       => null,
+                        'user_type'       => 'user',
+                        'amount'          => $coin,
+                        'usd'             => 0,
+                        'balance_before'  => $amountBefore,
+                        'reason_en'       => $reason,
+                        'created_at'      => now(),
+                        'updated_at'      => now(),
+                    ];
+
+                    // Dispatch queued job for notification
+                    SendChargeNotificationJob::dispatch(
+                        $user,
+                        'Coins Added',
+                        "You have received {$coin} coins from admin.",
+                        ['coins' => $coin]
+                    )->onQueue('notifications');
+                }
+
+                // Bulk insert charges for this chunk
+                if (!empty($charges)) {
+                    Charge::insert($charges);
+                    $processedCount += count($charges);
+                }
+            });
+
+        return response()->json([
+            'message' => 'User charge process completed successfully.',
+            'count'   => $processedCount,
+        ]);
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
+
+
+    private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
     {
-        $form = new Form(new Charge);
+        $charge = new Charge();
+        $charge->charger_id = 1;
+        $charge->charger_type =  'dash';
+        $charge->user_id = $user->id;
+        $charge->agency_id =   null;
+        $charge->user_type = 'user';
+        $charge->amount = $coins;
+        $charge->usd = $usdAmount;
+        $charge->balance_before =  $user->di  - $coins;
+        $charge->reason_en = self::reason;
+        $charge->save();
 
-        //        $form->display('ID');
-        //        $form->text('charger_id', 'charger_id');
-        //        $form->text('charger_type', 'charger_type');
-        //        $form->text('user_id', 'user_id');
-        //        $form->text('user_type', 'user_type');
-        //        $form->text('amount', 'amount');
-        //        $form->text('amount_type', 'amount_type');
-        //        $form->display(trans('admin.created_at'));
-        //        $form->display(trans('admin.updated_at'));
+//        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
+    }
 
-        return $form;
+    private function recentlyCharged(int $userId)
+    {
+        return Charge::where('user_id', $userId)->where('reason_en',self::reason )->exists();
     }
 }

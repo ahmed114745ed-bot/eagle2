@@ -48,6 +48,7 @@ class HomeCarousel extends Model
                     ->select(['countries.id', 'countries.name', 'countries.e_name', 'countries.flag'])
                     ->withPivot('home_carousel_id', 'country_id');
     }
+
     protected static function boot()
     {
         parent::boot();

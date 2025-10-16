@@ -23,7 +23,7 @@ class ReceiverGiftLogResource extends JsonResource
             'uuid' => @$this->receiver->uuid ?? '', // both
             'name' => @$this->receiver->name ?: '', // both
             'image' => $this->receiver->profile->avatar ?: '',
-            'exp'   => $this->exp ?? '',
+            'exp'   => number_format(floatval($this->exp ?? 0.0)) ?? '',
             'image_color'          => @$this->receiver->color_image,
             'id_image'             => @$this->receiver->specialId?->ware?->show_img ?? '',
             'level' => Common::level_center_min(@$this->receiver->id), // refactor
