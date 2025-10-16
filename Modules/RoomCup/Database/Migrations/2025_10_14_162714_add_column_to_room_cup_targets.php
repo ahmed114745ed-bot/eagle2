@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('room_cup_targets')) {
-            Schema::table('room_cup_targets', function (Blueprint $table) {
-                if (!Schema::hasColumn('room_cup_targets', 'total_profit')) {
-                    $table->decimal('total_profit', 8, 2)->default(0);
-                }
-                if (!Schema::hasColumn('room_cup_targets', 'owner_percentage')) {
-                    $table->integer('owner_percentage')->default(0);
-                }
-                if (!Schema::hasColumn('room_cup_targets', 'admin_percentage')) {
-                    $table->integer('admin_percentage')->default(0);
-                }
-            });
+            // Schema::table('room_cup_targets', function (Blueprint $table) {
+            //     if (!Schema::hasColumn('room_cup_targets', 'total_profit')) {
+            //         $table->decimal('total_profit', 8, 2)->default(0);
+            //     }
+            //     if (!Schema::hasColumn('room_cup_targets', 'owner_percentage')) {
+            //         $table->integer('owner_percentage')->default(0);
+            //     }
+            //     if (!Schema::hasColumn('room_cup_targets', 'admin_percentage')) {
+            //         $table->integer('admin_percentage')->default(0);
+            //     }
+            // });
         }
     }
 
