@@ -187,7 +187,7 @@ class UserService
 
     public function processUserData($user, $deviceToken, $lat, $long, $iso)
     {
-        $countryId = null;
+        $countryId = $user->country_id;
 
         if ($iso) {
             $country = Country::where('iso', strtoupper($iso))->first();
