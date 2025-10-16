@@ -26,14 +26,21 @@ class CoreWalletsSeeder extends Seeder
             'mall',
             'vip',
             'ads',
-            'invitation_code_wallet'
+            'invitation_code_wallet',
+            'room_cup_target'
         ];
+        
+        $negativeWallets = [
+            'invitation_code_wallet',
+            'room_cup_target',
+        ];
+        
         
         foreach ($walletNames as $name) {
             CoreWallets::updateOrCreate(
                 ['name' => $name], 
                 [
-                    'is_negative' => $name === 'invitation_code_wallet'
+                    'is_negative' =>in_array($name,$negativeWallets)
                 ]
             );
         }

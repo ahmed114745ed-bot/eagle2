@@ -47,6 +47,7 @@ class RegisterRequest extends FormRequest
 
         $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
         $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
+        $rules['iso'] = ['sometimes', 'string', 'size:2'];
 
         return $rules;
     }

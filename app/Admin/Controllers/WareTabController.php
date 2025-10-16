@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
+use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
@@ -333,7 +334,7 @@ class WareTabController extends MainController
             })
             ->default('1.png');
 
-        $form->display('img2', 'Preview')->with(function ($value) {
+       /* $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return "<div id='preview-display-img2'></div>";
 
             $url = \Storage::disk(config('admin.upload.disk'))->url($value);
@@ -349,7 +350,7 @@ class WareTabController extends MainController
             return "<div id='preview-display-img2'>
                 <img src='{$url}' style='max-height:150px' class='img img-thumbnail' />
             </div>";
-        });
+        });*/
 
         // تحسين حقل img2 بشكل كامل
         $form->file('img2', trans('svg'))
@@ -366,11 +367,8 @@ class WareTabController extends MainController
                     return 'svga_' . Str::random(8) . '.svg';
                 }
 
-                return 'svga_' . Str::random(8) . '.' . $extension;
-            })
-            ->attribute(['id' => 'file-input-img2'])
-            ->rules('mimes:svg,svga,mp4,mov,avi,mkv,png,jpg,jpeg,gif,webp,webm')
-            ->hidePreview();
+                return 'animation_' . Str::random(8) . '.' . $extension;
+            });
 
         $form->select('image_type1', __('image_type'))->options([
             'svga' => __('svga'),
@@ -473,7 +471,14 @@ class WareTabController extends MainController
 
                 // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
-                    Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
+                    /** @var FileService $fileService*/
+                    $fileService = app( FileService::class);
+                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
+
+                    $form->input('detected_profile_frame_type', $ext);
+                    $form->profile_frame_type = $ext;
+                    LogHelper::info('This ext ', $ext);
+                    /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
                         'original_name' => $img2->getClientOriginalName(),
                         'original_extension' => $img2->getClientOriginalExtension(),
                         'mime_type' => $img2->getMimeType(),
@@ -505,7 +510,7 @@ class WareTabController extends MainController
                     // /** @var FileService $fileService*/
                     // $fileService = app(FileService::class);
                     // $extFromService = $fileService->getExtension($img2, $wareId, getFromService: true);
-                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);
+                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);*/
                 }
             });
         }
@@ -534,12 +539,12 @@ class WareTabController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            if ($form->img2 instanceof UploadedFile) {
+            /*if ($form->img2 instanceof UploadedFile) {
                 $originalName = $form->img2->getClientOriginalName();
                 info('form image', [$form->img2]);
                 info('originalName', [$originalName]);
                 $model->update(['img2' => $originalName]);
-            }
+            }*/
 
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;

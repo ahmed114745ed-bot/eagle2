@@ -13,6 +13,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Resources\Api\V1\BoxUseResource;
 
@@ -45,7 +46,7 @@ class BoxService
         $user->decrement('di', $box->coins);
         try {
             DB::commit();
-            $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
+            $c = BoxUse::query()->where('room_id', $room->id)->where('not_used_num', '>', 0)->count();
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
                 Carbon::createFromTimestamp($boxU->end_at)
             );
@@ -138,7 +139,6 @@ class BoxService
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
-
         dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
 
         $key  = 'BoxUse_' . $boxUser->id;

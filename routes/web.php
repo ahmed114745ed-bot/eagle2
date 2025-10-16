@@ -1,35 +1,37 @@
 <?php
 
-use App\Admin\Controllers\BdController;
-use App\Exports\AgencyChargeTransactions;
-use  App\helper\TimeHelper;
-use App\Http\Controllers\Api\V1\GiftLogController;
-use App\Http\Controllers\PayPalController;
-use App\Http\Controllers\BdSalaryMigrationController;
-use App\Http\Controllers\SuperAdminCountryController;
-use App\Jobs\UpdateUserFollowCountsJob;
+use App\Models\Country;
+use Carbon\Carbon;
 use App\Models\Ban;
-use App\Models\CoinLog;
-use App\Models\PaymentCoin;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Models\CoinLog;
+use  App\helper\TimeHelper;
+use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
-use Carbon\Carbon;
-use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
+use App\Models\CoinGameUserAll;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
+use Modules\Vip\Entities\VipPrivilege;
+use App\Admin\Controllers\BdController;
+use App\Jobs\UpdateUserFollowCountsJob;
 use App\Admin\Controllers\UserController;
+use App\Exports\AgencyChargeTransactions;
+use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\AppearChargerAgencyController;
-use App\Facades\CustomNotification;
+use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -319,6 +321,9 @@ Route::get('/clear-admin-error', function () {
     return 'Session cleared!';
 });
 
+
+//Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
+
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
 });
@@ -437,7 +442,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
-Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview');
+Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
 Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
 
 Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
@@ -464,7 +469,7 @@ Route::get('/test-games', function () {
     return $records;
 })->name('test-games');
 
-use App\Models\CoinGameUserAll;
+
 
 
 
@@ -531,7 +536,17 @@ Route::get('/fix-bans-user-id', function () {
 });
 
 
+Route::get('update/countries', function () {
+    $userCountries = User::whereNotNull('country_id')->get()->pluck('country_id')->toArray();
 
+    $unique = array_unique($userCountries);
+
+    Country::whereIn('id', $unique)->update(['status' => 1]);
+
+    Country::whereNotIn('id', $unique)->update(['status' => 0]);
+
+    return 'done';
+});
 
 Route::get('/week-zone', function () {
 
@@ -546,3 +561,18 @@ Route::get('/week-zone', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'CleanUpDuplicateCountriesSeeder',
+    ]);
+
+    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
+});
+
+
+// Main page route
+Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');

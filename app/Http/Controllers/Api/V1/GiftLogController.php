@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\GiftBannerEvent;
 use App\Jobs\CleanGiftLogsJob;
 use App\Models\Cp;
 use App\Models\Pk;
@@ -276,7 +277,7 @@ class GiftLogController extends Controller
         // Update when sending the gift
         $validator = Validator::make($request->all(), [
             'id'       => 'required',
-            'owner_id' => 'required',
+            'owner_id' => 'nullable',
             'toUid'    => 'required',
             'num'      => 'required|integer|min:1',
             'type'     => 'nullable',
@@ -293,6 +294,7 @@ class GiftLogController extends Controller
         }
 
         settings()->set('gift_send', true);
+
 
         return Common::apiResponse(true, $message);
     }
@@ -364,7 +366,7 @@ class GiftLogController extends Controller
 
         $validator = Validator::make($request->all(), [
             'id'       => 'required',
-            'owner_id' => 'required',
+            'owner_id' => 'nullable',
             'toUid'    => 'required',
             'num'      => 'required|integer|min:1',
             'count'    => 'sometimes|integer|min:1',

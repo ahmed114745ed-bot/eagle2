@@ -88,9 +88,6 @@ class PkController extends Controller
     {
 
         if (!$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-
-        if (!$request->owner_id && !$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-
         try {
             $pk = $this->pkService->closePk($request->pk_id);
         } catch (Exception $e) {
@@ -136,10 +133,10 @@ class PkController extends Controller
 
     public function hidePk(Request $request)
     {
-        if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+        if (!$request->owner_id && !$request->room_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
 
         try {
-            $room = $this->pkService->showPkOrHide($request->owner_id, 0);
+            $room = $this->pkService->showPkOrHide($request->owner_id, status: 0, roomId: $request->room_id);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
@@ -150,7 +147,7 @@ class PkController extends Controller
         ];
         $json = json_encode($d);
         $jsons[] = $json;
-        $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {
@@ -183,14 +180,14 @@ class PkController extends Controller
     public function showPK(Request $request)
     {
         $isPkCustom = true;
-        if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+        if (!$request->owner_id && !$request->room_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         try {
-            $room = $this->pkService->showPkOrHide($request->owner_id, status: 1, isPkCustom: $isPkCustom);
+            $room = $this->pkService->showPkOrHide($request->owner_id, status: 1, isPkCustom: $isPkCustom, roomId: $request->room_id);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
         if ($isPkCustom) {
-            $jsons[] = $this->changeBackground($room, $request->owner_id, PK_IMAGE);
+            $jsons[] = $this->changeBackground($room, $room->uid, PK_IMAGE);
         }
         $mc   = [
             'messageContent' => [

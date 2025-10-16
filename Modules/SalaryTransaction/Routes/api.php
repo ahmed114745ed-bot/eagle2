@@ -16,7 +16,7 @@ use Modules\SalaryTransaction\Http\Controllers\Api\SalaryTransactionController;
     | is assigned the "api" middleware group. Enjoy building your API!
     |
 */
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'agencyFeature'])->group (
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group (
     function (){
         Route::prefix('salary-transaction')->group(function () {
             Route::post('add-request', [SalaryTransactionController::class, 'add_request_salary']);
@@ -40,7 +40,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
             Route::post('charge_co_for_users2', [AgentSalaryTransactionController::class, 'send_money_for_the_host']);
             Route::get('charge-agent-history', [AgentSalaryTransactionController::class, 'chargeCoForUserHistory']);
             Route::get( 'hosts-agency-dollars-history', [AgentSalaryTransactionController::class, 'chargeDollarForUserHistory']);
-            
+
         });
 
     }

@@ -10,6 +10,7 @@ use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteShippingAgencyAction extends RowAction
 {
@@ -24,6 +25,9 @@ class DeleteShippingAgencyAction extends RowAction
     {
         try {
             DB::beginTransaction();
+            $owner = User::find($model->app_owner_id);
+            MilestoneHelper::removeReward($owner, 'charge-agency-owner');
+
             $model->delete();
             DB::commit();
             return $this->response()->success(__('dashboard.successful'))->refresh();
