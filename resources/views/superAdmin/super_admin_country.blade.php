@@ -438,7 +438,7 @@
         $('#loadingOverlay').removeClass('hidden');
 
         $.ajax({
-            url: `country/${countryId}/stats`,
+            url: {{route('country.stats', ['id' => $country->id])}},
             method: 'GET',
             success: function(data) {
                 renderStats(data);
