@@ -569,3 +569,10 @@ Route::get('update-country-id', function () {
 
     return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
 });
+
+
+// Main page route
+Route::get('/country-v2/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('/api/country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
