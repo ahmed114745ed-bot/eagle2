@@ -21,6 +21,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 
 
@@ -343,12 +344,16 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
+                        MilestoneHelper::removeReward($OldUserAppId, 'bd');
+
                     }
 
                     $newUserAppId = \App\Models\User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
+                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+
                 }
             }
 
@@ -365,6 +370,7 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
+
             }
 
 

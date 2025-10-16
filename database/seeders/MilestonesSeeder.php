@@ -42,6 +42,18 @@ class MilestonesSeeder extends Seeder
                 'description' => 'Milestone for family owners',
                 'is_active'   => true,
             ],
+            [
+                'name'        => 'Super admin',
+                'slug'        => 'super-admin',
+                'description' => 'Milestone for Super admin',
+                'is_active'   => true,
+            ],
+            [
+                'name'        => 'BD',
+                'slug'        => 'bd',
+                'description' => 'Milestone for BD',
+                'is_active'   => true,
+            ],
         ];
 
         foreach ($milestones as $milestone) {
