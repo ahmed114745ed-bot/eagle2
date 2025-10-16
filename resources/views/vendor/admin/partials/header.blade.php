@@ -14,8 +14,11 @@
         projectId: "{{ config('firebase.projectId') }}",
         storageBucket: "{{ config('firebase.storageBucket') }}",
         messagingSenderId: "{{ config('firebase.messagingSenderId') }}",
-        appId: "{{ config('firebase.appId') }}"
+        appId: "{{ config('firebase.appId') }}",
+        vapidKey: "{{ config('firebase.vapid_key') }}"
     };
+    window.ADMIN_ID = @json(Auth::user()->id);
+
 </script>
 
 
