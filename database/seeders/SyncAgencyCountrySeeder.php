@@ -35,12 +35,6 @@ class SyncAgencyCountrySeeder extends Seeder
             return $bd->country_id == 0;
         });
 
-        $info = Agency::where(function ($q){
-            $q->whereNull('bd_id')->orWhere('bd_id', 0);
-        })->get();
-
-        info($info);
-
         Agency::where(function ($q){
             $q->whereNull('bd_id')->orWhere('bd_id', 0);
         })

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Charge;
@@ -378,7 +379,7 @@ class SuperAdminController extends MainController
             if (!$isEditing) {
                 $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
 
-                DB::table('admin_users')->insert([
+                $newBdId = DB::table('admin_users')->insertGetId([
                     'parent_id' => $superAdmin->id,
                     'username' => 'bd' . $countryName . 'default',
                     'name' => 'bd' . $countryName . 'default',
@@ -389,6 +390,18 @@ class SuperAdminController extends MainController
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
+
+                Agency::where('country_id', $superAdmin->country_id)->where(function ($q){
+                    $q->whereDoesntHave('bd')
+                        ->orWhereHas('bd', function($q){
+                            $q->where([
+                                'default' => 1,
+                                'country_id' => 0
+                            ]);
+                        });
+                })->update(['bd_id' => $newBdId]);
             }
         });
 
@@ -410,7 +423,7 @@ class SuperAdminController extends MainController
             });
 
         $form->hidden('phone_code')->default(function ($form) {
-            return $form->model()->phone_code ?? '';;
+            return $form->model()->phone_code ?? '';
         });
 
 
