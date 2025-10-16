@@ -355,6 +355,15 @@ class BdController extends MainController
                     MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
 
                 }
+            }else{
+                $userAppId = $form->model()->app_id;
+                $userApp = User::find($userAppId);
+                if (isset($userApp)) {
+                    $userApp->is_bd = 1;
+                    $userApp->save();
+                    MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
+
+                }
             }
 
             if ($form->password && $form->model()->password != $form->password) {
@@ -365,12 +374,6 @@ class BdController extends MainController
         $form->saved(function (Form $form) {
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
-
-            $userApp = User::find($userAppId);
-            if (isset($userApp)) {
-                $userApp->is_bd = 1;
-                $userApp->save();
-            }
 
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
