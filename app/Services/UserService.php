@@ -212,7 +212,7 @@ class UserService
         // end update location
 
         $this->userRepository->updateCountry($user, $countryId);
-        $this->updateCountryAgencyAndBD($user->id, $countryId);
+//        $this->updateCountryAgencyAndBD($user->id, $countryId);
 
         return $this->userRepository->getUserWithMedals($user->id);
     }
