@@ -135,13 +135,11 @@ trait PaymentTrait
     
         (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
     
-        Log::info("Stripe Webhook: User {$user->id} credited with {$coinLog->obtained_coins} coins");
     }
     
     private function processAgencyPayment(ShippingAgency $agency, CoinLog $coinLog): void
     {
         $agency->increment('coins', $coinLog->obtained_coins);
-        Log::info("Stripe Webhook: Agency {$agency->id} credited with {$coinLog->obtained_coins} coins");
     }
     
     private function transactionNotFoundResponse()

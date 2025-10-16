@@ -307,9 +307,7 @@ class PayPalService
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
 
-                Log::info($eventType);
-                info('APPROVED', ['trx' => $coinLog->trx]);
-                info('APPROVED', ['payment id' => $paypalId]);
+         
                 return response()->json([
                     'status'  => true,
                     'trx'     =>  $paypalId,
@@ -317,8 +315,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.PENDING':
-                info('PENDING', ['trx' => $coinLog->trx]);
-                info('PENDING', ['payment id' => $paypalId]);
+            
                 $coinLog->update(['status' => PaymentStatus::PENDING, 'trx' => $paypalId]);
                 return response()->json([
                     'status'  => true,
@@ -327,13 +324,11 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
-                info('COMPLETED', ['trx' => $coinLog->trx]);
-                info('COMPLETED', ['payment id' => $paypalId]);
+           
                 return $this->webhookPayment($paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
-                info('DENIED', ['trx' => $coinLog->trx]);
-                info('DENIED', ['payment id' => $paypalId]);
+            
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
 
                 return response()->json([
@@ -343,8 +338,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
-                info('DECLINED', ['trx' => $coinLog->trx]);
-                info('DECLINED', ['payment id' => $paypalId]);
+             
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
                 return response()->json([
                     'status'  => false,
@@ -353,8 +347,7 @@ class PayPalService
                 ]);
 
             default:
-                info('default', ['trx' => $coinLog->trx]);
-                info('default', ['payment id' => $paypalId]);
+          
                 $coinLog->update(['trx' => $paypalId]);
                 return response()->json([
                     'status'  => 'ignored',

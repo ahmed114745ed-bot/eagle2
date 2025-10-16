@@ -423,13 +423,7 @@ class WareTabController extends MainController
                 $img2 = $form->img2;
                 $wareId = $form->model()->id;
 
-                Log::info('🟢 [Form Saving Started]', [
-                    'model_id' => $form->model()->id,
-                    'has_show_img' => (bool) $form->show_img,
-                    'has_existing_show_img' => (bool) $form->model()->show_img,
-                    'has_img2' => (bool) $form->img2,
-                    'has_existing_img2' => (bool) $form->model()->img2,
-                ]);
+       
 
                 $hasImg2 = $img2 || $form->model()->img2;
 
@@ -452,13 +446,7 @@ class WareTabController extends MainController
                     // إعطاء الأولوية للامتداد الأصلي
                     $ext = !empty($originalExt) ? $originalExt : $guessedExt;
 
-                    Log::info('🖼 show_img uploaded', [
-                        'original_name' => $form->show_img->getClientOriginalName(),
-                        'original_extension' => $originalExt,
-                        'guessed_extension' => $guessedExt,
-                        'final_extension' => $ext,
-                        'mime_type' => $form->show_img->getMimeType(),
-                    ]);
+               
 
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
