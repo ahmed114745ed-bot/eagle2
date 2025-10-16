@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -467,8 +469,7 @@ Route::get('/test-games', function () {
     return $records;
 })->name('test-games');
 
-use App\Http\Controllers\SuperAdminCountryController;
-use App\Admin\Controllers\AppearChargerAgencyController;
+
 
 
 
@@ -535,7 +536,17 @@ Route::get('/fix-bans-user-id', function () {
 });
 
 
+Route::get('update/countries', function () {
+    $userCountries = User::whereNotNull('country_id')->get()->pluck('country_id')->toArray();
 
+    $unique = array_unique($userCountries);
+
+    Country::whereIn('id', $unique)->update(['status' => 1]);
+
+    Country::whereNotIn('id', $unique)->update(['status' => 0]);
+
+    return 'done';
+});
 
 Route::get('/week-zone', function () {
 
@@ -550,3 +561,18 @@ Route::get('/week-zone', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'CleanUpDuplicateCountriesSeeder',
+    ]);
+
+    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
+});
+
+
+// Main page route
+Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');

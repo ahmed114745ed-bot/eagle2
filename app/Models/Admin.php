@@ -39,6 +39,10 @@ class Admin extends Administrator
     {
         return $this->hasMany(Agency::class, 'agency_manger_id');
     }
+    public function user()
+    {
+        return $this->hasOne(User::class, 'app_id');
+    }
 
     public function per()
     {

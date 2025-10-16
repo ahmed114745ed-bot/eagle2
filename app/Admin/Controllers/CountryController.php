@@ -70,10 +70,14 @@ class CountryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Country);
+        $grid->model()->orderByDesc('status');
 
         $grid->id(__ ('ID'));
-        $grid->name(trans('name'));
-        $grid->e_name(trans('english name'));
+//        $grid->name(trans('name'));
+//        $grid->e_name(trans('english name'));
+        $grid->column('e_name', __('name'))->display(function ($value) {
+            return __("countries.$value");
+        });
         $grid->phone_code(trans('phone code'));
         // $grid->column('language',trans ('language'));
         $grid->column ('flag',trans ('flag'))->image ('',30);
@@ -84,7 +88,8 @@ class CountryController extends MainController
         $grid->column ('status',trans ('status'))->switch (Common::getSwitchStates ());
         $this->extendGrid ($grid);
         $grid->disableExport();
-
+        $grid->disableActions();
+        $grid->disableCreateButton();
         return $grid;
     }
 

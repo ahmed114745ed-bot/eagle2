@@ -982,3 +982,17 @@ if (!function_exists('respond_and_continue')) {
         exit; // ensure no further output
     }
 }
+
+
+if (!function_exists('isValidTimezone')) {
+    function isValidTimezone($tz) {
+        $abbrs = \DateTimeZone::listAbbreviations();
+        foreach ($abbrs as $abbreviation => $zones) {
+            if (strcasecmp($abbreviation, $tz) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+

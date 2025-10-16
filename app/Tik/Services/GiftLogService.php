@@ -127,7 +127,13 @@ class GiftLogService
 
             if (is_array($receiversIds) && count($receiversIds) > 1) {
                 $to_id = $receiversIds[0];
-                $to    = 'الغرفة';
+                $to ="";
+                if($room->type == "audio"){
+                    $to    = 'الغرفة';
+                }else{
+                    $to    = __('live');
+                }
+               
             } else {
                 $to_id = $receiversIds[0];
                 $to    = @$receivedUsers->first()->name;
@@ -211,8 +217,11 @@ class GiftLogService
             // (new RoomAchievementTargetService)->roomTarget($room);
 
             // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
+            
 
-            $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
+            
+                $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
+
 
 
             $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;

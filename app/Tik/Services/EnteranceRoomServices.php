@@ -30,6 +30,7 @@ use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Entities\CpRoomHistory;
+use Modules\RoomCup\Helpers\RoomCupHelper;
 
 class EnteranceRoomServices
 {
@@ -506,6 +507,8 @@ class EnteranceRoomServices
     }
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
+        $timezone = Common::timeZone();
+
         EnteredRoom::query ()->updateOrCreate (
             [
                 'uid'=>$user_id,
@@ -513,9 +516,11 @@ class EnteranceRoomServices
                 'rid'=>$room_id
             ],
             [
-                'entered_at'=>now ()
+                'entered_at'=>now($timezone)
             ]
         );
+        RoomCupHelper::updateRoomVisitors($room_id);
+
     }
 
 
