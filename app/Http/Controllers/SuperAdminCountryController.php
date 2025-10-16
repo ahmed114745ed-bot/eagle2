@@ -167,7 +167,7 @@ class SuperAdminCountryController extends Controller
         $cacheKey = "country_stats_{$id}";
 
         // Cache for 5 minutes
-        $stats = Cache::remember($cacheKey, 300, function () use ($country) {
+        $stats = \Cache::remember($cacheKey, 300, function () use ($country) {
             return $this->fetchCountryStats($country);
         });
 
@@ -213,8 +213,8 @@ class SuperAdminCountryController extends Controller
 
     private function getTopRooms($countryID, $from, $to)
     {
-        return Room::select('rooms.id', 'rooms.name', 'rooms.uid', 'rooms.room_cover', 'rooms.user_id')
-            ->join('users', 'rooms.user_id', '=', 'users.id')
+        return Room::select('rooms.id', 'rooms.room_name', 'rooms.uid', 'rooms.room_cover')
+            ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('users.country_id', $countryID)
             ->with('owner:id,name,country_id')
             ->withCount(['roomVisitors' => function ($q) use ($from, $to) {
@@ -226,7 +226,7 @@ class SuperAdminCountryController extends Controller
             ->map(function ($room) {
                 return [
                     'id' => $room->id,
-                    'room_name' => $room->name,
+                    'room_name' => $room->room_name,
                     'room_cover' => $room->room_cover,
                     'room_visitors_count' => $room->room_visitors_count,
                     'owner' => $room->owner,
