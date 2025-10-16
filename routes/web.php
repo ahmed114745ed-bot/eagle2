@@ -575,4 +575,4 @@ Route::get('update-country-id', function () {
 Route::get('/country-v2/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
 
 // AJAX API route
-Route::get('/api/country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');

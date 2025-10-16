@@ -438,7 +438,7 @@
         $('#loadingOverlay').removeClass('hidden');
 
         $.ajax({
-            url: `/api/country/${countryId}/stats`,
+            url: `country/${countryId}/stats`,
             method: 'GET',
             success: function(data) {
                 renderStats(data);
