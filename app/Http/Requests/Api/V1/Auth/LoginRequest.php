@@ -30,31 +30,31 @@ class LoginRequest extends FormRequest
         if ($this->get('type') == 'email_pass') {
             $rules['email']    = ['required', 'email'];
             $rules['password'] = ['required'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'phone_pass') {
             $rules['phone']    = ['required'];
             $rules['password'] = ['required'];
             $rules['device_token'] = ['sometimes'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'google') {
             $rules['google_id'] = ['required'];
             $rules['device_token'] = ['sometimes'];
             $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
             $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
             $rules['iso'] = ['sometimes', 'string', 'size:2'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'huawei') {
             $rules['huawei_id'] = ['required'];
             $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
             $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
             $rules['iso'] = ['sometimes', 'string', 'size:2'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'facebook') {
             $rules['facebook_id'] = ['required'];
         } elseif ($this->get('type') == 'phone_code') {
             $rules['phone'] = ['required'];
             $rules['code']  = ['required'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'apple') {
             $rules['apple_id']     = ['required'];
             $rules['device_token'] = ['sometimes'];
@@ -66,7 +66,7 @@ class LoginRequest extends FormRequest
         } else {
             $rules['phone']    = ['required'];
             $rules['password'] = ['required'];
-            $rules['uuid'] = ['uuid'];
+            $rules['uuid'] = ['nullable'];
 
         }
         return $rules;
