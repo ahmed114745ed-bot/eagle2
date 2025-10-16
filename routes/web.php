@@ -2,9 +2,11 @@
 
 use App\Admin\Controllers\BdController;
 use App\Enums\AdminNotificationType;
+use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
 use  App\helper\TimeHelper;
 use App\Helpers\AdminNotificationHelper;
+use App\Helpers\SuperAdminNotificationHelper;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -623,3 +625,22 @@ Route::get('update-country-id', function () {
 
     return 'EditCountrySeeder has been executed successfully!';
 });
+
+Route::get('notifications/test2', function () {
+    SuperAdminNotificationHelper::notify(
+        SuperAdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        
+
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        95,
+        
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+
+
+

@@ -7,7 +7,17 @@
 <script>
     window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
     window.ADMIN_TYPE = @json(Auth::user()->type);
+    window.ADMIN_ID = @json(Auth::user()->id);
+    window.firebaseConfig = {
+        apiKey: "{{ config('firebase.apiKey') }}",
+        authDomain: "{{ config('firebase.authDomain') }}",
+        projectId: "{{ config('firebase.projectId') }}",
+        storageBucket: "{{ config('firebase.storageBucket') }}",
+        messagingSenderId: "{{ config('firebase.messagingSenderId') }}",
+        appId: "{{ config('firebase.appId') }}"
+    };
 </script>
+
 
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -248,65 +258,24 @@
 
             <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
         @if (!Admin::user()->type || Admin::user()->type == '')
-                <li class="nav-item dropdown" id="notificationsDropdown">
-                    <a href="#" class="nav-link" onclick="openModal(event)" style="position: relative;">
-                        <i class="fa fa-bell" style="font-size: 20px;"></i>
-                        <span id="notificationsCount"
-                            style="position:absolute; top:5px; right:5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:11px; display:none;">
-                        </span>
-                    </a>
-                </li>
-
-                <!-- المودال -->
-                <div class="modal-overlay" id="myModal">
-                    <div class="modal-no">
-                        <div class="modal-header">
-                            <h5>{{ __('Notifications') }}</h5>
-                            <button type="button" class="close-btn" id="closeModalBtn">×</button>
-                        </div>
-                        <div class="modal-body2" id="notificationsContent">
-                            <div class="text-center text-muted p-3">{{ __('dashboard.login.loading.prepare') }}</div>
-                        </div>
-                        {{-- <div class="modal-footer" style="text-align: center; padding: 10px;">
-                            <button type="button" class="btn btn-sm btn-primary" id="markAllReadBtn">{{ __('Mark all as read') }}</button>
-                        </div>
-                        <div class="modal-footer" style="text-align: center; padding: 10px;">
-                            <button type="button" class="see-more btn btn-sm btn-outline-secondary load-more-btn" id="loadMoreBtn">
-                            <a href="{{ route('admin.notifications.grid') }}" 
-                                    class="see-more btn btn-sm btn-outline-secondary load-more-btn" 
-                                    id="loadMoreBtn">
-                                        {{ __('Show more') }}
-                                    </a>
-                            </button>
-                        </div> --}}
-
-                         <div class="modal-footer">
-                            <button type="button" class="btn btn-footer btn-mark-all" id="markAllReadBtn">
-                                {{ __('Mark all as read') }}
-                            </button>
-                            <a href="{{ route('admin.notifications.grid') }}" class="btn btn-footer btn-show-more" id="loadMoreBtn">
-                                 {{ __('Show more') }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <audio id="notificationSound" src="{{ asset('sounds/notification.mp3') }}" preload="auto" style="display:none;"></audio>
-    
-                <script>
-                    window.NOTIFICATIONS_API = {
-                        countUrl: "{{ admin_url('notifications/count') }}",
-                        listUrl: "{{ admin_url('notifications/list') }}",
-                        markReadUrl: "{{ admin_url('notifications/mark-all-read') }}"
-                    };
-                </script>
-
-                <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
-                <script src="{{ asset('js/modal.js') }}"></script>
-                <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
-
+        
                 @endif
 
 
+                @php
+                    $admin = Auth::user();
+                 
+                @endphp
+
+                @if (empty($admin->type))
+                    @include('admin.notifications.admin')
+                @endif
+
+                @if ($admin->type == 'superadmin')
+          
+                   @include('superadmin.notifications.super')
+
+                @endif
 
             </ul>
      
@@ -481,6 +450,8 @@
 
 
 <script>
+
+
     window.handleNotificationClick = function(id, url) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -488,6 +459,37 @@
         if (!id) return;
 
             fetch(`/admin/notifications/mark-as-read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin',
+            })
+            .then(res => res.json())
+            .then(data => {
+                const el = document.querySelector(`.notification-item[data-id='${id}']`);
+                if (el) {
+                    el.classList.remove('unread');
+                    el.classList.add('read');
+                }
+                if (url) {
+                    window.location.href = url;
+                }
+            })
+            .catch(err => console.error('Error marking notification:', err));
+    };
+
+
+
+    window.superAdminhandleNotificationClick = function(id, url) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        if (!id) return;
+
+            fetch(`/superadmin/notifications/mark-as-read/${id}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': csrfToken,

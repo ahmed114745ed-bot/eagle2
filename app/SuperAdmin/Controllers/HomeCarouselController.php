@@ -81,8 +81,12 @@ class HomeCarouselController extends MainController
      */
     protected function grid()
     {
+        $itemNotification = request('itemNotification');
+       
         $grid = new Grid(new HomeCarousel);
-    
+        $grid->model()->when($itemNotification, function ($query, $itemNotification) {
+            $query->where('id', $itemNotification);
+        });
         $grid->model()->whereHas('countries', function ($q) {
             $q->where('countries.id', auth()->user()->country_id);
         });

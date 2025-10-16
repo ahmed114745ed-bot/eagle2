@@ -8,14 +8,9 @@ importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
 // Initialize Firebase
-firebase.initializeApp({
-apiKey: "AIzaSyCn9-Z_mz6zlq6A86bvLDkhrrqNuXSd9xg",
-authDomain: "eagle-24712.firebaseapp.com",
-projectId: "eagle-24712",
-storageBucket: "eagle-24712.firebasestorage.app",
-messagingSenderId: "817000206466",
-appId: "1:817000206466:web:55bd3dd1ff3848eb91249b"
-});
+const firebaseConfig = window.firebaseConfig;
+
+console.log('Firebase Config:', firebaseConfig);
 
 const messaging = firebase.messaging();
 
