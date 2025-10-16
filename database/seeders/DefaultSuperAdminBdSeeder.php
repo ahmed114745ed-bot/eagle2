@@ -6,7 +6,7 @@ use App\Models\Bd;
 use App\Models\SuperAdmin;use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class DefaultSuperAdminBd extends Seeder
+class DefaultSuperAdminBdSeeder extends Seeder
 {
     /**
      * Run the database seeds.
