@@ -184,7 +184,7 @@ class ChatRoomService
                 'updated_at',
             ])
             ->orderByDesc('last_message_created_at')
-            ->paginate(20);
+            ->paginate(request('per_page', 10));
 
         // // Get chat requests (guest)
         // $guestChats = ChatRoom::WhereHas('messages')
@@ -205,7 +205,7 @@ class ChatRoomService
             ->where('user_id', '!=', $user->id)
             ->where('status', '!=', 'seen')
             ->paginate(20);
-           
+
         return [
             'success' => true,
             'message' => 'successfully',

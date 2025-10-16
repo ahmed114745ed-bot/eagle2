@@ -38,7 +38,7 @@ class BanRoomAction extends Action
         }
         $user = User::query()->searchByUuid($request->uuid)->first();
         if (!$user) return $this->response()->error('user not found')->refresh();
-        $room = Room::where('uid', $user->id)->first();
+        $room = Room::where('uid', $user->id)->where('type', $request->type)->first();
         if (!$room) {
             return $this->response()->error(__('room not found'))->refresh();
         }
@@ -64,9 +64,7 @@ class BanRoomAction extends Action
                 ]
             );
 
-            $room->room_status = 2;
 
-            $room->save();
         }
 
 
@@ -97,6 +95,7 @@ class BanRoomAction extends Action
     {
         $this->text('uuid', __('uuid'));
         $this->integer('duration', __('duration(hours)'))->rules('required|max:6');
+        $this->select('type', __('type'))->options(['audio' => __('audio'), 'live' => __('live')])->default('audio');
     }
 
     public function html()

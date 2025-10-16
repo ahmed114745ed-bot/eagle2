@@ -21,6 +21,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 
 
@@ -339,16 +340,29 @@ class BdController extends MainController
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
                 if ($originalAppId !=  $newAppId) {
-                    $OldUserAppId = \App\Models\User::find($originalAppId);
+                    $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
+                        MilestoneHelper::removeReward($OldUserAppId, 'bd');
+
                     }
 
-                    $newUserAppId = \App\Models\User::find($newAppId);
+                    $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
+                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+
+                }
+            }else{
+                $userAppId = $form->input('app_id');
+                $userApp = User::find($userAppId);
+                if (isset($userApp)) {
+                    $userApp->is_bd = 1;
+                    $userApp->save();
+                    MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
+
                 }
             }
 
@@ -360,12 +374,6 @@ class BdController extends MainController
         $form->saved(function (Form $form) {
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
-
-            $userApp = User::find($userAppId);
-            if (isset($userApp)) {
-                $userApp->is_bd = 1;
-                $userApp->save();
-            }
 
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
