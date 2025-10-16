@@ -13,52 +13,43 @@ class SuperAdminNotificationCreated implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $notification;
+    public $translatedTitle;
+    public $translatedMessage;
+    public $previewUrl;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param \App\Models\SuperAdminNotification $notification
-     */
-    public function __construct(SuperAdminNotification $notification)
-    {
+    public function __construct(
+        SuperAdminNotification $notification,
+        string $translatedTitle,
+        string $translatedMessage,
+        ?string $previewUrl = null
+    ) {
         $this->notification = $notification;
+        $this->translatedTitle = $translatedTitle;
+        $this->translatedMessage = $translatedMessage;
+        $this->previewUrl = $previewUrl;
     }
 
-    /**
-     * The name of the channel on which the event is broadcast.
-     *
-     * @return Channel|array
-     */
     public function broadcastOn()
     {
         return new Channel('superAdmin.notifications.' . $this->notification->super_admin_id);
     }
-   
+
     public function broadcastAs()
     {
         return 'SuperAdminNotificationCreated';
     }
-    /**
-     *
-     * @return array
-     */
+
     public function broadcastWith()
     {
-        \Log::info('📡 Broadcasting AdminNotificationCreated', [
-            'id' => $this->notification->id,
-            'title' => $this->notification->title,
-            'channel' => 'superAdmin.notifications.' . $this->notification->super_admin_id,
-        ]);
-
         return [
             'id'        => $this->notification->id,
-            'title'     => $this->notification->title,
-            'message'   => $this->notification->message,
+            'title'     => $this->translatedTitle,
+            'message'   => $this->translatedMessage,
             'data'      => $this->notification->data,
             'is_read'   => $this->notification->is_read,
-            'super_admin_id'   => $this->notification->super_admin_id,
+            'super_admin_id' => $this->notification->super_admin_id,
             'created_at'=> $this->notification->created_at->toDateTimeString(),
-            
+            'preview_url' => $this->previewUrl,
         ];
     }
 }

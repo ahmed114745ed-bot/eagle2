@@ -29,7 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
     channel.bind('SuperAdminNotificationCreated', function (e) {
 
         if (adminID !== e.super_admin_id) return;
-
+      console.log('oo',e);
+      
 
         if (notifCountEl) {
                 const current = parseInt(notifCountEl.textContent, 10) || 0;
@@ -37,17 +38,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 notifCountEl.textContent = current + 1;
             
         }
+        let preview_url= e.preview_url ;
 
         if (notifContentEl) {
             const newNotif = `
-                <div class="notification-item unread" data-id="${e.id}">
-                    <div class="title">${e.title}</div>
-                    <div class="message text-muted small">${e.message}</div>
-                    <div class="time text-secondary small">الآن</div>
-                    <button class="btn btn-sm btn-outline-primary mark-read-btn mt-1" data-id="${e.id}">
-                        تحديد كمقروء
-                    </button>
-                </div>`;
+            <div class="notification-item unread" data-id="${e.id}" style="cursor:pointer;"
+                 onclick="window.open('${preview_url}', '_blank')">
+                <div class="title">${e.title}</div>
+                <div class="message text-muted small">${e.message}</div>
+                <div class="time text-secondary small">الآن</div>
+                <button class="btn btn-sm btn-outline-primary mark-read-btn mt-1" data-id="${e.id}">
+                    تحديد كمقروء
+                </button>
+            </div>`;
+    
             notifContentEl.insertAdjacentHTML('afterbegin', newNotif);
             attachMarkReadHandlers();
             const audio = document.getElementById("notificationSound");

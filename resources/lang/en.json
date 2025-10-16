@@ -1281,8 +1281,10 @@
 "banner_request_title": "New Banner Display Request",
 "banner_request_message": "Admin :name (ID: :id) has requested a new banner display worth :coins coins."
 ,"Mark all as read":"Mark all as read",
-  "banner_approved_title": "Banner Request Approved",
-  "banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins."
+"banner_approved_title": "Banner Request Approved",
+"banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins.",
+"banner_rejected_title": "The banner request has been rejected",
+"banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request."
 
 
 
