@@ -31,11 +31,23 @@ class SyncAgencyCountrySeeder extends Seeder
 
         $bds = Bd::where('default', 1)->whereNotNull('country_id')->get()->keyBy('country_id');
 
-        Agency::whereNull('bd_id')
-            ->whereNotNull('country_id')
-            ->chunk(100, function ($agencies) use ($bds){
+        $defaultBd = $bds->first(function ($bd) {
+            return $bd->country_id == 0;
+        });
+
+        $info = Agency::where(function ($q){
+            $q->whereNull('bd_id')->orWhere('bd_id', 0);
+        })->get();
+
+        info($info);
+
+        Agency::where(function ($q){
+            $q->whereNull('bd_id')->orWhere('bd_id', 0);
+        })
+//            ->whereNotNull('country_id')
+            ->chunk(100, function ($agencies) use ($bds, $defaultBd){
                 foreach ($agencies as $agency) {
-                    $bd = $bds->get($agency->country_id);
+                    $bd = $bds->get($agency->country_id) ?? $defaultBd;
 
                     if ($bd) {
                         $agency->bd_id = $bd->id;
