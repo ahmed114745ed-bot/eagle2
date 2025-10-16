@@ -10,8 +10,6 @@ class SyncBdCountrySeeder extends Seeder
 {
     public function run(): void
     {
-        $superAdmins = SuperAdmin::all();
-
         Bd::with('appUser')
             ->whereNull('country_id')
             ->chunk(100, function ($bds) {
