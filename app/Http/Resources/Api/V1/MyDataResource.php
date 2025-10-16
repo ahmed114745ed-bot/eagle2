@@ -124,6 +124,8 @@ class MyDataResource extends JsonResource
             'notification_id' => @$this->notification_id ?: "",
             'name' => @$this->name ?: 'user' . ' ' . '#' . $uuid,
             'phone' => (string)@$this->phone ?: '',
+            'firebase_uuid' => (string)@$this->firebase_uuid ?: '',
+            
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),

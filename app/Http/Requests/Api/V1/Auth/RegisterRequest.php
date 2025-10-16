@@ -31,18 +31,22 @@ class RegisterRequest extends FormRequest
         if ($this->get('type') == 'email_pass') {
             $rules['email'] = ['required','unique:users','email'];
             $rules['password'] = ['required'];
+            $rules['uuid'] = ['uuid'];
         }elseif ($this->get ('type') == 'phone_pass'){
             $rules['phone'] = ['required'];
             $rules['code'] = ['required'];
             $rules['password'] = ['required'];
+            $rules['uuid'] = ['uuid'];
 //            $rules['device_token']=['unique:users'];
         }elseif ($this->get ('type') == 'google'){
             $rules['google_id'] = ['required','unique:users'];
+            $rules['uuid'] = ['uuid'];
         }elseif ($this->get ('type') == 'facebook'){
             $rules['facebook_id'] = ['required','unique:users'];
         }else{
             $rules['phone'] = ['required'];
             $rules['password'] = ['required'];
+            $rules['uuid'] = ['uuid'];
         }
 
         $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];

@@ -32,8 +32,12 @@ class ProfileService
     {
      
         $data = $request->only(['name', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
+      
         if ($request->email) {
             $data['email'] = $request->email;
+        }
+        if ($request->uuid) {
+            $data['firebase_uuid'] = $request->uuid;
         }
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
