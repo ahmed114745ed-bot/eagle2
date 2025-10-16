@@ -1338,6 +1338,7 @@ class AgencyController extends MainController
         $user->agency_id = 0;
         $user->type_user = 0;
         $user->save();
+        
         MilestoneHelper::removeReward($user, 'host');
 
 
