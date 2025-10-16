@@ -262,9 +262,11 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 <div class="card-visa">
     <div class="card-content">
         <span class="icon_trans"><i class="fas fa-exchange-alt"></i></span>
+        @if (\Encore\Admin\Facades\Admin::user()->can('add-switch-coin-recharge') || \Encore\Admin\Facades\Admin::user()->can('*'))
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('Charge') }}
         </button>
+        @endif
         <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
     </div>
 </div>

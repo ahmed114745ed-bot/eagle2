@@ -24,9 +24,10 @@ use App\Admin\Widgets\CustomInfoBox;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Chat\Entities\ChatMessage;
+use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
 
-class HomeController extends Controller
+class HomeController extends  MainController
 {
 
     public function index(Content $content)
@@ -248,7 +249,7 @@ class HomeController extends Controller
         $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
         $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
-        return $content
+        return parent::index($content
             ->title(__('Home'))
             ->description(__('General Statistics'))
 
@@ -639,7 +640,7 @@ class HomeController extends Controller
 //                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
                     });
                 });
-            });
+            }));
     }
 
 

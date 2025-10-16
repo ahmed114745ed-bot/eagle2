@@ -128,9 +128,24 @@
                                     ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
                                 ],
                             ],
-                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
-                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
-                            ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('rooms'),
+                                'children' => [
+                                    ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                                    ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                                ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Advertisements'),
+                                'children' => [
+                                    ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                                ],
+                            ],
+                            
                             ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
                         ];
                     @endphp

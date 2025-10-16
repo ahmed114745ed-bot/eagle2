@@ -2,40 +2,41 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Admin\Actions\DeleteBdAction;
-use App\Helpers\Common;
 use App\Models\Bd;
-use App\Models\BdAgencyHostSallary;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Routing\Controller;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use App\Models\BdAgencyHostSallary;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use App\Admin\Actions\DeleteBdAction;
+use App\Admin\Controllers\MainController;
 
 
-class ProfessionalBdController extends Controller
+class ProfessionalBdController extends MainController
 {
 
     protected $title = 'BD';
-    public $permission_name = 'BD';
+    public $permission_name = 'professional-bd';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid2()
@@ -245,6 +246,8 @@ class ProfessionalBdController extends Controller
         });
 
         $grid->disableRowSelector();
+        $grid->disableCreateButton();
+        $grid->disableActions();
 
         return $grid;
     }

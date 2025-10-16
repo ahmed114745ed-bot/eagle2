@@ -24,6 +24,7 @@ class ChargeController extends MainController
      * @var string
      */
     protected $title = 'Charge';
+    public $permission_name = 'coin-recharge';
 
     /**
      * Make a grid builder.
@@ -37,8 +38,10 @@ class ChargeController extends MainController
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::SUPER_ADMIN, $user->id,
-            UserTypeEnum::SUPER_ADMIN, $user->id
+            UserTypeEnum::SUPER_ADMIN,
+            $user->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $user->id
         ])
             ->first();
 
@@ -46,20 +49,20 @@ class ChargeController extends MainController
         $totalSpent   = $totals->total_spent;
 
         $finalSalary = $user->di;
-        return $content
+        return parent::index($content
             ->header(trans('Charges'))
             ->description(trans('Charges'))
 
             ->row(function ($row) use ($finalSalary) {
                 $row->column(12, view('admin.grid.superadmin.wallet', ['finalSalary' => $finalSalary]));
             })
-            ->row(function (Row $row) use ($totalCharges, $totalSpent ) {
-                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
-                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
+            ->row(function (Row $row) use ($totalCharges, $totalSpent) {
+                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
+                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
     protected function grid()
     {
@@ -107,9 +110,9 @@ class ChargeController extends MainController
                     if (!isImageExists($url)) $url = $defaultImage;
                     return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
                 });
-                $profileUrl ='';
+                $profileUrl = '';
                 if (!empty($info['uuid'])) {
-                $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
+                    $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
