@@ -213,7 +213,7 @@ class HomeController extends Controller
      */
     private function getGamesImages(): array
     {
-        settings()->set('images_updated_at', time());
+//        settings()->set('images_updated_at', time());
         return [
             'dice'     => [
                 'id'    => 1,

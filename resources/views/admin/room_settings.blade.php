@@ -233,10 +233,10 @@
         <div class="settings-sidebar">
             <h2>{{__("setting")}}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('PaidRoom')"">{{ __('Paid Room') }}</button>
-                <button
-                    onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
+                <button onclick="showSection('PaidRoom')">{{ __('Paid Room') }}</button>
+                <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
+                 <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
             </div>
         </div>
 
@@ -338,6 +338,21 @@
                                 <span class="slider round"></span>
                             </label>
                         </div>
+
+                        <button type="submit">{{ __('save') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="admin_settings" class="settings-section">
+                <h3>{{ __('Admin settings') }}</h3>
+                <form action="{{ route('admin.room-settings.store') }}" method="POST">
+                    <div class="form">
+                        @csrf
+
+                        <label>{{ __('admins number') }}</label>
+                        <input class="form-control" type="number" min="1" name="max_room_admin"
+                            value="{{ $settings['max_room_admin'] ?? '' }}">
 
                         <button type="submit">{{ __('save') }}</button>
                     </div>

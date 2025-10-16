@@ -8,6 +8,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
 use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -63,7 +64,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
-            $schedule->command('update-room-ban')
+        $schedule->command('update-room-ban')
             ->everyFiveMinutes()
             ->appendOutputTo(storage_path('logs/update-room-ban'))
             ->runInBackground();
@@ -134,31 +135,57 @@ class Kernel extends ConsoleKernel
         ->timezone(getTimezone())
         ->withoutOverlapping()
         ->runInBackground();
-    
-        // $schedule->command('users:freeze-unfinished')
-        //     ->everySecond()
-        //     ->timezone(getTimezone())
-        //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
-        //     ->runInBackground();
 
-       /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
+        $this->scheduleRoomCupRewards($schedule);
 
-        $schedule->job(new AgencyTribeRewardJob())
-            ->daily()->when(function (){
-                $startDate = Carbon::create(2025, 1, 1);
-                $today = Carbon::today();
+        // $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
 
-                return $startDate->diffInDays($today) % 15 === 0;
-            });
-
-        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();*/
-        //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
+
+    private function scheduleRoomCupRewards(Schedule $schedule): void
+    {
+        $settings = $this->getRoomCupSettings();
+
+        if (empty($settings['enabled'])) {
+            return;
+        }
+    
+        $type     = $settings['type'] ?? 'daily';
+        $time     =  '23:59';
+    
+        $command = $schedule->command('roomcup:calculate-rewards')
+                            ->timezone(getTimezone());
+    
+        match ($type) {
+            'daily'   => $command->dailyAt($time),
+            'weekly'  => $command->weeklyOn(1, $time),   
+            'monthly' => $command->monthlyOn(1, $time),
+            default   => $command->dailyAt($time),
+        };
+    }
+    
+    private function getRoomCupSettings(): array
+    {
+        $default = [
+            'enabled'          => true,
+            'interval_minutes' => 60,
+            'type'             => 'daily',
+            'time'             => '23:59',
+        ];
+    
+        if (!Storage::disk('local')->exists('roomcup_settings.json')) {
+            Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
+        }
+    
+        return array_merge($default, json_decode(Storage::disk('local')->get('roomcup_settings.json'), true) ?? []);
+    }
+    
+
 }

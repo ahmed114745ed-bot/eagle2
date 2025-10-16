@@ -42,8 +42,8 @@ class ChatRoomController extends Controller
         $this->chatRoomService->handleInvite($data, $userId, $type, $userIds, $exceptIds);
 
         return Common::apiResponse(true, __('success'));
-
     }
+
     public function find_user(Request $request)
     {
         $request->validate([

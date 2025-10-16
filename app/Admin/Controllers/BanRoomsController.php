@@ -2,20 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Ban;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\BanRoom;
-use App\Models\BanType;
-use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\DeleteBans;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\BanRoomAction;
-use App\Http\Controllers\Controller;
-use App\Admin\Actions\DedicateAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -128,6 +121,8 @@ class BanRoomsController extends MainController
                     </div>";
         });
 
+        $grid->column('room.type', __('room type'));
+
         $grid->column('user_id', __('owner'))->display(function () {
             $user = $this->room->owner; // العلاقة مع المستخدم
             if (!$user) return '-';
@@ -214,16 +209,18 @@ class BanRoomsController extends MainController
         $grid->disableRowSelector();
         $grid->disableActions();
         $grid->disableCreateButton();
-        // $grid->actions(function ($actions) {
-        //     $actions->disableEdit();
-        //     $actions->disableView();
-        //     // $actions->add(new DedicateAction());
-        // });
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('room_id', __('Room Id'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->equal('room.type', __('room type'))->select([
+                    'audio' => trans('audio'),
+                    'live' => trans('live'),
+                ]);
             });
         });
 

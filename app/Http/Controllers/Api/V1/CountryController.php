@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Resources\CountrySupportersResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
@@ -14,13 +15,11 @@ use Illuminate\Support\Facades\DB;
 class CountryController extends Controller
 {
 
-    public function __construct(private CountryService $countryService)
-    {
-    }
+    public function __construct(private CountryService $countryService) {}
 
-    public function allCountries()
+    public function allCountries(): JsonResponse
     {
-        $countries = $this->countryService->indexWithSupporters();
+        $countries = $this->countryService->indexByHotAndSupporters();
         return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
     }
 
@@ -33,32 +32,46 @@ class CountryController extends Controller
         return Common::apiResponse(0, __('not found'), null, 404);
     }
 
+    public function getCountryByHtml($id)
+    {
+        return $this->countryService->countryDetails($id);
+    }
+
     public function index()
     {
         return $this->countryService->index2();
     }
 
-    public function countries(){
+    public function countries()
+    {
 
         $allTypesWithCountries = DB::table('countries')
-        ->leftJoin('users', 'users.country_id', '=', 'countries.id')
-        ->select(
-            'countries.name as country_name',
-            'countries.flag as image',
-            DB::raw('COUNT(users.id) as user_count')
-        )
-        ->groupBy('countries.id', 'countries.name', 'countries.flag')
-        ->get();
-        
+            ->leftJoin('users', 'users.country_id', '=', 'countries.id')
+            ->select(
+                'countries.name as country_name',
+                'countries.flag as image',
+                DB::raw('COUNT(users.id) as user_count')
+            )
+            ->groupBy('countries.id', 'countries.name', 'countries.flag')
+            ->get();
+
         // تقسيم النتائج إلى المصفوفتين
         $allCountriesSortedByName = $allTypesWithCountries->sortBy('country_name')->values();
         $hotCountries = $allTypesWithCountries->sortByDesc('user_count')->take(20)->values();
-        
+
         $data = [
             'all' => $allCountriesSortedByName,
             'hot' => $hotCountries,
         ];
 
-        return Common::apiResponse(1,'', $data);
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function searchCountries(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $countries = $this->countryService->searchCountries($key, $page);
+        return response()->json($countries);
     }
 }

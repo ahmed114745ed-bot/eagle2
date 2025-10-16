@@ -41,7 +41,7 @@ class MicrophoneController extends Controller
     {
         $data = $request;
         $user_id = $request->user_id;
-        if (!$data['owner_id'] || !$user_id) return Common::apiResponse(0, __('api_responses.Missing_data'), null, 422);
+        if ((!$data['owner_id'] && !$request->room_id) || !$user_id) return Common::apiResponse(0, __('api_responses.Missing_data'), null, 422);
         try {
             [$user, $room] = $this->microphoneService->upMic($data);
         } catch (Exception $e) {

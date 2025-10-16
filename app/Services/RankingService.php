@@ -17,6 +17,7 @@ use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
 use Illuminate\Pagination\Paginator;
 use App\Repositories\RankingRepository;
+
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
@@ -34,6 +35,7 @@ class RankingService
 {
     protected $rankingRepo, $cpRepository;
 
+    
     public function __construct(
         RankingRepository $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,

@@ -39,10 +39,12 @@ class LoginRequest extends FormRequest
             $rules['device_token'] = ['sometimes'];
             $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
             $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
+            $rules['iso'] = ['sometimes', 'string', 'size:2'];
         } elseif ($this->get('type') == 'huawei') {
             $rules['huawei_id'] = ['required'];
             $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
             $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
+            $rules['iso'] = ['sometimes', 'string', 'size:2'];
         } elseif ($this->get('type') == 'facebook') {
             $rules['facebook_id'] = ['required'];
         } elseif ($this->get('type') == 'phone_code') {
@@ -55,6 +57,7 @@ class LoginRequest extends FormRequest
             $rules['name']         = ['sometimes'];
             $rules['lat'] = ['sometimes', 'numeric', 'between:-90,90'];
             $rules['long'] = ['sometimes', 'numeric', 'between:-180,180'];
+            $rules['iso'] = ['sometimes', 'string', 'size:2'];
         } else {
             $rules['phone']    = ['required'];
             $rules['password'] = ['required'];

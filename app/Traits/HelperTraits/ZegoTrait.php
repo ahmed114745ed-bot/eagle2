@@ -6,6 +6,7 @@ namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use function Laravel\Prompts\error;
 
 Trait ZegoTrait
@@ -79,7 +80,13 @@ Trait ZegoTrait
 
         ];
         try {
-            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+            Log::info('🛰️ Sending Zego request', [
+                'sendToZego' => '',
+                'params' => $params,
+            ]);
+        
+           return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+    
         }catch (\Exception $exception){
 
         }
@@ -113,6 +120,7 @@ Trait ZegoTrait
 
         ];
         try {
+         
             Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
@@ -143,6 +151,10 @@ Trait ZegoTrait
 
         ];
         try {
+            Log::info('🛰️ Sending Zego request', [
+                'sendToZego_3' => '',
+                'params' => $params,
+            ]);
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
