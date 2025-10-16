@@ -68,8 +68,12 @@ class MilestoneHelper
             ->where('rewardable_id', $mr->rewardable_id)
             ->first();
     
-        if ($existing && !$existing->trashed()) {
-            return;
+        if ($existing) {
+            if (!$existing->trashed()) {
+                return;
+            }
+    
+            $existing->forceDelete();
         }
     
         UserHistoryReward::create([
