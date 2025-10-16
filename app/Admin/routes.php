@@ -116,7 +116,6 @@ use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
 
 Route::group(
