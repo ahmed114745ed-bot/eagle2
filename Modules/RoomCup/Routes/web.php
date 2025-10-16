@@ -29,7 +29,7 @@ Route::group(
     function () {
         Route::resource('room-cup-target', RoomCupTargetController::class);
         Route::resource('room-cup-settings', RoomCupSettingsController::class);
-        Route::post('room-cup-settings/save', [RoomCupSettingsController::class, 'save']);
+        Route::post('room-cup-settings/save', [RoomCupSettingsController::class, 'save'])->name('room-cup-settings.save');
 
         Route::resource('room-cup-reports', RoomCupReportsController::class);
         
