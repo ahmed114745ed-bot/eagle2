@@ -356,7 +356,7 @@ class BdController extends MainController
 
                 }
             }else{
-                $userAppId = $form->model()->app_id;
+                $userAppId = $form->input('app_id');
                 $userApp = User::find($userAppId);
                 if (isset($userApp)) {
                     $userApp->is_bd = 1;
