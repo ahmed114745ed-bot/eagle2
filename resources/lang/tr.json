@@ -3630,7 +3630,9 @@
       "confirm_resend": "Yeniden Gönderimi Onayla",
     "deduct_text": "Banner isteğini yeniden göndermek için jetonlar düşülecektir:",
     "banner_request_title": "Yeni Afiş Gösterim Talebi",
-    "banner_request_message": "Yönetici :name (ID: :id), :coins madeni para değerinde yeni bir afiş gösterimi talep etti."
+    "banner_request_message": "Yönetici :name (ID: :id), :coins madeni para değerinde yeni bir afiş gösterimi talep etti.",
+    "banner_rejected_title": "Afiş talebi reddedildi",
+     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti."
 
 
 

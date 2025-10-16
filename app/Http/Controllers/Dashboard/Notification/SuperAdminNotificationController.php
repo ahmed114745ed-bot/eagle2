@@ -16,7 +16,7 @@ class SuperAdminNotificationController extends Controller
 
     public function list()
     {
-        $notifications = SuperAdminNotification::where('is_read', false)->latest()->limit(20)->get();
+        $notifications = SuperAdminNotification::latest()->limit(20)->get();
 
         return view('superadmin.notifications.list', compact('notifications'));
     }

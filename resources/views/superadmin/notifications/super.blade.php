@@ -24,7 +24,7 @@
             <button type="button" class="btn btn-footer btn-mark-all" id="markAllReadBtn">
                 {{ __('Mark all as read') }}
             </button>
-            <a href="{{ route('superadmin.notifications.grid') }}" class="btn btn-footer btn-show-more" id="loadMoreBtn">
+            <a href="{{ route('superadmin.notifications.grid') }}" class="btn btn-footer btn-show-more" onclick=" closeModal();" id="loadMoreBtn">
                 {{ __('Show more') }}
             </a>
         </div>
@@ -39,6 +39,14 @@
         listUrl: "{{ superadmin_url('notifications/list') }}",
         markReadUrl: "{{ superadmin_url('notifications/mark-all-read') }}"
     };
+
+    const modal = document.getElementById('myModal');
+
+    function closeModal() {
+        if (!modal) return;
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 </script>
 
 <link rel="stylesheet" href="{{ asset('css/superadmin/modal.css') }}">

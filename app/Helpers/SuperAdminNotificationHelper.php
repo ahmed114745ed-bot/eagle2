@@ -33,19 +33,41 @@ class SuperAdminNotificationHelper
             'data' => $data ?? [],
             'super_admin_id' => $superAdminId,
         ]);
-        $url='';
-        $previewUrl = $data['preview_url'] ?? null;
-        if ($previewUrl) {
-            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrl?->value);
+        $data = is_array($data) ? $data : json_decode($data, true);
+
+        $translatedTitle = __($title);
+        $translatedMessage = __(
+            $message,
+            [
+                'name' => $data['requested_by'] ?? 'غير معروف',
+                'id' => $data['requested_by_id'] ?? 0,
+                'coins' => $data['coins_deducted'] ?? 0,
+            ]
+        );
+    
+        $url = '';
+        $previewUrlValue = $data['preview_url'] ?? null;
+        if ($previewUrlValue) {
+            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrlValue->value);
             if ($enum) {
                 $url = $enum->url($data);
             }
         }
-        broadcast(new SuperAdminNotificationCreated($notification))->toOthers();
+    
+        broadcast(new SuperAdminNotificationCreated(
+            notification: $notification,
+            translatedTitle: $translatedTitle,
+            translatedMessage: $translatedMessage,
+            previewUrl: $url
+        ))->toOthers();
+
+
+        
         if ($superAdminId) {
             $superAdmin = SuperAdmin::find($superAdminId);
             $token = $superAdmin?->fcm_token;
            
+
         if (!empty($token)) {
            
             $translatedTitle = __($title);
