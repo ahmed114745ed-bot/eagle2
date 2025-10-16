@@ -4,7 +4,6 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
 
 const firebaseConfig = window.firebaseConfig;
 
-console.log('Firebase Config:', firebaseConfig);
 
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
@@ -14,8 +13,7 @@ async function requestPermission() {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
             console.log("Notification permission granted.");
-            const token = await getToken(messaging, { vapidKey: "BAbk-_zwaOviMhva90NorW5kOwtFuNyT8S7soK8BFkJoo_1LdG646fWW8UYFICvDE6yot9f7vYxb029CM6G-0W8" });
-            console.log("FCM Token:", token);
+            const token = await getToken(messaging, { vapidKey: firebaseConfig.vapidKey });
 
             await fetch("/superadmin/save-fcm-token", {
                 method: "POST",
