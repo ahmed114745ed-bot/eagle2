@@ -61,6 +61,6 @@ class RemoveBackgroundCron extends Command
         }
 //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
 
-        //$this->info('update-room-user-now:cron Command Run Successfully !');
+        $this->info('update-room-user-now:cron Command Run Successfully !');
     }
 }
