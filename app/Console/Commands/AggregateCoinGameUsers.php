@@ -37,7 +37,7 @@ class AggregateCoinGameUsers extends Command
             
             SELECT user_id, game_id, coins, type, created_at 
             FROM coin_game_users_archive 
-            WHERE DATE(created_at) = ?
+            WHERE DATE(created_at) = ? AND game_id IS NOT NULL
         ) t
         GROUP BY user_id, game_id, DATE(created_at)
         ON DUPLICATE KEY UPDATE
