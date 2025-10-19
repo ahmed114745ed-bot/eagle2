@@ -101,7 +101,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
-    Route::post('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback');
+    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback');
     Route::get('codapay-success', [CodapayService::class, 'success'])->name('paypal.success');
     Route::get('codapay-failed', [CodapayService::class, 'failed'])->name('paypal.cancel');
 
