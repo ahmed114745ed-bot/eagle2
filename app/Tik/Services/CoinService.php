@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\ShippingAgency;
+use App\Services\CodapayService;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
 use App\Services\PayPalService;
@@ -81,18 +82,20 @@ class CoinService
                 $sessionUrl = $this->createStripePayment($settings, $data);
                 return Common::apiResponse(1, 'ok', $sessionUrl, 200);
 
-            } elseif ($paymentMethod == 'fawry') {
-                $Active = config('is_fawry_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
-                $newFawryService = new FawryPaymentServiceV2();
-                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
-
-               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
-                if (isset($response['status']) && $paymentUrl['status']  == 0) {
-                    return $paymentUrl;
-                }
-                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            } elseif ($paymentMethod == 'utd_fawry') {
+            }
+//            elseif ($paymentMethod == 'fawry') {
+//                $Active = config('is_fawry_active');
+//                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+//                $newFawryService = new FawryPaymentServiceV2();
+//                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
+//
+//               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
+//                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+//                    return $paymentUrl;
+//                }
+//                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+//            }
+            elseif ($paymentMethod == 'utd_fawry') {
                 $Active = config('is_utd_fawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $oldFawryService = new FawryPaymentService();
@@ -118,6 +121,16 @@ class CoinService
                 $bladeUrl = url("/paypal/checkout/{$log->id}");
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
+            } elseif ($paymentMethod == 'fawry') {
+//                $Active = config('is_codapay_active');
+//                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $codapayService = new CodapayService();
+
+                $paymentUrl = $codapayService->makePayment($log->id, $coin->usd, $user->id);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
