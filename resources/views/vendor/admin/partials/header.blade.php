@@ -22,7 +22,7 @@
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
 
-        @if(!session('preview_superadmin'))
+{{--        @if(!session('preview_superadmin'))--}}
             @if (request()->is('admin*'))
                 <a class="nav-item select-country">
                     <select id="country-select" class="form-control" style="width:190px;">
@@ -39,7 +39,7 @@
                 </a>
             @endif
             <script>window.enableCountryHeader = true;</script>
-        @endif
+{{--        @endif--}}
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
         {!! Admin::getNavbar()->render('left') !!}
@@ -56,7 +56,7 @@
 
             <ul class="nav navbar-nav">
 
-     
+
                 {!! Admin::getNavbar()->render() !!}
 
                 <li class="dropdown user user-menu">

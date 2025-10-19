@@ -577,14 +577,14 @@ Route::get('/migrate-home-carousel', function () {
                         'display_type'     => $type,
                     ],
                     [
-                        'end_at'        => now()->addDays(30), 
-                        'duration'      => 30,               
+                        'end_at'        => now()->addDays(30),
+                        'duration'      => 30,
                         'duration_unit' => 'days',
                         'created_at'    => $carousel->created_at,
                         'updated_at'    => $carousel->updated_at,
                     ]
                 );
-            }            
+            }
         }
     }
 

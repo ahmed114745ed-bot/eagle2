@@ -304,14 +304,14 @@ class BdController extends AdminController
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
-                if ($originalAppId !=  $newAppId && $newAppId != null) {
+                if ($originalAppId != $newAppId && $newAppId != null) {
 
-                    $OldUserAppId = \App\Models\User::find($originalAppId);
+                    $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
                     }
-                    $newUserAppId = \App\Models\User::find($newAppId);
+                    $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;

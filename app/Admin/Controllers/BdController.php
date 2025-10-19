@@ -2,23 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Bd;
-use App\Models\BdAgencyHostSallary;
-use App\Models\Country;
-use App\Models\SuperAdmin;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Carbon;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
+use App\Helpers\Common;
+use App\Models\Country;
+use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use App\Models\BdAgencyHostSallary;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Hash;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
 {
@@ -101,7 +102,8 @@ class BdController extends MainController
 
         $grid->model()
             ->when(isset($countryID), function ($query) use ($superAdmin) {
-                $query->where('parent_id', $superAdmin->id);
+               
+                $query->where('parent_id', @$superAdmin->id);
             })
 
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs'])
@@ -409,6 +411,7 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
+                        MilestoneHelper::removeReward($OldUserAppId, 'bd');
                     }
 
                     $newUserAppId = \App\Models\User::find($newAppId);
@@ -431,6 +434,7 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
+                 MilestoneHelper::grantMilestoneToUser($userApp->id, 'bd');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();

@@ -1,7 +1,9 @@
 <?php
 
 use App\Admin\Controllers\NotificationController;
+use App\Admin\Controllers\SuperadminBannerHistoryController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
+use App\Admin\Controllers\SuperAdminHomeCarouselController;
 use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
@@ -318,6 +320,7 @@ Route::group(
         ]);
          Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
          Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -377,13 +380,17 @@ Route::group(
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
 
-        Route::prefix('superadmin')->name('superadmin.')->group(function () {
+        Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
             Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
             Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
             Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
             Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
             Route::get('profile', [SuperAdminController::class, 'showPreview']);
+            Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('superadmin.home-carousel.history');
+            Route::resource('home-carousel', SuperAdminHomeCarouselController::class);
+            Route::post('home-carousel/resend-banner-request/{banner}', [SuperAdminHomeCarouselController::class, 'resendBannerRequest'])
+                ->name('superadmin.banner.resend');
         });
 
         Route::get('/soon', 'AllStatisticController@index2');
@@ -730,7 +737,7 @@ Route::group(
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']); 
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
 
 
@@ -741,7 +748,7 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
-    
+
 
     }
 );

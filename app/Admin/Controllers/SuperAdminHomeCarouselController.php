@@ -1,12 +1,13 @@
 <?php
 
-namespace App\SuperAdmin\Controllers;
+namespace App\Admin\Controllers;
 
 use App\Enums\AdminNotificationLink;
 use App\Enums\AdminNotificationType;
 use App\helper\SuperAdminHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
+use App\Models\SuperAdmin;
 use App\Models\SuperadminBannerRequest;
 use App\Selectables\Countries;
 use App\Tik\Services\Files\ImageConverter;
@@ -23,8 +24,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Grid\Tools; 
-class HomeCarouselController extends MainController
+use Encore\Admin\Grid\Tools;
+class SuperAdminHomeCarouselController extends MainController
 {
     use HasResourceActions;
 
@@ -82,16 +83,17 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-    
-        $grid->model()->whereHas('countries', function ($q) {
-            $q->where('countries.id', auth()->user()->country_id);
+        $countryID = session('country_id');
+
+        $grid->model()->whereHas('countries', function ($q) use ($countryID){
+            $q->where('countries.id', $countryID);
         });
-    
+
         $grid->id(__('ID'));
         $grid->column('img', __('Image'))->image('', 235, 77);
-    
+
         $grid->column('actions', __('Actions'))->display(function () {
-    
+
             $types = [
                 'display_discover' => __('Display Discover'),
                 'display_home_top' => __('Display Home Top'),
@@ -99,28 +101,28 @@ class HomeCarouselController extends MainController
                 'display_live' => __('Display Live'),
                 'display_room' => __('Display Rooms'),
             ];
-    
+
             $buttons = '';
             foreach ($types as $type => $label) {
                 $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
-                                data-id="' . $this->id . '" 
+                                data-id="' . $this->id . '"
                                 data-type="' . $type . '">
                                 <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
             }
             return $buttons;
         });
-    
+
         $grid->disableExport();
         $grid->disableActions();
-    
+
         $display_prices = [
             'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
             'display_home_top' => SuperAdminHelper::getHourlyBannerPrice('display_home_top'),
             'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
             'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
         ];
-    
+
         $translations = [
             'confirm_deduction' => __('Confirm Deduction'),
             'deduct_text' => __('coins will be deducted to send the display request: '),
@@ -191,8 +193,8 @@ class HomeCarouselController extends MainController
                         $.ajax({
                             url: '/superadmin/banner-request/' + bannerId,
                             type: 'POST',
-                            data: { 
-                                _token: LA.token, 
+                            data: {
+                                _token: LA.token,
                                 field: displayType,
                                 hours: hours,
                                 total: totalDeduct
@@ -218,18 +220,18 @@ class HomeCarouselController extends MainController
         $(document).on('pjax:complete', function() { bindBannerRequestButtons(); });
     ");
 
-        
-        
+
+
         $grid->tools(function (Tools $tools) {
-            $tools->append('<a href="' . superadmin_url('home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+            $tools->append('<a href="' . admin_url('superadmin/home-carousel/history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
-    
+
         return $grid;
     }
-    
-    
-    
-    
+
+
+
+
 
     /**
      * Make a show builder.
@@ -255,21 +257,21 @@ class HomeCarouselController extends MainController
      protected function form()
      {
          $form = new Form(new HomeCarousel);
-     
+
          $this->disableFormTools($form);
-     
+
          $this->addBasicFields($form);
          $this->addTimeSettings($form);
          $this->addContentType($form);
          $this->addCountryDisplay($form);
-     
+
          $this->syncCountryDisplayBeforeSave($form);
          $this->syncCountryRelationsAfterSave($form);
-     
+
          return $form;
      }
-     
-   
+
+
      protected function addBasicFields(Form $form)
      {
          $form->display(__('admin.ID'));
@@ -277,8 +279,8 @@ class HomeCarouselController extends MainController
          $form->image('img', __('Image'))->uniqueName()->required();
          $form->switch('enable', __('Enable'))->states(Common::getSwitchStates())->default(true);
      }
-     
-   
+
+
      protected function addTimeSettings(Form $form)
      {
          $form->select('form', __('Time View Type'))->options([
@@ -290,8 +292,8 @@ class HomeCarouselController extends MainController
            ->when('2', fn(Form $form) => $form->number('input', __('Input'))->min(1))
            ->when('3', fn(Form $form) => $form->number('input', __('Input'))->min(1));
      }
-     
-    
+
+
      protected function addContentType(Form $form)
      {
          $form->select('type', __('Type'))->options([
@@ -316,15 +318,15 @@ class HomeCarouselController extends MainController
              ]);
          });
      }
-  
+
      protected function addCountryDisplay(Form $form)
      {
          $form->hidden('display_at')->default(json_encode(['country']));
-     
+
         //  $form->belongsToMany('countries', Countries::class, __('Country'))->required();
      }
-     
-  
+
+
      protected function syncCountryDisplayBeforeSave(Form $form)
      {
          $form->saving(function (Form $form) {
@@ -332,23 +334,24 @@ class HomeCarouselController extends MainController
              $form->display_at = json_encode(['country']);
          });
      }
-     
-   
+
+
      protected function syncCountryRelationsAfterSave(Form $form)
      {
          $form->saved(function (Form $form) {
+             $countryID = session('country_id');
              $model = $form->model();
-     
+
              $formInput = request('input') ?? $model->input ?? 0;
              $formForm  = request('form') ?? $model->form ?? 1;
-     
+
              $unit = match ($formForm) {
                  1 => 'hours',
                  2 => 'days',
                  3 => 'months',
                  default => 'hours',
              };
-     
+
              $start = now();
              $endAt = match ($unit) {
                  'hours'  => $start->copy()->addHours($formInput),
@@ -356,7 +359,7 @@ class HomeCarouselController extends MainController
                  'months' => $start->copy()->addMonths($formInput),
                  default  => $start->copy()->addHours($formInput),
              };
-     
+
              $display = $model->displays()->firstOrNew(['display_type' => 'country']);
              $display->fill([
                  'duration'      => $formInput,
@@ -366,25 +369,27 @@ class HomeCarouselController extends MainController
              ]);
              $display->save();
 
-             $countries = Auth::user()->country_id;
+             $countries = $countryID;
              $model->countries()->sync($countries);
          });
      }
-     
+
 
 
      public function storeBannerRequest($bannerId, Request $request)
      {
          $banner = HomeCarousel::findOrFail($bannerId);
-         $user   = auth()->user();
+         $countryID = session('country_id');
+         $user = SuperAdmin::where('country_id', $countryID)->first();
+
          $field  = $request->field;
          $hours  = $request->hours;
-         
-     
+
+
          if ($this->hasActiveDisplay($banner, $field)) {
              return $this->errorResponse(__('A display of this type is already active for this banner.'));
          }
-     
+
          if ($this->hasPendingRequest($user, $banner, $field)) {
              return $this->errorResponse(__('You already have a pending request for this banner and display type.'));
          }
@@ -392,18 +397,18 @@ class HomeCarouselController extends MainController
          if ($this->hasViewRequest($user, $banner, $field)) {
             return $this->errorResponse(__('This banner is already displayed in the selected section.'));
         }
-     
+
          $totalDeduct = $this->calculateDeduction($request, $field);
-     
+
          if ($user->di < $totalDeduct) {
              return $this->errorResponse(__('insufficient_balance'));
          }
-     
+
          $this->processBannerRequest($user, $banner, $field, $totalDeduct ,$hours);
-     
+
          return response()->json(['message' => __('request_sent_success')]);
      }
-     
+
      protected function hasActiveDisplay($banner, $field)
      {
          return $banner->displays()
@@ -414,7 +419,7 @@ class HomeCarouselController extends MainController
              })
              ->exists();
      }
-     
+
      protected function hasPendingRequest($user, $banner, $field)
      {
          return SuperadminBannerRequest::where('user_id', $user->id)
@@ -435,19 +440,19 @@ class HomeCarouselController extends MainController
              })
              ->exists();
      }
-     
+
      protected function calculateDeduction(Request $request, $field)
      {
          $hours       = (int) $request->input('hours', 1);
          $hourlyPrice = SuperAdminHelper::getHourlyBannerPrice($field);
          return $hours * $hourlyPrice;
      }
-     
+
      protected function processBannerRequest($user, $banner, $field, $totalDeduct ,$hours)
      {
          \DB::transaction(function () use ($user, $banner, $field, $totalDeduct,$hours) {
              $user->decrement('di', $totalDeduct);
-     
+
             $req = SuperadminBannerRequest::create([
                  'user_id'          => $user->id,
                  'home_carousel_id' => $banner->id,
@@ -480,19 +485,20 @@ class HomeCarouselController extends MainController
             // );
          });
      }
-     
+
      protected function errorResponse($message)
      {
          return response()->json(['message' => $message], 422);
      }
-    
 
-     
-     
+
+
+
      public function resendBannerRequest($bannerId, Request $request)
     {
         $bannerRequest = $this->getLatestBannerRequest($bannerId);
-        $user = auth()->user();
+        $countryID = session('country_id');
+        $user = SuperAdmin::where('country_id', $countryID)->first();
 
         if (!$bannerRequest) {
             return $this->errorResponse(__('No previous banner request found.'));
@@ -513,8 +519,11 @@ class HomeCarouselController extends MainController
 
     protected function getLatestBannerRequest($bannerId)
     {
+        $countryID = session('country_id');
+        $superAdmin = SuperAdmin::where('country_id', $countryID)->first();
+
         return SuperadminBannerRequest::where('home_carousel_id', $bannerId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', $superAdmin->id())
             ->latest()
             ->first();
     }
@@ -539,8 +548,8 @@ class HomeCarouselController extends MainController
         });
     }
 
-   
 
-     
+
+
 }
 

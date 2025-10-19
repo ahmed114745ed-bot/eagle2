@@ -150,10 +150,11 @@ class MilestoneHelper
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->get();
-
-        foreach ($rewards as $r) {
-            self::removeRewardEffect($user, $r);
-            $r->delete();
+        if ($rewards) {
+            foreach ($rewards as $r) {
+                self::removeRewardEffect($user, $r);
+                $r->delete();
+            }
         }
     }
 
@@ -194,6 +195,11 @@ class MilestoneHelper
     public static function removeReward($user, $slug)
     {
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
-        if ($milestone && $milestone->rewards)  self::revokeRewardFromUser($user, $milestone->rewards);
+
+        if ($milestone && $milestone->rewards) {
+            foreach ($milestone->rewards as $reward) {
+                self::revokeRewardFromUser($user, $reward);
+            }
+        }
     }
 }
