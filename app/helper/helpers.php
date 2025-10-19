@@ -914,7 +914,7 @@ if (!function_exists('bd_url')) {
 }
 
 if (!function_exists('getCountryIdFromLatLong')) {
-    function getCountryIdFromLatLong($lat, $lon)
+    function getCountryIdFromLatLong($lat, $lon, $register = true)
     {
         $responseEn = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
@@ -937,6 +937,10 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $country = Country::where('iso', $countryCode)->first();
         if ($country) {
             return $country->id;
+        }
+
+        if ($register) {
+            return null;
         }
 
         $responseAr = Http::withHeaders([
