@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AggregateCoinGameUsers extends Command
 {
@@ -68,7 +69,6 @@ class AggregateCoinGameUsers extends Command
 
     protected function log(string $message)
     {
-        // ينشئ ملف log في storage/logs/coin-game.log ويضيف السطر
         Storage::append('logs/coin-game.log', '[' . now()->toDateTimeString() . '] ' . $message);
     }
 }
