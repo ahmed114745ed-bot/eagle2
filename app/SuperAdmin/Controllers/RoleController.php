@@ -81,19 +81,19 @@ class RoleController extends MainController
 
         $grid->column('name', trans('admin.name'));
 
-        $grid->column('preview', trans('admin.preview'))->display(function () {
-            $id = $this->id; // Assuming 'id' is the record ID field
-            return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">
-                <i class="fa fa-eye"></i>
-            </a>';
-        });
+        // $grid->column('preview', trans('admin.preview'))->display(function () {
+        //     $id = $this->id; // Assuming 'id' is the record ID field
+        //     return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">
+        //         <i class="fa fa-eye"></i>
+        //     </a>';
+        // });
 
-        $grid->column('rewards', __('Rewards'))->display(function () {
-            $url = admin_url("role-rewards/{$this->id}");
-            return '<a href="' . $url . '" class="btn btn-sm btn-info">
-                        <i class="fa fa-gift"></i> ' . __('rewards') . '
-                    </a>';
-        });
+        // $grid->column('rewards', __('Rewards'))->display(function () {
+        //     $url = admin_url("role-rewards/{$this->id}");
+        //     return '<a href="' . $url . '" class="btn btn-sm btn-info">
+        //                 <i class="fa fa-gift"></i> ' . __('rewards') . '
+        //             </a>';
+        // });
         // $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
         $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
             return collect($permissions)->pluck('name')->take(7)->map(function ($name) {

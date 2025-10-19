@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 
 use App\SuperAdmin\Controllers\EncorUsersController;
+use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
 
@@ -43,7 +44,7 @@ class AdminUserController extends EncorUsersController
 
         $grid->actions(function ( $actions) {
                 $actions->disableDelete();
-                $actions->add(new DeleteUser());
+                $actions->add(new DeleteSubSuperAdmin());
         });
 
         return $grid;
@@ -88,78 +89,7 @@ class AdminUserController extends EncorUsersController
                 $ops2[$user->id] = $user->uuid . '_' . $user->name;
             }
             return $ops2;
-        })->ajax('/api/search/users3', 'id', 'name')->rules('required');
-
-
-        $form->saving(function (Form $form) {
-            $model = $form->model();
-
-            $oldAppId  = $model->getOriginal('app_id');
-            $newAppId  = $form->app_id;
-
-            $oldRoles = $model->exists
-                ? $model->roles()->get(['id', 'slug'])->map(fn($r) => ['id' => (int)$r->id, 'slug' => $r->slug])->toArray()
-                : [];
-
-            $newRoles = collect($form->roles ?? [])
-                ->filter()
-                ->map(function ($id) {
-                    $role = \Encore\Admin\Auth\Database\Role::find($id);
-                    return $role ? ['id' => (int)$role->id, 'slug' => $role->slug] : null;
-                })
-                ->filter()
-                ->toArray();
-
-            if ($model->exists) {
-
-                if ($oldAppId && $oldAppId != $newAppId) {
-                    $oldUser = User::find($oldAppId);
-                    if ($oldUser) {
-                        foreach ($oldRoles as $role) {
-                            UserRoleRewardHelper::revokeRoleRewards($oldUser, $role['id'], $role['slug']);
-                        }
-                    }
-                }
-
-                $rolesRemoved = array_udiff($oldRoles, $newRoles, fn($a, $b) => $a['id'] <=> $b['id']);
-                $rolesAdded   = array_udiff($newRoles, $oldRoles, fn($a, $b) => $a['id'] <=> $b['id']);
-
-                $user = User::find($newAppId);
-                if ($user) {
-                    foreach ($rolesRemoved as $role) {
-                        UserRoleRewardHelper::revokeRoleRewards($user, $role['id'], $role['slug']);
-                    }
-
-                    foreach ($rolesAdded as $role) {
-                        UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
-                    }
-                }
-            }
-        });
-
-        $form->saved(function (Form $form) {
-            $model = $form->model();
-            $user  = User::find($model->app_id);
-
-            $newRoles = $model->roles()->get(['id', 'slug'])->map(fn($r) => ['id' => (int)$r->id, 'slug' => $r->slug]);
-
-            if ($user) {
-                foreach ($newRoles as $role) {
-                    UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
-                }
-            }
-        });
-
-        $form->deleted(function (Form $form) {
-            $model = $form->model();
-            $user  = User::find($model->app_id);
-
-            if ($user) {
-                foreach ($model->roles as $role) {
-                    UserRoleRewardHelper::revokeRoleRewards($user, (int)$role->id, $role->slug);
-                }
-            }
-        });
+        })->ajax('/api/search/users-subsuperadmin', 'id', 'name')->rules('required');
         return $form;
     }
 

@@ -12,6 +12,7 @@ use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\ChargeController;
 use App\SuperAdmin\Controllers\WalletController;
 use App\SuperAdmin\Controllers\LiveRoomController;
+use App\SuperAdmin\Controllers\AdminUserController;
 use App\SuperAdmin\Controllers\AgencyUserController;
 use App\SuperAdmin\Controllers\BdSalariesController;
 use App\SuperAdmin\Controllers\HomeCarouselController;
@@ -128,6 +129,6 @@ Route::group(
         Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
             ->name('banner.resend');
         Route::resource('roles', RoleController::class);
-        Route::resource('auth-users', RoleController::class);
+        Route::resource('auth-users', AdminUserController::class);
     }
 );

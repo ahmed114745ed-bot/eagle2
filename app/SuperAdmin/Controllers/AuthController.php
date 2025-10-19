@@ -3,13 +3,14 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Models\SuperAdmin;
-use App\Models\User;
 use Exception;
+use App\Models\User;
 use App\Models\Agent;
 use Encore\Admin\Form;
 use App\Helpers\Common;
+use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
+use App\Enums\PermissionType;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Services\WhatsappOtp;
@@ -109,7 +110,7 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("superadmin.auth.password", compact('userName','current'));
+        return view("superadmin.auth.password", compact('userName', 'current'));
     }
 
     public function verifyWhatsappCode(Request $request)
@@ -192,15 +193,19 @@ class AuthController extends BaseAuthController
         $request->session()->regenerate();
 
         $user = $this->guard()->user();
+        
 
         if (!$user) {
             return back()->withInput()->withErrors([
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
-
+// dd($user->type);
         switch ($user->type) {
+            
             case 'superadmin':
+                return redirect()->route('superadmin.home');
+            case 'sub_super_admin ':
                 return redirect()->route('superadmin.home');
             default:
                 $this->guard()->logout();
@@ -299,15 +304,15 @@ class AuthController extends BaseAuthController
         $username = $request->input('username');
 
         $user = SuperAdmin::where('username', $username)->first();
-    
+
         if (! $user || ! $user->phone) {
             return response()->json([
                 'status'  => false,
                 'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
             ]);
         }
-             
-        $masked = substr($user->phone_code.$user->phone, 0, -5) . '***';
+
+        $masked = substr($user->phone_code . $user->phone, 0, -5) . '***';
 
         return response()->json([
             'status'        => true,
@@ -315,7 +320,4 @@ class AuthController extends BaseAuthController
             'message'       => 'تم جلب بيانات الرقم بنجاح',
         ]);
     }
-
-    
- 
 }

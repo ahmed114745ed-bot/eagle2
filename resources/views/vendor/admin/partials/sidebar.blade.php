@@ -153,6 +153,7 @@
                                 'title' => __('Employees and Permissions'),
                                 'children' => [
                                     ['uri' => '/roles','icon' => 'fa-home','title' => __('roles')],
+                                    ['uri' => '/auth-users','icon' => 'fa-home','title' => __('users')],
                                 ],
                             ],
                         ];

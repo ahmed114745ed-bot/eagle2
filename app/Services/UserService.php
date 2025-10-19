@@ -131,6 +131,12 @@ class UserService
         return $this->userRepository->superAdminUsers($key, $page, $perPage);
     }
 
+    public function subSuperAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->supSuperAdminUsers($key, $page, $perPage);
+    }
+
     public function superAdminUsers2($key, $page)
     {
         $perPage = 10;
