@@ -1093,6 +1093,65 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
+        //codapay
+        $codapay_id = PaymentCoin::updateOrCreate([
+            'title' => 'codapay',
+        ], [
+            'photo' => 'images/codapay.png',
+            'status' => 1,
+            'type' => 'codapay',
+            'package_type' => 'user'
+        ]);
+
+        $codapay_fields = [
+            'new_1' => [
+                "name" => "codapay_payment_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_2' => [
+                "name" => "codapay_api_key",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_3' => [
+                "name" => "codapay_project_id",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_4' => [
+                "name" => "codapay_country",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_5' => [
+                "name" => "codapay_pay_type",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_6' => [
+                "name" => "codapay_currency",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_7' => [
+                "name" => "codapay_webhook_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+        ];
+
+        foreach ($codapay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $codapay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
         //huawei pay
 //        $huawei_pay_id = PaymentCoin::updateOrCreate([
 //            'title' => 'huawei_pay',

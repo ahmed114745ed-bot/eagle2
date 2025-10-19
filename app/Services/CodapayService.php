@@ -20,7 +20,7 @@ class CodapayService
         $this->apiKey    = 'test_kgaDbBSnvQZwiOGYulZfX561bae';
         $this->projectId = 289;
         $this->country = 818;
-        $this->payType = 417;
+        $this->payType = 338;
         $this->currency = 818;
     }
 
@@ -68,7 +68,7 @@ class CodapayService
                 'items' => [
                     [
                         'code'  => '1',
-                        'price' => floatval($amount),
+                        'price' => floatval(100),
                         'name'  => 'Order #' . $trx,
                     ]
                 ],
