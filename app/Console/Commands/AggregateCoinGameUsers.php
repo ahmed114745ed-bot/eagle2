@@ -69,7 +69,6 @@ class AggregateCoinGameUsers extends Command
 
     protected function log(string $message)
     {
-        // ينشئ ملف log في storage/logs/coin-game.log ويضيف السطر
         Storage::append('logs/coin-game.log', '[' . now()->toDateTimeString() . '] ' . $message);
     }
 }
