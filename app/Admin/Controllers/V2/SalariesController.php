@@ -99,8 +99,16 @@ class SalariesController extends MainController
     protected function users()
     {
         $grid  = new Grid(new User());
+        $countryID = session('country_id');
+
         $model =
-            $grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
+            $grid->model()
+                ->when($countryID, fn($q) =>
+                $q->where(function ($q) use ($countryID) {
+                    $q->where('country_id', $countryID)
+                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+                }))
+                ->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
         }
@@ -147,9 +155,11 @@ class SalariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
+        $countryID = session('country_id');
 
         $model = $grid->model()
-                 ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
                  ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
 //            ->where('agencies.id', request('id'))
                  ->orderByRaw('total desc')

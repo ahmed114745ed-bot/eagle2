@@ -74,10 +74,12 @@ class ChargeCountryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChargeCountry());
+        $countryID = session('country_id');
+
+        $grid->model()->when($countryID, fn($q) => $q->whereHas('country', fn($q) => $q->where('id', $countryID)));
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {

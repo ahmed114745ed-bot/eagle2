@@ -459,6 +459,13 @@ class WareTabController extends MainController
 
                 // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
+            
+
+                    Log::info('🖼 img2 uploaded', [
+                        'original_name' => $img2->getClientOriginalName(),
+                        'mime' => $img2->getMimeType(),
+                    ]);
+        
                     /** @var FileService $fileService*/
                     $fileService = app( FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
@@ -522,7 +529,7 @@ class WareTabController extends MainController
             if (request('get_type') == 4) {
                 $form->model()->expire = 0;
             }
-
+        
         });
 
         $form->saved(function (Form $form) {

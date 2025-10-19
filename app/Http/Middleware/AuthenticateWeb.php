@@ -17,73 +17,63 @@ class AuthenticateWeb
      * @return mixed
      */
     public function handle($request, Closure $next)
-    { 
+    {
         \config(['auth.defaults.guard' => 'admin']);
-        $uri = $request->path(); 
-        
-        $user = Admin::user(); 
+        $uri = $request->path();
+
+        $user = Admin::user();
+        $userType = $user?->type ?? 'admin';
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
-    
+        $superadminLogin = 'superadmin/login';
+
         if ($user) {
-            if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd') {
-                return redirect('/admin'); 
+            if (Str::is($uri, $adminLogin) && $userType === 'admin') {
+                return redirect('/admin');
             }
-    
-            if (Str::contains($uri, $bdLogin) && $user?->type == 'bd') {
-                return redirect('/bd'); 
+            if (Str::is($uri, $bdLogin) && $userType === 'bd') {
+                return redirect('/bd');
+            }
+            if (Str::is($uri, $superadminLogin) && $userType === 'superadmin') {
+                return redirect('/superadmin');
+            }
+
+            if (
+                (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
+                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
+                (Str::startsWith($uri, 'admin') && $userType !== 'admin')
+            ) {
+                Admin::guard()->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                if ($userType === 'bd') {
+                    return redirect('/bd/login')->withErrors(['error' => 'Please login through BD portal.']);
+                } elseif ($userType === 'superadmin') {
+                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
+                } else {
+                    return redirect('/admin/login')->withErrors(['error' => 'Please login through Admin portal.']);
+                }
             }
         }
+
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
-        $test = $request->getRequestUri();  // Or any other value you want to pass
+        $test = $request->getRequestUri();
+
         if (Str::contains($uri, 'bd')) {
             $redirectTo = '/bd/login';
         }
+        if (Str::contains($uri, 'superadmin')) {
+            $redirectTo = '/superadmin/login';
+        }
 
-        // If the user is not authenticated, redirect to login and pass the $test variable as a query parameter
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {
             return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
-        
-        // if (
-        //     (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
-        //     (Str::contains($uri, 'admin') && $user?->type == 'bd')
-        // ) {
-        //     if ($user->type === 'bd') {
-        //         $redirectUrl = url('/bd');
-        //         $logoutRoute = 'bd.logout';
-        //     } else {
-        //         $redirectUrl = url('/admin');
-        //         $logoutRoute = 'admin.logout';
-        //     }
-
-        //     return response()->view('auth.unauthorized', [
-        //         'redirect_url' => $redirectUrl,
-        //         'logout_route' => $logoutRoute,
-        //     ], 403);
-        // }
-
-        if (
-            (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
-            (Str::contains($uri, 'admin') && $user?->type == 'bd')
-        ) {
-            // تحديد رابط العودة حسب نوع المستخدم
-            if ($user->type === 'bd') {
-                return redirect('/bd');
-            } else {
-                return redirect('/admin');
-            }
-        }
-
-
-
-        
-        
         return $next($request);
     }
-
     /**
      * Determine if the request has a URI that should pass through verification.
      *

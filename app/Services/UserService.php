@@ -108,6 +108,15 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+
+    public function bdCountryUsers($key, $page,$country_id)
+    {
+        $perPage = 10;
+        return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
+    }
+
+    
+
     public function user_bd($key, $page)
     {
         $perPage = 10;
@@ -120,11 +129,35 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
+    public function superAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers($key, $page, $perPage);
+    }
+
+    public function superAdminUsers2($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers2($key, $page, $perPage);
+    }
+
+    public function usersByCountry($superAdminId, $key, $page)
+    {
+        $perPage = 10;
+
+        return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
+    }
 
     public function searchInAgency($key, $page)
     {
         $perPage = 10;
         return $this->userRepository->searchInAgency($key, $page, $perPage);
+    }
+
+    public function superAdminAgencies($key, $page, $countryId)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminAgencies($key, $page, $perPage, $countryId);
     }
 
     public function searchInHostAgency($key, $page)

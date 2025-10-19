@@ -92,8 +92,16 @@ class ChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
-        $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
+        $grid->model()
+            ->when($countryID, fn($q) =>
+                $q->where(function ($q) use ($countryID) {
+                    $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
+                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+                }))
+            ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash");
@@ -234,7 +242,7 @@ class ChargeReportController extends MainController
                             }
                         }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
                     });
-                
+
 
 
                 $filter->column(1 / 2, function ($filter) {
@@ -426,10 +434,13 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
+        $countryID = session('country_id');
 
         $grid->disableRowSelector();
 
-        $grid->model()->orderByDesc('created_at');
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -604,8 +615,12 @@ class ChargeReportController extends MainController
     {
 
         $grid = new Grid(new CoinLog());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
-        $grid->model()->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -703,8 +718,12 @@ class ChargeReportController extends MainController
     protected function exchange()
     {
         $grid = new Grid(new ExchangeLog());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
-        $grid->model()->orderByDesc('created_at')->where('status', 1);
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->orderByDesc('created_at')->where('status', 1);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();

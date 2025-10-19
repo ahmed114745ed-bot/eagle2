@@ -40,8 +40,16 @@
 
                     @endif
 
+                        @if (Admin::user()->type == 'superadmin')
 
-                    @if (Admin::user()->type != 'bd')
+                            @foreach(Admin::menuLinks() as $link)
+                                <li>
+                                    <a href="{{ superadmin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                                </li>
+                            @endforeach
+                        @endif
+
+                    @if (Admin::user()->type != 'bd' || Admin::user()->type != 'superadmin')
 
                         @foreach(Admin::menuLinks() as $link)
                             <li>
@@ -73,7 +81,7 @@
                 <li class="header">{{ trans('admin.menu') }}</li>
 
                 @if (Admin::user()->type == 'bd')
-  
+
                 @php
                     $bdLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Home')],
@@ -86,14 +94,139 @@
 
                 @foreach($bdLinks as $link)
                     <li>
-                        <a href="{{  bd_url($link['uri']) }}">
+                        <a href="{{ bd_url($link['uri']) }}">
                             <i class="fa {{ $link['icon'] }}"></i>
                             <span>{{ $link['title'] }}</span>
                         </a>
                     </li>
                 @endforeach
                 @endif
-                @each('admin::partials.menu', $filteredMenu, 'item')
+
+                @if (Admin::user()->type == 'superadmin')
+                    @php
+                        $superadminLinks = [
+                            ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-briefcase',
+                                'title' => __('BD'),
+                                'children' => [
+                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')],
+                                    ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD')],
+                                ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
+                                ],
+                            ],
+                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                            ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                            ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
+                        ];
+                    @endphp
+
+                @foreach($superadminLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ superadmin_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i>
+                                                <span>{{ $child['title'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ superadmin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+
+{{--                @foreach($superadminLinks as $link)--}}
+{{--                        <li>--}}
+{{--                            <a href="{{ superadmin_url($link['uri']) }}">--}}
+{{--                                <i class="fa {{ $link['icon'] }}"></i>--}}
+{{--                                <span>{{ $link['title'] }}</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                    @endforeach--}}
+                @endif
+
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && !session('preview_superadmin'))
+                    @each('admin::partials.menu', $filteredMenu, 'item')
+                @elseif(session('preview_superadmin'))
+                    @php
+                        $superadminPreviewLinks = [
+                            ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/superadmin/profile','icon' => 'fa-home','title' => __('Super Admin Profile')],
+                            ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                            ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
+                                ],
+                            ],
+                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                            ['uri' => '/superadmin/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                        ];
+                    @endphp
+
+                    @foreach($superadminPreviewLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ admin_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i> {{ $child['title'] }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ admin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i> {{ $link['title'] }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @endif
             </ul>
 
 

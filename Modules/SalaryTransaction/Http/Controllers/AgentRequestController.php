@@ -66,7 +66,15 @@ class AgentRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AgentSalaryRequest());
-        $grid->model()->where("status", 0);
+        $countryID = session('country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('agent', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }))
+            ->where("status", 0);
         $grid->column('id', __('Id'));
         $grid->column('agency.name', __("agency"))->display(function ($name) {
             $path = @$this->agency->img;

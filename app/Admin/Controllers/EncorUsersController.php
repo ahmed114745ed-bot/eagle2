@@ -2,23 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\KickOfAgencyAction;
-use App\Facades\ManagerHelper;
-use App\Models\User;
-use App\Models\Agency;
-use Encore\Admin\Actions\Action;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\AdminUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
 
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\HostUserAction;
 use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
 use Illuminate\Support\Facades\Hash;
 use Encore\Admin\Actions\Response;
 
@@ -179,9 +170,10 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
-
+    
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
+                ->where('type', '!=', 'superadmin')
                 ->orWhereNull('type');
         })
             ->where('is_preview', 0)

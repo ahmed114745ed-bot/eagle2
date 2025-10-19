@@ -2,7 +2,7 @@
 
 return[
 
-"code_is_sent_to_your_phone" =>"تم بعت الرسالة بنجاح",
+"code_is_sent_to_your_phone" =>"تم ارسال كود اللى الوتساب بنجاح",
 "too_many_send" =>"الكثير من الطلبات ",
 'yesterday' => 'أمس',
 'confirm_delete' => 'هل انت مأكد',

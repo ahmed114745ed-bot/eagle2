@@ -26,6 +26,7 @@ use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Session;
@@ -578,25 +579,38 @@ class AgencyController extends MainController
 
     protected function grid()
     {
+        $countryID = session('country_id');
+
         $grid = new Grid(new Agency);
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-            ->with([
-                'owner:id,name,uuid', // only needed fields
-                'owner.profile:id,user_id,avatar',
-                'owner.packs' => fn($q) => $q
-                    ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                    ->where('type', 25)
-                    ->where('is_used', true)
-                    ->with('ware:id,value'),
-            ])
-            ->available()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->where(function ($query) {
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+            })
             ->orderByDesc('id');
-        if (request()->has('active')) {
-            $grid->model()->whereHas('agencySalaries', function ($q) {
+
+        if (request("active") == true) {
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
                     ->where('year', now()->year);
             });
+        }
+
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
         }
 
         // --- Agency name column ---
@@ -933,12 +947,12 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
@@ -946,11 +960,12 @@ class AgencyController extends MainController
                         // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                         // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
                          hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
                     });
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
@@ -963,6 +978,16 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
+
+            if (!$form->bd_id && !$form->model()->bd_id ){
+                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
+
+                if ($defaultBd) {
+                    $form->bd_id = $defaultBd->id;
+                } else {
+                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                }
+            }
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;

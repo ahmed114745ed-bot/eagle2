@@ -57,6 +57,8 @@ class UsersChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -77,6 +79,7 @@ class UsersChargeController extends MainController
         });
 
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->select('id', 'name', 'uuid', 'coins', 'di')
             ->with('profile')
             ->orderByDesc('id');

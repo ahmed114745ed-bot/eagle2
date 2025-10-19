@@ -2,20 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Row;
 use App\Models\MomentGallery;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Moment\Entities\Moment;
-use Encore\Admin\Grid\Displayers\Table;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
-use Encore\Admin\Form\Field\Table as FieldTable;
 
 class MomentController extends MainController
 {
@@ -50,132 +44,136 @@ class MomentController extends MainController
 
 
     protected function grid()
-{
-    $grid = new Grid(new Moment());
+    {
+        $grid = new Grid(new Moment());
+        $countryID = session('country_id');
+        // 🔹 **إضافة الفلتر للبحث عن المستخدم بالاسم أو UUID**
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
 
-    // 🔹 **إضافة الفلتر للبحث عن المستخدم بالاسم أو UUID**
-    $grid->filter(function (Grid\Filter $filter) {
-        $filter->expand();
-        $filter->disableIdFilter();
-        $filter->column('1/2', function ($filter) {
-            $filter->where(function ($query) {
-                $input = $this->input;
-
-                $query->whereHas('user', function ($query) use ($input) {
-                    $query->where('name', 'like', "%$input%")
-                          ->orWhere('uuid', 'like', "%$input%");
-                });
-            }, __('User'))->placeholder(__('Search by name or UUID'));
+                    $query->whereHas('user', function ($query) use ($input) {
+                        $query->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%");
+                    });
+                }, __('User'))->placeholder(__('Search by name or UUID'));
+            });
         });
-    });
 
-    $grid->model()->orderByDesc('created_at');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                });
+            });
+        })->orderByDesc('created_at');
 
-    // 🔹 **عرض الوصف في مودال عند النقر عليه**
-    $grid->column('description', __('Description'))->display(function ($description) {
-        $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-        return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-    });
+        // 🔹 **عرض الوصف في مودال عند النقر عليه**
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
 
-    // 🔹 **عرض معلومات المستخدم**
-    $grid->column('user.name', __('User'))->display(function ($name) {
-        $uid = @$this->user->uuid;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $avatarPath = @$this->user->avatar;
-        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+        // 🔹 **عرض معلومات المستخدم**
+        $grid->column('user.name', __('User'))->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$this->user->avatar;
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        $userUrl = admin_url('users/' . $this->user_id); // رابط صفحة المستخدم في لوحة التحكم
+            $userUrl = admin_url('users/' . $this->user_id); // رابط صفحة المستخدم في لوحة التحكم
 
-        return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                     <div>
                         <a href='$userUrl' style='font-weight: bold; text-decoration: none;'>$name</a><br>
                         <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
                 </div>";
-    });
+        });
 
 
-    // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
-    $grid->column('comment_num', __('status'))->display(function () {
-        $likeCount = count(@$this->likes);
-        $commentCount = count(@$this->comments);
-        return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
-    });
+        // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
+        $grid->column('comment_num', __('status'))->display(function () {
+            $likeCount = count(@$this->likes);
+            $commentCount = count(@$this->comments);
+            return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
+        });
 
-    // 🔹 **عرض تاريخ الإنشاء**
-    $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+        // 🔹 **عرض تاريخ الإنشاء**
+        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
-    // $grid->column('img', __('Image'))->display(function () {
-    //     $id = $this->id;
-    //     $galleries = MomentGallery::where('moment_id', $id)->get();
+        // $grid->column('img', __('Image'))->display(function () {
+        //     $id = $this->id;
+        //     $galleries = MomentGallery::where('moment_id', $id)->get();
 
-    //     $html = '<div id="image-gallery-' . $id . '" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">';
+        //     $html = '<div id="image-gallery-' . $id . '" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">';
 
-    //     foreach ($galleries as $image) {
-    //         $imgUrl = getDriverUrl() . '/' . $image->image;
+        //     foreach ($galleries as $image) {
+        //         $imgUrl = getDriverUrl() . '/' . $image->image;
 
-    //         $html .= '<div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
-    //                     <img src="' . $imgUrl . '"
-    //                          style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
-    //                          data-original="' . $imgUrl . '"
-    //                          loading="lazy"
-    //                          class="gallery-image">
-    //                  </div>';
-    //     }
+        //         $html .= '<div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+        //                     <img src="' . $imgUrl . '"
+        //                          style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
+        //                          data-original="' . $imgUrl . '"
+        //                          loading="lazy"
+        //                          class="gallery-image">
+        //                  </div>';
+        //     }
 
-    //     $html .= '</div>';
+        //     $html .= '</div>';
 
-    //     Admin::script("
-    //         new Viewer(document.getElementById('image-gallery-$id'));
-    //     ");
+        //     Admin::script("
+        //         new Viewer(document.getElementById('image-gallery-$id'));
+        //     ");
 
-    //     return $html;
-    // });
+        //     return $html;
+        // });
 
-    $grid->column('img', __('Image'))->display(function () {
-        $id = $this->id;
-        $galleries = MomentGallery::where('moment_id', $id)->get();
+        $grid->column('img', __('Image'))->display(function () {
+            $id = $this->id;
+            $galleries = MomentGallery::where('moment_id', $id)->get();
 
-        if ($galleries->isEmpty()) {
-            return 'No Image';
-        }
+            if ($galleries->isEmpty()) {
+                return 'No Image';
+            }
 
-        $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
-        $imgUrl = '';
-        foreach ($galleries as $image) {
-            $imgUrl = getDriverUrl() . '/' . $image->image;
+            $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
+            $imgUrl = '';
+            foreach ($galleries as $image) {
+                $imgUrl = getDriverUrl() . '/' . $image->image;
 
-            $html .= '<img src="' . $imgUrl . '"
+                $html .= '<img src="' . $imgUrl . '"
                          style="width: 100%; height: 200px; object-fit: cover;"
                          data-original="' . $imgUrl . '"
                          loading="lazy"
                          class="gallery-image">';
-        }
+            }
 
-        $html .= '</div>';
+            $html .= '</div>';
 
-        // Show only the first image
+            // Show only the first image
 
-        $html .= '<img src="' . $imgUrl . '"
+            $html .= '<img src="' . $imgUrl . '"
                       style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
                       onclick="document.querySelector(`#image-gallery-' . $id . ' img`).click()">';
 
-        Admin::script("
+            Admin::script("
             new Viewer(document.getElementById('image-gallery-$id'));
         ");
 
-        return $html;
-    });
+            return $html;
+        });
 
-    $grid->disableCreateButton();
-    $this->extendGrid($grid);
-    return $grid;
-
-
-}
+        $grid->disableCreateButton();
+        $this->extendGrid($grid);
+        return $grid;
+    }
 
     // protected function grid()
     // {
@@ -268,9 +266,9 @@ class MomentController extends MainController
         return $form;
     }
 
-    public function momentGallery(Content $content,$id)
+    public function momentGallery(Content $content, $id)
     {
-       $galleries = MomentGallery::where('moment_id',$id)->get();
+        $galleries = MomentGallery::where('moment_id', $id)->get();
         return $content
             ->header(__('images'))
             ->description('')
