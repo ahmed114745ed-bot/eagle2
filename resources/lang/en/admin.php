@@ -436,7 +436,9 @@ return [
     'huawei_pay'    => 'Huawei Pay',
     "webhook_url" => "Webhook Url",
     "webhook_id" => "Webhook Id",
-
+    'project_id'   => 'Project ID',
+    'country'      => 'Country',
+    'pay_type'     => 'Payment Type',
     "target_no" => 'Target Number',
     "diamonds" => 'Diamonds',
     "usd" => 'Host Salary',

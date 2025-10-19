@@ -16,12 +16,12 @@ class CodapayService
 
     public function __construct()
     {
-        $this->baseUrl   = 'https://sandbox.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
-        $this->apiKey    = 'test_kgaDbBSnvQZwiOGYulZfX561bae';
-        $this->projectId = 289;
-        $this->country = 818;
-        $this->payType = 338;
-        $this->currency = 818;
+        $this->baseUrl   = config('codapay.base_url');
+        $this->apiKey    = config('codapay.api_key');
+        $this->projectId = config('codapay.project_id');
+        $this->country   = config('codapay.country');
+        $this->payType   = config('codapay.pay_type');
+        $this->currency  = config('codapay.currency');
     }
 
     public static function redirect_if_payment_success($trx)

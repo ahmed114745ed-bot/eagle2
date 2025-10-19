@@ -37,6 +37,7 @@ class PaymentGatewaysSeeder extends Seeder
             'googlepay.png',
 //            'huaweipay.png',
 //            'zinipay.jpg',
+            'codapay.webp',
         ];
 
         foreach ($images as $img) {
@@ -1105,34 +1106,34 @@ class PaymentGatewaysSeeder extends Seeder
 
         $codapay_fields = [
             'new_1' => [
-                "name" => "codapay_payment_url",
+                "name" => "codapay_base_url",
                 "type" => "input",
-                "value" => "test"
+                "value" => "https://sandbox.codapayments.com/airtime/api/restful/v2.0/Payment/init.json"
             ],
             'new_2' => [
                 "name" => "codapay_api_key",
                 "type" => "input",
-                "value" => "test"
+                "value" => "test_kgaDbBSnvQZwiOGYulZfX561bae"
             ],
             'new_3' => [
                 "name" => "codapay_project_id",
                 "type" => "input",
-                "value" => "test"
+                "value" => 289
             ],
             'new_4' => [
                 "name" => "codapay_country",
                 "type" => "input",
-                "value" => "test"
+                "value" => 818
             ],
             'new_5' => [
                 "name" => "codapay_pay_type",
                 "type" => "input",
-                "value" => "test"
+                "value" => 338
             ],
             'new_6' => [
                 "name" => "codapay_currency",
                 "type" => "input",
-                "value" => "test"
+                "value" => 818
             ],
             'new_7' => [
                 "name" => "codapay_webhook_url",
