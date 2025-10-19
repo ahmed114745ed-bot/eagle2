@@ -403,7 +403,7 @@ class HomeCarouselController extends MainController
 
             }
 
-            if (in_array('country', $displays ?? [])) {
+            if (in_array('country', $displays ?? []) && $foundKeys == []) {
                 $countries = array_filter(request('countries', []));
                 $form->model()->countries()->sync($countries);
             } elseif (!empty(request('displayCountry'))) {
@@ -411,9 +411,11 @@ class HomeCarouselController extends MainController
                     $countries = array_filter(request('countries', []));
                     $form->model()->countries()->sync($countries);
                 } else {
+
                     $form->model()->countries()->detach();
                 }
             }
+
         });
      }
 
