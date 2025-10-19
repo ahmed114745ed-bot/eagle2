@@ -190,8 +190,11 @@ class CoinGameUserService
             'user_uuid',
             'user_name',
             'user_avatar',
+            'date',
         ])
-        ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar')
+        ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar',
+        'date'
+        )
         ->orderByDesc('total_played');    
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -200,7 +203,7 @@ class CoinGameUserService
             $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
             $filter->like('game_id', 'Game')->placeholder('ID');
             $filter->between('date', __('Created At'))->datetime([
-                'format' => 'YYYY-MM-DD HH:mm:ss',
+                'format' => 'YYYY-MM-DD',
                 'locale' => 'en'
             ]);
         });
