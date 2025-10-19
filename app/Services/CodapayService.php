@@ -26,12 +26,12 @@ class CodapayService
 
     public static function redirect_if_payment_success($trx)
     {
-        return url(config('services.codapay.return_url_success', '/payment/success'));
+        return url(config('codapay.return_url_success', 'api/codapay-success'));
     }
 
     public static function redirect_if_payment_failed($trx)
     {
-        return url(config('services.codapay.return_url_failed', '/payment/failed'));
+        return url(config('codapay.return_url_failed', '/api/codapay-success'));
     }
 
     public function makePayment($trx, $amount, $userId = null)
@@ -87,5 +87,15 @@ class CodapayService
     public function callback(): void
     {
         info('codapay log');
+    }
+
+    public function success()
+    {
+        return response()->json(['status' => 'success', 'message' => 'Payment completed successfully!']);
+    }
+
+    public function failed()
+    {
+        return response()->json(['status' => 'failed', 'message' => 'Payment failed or was cancelled.']);
     }
 }
