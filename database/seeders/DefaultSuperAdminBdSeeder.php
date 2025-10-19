@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Bd;
 use App\Models\SuperAdmin;use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class DefaultSuperAdminBdSeeder extends Seeder
 {
@@ -28,7 +29,10 @@ class DefaultSuperAdminBdSeeder extends Seeder
 
         $defaultBd = Bd::where('default', 1)->where('country_id', 0 )->first();
 
+        Log::info(['defaultBd'=>$defaultBd]);
         if ($defaultBd){
+        Log::info(['defaultSuperAdmin'=>$defaultSuperAdmin->id]);
+
             $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
         }else {
             Bd::create([
