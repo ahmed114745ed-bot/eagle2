@@ -5,6 +5,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
 use App\SuperAdmin\Controllers\AuthController;
 use App\SuperAdmin\Controllers\HomeController;
+use App\SuperAdmin\Controllers\RoleController;
 use App\SuperAdmin\Controllers\RoomController;
 use App\SuperAdmin\Controllers\UserController;
 use App\SuperAdmin\Controllers\AgencyController;
@@ -126,5 +127,7 @@ Route::group(
         Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
         Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
             ->name('banner.resend');
+        Route::resource('roles', RoleController::class);
+        Route::resource('auth-users', RoleController::class);
     }
 );

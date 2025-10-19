@@ -3,13 +3,7 @@
     use App\Enums\PermissionType;
     // Group permissions by category first
     $grouped = $permissions->groupBy('category');
-    $categories = RoleCategory::orderBy('sort')
-    ->select('slug', 'type')
-    ->where(function ($q) {
-        $q->where('type', PermissionType::ADMIN->value)
-          ->orWhere('slug', 'general');
-    })->get();
-    //dd($categories);
+    $categories = RoleCategory::orderBy('sort')->select('slug','type')-> where('type',PermissionType::SUPER_ADMIN->value)->get();
     $selected = $selectedPermissions ?? [];
 
     // Pre-process all permissions by category and group

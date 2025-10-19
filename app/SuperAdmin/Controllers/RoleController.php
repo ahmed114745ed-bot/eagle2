@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace App\SuperAdmin\Controllers;
 
 use App\Models\Role;
 use Encore\Admin\Form;
@@ -8,12 +8,15 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Permission;
 use Illuminate\Support\Str;
+use App\Enums\PermissionType;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Modules\RoleRewards\Actions\DeleteRole;
+use Encore\Admin\Controllers\AdminController;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
-class RoleControllerNew extends MainController
+class RoleController extends MainController
 {
     public $permission_name = 'roles';
     /**
@@ -26,24 +29,24 @@ class RoleControllerNew extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(__('Roles'))
-            ->body($this->grid()));
+            ->body($this->grid());
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
+        return  $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
-            ->body($this->form($id)->edit($id)));
+            ->body($this->form($id)->edit($id));
     }
     public function create(Content $content)
     {
-        return parent::create($content
+        return $content
             ->title($this->title())
             ->description($this->description['create'] ?? trans('admin.create'))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     public function store()
@@ -52,9 +55,9 @@ class RoleControllerNew extends MainController
     }
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return $content
             ->title(trans(__('Roles')))
-            ->body($this->detail($id)));
+            ->body($this->detail($id));
     }
     public function update($id)
     {
@@ -72,7 +75,7 @@ class RoleControllerNew extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('admin_id', null);
+        $grid->model()->where('admin_id', Auth::id());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 
@@ -124,7 +127,7 @@ class RoleControllerNew extends MainController
 
 
         $grid->disableExport();
-        // $this->extendGrid($grid);
+       // $this->extendGrid($grid);
         return $grid;
     }
 
@@ -162,12 +165,9 @@ class RoleControllerNew extends MainController
     public function form($id = null)
     {
         $permissionModel = config('admin.database.permissions_model');
-        $permissions = Permission::where(function ($q) {
-            $q->whereHas('permissionTypes', function ($q) {
-                $q->where('type', 'admin');
-            })
-                ->orWhere('category', 'general');
-        })->get();
+        $permissions = Permission::with('permissionTypes')
+            ->whereHas('permissionTypes', fn($q) => $q->where('type', 'super_admin'))
+            ->get();
         $roleModel = config('admin.database.roles_model');
 
         $form = new Form(new $roleModel());
@@ -181,8 +181,10 @@ class RoleControllerNew extends MainController
         // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         // Custom tabbed view
-        $form->html(view('admin.permissions-tabs', [
+       // dd(Role::where('id', $id)->first()->permissions->pluck('id')->toArray());
+        $form->html(view('admin.super-admin-permission-tabs', [
             'permissions' => $permissions,
+            
             'selectedPermissions' => $id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray() : [],
         ])->render());
 
@@ -192,7 +194,8 @@ class RoleControllerNew extends MainController
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');
-
+                        $form->model()->admin_id = Auth::id();
+                        $form->model()->type = PermissionType::SUPER_ADMIN->value;
             // Automatically generate slug from name *before saving*
             $form->model()->slug = Str::slug($form->name);
         });
@@ -202,7 +205,7 @@ class RoleControllerNew extends MainController
 
         $form->saved(function (Form $form) {
             $form->slug = Str::slug(request('name'));
-
+            $form->admin_id = Auth::id();
             $all = request('permissions_all');
             $selectedPermissionIds = array_filter(explode(',', $all));
 

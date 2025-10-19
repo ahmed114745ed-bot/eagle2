@@ -147,6 +147,14 @@
                             ],
                             
                             ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Employees and Permissions'),
+                                'children' => [
+                                    ['uri' => '/roles','icon' => 'fa-home','title' => __('roles')],
+                                ],
+                            ],
                         ];
                     @endphp
 

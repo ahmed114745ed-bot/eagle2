@@ -6,8 +6,6 @@ use App\Models\RoleCategory;
 use App\Enums\PermissionType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 
 class PermissionTypeSeeder extends Seeder
@@ -19,6 +17,8 @@ class PermissionTypeSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('permission_types')->truncate();
+        DB::table('role_categories')->truncate();
         $defaultMethods = ['browse', 'create', 'delete', 'edit', 'show'];
 
         // Define your base categories
@@ -300,19 +300,15 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'banner-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
                     ],],
                     ['key' => 'splash', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
                     ],],
                     ['key' => 'official-messages', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
                     ],],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
                     ],],
                 ],
             ],
@@ -810,7 +806,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'roles', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
+                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'roles-reward', 'except' => ['show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -993,7 +989,6 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-
             [
                 'name' => 'reward',
                 'sort' => 37,
@@ -1002,7 +997,15 @@ class PermissionTypeSeeder extends Seeder
                     // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
                 ],
                 'permissions' => [
-                    ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                    [
+                        'key' => 'user-reward',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
 
                 ],
             ],
@@ -1014,12 +1017,15 @@ class PermissionTypeSeeder extends Seeder
                     // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
                 ],
                 'permissions' => [
-                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
+                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
+
+                    ],],
 
                 ],
             ],
             [
-                'name' => 'Bd',
+                'name' => 'Bds',
                 'sort' => 38,
                 'types' => [
                     // PermissionType::ADMIN->value => ['sort' => 19],
@@ -1027,7 +1033,7 @@ class PermissionTypeSeeder extends Seeder
                 ],
                 'permissions' => [
                     [
-                        'key' => 'Bd',
+                        'key' => 'Bds',
                         'except' => [],
                         'additional' => ['delete-switch', 'choose-switch', 'stop-salary-switch'],
                         'types' => [
@@ -1079,7 +1085,7 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'rewards',
+                'name' => 'super rewards',
                 'sort' => 40,
                 'types' => [
 
@@ -1087,10 +1093,7 @@ class PermissionTypeSeeder extends Seeder
                 ],
                 'permissions' => [
 
-
-
-
-                    ['key' => 'professional-users', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                    ['key' => 'reward-center', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
 
                         PermissionType::SUPER_ADMIN->value => ['browse', 'dedicate-switch'],
                     ],],
@@ -1098,6 +1101,8 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
         ];
+
+
 
         $allSlugs = [];
 
@@ -1108,7 +1113,7 @@ class PermissionTypeSeeder extends Seeder
 
             foreach ($category['types'] as $type => $typeData) {
                 $categoryName = $category['name'];
-                $categorySlug = Str::slug($categoryName);
+                $categorySlug = $categoryName;
 
                 // 🧱 Create or update category
                 DB::table('role_categories')->updateOrInsert(
@@ -1167,6 +1172,12 @@ class PermissionTypeSeeder extends Seeder
 
                         // ✅ Additional permissions
                         foreach ($perm['additional'] as $extra) {
+
+                            // Only add this extra if it exists in the current $permType list
+                            if (!in_array($extra, $perm['types'][$type] ?? [])) {
+                                continue; // skip if this type doesn't have this additional permission
+                            }
+
                             $slug = "{$extra}-{$perm['key']}";
                             $name = ucfirst(str_replace('-', ' ', $slug));
 
@@ -1198,6 +1209,15 @@ class PermissionTypeSeeder extends Seeder
                 }
             }
         }
+        $lastSort = RoleCategory::where('type', PermissionType::ADMIN->value)->max('sort');
+        RoleCategory::updateOrCreate(
+            ['name_en' => 'general'],
+            ['slug' => 'general', 'sort' => $lastSort + 1]
+        );
+        DB::table('admin_permissions')
+            ->whereNull('category')
+            ->update(['category' => 'general']);
+
 
         // 🚮 Remove old permissions
         DB::table('admin_permissions')

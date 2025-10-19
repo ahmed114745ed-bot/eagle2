@@ -238,6 +238,8 @@ Route::group(
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('roles', 'RoleControllerNew');
+
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
         //     Route::get('/', [RoleControllerNew::class, 'index']);
@@ -312,7 +314,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+        Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -719,10 +721,8 @@ Route::group(
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']); 
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
-
-
         });
         Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
             $user = auth()->user();
@@ -730,8 +730,6 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
-    
-
     }
 );
 
