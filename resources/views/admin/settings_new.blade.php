@@ -2318,7 +2318,7 @@ use Modules\Vip\Entities\Vip;
                                                                 <div class="copy-container">
                                                                     <input type="text" id="codapay_webhook_url" name="codapay_webhook_url"
                                                                            placeholder="codapay_webhook_url"
-                                                                           value="{{ url('/api/codapaypublic-callback') }}"
+                                                                           value="{{ url('/api/codapay-callback') }}"
                                                                            class="form-control" required>
                                                                     <button type="button" class="copy-button" data-copy-target="codapay_webhook_url" title="Copy">📋</button>
                                                                 </div>
