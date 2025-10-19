@@ -252,7 +252,7 @@ class HomeController extends  MainController
         $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
         $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
-        return $content
+        return parent::index($content
             ->title(__('Home'))
             ->description(__('General Statistics'))
 
@@ -643,7 +643,7 @@ class HomeController extends  MainController
                         //                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
                     });
                 });
-            });
+            }));
     }
 
 

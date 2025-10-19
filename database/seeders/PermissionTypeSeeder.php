@@ -802,7 +802,7 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     ['key' => 'auth-users', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
+                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'roles', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
