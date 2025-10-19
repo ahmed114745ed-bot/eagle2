@@ -21,7 +21,7 @@ class CountryResource extends JsonResource
             'lang' => @$this->language ?: '',
             'phone_code' => @$this->phone_code ?: '',
             'iso' => @$this->iso ?: '',
-            'total_rooms' => $this->whenHas(),
+            'total_rooms' => $this->whenHas('total_rooms'),
         ];
     }
 }
