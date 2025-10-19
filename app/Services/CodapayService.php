@@ -68,7 +68,7 @@ class CodapayService
                 'items' => [
                     [
                         'code'  => '1',
-                        'price' => floatval(100),
+                        'price' => floatval($amount),
                         'name'  => 'Order #' . $trx,
                     ]
                 ],
