@@ -104,9 +104,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;
@@ -224,9 +224,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;
@@ -314,9 +314,9 @@ class AuthService
                 }
             }
 
-            if (!$countryId && $lat && $long){
-                $countryId = getCountryIdFromLatLong($lat, $long);
-            }
+//            if (!$countryId && $lat && $long){
+//                $countryId = getCountryIdFromLatLong($lat, $long);
+//            }
 
             if ($countryId) {
                 $data['country_id'] = $countryId;
@@ -364,9 +364,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;

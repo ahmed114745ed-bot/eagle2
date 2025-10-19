@@ -235,9 +235,9 @@ class UserService
         // update location
         if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
             $this->userRepository->updateLocation($user->id, $lat, $long);
-            if (!$countryId) {
-                $countryId = getCountryIdFromLatLong($lat, $long, false);
-            }
+//            if (!$countryId) {
+//                $countryId = getCountryIdFromLatLong($lat, $long, false);
+//            }
         }
         // end update location
 
