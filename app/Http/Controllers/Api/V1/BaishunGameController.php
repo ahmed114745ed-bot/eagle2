@@ -87,17 +87,19 @@ class BaishunGameController extends Controller
 
                 $userDi += (int) $request->currency_diff;
 
-                // Insert into coin_game_users after all checks
-                // $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
-
-                $game =AllGame::where('custom_id', $request->game_id)->first();
+                $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
+                $game = AllGame::where('custom_id', $request->game_id)->first();
+                
+                if (empty($gameId) && $game) {
+                    $gameId = $game->id;
+                }
                 
                 DB::table('coin_game_users')->insert([
                     'user_id' => $id,
                     'coins' => abs($request->currency_diff),
                     'app_profit_coins' => abs($request->currency_diff),
                     'type' => $request->currency_diff >= 0,
-                    'game_id' => $game->id,
+                    'game_id' => $gameId,
                     'round_id' => $request->game_round_id,
                     'order_id' => $request->order_id,
                     'created_at' => now(),
