@@ -205,7 +205,7 @@ class AuthController extends BaseAuthController
             
             case 'superadmin':
                 return redirect()->route('superadmin.home');
-            case 'sub_super_admin ':
+            case 'sub_super_admin':
                 return redirect()->route('superadmin.home');
             default:
                 $this->guard()->logout();
