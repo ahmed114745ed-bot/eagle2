@@ -10,7 +10,7 @@ class FillNullGameIdSeeder extends Seeder
 {
     public function run()
     {
-        $startDate = '2025-09-22';
+        $startDate = '2025-01-1';
         $gameName = 'null'; 
 
         $game = DB::table('games')->where('name', $gameName)->first();
