@@ -604,3 +604,37 @@ Route::get('notifications/test', function () {
 
     return 'done';
 });
+
+Route::get('/week-zone', function () {
+
+
+
+    $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
+    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+
+    return response()->json([
+        'start_of_week'  => $startOfWeek,
+        'end_of_week'    => $endOfWeek,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'CleanUpDuplicateCountriesSeeder',
+    ]);
+
+    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
+});
+
+Route::get('remove-new-country', function () {
+    User::where('country_id', 266)->update(['country_id' => null]);
+
+    return 'done';
+});
+
+// Main page route
+Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
