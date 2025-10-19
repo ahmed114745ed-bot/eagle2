@@ -102,7 +102,7 @@
                 @endforeach
                 @endif
 
-                @if (Admin::user()->type == 'superadmin')
+                @if ((Admin::user()->type == 'superadmin') || Admin::user()->type =='sub_super_admin')
                     @php
                         $superadminLinks = [
                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
