@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('time_enter_rooms', function (Blueprint $table) {
-            $table->renameColumn('seconds', 'minutes');
-        });
+        // Schema::table('time_enter_rooms', function (Blueprint $table) {
+        //     $table->renameColumn('seconds', 'minutes');
+        // });
     }
 
     /**
