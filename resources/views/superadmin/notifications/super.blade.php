@@ -52,3 +52,5 @@
 <link rel="stylesheet" href="{{ asset('css/superadmin/modal.css') }}">
 <script src="{{ asset('js/superadmin/modal.js') }}"></script>
 <script type="module" src="{{ asset('js/superadmin-firebase-notification.js') }}"></script>
+<script src="{{ asset('firebase-messaging-sw.js') }}"></script>
+

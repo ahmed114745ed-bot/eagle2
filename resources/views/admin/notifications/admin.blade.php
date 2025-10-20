@@ -54,3 +54,5 @@
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
 <script src="{{ asset('js/modal.js') }}"></script>
 <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
+<script src="{{ asset('firebase-messaging-sw.js') }}"></script>
+
