@@ -28,18 +28,16 @@ class CodapayService
         $this->projectId = config('codapay.project_id');
         $this->country = config('codapay.country');
         $this->currency = config('codapay.currency');
-        
-        // تحقق من الإعدادات
-        if (!$this->baseUrl || !$this->apiKey || !$this->projectId) {
-            Log::error('Codapay: Missing configuration');
-            throw new \Exception('Codapay configuration is incomplete');
-        }
-        
         Log::info('Codapay Service Initialized', [
             'environment' => $environment,
             'base_url' => $this->baseUrl,
             'project_id' => $this->projectId,
         ]);
+        if (!$this->baseUrl || !$this->apiKey || !$this->projectId) {
+            Log::error('Codapay: Missing configuration');
+            throw new \Exception('Codapay configuration is incomplete');
+        }
+       
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
