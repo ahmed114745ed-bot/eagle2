@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\Payments\PaymentStatus;
 use App\Models\CoinLog;
 use App\Traits\User\PaymentTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -141,13 +142,71 @@ class CodapayService
         }
     }
 
-    public function success()
+    public function success(Request $request): JsonResponse
     {
-        return response()->json(['status' => 'success', 'message' => 'Payment completed successfully!']);
+        $txnId = $request->query('txn_id');
+        $coinLog = CoinLog::where('trx', $txnId)->whereMethod('paypal')->firstOrFail();
+
+        if (!$txnId) {
+            return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
+        }
+
+        $url = $this->baseUrl . '/api/restful/v2.0/Payment/inquiryPaymentResult.json';
+        $body = [
+            'inquiryPaymentRequest' => [
+                'txnId'          => $txnId,
+                'country'        => $this->country,
+                'apiKey'         => $this->apiKey,
+                'projectId'      => $this->projectId,
+                'needStatusFinal'=> true,
+            ],
+        ];
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post($url, $body);
+
+        $json = $response->json();
+        \Log::info('Codapay Inquiry Response', ['txnId' => $txnId, 'response' => $json]);
+
+        $paymentResult = $json['paymentResult'] ?? null;
+        $entries = $paymentResult['profile']['entry'] ?? [];
+
+        $statusValue = null;
+
+        foreach ($entries as $entry) {
+            if ($entry['key'] === 'status') {
+                $statusValue = strtolower($entry['value']);
+            }
+        }
+
+        switch ($statusValue) {
+            case 'success':
+                $status = true;
+                $message = 'Payment completed successfully!';
+                break;
+            case 'pending':
+                $status = true;
+                $message = 'pending';
+                break;
+            default:
+                $status = false;
+                $message = 'Payment failed or was cancelled.';
+                break;
+        }
+
+        return response()->json([
+            'status'  => $status,
+            'trx'     => $coinLog->trx,
+            'message' => $message,
+        ]);
     }
 
-    public function failed()
+    public function failed(Request $request): JsonResponse
     {
-        return response()->json(['status' => 'failed', 'message' => 'Payment failed or was cancelled.']);
+        $txnId = $request->query('txn_id');
+        $coinLog = CoinLog::where('trx', $txnId)->whereMethod('paypal')->firstOrFail();
+
+        return response()->json(['status'  => false, 'trx' => $coinLog->trx, 'message' => 'Payment failed or was cancelled.']);
     }
 }
