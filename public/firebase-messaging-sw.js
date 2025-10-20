@@ -1,20 +1,13 @@
-
-
-
-
-
-// Import Firebase scripts (required for background notifications)
+//Import Firebase scripts (required for background notifications)
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
+console.log('Firebase Config:', firebaseConfig);
 
-// Initialize Firebase
 const firebaseConfig = window.firebaseConfig;
 
-console.log('Firebase Config:', firebaseConfig);
 
 const messaging = firebase.messaging();
 
-// // Optional: Handle background notifications
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload);
   const { title, body } = payload.notification;
