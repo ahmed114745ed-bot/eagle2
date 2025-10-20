@@ -45,6 +45,9 @@
         modal.classList.remove('active');
         document.body.style.overflow = '';
     }
+    $('.btn-show-more').click(function (e) {
+        closeModal();
+    });
 </script>
 
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
