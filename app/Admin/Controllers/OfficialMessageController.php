@@ -110,6 +110,7 @@ class OfficialMessageController extends MainController
 
 
         $grid->content(__('content'));
+        $grid->feature(__('type'));
         $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
