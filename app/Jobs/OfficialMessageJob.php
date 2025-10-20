@@ -10,6 +10,7 @@ use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
 use App\Models\ShippingAgency;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -49,6 +50,12 @@ class OfficialMessageJob implements ShouldQueue
             // if it's a comma-separated string or single value
             $featureIds = array_filter(explode(',', $featureIds));
         }
+        Log::info('OfficialMessageJob started', [
+        'feature'      => $feature,
+        'sub_feature'  => $subFeature,
+        'member_title' => $memberTitle,
+        'feature_ids'  => $featureIds,
+    ]);
 
         $usersId = [];
 
