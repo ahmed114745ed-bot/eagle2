@@ -81,8 +81,12 @@ class HomeCarouselController extends MainController
      */
     protected function grid()
     {
+        $itemNotification = request('itemNotification');
+       
         $grid = new Grid(new HomeCarousel);
-    
+        $grid->model()->when($itemNotification, function ($query, $itemNotification) {
+            $query->where('id', $itemNotification);
+        });
         $grid->model()->whereHas('countries', function ($q) {
             $q->where('countries.id', auth()->user()->country_id);
         });
@@ -456,28 +460,28 @@ class HomeCarouselController extends MainController
                  'notes'            => $field,
                  'hours'            => $hours,
              ]);
-            //  AdminNotificationHelper::notify(
-            //     type: AdminNotificationType::NEW_ORDER,
-            //     title: 'banner_request_title',
-            //     message: __(
-            //         'banner_request_message',
-            //         [
-            //             'name' => auth()->user()->name,
-            //             'id' => auth()->user()->id,
-            //             'coins' => $totalDeduct,
-            //         ]
-            //     ),
-            //     model: $banner,
-            //     data: [
-            //         'requested_by' => auth()->user()->name,
-            //         'requested_by_id' =>auth()->user()->id,
-            //         'item_id' => $req->id,
-            //         'coins_deducted' => $totalDeduct,
-            //         'hours' => $hours,
-            //         'notes' => $field,
-            //         'preview_url' => AdminNotificationLink::BANNER_SHOW,
-            //     ]
-            // );
+             AdminNotificationHelper::notify(
+                type: AdminNotificationType::NEW_ORDER,
+                title: 'banner_request_title',
+                message: __(
+                    'banner_request_message', 
+                    [
+                        'name' => auth()->user()->name,
+                        'id' => auth()->user()->id,
+                        'coins' => $totalDeduct,
+                    ]
+                ),
+                model: $banner,
+                data: [
+                    'requested_by' => auth()->user()->name,
+                    'requested_by_id' =>auth()->user()->id,
+                    'item_id' => $req->id,
+                    'coins_deducted' => $totalDeduct,
+                    'hours' => $hours,
+                    'notes' => $field,
+                    'preview_url' => AdminNotificationLink::BANNER_SHOW,
+                ]
+            );
          });
      }
      

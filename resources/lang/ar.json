@@ -22,6 +22,7 @@
 "Professional BD": "ال bd المحترفين",
 "not_in_same_country":"ليس في نفس البلد",
 "No reward found": "لم يتم العثور على أي هدية",
+"Show more": "عرض المزيد",
 
 "Select Super Admins": "اختر المشرفين العامين",
     "Email": "بريد الكتروني",
@@ -4140,5 +4141,10 @@
 "banner_request_message": "قام المشرف :name (المعرف: :id) بطلب عرض بانر جديد بقيمة :coins عملة.",
 "Mark as read" :"تعيين كا مقرؤة",
 "Mark all as read":"تمييز الكل كمقروء",
-"Read":"مقرؤء"
+"Read":"مقرؤء",
+"banner_approved_title": "تمت الموافقة على طلب البانر",
+"banner_approved_message": "قام المشرف :name (رقم المعرف: :id) بالموافقة على طلب البانر وتم خصم :coins عملة.",
+"banner_rejected_title": "تم رفض طلب البانر",
+"banner_rejected_message": "قام المشرف :name (رقم المعرف: :id) برفض طلب البانر."
+
 }

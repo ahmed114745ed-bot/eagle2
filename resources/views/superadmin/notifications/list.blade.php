@@ -3,6 +3,7 @@
 @foreach ($notifications as $notif)
     @php
         $data = is_array($notif->data) ? $notif->data : json_decode($notif->data, true);
+
         $title = __("{$notif->title}") ?: $notif->title;
         $message = __(
             "{$notif->message}",
@@ -14,23 +15,25 @@
         );
 
         $previewUrl = $data['preview_url'] ?? null;
-
         if ($previewUrl) {
-            $enum = \App\Enums\AdminNotificationLink::tryFrom($previewUrl);
+            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrl);
             if ($enum) {
                 $previewUrl = $enum->url($data);
             }
         }
     @endphp
 
-    <div class="notification-item {{ $notif->is_read ? 'read' : 'unread' }}" data-id="{{ $notif->id }}" 
+    <div class="notification-item {{ $notif->is_read ? 'read' : 'unread' }}" 
+         data-id="{{ $notif->id }}" 
          style="cursor:pointer;" 
-         onclick="handleNotificationClick({{ $notif->id }}, '{{ $previewUrl }}')">
+         onclick="superAdminhandleNotificationClick({{ $notif->id }}, '{{ $previewUrl }}')">
+
         <div class="title">{{ $title }}</div>
         <div class="message text-muted small">{{ $message }}</div>
         <div class="time text-secondary small">{{ $notif->created_at->diffForHumans() }}</div>
     </div>
 @endforeach
+
 
 <style>
 .notification-item {

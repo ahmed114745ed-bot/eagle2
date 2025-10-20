@@ -1,13 +1,9 @@
 <?php
-
 namespace App\Events;
 
 use App\Models\AdminNotification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -35,22 +31,38 @@ class AdminNotificationCreated implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('admin.notifications');
+        // قناة عامة بدل الخاصة
+        return new Channel('admin.notifications');
     }
 
     /**
+     * اسم الحدث عند البث
+     */
+    public function broadcastAs()
+    {
+        return 'AdminNotificationCreated';
+    }
+    
+    /**
+     * البيانات المرسلة عند البث
      *
      * @return array
      */
     public function broadcastWith()
     {
+        \Log::info('📡 Broadcasting AdminNotificationCreated', [
+            'id' => $this->notification->id,
+            'title' => $this->notification->title,
+            'channel' => 'public-admin.notifications',
+        ]);
+
         return [
-            'id'      => $this->notification->id,
-            'title'   => $this->notification->title,
-            'message' => $this->notification->message,
-            'data' => $this->notification->data,
-            'is_read' => $this->notification->is_read,
-            'created_at' => $this->notification->created_at->toDateTimeString(),
+            'id'        => $this->notification->id,
+            'title'     => $this->notification->title,
+            'message'   => $this->notification->message,
+            'data'      => $this->notification->data,
+            'is_read'   => $this->notification->is_read,
+            'created_at'=> $this->notification->created_at->toDateTimeString(),
         ];
     }
 }

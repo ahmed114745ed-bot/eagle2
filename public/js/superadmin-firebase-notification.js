@@ -15,7 +15,7 @@ async function requestPermission() {
             console.log("Notification permission granted.");
             const token = await getToken(messaging, { vapidKey: firebaseConfig.vapidKey });
 
-            await fetch("/admin/save-fcm-token", {
+            await fetch("/superadmin/save-fcm-token", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

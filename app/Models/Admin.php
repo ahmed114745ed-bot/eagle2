@@ -10,7 +10,7 @@ class Admin extends Administrator
 
     protected $appends = ['agency_id'];
 
-    protected $fillable = ['username', 'password', 'name','app_id', 'avatar', 'is_preview'];
+    protected $fillable = ['username', 'password', 'name','app_id', 'avatar', 'is_preview','type'];
 
     protected $guarded = [];
 
