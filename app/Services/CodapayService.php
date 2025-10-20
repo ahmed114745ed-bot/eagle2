@@ -18,21 +18,21 @@ class CodapayService
     protected $country;
     protected $payType;
     protected $currency;
-    use PaymentTrait;
     public function __construct()
     {
         $environment = env('CODAPAY_ENV', 'production');
         
+        // ✅ الـ URLs الصحيحة
         if ($environment === 'production') {
-            $this->baseUrl = 'https://api.codapay.com';
+            $this->baseUrl = 'https://airtime.codapayments.com/airtime';
         } else {
-            $this->baseUrl = 'https://sandbox.codapay.com';
+            $this->baseUrl = 'https://sandbox.codapayments.com/airtime';
         }
         
         $this->apiKey = env('CODAPAY_API_KEY');
         $this->projectId = env('CODAPAY_PROJECT_ID');
         $this->country = env('CODAPAY_COUNTRY', '818');
-        $this->currency = env('CODAPAY_CURRENCY', '840');
+        $this->currency = env('CODAPAY_CURRENCY', '818'); // EGP
         $this->payType = env('CODAPAY_PAY_TYPE', 0);
         
         Log::info('Codapay Service Initialized', [
@@ -73,9 +73,9 @@ class CodapayService
             if (!$response->successful()) {
                 Log::error('Codapay: HTTP request failed', [
                     'status' => $response->status(),
-                    'body' => $response->body()
+                    'body' => $response->body(),
                 ]);
-                throw new \Exception('Codapay API request failed');
+                throw new \Exception('Codapay API request failed with status: ' . $response->status());
             }
 
             $json = $response->json();
@@ -107,6 +107,7 @@ class CodapayService
         $txnId = $initResult['txnId'] ?? 0;
         $resultDesc = $initResult['resultDesc'] ?? 'Unknown error';
 
+        // نجاح
         if ($resultCode === 0 && $txnId > 0) {
             Log::info('Codapay: Payment initialized successfully', [
                 'trx' => $trx,
@@ -121,6 +122,7 @@ class CodapayService
             ];
         }
 
+        // فشل
         Log::warning('Codapay: Payment initialization failed', [
             'trx' => $trx,
             'code' => $resultCode,
@@ -129,12 +131,10 @@ class CodapayService
         ]);
 
         $errorMessages = [
-            201 => 'معلومات الدفع غير صحيحة',
-            202 => 'فشل التحقق من البيانات',
-            203 => 'الخدمة غير متاحة مؤقتاً',
-            204 => 'انتهت صلاحية الطلب',
-            205 => 'تم إلغاء العملية أو Account غير مفعّل',
-            206 => 'طريقة الدفع غير مدعومة',
+            201 => 'معلومات الدفع غير صحيحة - تحقق من API Key',
+            202 => 'فشل التحقق - تأكد من تفعيل Production Account',
+            205 => 'الحساب غير مفعّل أو البلد غير مدعوم',
+            206 => 'طريقة الدفع غير متاحة',
         ];
 
         return [
@@ -144,6 +144,7 @@ class CodapayService
             'trx' => $trx,
         ];
     }
+
 
 
 
