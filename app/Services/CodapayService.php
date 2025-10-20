@@ -22,10 +22,70 @@ class CodapayService
 
     public function __construct()
     {
-        $this->baseUrl = config('codapay.base_url');
+        $environment = config('codapay.environment');
+        $this->baseUrl = config("codapay.urls.{$environment}");
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
         $this->country = config('codapay.country');
+        $this->currency = config('codapay.currency');
+        
+        // تحقق من الإعدادات
+        if (!$this->baseUrl || !$this->apiKey || !$this->projectId) {
+            Log::error('Codapay: Missing configuration');
+            throw new \Exception('Codapay configuration is incomplete');
+        }
+        
+        Log::info('Codapay Service Initialized', [
+            'environment' => $environment,
+            'base_url' => $this->baseUrl,
+            'project_id' => $this->projectId,
+        ]);
+    }
+
+    public function initiatePayment($trx, $amount, $userId = null)
+    {
+        try {
+            $body = $this->getBodyForCodapay($trx, $amount, $userId);
+            $url = $this->baseUrl . '/api/restful/v2.0/Payment/init.json';
+            
+            Log::info("Codapay: Initiating payment", [
+                'url' => $url,
+                'trx' => $trx,
+                'amount' => $amount,
+            ]);
+
+            $response = Http::timeout(30)
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post($url, $body);
+
+            if (!$response->successful()) {
+                Log::error('Codapay: HTTP request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception('Codapay API request failed');
+            }
+
+            $json = $response->json();
+            
+            Log::info('Codapay Payment Response', [
+                'trx' => $trx,
+                'response' => $json,
+            ]);
+
+            return $this->handleResponse($json, $trx);
+
+        } catch (\Exception $e) {
+            Log::error('Codapay: Exception', [
+                'trx' => $trx,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'حدث خطأ في معالجة الدفع'
+            ];
+        }
     }
 
     public static function redirect_if_payment_success()
@@ -38,120 +98,7 @@ class CodapayService
         return url('/api/codapay-success');
     }
 
-    public function initiatePayment($trx, $amount, $userId = null)
-    {
-        try {
-            $body = $this->getBodyForCodapay($trx, $amount, $userId);
-            $url = $this->baseUrl . '/api/restful/v2.0/Payment/init.json';
-            
-            \Log::info("Codapay Payment Init", [
-                'url' => $url,
-                'trx' => $trx,
-                'amount' => $amount,
-                'userId' => $userId
-            ]);
     
-            $response = Http::timeout(30)->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post($url, $body);
-    
-            $json = $response->json();
-            
-            Log::info('Codapay Payment Response', [
-                'trx' => $trx,
-                'body' => $body,
-                'response' => $json,
-            ]);
-    
-            if (!isset($json['initResult'])) {
-                Log::error('Codapay: Invalid response structure', ['response' => $json]);
-                throw new \Exception('Invalid response from Codapay');
-            }
-    
-            $initResult = $json['initResult'];
-            $resultCode = $initResult['resultCode'] ?? null;
-            $resultDesc = $initResult['resultDesc'] ?? 'Unknown error';
-            $txnId = $initResult['txnId'] ?? 0;
-    
-            if ($resultCode === 0 && $txnId > 0) {
-                Log::info('Codapay: Payment initialized successfully', [
-                    'trx' => $trx,
-                    'txnId' => $txnId
-                ]);
-                
-                return [
-                    'success' => true,
-                    'payment_url' => $this->baseUrl . "/begin?type=3&txn_id=$txnId",
-                    'txnId' => $txnId
-                ];
-            }
-    
-            switch ($resultCode) {
-                case 205:
-                    Log::warning('Codapay: Transaction cancelled', [
-                        'trx' => $trx,
-                        'desc' => $resultDesc
-                    ]);
-                    return [
-                        'success' => false,
-                        'error' => 'cancelled',
-                        'message' => 'عملية الدفع تم إلغاؤها',
-                        'code' => 205
-                    ];
-    
-                case 201:
-                    Log::error('Codapay: Invalid parameters', [
-                        'trx' => $trx,
-                        'desc' => $resultDesc,
-                        'body' => $body
-                    ]);
-                    return [
-                        'success' => false,
-                        'error' => 'invalid_parameters',
-                        'message' => 'معلومات الدفع غير صحيحة',
-                        'code' => 201
-                    ];
-    
-                case 202:
-                    Log::error('Codapay: Authentication failed', [
-                        'trx' => $trx,
-                        'desc' => $resultDesc
-                    ]);
-                    return [
-                        'success' => false,
-                        'error' => 'authentication_failed',
-                        'message' => 'فشل في التحقق من بيانات الدفع',
-                        'code' => 202
-                    ];
-    
-                default:
-                    Log::error('Codapay: Payment initialization failed', [
-                        'trx' => $trx,
-                        'code' => $resultCode,
-                        'desc' => $resultDesc
-                    ]);
-                    return [
-                        'success' => false,
-                        'error' => 'payment_failed',
-                        'message' => $resultDesc,
-                        'code' => $resultCode
-                    ];
-            }
-    
-        } catch (\Exception $e) {
-            Log::error('Codapay: Exception during payment init', [
-                'trx' => $trx,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-    
-            return [
-                'success' => false,
-                'error' => 'exception',
-                'message' => 'حدث خطأ أثناء معالجة الدفع'
-            ];
-        }
-    }
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
