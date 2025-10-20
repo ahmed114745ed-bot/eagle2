@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Request;
 
 class CodapayService
 {
@@ -84,9 +85,19 @@ class CodapayService
         ];
     }
 
-    public function callback(): void
+    public function callback(Request $request)
     {
-        info('codapay log');
+        $orderId = $request->get('OrderId');
+        $txnId = $request->get('TxnId');
+        $resultCode = $request->get('ResultCode');
+
+        if ($resultCode === "0") {
+            Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
+        } else {
+            Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
+        }
+
+        return response()->json(['status' => 'ok']);
     }
 
     public function success()
