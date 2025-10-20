@@ -16,24 +16,39 @@ class VerifyCodapayWebhook
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Log::info('Codapay Callback Received', [
-            'headers' => $request->headers->all(),
-            'body' => $request->all(),
+        Log::info('Codapay Callback Middleware Triggered', [
+            'payload' => $request->all(),
         ]);
 
-        $providedSignature = $request->header('X-Codapay-Signature');
+        $required = ['TxnId', 'OrderId', 'TotalPrice', 'Checksum'];
+        foreach ($required as $field) {
+            if (!$request->has($field)) {
+                Log::warning("Codapay callback missing field: {$field}");
+                return response()->json(['error' => "Missing required field: {$field}"], 400);
+            }
+        }
+
+        $txnId     = $request->get('TxnId');
+        $orderId   = $request->get('OrderId');
+        $amount    = $request->get('TotalPrice');
+        $checksum  = $request->get('Checksum');
+
         $secretKey = config('codapay.api_key');
 
-        if ($providedSignature) {
-            $expectedSignature = hash_hmac('sha256', json_encode($request->all()), $secretKey);
+        $computedChecksum = md5($txnId . $orderId . $amount . $secretKey);
 
-            if (!hash_equals($expectedSignature, $providedSignature)) {
-                Log::warning('Codapay Signature Verification Failed');
-                return response()->json(['error' => 'Invalid signature'], 403);
-            }
-        } else {
-            Log::warning('Codapay callback missing signature header');
+        if ($computedChecksum !== $checksum) {
+            Log::warning('Codapay checksum verification failed', [
+                'received' => $checksum,
+                'expected' => $computedChecksum,
+            ]);
+            return response()->json(['error' => 'Invalid checksum'], 403);
         }
+
+        Log::info('Codapay checksum verified successfully', [
+            'TxnId' => $txnId,
+            'OrderId' => $orderId,
+        ]);
 
         return $next($request);
     }
