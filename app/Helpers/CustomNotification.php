@@ -12,6 +12,7 @@ use App\Models\OfficialMessage;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserOfficialMessage;
+use Illuminate\Support\Facades\Log;
 use Modules\Moment\Entities\Moment;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Lang;
@@ -347,6 +348,7 @@ class CustomNotification
         $user_id = $msg->user_id;
         $language = $msg->language;
         if ($usersId) {
+            Log::info(123);
             $usersChunk = User::where('notification_id', '!=', NULL)->whereIn('id', $usersId)->when(isset($language), function ($query) use ($language) {
                 $query->where('lan', $language);
             })->select(['id', 'notification_id', 'lan'])->get()->unique('notification_id')->chunk(50);
@@ -376,6 +378,7 @@ class CustomNotification
 
                 // Save user_official_messages records
                 foreach ($chunk as $user) {
+                    Log::info($user->id);
                     UserOfficialMessage::create([
                         'official_message_id' => $msg->id,
                         'user_id' => $user->id,
