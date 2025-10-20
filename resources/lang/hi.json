@@ -3248,7 +3248,9 @@
     "banner_request_title": "नया बैनर प्रदर्शन अनुरोध",
     "banner_request_message": "प्रशासक :name (आईडी: :id) ने :coins सिक्कों के लिए नया बैनर प्रदर्शन अनुरोध किया है।",
     "banner_rejected_title": "बैनर अनुरोध अस्वीकृत कर दिया गया है",
-    "banner_rejected_message": "प्रशासक :name (आईडी: :id) ने बैनर अनुरोध अस्वीकृत कर दिया है।"
+    "banner_rejected_message": "प्रशासक :name (आईडी: :id) ने बैनर अनुरोध अस्वीकृत कर दिया है।",
+      "Banner approved successfully": "बैनर सफलतापूर्वक अनुमोदित किया गया",
+  "Banner rejected successfully": "बैनर को सफलतापूर्वक अस्वीकृत कर दिया गया"
 
 
 

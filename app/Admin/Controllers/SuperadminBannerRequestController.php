@@ -190,7 +190,7 @@ class SuperadminBannerRequestController extends AdminController
                                         if(res.success){
                                             Swal.fire({
                                                 title: res.message || messages.success[locale],
-                                                icon: 'success',
+                                                type: 'success',
                                                 timer: 2000,
                                                 showConfirmButton: false
                                             });
@@ -388,7 +388,7 @@ class SuperadminBannerRequestController extends AdminController
 
         );
 
-        return response()->json(['success' => true, 'message' => 'Banner rejected successfully']);
+        return response()->json(['success' => true, 'message' => __('Banner rejected successfully')]);
     }
 
 }
