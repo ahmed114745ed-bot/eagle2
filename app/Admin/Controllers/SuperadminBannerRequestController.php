@@ -25,6 +25,7 @@ class SuperadminBannerRequestController extends AdminController
      * @var string
      */
     protected $title = 'SuperadminBannerRequest';
+    public $permission_name = 'superadmin-banners';
 
 
     public function __construct(SuperAdminService $userService)
@@ -34,9 +35,9 @@ class SuperadminBannerRequestController extends AdminController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__('SuperadminBannerRequest'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
     /**
      * Make a grid builder.
@@ -103,21 +104,22 @@ class SuperadminBannerRequestController extends AdminController
         });
 
         // Actions
-        $grid->column('actions', __('Actions'))->display(function () {
-            $approveUrl = route('admin.superadmin-banner.approve', $this->id);
-            $rejectUrl  = route('admin.superadmin-banner.reject', $this->id);
+        if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('approve-switch-') || Admin::user()->can('*')) {
+            $grid->column('actions', __('Actions'))->display(function () {
+                $approveUrl = route('admin.superadmin-banner.approve', $this->id);
+                $rejectUrl  = route('admin.superadmin-banner.reject', $this->id);
 
-            if ($this->status === 'rejected') {
-                return '<span class="text-danger">' . __('Rejected') . '</span>';
-            }
+                if ($this->status === 'rejected') {
+                    return '<span class="text-danger">' . __('Rejected') . '</span>';
+                }
 
-            if ($this->status === 'approved') {
-                return '<span class="text-success">' . __('Approved') . '</span>';
-            }
-            $approveText = __('Approved');
-            $rejectText  = __('Reject');
+                if ($this->status === 'approved') {
+                    return '<span class="text-success">' . __('Approved') . '</span>';
+                }
+                $approveText = __('Approved');
+                $rejectText  = __('Reject');
 
-            return <<<HTML
+                return <<<HTML
             <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
             <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
 
@@ -125,7 +127,8 @@ class SuperadminBannerRequestController extends AdminController
 
 
            HTML;
-        });
+            });
+        }
 
         Admin::script("
                   document.addEventListener('DOMContentLoaded', function () {
@@ -313,7 +316,7 @@ class SuperadminBannerRequestController extends AdminController
 
         SuperAdminNotificationHelper::notify(
             type: SuperAdminNotificationType::NEW_ORDER,
-            title: 'banner_approved_title', 
+            title: 'banner_approved_title',
             message: 'banner_approved_message',
             model: $homeCarousel,
             data: [
@@ -323,7 +326,7 @@ class SuperadminBannerRequestController extends AdminController
                 'coins_deducted' => $request->coins_deducted,
                 'hours' => $hours,
                 'preview_url' => SuperAdminNotificationLink::BANNER_APPROVED,
-        
+
                 'translation_params' => [
                     'name' => auth()->user()->name,
                     'id' => auth()->user()->id,
@@ -334,9 +337,9 @@ class SuperadminBannerRequestController extends AdminController
                 superAdminId:$request->user_id
 
         );
-        
+
         $request->update(['status' => 'approved']);
-        
+
         return response()->json([
             'success' => true,
             'message' => __('Banner approved successfully'),
@@ -366,7 +369,7 @@ class SuperadminBannerRequestController extends AdminController
         $hours = (int) ($request->hours ?? 1);
         SuperAdminNotificationHelper::notify(
             type: SuperAdminNotificationType::REGECTED_BANNER_ORDER,
-            title: 'banner_rejected_title', 
+            title: 'banner_rejected_title',
             message: 'banner_rejected_message',
             model: $homeCarousel,
             data: [
@@ -376,7 +379,7 @@ class SuperadminBannerRequestController extends AdminController
                 'coins_deducted' => $request->coins_deducted,
                 'hours' => $hours,
                 'preview_url' => SuperAdminNotificationLink::BANNER_REGECTED,
-        
+
                 'translation_params' => [
                     'name' => auth()->user()->name,
                     'id' => auth()->user()->id,
