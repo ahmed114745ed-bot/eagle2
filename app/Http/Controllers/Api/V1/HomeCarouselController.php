@@ -16,7 +16,7 @@ class HomeCarouselController extends Controller
     {
     
         $user = Auth::user();
-        $displayAt = request('display_at');
+        $displayType = request('display_at');
         $country = request('country_id');
         $timezone = getTimezone();
 
