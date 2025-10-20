@@ -239,9 +239,9 @@ class SuperAdminController extends MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
-            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-                $actions->add(new DeleteSuperAdminAction());
-            }
+//            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+//                $actions->add(new DeleteSuperAdminAction());
+//            }
         });
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
