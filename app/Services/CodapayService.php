@@ -31,12 +31,12 @@ class CodapayService
 
     public static function redirect_if_payment_success($trx)
     {
-        return url(config('codapay.return_url_success', 'api/codapay-success'));
+        return url('api/codapay-success');
     }
 
     public static function redirect_if_payment_failed($trx)
     {
-        return url(config('codapay.return_url_failed', '/api/codapay-success'));
+        return url('/api/codapay-success');
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
@@ -71,6 +71,8 @@ class CodapayService
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
                 'currency'  => $this->currency,
+                'returnUrl' => self::redirect_if_payment_success($trx),
+                'failUrl'   => self::redirect_if_payment_failed($trx),
                 'items' => [
                     [
                         'code'  => '1',
