@@ -40,7 +40,15 @@ class OfficialMessageJob implements ShouldQueue
         $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? null;
-        $featureIds = array_filter($this->request['feature_ids'] ?? []);
+
+        // Handle feature_ids as array or string
+        $featureIds = $this->request['feature_ids'] ?? [];
+
+        // ✅ Always make $featureIds an array safely
+        if (!is_array($featureIds)) {
+            // if it's a comma-separated string or single value
+            $featureIds = array_filter(explode(',', $featureIds));
+        }
 
         $usersId = [];
 
@@ -71,7 +79,7 @@ class OfficialMessageJob implements ShouldQueue
                 if ($memberTitle === 'owner') {
                     $usersId[] = $family->user_id;
                 } elseif ($memberTitle === 'admin') {
-                    $usersId = array_merge($usersId, $family->admin->pluck('user_id')->toArray());
+                    $usersId = array_merge($usersId, $family->admins->pluck('user_id')->toArray());
                 } elseif ($memberTitle === 'members') {
                     $usersId = array_merge($usersId, $family->members->pluck('user_id')->toArray());
                 }
