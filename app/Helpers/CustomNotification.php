@@ -2,19 +2,21 @@
 
 namespace App\Helpers;
 
-use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Family;
+use Modules\Vip\Entities\Vip;
 use App\Models\OfficialMessage;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Lang;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserOfficialMessage;
+use Illuminate\Support\Facades\Log;
 use Modules\Moment\Entities\Moment;
 use App\Models\OfficialMessageAdmin;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Cache;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class CustomNotification
@@ -341,11 +343,15 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public  function officialMsg(OfficialMessageAdmin $msg)
+    public  function officialMsg(OfficialMessageAdmin $msg, $usersId)
     {
         $user_id = $msg->user_id;
-        if ($user_id == 0) {
-            $usersChunk = User::where('notification_id', '!=', NULL)->select(['id', 'notification_id'])->get()->unique('notification_id')->chunk(50);
+        $language = $msg->language;
+        if ($usersId) {
+            Log::info(123);
+            $usersChunk = User::where('notification_id', '!=', NULL)->whereIn('id', $usersId)->when(isset($language), function ($query) use ($language) {
+                $query->where('lan', $language);
+            })->select(['id', 'notification_id', 'lan'])->get()->unique('notification_id')->chunk(50);
             $body             = $msg->content;
             $title = $msg->title;
             $data['image'] = null;
@@ -356,11 +362,28 @@ class CustomNotification
             }
 
 
-            foreach ($usersChunk as $user) {
-                $user = $user->pluck('notification_id')->toArray();
+            foreach ($usersChunk as $chunk) {
+                // Extract notification IDs
+                $notificationIds = $chunk->pluck('notification_id')->toArray();
 
-                Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
-                // dd($data);
+                // Send Firebase notification
+                Common::send_firebase_notification(
+                    $notificationIds,
+                    title: $title,
+                    body: $body,
+                    icon: $icon,
+                    data: $data,
+                    messageType: 'system-msg'
+                );
+
+                // Save user_official_messages records
+                foreach ($chunk as $user) {
+                    Log::info($user->id);
+                    UserOfficialMessage::create([
+                        'official_message_id' => $msg->id,
+                        'user_id' => $user->id,
+                    ]);
+                }
             }
             (new UserCounterServices)->eventUsers('system-messages');
             // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {

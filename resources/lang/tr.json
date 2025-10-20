@@ -22,6 +22,16 @@
     "Top 3 Host Agencies": "En Güçlü 3 Sunucu Ajansı",
     "Top 3 Recharge Agencies": "En Büyük 3 Yükleme Ajansı",
     "Top 3 Most Active BD": "En Aktif 3 BD",
+     "feature": "özellik",
+    "BDs": "İş Geliştiriciler (BDs)",
+    "shipping agency": "nakliye acentesi",
+    "all agencies": "tüm ajanslar",
+    "All Agencies in Country": "ülkedeki tüm ajanslar",
+    "Specific Agency by ID": "ID'ye göre belirli ajans",
+    "Users in Specific Country": "belirli bir ülkedeki kullanıcılar",
+    "Logged Out Users": "çıkış yapmış kullanıcılar",
+    "All BDS": "tüm İş Geliştiriciler (BDs)",
+    "All Shipping Agencies": "tüm nakliye acenteleri",
     "clients": "müşteri",
     "Gaming Champions": "Oyun Şampiyonları",
     "Epic Message to Heroes of :country": ":country Kahramanlarına Epik Mesaj",
@@ -3645,6 +3655,8 @@
     "Friday": "Cuma",
     "Saturday": "Cumartesi",
     "Settings updated successfully.": "Ayarlar başarıyla güncellendi.",
-     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti."
+    "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti.",
+    "Banner approved successfully": "Afiş başarıyla onaylandı",
+    "Banner rejected successfully": "Afiş başarıyla reddedildi"
 
 }

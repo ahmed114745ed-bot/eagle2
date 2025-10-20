@@ -58,6 +58,7 @@ class FamilyService
             'num' => 20,
             'image' =>  $img ?: '',
             'is_success' => 1,
+            'country_id' => $user->country_id,
         ];
         $family =  $this->familyRepository->create($familyData);
 

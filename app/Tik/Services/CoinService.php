@@ -120,8 +120,10 @@ class CoinService
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
             } elseif ($paymentMethod == 'codapay') {
-                $Active = config('is_codapay_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $active = config('is_codapay_active');
+                \Log::info("start $active coins");
+
+                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $codapayService = new CodapayService();
 
                 $paymentUrl = $codapayService->initiatePayment($log->id, $coin->usd, $user->id);

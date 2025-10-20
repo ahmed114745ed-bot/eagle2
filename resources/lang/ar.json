@@ -1940,6 +1940,16 @@
     "Agora Settings" : "اعدادات Agora",
     "Zego Settings" : "اعدادات Zego",
     "Confirm Password" : "تأكيد كلمة المرور",
+        "feature": "الميزة",
+    "BDs": "مديرو الأعمال (BDs)",
+    "shipping agency": "وكالة الشحن",
+    "all agencies": "جميع الوكالات",
+    "All Agencies in Country": "جميع الوكالات في الدولة",
+    "Specific Agency by ID": "وكالة محددة حسب المعرف (ID)",
+    "Users in Specific Country": "المستخدمون في دولة معينة",
+    "Logged Out Users": "المستخدمون الذين قاموا بتسجيل الخروج",
+    "All BDS": "جميع مديري الأعمال (BDs)",
+    "All Shipping Agencies": "جميع وكالات الشحن",
     "Chat Settings" : "اعدادات الجروب شات",
     "Custom Settings" : "الاعدادات المخصصة",
     "Description Ar" : "الوصف بالعربية",
@@ -4145,6 +4155,8 @@
 "banner_approved_title": "تمت الموافقة على طلب البانر",
 "banner_approved_message": "قام المشرف :name (رقم المعرف: :id) بالموافقة على طلب البانر وتم خصم :coins عملة.",
 "banner_rejected_title": "تم رفض طلب البانر",
-"banner_rejected_message": "قام المشرف :name (رقم المعرف: :id) برفض طلب البانر."
+"banner_rejected_message": "قام المشرف :name (رقم المعرف: :id) برفض طلب البانر.",
+  "Banner approved successfully": "تمت الموافقة على البانر بنجاح",
+  "Banner rejected successfully": "تم رفض البانر بنجاح"
 
 }
