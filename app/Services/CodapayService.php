@@ -42,10 +42,11 @@ class CodapayService
     public function makePayment($trx, $amount, $userId = null)
     {
         $body = $this->getBodyForCodapay($trx, $amount, $userId);
+        $url = $this->baseUrl.'/api/restful/v2.0/Payment/init.json';
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post($this->baseUrl, $body);
+        ])->post($url, $body);
 
         Log::info('Codapay Payment Response', [
             'trx' => $trx,
@@ -56,7 +57,7 @@ class CodapayService
         $json = $response->json();
         $txnId = $json['initResult']['txnId'];
         if ($txnId){
-            return "https://airtime.codapayments.com/airtime/begin?type=3&txn_id=$txnId";
+            return $this->baseUrl."/begin?type=3&txn_id=$txnId";
         }
     }
 
