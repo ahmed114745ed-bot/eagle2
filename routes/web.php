@@ -692,8 +692,8 @@ Route::get('/codapay/create-payment', function () {
 
     $payload = [
         'initRequest' => [
-            'country'    => 'EG',    // Egypt
-            'currency'   => 'EGP',   // Egyptian Pound
+            'country'    => 818,    // Egypt
+            'currency'   => 818,   // Egyptian Pound
             'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
             'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
             'orderId'    => (string) $trxId,
