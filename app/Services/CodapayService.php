@@ -131,7 +131,7 @@ class CodapayService
 
         if ($resultCode === "0") {
             Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
-            return $this->webhookPayment($orderId, method: 'paypal');
+            return $this->webhookPayment($orderId, method: 'codapay');
         } else {
             Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
             $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
