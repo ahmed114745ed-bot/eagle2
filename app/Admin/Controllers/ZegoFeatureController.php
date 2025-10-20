@@ -45,7 +45,7 @@ class ZegoFeatureController extends MainController
 
         $setting = Setting::where('key', $keys)->first();
         if ($setting) {
-            if ($request->is_active){
+            if ($request->is_active == 1){
                 $zegoFeature = [
                     'zego_feature' => (bool)0,
                 ];
