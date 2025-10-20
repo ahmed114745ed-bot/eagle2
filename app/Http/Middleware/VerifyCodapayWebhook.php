@@ -31,11 +31,12 @@ class VerifyCodapayWebhook
         $txnId     = $request->get('TxnId');
         $orderId   = $request->get('OrderId');
         $amount    = $request->get('TotalPrice');
+        $resultCode = $request->get('ResultCode');
         $checksum  = $request->get('Checksum');
 
         $secretKey = config('codapay.api_key');
 
-        $computedChecksum = md5($orderId . $txnId . $amount . $secretKey);
+        $computedChecksum = md5($txnId . $secretKey . $orderId . $resultCode);
 
         if ($computedChecksum !== $checksum) {
             Log::warning('Codapay checksum verification failed', [
