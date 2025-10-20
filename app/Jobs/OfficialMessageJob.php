@@ -44,6 +44,7 @@ class OfficialMessageJob implements ShouldQueue
 
         // Handle feature_ids as array or string
         $featureIds = $this->request['feature_ids'] ?? [];
+        Log::info($featureIds);
 
         // ✅ Always make $featureIds an array safely
         if (!is_array($featureIds)) {
@@ -68,6 +69,7 @@ class OfficialMessageJob implements ShouldQueue
             foreach ($agencies as $agency) {
                 if ($memberTitle === 'owner') {
                     $usersId[] = $agency->app_owner_id;
+                  Log::info($usersId);
                 } elseif ($memberTitle === 'admin') {
                     $usersId = array_merge($usersId, $agency->admins->pluck('user_id')->toArray());
                 } elseif ($memberTitle === 'members') {
