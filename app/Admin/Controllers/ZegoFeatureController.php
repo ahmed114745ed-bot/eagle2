@@ -3,13 +3,11 @@
 namespace App\Admin\Controllers;
 
 use App\Events\ZegoFeatureEvent;
-use App\Models\Config;
 use App\Models\Setting;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Log;
 use App\Admin\Controllers\MainController;
+use Cache;
 
 class ZegoFeatureController extends MainController
 {
@@ -41,7 +39,6 @@ class ZegoFeatureController extends MainController
     public function zegoKey(Request $request)
     {
         $keys = 'zego_feature';
-        info('utd zego1', [$request->all()]);
 
         $setting = Setting::where('key', $keys)->first();
         if ($setting) {
@@ -49,20 +46,17 @@ class ZegoFeatureController extends MainController
                 $zegoFeature = [
                     'zego_feature' => (bool)0,
                 ];
-                info('utd zego', [$zegoFeature]);
                 event(new ZegoFeatureEvent($zegoFeature));
             }
             $setting->value = $request->is_active;
             $setting->save();
-        info('utd zego2', [$request->all()]);
 
         } else {
-        info('utd zego3', [$request->all()]);
-
             Setting::create([
                 'key' => $keys,
                 'value' => $request->is_active,
             ]);
         }
+        Cache::put('zego_feature', $request->is_active);
     }
 }
