@@ -21,12 +21,12 @@ class CodapayService
 
     public function __construct()
     {
-        $this->baseUrl   = config('codapay.base_url');
-        $this->apiKey    = config('codapay.api_key');
+        $this->baseUrl = config('codapay.base_url');
+        $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
-        $this->country   = config('codapay.country');
-        $this->payType   = config('codapay.pay_type');
-        $this->currency  = config('codapay.currency');
+        $this->country = config('codapay.country');
+        $this->payType = config('codapay.pay_type');
+        $this->currency = config('codapay.currency');
     }
 
     public static function redirect_if_payment_success()
@@ -63,8 +63,6 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
-        info(self::redirect_if_payment_success());
-        info(self::redirect_if_payment_failed());
         return [
             'initRequest' => [
                 'country'   => $this->country,
@@ -96,11 +94,11 @@ class CodapayService
 
     public function callback(Request $request)
     {
-        $txnId      = $request->input('TxnId');
-        $orderId    = $request->input('OrderId');
+        $txnId = $request->input('TxnId');
+        $orderId = $request->input('OrderId');
         $totalPrice = $request->input('TotalPrice');
         $resultCode = $request->input('ResultCode');
-        $checksum   = $request->input('Checksum');
+        $checksum = $request->input('Checksum');
 
         \Log::info('Codapay Callback Received', $request->all());
 
