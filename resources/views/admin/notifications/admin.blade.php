@@ -23,7 +23,7 @@
             <button type="button" class="btn btn-footer btn-mark-all" id="markAllReadBtn">
                 {{ __('Mark all as read') }}
             </button>
-            <a href="{{ route('admin.notifications.grid') }}" class="btn btn-footer btn-show-more" id="loadMoreBtn">
+            <a href="{{ route('admin.notifications.grid') }}" class="btn btn-footer btn-show-more" id="loadMoreBtn" >
                     {{ __('Show more') }}
             </a>
         </div>
@@ -45,8 +45,13 @@
         modal.classList.remove('active');
         document.body.style.overflow = '';
     }
+
+    $('.btn-show-more').click(function (e) {
+        closeModal();
+    });
 </script>
 
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
 <script src="{{ asset('js/modal.js') }}"></script>
 <script type="module" src="{{ asset('js/firebase-notification.js') }}"></script>
+

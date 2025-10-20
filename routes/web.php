@@ -292,6 +292,18 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
 
+        Route::get('/firebase-config', function () {
+            return response()->json([
+                'apiKey' => config('firebase.apiKey'),
+                'authDomain' => config('firebase.authDomain'),
+                'projectId' => config('firebase.projectId'),
+                'storageBucket' => config('firebase.storageBucket'),
+                'messagingSenderId' => config('firebase.messagingSenderId'),
+                'appId' => config('firebase.appId'),
+                'vapidKey' => config('firebase.vapid_key'),
+            ]);
+        });
+
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
@@ -672,6 +684,9 @@ Route::get('notifications/test2', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
+
+
+
 
 
 
