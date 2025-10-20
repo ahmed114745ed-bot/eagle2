@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\Payments\PaymentStatus;
+use App\Models\CoinLog;
+use App\Traits\User\PaymentTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +17,7 @@ class CodapayService
     protected $country;
     protected $payType;
     protected $currency;
+    use PaymentTrait;
 
     public function __construct()
     {
@@ -106,6 +110,16 @@ class CodapayService
             return response()->json(['error' => 'Invalid checksum'], 403);
         }
 
+        $coinLog = CoinLog::where('trx', $txnId)->first();
+
+        if (! $coinLog){
+            return response()->json([
+                'status'  => 'ignored',
+                'trx'     =>  $txnId,
+                'message' => "Failed",
+            ]);
+        }
+
         \Log::info('Codapay callback verified', [
             'TxnId' => $txnId,
             'OrderId' => $orderId,
@@ -114,11 +128,16 @@ class CodapayService
 
         if ($resultCode === "0") {
             Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
+            return $this->webhookPayment($orderId, method: 'paypal');
         } else {
             Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
+            $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
+            return response()->json([
+                'status'  => false,
+                'trx'     => $txnId,
+                'message' => 'Transaction declined.',
+            ]);
         }
-
-        return response('OK', 200);
     }
 
     public function success()
