@@ -3645,6 +3645,13 @@
     "Friday": "Cuma",
     "Saturday": "Cumartesi",
     "Settings updated successfully.": "Ayarlar başarıyla güncellendi.",
-     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti."
+     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti.",
+     "areaManagerDescription":"İşlerin sorunsuz yürümesini sağlamak için, doğrudan yönetiminiz altında varsayılan bir Bölge Yöneticisi oluşturulması gereklidir. Belirli bir Bölge Yöneticisine ait olmayan tüm ülkeler veya ajanslar otomatik olarak bu varsayılan yöneticinin altına atanır. Bir Bölge Yöneticisi silindiğinde, ilgili ülkeler veya ajanslar varsayılan yöneticinin altına aktarılır, böylece yönetim kesintisiz devam eder. Varsayılan bir Bölge Yöneticisi yoksa, kullanıcılar herhangi bir ülke veya ajans açarken bir Bölge Yöneticisi belirtmelidir ve belirlenmiş bir yönetici olmadan bunu çalıştıramazlar. Bu nedenle, sürekli operasyonel akışın kesintisiz devam etmesini sağlamak için varsayılan bir Bölge Yöneticisi oluşturmak ve yönetmek her zaman önerilir."
+,    "Area Manager": "Bölge Yöneticisi",
+    "User": "Kullanıcı",
+    "Unknown": "Bilinmeyen",
+    "Not Linked": "Bağlı Değil",
+    "Created at": "Oluşturulma Tarihi",
+    "areaManagerDescriptionTitle": "Bölge Yöneticisi Açıklaması"
 
 }

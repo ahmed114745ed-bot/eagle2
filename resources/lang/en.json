@@ -1292,7 +1292,15 @@
 "banner_approved_title": "Banner Request Approved",
 "banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins.",
 "banner_rejected_title": "The banner request has been rejected",
-"banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request."
+"banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request.",
+"areaManagerDescription":"To ensure smooth operations, it is necessary to create a default Area Manager under your supervision. All countries or agencies that do not belong to a specific Area Manager are automatically assigned to this default manager. When an Area Manager is deleted, the associated countries or agencies are transferred to the default manager, ensuring uninterrupted management. If no default Area Manager exists, users must specify an Area Manager when opening any country or agency, and they will not be able to operate it without a designated manager. Therefore, it is always recommended to create and manage a default Area Manager to guarantee continuous operational workflow without complications."
+,"area_manager_default":"Default Area Manager",
+"Area Manager": "Area Manager",
+"User": "User",
+"Unknown": "Unknown",
+"Not Linked": "Not Linked",
+"Created at": "Created at",
+"areaManagerDescriptionTitle": "Area Manager Description"
 
 
 

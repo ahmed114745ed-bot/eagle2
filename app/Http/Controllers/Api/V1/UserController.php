@@ -304,7 +304,16 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    public function usersAreaManager(Request $request)
+    {
+        $key = $request->q;
 
+        $page = $request->get('page', 1);
+        $users = $this->userService->usersAreaManager($key, $page);
+
+        return response()->json($users);
+    }
+    
     public function superAdminUsers2(Request $request): JsonResponse
     {
         $key = $request->q;

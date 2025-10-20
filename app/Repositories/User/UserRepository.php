@@ -155,6 +155,7 @@ class UserRepository extends Repository
     public function superAdminUsers($key, $page, $perPage)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+            ->where('is_area_manager', 0)
             ->where('is_super_admin', 0)
             ->where(function ($query) {
                 $query->where('agency_id', 0)
@@ -171,6 +172,7 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
+
     public function superAdminUsers2($key, $page, $perPage)
     {
         return SuperAdmin::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
@@ -180,6 +182,28 @@ class UserRepository extends Repository
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function usersAreaManager($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+            ->where('is_super_admin', 0)
+            ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            ->whereDoesntHave('shippingAgency')
+            ->where(function ($query) use ($key) {
+                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+    
 
     public function searchInAgency($key, $page, $perPage)
     {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -135,7 +136,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
+        Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
 
+        
     });
 
     // authorization
@@ -717,3 +720,6 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
+Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);

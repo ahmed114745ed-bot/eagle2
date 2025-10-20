@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AdminNotification;
+use App\Admin\Controllers\AreaManagerController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerHistoryController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
@@ -472,6 +473,8 @@ Route::group(
         });
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
+
+        Route::resource('area-manager-users', AreaManagerController::class);
 
 
         Route::resource('usersBd', BdController::class);
