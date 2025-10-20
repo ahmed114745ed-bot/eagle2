@@ -72,6 +72,7 @@ Route::group(
     ],
     function () {
         Route::get('setting', [AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [AuthController::class, 'getSetting']);
         Route::put('update-setting', [AuthController::class, 'putSetting']);
 
         Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -131,7 +132,7 @@ Route::group(
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']); 
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
         });
 
