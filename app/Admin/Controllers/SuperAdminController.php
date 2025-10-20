@@ -302,7 +302,7 @@ class SuperAdminController extends MainController
             $form->switch('default', __('set_superadmin_as_default'))
                 ->help(__('make_super_admin_default'));
         }
-        $this->addPhoneFields($form);
+        $this->addPhoneFields($form, 'sometimes');
 
         $form->hidden('type', __('Type'))->value('superadmin');
         //        $form->hidden('transfer_salary', __('transfer_salary'));
@@ -408,11 +408,11 @@ class SuperAdminController extends MainController
         return $form;
     }
 
-    protected function addPhoneFields(Form $form)
+    protected function addPhoneFields(Form $form, $rules = 'required')
     {
 
         $form->text('phone', __('whatsApp number'))
-            ->rules('required')
+            ->rules($rules)
             ->attribute('id', 'phone-input')
             ->attribute('maxlength', 12)
             ->default(function ($form) {

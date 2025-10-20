@@ -308,6 +308,27 @@ Route::group(
     }
 );
 
+Route::group(
+    [
+        'prefix' => 'superadmin',
+        'namespace' => 'App\\SuperAdmin\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            // 'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => 'superadmin.',
+    ],
+    function () {
+        Route::get('auth/setting', [\App\SuperAdmin\Controllers\AuthController::class, 'getSetting']);
+    }
+);
+
 Route::group([
     'prefix' => '',
     'namespace' => '',
@@ -675,11 +696,11 @@ Route::get('notifications/test2', function () {
         'إشعار تجريبي 🎉',
         'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
         null,
-        
+
 
         ['created_at' => Carbon::now()->toDateTimeString()],
         95,
-        
+
     );
 
     return 'تم إرسال الإشعار ✉️';
