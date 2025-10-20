@@ -243,7 +243,7 @@ class EnteranceController extends Controller
     {
         $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
-        if (!$app_feature && !is_null($app_feature)) {
+        if ($app_feature && $app_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();
