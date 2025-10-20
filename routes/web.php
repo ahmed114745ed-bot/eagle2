@@ -705,20 +705,88 @@ Route::get('notifications/test2', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
+use Illuminate\Support\Facades\Http;
+Route::get('/codapay/create-payment', function () {
+    $trxId  = rand(1000, 9999);
+    $amount = 1.00;
+    $userId = 123;
 
-Route::get('/test-codapay-config', function() {
-    return response()->json([
-        'environment' =>  env('CODAPAY_ENV'),
-        'base_url' => config('codapay.base_url'),
-        'has_api_key' => !empty(config('codapay.api_key')),
-        'project_id' => config('codapay.project_id'),
-        'country' => config('codapay.country'),
-        'currency' => config('codapay.currency'),
-    ]);
+    $payload = [
+        'initRequest' => [
+            'country'    => "818",    // Egypt
+            'currency'   => 818,   // Egyptian Pound
+            'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
+            'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
+            'orderId'    => (string) $trxId,
+            'returnUrl'  => url('/codapay/success'),
+            'failUrl'    => url('/codapay/fail'),
+            'items'      => [
+                [
+                    'code'  => '1',
+                    'price' => (float) $amount,
+                    'name'  => "Order #{$trxId}"
+                ]
+            ],
+            'profile' => [
+                'entry' => [
+                    ['key' => 'user_id', 'value' => (string) $userId],
+                ],
+            ],
+        ],
+    ];
+
+    $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
+
+    try {
+        Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
+
+        // لاحظ أننا نرسل بصيغة JSON وليس asForm
+        $response = Http::timeout(15)
+            ->withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, $payload);
+
+        if ($response->failed()) {
+            Log::error("❌ Codapay Connection Failed", [
+                'status'  => $response->status(),
+                'body'    => $response->body(),
+                'headers' => $response->headers(),
+            ]);
+
+            return response()->json([
+                'error'   => 'Failed to connect Codapay',
+                'status'  => $response->status(),
+                'details' => $response->body(),
+                'url'     => $url,
+                'payload' => $payload,
+            ], 500);
+        }
+
+        $result = $response->json();
+
+        Log::info("✅ Codapay Response Received", ['result' => $result]);
+
+        if (!empty($result['initResult']['paymentUrl'])) {
+            return response()->json([
+                'message' => 'Payment link generated successfully.',
+                'paymentUrl' => $result['initResult']['paymentUrl'],
+                'result' => $result,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Codapay returned a response but no payment URL found.',
+            'result'  => $result,
+        ]);
+
+    } catch (\Throwable $e) {
+        Log::error("💥 Codapay Exception", ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
+        return response()->json([
+            'error'   => 'Exception while connecting Codapay',
+            'details' => $e->getMessage(),
+            'trace'   => $e->getTraceAsString(),
+            'url'     => $url,
+            'payload' => $payload,
+        ], 500);
+    }
 });
-
-
-
-
-
-
