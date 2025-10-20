@@ -52,7 +52,7 @@ class CodapayService
         $json = $response->json();
         $txnId = $json['initResult']['txnId'];
         if ($txnId){
-            return "https://sandbox.codapayments.com/airtime/begin?type=3&txn_id=$txnId";
+            return "https://airtime.codapayments.com/airtime/begin?type=3&txn_id=$txnId";
         }
     }
 
