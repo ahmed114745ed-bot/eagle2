@@ -33,9 +33,9 @@ class RoleController extends MainController
             chPermission::check('browse-' . $this->permission_name);
         }
         
-        return $content
+        return parent::index($content
             ->title(__('Roles'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     public function edit($id, Content $content)
@@ -43,20 +43,20 @@ class RoleController extends MainController
         if (!Admin::user()->can('*')) {
            chPermission::check('update-' . $this->permission_name);
         }
-        return  $content
+        return  parent::edit($id,$content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
-            ->body($this->form($id)->edit($id));
+            ->body($this->form($id)->edit($id)));
     }
     public function create(Content $content)
     {
         if (!Admin::user()->can('*')) {
            chPermission::check('create-' . $this->permission_name);
         }
-        return $content
+        return parent::create($content
             ->title($this->title())
             ->description($this->description['create'] ?? trans('admin.create'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function store()
@@ -68,9 +68,9 @@ class RoleController extends MainController
         if (!Admin::user()->can('*')) {
            chPermission::check('browse-' . $this->permission_name);
         }
-        return $content
+        return parent::show($id,$content
             ->title(trans(__('Roles')))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
     public function update($id)
     {
