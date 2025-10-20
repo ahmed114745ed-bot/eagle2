@@ -29,12 +29,12 @@ class CodapayService
         $this->currency  = config('codapay.currency');
     }
 
-    public static function redirect_if_payment_success($trx)
+    public static function redirect_if_payment_success()
     {
-        return url('api/codapay-success');
+        return url('/api/codapay-success');
     }
 
-    public static function redirect_if_payment_failed($trx)
+    public static function redirect_if_payment_failed()
     {
         return url('/api/codapay-success');
     }
@@ -63,6 +63,8 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
+        info(self::redirect_if_payment_success());
+        info(self::redirect_if_payment_failed());
         return [
             'initRequest' => [
                 'country'   => $this->country,
@@ -71,8 +73,8 @@ class CodapayService
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
                 'currency'  => $this->currency,
-                'returnUrl' => self::redirect_if_payment_success($trx),
-                'failUrl'   => self::redirect_if_payment_failed($trx),
+                'returnUrl' => self::redirect_if_payment_success(),
+                'failUrl'   => self::redirect_if_payment_failed(),
                 'items' => [
                     [
                         'code'  => '1',
