@@ -687,8 +687,8 @@ Route::get('notifications/test2', function () {
 
 Route::get('/test-codapay-config', function() {
     return response()->json([
-        'environment' => config('codapay.environment'),
-        'base_url' => config('codapay.urls.production'),
+        'environment' =>  env('CODAPAY_ENV'),
+        'base_url' => config('codapay.base_url'),
         'has_api_key' => !empty(config('codapay.api_key')),
         'project_id' => config('codapay.project_id'),
         'country' => config('codapay.country'),

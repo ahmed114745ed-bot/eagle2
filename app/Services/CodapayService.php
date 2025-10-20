@@ -19,16 +19,21 @@ class CodapayService
     protected $payType;
     protected $currency;
     use PaymentTrait;
-
     public function __construct()
     {
-        $environment = config('codapay.environment', 'production');
-        $this->baseUrl = config("codapay.urls.{$environment}");
-        $this->apiKey = config('codapay.api_key');
-        $this->projectId = config('codapay.project_id');
-        $this->country = config('codapay.country');
-        $this->currency = config('codapay.currency');
-        $this->payType = config('codapay.pay_type', 0);
+        $environment = env('CODAPAY_ENV', 'production');
+        
+        if ($environment === 'production') {
+            $this->baseUrl = 'https://api.codapay.com';
+        } else {
+            $this->baseUrl = 'https://sandbox.codapay.com';
+        }
+        
+        $this->apiKey = env('CODAPAY_API_KEY');
+        $this->projectId = env('CODAPAY_PROJECT_ID');
+        $this->country = env('CODAPAY_COUNTRY', '818');
+        $this->currency = env('CODAPAY_CURRENCY', '840');
+        $this->payType = env('CODAPAY_PAY_TYPE', 0);
         
         Log::info('Codapay Service Initialized', [
             'environment' => $environment,
@@ -86,7 +91,6 @@ class CodapayService
             Log::error('Codapay: Exception', [
                 'trx' => $trx,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
             
             return [
@@ -129,7 +133,7 @@ class CodapayService
             202 => 'فشل التحقق من البيانات',
             203 => 'الخدمة غير متاحة مؤقتاً',
             204 => 'انتهت صلاحية الطلب',
-            205 => 'تم إلغاء العملية',
+            205 => 'تم إلغاء العملية أو Account غير مفعّل',
             206 => 'طريقة الدفع غير مدعومة',
         ];
 
@@ -141,6 +145,8 @@ class CodapayService
         ];
     }
 
+
+
     public static function redirect_if_payment_success()
     {
         return url('/api/codapay-success');
@@ -150,8 +156,6 @@ class CodapayService
     {
         return url('/api/codapay-success');
     }
-
-    
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
