@@ -1292,7 +1292,9 @@
 "banner_approved_title": "Banner Request Approved",
 "banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins.",
 "banner_rejected_title": "The banner request has been rejected",
-"banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request."
+"banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request.",
+ "Banner approved successfully": "Banner approved successfully",
+  "Banner rejected successfully": "Banner rejected successfully"
 
 
 

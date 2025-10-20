@@ -42,6 +42,7 @@ class CodapayService
     {
         $body = $this->getBodyForCodapay($trx, $amount, $userId);
         $url = $this->baseUrl.'/api/restful/v2.0/Payment/init.json';
+        \Log::info("start $url ");
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
