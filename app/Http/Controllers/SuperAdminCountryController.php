@@ -38,7 +38,7 @@ class SuperAdminCountryController extends Controller
 
         $superAdmin = Admin::where([
             'country_id' => $countryID,
-            'type' => 'super_admin',
+            'type' => 'superadmin',
         ])->first();
 
         $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
