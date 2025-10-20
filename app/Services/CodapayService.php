@@ -39,7 +39,7 @@ class CodapayService
         return url(config('codapay.return_url_failed', '/api/codapay-success'));
     }
 
-    public function makePayment($trx, $amount, $userId = null)
+    public function initiatePayment($trx, $amount, $userId = null)
     {
         $body = $this->getBodyForCodapay($trx, $amount, $userId);
         $url = $this->baseUrl.'/api/restful/v2.0/Payment/init.json';
