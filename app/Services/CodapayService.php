@@ -87,9 +87,30 @@ class CodapayService
 
     public function callback(Request $request)
     {
-        $orderId = $request->get('OrderId');
-        $txnId = $request->get('TxnId');
-        $resultCode = $request->get('ResultCode');
+        $txnId      = $request->input('TxnId');
+        $orderId    = $request->input('OrderId');
+        $totalPrice = $request->input('TotalPrice');
+        $resultCode = $request->input('ResultCode');
+        $checksum   = $request->input('Checksum');
+
+        \Log::info('Codapay Callback Received', $request->all());
+
+        $secretKey = config('codapay.api_key');
+        $computedChecksum = md5($txnId . $secretKey . $orderId . $resultCode);
+
+        if ($checksum !== $computedChecksum) {
+            \Log::warning('Codapay checksum failed', [
+                'expected' => $computedChecksum,
+                'received' => $checksum,
+            ]);
+            return response()->json(['error' => 'Invalid checksum'], 403);
+        }
+
+        \Log::info('Codapay callback verified', [
+            'TxnId' => $txnId,
+            'OrderId' => $orderId,
+            'ResultCode' => $resultCode,
+        ]);
 
         if ($resultCode === "0") {
             Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
@@ -97,7 +118,7 @@ class CodapayService
             Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
         }
 
-        return response()->json(['status' => 'ok']);
+        return response('OK', 200);
     }
 
     public function success()
