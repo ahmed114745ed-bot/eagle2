@@ -979,8 +979,8 @@ class AgencyController extends MainController
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
 
-            if (!$form->bd_id && !$form->model()->bd_id ){
-                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
+            if (!$form->bd_id && !$form->model()->bd_id) {
+                $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
@@ -1012,6 +1012,10 @@ class AgencyController extends MainController
             if (!request('bd_id') && $isEditing) {
                 $admin =  Bd::where('default', 1)->first();
                 $form->bd_id = $admin->id;
+            }
+            $bd = Bd::find($form->bd_id);
+            if ($bd) {
+                $form->model()->country_id = $bd->country_id;
             }
         });
     }
@@ -1363,7 +1367,7 @@ class AgencyController extends MainController
         $user->agency_id = 0;
         $user->type_user = 0;
         $user->save();
-        
+
         MilestoneHelper::removeReward($user, 'host');
 
 
