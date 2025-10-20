@@ -22,22 +22,30 @@ class CodapayService
 
     public function __construct()
     {
-        $environment = config('codapay.environment');
+        $environment = config('codapay.environment', 'production');
         $this->baseUrl = config("codapay.urls.{$environment}");
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
         $this->country = config('codapay.country');
         $this->currency = config('codapay.currency');
+        $this->payType = config('codapay.pay_type', 0);
+        
         Log::info('Codapay Service Initialized', [
             'environment' => $environment,
             'base_url' => $this->baseUrl,
             'project_id' => $this->projectId,
+            'country' => $this->country,
+            'currency' => $this->currency,
         ]);
+        
         if (!$this->baseUrl || !$this->apiKey || !$this->projectId) {
-            Log::error('Codapay: Missing configuration');
+            Log::error('Codapay: Missing configuration', [
+                'base_url' => $this->baseUrl,
+                'has_api_key' => !empty($this->apiKey),
+                'project_id' => $this->projectId,
+            ]);
             throw new \Exception('Codapay configuration is incomplete');
         }
-       
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
@@ -50,6 +58,7 @@ class CodapayService
                 'url' => $url,
                 'trx' => $trx,
                 'amount' => $amount,
+                'userId' => $userId,
             ]);
 
             $response = Http::timeout(30)
@@ -77,6 +86,7 @@ class CodapayService
             Log::error('Codapay: Exception', [
                 'trx' => $trx,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             
             return [
@@ -84,6 +94,51 @@ class CodapayService
                 'message' => 'حدث خطأ في معالجة الدفع'
             ];
         }
+    }
+
+    private function handleResponse($json, $trx)
+    {
+        $initResult = $json['initResult'] ?? [];
+        $resultCode = $initResult['resultCode'] ?? null;
+        $txnId = $initResult['txnId'] ?? 0;
+        $resultDesc = $initResult['resultDesc'] ?? 'Unknown error';
+
+        if ($resultCode === 0 && $txnId > 0) {
+            Log::info('Codapay: Payment initialized successfully', [
+                'trx' => $trx,
+                'txnId' => $txnId
+            ]);
+            
+            return [
+                'success' => true,
+                'payment_url' => $this->baseUrl . "/begin?type=3&txn_id={$txnId}",
+                'txnId' => $txnId,
+                'trx' => $trx,
+            ];
+        }
+
+        Log::warning('Codapay: Payment initialization failed', [
+            'trx' => $trx,
+            'code' => $resultCode,
+            'desc' => $resultDesc,
+            'txnId' => $txnId,
+        ]);
+
+        $errorMessages = [
+            201 => 'معلومات الدفع غير صحيحة',
+            202 => 'فشل التحقق من البيانات',
+            203 => 'الخدمة غير متاحة مؤقتاً',
+            204 => 'انتهت صلاحية الطلب',
+            205 => 'تم إلغاء العملية',
+            206 => 'طريقة الدفع غير مدعومة',
+        ];
+
+        return [
+            'success' => false,
+            'error_code' => $resultCode,
+            'message' => $errorMessages[$resultCode] ?? $resultDesc,
+            'trx' => $trx,
+        ];
     }
 
     public static function redirect_if_payment_success()

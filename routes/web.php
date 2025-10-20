@@ -685,6 +685,17 @@ Route::get('notifications/test2', function () {
     return 'تم إرسال الإشعار ✉️';
 });
 
+Route::get('/test-codapay-config', function() {
+    return response()->json([
+        'environment' => config('codapay.environment'),
+        'base_url' => config('codapay.urls.production'),
+        'has_api_key' => !empty(config('codapay.api_key')),
+        'project_id' => config('codapay.project_id'),
+        'country' => config('codapay.country'),
+        'currency' => config('codapay.currency'),
+    ]);
+});
+
 
 
 
