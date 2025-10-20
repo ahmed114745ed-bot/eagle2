@@ -52,6 +52,7 @@
     "Select Country...": "देश चुनें...",
     "No reward found": "कोई इनाम नहीं मिला",
     "Select Country": "देश चुनें",
+    "Show more": "और दिखाओ",
 "Something went wrong": "कुछ गलत हो गया",
 "Select Super Admins": "सुपर एडमिन चुनें",
     "Profile Images": "प्रोफ़ाइल छवियाँ",
@@ -3245,7 +3246,9 @@
        "confirm_resend": "पुनः भेजने की पुष्टि करें",
     "deduct_text": "बैनर अनुरोध को पुनः भेजने के लिए सिक्के काटे जाएंगे:",
     "banner_request_title": "नया बैनर प्रदर्शन अनुरोध",
-    "banner_request_message": "प्रशासक :name (आईडी: :id) ने :coins सिक्कों के लिए नया बैनर प्रदर्शन अनुरोध किया है।"
+    "banner_request_message": "प्रशासक :name (आईडी: :id) ने :coins सिक्कों के लिए नया बैनर प्रदर्शन अनुरोध किया है।",
+    "banner_rejected_title": "बैनर अनुरोध अस्वीकृत कर दिया गया है",
+    "banner_rejected_message": "प्रशासक :name (आईडी: :id) ने बैनर अनुरोध अस्वीकृत कर दिया है।"
 
 
 

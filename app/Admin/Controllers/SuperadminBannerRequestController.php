@@ -3,6 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\SuperAdminService;
+use App\Enums\SuperAdminNotificationLink;
+use App\Enums\SuperAdminNotificationType;
+use App\Helpers\SuperAdminNotificationHelper;
 use App\Models\HomeCarouselDisplay;
 use App\Models\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
@@ -308,8 +311,32 @@ class SuperadminBannerRequestController extends AdminController
             ]);
         }
 
-        $request->update(['status' => 'approved']);
+        SuperAdminNotificationHelper::notify(
+            type: SuperAdminNotificationType::NEW_ORDER,
+            title: 'banner_approved_title', 
+            message: 'banner_approved_message',
+            model: $homeCarousel,
+            data: [
+                'requested_by' => auth()->user()->name,
+                'requested_by_id' => auth()->user()->id,
+                'item_id' => $homeCarousel->id,
+                'coins_deducted' => $request->coins_deducted,
+                'hours' => $hours,
+                'preview_url' => SuperAdminNotificationLink::BANNER_APPROVED,
+        
+                'translation_params' => [
+                    'name' => auth()->user()->name,
+                    'id' => auth()->user()->id,
+                    'coins' => $request->coins_deducted,
+                ]
 
+                ],
+                superAdminId:$request->user_id
+
+        );
+        
+        $request->update(['status' => 'approved']);
+        
         return response()->json([
             'success' => true,
             'message' => __('Banner approved successfully'),
@@ -330,11 +357,36 @@ class SuperadminBannerRequestController extends AdminController
     public function reject($id)
     {
         $request = SuperadminBannerRequest::findOrFail($id);
-
+        $homeCarousel = $request->homeCarousel;
         SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
+
 
         $request->status = 'rejected';
         $request->save();
+        $hours = (int) ($request->hours ?? 1);
+        SuperAdminNotificationHelper::notify(
+            type: SuperAdminNotificationType::REGECTED_BANNER_ORDER,
+            title: 'banner_rejected_title', 
+            message: 'banner_rejected_message',
+            model: $homeCarousel,
+            data: [
+                'requested_by' => auth()->user()->name,
+                'requested_by_id' => auth()->user()->id,
+                'item_id' => $homeCarousel->id,
+                'coins_deducted' => $request->coins_deducted,
+                'hours' => $hours,
+                'preview_url' => SuperAdminNotificationLink::BANNER_REGECTED,
+        
+                'translation_params' => [
+                    'name' => auth()->user()->name,
+                    'id' => auth()->user()->id,
+                    'coins' => $request->coins_deducted,
+                ]
+
+                ],
+                superAdminId:$request->user_id
+
+        );
 
         return response()->json(['success' => true, 'message' => 'Banner rejected successfully']);
     }

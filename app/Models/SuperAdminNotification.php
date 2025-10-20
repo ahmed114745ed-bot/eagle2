@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AdminNotification extends Model
+class SuperAdminNotification extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'type', 'model_id', 'model_type', 'title', 'message',
-        'is_read', 'admin_id', 'read_at','data'
+        'is_read', 'super_admin_id', 'read_at','data'
     ];
 
     protected $casts = [

@@ -3,6 +3,9 @@
 use App\Models\Country;
 use Carbon\Carbon;
 use App\Enums\AdminNotificationType;
+use App\Enums\SuperAdminNotificationType;
+use App\Helpers\AdminNotificationHelper;
+use App\Helpers\SuperAdminNotificationHelper;
 use App\Models\AdminNotification;
 use App\Models\Ban;
 use App\Models\Room;
@@ -640,15 +643,35 @@ Route::get('/migrate-home-carousel', function () {
 });
 
 
-
 Route::get('notifications/test', function () {
-    $notification = AdminNotification::create([
-        'title' => 'إشعار تجريبي 🎉',
-        'message' => 'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
-        'type' => AdminNotificationType::SYSTEM->value,
-        'data' => json_encode(['created_at' => Carbon::now()->toDateTimeString()]),
-        'is_read' => false,
-    ]);
+    AdminNotificationHelper::notify(
+        AdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        null
+    );
 
-    return 'done';
+    return 'تم إرسال الإشعار ✉️';
 });
+
+
+Route::get('notifications/test2', function () {
+    SuperAdminNotificationHelper::notify(
+        SuperAdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        
+
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        95,
+        
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+
+
+

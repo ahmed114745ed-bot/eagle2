@@ -3644,5 +3644,7 @@
     "Thursday": "Perşembe",
     "Friday": "Cuma",
     "Saturday": "Cumartesi",
-    "Settings updated successfully.": "Ayarlar başarıyla güncellendi."
+    "Settings updated successfully.": "Ayarlar başarıyla güncellendi.",
+     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti."
+
 }

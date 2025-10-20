@@ -125,6 +125,21 @@ Route::group(
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
         Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
-            ->name('banner.resend');
+        ->name('banner.resend');
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
+            Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']); 
+            Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
+        });
+
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
     }
 );
