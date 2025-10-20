@@ -245,6 +245,7 @@ Route::group(
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles-new', 'RoleControllerNew');
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
         //     Route::get('/', [RoleControllerNew::class, 'index']);
