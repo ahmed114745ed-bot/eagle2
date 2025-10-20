@@ -25,8 +25,6 @@ class CodapayService
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
         $this->country = config('codapay.country');
-        $this->payType = config('codapay.pay_type');
-        $this->currency = config('codapay.currency');
     }
 
     public static function redirect_if_payment_success()
@@ -66,11 +64,11 @@ class CodapayService
         return [
             'initRequest' => [
                 'country'   => $this->country,
-                'payType'   => $this->payType,
+                'payType'   => 0,
                 'apiKey'    => $this->apiKey,
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
-                'currency'  => $this->currency,
+                'currency'  => 840,
                 'returnUrl' => self::redirect_if_payment_success(),
                 'failUrl'   => self::redirect_if_payment_failed(),
                 'items' => [
