@@ -4030,6 +4030,11 @@
   "Day (0=Sunday,1=Monday,...)": "اليوم (0=الأحد،1=الإثنين، ...)",
   "Interval (days)": "الفاصل (بالأيام)",
 
+    "super admin charges": "رسوم المشرف الأعلى",
+    "superadmin": "المشرف الأعلى",
+    "settings": "الإعدادات",
+    "super admin banner requests": "طلبات لافتة المشرف الأعلى",
+    "superadmin rewards": "مكافآت المشرف الأعلى",
 
     "Open Profile": "فتح الملف الشخصي",
     "Sending Level": "مستوى الإرسال",

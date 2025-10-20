@@ -477,7 +477,15 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'SuperAdmin Banners',
                 'sort' => 40,
                 'permissions' => [
-                    ['key' => 'charge-to-superadmin', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['add-switch', 'history-switch']],
+                    ['key' => 'superadmin-banners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['add-switch', 'history-switch']],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Rewards',
+                'sort' => 41,
+                'permissions' => [
+                    ['key' => 'super-admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch', 'history-switch']],
+                    ['key' => 'super-admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
         ];

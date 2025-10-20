@@ -104,7 +104,7 @@ class SuperadminBannerRequestController extends AdminController
         });
 
         // Actions
-        if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('approve-switch-') || Admin::user()->can('*')) {
+        if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('approve-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('actions', __('Actions'))->display(function () {
                 $approveUrl = route('admin.superadmin-banner.approve', $this->id);
                 $rejectUrl  = route('admin.superadmin-banner.reject', $this->id);
