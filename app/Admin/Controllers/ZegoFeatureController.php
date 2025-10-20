@@ -41,6 +41,7 @@ class ZegoFeatureController extends MainController
     public function zegoKey(Request $request)
     {
         $keys = 'zego_feature';
+        info('utd zego1', [$request->all()]);
 
         $setting = Setting::where('key', $keys)->first();
         if ($setting) {
@@ -53,7 +54,11 @@ class ZegoFeatureController extends MainController
             }
             $setting->value = $request->is_active;
             $setting->save();
+        info('utd zego1', [$request->all()]);
+
         } else {
+        info('utd zego3', [$request->all()]);
+
             Setting::create([
                 'key' => $keys,
                 'value' => $request->is_active,
