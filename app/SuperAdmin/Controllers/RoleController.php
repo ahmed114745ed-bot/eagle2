@@ -15,13 +15,13 @@ use App\Admin\Controllers\MainController;
 use Modules\RoleRewards\Actions\DeleteRole;
 use Encore\Admin\Controllers\AdminController;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission as chPermission;
 
 class RoleController extends MainController
 {
     public $permission_name = 'roles';
-    /**
-     * {@inheritdoc}
-     */
+ 
     protected function title()
     {
         return trans('Roles');
@@ -29,6 +29,10 @@ class RoleController extends MainController
 
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            chPermission::check('browse-' . $this->permission_name);
+        }
+        
         return $content
             ->title(__('Roles'))
             ->body($this->grid());
@@ -36,6 +40,9 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
+        if (!Admin::user()->can('*')) {
+           chPermission::check('update-' . $this->permission_name);
+        }
         return  $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
@@ -43,6 +50,9 @@ class RoleController extends MainController
     }
     public function create(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+           chPermission::check('create-' . $this->permission_name);
+        }
         return $content
             ->title($this->title())
             ->description($this->description['create'] ?? trans('admin.create'))
@@ -55,6 +65,9 @@ class RoleController extends MainController
     }
     public function show($id, Content $content)
     {
+        if (!Admin::user()->can('*')) {
+           chPermission::check('browse-' . $this->permission_name);
+        }
         return $content
             ->title(trans(__('Roles')))
             ->body($this->detail($id));
@@ -173,15 +186,10 @@ class RoleController extends MainController
         $form = new Form(new $roleModel());
         $this->disableFormTools($form);
 
-        // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
         $form->text('name', trans('role name'))->rules('required|unique:admin_roles,name,{{id}}');
 
-        // Hide default listbox and use custom tabbed permission UI
-        // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
-
-        // Custom tabbed view
-       // dd(Role::where('id', $id)->first()->permissions->pluck('id')->toArray());
+     
         $form->html(view('admin.super-admin-permission-tabs', [
             'permissions' => $permissions,
             
@@ -303,6 +311,9 @@ class RoleController extends MainController
 
     public function destroy($id)
     {
+        if (!Admin::user()->can('*')) {
+           chPermission::check('delete-' . $this->permission_name);
+        }
         $role = Role::findOrFail($id);
 
         UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);

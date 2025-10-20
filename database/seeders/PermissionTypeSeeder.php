@@ -797,12 +797,12 @@ class PermissionTypeSeeder extends Seeder
                 'sort' => 29,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 29],
-                    // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
+                    PermissionType::SUPER_ADMIN->value => ['sort' => 4],
                 ],
                 'permissions' => [
                     ['key' => 'auth-users', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        //PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
+                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'roles', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -1100,6 +1100,8 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
+            
+            
         ];
 
 
@@ -1115,7 +1117,6 @@ class PermissionTypeSeeder extends Seeder
                 $categoryName = $category['name'];
                 $categorySlug = $categoryName;
 
-                // 🧱 Create or update category
                 DB::table('role_categories')->updateOrInsert(
                     ['slug' => $categorySlug, 'type' => $type],
                     [
@@ -1131,7 +1132,6 @@ class PermissionTypeSeeder extends Seeder
                     ->where('type', $type)
                     ->value('id');
 
-                // ✅ Loop through permissions
                 foreach ($category['permissions'] as $perm) {
                     if (!isset($perm['types'])) continue;
 
@@ -1170,7 +1170,6 @@ class PermissionTypeSeeder extends Seeder
                             );
                         }
 
-                        // ✅ Additional permissions
                         foreach ($perm['additional'] as $extra) {
 
                             // Only add this extra if it exists in the current $permType list
@@ -1219,7 +1218,6 @@ class PermissionTypeSeeder extends Seeder
             ->update(['category' => 'general']);
 
 
-        // 🚮 Remove old permissions
         DB::table('admin_permissions')
             ->whereNotIn('slug', $allSlugs)
             ->where('slug', '!=', '*')
