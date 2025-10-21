@@ -20,6 +20,7 @@ use App\SuperAdmin\Controllers\ProfessionalBdController;
 use App\SuperAdmin\Controllers\SuperAdminRewardController;
 use App\SuperAdmin\Controllers\AppearChargerAgencyController;
 use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
+use App\SuperAdmin\Controllers\OfficialMessengerSuperAdminController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -95,6 +96,7 @@ Route::group(
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
         Route::resource('live-rooms', LiveRoomController::class);
+        Route::resource('official-message', OfficialMessengerSuperAdminController::class);
 
         //users
         Route::resource('users', 'UserController', [

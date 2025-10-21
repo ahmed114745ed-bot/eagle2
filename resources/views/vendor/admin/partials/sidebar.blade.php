@@ -132,6 +132,15 @@
                             ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
                             ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
                             ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Advertisements'),
+                                'children' => [
+                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages')],
+                                   
+                                ],
+                            ],
                         ];
                     @endphp
 

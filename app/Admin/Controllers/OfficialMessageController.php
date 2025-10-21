@@ -156,7 +156,7 @@ class OfficialMessageController extends MainController
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
 
-        $this->extendGrid($grid);
+       // $this->extendGrid($grid);
         $grid->actions(function ($actions) {
             $actions->disableEdit();
         });
