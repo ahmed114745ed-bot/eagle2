@@ -490,15 +490,6 @@ class HomeCarouselController extends MainController
      {
          return response()->json(['message' => $message], 422);
      }
-    
-
-    protected function errorResponse($message)
-    {
-        return response()->json(['message' => $message], 422);
-    }
-
-
-
 
     public function resendBannerRequest($bannerId, Request $request)
     {
