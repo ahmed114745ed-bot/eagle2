@@ -141,9 +141,9 @@ class CodapayService
         }
     }
 
-    public function success($trx, $country, Request $request): JsonResponse
+    public function success($trx, $country): JsonResponse
     {
-        $coinLog = CoinLog::where('trx', $trx)->whereMethod('paypal')->firstOrFail();
+        $coinLog = CoinLog::where('trx', $trx)->whereMethod('codapay')->firstOrFail();
 
         if (!$trx) {
             return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
