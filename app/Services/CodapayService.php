@@ -40,7 +40,7 @@ class CodapayService
 
     public static function redirect_if_payment_failed()
     {
-        return url('/api/codapay-success');
+        return url('/api/codapay-failed');
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
@@ -67,7 +67,6 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
-        info($this->country);
         return [
             'initRequest' => [
                 'country'   => $this->country,
@@ -90,6 +89,11 @@ class CodapayService
                         [
                             'key'   => 'user_id',
                             'value' => (string)($userId ?? 'guest'),
+                        ],
+                        [
+                            "key" => "return_url",
+                            "value" => self::redirect_if_payment_success()
+//                            "value" => "https://www.example.com/{transactionId}/{orderId}/return"
                         ]
                     ]
                 ]
