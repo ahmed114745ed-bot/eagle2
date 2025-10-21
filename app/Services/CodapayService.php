@@ -25,7 +25,7 @@ class CodapayService
         $this->baseUrl = config('codapay.base_url');
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
-        $this->country = auth()->user()->country->iso_numeric;
+        $this->country = auth()->user()?->country?->iso_numeric;
 
 //        $this->baseUrl = 'https://airtime.codapayments.com/airtime';
 //        $this->apiKey = 'live_JI4WS6k27hHslcUOcmC9SGFDiyo';
@@ -141,18 +141,13 @@ class CodapayService
         }
     }
 
-    public function success($trx, $country, Request $request): JsonResponse
+    public function success($trx, $country): JsonResponse
     {
-        Log::info('✅ Codapay Success Request Received', [
-            'trx' => $trx,
-            'query' => $request->query(),
-            'input' => $request->all(),
-            'full_url' => $request->fullUrl(),
-            'headers' => $request->headers->all(),
-        ]);
+        info('before coin log');
 
-        $coinLog = CoinLog::where('trx', $trx)->whereMethod('paypal')->firstOrFail();
+        $coinLog = CoinLog::where('trx', $trx)->whereMethod('codapay')->firstOrFail();
 
+        info($coinLog);
         if (!$trx) {
             return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
         }
@@ -168,6 +163,10 @@ class CodapayService
             ],
         ];
 
+        info($trx);
+        info($country);
+        info($this->apiKey);
+        info($this->projectId);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->post($url, $body);
