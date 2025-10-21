@@ -26,6 +26,7 @@ class RoleControllerNew extends MainController
 
     public function index(Content $content)
     {
+        dd("dddddddddddddd");
         return parent::index($content
             ->title(__('Roles'))
             ->body($this->grid()));
