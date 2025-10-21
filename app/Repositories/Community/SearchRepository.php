@@ -86,7 +86,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
     }
 
-    public function searchRoomsV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): array|Collection
+    public function searchRoomsV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1): array|Collection
     {
         $user = User::query()
             ->fitterByUuid($keywords)
@@ -184,7 +184,7 @@ class SearchRepository implements SearchRepositoryInterface
         return $users;
     }
 
-    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1)
+    public function userSearchHandV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
             return [];
@@ -223,7 +223,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderByDesc('total_score')
             ->take(10)
             ->get();
-//            ->paginate(10, ['*'], 'page', $page);
+        //            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
@@ -290,7 +290,9 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
 
         $official = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
+            ->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->get();
