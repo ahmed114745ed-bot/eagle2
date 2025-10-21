@@ -22,10 +22,10 @@ class CodapayService
 
     public function __construct()
     {
-        $this->baseUrl = config('codapay.base_url');
-        $this->apiKey = config('codapay.api_key');
-        $this->projectId = config('codapay.project_id');
-        $this->country = auth()->user()->country->iso_numeric;
+        $this->baseUrl = 'https://airtime.codapayments.com/airtime';//config('codapay.base_url');
+        $this->apiKey = 'live_JI4WS6k27hHslcUOcmC9SGFDiyo';//config('codapay.api_key');
+        $this->projectId = 289;//config('codapay.project_id');
+        $this->country = 818;//auth()->user()->country->iso_numeric;
     }
 
     public static function redirect_if_payment_success()
