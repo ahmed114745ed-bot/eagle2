@@ -317,7 +317,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->when($type == 2, fn($q) => $q->whereHas('userOfficialMessages', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             }))
-            ->when($$type != 2, fn($q) => $q->whereIn('user_id', [0, $userId]))
+            ->when($type != 2, fn($q) => $q->whereIn('user_id', [0, $userId]))
             ->where('type', $type)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
