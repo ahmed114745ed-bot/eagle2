@@ -5,12 +5,14 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
 use App\SuperAdmin\Controllers\AuthController;
 use App\SuperAdmin\Controllers\HomeController;
+use App\SuperAdmin\Controllers\RoleController;
 use App\SuperAdmin\Controllers\RoomController;
 use App\SuperAdmin\Controllers\UserController;
 use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\ChargeController;
 use App\SuperAdmin\Controllers\WalletController;
 use App\SuperAdmin\Controllers\LiveRoomController;
+use App\SuperAdmin\Controllers\AdminUserController;
 use App\SuperAdmin\Controllers\AgencyUserController;
 use App\SuperAdmin\Controllers\BdSalariesController;
 use App\SuperAdmin\Controllers\HomeCarouselController;
@@ -144,5 +146,7 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
+        Route::resource('roles', RoleController::class);
+        Route::resource('auth-users', AdminUserController::class);
     }
 );

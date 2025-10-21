@@ -52,7 +52,7 @@ class RoomController extends MainController
         $grid = $this->grid();
         $content = $content->body($grid);
 
-        return $content;
+        return parent::index($content);
     }
 
     /**
@@ -195,7 +195,7 @@ class RoomController extends MainController
             '8' => 8,
         ];
 
-        return $content
+        return parent::show($id,$content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
@@ -208,7 +208,7 @@ class RoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes
-            ]));
+            ])));
     }
     /**
      * Edit interface.

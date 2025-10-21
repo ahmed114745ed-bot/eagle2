@@ -1,15 +1,10 @@
 @php
-    use App\Models\RoleCategory;
-    use App\Enums\PermissionType;
+  
+use App\Models\RoleCategory;
+use App\Enums\PermissionType;
     // Group permissions by category first
     $grouped = $permissions->groupBy('category');
-    $categories = RoleCategory::orderBy('sort')
-    ->select('slug', 'type')
-    ->where(function ($q) {
-        $q->where('type', PermissionType::ADMIN->value)
-          ->orWhere('slug', 'general');
-    })->get();
-    //dd($categories);
+    $categories = RoleCategory::orderBy('sort')->select('slug','type')-> where('type',PermissionType::SUPER_ADMIN->value)->get();
     $selected = $selectedPermissions ?? [];
 
     // Pre-process all permissions by category and group
@@ -150,8 +145,8 @@
             <div class="permissions-grid">
                 @foreach($groupedPermissions as $group => $perms)
                     <div class="permission-group">
-                        <h6 class="permission-group-title">
-                            <input class="form-check-input group-select-all"
+                        <div class="permission-group-title d-flex align-items-center mb-2">
+                             <input class="form-check-input group-select-all"
                                    type="checkbox"
                                    data-group="{{ $group }}"
                                    data-category="{{ $categorySlug }}"
@@ -159,7 +154,7 @@
                             <label for="group-{{ $categorySlug }}-{{ $group }}"class="label-small-font">
                                 {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
                             </label>
-                        </h6>
+                        </div>
                         @foreach($perms as $perm)
                             <div class="form-check">
                                 <input class="form-check-input permission-checkbox"

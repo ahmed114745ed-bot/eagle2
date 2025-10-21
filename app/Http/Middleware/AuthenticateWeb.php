@@ -23,6 +23,7 @@ class AuthenticateWeb
 
         $user = Admin::user();
         $userType = $user?->type ?? 'admin';
+        //  dd($userType);
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
@@ -35,13 +36,16 @@ class AuthenticateWeb
             if (Str::is($uri, $bdLogin) && $userType === 'bd') {
                 return redirect('/bd');
             }
-            if (Str::is($uri, $superadminLogin) && $userType === 'superadmin') {
+            if (
+                Str::is($uri, $superadminLogin)
+                && in_array($userType, ['superadmin', 'sub_super_admin'], true)
+            ) {
                 return redirect('/superadmin');
             }
 
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
-                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
+                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin' && $userType !== 'sub_super_admin') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
                 Admin::guard()->logout();
@@ -52,6 +56,8 @@ class AuthenticateWeb
                     return redirect('/bd/login')->withErrors(['error' => 'Please login through BD portal.']);
                 } elseif ($userType === 'superadmin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
+                } elseif ($userType === 'sub_super_admin') {
+                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin123 portal.']);
                 } else {
                     return redirect('/admin/login')->withErrors(['error' => 'Please login through Admin portal.']);
                 }

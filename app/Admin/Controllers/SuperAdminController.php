@@ -10,6 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Country;
+use App\Models\Permission;
 use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -359,6 +360,9 @@ class SuperAdminController extends MainController
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
+            $permissions = Permission::whereHas('permissionTypes', function ($q) {
+                $q->where('type', 'super_admin');
+            })->get();
 
             if ($role && $userId) {
                 $exists = DB::table('admin_role_users')
@@ -373,6 +377,22 @@ class SuperAdminController extends MainController
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                }
+            }
+            if ($permissions && $userId) {
+                foreach ($permissions as $permission) {
+                    $exists = DB::table('admin_user_permissions')
+                        ->where('user_id', $userId)
+                        ->where('permission_id', $permission->id)
+                        ->exists();
+                    if (!$exists) {
+                        DB::table('admin_user_permissions')->insert([
+                            'user_id' => $userId,
+                            'permission_id' => $permission->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
             }
             $isEditing = $form->isEditing();
