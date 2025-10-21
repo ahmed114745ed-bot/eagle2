@@ -65,7 +65,7 @@ class CodapayService
         return [
             'initRequest' => [
                 'country'   => $this->country,
-                'payType'   => 0,
+                'payType'   => 338,
                 'apiKey'    => $this->apiKey,
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
