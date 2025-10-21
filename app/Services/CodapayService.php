@@ -115,7 +115,7 @@ class CodapayService
             return response()->json(['error' => 'Invalid checksum'], 403);
         }
 
-        $coinLog = CoinLog::where('trx', $txnId)->first();
+        $coinLog = CoinLog::where('id', $orderId)->first();
 
         if (! $coinLog){
             return response()->json([
@@ -133,7 +133,7 @@ class CodapayService
 
         if ($resultCode === "0") {
             Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
-            return $this->webhookPayment($orderId, method: 'codapay');
+            return $this->webhookPayment($orderId, method: 'codapay', newTrx: $txnId);
         } else {
             Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
             $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
@@ -141,21 +141,18 @@ class CodapayService
         }
     }
 
-    public function success($trx, $country): JsonResponse
+    public function success($id, $country): JsonResponse
     {
-        info('before coin log');
+        $coinLog = CoinLog::where('id', $id)->whereMethod('codapay')->firstOrFail();
 
-        $coinLog = CoinLog::where('trx', $trx)->whereMethod('codapay')->firstOrFail();
-
-        info($coinLog);
-        if (!$trx) {
+        if (!$id) {
             return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
         }
 
         $url = $this->baseUrl . '/api/restful/v2.0/Payment/inquiryPaymentResult.json';
         $body = [
             'inquiryPaymentRequest' => [
-                'txnId'          => $trx,
+                'txnId'          => $coinLog->trx,
                 'country'        => $country,
                 'apiKey'         => $this->apiKey,
                 'projectId'      => $this->projectId,
@@ -163,16 +160,12 @@ class CodapayService
             ],
         ];
 
-        info($trx);
-        info($country);
-        info($this->apiKey);
-        info($this->projectId);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->post($url, $body);
 
         $json = $response->json();
-        \Log::info('Codapay Inquiry Response', ['txnId' => $trx, 'response' => $json]);
+        \Log::info('Codapay Inquiry Response', ['txnId' => $coinLog->trx, 'response' => $json]);
 
         $paymentResult = $json['paymentResult'] ?? null;
         $entries = $paymentResult['profile']['entry'] ?? [];
