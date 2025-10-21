@@ -25,7 +25,7 @@ class CodapayService
         $this->baseUrl = config('codapay.base_url');
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
-        $this->country = config('codapay.country');
+        $this->country = auth()->user()->country->iso_numeric;
     }
 
     public static function redirect_if_payment_success()
