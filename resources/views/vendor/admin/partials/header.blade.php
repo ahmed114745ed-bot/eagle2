@@ -208,12 +208,13 @@
         }
     </style>
 <header class="main-header">
-    <a href="{{ admin_url('/') }}" class="logo">
+  
+<a href="{{ admin_url('/') }}" class="logo">
         <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
         <span class="logo-lg">{!! config('admin.logo', config('admin.name')) !!}</span>
     </a>
-
     <nav class="navbar navbar-static-top" role="navigation">
+  
         <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
             <span class="sr-only">Toggle navigation</span>
         </a>
