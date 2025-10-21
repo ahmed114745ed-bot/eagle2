@@ -67,10 +67,11 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
+        info($this->country);
         return [
             'initRequest' => [
                 'country'   => $this->country,
-                'payType'   => 338,
+                'payType'   => 0,
                 'apiKey'    => $this->apiKey,
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
