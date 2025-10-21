@@ -246,6 +246,8 @@ Route::group(
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         Route::resource('auth/roles', 'RoleControllerNew');
         Route::resource('auth/roles-new', 'RoleControllerNew');
+        Route::resource('roles', 'RoleControllerNew');
+
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
         //     Route::get('/', [RoleControllerNew::class, 'index']);
@@ -741,8 +743,6 @@ Route::group(
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
             Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
-
-
         });
         Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
             $user = auth()->user();
@@ -750,8 +750,6 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
-
-
     }
 );
 

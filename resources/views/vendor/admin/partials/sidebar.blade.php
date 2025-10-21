@@ -102,7 +102,7 @@
                 @endforeach
                 @endif
 
-                @if (Admin::user()->type == 'superadmin')
+                @if ((Admin::user()->type == 'superadmin') || Admin::user()->type =='sub_super_admin')
                     @php
                         $superadminLinks = [
                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
@@ -128,10 +128,34 @@
                                     ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
                                 ],
                             ],
-                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
-                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
-                            ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('rooms'),
+                                'children' => [
+                                    ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                                    ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                                ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Advertisements'),
+                                'children' => [
+                                    ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                                ],
+                            ],
+                            
                             ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Employees and Permissions'),
+                                'children' => [
+                                    ['uri' => '/roles','icon' => 'fa-home','title' => __('roles')],
+                                    ['uri' => '/auth-users','icon' => 'fa-home','title' => __('users')],
+                                ],
+                            ],
                         ];
                     @endphp
 

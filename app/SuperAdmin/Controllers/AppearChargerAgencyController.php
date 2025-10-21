@@ -27,7 +27,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
-    public $permission_name = 'appear-charger-agency';
+    public $permission_name = 'shipping-agency';
 
     public function index(Content $content)
     {
@@ -36,7 +36,7 @@ class AppearChargerAgencyController extends MainController
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
         });
-        return $content;
+        return parent::index($content);
     }
 
     public function transferSalary(Request $request)
@@ -57,9 +57,9 @@ class AppearChargerAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('appear-charger-agency'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -71,16 +71,16 @@ class AppearChargerAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('appear-charger-agency'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('appear-charger-agency'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function profile($id, Request $request, Content $content)
@@ -207,7 +207,7 @@ class AppearChargerAgencyController extends MainController
         $grid = new Grid(new ShippingAgency());
 
         $grid->model()->with('owner.profile')->where('country_id', auth()->user()->country_id)
-             ->orderByDesc('id');
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -277,29 +277,33 @@ class AppearChargerAgencyController extends MainController
                 </div>
             ";
         });
+        if (Admin::user()->can('switches-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('charge_agency', __("Charge-agency"))
+                ->display(function () {
+                    return $this->chargeAgency ? 1 : 0;
+                })
+                ->switch(Common::getSwitchStates());
 
-        $grid->column('charge_agency', __("Charge-agency"))
-            ->display(function () {
-                return $this->chargeAgency ? 1 : 0;
-            })
-            ->switch(Common::getSwitchStates());
+            $grid->column('appear_charger_agency', __("Appear charger agency"))
+                ->display(function () {
+                    return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
+                })
+                ->switch(Common::getSwitchStates());
 
-        $grid->column('appear_charger_agency', __("Appear charger agency"))
-            ->display(function () {
-                return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
-            })
-            ->switch(Common::getSwitchStates());
-
-        $grid->column('is_frozen', __("frozen"))
-            ->display(function () {
-                return $this->is_frozen ? 1 : 0;
-            })
-            ->switch(Common::getSwitchStates());
+            $grid->column('is_frozen', __("frozen"))
+                ->display(function () {
+                    return $this->is_frozen ? 1 : 0;
+                })
+                ->switch(Common::getSwitchStates());
+        }
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
             $actions->add(new DeleteShippingAgencyAction());
+            }
         });
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) {
