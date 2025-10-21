@@ -157,6 +157,9 @@ class OfficialMessageController extends MainController
         $grid->disableExport();
 
         $this->extendGrid($grid);
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
         return $grid;
     }
 
