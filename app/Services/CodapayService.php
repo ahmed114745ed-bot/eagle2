@@ -33,14 +33,9 @@ class CodapayService
 //        $this->country = 818;
     }
 
-    public static function redirect_if_payment_success()
+    public static function redirect_if_payment_success($trx)
     {
-        return url('/api/codapay-success');
-    }
-
-    public static function redirect_if_payment_failed()
-    {
-        return url('/api/codapay-failed');
+        return url("/api/codapay-success/$trx");
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
@@ -75,8 +70,6 @@ class CodapayService
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
                 'currency'  => 840,
-//                'returnUrl' => self::redirect_if_payment_success(),
-//                'failUrl'   => self::redirect_if_payment_failed(),
                 'items' => [
                     [
                         'code'  => '1',
@@ -92,7 +85,7 @@ class CodapayService
                         ],
                         [
                             "key" => "return_url",
-                            "value" => self::redirect_if_payment_success()
+                            "value" => self::redirect_if_payment_success($trx)
 //                            "value" => "https://www.example.com/{transactionId}/{orderId}/return"
                         ]
                     ]
@@ -148,19 +141,18 @@ class CodapayService
         }
     }
 
-    public function success(Request $request): JsonResponse
+    public function success($trx): JsonResponse
     {
-        $txnId = $request->query('txn_id');
-        $coinLog = CoinLog::where('trx', $txnId)->whereMethod('paypal')->firstOrFail();
+        $coinLog = CoinLog::where('trx', $trx)->whereMethod('paypal')->firstOrFail();
 
-        if (!$txnId) {
+        if (!$trx) {
             return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
         }
 
         $url = $this->baseUrl . '/api/restful/v2.0/Payment/inquiryPaymentResult.json';
         $body = [
             'inquiryPaymentRequest' => [
-                'txnId'          => $txnId,
+                'txnId'          => $trx,
                 'country'        => $this->country,
                 'apiKey'         => $this->apiKey,
                 'projectId'      => $this->projectId,
@@ -173,7 +165,7 @@ class CodapayService
         ])->post($url, $body);
 
         $json = $response->json();
-        \Log::info('Codapay Inquiry Response', ['txnId' => $txnId, 'response' => $json]);
+        \Log::info('Codapay Inquiry Response', ['txnId' => $trx, 'response' => $json]);
 
         $paymentResult = $json['paymentResult'] ?? null;
         $entries = $paymentResult['profile']['entry'] ?? [];
@@ -206,13 +198,5 @@ class CodapayService
             'trx'     => $coinLog->trx,
             'message' => $message,
         ]);
-    }
-
-    public function failed(Request $request): JsonResponse
-    {
-        $txnId = $request->query('txn_id');
-        $coinLog = CoinLog::where('trx', $txnId)->whereMethod('paypal')->firstOrFail();
-
-        return response()->json(['status'  => false, 'trx' => $coinLog->trx, 'message' => 'Payment failed or was cancelled.']);
     }
 }

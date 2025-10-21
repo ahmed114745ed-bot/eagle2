@@ -102,8 +102,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
-    Route::get('codapay-success', [CodapayService::class, 'success'])->name('codapay.success');
-    Route::get('codapay-failed', [CodapayService::class, 'failed'])->name('codapay.cancel');
+    Route::get('codapay-success/{trx}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
