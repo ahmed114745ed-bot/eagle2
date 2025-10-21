@@ -248,20 +248,20 @@ class OfficialMessageController extends MainController
                     ->options('/api/search/countries')
                     ->ajax('/api/search/countries', 'id', 'name');
             })->when('ids', function (Form $form) {
-                $form->belongsToMany('feature_ids', Agencies::class, trans('agencies'));
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
                     'admin' => __('admins'),
                     'members'   => __('members'),
                 ]);
-            });
+            })->default('owner');
         })->when('family', function (Form $form) {
-            $form->belongsToMany('feature_ids', Families::class, trans('families'));
+            $form->belongsToMany('family_ids', Families::class, trans('families'));
             $form->select('member_title', trans('member'))->options([
                 'owner'   => __('owner'),
                 'admin' => __('admins'),
                 'members'   => __('members'),
-            ]);
+            ])->default('owner');
         })->when('users', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'country' => __('Users in Specific Country'),

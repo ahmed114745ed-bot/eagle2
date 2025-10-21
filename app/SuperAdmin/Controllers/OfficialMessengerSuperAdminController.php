@@ -174,12 +174,12 @@ class OfficialMessengerSuperAdminController extends MainController
                 'your_country' => __('All Agencies in your Country'),
                 'ids'   => __('Specific Agency by ID'),
             ])->when('ids', function (Form $form) {
-                $form->belongsToMany('feature_ids', Agencies::class, trans('agencies'));
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
                     'admin' => __('admins'),
                     'members'   => __('members'),
-                ]);
+                ])->default('owner');
             });
         })->when('family', function (Form $form) {
             $form->belongsToMany('feature_ids', Families::class, trans('families'));
@@ -187,7 +187,7 @@ class OfficialMessengerSuperAdminController extends MainController
                 'owner'   => __('owner'),
                 'admin' => __('admins'),
                 'members'   => __('members'),
-            ]);
+            ])->default('owner');
         })->when('users', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'your_country' => __('Users in your Country'),
@@ -206,12 +206,13 @@ class OfficialMessengerSuperAdminController extends MainController
                 'ids'   => __('Specific shipping Agency by ID'),
                 'your_country' => __('shipping agency in your Country'),
             ])->when('ids', function (Form $form) {
-                $form->belongsToMany('feature_ids', ShippingAgencies::class, trans('agencies'));
+                $form->belongsToMany('shipping_agency_ids', ShippingAgencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
-                ]);
+                ])->default('owner');
             });;
         });
+        
 
         $form->saved(function (Form $form) {
             $model = $form->model();

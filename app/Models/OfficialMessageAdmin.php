@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-
-use App\Helpers\Common;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Request;
+
 class OfficialMessageAdmin extends Model
 {
     use TimestampsWithTimezone;
@@ -29,23 +28,23 @@ class OfficialMessageAdmin extends Model
     {
         parent::boot();
         self::creating(function ($model) {
-            $featureIdsText = request('feature_ids');
-            if (is_array(request('feature_ids'))) {
-                $featureIds = array_filter(request('feature_ids')); // remove nulls
+            // Determine which request field exists (priority order)
+            $featureIdsText = request('feature_ids')
+                ?? request('agency_ids')
+                ?? request('shipping_agency_ids');
+
+            if (is_array($featureIdsText)) {
+                $featureIds = array_filter($featureIdsText); // remove nulls
                 $featureIdsText = implode(',', $featureIds);
-
-                unset(request()['feature_ids']);
             }
-            $model->feature_ids  = $featureIdsText;
 
-            // $file = request('img', $model->img);
+            // Assign to feature_ids column
+            $model->feature_ids = $featureIdsText;
 
-            //     if ($file instanceof UploadedFile) {
-            //         $url = Common::upload(DIRECTORY_SEPARATOR . 'official_message', $file);
-            //     }
-            //     $model->img = $url ?? '';
-
-            
+            // ✅ Remove the raw arrays from the request before save
+            unset($model->agency_ids);
+            unset($model->shipping_agency_ids);
+           
         });
     }
 }
