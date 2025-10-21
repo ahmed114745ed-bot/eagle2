@@ -75,8 +75,8 @@ class CodapayService
                 'projectId' => $this->projectId,
                 'orderId'   => (string)$trx,
                 'currency'  => 840,
-                'returnUrl' => self::redirect_if_payment_success(),
-                'failUrl'   => self::redirect_if_payment_failed(),
+//                'returnUrl' => self::redirect_if_payment_success(),
+//                'failUrl'   => self::redirect_if_payment_failed(),
                 'items' => [
                     [
                         'code'  => '1',
