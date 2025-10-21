@@ -173,14 +173,7 @@ class AreaManagerController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
-        // $form->select('country_id', trans('country'))->options(function ($value) {
-        //     $ops = [null => __('no country')];
-        //     $countries = Country::nonDefaultOrUnassigned()->orWhere('id', $value)->get();
-        //     foreach ($countries as $country) {
-        //         $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
-        //     }
-        //     return $ops;
-        // });
+       
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
