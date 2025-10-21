@@ -33,9 +33,9 @@ class CodapayService
 //        $this->country = 818;
     }
 
-    public static function redirect_if_payment_success($trx)
+    public static function redirect_if_payment_success($trx, $country)
     {
-        return url("/api/codapay-success/$trx");
+        return url("/api/codapay-success/$trx/$country");
     }
 
     public function initiatePayment($trx, $amount, $userId = null)
@@ -85,7 +85,7 @@ class CodapayService
                         ],
                         [
                             "key" => "return_url",
-                            "value" => self::redirect_if_payment_success($trx)
+                            "value" => self::redirect_if_payment_success($trx, $this->country)
 //                            "value" => "https://www.example.com/{transactionId}/{orderId}/return"
                         ]
                     ]
@@ -141,7 +141,7 @@ class CodapayService
         }
     }
 
-    public function success($trx): JsonResponse
+    public function success($trx, $country): JsonResponse
     {
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('paypal')->firstOrFail();
 
@@ -153,7 +153,7 @@ class CodapayService
         $body = [
             'inquiryPaymentRequest' => [
                 'txnId'          => $trx,
-                'country'        => $this->country,
+                'country'        => $country,
                 'apiKey'         => $this->apiKey,
                 'projectId'      => $this->projectId,
                 'needStatusFinal'=> true,
