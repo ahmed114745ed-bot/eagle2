@@ -143,8 +143,11 @@ class CodapayService
 
     public function success($trx, $country): JsonResponse
     {
+        info('before coin log');
+
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('codapay')->firstOrFail();
 
+        info($coinLog);
         if (!$trx) {
             return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
         }
