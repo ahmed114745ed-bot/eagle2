@@ -74,11 +74,11 @@ class OfficialMessageController extends MainController
     {
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
-        if (Auth::user()->type == null) {
+        
             $grid->model()->whereNull('admin_id')
                 ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
                 ->where('type', 2)->orderByDesc('id');
-        }
+      
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -221,10 +221,9 @@ class OfficialMessageController extends MainController
             ->options('/api/search/language')
             ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
-        if (Auth::user()->type == null) {
+        
             $this->selectFeature($form);
-        }
-
+       
         $form->hidden('type', __('type'))->default(2);
 
 
