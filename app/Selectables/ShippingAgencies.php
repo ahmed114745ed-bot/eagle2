@@ -2,22 +2,21 @@
 
 namespace App\Selectables;
 
-
-use App\Models\Agency;
 use Encore\Admin\Grid\Filter;
+use App\Models\ShippingAgency;
 use Modules\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
 use Illuminate\Support\Facades\Auth;
 
-class Agencies extends Selectable
+class ShippingAgencies extends Selectable
 {
 
-    public $model = Agency::class;
+    public $model = ShippingAgency::class;
 
     public function make()
     {
         if (in_array(Auth::user()->type, ['superadmin', 'sub_super_admin'])) {
-             $this->model()->where('type',1)->where('country_id', Auth::user()->country_id);
+            $this->model()->where('type', 2)->where('country_id', Auth::user()->country_id);
         }
         $this->column('id');
         $this->column('name', __('name'));

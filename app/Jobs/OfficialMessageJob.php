@@ -23,14 +23,16 @@ class OfficialMessageJob implements ShouldQueue
 
     protected $model;
     protected $request;
+    protected $admin;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($model, array $request)
+    public function __construct($model, array $request, $admin)
     {
         $this->model = $model;
         $this->request = $request;
+        $this->admin = $admin;
     }
 
     /**
@@ -41,7 +43,7 @@ class OfficialMessageJob implements ShouldQueue
         Log::info('OfficialMessageJob raw request', $this->request);
         $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
-        $memberTitle = $this->request['member_title'] ?? null;
+        $memberTitle = $this->request['member_title'] ?? 'owner';
 
         // Handle feature_ids as array or string
         $featureIds = $this->request['feature_ids'] ?? [];
@@ -69,6 +71,7 @@ class OfficialMessageJob implements ShouldQueue
         if ($feature === 'agency') {
             $agencies = Agency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
 
@@ -87,6 +90,7 @@ class OfficialMessageJob implements ShouldQueue
                 ->when($subFeature === 'country', function ($q) use ($featureIds) {
                     $q->whereHas('owner', fn($query) => $query->whereIn('country_id', $featureIds));
                 })
+                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
 
@@ -102,6 +106,7 @@ class OfficialMessageJob implements ShouldQueue
         } elseif ($feature === 'users') {
             $users = User::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->when($subFeature === 'logout', fn($q) => $q->where('is_logout', 1))
                 ->get();
 
@@ -109,12 +114,15 @@ class OfficialMessageJob implements ShouldQueue
         } elseif ($feature === 'bds') {
             $users = Bd::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->get();
 
             $usersId = $users->pluck('app_id')->toArray();
         } elseif ($feature === 'shipping_agency') {
             $agencies = ShippingAgency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
+                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->get();
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
