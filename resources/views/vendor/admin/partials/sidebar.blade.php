@@ -143,18 +143,12 @@
                                 'title' => __('Advertisements'),
                                 'children' => [
                                     ['uri' => '/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages')],
                                 ],
                             ],
                             
                             ['uri' => '/super-admin-rewards','icon' => 'fa-home','title' => __('reward dedicate')],
-                            [
-                                'uri' => '#',
-                                'icon' => 'fa-building',
-                                'title' => __('Advertisements'),
-                                'children' => [
-                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages')],
-                                   ],
-                            ],[
+                           [
                                    
                                 'icon' => 'fa-home',
                                 'title' => __('Employees and Permissions'),

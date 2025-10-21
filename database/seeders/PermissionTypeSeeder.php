@@ -306,6 +306,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'official-messages', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
+                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -1100,8 +1101,102 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
-            
-            
+            [
+                'name' => 'SuperAdmin',
+                'sort' => 39,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 39],
+                    // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'superadmin',
+                        'except' => ['show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'superadmin-settings',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Charge',
+                'sort' => 40,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 40],
+                    // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'charge-to-superadmin',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
+
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Banners',
+                'sort' => 41,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 41],
+                    // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'superadmin-banners',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
+
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Rewards',
+                'sort' => 41,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 42],
+                    // PermissionType::SUPER_ADMIN->value => ['sort' => 10],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'super-admin-reward',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['dedicate-switch', 'history-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'history-switch'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'super-admin-reward-history',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                ],
+            ],
+
+
         ];
 
 
