@@ -306,6 +306,8 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'official-messages', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
+                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
+
                     ],],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
