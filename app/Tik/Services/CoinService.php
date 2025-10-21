@@ -126,7 +126,7 @@ class CoinService
                 if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $codapayService = new CodapayService();
 
-                $paymentUrl = $codapayService->initiatePayment($log->id, $coin->usd, $user->id);
+                $paymentUrl = $codapayService->initiatePayment($log->trx, $coin->usd, $user->id);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
