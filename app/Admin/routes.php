@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AdminNotification;
+use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerHistoryController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
@@ -736,6 +737,11 @@ Route::group(
             Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
             Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
+
+        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
 
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);

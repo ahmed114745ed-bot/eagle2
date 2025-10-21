@@ -12,6 +12,7 @@ use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Models\OfficialMessageAdmin;
+use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
 
@@ -73,10 +74,11 @@ class OfficialMessageController extends MainController
     {
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
-
-        $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
-            ->where('type', 2)->orderByDesc('id');
+        if (Auth::user()->type == null) {
+            $grid->model()->whereNull('admin_id')
+                ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+                ->where('type', 2)->orderByDesc('id');
+        }
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -156,7 +158,7 @@ class OfficialMessageController extends MainController
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
 
-       // $this->extendGrid($grid);
+        // $this->extendGrid($grid);
         $grid->actions(function ($actions) {
             $actions->disableEdit();
         });
@@ -218,7 +220,11 @@ class OfficialMessageController extends MainController
         $form->select('language', __('language'))
             ->options('/api/search/language')
             ->ajax('/api/search/language', 'code', 'name')->rules('required');
-        $this->selectFeature($form);
+
+        if (Auth::user()->type == null) {
+            $this->selectFeature($form);
+        }
+
         $form->hidden('type', __('type'))->default(2);
 
 
@@ -269,7 +275,7 @@ class OfficialMessageController extends MainController
         })->when('bds', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'all' => __('All BDS'),
-                'country' => __('Users in Specific Country'),
+                'country' => __('Bds in Specific Country'),
             ])->when('country', function (Form $form) {
                 $form->select('feature_ids', __('country'))
                     ->options('/api/search/countries')
@@ -278,7 +284,7 @@ class OfficialMessageController extends MainController
         })->when('shipping_agency', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'all' => __('All Shipping Agencies'),
-                'country' => __('Users in Specific Country'),
+                'country' => __('Shipping Agencies in Specific Country'),
             ])->when('country', function (Form $form) {
                 $form->select('feature_ids', __('country'))
                     ->options('/api/search/countries')
@@ -288,7 +294,7 @@ class OfficialMessageController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            dispatch(new OfficialMessageJob($model, request()->all()))->onQueue('official-message');
+            dispatch(new OfficialMessageJob($model, request()->all(), Auth::user()))->onQueue('official-message');
         });
     }
 }
