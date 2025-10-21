@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Support\Str;
+use App\Enums\PermissionType;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use App\Models\OfficialMessage;
@@ -50,7 +51,7 @@ class OfficialMessengerSuperAdminController extends MainController
 
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
-        $grid->model()->where('admin_id', Auth::id())->where('type', 2)->orderByDesc('id');
+        $grid->model()->where('admin_type', PermissionType::SUPER_ADMIN->value)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -153,6 +154,7 @@ class OfficialMessengerSuperAdminController extends MainController
             ->options('/api/search/language')
             ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
+        $form->hidden('admin_type', __('type'))->default(PermissionType::SUPER_ADMIN->value);
         $form->hidden('type', __('type'))->default(2);
         $this->selectFeature($form);
         $form->hidden('admin_id', __('type'))->default(Auth::user()->id);
