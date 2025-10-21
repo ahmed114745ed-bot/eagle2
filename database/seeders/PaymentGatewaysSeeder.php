@@ -1098,7 +1098,7 @@ class PaymentGatewaysSeeder extends Seeder
         $codapay_id = PaymentCoin::updateOrCreate([
             'title' => 'codapay',
         ], [
-            'photo' => 'images/codapay.png',
+            'photo' => 'images/codapay.webp',
             'status' => 1,
             'type' => 'codapay',
             'package_type' => 'user'

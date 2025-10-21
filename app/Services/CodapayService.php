@@ -25,7 +25,12 @@ class CodapayService
         $this->baseUrl = config('codapay.base_url');
         $this->apiKey = config('codapay.api_key');
         $this->projectId = config('codapay.project_id');
-        $this->country = config('codapay.country');
+        $this->country = auth()->user()->country->iso_numeric;
+
+//        $this->baseUrl = 'https://airtime.codapayments.com/airtime';
+//        $this->apiKey = 'live_JI4WS6k27hHslcUOcmC9SGFDiyo';
+//        $this->projectId = 289;
+//        $this->country = 818;
     }
 
     public static function redirect_if_payment_success()
@@ -62,6 +67,7 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
+        info($this->country);
         return [
             'initRequest' => [
                 'country'   => $this->country,
