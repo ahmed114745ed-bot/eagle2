@@ -1300,7 +1300,21 @@
 "Unknown": "Unknown",
 "Not Linked": "Not Linked",
 "Created at": "Created at",
-"areaManagerDescriptionTitle": "Area Manager Description"
+"areaManagerDescriptionTitle": "Area Manager Description",
+"Clear Selection": "Clear Selection",
+"Show Selected Countries": " Selecte Countries",
+"Selected Countries": "Selected Countries",
+"Please select an area on the map first": "Please select an area on the map first",
+"Searching for countries... This may take a few seconds": "Searching for countries... This may take a few seconds",
+"Searching...": "Searching...",
+"No countries found in the selected area. Try expanding the area.": "No countries found in the selected area. Try expanding the area.",
+"Found": "Found",
+"country": "country",
+"Arabic Name": "Arabic Name",
+"English Name": "English Name",
+"Phone Code": "Phone Code",
+"An error occurred while searching for countries. Please check your Google Maps API Key.": "An error occurred while searching for countries. Please check your Google Maps API Key."
+
 
 
 

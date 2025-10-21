@@ -6,9 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class CountriesInPolygonController extends Controller
 {
+    private $maxPoints = 80;
+    private $batchSize = 20; 
+    private $requestTimeout = 8; 
+    
     public function getCountriesInPolygon(Request $request)
     {
         $coordinates = $request->input('coordinates');
@@ -18,75 +24,223 @@ class CountriesInPolygonController extends Controller
         }
 
         $countries = $this->detectCountriesInPolygon($coordinates);
-
         return response()->json(['countries' => $countries]);
     }
 
-  
     private function detectCountriesInPolygon($polygon)
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY');
-        $detectedCountries = [];
         $countryCodes = [];
-
         $bounds = $this->calculateBounds($polygon);
         
-        $testPoints = $this->generateTestPoints($polygon, $bounds, 20);
+        $areaSize = ($bounds['maxLat'] - $bounds['minLat']) * ($bounds['maxLng'] - $bounds['minLng']);
+        
+        $gridSize = $areaSize > 1000 ? 50 : ($areaSize > 100 ? 40 : 30);
+        
+        // Log::info("Area size: {$areaSize}, Grid size: {$gridSize}");
+        
+        $testPoints = $this->generateOptimizedGrid($polygon, $bounds, $gridSize);
+        // Log::info('Generated ' . count($testPoints) . ' test points');
+        
+        $countryCodes = $this->fetchCountriesParallel($testPoints, $apiKey);
+        
+        if ($areaSize > 1000 && count($countryCodes) < 15) {
+            Log::info('Area is large, generating additional points');
+            $additionalPoints = $this->generateTargetedPoints($polygon, $bounds, 30);
+            $additionalCountries = $this->fetchCountriesParallel($additionalPoints, $apiKey);
+            $countryCodes = array_unique(array_merge($countryCodes, $additionalCountries));
+        }
+        
+        Log::info('Total countries found: ' . count($countryCodes));
+        Log::info('Country codes: ' . implode(', ', $countryCodes));
 
-        foreach ($testPoints as $point) {
-            try {
-                $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
-                    'latlng' => $point['lat'] . ',' . $point['lng'],
-                    'key' => $apiKey,
-                    'result_type' => 'country'
-                ]);
+        return $this->getCountriesData($countryCodes);
+    }
 
-                if ($response->successful()) {
-                    $data = $response->json();
-                    
-                    if (!empty($data['results'])) {
-                        foreach ($data['results'] as $result) {
-                            foreach ($result['address_components'] as $component) {
-                                if (in_array('country', $component['types'])) {
-                                    $countryCode = $component['short_name'];
-                                    
-                                    if (!in_array($countryCode, $countryCodes)) {
-                                        $countryCodes[] = $countryCode;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                usleep(100000); 
-                
-            } catch (\Exception $e) {
-                continue;
+    private function generateOptimizedGrid($polygon, $bounds, $gridSize)
+    {
+        $testPoints = [];
+        $latStep = ($bounds['maxLat'] - $bounds['minLat']) / $gridSize;
+        $lngStep = ($bounds['maxLng'] - $bounds['minLng']) / $gridSize;
+    
+        $centerLat = ($bounds['minLat'] + $bounds['maxLat']) / 2;
+        $centerLng = ($bounds['minLng'] + $bounds['maxLng']) / 2;
+        if ($this->isPointInPolygon($centerLat, $centerLng, $polygon)) {
+            $testPoints[] = ['lat' => $centerLat, 'lng' => $centerLng];
+        }
+    
+        $corners = [
+            ['lat' => $bounds['minLat'] + $latStep * 3, 'lng' => $bounds['minLng'] + $lngStep * 3],
+            ['lat' => $bounds['maxLat'] - $latStep * 3, 'lng' => $bounds['minLng'] + $lngStep * 3],
+            ['lat' => $bounds['minLat'] + $latStep * 3, 'lng' => $bounds['maxLng'] - $lngStep * 3],
+            ['lat' => $bounds['maxLat'] - $latStep * 3, 'lng' => $bounds['maxLng'] - $lngStep * 3],
+        ];
+        
+        foreach ($corners as $corner) {
+            if ($this->isPointInPolygon($corner['lat'], $corner['lng'], $polygon)) {
+                $testPoints[] = $corner;
             }
         }
 
-        if (!empty($countryCodes)) {
-            $countries = Country::whereIn('iso2', $countryCodes)
-                ->orWhereIn('iso3', $countryCodes)
-                ->get();
-
-            foreach ($countries as $country) {
-                $detectedCountries[] = [
-                    'id' => $country->id,
-                    'name' => $country->name,
-                    'e_name' => $country->e_name ?? $country->name,
-                    'iso2' => $country->iso2 ?? '',
-                    'iso3' => $country->iso3 ?? '',
-                    'phone_code' => $country->phone_code ?? ''
-                ];
+        for ($i = 1; $i <= 4; $i++) {
+            $ratio = $i / 5.0;
+            $axisPoints = [
+                ['lat' => $bounds['minLat'] + ($bounds['maxLat'] - $bounds['minLat']) * $ratio, 'lng' => $centerLng],
+                ['lat' => $centerLat, 'lng' => $bounds['minLng'] + ($bounds['maxLng'] - $bounds['minLng']) * $ratio],
+            ];
+            
+            foreach ($axisPoints as $point) {
+                if ($this->isPointInPolygon($point['lat'], $point['lng'], $polygon)) {
+                    $testPoints[] = $point;
+                }
             }
+        }
+
+        for ($lat = $bounds['minLat']; $lat <= $bounds['maxLat']; $lat += $latStep) {
+            for ($lng = $bounds['minLng']; $lng <= $bounds['maxLng']; $lng += $lngStep) {
+                if ($this->isPointInPolygon($lat, $lng, $polygon)) {
+                    if (!$this->isDuplicatePoint(['lat' => $lat, 'lng' => $lng], $testPoints, 0.1)) {
+                        $testPoints[] = ['lat' => $lat, 'lng' => $lng];
+                    }
+                    
+                    if (count($testPoints) >= $this->maxPoints) {
+                        return $testPoints;
+                    }
+                }
+            }
+        }
+    
+        return $testPoints;
+    }
+
+    private function generateTargetedPoints($polygon, $bounds, $count)
+    {
+        $points = [];
+        $attempts = 0;
+        $maxAttempts = $count * 3;
+        
+        while (count($points) < $count && $attempts < $maxAttempts) {
+            $randomLat = $bounds['minLat'] + (($bounds['maxLat'] - $bounds['minLat']) * (mt_rand(0, 1000) / 1000));
+            $randomLng = $bounds['minLng'] + (($bounds['maxLng'] - $bounds['minLng']) * (mt_rand(0, 1000) / 1000));
+            
+            if ($this->isPointInPolygon($randomLat, $randomLng, $polygon)) {
+                if (!$this->isDuplicatePoint(['lat' => $randomLat, 'lng' => $randomLng], $points, 0.5)) {
+                    $points[] = ['lat' => $randomLat, 'lng' => $randomLng];
+                }
+            }
+            
+            $attempts++;
+        }
+
+        return $points;
+    }
+
+    private function fetchCountriesParallel($points, $apiKey)
+    {
+        $countryCodes = [];
+        $chunks = array_chunk($points, $this->batchSize);
+        
+        foreach ($chunks as $chunkIndex => $chunk) {
+            $promises = [];
+            
+            foreach ($chunk as $index => $point) {
+                $cacheKey = 'geocode_' . round($point['lat'], 2) . '_' . round($point['lng'], 2);
+                
+                $cachedData = Cache::get($cacheKey);
+                if ($cachedData) {
+                    $this->extractCountryCodes($cachedData, $countryCodes, $index);
+                    continue;
+                }
+                
+                $promises[] = Http::timeout($this->requestTimeout)
+                    ->async()
+                    ->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                        'latlng' => $point['lat'] . ',' . $point['lng'],
+                        'key' => $apiKey,
+                        'result_type' => 'country'
+                    ])
+                    ->then(function ($response) use ($cacheKey, &$countryCodes, $index, $point) {
+                        if ($response->successful()) {
+                            $data = $response->json();
+                            Cache::put($cacheKey, $data, 3600);
+                            $this->extractCountryCodes($data, $countryCodes, $index);
+                            // Log::info("Point {$index}: ({$point['lat']}, {$point['lng']})");
+                        }
+                    })
+                    ->otherwise(function ($exception) use ($index) {
+                        // Log::warning("Failed at point {$index}: " . $exception->getMessage());
+                    });
+            }
+            
+            if (!empty($promises)) {
+                try {
+                    \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+                } catch (\Exception $e) {
+                    // Log::error("Batch {$chunkIndex} error: " . $e->getMessage());
+                }
+                
+                usleep(200000); 
+            }
+        }
+
+        return array_unique($countryCodes);
+    }
+
+    private function extractCountryCodes($data, &$countryCodes, $index)
+    {
+        if (!empty($data['results'])) {
+            foreach ($data['results'] as $result) {
+                foreach ($result['address_components'] as $component) {
+                    if (in_array('country', $component['types'])) {
+                        $countryCode = $component['short_name'];
+                        
+                        if (!in_array($countryCode, $countryCodes)) {
+                            $countryCodes[] = $countryCode;
+                            Log::info("Found country: {$countryCode} at point {$index}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private function getCountriesData($countryCodes)
+    {
+        if (empty($countryCodes)) {
+            return [];
+        }
+
+        $countries = Country::where(function($query) use ($countryCodes) {
+            $query->whereIn('iso', $countryCodes)
+                  ->orWhereIn('iso3', $countryCodes);
+        })->get();
+
+        $detectedCountries = [];
+        foreach ($countries as $country) {
+            $detectedCountries[] = [
+                'id' => $country->id,
+                'name' => $country->name,
+                'e_name' => $country->e_name ?? $country->name,
+                'iso2' => $country->iso2 ?? '',
+                'iso3' => $country->iso3 ?? '',
+                'phone_code' => $country->phone_code ?? ''
+            ];
         }
 
         return $detectedCountries;
     }
 
- 
+    private function isDuplicatePoint($newPoint, $existingPoints, $threshold = 0.01)
+    {
+        foreach ($existingPoints as $existing) {
+            if (abs($existing['lat'] - $newPoint['lat']) < $threshold && 
+                abs($existing['lng'] - $newPoint['lng']) < $threshold) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function calculateBounds($polygon)
     {
         $minLat = $maxLat = $polygon[0]['lat'];
@@ -107,35 +261,6 @@ class CountriesInPolygonController extends Controller
         ];
     }
 
-  
-    private function generateTestPoints($polygon, $bounds, $gridSize = 20)
-    {
-        $testPoints = [];
-        $latStep = ($bounds['maxLat'] - $bounds['minLat']) / $gridSize;
-        $lngStep = ($bounds['maxLng'] - $bounds['minLng']) / $gridSize;
-
-        $centerLat = ($bounds['minLat'] + $bounds['maxLat']) / 2;
-        $centerLng = ($bounds['minLng'] + $bounds['maxLng']) / 2;
-        if ($this->isPointInPolygon($centerLat, $centerLng, $polygon)) {
-            $testPoints[] = ['lat' => $centerLat, 'lng' => $centerLng];
-        }
-
-        for ($lat = $bounds['minLat']; $lat <= $bounds['maxLat']; $lat += $latStep) {
-            for ($lng = $bounds['minLng']; $lng <= $bounds['maxLng']; $lng += $lngStep) {
-                if ($this->isPointInPolygon($lat, $lng, $polygon)) {
-                    $testPoints[] = ['lat' => $lat, 'lng' => $lng];
-                    
-                    if (count($testPoints) >= 25) {
-                        return $testPoints;
-                    }
-                }
-            }
-        }
-
-        return $testPoints;
-    }
-
- 
     private function isPointInPolygon($lat, $lng, $polygon)
     {
         $vertices = count($polygon);

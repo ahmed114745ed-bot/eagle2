@@ -3255,7 +3255,21 @@
     "Unknown": "अज्ञात",
     "Not Linked": "संबंधित नहीं",
     "Created at": "निर्माण तिथि",
-    "areaManagerDescriptionTitle": "एरिया मैनेजर विवरण"
+    "areaManagerDescriptionTitle": "एरिया मैनेजर विवरण",
+    "areaManagerDescriptionTitle": "एरिया मैनेजर विवरण",
+  "Clear Selection": "चयन साफ़ करें",
+  "Show Selected Countries": "चयनित देशों को दिखाएँ",
+  "Selected Countries": "चयनित देश",
+  "Please select an area on the map first": "कृपया पहले नक्शे पर एक क्षेत्र चुनें",
+  "Searching for countries... This may take a few seconds": "देश खोजे जा रहे हैं... इसमें कुछ सेकंड लग सकते हैं",
+  "Searching...": "खोज रहा है...",
+  "No countries found in the selected area. Try expanding the area.": "चयनित क्षेत्र में कोई देश नहीं मिला। कृपया क्षेत्र का विस्तार करें।",
+  "Found": "मिला",
+  "country": "देश",
+  "Arabic Name": "अरबी नाम",
+  "English Name": "अंग्रेज़ी नाम",
+  "Phone Code": "फोन कोड",
+  "An error occurred while searching for countries. Please check your Google Maps API Key.": "देश खोजते समय एक त्रुटि हुई। कृपया अपने Google Maps API Key की जाँच करें।"
 
 
 

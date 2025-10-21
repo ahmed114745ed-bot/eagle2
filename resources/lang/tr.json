@@ -3652,6 +3652,21 @@
     "Unknown": "Bilinmeyen",
     "Not Linked": "Bağlı Değil",
     "Created at": "Oluşturulma Tarihi",
-    "areaManagerDescriptionTitle": "Bölge Yöneticisi Açıklaması"
+    "areaManagerDescriptionTitle": "Bölge Yöneticisi Açıklaması",
+    "areaManagerDescriptionTitle": "Bölge Yöneticisi Açıklaması",
+    "Clear Selection": "Seçimi Temizle",
+    "Show Selected Countries": "Seçilen Ülkeleri Göster",
+    "Selected Countries": "Seçilen Ülkeler",
+    "Please select an area on the map first": "Lütfen önce haritada bir alan seçin",
+    "Searching for countries... This may take a few seconds": "Ülkeler aranıyor... Bu birkaç saniye sürebilir",
+    "Searching...": "Aranıyor...",
+    "No countries found in the selected area. Try expanding the area.": "Seçilen alanda ülke bulunamadı. Alanı genişletmeyi deneyin.",
+    "Found": "Bulundu",
+    "country": "Ülke",
+    "Arabic Name": "Arapça İsim",
+    "English Name": "İngilizce İsim",
+    "Phone Code": "Telefon Kodu",
+    "An error occurred while searching for countries. Please check your Google Maps API Key.": "Ülkeler aranırken bir hata oluştu. Lütfen Google Maps API Anahtarınızı kontrol edin."
+
 
 }

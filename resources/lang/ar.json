@@ -4155,7 +4155,21 @@
 "Created at": "تاريخ الإنشاء",
 "areaManagerDescriptionTitle": "وصف مدير مناطق",
 "Area-manager-users":"مدير مناطق",
-"area-manager-users":"مدير مناطق"
+"area-manager-users":"مدير مناطق",
+"Clear Selection": "مسح النقاط",
+"Show Selected Countries": "تحديد الدول ",
+"Selected Countries": "الدول المحددة",
+"Please select an area on the map first": "الرجاء تحديد منطقة على الخريطة أولاً",
+"Searching for countries... This may take a few seconds": "جاري البحث عن الدول... قد يستغرق هذا بضع ثوانٍ",
+"Searching...": "جاري البحث...",
+"No countries found in the selected area. Try expanding the area.": "لا توجد دول في المنطقة المحددة. جرب توسيع المنطقة.",
+"Found": "تم العثور على",
+"country": "دولة",
+"Arabic Name": "الاسم بالعربي",
+"English Name": "الاسم بالإنجليزي",
+"Phone Code": "رمز الهاتف",
+"An error occurred while searching for countries. Please check your Google Maps API Key.": "حدث خطأ أثناء البحث عن الدول. تأكد من صحة Google Maps API Key."
+
 
 
 }

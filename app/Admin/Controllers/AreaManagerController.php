@@ -173,14 +173,14 @@ class AreaManagerController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
-        $form->select('country_id', trans('country'))->options(function ($value) {
-            $ops = [null => __('no country')];
-            $countries = Country::nonDefaultOrUnassigned()->orWhere('id', $value)->get();
-            foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
-            }
-            return $ops;
-        })->required();
+        // $form->select('country_id', trans('country'))->options(function ($value) {
+        //     $ops = [null => __('no country')];
+        //     $countries = Country::nonDefaultOrUnassigned()->orWhere('id', $value)->get();
+        //     foreach ($countries as $country) {
+        //         $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+        //     }
+        //     return $ops;
+        // });
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -191,7 +191,7 @@ class AreaManagerController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-area-manager', 'id', 'name')
                 ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')
-                ->rules('required');
+               ;
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -199,7 +199,7 @@ class AreaManagerController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users-area-manager', 'id', 'name')->rules('required');
+            })->ajax('/api/search/users-area-manager', 'id', 'name');
         }
 
         $this->addPhoneFields($form);
@@ -236,19 +236,16 @@ class AreaManagerController extends MainController
             $areaManager = $form->model();
             $userId = $form->model()->id;
             
-            $coordinates = request('polygon_coordinates');
             $coveredCountries = request('covered_countries');
-
-            if ($coordinates) {
-                $areaManager->polygon()->updateOrCreate(
-                    ['area_manager_id' => $userId],
-                    [
-                        'coordinates' => json_decode($coordinates, true),
-                        'covered_countries' => $coveredCountries ? json_decode($coveredCountries, true) : null
-                    ]
-                );
+            if ($coveredCountries) {
+                $countries = json_decode($coveredCountries, true);
+                $countryIds = array_column($countries, 'id'); 
+                Country::whereIn('id', $countryIds)
+                    ->update(['area_manager_id' => $userId]);
             }
         });
+
+        
 
         return $form;
     }
@@ -256,42 +253,57 @@ class AreaManagerController extends MainController
     protected function addMapField(Form $form)
     {
         $form->hidden('polygon_coordinates')->default(function ($form) {
-            if ($form->model()->polygon) {
-                return json_encode($form->model()->polygon->coordinates);
+            if ($form->model()->polygon_coordinates) {
+                return json_encode($form->model()->polygon_coordinates);
             }
             return '[]';
         });
-
+    
         $form->hidden('covered_countries')->default(function ($form) {
-            if ($form->model()->polygon && $form->model()->polygon->covered_countries) {
-                return json_encode($form->model()->polygon->covered_countries);
+            if ($form->model()->polygon_coordinates && $form->model()->covered_countries) {
+                return json_encode($form->model()->covered_countries);
             }
             return '[]';
         });
-
+    
         $form->html('<div class="form-group">
-            <label class="col-sm-2 control-label">تحديد المنطقة على الخريطة</label>
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <div id="map" style="height: 500px; width: 100%; border: 1px solid #ddd;"></div>
                 <div style="margin-top: 10px;">
-                    <button type="button" class="btn btn-primary" id="clear-polygon">مسح التحديد</button>
-                    <button type="button" class="btn btn-info" id="get-countries">عرض الدول المحددة</button>
+                    <button type="button" class="btn btn-primary" id="clear-polygon">' . __('Clear Selection') . '</button>
+                    <button type="button" class="btn btn-info" id="get-countries">' . __('Show Selected Countries') . '</button>
                 </div>
                 <div id="countries-list" style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 4px; display: none;">
-                    <h4>الدول المحددة:</h4>
+                    <h4>' . __('Selected Countries') . ':</h4>
                     <div id="countries-content"></div>
                 </div>
             </div>
         </div>');
-
+    
         Admin::script($this->mapJs());
     }
-
+    
     protected function mapJs()
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY', '');
         
+        $translations = json_encode([
+            'please_select_area' => __('Please select an area on the map first'),
+            'searching_countries' => __('Searching for countries... This may take a few seconds'),
+            'searching' => __('Searching...'),
+            'no_countries_found' => __('No countries found in the selected area. Try expanding the area.'),
+            'found' => __('Found'),
+            'country' => __('country'),
+            'arabic_name' => __('Arabic Name'),
+            'english_name' => __('English Name'),
+            'phone_code' => __('Phone Code'),
+            'error_fetching' => __('An error occurred while searching for countries. Please check your Google Maps API Key.'),
+            'show_selected_countries' => __('Show Selected Countries'),
+        ]);
+        
         return <<<JS
+        const translations = {$translations};
+        
         if (!window.google || !window.google.maps) {
             const script = document.createElement('script');
             script.src = 'https://maps.googleapis.com/maps/api/js?key={$apiKey}&libraries=drawing,geometry';
@@ -302,24 +314,24 @@ class AreaManagerController extends MainController
         } else {
             initMap();
         }
-
+    
         let map, drawingManager, currentPolygon;
         let polygonCoordinates = [];
-
+    
         function initMap() {
             if (!document.getElementById('map')) {
                 setTimeout(initMap, 100);
                 return;
             }
-
+    
             const center = { lat: 26.8206, lng: 30.8025 };
-
+    
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 6,
                 center: center,
                 mapTypeId: 'roadmap'
             });
-
+    
             drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.POLYGON,
                 drawingControl: true,
@@ -337,9 +349,9 @@ class AreaManagerController extends MainController
                     zIndex: 1
                 }
             });
-
+    
             drawingManager.setMap(map);
-
+    
             const savedCoordinates = document.querySelector('input[name="polygon_coordinates"]');
             if (savedCoordinates && savedCoordinates.value && savedCoordinates.value !== '[]') {
                 try {
@@ -352,7 +364,7 @@ class AreaManagerController extends MainController
                     console.error('Error parsing saved coordinates:', e);
                 }
             }
-
+    
             google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
                 if (currentPolygon) {
                     currentPolygon.setMap(null);
@@ -361,11 +373,11 @@ class AreaManagerController extends MainController
                 updatePolygonCoordinates();
                 
                 drawingManager.setDrawingMode(null);
-
+    
                 google.maps.event.addListener(polygon.getPath(), 'set_at', updatePolygonCoordinates);
                 google.maps.event.addListener(polygon.getPath(), 'insert_at', updatePolygonCoordinates);
             });
-
+    
             document.getElementById('clear-polygon').addEventListener('click', function() {
                 if (currentPolygon) {
                     currentPolygon.setMap(null);
@@ -377,16 +389,16 @@ class AreaManagerController extends MainController
                     drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
                 }
             });
-
+    
             document.getElementById('get-countries').addEventListener('click', getCountriesInPolygon);
         }
-
+    
         function drawSavedPolygon(coordinates) {
             const polygonPath = coordinates.map(coord => ({
                 lat: parseFloat(coord.lat),
                 lng: parseFloat(coord.lng)
             }));
-
+    
             currentPolygon = new google.maps.Polygon({
                 paths: polygonPath,
                 fillColor: '#2196F3',
@@ -397,25 +409,25 @@ class AreaManagerController extends MainController
                 editable: true,
                 zIndex: 1
             });
-
+    
             currentPolygon.setMap(map);
             
             google.maps.event.addListener(currentPolygon.getPath(), 'set_at', updatePolygonCoordinates);
             google.maps.event.addListener(currentPolygon.getPath(), 'insert_at', updatePolygonCoordinates);
-
+    
             const bounds = new google.maps.LatLngBounds();
             polygonPath.forEach(point => bounds.extend(point));
             map.fitBounds(bounds);
-
+    
             polygonCoordinates = coordinates;
         }
-
+    
         function updatePolygonCoordinates() {
             if (!currentPolygon) return;
-
+    
             const path = currentPolygon.getPath();
             polygonCoordinates = [];
-
+    
             for (let i = 0; i < path.getLength(); i++) {
                 const point = path.getAt(i);
                 polygonCoordinates.push({
@@ -423,23 +435,23 @@ class AreaManagerController extends MainController
                     lng: point.lng()
                 });
             }
-
+    
             document.querySelector('input[name="polygon_coordinates"]').value = JSON.stringify(polygonCoordinates);
         }
-
+    
         function getCountriesInPolygon() {
             if (!polygonCoordinates || polygonCoordinates.length === 0) {
-                alert('الرجاء تحديد منطقة على الخريطة أولاً');
+                alert(translations.please_select_area);
                 return;
             }
-
-            document.getElementById('countries-content').innerHTML = '<p><i class="fa fa-spinner fa-spin"></i> جاري البحث عن الدول... قد يستغرق هذا بضع ثوانٍ</p>';
+    
+            document.getElementById('countries-content').innerHTML = '<p><i class="fa fa-spinner fa-spin"></i> ' + translations.searching_countries + '</p>';
             document.getElementById('countries-list').style.display = 'block';
             
             const btn = document.getElementById('get-countries');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> جاري البحث...';
-
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + translations.searching;
+    
             fetch('/api/countries-in-polygon', {
                 method: 'POST',
                 headers: {
@@ -453,10 +465,10 @@ class AreaManagerController extends MainController
                 const countries = data.countries;
                 
                 if (countries.length === 0) {
-                    document.getElementById('countries-content').innerHTML = '<div class="alert alert-warning">لا توجد دول في المنطقة المحددة. جرب توسيع المنطقة.</div>';
+                    document.getElementById('countries-content').innerHTML = '<div class="alert alert-warning">' + translations.no_countries_found + '</div>';
                 } else {
-                    let html = '<div class="alert alert-success">تم العثور على ' + countries.length + ' دولة</div>';
-                    html += '<table class="table table-bordered table-striped"><thead><tr><th>الاسم بالعربي</th><th>الاسم بالإنجليزي</th><th>ISO2</th><th>ISO3</th><th>رمز الهاتف</th></tr></thead><tbody>';
+                    let html = '<div class="alert alert-success">' + translations.found + ' ' + countries.length + ' ' + translations.country + '</div>';
+                    html += '<table class="table table-bordered table-striped"><thead><tr><th>' + translations.arabic_name + '</th><th>' + translations.english_name + '</th><th>ISO2</th><th>ISO3</th><th>' + translations.phone_code + '</th></tr></thead><tbody>';
                     
                     countries.forEach(country => {
                         html += '<tr>';
@@ -476,14 +488,14 @@ class AreaManagerController extends MainController
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('countries-content').innerHTML = '<div class="alert alert-danger">حدث خطأ أثناء البحث عن الدول. تأكد من صحة Google Maps API Key.</div>';
+                document.getElementById('countries-content').innerHTML = '<div class="alert alert-danger">' + translations.error_fetching + '</div>';
             })
             .finally(() => {
                 btn.disabled = false;
-                btn.innerHTML = 'عرض الدول المحددة';
+                btn.innerHTML = translations.show_selected_countries;
             });
         }
-
+    
         $(document).on('pjax:complete', function() {
             setTimeout(initMap, 100);
         });
