@@ -143,15 +143,6 @@ class CodapayService
 
     public function success($trx, $country, Request $request): JsonResponse
     {
-        Log::info('✅ Codapay Success Request Received', [
-            'trx' => $trx,
-            'country' => $country,
-            'query' => $request->query(),
-            'input' => $request->all(),
-            'full_url' => $request->fullUrl(),
-            'headers' => $request->headers->all(),
-        ]);
-
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('paypal')->firstOrFail();
 
         if (!$trx) {
@@ -169,6 +160,10 @@ class CodapayService
             ],
         ];
 
+        info($trx);
+        info($country);
+        info($this->apiKey);
+        info($this->projectId);
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->post($url, $body);
