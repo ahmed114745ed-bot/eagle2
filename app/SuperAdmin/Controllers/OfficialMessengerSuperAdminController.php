@@ -9,18 +9,21 @@ use Encore\Admin\Show;
 use Illuminate\Support\Str;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
+use App\Models\OfficialMessage;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Models\AdminNotification;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
+use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
 use App\Selectables\ShippingAgencies;
 use App\Models\SuperAdminNotification;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Admin\Controllers\OfficialMessageController;
 
-class OfficialMessengerSuperAdminController extends OfficialMessageController
+class OfficialMessengerSuperAdminController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'official-messages';
@@ -29,23 +32,109 @@ class OfficialMessengerSuperAdminController extends OfficialMessageController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Official messages'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('official-messages'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     protected function grid()
     {
-        $grid = parent::grid();
+
+
+        $grid = new Grid(new OfficialMessage);
+        $countryID = session('country_id');
         $grid->model()->where('admin_id', Auth::id())->where('type', 2)->orderByDesc('id');
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
+        });
+        $grid->id(__('ID'));
+        $grid->column('user.name', trans('user id'))->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
+        $grid->title(trans('title'));
+
+
+        $grid->content(__('content'));
+        $grid->feature(__('type'));
+        $grid->column('img', trans('img'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img);
+            if (!isImageExists(@$path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
+                    <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
+
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
+
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
+        $grid->column('url', trans('url'))
+            ->display(function ($value) {
+                return "<span style='color: #89CFF0;'>$value</span>";
+            });
+        $grid->created_at(trans('admin.created_at'));
+        $grid->disableExport();
+
+        $this->extendGrid($grid);
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
 
         return $grid;
     }
@@ -53,7 +142,18 @@ class OfficialMessengerSuperAdminController extends OfficialMessageController
 
     protected function form()
     {
-        $form = parent::form();
+        $form = new Form(new OfficialMessageAdmin);
+        $this->disableFormTools($form);
+        $form->display('ID');
+        $form->text('title', __('title'))->rules('required|max:255');
+        $form->textarea('content', __('content'))->rules('required');
+        $form->image('img', __('img'));
+        $form->text('url', __('url'));
+        $form->select('language', __('language'))
+            ->options('/api/search/language')
+            ->ajax('/api/search/language', 'code', 'name')->rules('required');
+
+        $form->hidden('type', __('type'))->default(2);
         $this->selectFeature($form);
         $form->hidden('admin_id', __('type'))->default(Auth::user()->id);
 
