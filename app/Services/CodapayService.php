@@ -145,7 +145,6 @@ class CodapayService
     {
         Log::info('✅ Codapay Success Request Received', [
             'trx' => $trx,
-            'country' => $country,
             'query' => $request->query(),
             'input' => $request->all(),
             'full_url' => $request->fullUrl(),
