@@ -165,6 +165,7 @@ class NotificationController extends Controller
 
         $grid->disableCreateButton();
         $grid->disableRowSelector();
+        $grid->disableActions();
 
         return $grid;
     }
