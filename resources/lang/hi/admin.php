@@ -402,6 +402,7 @@ return [
     'mada'          => 'मडा',
     'liqpay'        => 'लिकपे',
     'paypal'        => 'पेपल',
+    'codapay'        => 'CodaPay',
     'paytm'         => 'पेटीएम',
     'paytabs'       => 'पेयटैब्स',
     'bkash'         => 'बीकैश',

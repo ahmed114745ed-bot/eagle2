@@ -425,6 +425,7 @@ return [
     'mada'          => 'Mada',
     'liqpay'        => 'LiqPay',
     'paypal'        => 'PayPal',
+    'codapay'        => 'CodaPay',
     'paytm'         => 'Paytm',
     'paytabs'       => 'PayTabs',
     'bkash'         => 'bKash',

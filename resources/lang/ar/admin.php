@@ -436,6 +436,7 @@ return [
     'project_id'   => 'معرّف المشروع',
     'country'      => 'الدولة',
     'pay_type'     => 'نوع الدفع',
+    'codapay'        => 'كودا باي',
 
     "target_no" => 'رقم الهدف',
     "diamonds" => ' الماس',
