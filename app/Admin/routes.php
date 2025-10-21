@@ -1,6 +1,9 @@
 <?php
 
+use App\Admin\Controllers\AdminManagerSelectController;
 use App\Admin\Controllers\AdminNotification;
+use App\Admin\Controllers\AreaManagerChargeController;
+use App\Admin\Controllers\AreaManagerChargeReportController;
 use App\Admin\Controllers\AreaManagerController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerHistoryController;
@@ -476,20 +479,24 @@ Route::group(
 
         Route::resource('area-manager-users', AreaManagerController::class);
 
+        Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
+        Route::group(['prefix' => 'area-manager-charges-report'], function () {
+            Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
+        });
 
         Route::resource('usersBd', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
         Route::resource('superadmin-users', SuperAdminController::class);
-        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
+//        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+//        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+//        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
-        Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
-        Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
+//        Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
+//        Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
 
         // Route::resource('ovip', 'OVipController');
