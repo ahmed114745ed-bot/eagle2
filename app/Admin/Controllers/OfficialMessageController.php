@@ -74,11 +74,11 @@ class OfficialMessageController extends MainController
     {
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
-        
-            $grid->model()->whereNull('admin_id')
-                ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
-                ->where('type', 2)->orderByDesc('id');
-      
+
+        $grid->model()->whereNull('admin_id')
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->where('type', 2)->orderByDesc('id');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -158,7 +158,7 @@ class OfficialMessageController extends MainController
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
 
-         $this->extendGrid($grid);
+        $this->extendGrid($grid);
         $grid->actions(function ($actions) {
             $actions->disableEdit();
         });
@@ -221,9 +221,9 @@ class OfficialMessageController extends MainController
             ->options('/api/search/language')
             ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
-        
-            $this->selectFeature($form);
-       
+
+        $this->selectFeature($form);
+
         $form->hidden('type', __('type'))->default(2);
 
 
@@ -293,7 +293,8 @@ class OfficialMessageController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            dispatch(new OfficialMessageJob($model, request()->all(), Auth::user()))->onQueue('official-message');
+            $data = request()->except(['img']);
+            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
         });
     }
 }
