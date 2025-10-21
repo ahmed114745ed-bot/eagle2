@@ -352,7 +352,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                 allowClear: true,
                  language: {
                     noResults: function() {
-                        return "{{ __('not_in_same_country') }}";
+                        return "{{ __('Not Found') }}";
                     }
                 },
                 ajax: {
