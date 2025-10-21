@@ -209,6 +209,7 @@ return [
         App\Providers\TimeServiceProvider::class,
 
         App\SuperAdmin\SuperAdminServiceProvider::class,
+        App\AreaManager\AreaManagerServiceProvider::class,
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 

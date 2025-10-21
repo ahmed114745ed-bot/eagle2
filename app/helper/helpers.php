@@ -811,6 +811,24 @@ if (!function_exists('superadmin_url')) {
     }
 }
 
+if (!function_exists('areaManager_url')) {
+    function areaManager_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
+        }
+
+        $base = trim(config('areaManager.route.prefix', 'areaManager'), '/');
+
+        $secure = $secure ?? (config('areaManager.https') || config('areaManager.secure'));
+
+        if (app()->environment(['production', 'Production'])) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        }
+
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}
 
 
 if (!function_exists('getToday')) {

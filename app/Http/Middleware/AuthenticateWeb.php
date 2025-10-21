@@ -27,6 +27,7 @@ class AuthenticateWeb
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
         $superadminLogin = 'superadmin/login';
+        $areaManagerLogin = 'areaManager/login';
 
         if ($user) {
             if (Str::is($uri, $adminLogin) && $userType === 'admin') {
@@ -38,10 +39,14 @@ class AuthenticateWeb
             if (Str::is($uri, $superadminLogin) && $userType === 'superadmin') {
                 return redirect('/superadmin');
             }
+            if (Str::is($uri, $areaManagerLogin) && $userType === 'area-manager') {
+                return redirect('/areaManager');
+            }
 
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
                 (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
+                (Str::startsWith($uri, 'areaManager') && $userType !== 'area-manager') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
                 Admin::guard()->logout();
@@ -52,6 +57,8 @@ class AuthenticateWeb
                     return redirect('/bd/login')->withErrors(['error' => 'Please login through BD portal.']);
                 } elseif ($userType === 'superadmin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
+                } elseif ($userType === 'area-manager') {
+                    return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
                 } else {
                     return redirect('/admin/login')->withErrors(['error' => 'Please login through Admin portal.']);
                 }
@@ -66,6 +73,9 @@ class AuthenticateWeb
         }
         if (Str::contains($uri, 'superadmin')) {
             $redirectTo = '/superadmin/login';
+        }
+        if (Str::contains($uri, 'areaManager')) {
+            $redirectTo = '/areaManager/login';
         }
 
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {

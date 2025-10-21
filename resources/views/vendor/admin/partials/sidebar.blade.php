@@ -163,6 +163,53 @@
                             </li>
                         @endif
                     @endforeach
+                @endif
+
+
+{{--                area manager--}}
+                    @if (Admin::user()->type == 'area-manager')
+                        @php
+                            $areaManagerLinks = [
+                                ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
+                                [
+                                    'uri' => '#',
+                                    'icon' => 'fa-users',
+                                    'title' => __('Super Admin'),
+                                    'children' => [
+                                        ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
+                                    ],
+                                ],
+                            ];
+                        @endphp
+
+                        @foreach($areaManagerLinks as $link)
+                            @if(isset($link['children']))
+                                <li class="treeview">
+                                    <a href="#">
+                                        <i class="fa {{ $link['icon'] }}"></i>
+                                        <span>{{ $link['title'] }}</span>
+                                        <i class="fa fa-angle-left pull-right"></i>
+                                    </a>
+                                    <ul class="treeview-menu">
+                                        @foreach($link['children'] as $child)
+                                            <li>
+                                                <a href="{{ areaManager_url($child['uri']) }}">
+                                                    <i class="fa {{ $child['icon'] }}"></i>
+                                                    <span>{{ $child['title'] }}</span>
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </li>
+                            @else
+                                <li>
+                                    <a href="{{ areaManager_url($link['uri']) }}">
+                                        <i class="fa {{ $link['icon'] }}"></i>
+                                        <span>{{ $link['title'] }}</span>
+                                    </a>
+                                </li>
+                            @endif
+                        @endforeach
 
 {{--                @foreach($superadminLinks as $link)--}}
 {{--                        <li>--}}

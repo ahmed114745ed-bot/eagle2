@@ -33,6 +33,11 @@ class SuperAdmin extends Model
     {
         return $this->belongsTo(Country::class);
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(AreaManager::class, 'parent_id');
+    }
 //
 //    public function transactions()
 //    {
