@@ -38,12 +38,12 @@ class OfficialMessageAdmin extends Model
             }
             $model->feature_ids  = $featureIdsText;
 
-            $file = request('img', $model->img);
+            // $file = request('img', $model->img);
 
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'official_message', $file);
-                }
-                $model->img = $url ?? '';
+            //     if ($file instanceof UploadedFile) {
+            //         $url = Common::upload(DIRECTORY_SEPARATOR . 'official_message', $file);
+            //     }
+            //     $model->img = $url ?? '';
 
             
         });

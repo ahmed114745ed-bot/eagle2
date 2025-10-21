@@ -215,7 +215,8 @@ class OfficialMessengerSuperAdminController extends MainController
 
         $form->saved(function (Form $form) {
             $model = $form->model();
-            dispatch(new OfficialMessageJob($model, request()->all(), Auth::user()))->onQueue('official-message');
+            $data = request()->except(['img']);
+            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
         });
     }
 }
