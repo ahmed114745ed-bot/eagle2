@@ -232,7 +232,7 @@ Route::get('delete-account', function () {
 });
 
 Route::get('/', function () {
-    return response()->json();
+    return view('welcome');
 });
 
 Route::group(
