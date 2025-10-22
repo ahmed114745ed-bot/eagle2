@@ -22,6 +22,7 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
 use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
+use Illuminate\Support\Facades\Log;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -534,7 +535,7 @@ class ChargeRepoService
             throw new Exception(__('balance not enough'));
         }
 
-   
+        Log::info('authAgency',[$authAgency,$chargeAgency]);
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
