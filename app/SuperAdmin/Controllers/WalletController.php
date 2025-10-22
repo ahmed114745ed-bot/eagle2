@@ -3,7 +3,11 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Enums\Charges\UserTypeEnum;
+use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
+use App\Helpers\UserCoinLogHelper;
+use App\Models\Setting;
+use App\Models\SubAdmin;
 use App\Models\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -19,6 +23,10 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Validation\ValidationException;
+use App\Models\ChargeInvoice;
+
+    
 
 class WalletController extends MainController
 {
@@ -48,7 +56,7 @@ class WalletController extends MainController
 
             ->row(function ($row) use ($finalvalue) {
                 // الكارت سيتم تضمينه من Blade View
-                $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalvalue]));
+                $row->column(12, view('admin.grid.superadmin.wallet', ['finalSalary' => $finalvalue]));
             })
 
             ->row(function ($row) {
@@ -291,7 +299,7 @@ class WalletController extends MainController
             ]);
 
             $types = [
-//                'user' => [$this, 'chargeToUser'],
+               'user' => [$this, 'chargeToSubAdmin'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 
@@ -369,6 +377,14 @@ class WalletController extends MainController
     {
         $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
+        $adminType = null ;
+        if (auth('admin')->user()->type === 'sub_super_admin') {
+            $adminType = UserTypeEnum::SUB_ADMIN ;
+        }
+
+        if (auth('admin')->user()->type === 'superadmin') {
+            $adminType = UserTypeEnum::SUPER_ADMIN ;
+        }
 
         WalletService::storeTransaction(
             $fromUser->id,
@@ -383,7 +399,7 @@ class WalletController extends MainController
 
         $data = [
             'charger_id' => $fromUser->id,
-            'charger_type' => UserTypeEnum::SUPER_ADMIN,
+            'charger_type' => $adminType,
             'user_id' => $toAgency->id,
             'agency_id' => null,
             'user_type' => 'agency',
@@ -391,7 +407,7 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => UserTypeEnum::SUPER_ADMIN
+            'user_charger_type' => $adminType
 
         ];
 
@@ -399,4 +415,70 @@ class WalletController extends MainController
 
         return true;
     }
+
+
+
+
+    public function chargeToSubAdmin(array $data)
+    {
+        $user = Auth::user();
+        $usd = $data['amount'] ?? 0;
+        $toId = $data['target_id'] ?? null;
+    
+        if (!$usd || !$toId) {
+            throw new \Exception(__('Invalid request data.'));
+        }
+    
+        $subAdmin = SubAdmin::where('parent_id', $user->id)->find($toId);
+    
+        if (!$subAdmin) {
+            throw new \Exception(__('This sub admin not found under your account.'));
+        }
+    
+        $userCoins = \Cache::rememberForever('super_admin_coins', function () {
+            return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
+        });
+    
+        $coins = $usd * $userCoins;
+    
+        if ($user->di < $coins) {
+            throw new \Exception(__('Insufficient balance.'));
+        }
+    
+        $subAdmin->di += $coins;
+        $subAdmin->save();
+
+        $user->di -= $coins;
+        $user->save();
+
+        $this->createChargeRecord($data, $subAdmin, $coins, $usd);
+        
+    
+        return true;
+    }
+    
+
+  
+
+    private function createChargeRecord( $request, SubAdmin $subAdmin, $coins = 0, $usdAmount )
+    {
+
+        $charge = new Charge();
+        $charge->charger_id = Auth::id();
+        $charge->charger_type =  UserTypeEnum::SUPER_ADMIN;
+        $charge->user_id = $subAdmin->id;
+        $charge->agency_id =   null;
+        $charge->user_type = UserTypeEnum::SUB_ADMIN;
+        $charge->amount = $coins;
+        $charge->usd = $usdAmount ;
+        $charge->balance_before =  $subAdmin->di  - $coins;
+        $charge->save();
+
+
+
+
+        return  true;
+    }
+
+
 }

@@ -175,11 +175,12 @@ class EncorUsersController extends AdminController
 
         $grid->model()->where(function ($q) {
             $q->where('type', PermissionType::SUB_SUPER_ADMIN->value);
-        })
+           })
             ->where('is_preview', 0)
+            ->where('parent_id', auth('admin')->id())
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
-            });
+        });
 
         $grid->column('id', 'ID')->sortable();
         $grid->column('username', trans('admin.username'));
@@ -277,6 +278,7 @@ class EncorUsersController extends AdminController
                 $tools->disableDelete();
             });
         }
+        $form->hidden('parent_id')->default(auth('admin')->id());
 
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');

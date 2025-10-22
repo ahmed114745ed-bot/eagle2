@@ -3,6 +3,7 @@
 namespace App\SuperAdmin\Controllers;
 
 use App\Enums\Charges\UserTypeEnum;
+use App\Enums\PermissionType;
 use App\Helpers\Common;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -15,6 +16,8 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ChargeController extends MainController
 {
@@ -68,10 +71,16 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new Charge());
 
-        $grid->model()->where('charger_type', UserTypeEnum::SUPER_ADMIN)
-            ->with('receiverUser', 'receiveragency')
-            ->where('charger_id', Auth::user()->id)
-            ->orderBy('id', 'desc');
+        $grid->model()
+                ->when(auth('admin')->user()->type === 'superadmin', function ($query) {
+                    $query->where('charger_type', UserTypeEnum::SUPER_ADMIN);
+                })
+                ->when(auth('admin')->user()->type === 'sub_super_admin', function ($query) {
+                    $query->where('charger_type', UserTypeEnum::SUB_ADMIN);
+                })
+                ->with('receiverSubAdmin', 'receiveragency')
+                ->where('charger_id', Auth::user()->id)
+                ->orderBy('id', 'desc');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -225,5 +234,35 @@ class ChargeController extends MainController
         $form->number('agency_id', __('Agency id'));
 
         return $form;
+    }
+
+
+    public function getSubAdmins(Request $request){
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $perPage = 10;
+        $offset = ($page - 1) * $perPage;
+        
+        $query = DB::table('admin_users')
+            ->where('type', PermissionType::SUB_SUPER_ADMIN->value)
+            ->where('is_preview', 0)
+            ->where('parent_id', auth('admin')->id());
+         
+            
+        if ($key) {
+                $query->where(function ($q) use ($key) {
+                    $q->where('name', 'like', "%{$key}%")
+                    ->orWhere('username', 'like', "%{$key}%")
+                    ->orWhere('id', $key);
+                });
+            }
+            
+            $total = $query->count();
+            
+            $users = $query->select('id', 'name', 'username')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+            
+            return response()->json([$users]);
     }
 }

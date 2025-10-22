@@ -4205,6 +4205,7 @@
 "banner_rejected_title": "تم رفض طلب البانر",
 "banner_rejected_message": "قام المشرف :name (رقم المعرف: :id) برفض طلب البانر.",
   "Banner approved successfully": "تمت الموافقة على البانر بنجاح",
-  "Banner rejected successfully": "تم رفض البانر بنجاح"
+  "Banner rejected successfully": "تم رفض البانر بنجاح",
+  "sub admin":"المشرف الفرعي"
 
 }
