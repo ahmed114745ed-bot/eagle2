@@ -798,7 +798,7 @@ class PermissionTypeSeeder extends Seeder
                 'sort' => 29,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 29],
-                    PermissionType::SUPER_ADMIN->value => ['sort' => 4],
+                    PermissionType::SUPER_ADMIN->value => ['sort' => 9],
                 ],
                 'permissions' => [
                     ['key' => 'auth-users', 'except' => [], 'additional' => [], 'types' => [

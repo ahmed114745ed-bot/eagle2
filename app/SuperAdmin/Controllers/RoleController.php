@@ -40,9 +40,6 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
-        if (!Admin::user()->can('*')) {
-           chPermission::check('update-' . $this->permission_name);
-        }
         return  parent::edit($id,$content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))

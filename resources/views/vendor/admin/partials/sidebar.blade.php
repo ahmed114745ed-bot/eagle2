@@ -105,9 +105,18 @@
                 @if ((Admin::user()->type == 'superadmin') || Admin::user()->type =='sub_super_admin')
                 @php
                     $superadminLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => null],
+                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
                         ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
-                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
+                       
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-building',
+                            'title' => __('charge system'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
+                            ],
+                        ],
                         [
                             'uri' => '#',
                             'icon' => 'fa-briefcase',
