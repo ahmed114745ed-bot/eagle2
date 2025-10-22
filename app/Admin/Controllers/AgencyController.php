@@ -980,7 +980,7 @@ class AgencyController extends MainController
             $appOwnerId = $form->input('app_owner_id');
 
             if (!$form->bd_id && !$form->model()->bd_id ){
-                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
+                $defaultBd = Bd::where('default', 1)->where('country_id', 0)->first();
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
@@ -988,6 +988,9 @@ class AgencyController extends MainController
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
+            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            $form->country_id = $bd->country_id;
+
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
@@ -1363,7 +1366,7 @@ class AgencyController extends MainController
         $user->agency_id = 0;
         $user->type_user = 0;
         $user->save();
-        
+
         MilestoneHelper::removeReward($user, 'host');
 
 

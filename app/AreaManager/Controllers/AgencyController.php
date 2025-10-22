@@ -3,9 +3,10 @@
 namespace App\AreaManager\Controllers;
 
 use App\Admin\Actions\ChangeUsersAgencyAction;
+use App\AreaManager\Actions\DeleteAgencyAction;
 use App\Models\Bd;
 use App\Models\Charge;
-use App\SuperAdmin\Actions\DeleteAgencyAction;
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -89,17 +90,17 @@ class AgencyController extends MainController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab', 'members');
-        $user = Auth::user();
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $agency = Agency::query()
-            ->where('country_id', $user->country_id)
+            ->whereIn('country_id', $countries)
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
             ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
             ->find($id);
 
         if (!$agency) {
             $agency = ShippingAgency::query()
-                ->where('country_id', $user->country_id)
+                ->whereIn('country_id', $countries)
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
                 ->find($id);
@@ -328,6 +329,7 @@ class AgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency);
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
@@ -341,7 +343,7 @@ class AgencyController extends MainController
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('country_id', Auth::user()->country_id)
+            ->whereIn('country_id', $countries)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -379,7 +381,7 @@ class AgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                $profileUrl = route('superadmin.agency.profile', ['id' => $this->id]);
+                $profileUrl = route('areaManager.agency.profile', ['id' => $this->id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -405,7 +407,7 @@ class AgencyController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? superadmin_url("users/profile/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? areaManager_url("users/profile/{$this->owner->id}") : 0;
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -663,7 +665,7 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             if (!$form->bd_id && !$form->model()->bd_id ){
 
-                $defaultBd = Bd::where('country_id',Auth::user()->country_id)->where('default', 1)->first();
+                $defaultBd = Bd::where('default', 1)->where('country_id', 0)->first();
 
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
@@ -671,7 +673,9 @@ class AgencyController extends MainController
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
-            $form->country_id = Auth::user()->country_id;
+            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            $form->country_id = $bd->country_id;
+
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;

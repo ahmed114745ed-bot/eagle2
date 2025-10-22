@@ -101,10 +101,12 @@ class AgencyUserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+
         $grid->model()->ofAgency()
             ->with(['profile', 'packs'])
             ->where('is_host', 1)
-            ->where('country_id', auth()->user()->country_id)
+            ->whereIn('country_id', $countries)
             ->withCount('sameDeviceUsers');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
@@ -246,6 +248,11 @@ class AgencyUserController extends MainController
         ");
 
         $grid->disableCreateButton();
+        $grid->actions(
+            function ($actions) {
+                $actions->disableEdit();
+            }
+        );
 
         return $grid;
     }
@@ -260,16 +267,17 @@ class AgencyUserController extends MainController
             ->where('is_host', 1)
             ->withCount('sameDeviceUsers')
             ->where(function ($query) {
-                $currentCountry = auth()->user()->country_id;
-                $query->where(function ($q) use ($currentCountry) {
-                    $q->where('country_id', $currentCountry)
-                        ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', '!=', $currentCountry);
+                $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+
+                $query->where(function ($q) use ($countries) {
+                    $q->whereIn('country_id', $countries)
+                        ->whereHas('agency', function ($a) use ($countries) {
+                            $a->whereIn('country_id', '!=', $countries);
                         });
-                })->orWhere(function ($q) use ($currentCountry) {
-                    $q->where('country_id', '!=', $currentCountry)
-                        ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', $currentCountry);
+                })->orWhere(function ($q) use ($countries) {
+                    $q->whereIn('country_id', '!=', $countries)
+                        ->whereHas('agency', function ($a) use ($countries) {
+                            $a->whereIn('country_id', $countries);
                         });
                 });
             });
@@ -421,6 +429,11 @@ class AgencyUserController extends MainController
         $grid->disableActions();
 
         $grid->disableCreateButton();
+        $grid->actions(
+            function ($actions) {
+                $actions->disableEdit();
+            }
+        );
 
         return $grid;
     }
@@ -490,8 +503,14 @@ class AgencyUserController extends MainController
         $form->switch('transfer_salary', __("transfer_salary"))->states($state);
         $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
         $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
-        $form->hidden('country_id')->default(auth()->user()->country_id);
-
+        $form->select('country_id', trans('country'))->options(function () {
+            $ops       = [null => __('no country')];
+            $countries = Country::all();
+            foreach ($countries as $country) {
+                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            }
+            return $ops;
+        });
         $states = [
             'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
             'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],

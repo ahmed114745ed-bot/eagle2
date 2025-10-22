@@ -1,6 +1,6 @@
 <?php
 
-namespace App\SuperAdmin\Actions;
+namespace App\AreaManager\Actions;
 
 use App\Models\User;
 use App\Models\Admin;

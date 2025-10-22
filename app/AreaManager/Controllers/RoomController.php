@@ -2,6 +2,7 @@
 
 namespace App\AreaManager\Controllers;
 
+use App\Models\Country;
 use Log;
 use App\Models\Pk;
 use App\Models\Room;
@@ -322,7 +323,8 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $authCountryId = Admin::user()->country_id;
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+
         $grid->model()
             ->audio()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("
@@ -342,8 +344,8 @@ class RoomController extends MainController
                     'profile:id,user_id,avatar'
                 ])->select(['id', 'uuid', 'special_id', 'name']),
 
-            ])->whereHas('owner.country', function ($q) use ($authCountryId) {
-                $q->where('id',  $authCountryId);
+            ])->whereHas('owner.country', function ($q) use ($countries) {
+                $q->whereIn('id',  $countries);
             })
             ->withCount('roomVisitors');
 

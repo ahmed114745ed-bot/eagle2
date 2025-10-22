@@ -246,6 +246,11 @@ class AgencyUserController extends MainController
         ");
 
         $grid->disableCreateButton();
+        $grid->actions(
+            function ($actions) {
+                $actions->disableEdit();
+            }
+        );
 
         return $grid;
     }
@@ -421,6 +426,11 @@ class AgencyUserController extends MainController
         $grid->disableActions();
 
         $grid->disableCreateButton();
+        $grid->actions(
+            function ($actions) {
+                $actions->disableEdit();
+            }
+        );
 
         return $grid;
     }

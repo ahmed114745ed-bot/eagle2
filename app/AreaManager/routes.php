@@ -83,21 +83,21 @@ Route::group(
 //        // Route::resource('/wallet', 'WalletController');
 //        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 //        Route::post('/locale', MultiLanguageController::class . '@locale');
-//
-//        Route::resource('usersBd', BdController::class);
-//
+
+        Route::resource('usersBd', BdController::class);
+
 //        //agencies
-//        Route::resource('/agencies', AgencyController::class);
+        Route::resource('/agencies', AgencyController::class);
 //        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
 //        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
-//        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
 //        Route::resource('/request-agencies', RequestAgencyController::class);
-//        Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
-//            Route::resource('users', AgencyUserController::class);
+        Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
+            Route::resource('users', AgencyUserController::class);
 //            Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
-//        });
-//        Route::resource('live-rooms', LiveRoomController::class);
-//
+        });
+        Route::resource('live-rooms', LiveRoomController::class);
+
 //        //users
        Route::resource('users', 'UserController', [
            'names' => [
@@ -106,7 +106,7 @@ Route::group(
            ]
        ]);
 //
-//        Route::resource('rooms', RoomController::class);
+        Route::resource('rooms', RoomController::class);
 //        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
 //
 //        Route::resource('home-carousel', HomeCarouselController::class);
@@ -117,14 +117,13 @@ Route::group(
 //        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
 //        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 //
-//        Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
+        Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
 //        Route::resource('professional-bd', ProfessionalBdController::class);
 //
 //        // ajax
-//        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
-//        Route::get('users-online-stats', [HomeController::class, 'onlineStats'])
-//            ->name('users.online.stats');
-//        Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
+        Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
+        Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
 //        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
 //        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
 //        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
