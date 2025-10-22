@@ -3,6 +3,7 @@
 namespace App\AreaManager\Controllers;
 
 use App\Models\Bd;
+use App\Models\Country;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
@@ -32,21 +33,22 @@ class HomeController extends Controller
     public function index(Content $content)
     {
         $countryID = Auth::user()->country_id;
-        $usersCount = User::where('country_id', $countryID)->count();
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $usersCount = User::whereIn('country_id', $countries)->count();
 
         //users
-        $newSignUpsToday = User::whereDate('created_at', today())->where('country_id', $countryID)->count();
+        $newSignUpsToday = User::whereDate('created_at', today())->whereIn('country_id', $countries)->count();
         $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->where('country_id', $countryID)->count();
         $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where('country_id', $countryID)->count();
-        $onlineUser = User::where('country_id', $countryID)->where('online', 1)->count();
+        $onlineUser = User::whereIn('country_id', $countries)->where('online', 1)->count();
         $topUsersByFollowers = User::withCount('followers')
             ->with('packs', 'profile')
             ->where('country_id', $countryID)
             ->orderByDesc('followers_count')
             ->take(10)
             ->get();
-        $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-                $q->where('country_id', $countryID);
+        $peakHours = LiveTime::whereHas('user', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);
             })
             ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
             ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
@@ -228,9 +230,9 @@ class HomeController extends Controller
                 SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
                 SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
             ", [
-            UserTypeEnum::SUPER_ADMIN,
+            UserTypeEnum::AREA_MANAGER,
             Auth::user()->id,
-            UserTypeEnum::SUPER_ADMIN,
+            UserTypeEnum::AREA_MANAGER,
             Auth::user()->id
         ])
             ->first();
@@ -254,25 +256,25 @@ class HomeController extends Controller
 
             ->row(function (Row $row) use ($totalCharges,$totalSpent,$agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $roomCounts, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse,$topUsersByFollowers,$totalBDSalary, $totalBDCut,$averageAgenciesPerBD,$game) {
                 $row->column(4, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
-//                $row->column(4, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
-//                $row->column(4, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
-//                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $topUsersByFollowers) {
-//                    $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
-//
-//                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
-//                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
-//                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users?online=1', $onlineUser));
-//                        if ($peakHours) {
-//                            $time = Carbon::createFromTime($peakHours->hour);
-//                            $time->locale(app()->getLocale());
-//                            $peakHour = $time->isoFormat('h A');
-//                            $peakHourCount = $peakHours->total_sessions;
-//                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
-//                        } else {
-//                            $value = 0;
-//                        }
-//                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'superadmin/users', $value));
-//                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users?signups=today', $newSignUpsToday));
+                $row->column(4, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
+                $row->column(4, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
+                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $topUsersByFollowers) {
+                    $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
+
+                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
+                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users?online=1', $onlineUser));
+                        if ($peakHours) {
+                            $time = Carbon::createFromTime($peakHours->hour);
+                            $time->locale(app()->getLocale());
+                            $peakHour = $time->isoFormat('h A');
+                            $peakHourCount = $peakHours->total_sessions;
+                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
+                        } else {
+                            $value = 0;
+                        }
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'superadmin/users', $value));
+                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users?signups=today', $newSignUpsToday));
 //                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users?signups=week', $newSignUpsThisWeek));
 //                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users?signups=month', $newSignUpsThisMonth));
 //                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', 'superadmin/users?messages=today', $messagesToday));
@@ -637,8 +639,8 @@ class HomeController extends Controller
 ////                        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red',"", number_format($game->total_loss ?? 0, 2)));
 ////                        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange',"", number_format($game->total_win ?? 0, 2)));
 ////                        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green',"", number_format($game->app_profit ?? 0, 2)));
-//                    });
-//                });
+                    });
+                });
             });
     }
 
