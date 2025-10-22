@@ -77,7 +77,6 @@ class Bd extends Model
     
         // عند الحذف
         self::deleting(function (Bd $bd) {
-            // نجيب الافتراضي الآخر لنفس السوبر ادمن
             $defaultBd = self::where('default', 1)
                 ->where('parent_id', $bd->parent_id)
                 ->where('id', '!=', $bd->id)
@@ -87,7 +86,7 @@ class Bd extends Model
                 // ننقل الوكالات لل BD الافتراضي
                 Agency::where('bd_id', $bd->id)
                     ->update(['bd_id' => $defaultBd->id]);
-            } else {
+            } elseif (count($bd->agencies) > 0) {
                 throw new Exception('لا يوجد BD افتراضي آخر لنقل الوكالات إليه.');
             }
     
