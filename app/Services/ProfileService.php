@@ -45,7 +45,7 @@ class ProfileService
         if ($request->uuid) {
             $data['firebase_uuid'] = $request->uuid;
         }
-
+        Log::info($data);
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
         $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country']);
