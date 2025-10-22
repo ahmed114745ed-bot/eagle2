@@ -47,6 +47,13 @@ class UserPackHelper
             ->first();
     }
 
+    public static function getGif(User $user)
+    {
+        return self::getPacks($user)
+            ->where('type', 22)
+            ->first();
+    }
+
     public static function getIntroImage(User $user) : string
     {
         return self::getPacks($user)
