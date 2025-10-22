@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class UserPackHelper
 {
@@ -49,6 +50,9 @@ class UserPackHelper
 
     public static function getGif(User $user)
     {
+        Log::info('gif',self::getPacks($user)
+            ->where('type', 22)
+            ->first());
         return self::getPacks($user)
             ->where('type', 22)
             ->first();
