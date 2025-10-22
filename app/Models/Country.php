@@ -51,7 +51,7 @@ class Country extends Model
 
     public function superAdmin()
     {
-        return $this->hasMany( SuperAdmin::class,'country_id');
+        return $this->hasMany(SuperAdmin::class,'country_id');
     }
     public function areaManager()
     {
@@ -63,7 +63,7 @@ class Country extends Model
         return $query->where(function($q) {
             $q->whereNull('area_manager_id')
               ->orWhereHas('areaManager', function($q2) {
-                 $q2->where('default', 0); 
+                 $q2->where('default', 0);
               });
         });
     }
