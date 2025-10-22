@@ -99,12 +99,12 @@ Route::group(
 //        Route::resource('live-rooms', LiveRoomController::class);
 //
 //        //users
-//        Route::resource('users', 'UserController', [
-//            'names' => [
-//                'index' => 'users',
-//                'show' => 'users.show'
-//            ]
-//        ]);
+       Route::resource('users', 'UserController', [
+           'names' => [
+               'index' => 'users',
+               'show' => 'users.show'
+           ]
+       ]);
 //
 //        Route::resource('rooms', RoomController::class);
 //        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');

@@ -16,7 +16,7 @@ class AreaManager extends Authenticatable
         'type' => 'area-manager',
     ];
 
- 
+
     protected static function booted(): void
     {
         self::addGlobalScope('AreaManagerOnly', function (Builder $builder) {
@@ -32,5 +32,10 @@ class AreaManager extends Authenticatable
     public function polygon()
     {
         return $this->hasOne(AreaPolygon::class, 'area_manager_id');
+    }
+
+    public function countries()
+    {
+        return $this->hasMany(Country::class, 'area_manager_id');
     }
 }
