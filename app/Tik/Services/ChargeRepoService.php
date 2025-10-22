@@ -533,6 +533,8 @@ class ChargeRepoService
      */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
+        Log::info('balance before', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
+
         $authAgencyUpdated = ShippingAgency::query()
             ->where('id', $authAgency->id)
             ->where('coins', '>=', $amount)
@@ -557,7 +559,7 @@ class ChargeRepoService
             chargeType: 'agency',
             agencyId: null,
         );
-        Log::info('balance', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
+        Log::info('balance after', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
     }
 
     /**
