@@ -168,22 +168,63 @@ class AuthController extends BaseAuthController
     }
 
 
+    // public function postLogin(Request $request)
+    // {
+    //     $url = $request->url;
+
+    //     $this->loginValidator($request->all())->validate();
+    //     $admin = DB::table('admin_users')
+    //         ->where('username', request('username'))
+    //         ->where('type', request('type'))
+    //         ->exists();
+
+    //     if ($admin) {
+    //         $credentials = $request->only([$this->username(), 'password']);
+    //         $remember = $request->get('remember', false);
+
+    //         if ($this->guard()->attempt($credentials, $remember)) {
+
+    //             return $this->sendLoginResponse($request);
+    //         }
+    //     }
+    //     return back()->withInput()->withErrors([
+    //         dd(123),
+    //         $this->username() => $this->getFailedLoginMessage(),
+    //     ]);
+    // }
+
     public function postLogin(Request $request)
     {
-        $url = $request->url;
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+            'type'     => 'required|string', // example: superadmin or sub_super_admin
+        ]);
 
-        $this->loginValidator($request->all())->validate();
+        // Fetch admin user by username and type
+        $admin = DB::table('admin_users')
+            ->where('username', $request->username)
+            ->where('type', $request->type)
+            ->first();
 
-        $credentials = $request->only([$this->username(), 'password']);
-        $remember = $request->get('remember', false);
-
-        if ($this->guard()->attempt($credentials, $remember)) {
-            return $this->sendLoginResponse($request);
+        if (!$admin) {
+            return back()->withInput()->withErrors([
+                'username' => trans('admin.username_not_found'),
+            ]);
         }
 
-        return back()->withInput()->withErrors([
-            $this->username() => $this->getFailedLoginMessage(),
-        ]);
+        // Check password manually
+        if (!Hash::check($request->password, $admin->password)) {
+            return back()->withInput()->withErrors([
+                'password' => trans('admin.password_incorrect'),
+            ]);
+        }
+
+        // Login manually via Auth guard
+        Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
+
+        // Successful login response
+        return $this->sendLoginResponse($request);
     }
 
     public function sendLoginResponse(Request $request)
@@ -192,23 +233,21 @@ class AuthController extends BaseAuthController
 
         $request->session()->regenerate();
 
-        $user = $this->guard()->user();
-        
+        $user = Auth::guard('admin')->user();
 
         if (!$user) {
             return back()->withInput()->withErrors([
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
-// dd($user->type);
+
         switch ($user->type) {
-            
             case 'superadmin':
                 return redirect()->route('superadmin.home');
             case 'sub_super_admin':
                 return redirect()->route('superadmin.home');
             default:
-                $this->guard()->logout();
+                Auth::guard('admin')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 return back()->withInput()->withErrors([
@@ -216,6 +255,38 @@ class AuthController extends BaseAuthController
                 ]);
         }
     }
+
+
+    // public function sendLoginResponse(Request $request)
+    // {
+    //     admin_toastr(trans('admin.login_successful'));
+
+    //     $request->session()->regenerate();
+
+    //     $user = $this->guard()->user();
+
+
+    //     if (!$user) {
+    //         return back()->withInput()->withErrors([
+    //             $this->username() => $this->getFailedLoginMessage(),
+    //         ]);
+    //     }
+    //     // dd($user->type);
+    //     switch ($user->type) {
+
+    //         case 'superadmin':
+    //             return redirect()->route('superadmin.home');
+    //         case 'sub_super_admin':
+    //             return redirect()->route('superadmin.home');
+    //         default:
+    //             $this->guard()->logout();
+    //             $request->session()->invalidate();
+    //             $request->session()->regenerateToken();
+    //             return back()->withInput()->withErrors([
+    //                 $this->username() => $this->getFailedLoginMessage(),
+    //             ]);
+    //     }
+    // }
 
     public function logout(Request $request)
     {
@@ -376,5 +447,4 @@ class AuthController extends BaseAuthController
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
     JS;
     }
-
 }

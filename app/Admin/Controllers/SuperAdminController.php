@@ -2,9 +2,9 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
+use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -13,9 +13,11 @@ use App\Models\Country;
 use App\Models\Permission;
 use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
+use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
 use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
@@ -240,9 +242,9 @@ class SuperAdminController extends MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
-//            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-//                $actions->add(new DeleteSuperAdminAction());
-//            }
+            //            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+            //                $actions->add(new DeleteSuperAdminAction());
+            //            }
         });
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
@@ -266,7 +268,21 @@ class SuperAdminController extends MainController
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
-        $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
+
+        $form->text('username', trans('admin.username'))
+            ->rules(function ($form) {
+                // Get the record ID if editing, otherwise null
+                $id = $form->model()?->id ?? null;
+
+                // Get the type from request or from existing model when editing
+                $type =  PermissionType::SUPER_ADMIN->value ?? $form->model()?->type;
+
+                // Default to empty string if not found (avoids SQL issues)
+                $type = $type ?? '';
+
+                // Build unique rule with type condition
+                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
@@ -318,6 +334,17 @@ class SuperAdminController extends MainController
                 $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
                     'message' => trans('you used this phone before'),
+                ]);
+                return back()->with(compact('error'))->withInput();
+            }
+
+            $userName = SuperAdmin::where('username', request('username'))->where('type', request('type'));
+            if ($isEditing) $userName->where('id', '!=', $form->model()->id);
+            $exists = $userName->exists();
+            if ($exists) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => trans('you used this user name before'),
                 ]);
                 return back()->with(compact('error'))->withInput();
             }
@@ -413,9 +440,9 @@ class SuperAdminController extends MainController
 
                 Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
 
-                Agency::where('country_id', $superAdmin->country_id)->where(function ($q){
+                Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
                     $q->whereDoesntHave('bd')
-                        ->orWhereHas('bd', function($q){
+                        ->orWhereHas('bd', function ($q) {
                             $q->where([
                                 'default' => 1,
                                 'country_id' => 0
