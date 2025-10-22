@@ -149,7 +149,7 @@ class MyDataResource extends JsonResource
             'vip' =>  [
                 'id'             => @$vipData->id,
                 'level'          => @$vipData->level,
-                'vip_upload_gif' => UserPackHelper::getGif($this->resource) ? true : false,
+                'vip_upload_gif' => UserPackHelper::hasPack($this->resource,22),
                 'vip_img'        => UserPackHelper::getVipIcon($this->resource),
                 'colored_name'   => UserPackHelper::getColorName($this->resource),
             ],
