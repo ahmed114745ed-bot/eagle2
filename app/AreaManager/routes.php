@@ -78,13 +78,13 @@ Route::group(
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::resource('superadmin-users', SuperAdminController::class);
 
-//        Route::resource('/salaries', BdSalariesController::class);
+        Route::resource('/bd-salaries', BdSalariesController::class);
 //        Route::resource('/charges', ChargeController::class);
 //        // Route::resource('/wallet', 'WalletController');
 //        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 //        Route::post('/locale', MultiLanguageController::class . '@locale');
 
-        Route::resource('usersBd', BdController::class);
+        Route::resource('usersBD', BdController::class);
 
 //        //agencies
         Route::resource('/agencies', AgencyController::class);

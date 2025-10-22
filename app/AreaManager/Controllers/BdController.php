@@ -298,8 +298,14 @@ class BdController extends AdminController
         $user = auth()->user();
         $form->hidden('type', __('Type'))->value('bd');
         $form->hidden('transfer_salary', __('transfer_salary'));
-        $form->hidden('parent_id', __('Super Admin'))->value($user->id);
-        $form->hidden('country_id', __('country'))->value($user->country_id);
+        $form->select('country_id', trans('country'))->options(function () {
+            $ops       = [null => __('no country')];
+            $countries = Country::where('area_manager_id', auth()->id())->get();
+            foreach ($countries as $country) {
+                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            }
+            return $ops;
+        })->required();
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
@@ -317,6 +323,13 @@ class BdController extends AdminController
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
+                }
+            }else{
+                $selectedCountryId = $form->country_id;
+                $superAdminId = SuperAdmin::where('country_id', $selectedCountryId)->first()?->id ?? SuperAdmin::where('default', 1)->where('country_id', 0)->first()?->id;
+
+                if ($superAdminId) {
+                    $form->model()->parent_id = $superAdminId;
                 }
             }
 
