@@ -216,7 +216,7 @@ class SuperAdminController extends MainController
 
         $form->select('country_id', trans('country'))->options(function ($value) {
             $ops       = [null => __('no country')];
-            $countries = Country::doesntHave('superAdmin')->orWhere('id', $value)->get();
+            $countries = Country::where('area_manager_id', auth()->id())->doesntHave('superAdmin')->orWhere('id', $value)->get();
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
