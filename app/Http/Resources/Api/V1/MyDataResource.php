@@ -126,7 +126,7 @@ class MyDataResource extends JsonResource
             'name' => @$this->name ?: 'user' . ' ' . '#' . $uuid,
             'phone' => (string)@$this->phone ?: '',
             'firebase_uuid' => (string)@$this->firebase_uuid ?: '',
-            
+
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
@@ -147,9 +147,9 @@ class MyDataResource extends JsonResource
             //ColorName
             'has_color_name'       => (bool)UserPackHelper::getColorName($this->resource),
             'vip' =>  [
-                'id'             => @$vipData->id,
-                'level'          => @$vipData->level,
-                'vip_upload_gif' => UserPackHelper::hasPack($this->resource,22),
+                'id'             => $this->UserVip->id,
+                'level'          => $this->UserVip->level,
+                'vip_upload_gif' => UserPackHelper::hasPack($this->resource, 22),
                 'vip_img'        => UserPackHelper::getVipIcon($this->resource),
                 'colored_name'   => UserPackHelper::getColorName($this->resource),
             ],
