@@ -557,6 +557,7 @@ class ChargeRepoService
             chargeType: 'agency',
             agencyId: null,
         );
+        Log::info('balance', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
     }
 
     /**
