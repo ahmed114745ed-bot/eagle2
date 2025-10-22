@@ -533,14 +533,19 @@ class ChargeRepoService
      */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
-        if ($authAgency->coins < $amount) {
-            throw new Exception(__('balance not enough'));
+        $authAgencyUpdated = ShippingAgency::query()
+            ->where('id', $authAgency->id)
+            ->where('coins', '>=', $amount)
+            ->decrement('coins', $amount);
+
+        if (!$authAgencyUpdated) {
+            throw new Exception(__('balance not enough or update failed'));
         }
 
-        Log::info('authAgency',[$authAgency,$chargeAgency]);
+        ShippingAgency::query()
+            ->where('id', $chargeAgency->id)
+            ->increment('coins', $amount);
 
-        $authAgency->decrement('coins', $amount);
-        $chargeAgency->increment('coins', $amount);
         $usdRate = $amount / Common::getCoinsValue('shipping_coins');
 
         $this->agencyCharge(
