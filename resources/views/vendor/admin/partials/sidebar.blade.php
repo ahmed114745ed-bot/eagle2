@@ -102,7 +102,7 @@
                 @endforeach
                 @endif
 
-                @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+                {{-- @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
@@ -173,65 +173,136 @@
                         ],
                     ];
 
-            //         function hasPermission($permission) {
-            //             if (Admin::user()->can('*')) {
-            //                 return true; 
-            //             }
+                    function hasPermission($permission) {
+                        if (Admin::user()->can('*')) {
+                            return true; 
+                        }
                         
-            //             if (is_null($permission)) {
-            //                 return true; 
-            //             }
+                        if (is_null($permission)) {
+                            return true; 
+                        }
                         
-            //             return Admin::user()->can('browse-' . $permission);
-            //         }
+                        return Admin::user()->can('browse-' . $permission);
+                    }
 
-            //         function hasVisibleChildren($children) {
-            //             foreach ($children as $child) {
-            //                 if (hasPermission($child['permission'] ?? null)) {
-            //                     return true;
-            //                 }
-            //             }
-            //             return false;
-            //         }
-            //     @endphp
+                    function hasVisibleChildren($children) {
+                        foreach ($children as $child) {
+                            if (hasPermission($child['permission'] ?? null)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                @endphp
 
-            //     @foreach($superadminLinks as $link)
-            //         @if(isset($link['children']))
-            //             @if(hasVisibleChildren($link['children']))
-            //                 <li class="treeview">
-            //                     <a href="#">
-            //                         <i class="fa {{ $link['icon'] }}"></i>
-            //                         <span>{{ $link['title'] }}</span>
-            //                         <i class="fa fa-angle-left pull-right"></i>
-            //                     </a>
-            //                     <ul class="treeview-menu">
-            //                         @foreach($link['children'] as $child)
-            //                             @if(hasPermission($child['permission'] ?? null))
-            //                                 <li>
-            //                                     <a href="{{ superadmin_url($child['uri']) }}">
-            //                                         <i class="fa {{ $child['icon'] }}"></i>
-            //                                         <span>{{ $child['title'] }}</span>
-            //                                     </a>
-            //                                 </li>
-            //                             @endif
-            //                         @endforeach
-            //                     </ul>
-            //                 </li>
-            //             @endif
-            //         @else
-            //             @if(hasPermission($link['permission'] ?? null))
-            //                 <li>
-            //                     <a href="{{ superadmin_url($link['uri']) }}">
-            //                         <i class="fa {{ $link['icon'] }}"></i>
-            //                         <span>{{ $link['title'] }}</span>
-            //                     </a>
-            //                 </li>
-            //             @endif
-            //         @endif
-            //     @endforeach
-            // @endif
+                @foreach($superadminLinks as $link)
+                    @if(isset($link['children']))
+                        @if(hasVisibleChildren($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        @if(hasPermission($child['permission'] ?? null))
+                                            <li>
+                                                <a href="{{ superadmin_url($child['uri']) }}">
+                                                    <i class="fa {{ $child['icon'] }}"></i>
+                                                    <span>{{ $child['title'] }}</span>
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endif
+                    @else
+                        @if(hasPermission($link['permission'] ?? null))
+                            <li>
+                                <a href="{{ superadmin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif
+                    @endif
+                @endforeach
+            @endif --}}
 
-            function hasPermission($permission) {
+            @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+    @php
+        $superadminLinks = [
+            ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
+
+            [
+                'uri' => '#',
+                'icon' => 'fa-building',
+                'title' => __('Charge System'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/charges', 'icon' => 'fa-coins', 'title' => __('Charges'), 'permission' => 'coin-recharge'],
+                ],
+            ],
+            [
+                'uri' => '#',
+                'icon' => 'fa-briefcase',
+                'title' => __('BD'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD List'), 'permission' => 'Bds'],
+                    ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                ],
+            ],
+            [
+                'uri' => '#',
+                'icon' => 'fa-building',
+                'title' => __('Agencies'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                    ['uri' => '/charge-agencies', 'icon' => 'fa-dollar-sign', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                    ['uri' => '/ag/users', 'icon' => 'fa-user', 'title' => __('Hosts'), 'permission' => 'host'],
+                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                ],
+            ],
+            [
+                'uri' => '#',
+                'icon' => 'fa-home',
+                'title' => __('Rooms'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('Rooms List'), 'permission' => 'rooms'],
+                    ['uri' => '/live-rooms', 'icon' => 'fa-video-camera', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                ],
+            ],
+            [
+                'uri' => '#',
+                'icon' => 'fa-bullhorn',
+                'title' => __('Advertisements'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/home-carousel', 'icon' => 'fa-image', 'title' => __('Home Carousel'), 'permission' => 'banner'],
+                    ['uri' => '/official-message', 'icon' => 'fa-envelope', 'title' => __('Official Messages'), 'permission' => 'banner'],
+                ],
+            ],
+            ['uri' => '/super-admin-rewards', 'icon' => 'fa-gift', 'title' => __('Reward Dedicate'), 'permission' => 'reward-center'],
+            [
+                'uri' => '#',
+                'icon' => 'fa-users-cog',
+                'title' => __('Employees and Permissions'),
+                'permission' => null,
+                'children' => [
+                    ['uri' => '/roles', 'icon' => 'fa-lock', 'title' => __('Roles'), 'permission' => 'roles'],
+                    ['uri' => '/auth-users', 'icon' => 'fa-user-shield', 'title' => __('Users'), 'permission' => 'auth-users'],
+                ],
+            ],
+        ];
+
+        // Helper to check permissions
+        function hasPermission($permission) {
             if (Admin::user()->can('*')) {
                 return true;
             }
@@ -288,6 +359,7 @@
         @endif
     @endforeach
 @endif
+
 
 
 
