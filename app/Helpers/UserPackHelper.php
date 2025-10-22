@@ -50,9 +50,9 @@ class UserPackHelper
 
     public static function getGif(User $user)
     {
-        Log::info('gif',self::getPacks($user)
+        Log::info('gif',[self::getPacks($user)
             ->where('type', 22)
-            ->first());
+            ->first()]);
         return self::getPacks($user)
             ->where('type', 22)
             ->first();
