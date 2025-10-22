@@ -76,6 +76,7 @@ use App\Jobs\SendFirebaseTopicNotificationJob;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use App\Models\AreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -2137,5 +2138,16 @@ class Common
 
             UserBadge::query()->create($data);
         }
+    }
+
+    public static function areaCountries($adminId)
+    {
+        $areaManager = AreaManager::with('countries')->find($adminId);
+
+        if (!$areaManager) {
+            return [];
+        }
+
+        return $areaManager->countries->pluck('id')->toArray();
     }
 }

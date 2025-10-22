@@ -9,6 +9,7 @@ return [
     'login.rights'          => ' © 2023. All rights reserved',
     'login.language.switch' => 'الانتقال إلى',
     'login.language.lang'   => 'اللغة العربية',
+    'login.titleAreaManager' => 'Login area manger dashboard',
 
     'online'                => 'Online',
     'login'                 => 'Login',

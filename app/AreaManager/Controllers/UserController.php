@@ -1,6 +1,6 @@
 <?php
 
-namespace App\SuperAdmin\Controllers;
+namespace App\AreaManager\Controllers;
 
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -84,7 +84,7 @@ class UserController extends MainController
     // {
     //     return $content
     //         ->title(__($this->title));
-           
+
     //         // ->body($this->form());
     // }
 
@@ -191,14 +191,16 @@ class UserController extends MainController
             ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
-            session(['back_url' => url()->previous()]);
+        session(['back_url' => url()->previous()]);
 
 
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return $content
             ->title(__('user profile'))
-            ->view('super_user_profile', $data
+            ->view(
+                'super_user_profile',
+                $data
             );
     }
 
@@ -216,10 +218,11 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-
+        $adminId = auth()->user()->id;
+        $countriesIds = Common::areaCountries($adminId);
         $grid->model()
-            ->where('country_id', auth()->user()->country_id)
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
+            ->whereIn('country_id', $countriesIds)
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -247,9 +250,11 @@ class UserController extends MainController
         }
 
         if (request()->messages == 'month') {
-            $grid->model()->whereHas('chatMessages', fn($q) =>
-            $q->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
+            $grid->model()->whereHas(
+                'chatMessages',
+                fn($q) =>
+                $q->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
             );
         }
 
@@ -270,8 +275,7 @@ class UserController extends MainController
 
         if (request()->online == 1) {
             $grid->model()->where('online', 1);
-        }
-        else if ($haveCoins) {
+        } else if ($haveCoins) {
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
             $grid->model()->orderByDesc('id');

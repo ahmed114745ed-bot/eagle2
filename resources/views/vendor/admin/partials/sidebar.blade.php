@@ -179,6 +179,7 @@
                                         ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
                                     ],
                                 ],
+                                 ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
                             ];
                         @endphp
 

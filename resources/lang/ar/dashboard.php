@@ -9,6 +9,7 @@ return [
     'login.rights'          => '  ٢٠٢٣. جميع الحقوق محفوظة © ',
     'login.language.switch' => 'Switch to',
     'login.language.lang' => 'English',
+    'login.titleAreaManager' => 'تسجيل الدخول إلى لوحة تحكم مدير المنطقة',
 
     'online'                => 'متصل',
     'login'                 => 'تسجيل الدخول',
