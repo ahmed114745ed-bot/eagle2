@@ -21,7 +21,7 @@ use Encore\Admin\Auth\Permission as chPermission;
 class RoleController extends MainController
 {
     public $permission_name = 'roles';
- 
+
     protected function title()
     {
         return trans('Roles');
@@ -32,7 +32,7 @@ class RoleController extends MainController
         if (!Admin::user()->can('*')) {
             chPermission::check('browse-' . $this->permission_name);
         }
-        
+
         return parent::index($content
             ->title(__('Roles'))
             ->body($this->grid()));
@@ -40,10 +40,7 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
-        if (!Admin::user()->can('*')) {
-           chPermission::check('update-' . $this->permission_name);
-        }
-        return  parent::edit($id,$content
+        return  parent::edit($id, $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
             ->body($this->form($id)->edit($id)));
@@ -51,7 +48,7 @@ class RoleController extends MainController
     public function create(Content $content)
     {
         if (!Admin::user()->can('*')) {
-           chPermission::check('create-' . $this->permission_name);
+            chPermission::check('create-' . $this->permission_name);
         }
         return parent::create($content
             ->title($this->title())
@@ -66,9 +63,9 @@ class RoleController extends MainController
     public function show($id, Content $content)
     {
         if (!Admin::user()->can('*')) {
-           chPermission::check('browse-' . $this->permission_name);
+            chPermission::check('browse-' . $this->permission_name);
         }
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans(__('Roles')))
             ->body($this->detail($id)));
     }
@@ -88,7 +85,7 @@ class RoleController extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('admin_id', Auth::id());
+        $grid->model()->where('type', PermissionType::SUPER_ADMIN->value);
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 
@@ -140,7 +137,7 @@ class RoleController extends MainController
 
 
         $grid->disableExport();
-       // $this->extendGrid($grid);
+        // $this->extendGrid($grid);
         return $grid;
     }
 
@@ -189,10 +186,10 @@ class RoleController extends MainController
 
         $form->text('name', trans('role name'))->rules('required|unique:admin_roles,name,{{id}}');
 
-     
+
         $form->html(view('admin.super-admin-permission-tabs', [
             'permissions' => $permissions,
-            
+
             'selectedPermissions' => $id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray() : [],
         ])->render());
 
@@ -202,8 +199,8 @@ class RoleController extends MainController
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');
-                        $form->model()->admin_id = Auth::id();
-                        $form->model()->type = PermissionType::SUPER_ADMIN->value;
+            $form->model()->admin_id = Auth::id();
+            $form->model()->type = PermissionType::SUPER_ADMIN->value;
             // Automatically generate slug from name *before saving*
             $form->model()->slug = Str::slug($form->name);
         });
@@ -312,7 +309,7 @@ class RoleController extends MainController
     public function destroy($id)
     {
         if (!Admin::user()->can('*')) {
-           chPermission::check('delete-' . $this->permission_name);
+            chPermission::check('delete-' . $this->permission_name);
         }
         $role = Role::findOrFail($id);
 

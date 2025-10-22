@@ -105,11 +105,20 @@ class Charge extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+
     public function receiveragency()
     {
         return $this->belongsTo(Agency::class, 'user_id')
             ->withoutGlobalScope(HostAgencyScope::class);
     }
+
+    public function receiverSubAdmin()
+    {
+        return $this->belongsTo(SubAdmin::class, 'user_id');
+    }
+
+
+    
 
     /**
      * sender ############################

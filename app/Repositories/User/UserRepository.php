@@ -213,7 +213,7 @@ class UserRepository extends Repository
     public function superAdminAgencies($key, $page, $perPage, $countryId)
     {
         return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
-            ->where('country_id', $countryId)
+            // ->where('country_id', $countryId)
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');

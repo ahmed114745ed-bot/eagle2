@@ -285,7 +285,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <label for="target_type">{{ __('select_target') }}</label>
         <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
             <option value="">{{ __('select') }}</option>
-{{--            <option value="user">{{ __('user') }}</option>--}}
+            @if (auth('admin')->user()->type === "superadmin")
+            <option value="user">{{ __('sub admin') }}</option>
+
+            @endif
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
@@ -327,7 +330,6 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         document.getElementById('chargeModal').style.display = 'block';
         document.getElementById('chargeOverlay').style.display = 'block';
 
-        // Initialize Select2 only when modal opens
         initSelect2();
     }
 
@@ -337,51 +339,89 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     }
 
     function toggleTargetFields() {
-        const type = document.getElementById('target_type').value;
-        const fields = document.getElementById('target_fields');
-        fields.style.display = type ? 'block' : 'none';
-    }
+    const type = document.getElementById('target_type').value;
+    const fields = document.getElementById('target_fields');
+    fields.style.display = type ? 'block' : 'none';
 
-    const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
-
-    function initSelect2() {
-        if (!$('#target_id').hasClass('select2-hidden-accessible')) {
-            $('#target_id').select2({
-                dropdownParent: $('#chargeModal'), // ✅ ensures dropdown stays inside modal
-                placeholder: '{{ __("Select agency") }}',
-                allowClear: true,
-                 language: {
-                    noResults: function() {
-                        return "{{ __('not_in_same_country') }}";
-                    }
-                },
-                ajax: {
-                    url: '/api/search/superadmin-agencies',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term ,
-                            page: params.page || 1,
-                            country_id: AUTH_COUNTRY_ID
-                        };
-                    },
-                    processResults: function(data, params) {
-                        params.page = params.page || 1;
-                        const items = data.data || data || [];
-                        return {
-                            results: items.map(item => ({
-                                id: item.id,
-                                text: item.name
-                            })),
-                            pagination: {
-                                more: (params.page * 10) < (data.total || 0)
-                            }
-                        };
-                    },
-                    cache: true
-                }
-            });
+    if (type) {
+        const $select = $('#target_id');
+        if ($select.data('select2')) {
+            $select.select2('destroy');
         }
+        initSelect2(type);
     }
+}
+
+const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
+
+function initSelect2(targetType = null) {
+    if (!targetType) {
+        targetType = document.getElementById('target_type').value;
+    }
+
+    let ajaxUrl = '';
+    let placeholderText = '';
+
+    if (targetType === 'user') {
+        ajaxUrl = '/superadmin/sub-admins';
+        placeholderText = '{{ __("Select sub admin") }}';
+    } else if (targetType === 'agency') {
+        ajaxUrl = '/api/search/superadmin-agencies';
+        placeholderText = '{{ __("Select agency") }}';
+    }
+
+    const $select = $('#target_id');
+
+    $select.select2({
+        dropdownParent: $('#chargeModal'),
+        placeholder: placeholderText,
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "{{ __('not_in_same_country') }}";
+            }
+        },
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                    country_id: AUTH_COUNTRY_ID
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                const items = Array.isArray(data)
+                            ? (data[0]?.data || [])
+                            : (data.data || []);             
+                
+                return {
+                    results: items.map(item => {
+                        let displayName = targetType === 'user'
+                            ? (item.username || item.name || `ID: ${item.id}`)
+                            : (item.name || item.username || `ID: ${item.id}`);
+
+                        if (item.status) {
+                            displayName += ` (${item.status})`;
+                        }
+
+                        return {
+                            id: item.id,
+                            text: displayName
+                        };
+                    }),
+
+                    pagination: {
+                        more: (params.page * 10) < (data.total || 0)
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+}
+
 </script>

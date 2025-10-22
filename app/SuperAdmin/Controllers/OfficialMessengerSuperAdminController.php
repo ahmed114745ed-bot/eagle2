@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Support\Str;
+use App\Enums\PermissionType;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use App\Models\OfficialMessage;
@@ -50,7 +51,7 @@ class OfficialMessengerSuperAdminController extends MainController
 
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
-        $grid->model()->where('admin_id', Auth::id())->where('type', 2)->orderByDesc('id');
+        $grid->model()->where('admin_type', PermissionType::SUPER_ADMIN->value)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -153,6 +154,7 @@ class OfficialMessengerSuperAdminController extends MainController
             ->options('/api/search/language')
             ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
+        $form->hidden('admin_type', __('type'))->default(PermissionType::SUPER_ADMIN->value);
         $form->hidden('type', __('type'))->default(2);
         $this->selectFeature($form);
         $form->hidden('admin_id', __('type'))->default(Auth::user()->id);
@@ -174,12 +176,12 @@ class OfficialMessengerSuperAdminController extends MainController
                 'your_country' => __('All Agencies in your Country'),
                 'ids'   => __('Specific Agency by ID'),
             ])->when('ids', function (Form $form) {
-                $form->belongsToMany('feature_ids', Agencies::class, trans('agencies'));
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
                     'admin' => __('admins'),
                     'members'   => __('members'),
-                ]);
+                ])->default('owner');
             });
         })->when('family', function (Form $form) {
             $form->belongsToMany('feature_ids', Families::class, trans('families'));
@@ -187,7 +189,7 @@ class OfficialMessengerSuperAdminController extends MainController
                 'owner'   => __('owner'),
                 'admin' => __('admins'),
                 'members'   => __('members'),
-            ]);
+            ])->default('owner');
         })->when('users', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'your_country' => __('Users in your Country'),
@@ -206,12 +208,13 @@ class OfficialMessengerSuperAdminController extends MainController
                 'ids'   => __('Specific shipping Agency by ID'),
                 'your_country' => __('shipping agency in your Country'),
             ])->when('ids', function (Form $form) {
-                $form->belongsToMany('feature_ids', ShippingAgencies::class, trans('agencies'));
+                $form->belongsToMany('shipping_agency_ids', ShippingAgencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
-                ]);
+                ])->default('owner');
             });;
         });
+        
 
         $form->saved(function (Form $form) {
             $model = $form->model();

@@ -16,6 +16,14 @@
     "Email": "Email",
     "action": "Action",
     "not_in_same_country":"not in same country",
+    "Browse coin recharge" : "Browse charges",
+    "Add switch coin recharge" : "Add charge",
+    "Coin Recharge" : "charges",
+    "super rewards": "Super Rewards",
+    "Reward Center": "Gift Rewards",
+    "Browse reward center": "Browse Gift Rewards",
+    "Dedicate switch reward center": "Dedicate Gift Rewards",
+    
 
     "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
@@ -1293,8 +1301,9 @@
 "banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins.",
 "banner_rejected_title": "The banner request has been rejected",
 "banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request.",
- "Banner approved successfully": "Banner approved successfully",
-  "Banner rejected successfully": "Banner rejected successfully"
+"Banner approved successfully": "Banner approved successfully",
+"Banner rejected successfully": "Banner rejected successfully",
+"sub admin" : "Sup Admin"
 
 
 

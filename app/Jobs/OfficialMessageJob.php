@@ -41,16 +41,13 @@ class OfficialMessageJob implements ShouldQueue
     public function handle(): void
     {
         Log::info('OfficialMessageJob raw request', $this->request);
-        $feature = $this->request['feature'] ?? null;
+        $feature = $this->request['feature'] ;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
 
         // Handle feature_ids as array or string
-        $featureIds = $this->request['feature_ids'] ?? [];
-        if ($feature == 'agency' || $feature == 'family') {
+        $featureIds = $this->model->feature_ids ?? [];
 
-            $featureIds = array_filter(explode(',', $this->model->feature_ids));
-        }
         Log::info($featureIds);
 
         // ✅ Always make $featureIds an array safely
