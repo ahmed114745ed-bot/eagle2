@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class UserPackHelper
 {
@@ -37,6 +38,13 @@ class UserPackHelper
         return self::getPacks($user)
             ->where('type', 10)
             ->first()?->ware?->show_img ?? '';
+    }
+
+    public static function getVipData(User $user)
+    {
+        return self::getPacks($user)
+            ->where('type', 10)
+            ->first();
     }
 
     public static function getIntroImage(User $user) : string
