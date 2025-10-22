@@ -19,6 +19,7 @@ use App\Http\Resources\DollarChargeAgencyResource;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
+use Illuminate\Support\Facades\Log;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -467,6 +468,8 @@ class ChargeController extends Controller
 
     public function chargeFromAgencyToAnother(Request $request)
     {
+        Log::info('authAgency1');
+
         $from = $request->user();
         if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
         if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');

@@ -422,6 +422,7 @@ class ChargeRepoService
 
             switch ($request->type) {
                 case 'agency':
+        Log::info('authAgency2');
                     $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
                     if (! $authAgency) {
                         throw new Exception(__('api.notAgency'));
@@ -511,6 +512,7 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
+        Log::info('authAgency3');
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }
