@@ -22,7 +22,6 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
 use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
-use Illuminate\Support\Facades\Log;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -422,7 +421,6 @@ class ChargeRepoService
 
             switch ($request->type) {
                 case 'agency':
-        Log::info('authAgency2');
                     $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
                     if (! $authAgency) {
                         throw new Exception(__('api.notAgency'));
@@ -512,7 +510,6 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
-        Log::info('authAgency3');
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }
@@ -533,21 +530,14 @@ class ChargeRepoService
      */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
-        Log::info('balance before', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
-
-        $authAgencyUpdated = ShippingAgency::query()
-            ->where('id', $authAgency->id)
-            ->where('coins', '>=', $amount)
-            ->decrement('coins', $amount);
-
-        if (!$authAgencyUpdated) {
-            throw new Exception(__('balance not enough or update failed'));
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
         }
 
-        ShippingAgency::query()
-            ->where('id', $chargeAgency->id)
-            ->increment('coins', $amount);
+   
 
+        $authAgency->decrement('coins', $amount);
+        $chargeAgency->increment('coins', $amount);
         $usdRate = $amount / Common::getCoinsValue('shipping_coins');
 
         $this->agencyCharge(
@@ -559,7 +549,6 @@ class ChargeRepoService
             chargeType: 'agency',
             agencyId: null,
         );
-        Log::info('balance after', [ShippingAgency::query()->where('id', $chargeAgency->id)->first()?->coins]);
     }
 
     /**

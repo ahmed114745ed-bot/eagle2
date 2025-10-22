@@ -468,8 +468,6 @@ class ChargeController extends Controller
 
     public function chargeFromAgencyToAnother(Request $request)
     {
-        Log::info('authAgency1');
-
         $from = $request->user();
         if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
         if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
