@@ -183,6 +183,18 @@
                                  [
                                     'uri' => '#',
                                     'icon' => 'fa-building',
+                                    'title' => __('Agencies'),
+                                    'permission' => null,
+                                    'children' => [
+                                        ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                        ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                        ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
+                                        ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                                    ],
+                                ],
+                                 [
+                                    'uri' => '#',
+                                    'icon' => 'fa-building',
                                     'title' => __('rooms'),
                                     'permission' => null,
                                     'children' => [
