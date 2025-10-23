@@ -101,8 +101,13 @@
                     </li>
                 @endforeach
                 @endif
-        @if (!defined('SUPERADMIN_MENU_RENDERED'))
-        @php define('SUPERADMIN_MENU_RENDERED', true); @endphp
+
+
+
+
+
+        @if (!session()->has('SUPERADMIN_MENU_RENDERED'))
+            @php session(['SUPERADMIN_MENU_RENDERED' => true]); @endphp
             @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
