@@ -188,6 +188,14 @@ Route::group(
 );
 
 Admin::routes();
+
+$routes = collect(app('router')->getRoutes()->get());
+$filtered = $routes->reject(function ($route) {
+    return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
+});
+
+
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
