@@ -246,7 +246,7 @@ Route::group(
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         // Route::resource('auth/roles', 'RoleControllerNew');
-        Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles-new', 'RoleControllerNew');
         // Route::resource('roles', 'RoleControllerNew');
 
         Route::resource('auth/rolesTest', 'RoleController');
