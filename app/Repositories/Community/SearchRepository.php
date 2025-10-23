@@ -90,7 +90,10 @@ class SearchRepository implements SearchRepositoryInterface
             $query->where('type', '!=', 'live')
                   ->orWhere(function ($subQuery) {
                       $subQuery->where('type', 'live')
-                               ->where('room_status', 1);
+                               ->where('room_status', 1)
+                               ->where('is_live', 1);
+                               
+
                   });
         })
         ->orderBy('hot', 'desc')
