@@ -180,6 +180,16 @@
                                     ],
                                 ],
                                  ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                                 [
+                                    'uri' => '#',
+                                    'icon' => 'fa-building',
+                                    'title' => __('rooms'),
+                                    'permission' => null,
+                                    'children' => [
+                                        ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                        ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                    ],
+                                ],
                             ];
                         @endphp
 
