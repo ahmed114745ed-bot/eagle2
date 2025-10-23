@@ -29,9 +29,9 @@ class DefaultSuperAdminBdSeeder extends Seeder
 
         $defaultBd = Bd::where('default', 1)->where('country_id', 0 )->first();
 
-        Log::info(['defaultBd'=>$defaultBd]);
+        // Log::info(['defaultBd'=>$defaultBd]);
         if ($defaultBd){
-        Log::info(['defaultSuperAdmin'=>$defaultSuperAdmin->id]);
+        // Log::info(['defaultSuperAdmin'=>$defaultSuperAdmin->id]);
 
             $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
         }else {

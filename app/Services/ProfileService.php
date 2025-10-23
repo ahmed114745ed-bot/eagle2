@@ -30,9 +30,9 @@ class ProfileService
 
     public function updateProfile(ProfileRequest $request)
     {
-        Log::info('Google login request', [
-            'data' => $request->only('email')
-        ]);
+        // Log::info('Google login request', [
+        //     'data' => $request->only('email')
+        // ]);
         $data = $request->only(['name', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
         if ($request->email) {
             $data['email'] = $request->email;

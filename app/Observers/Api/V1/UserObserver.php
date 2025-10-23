@@ -89,7 +89,7 @@ class UserObserver
     public function deleted(User $user)
     {
 
-        Log::info('deleted from Observer');
+        // Log::info('deleted from Observer');
 
         // $user->profile()->delete();
         // AgencyJoinRequest::query()->where('user_id', $user->id)->delete();

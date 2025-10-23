@@ -25,18 +25,18 @@ class UserStatus implements ShouldBroadcastNow
         $this->show_invite_code = $show_invite_code;
         $this->user_id = $user_id;
 
-        Log::info("📢 UserStatus Event Created", [
-            'user_id' => $user_id,
-            'can_play' => $can_play,
-            'show_invite_code' => $show_invite_code
-        ]);
+        // Log::info("📢 UserStatus Event Created", [
+        //     'user_id' => $user_id,
+        //     'can_play' => $can_play,
+        //     'show_invite_code' => $show_invite_code
+        // ]);
     }
 
     public function broadcastOn()
     {
-        Log::info("📡 UserStatus broadcastOn", [
-            'channel' => 'status-user-'.$this->user_id
-        ]);
+        // Log::info("📡 UserStatus broadcastOn", [
+        //     'channel' => 'status-user-'.$this->user_id
+        // ]);
         return ['status-user-'.$this->user_id];
     }
 
@@ -47,13 +47,13 @@ class UserStatus implements ShouldBroadcastNow
 
     public function broadcastWith() : array
     {
-        Log::info("🚀 UserStatus broadcastWith Data", [
-            'user_id' => $this->user_id,
-            'data' =>  [
-                'show_invite_code' => $this->show_invite_code,
-                'can_play' => $this->can_play
-            ]
-        ]);
+        // Log::info("🚀 UserStatus broadcastWith Data", [
+        //     'user_id' => $this->user_id,
+        //     'data' =>  [
+        //         'show_invite_code' => $this->show_invite_code,
+        //         'can_play' => $this->can_play
+        //     ]
+        // ]);
         
         return [
             'show_invite_code'=>$this->show_invite_code,

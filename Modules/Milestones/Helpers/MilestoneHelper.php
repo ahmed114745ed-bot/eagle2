@@ -25,9 +25,9 @@ class MilestoneHelper
 
     public static function grantMilestoneToUser(User|int $user, string $slug): void
     {
-        Log::info("Granting milestone '{$slug}' to user", [
-            'user' => $user instanceof User ? $user->id : $user,
-        ]);
+        // Log::info("Granting milestone '{$slug}' to user", [
+        //     'user' => $user instanceof User ? $user->id : $user,
+        // ]);
         // تأكد أن $user هو موديل
         if (! $user instanceof User) {
             $user = User::find($user);
@@ -43,27 +43,27 @@ class MilestoneHelper
             return;
         }
 
-        Log::info("Found milestone '{$milestone->name}' (ID {$milestone->id}) for user {$user->id}");
+        // Log::info("Found milestone '{$milestone->name}' (ID {$milestone->id}) for user {$user->id}");
 
         // تحقق من وجود rewards
         if (! $milestone->rewards || $milestone->rewards->isEmpty()) {
-            Log::info("No rewards found for milestone '{$slug}'");
+            // Log::info("No rewards found for milestone '{$slug}'");
             return;
         }
         // مر على كل الهدايا وأضفها
         foreach ($milestone->rewards as $mr) {
-            Log::info("Granting reward to user", [
-                'user_id' => $user->id,
-                'milestone_id' => $milestone->id,
-                'reward_id' => $mr->id,
-                'rewardable_type' => $mr->rewardable_type,
-                'rewardable_id' => $mr->rewardable_id,
-            ]);
+            // Log::info("Granting reward to user", [
+            //     'user_id' => $user->id,
+            //     'milestone_id' => $milestone->id,
+            //     'reward_id' => $mr->id,
+            //     'rewardable_type' => $mr->rewardable_type,
+            //     'rewardable_id' => $mr->rewardable_id,
+            // ]);
 
             self::giveRewardToUser($user, $mr);
         }
 
-        Log::info("Finished granting milestone '{$slug}' to user {$user->id}");
+        // Log::info("Finished granting milestone '{$slug}' to user {$user->id}");
     }
 
 

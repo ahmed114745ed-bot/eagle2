@@ -36,7 +36,7 @@ class ChangeCinemaModeJob implements ShouldQueue
 
 
             $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-             \Log::info("cinema mode");
+            //  \Log::info("cinema mode");
             Common::sendToZego3('SendCustomCommand', $room->id, $room->uid, $jsons);
         }
     }

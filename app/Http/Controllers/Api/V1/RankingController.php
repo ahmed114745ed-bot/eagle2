@@ -33,7 +33,7 @@ class RankingController extends Controller
 
     public function ranking(Request $request)
     {
-        Log::info("makled makled makled");
+        // Log::info("makled makled makled");
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
 

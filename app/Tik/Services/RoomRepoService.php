@@ -398,7 +398,7 @@ class RoomRepoService
         $room = $roomId
             ? $this->repository->findById($roomId)
             : $this->repository->findRoomUserEnableAudio($request->owner_id);
-        \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
+        // \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
@@ -447,7 +447,7 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
@@ -455,7 +455,7 @@ class RoomRepoService
         } catch (\Throwable $e) {
             \Log::error("changeMode: Zego send failed - " . $e->getMessage());
         }
-        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
 
         return Common::apiResponse(1, 'done', null, 201);

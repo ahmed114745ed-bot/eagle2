@@ -37,11 +37,11 @@ class CalculateRoomCupRewards extends Command
         }
 
         [$start, $end] = $this->getPeriodByType($type);
-        Log::info('Period by type', [
-            'type'  => $type,
-            'start' => $start,
-            'end'   => $end,
-        ]);
+        // Log::info('Period by type', [
+        //     'type'  => $type,
+        //     'start' => $start,
+        //     'end'   => $end,
+        // ]);
 
         $this->logStart($start, $end);
 
@@ -137,15 +137,15 @@ class CalculateRoomCupRewards extends Command
 
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
         if ($gift->room_id == 215) {
-            Log::info('Gift Debug Data', [
-                'target' => $target,
-                'room'   => $room,
-            ]);
+            // Log::info('Gift Debug Data', [
+            //     'target' => $target,
+            //     'room'   => $room,
+            // ]);
            
-            Log::info('count', [
-                'visitor' => $visitorsCount,
-                'admin'   => $adminsCount,
-            ]);
+            // Log::info('count', [
+            //     'visitor' => $visitorsCount,
+            //     'admin'   => $adminsCount,
+            // ]);
         }
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");

@@ -59,8 +59,8 @@ class EnteranceRoomServices
     ///////////////////////////////////////pusher////////////////////////////////////
     public function updateRoomCountFromPusher(Request $request)
     {
-        Log::info(json_decode($request->all));
-        Log::info("agora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-setting");
+        // Log::info(json_decode($request->all));
+        // Log::info("agora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-setting");
         if ($request->header('X-Pusher-Key') !== env('PUSHER_APP_KEY')) {
             abort(403, 'Invalid Pusher webhook request');
         }
@@ -104,7 +104,7 @@ class EnteranceRoomServices
         //     $room->count_room_socket = count($visitors);
         //     $room->room_visitor = trim(implode(",", $visitors), ",");
         // }
-        Log::info("room addedroom addedroom addedroom addedroom added");
+        // Log::info("room addedroom addedroom addedroom addedroom added");
         RoomVisitor::query()->where(['user_id' => $userId])->delete();
         RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $room->id]);
     }

@@ -29,7 +29,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
     {
         $bdSalaries = BDSallary::all();
 
-        \Log::info("start    MigrateOldBdSalariesJob ...........");
+        // \Log::info("start    MigrateOldBdSalariesJob ...........");
 
         DB::beginTransaction();
 
@@ -42,13 +42,13 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                 $year     = $bdSalary->year;
     
                 if ($bdId == 51) {
-                    \Log::info("Migrating salary record", [
-                        'bd_app_id' => $bdAppId,
-                        'bd_id'     => $bdId,
-                        'agency_id' => $agencyId,
-                        'month'     => $month,
-                        'year'      => $year,
-                    ]);
+                    // \Log::info("Migrating salary record", [
+                    //     'bd_app_id' => $bdAppId,
+                    //     'bd_id'     => $bdId,
+                    //     'agency_id' => $agencyId,
+                    //     'month'     => $month,
+                    //     'year'      => $year,
+                    // ]);
                 }
                 // 1) حفظ الرواتب الخاصة بالمستخدمين (زي ما هو)
                 $userSalaries = UserSallary::where('user_agency_id', $agencyId)
@@ -76,10 +76,10 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                 }
     
                 if ($bdId == 51) {
-                    \Log::info("Updated BdAgencyHostSallary", [
-                        'user_id' => $userSallary->user_id,
-                        'user_sallary' => $userSallary->sallary,
-                    ]);
+                    // \Log::info("Updated BdAgencyHostSallary", [
+                    //     'user_id' => $userSallary->user_id,
+                    //     'user_sallary' => $userSallary->sallary,
+                    // ]);
                 }
                 // 2) اجمع كل الرواتب لنفس الـ bd_id + الشهر + السنة
                 $totals = BDSallary::where('bd_id', $bdAppId)
@@ -102,10 +102,10 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                 );
 
                 if ($bdId == 51) {
-                    \Log::info("Updated BdSalary totals", [
-                        'total_salary' => $totals->total_salary ?? 0,
-                        'total_cut'    => $totals->total_cut ?? 0,
-                    ]);
+                    // \Log::info("Updated BdSalary totals", [
+                    //     'total_salary' => $totals->total_salary ?? 0,
+                    //     'total_cut'    => $totals->total_cut ?? 0,
+                    // ]);
                 }
             }
     

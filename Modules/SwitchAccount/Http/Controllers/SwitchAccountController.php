@@ -171,10 +171,10 @@ class SwitchAccountController extends Controller
 
     public function switch_account(Request $request)
     {
-        \Log::info('Switch account request received', [
-            'user_id'   => optional($request->user())->id,
-            'input'     => $request->all(),
-        ]);
+        // \Log::info('Switch account request received', [
+        //     'user_id'   => optional($request->user())->id,
+        //     'input'     => $request->all(),
+        // ]);
         $user = $request->user();
         if (!$request->key) return Common::apiResponse(0, 'missing params', null, 422);
         if (!$request->token) return Common::apiResponse(0, 'token not valid', null, 422);

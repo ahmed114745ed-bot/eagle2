@@ -50,7 +50,7 @@ class CleanGiftLogsJob  implements ShouldQueue
     
                     // إذا المجموع ضمن الرصيد، لا تعديل
                     if ($total <= $monthlyLimit) {
-                        Log::info("No deletion needed for user {$user->id}, total gifts {$total} within limit {$monthlyLimit}");
+                        // Log::info("No deletion needed for user {$user->id}, total gifts {$total} within limit {$monthlyLimit}");
                         continue;
                     }
     
@@ -87,7 +87,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                         }
                     }
     
-                    Log::info("Cleanup for user {$user->id} done, reduced by " . ($total - $monthlyLimit));
+                    // Log::info("Cleanup for user {$user->id} done, reduced by " . ($total - $monthlyLimit));
                 }
             });
     }
