@@ -83,7 +83,7 @@
 
     .transferModal{
         width: 600px;
-        height: 332px;
+        height: 1000px;
         background-color:var(--box-background-color);
         display: none;
         position: fixed;
@@ -225,6 +225,14 @@
 #searchResults .list-group-item:hover {
     /* background-color: #f1f1f1; */
 }
+#chargeModal::-webkit-scrollbar {
+    width: 8px;
+}
+#chargeModal::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
 
 #target_id_search {
     padding: 10px 12px;
@@ -253,7 +261,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('charge_wallet') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 🪙
 
     </div>
 </div> -->
@@ -265,13 +273,11 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('Charge') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 🪙
     </div>
 </div>
 
-<div id="chargeModal" class="transferModal" style="
-
-    ">
+<div id="chargeModal" class="transferModal large">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
           <h5 class="modal-title" id="modalDescriptionTitle"></h5>
           <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
@@ -287,20 +293,39 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
-<br>
+
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
             <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
 
         </div>
-        <br>
-        <div class="form-group">
-            <label for="amount">{{ __('enter_amount') }}</label>
-            <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
-        </div>
+        @php
+                $rate = App\Helpers\Common::getCoinsValue('shipping_coins'); // e.g. 10 coins per dollar
+            @endphp
 
-        <div class="text-right mt-3 actions">
+            <div class="form-group">
+                <label for="amount">{{ __('enter_amount') }} 💲</label>
+                <input type="number"
+                    name="amount"
+                    id="amount"
+                    class="form-control"
+                    required
+                    step="0.01"
+                    min="0.01"
+                    oninput="updateConvertedAmount()">
+
+                <small class="form-text" style="color: #6c757d; font-style: italic;">
+                    {{ __('Now charge by dollar') }}
+                </small>
+
+                <small id="convertedAmount"
+                    class="form-text"
+                    style="color: #007bff; font-weight: bold; display: none;">
+                </small>
+            </div>
+
+        <div class="text-right mt-1 actions">
             <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
             <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
         </div>
@@ -321,6 +346,23 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
 
 <script>
+
+    
+    const rate = {{ $rate ?? 1 }}; // fallback 1 if null
+
+    function updateConvertedAmount() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const result = amount * rate;
+
+        const output = document.getElementById('convertedAmount');
+        if (amount > 0) {
+            output.style.display = 'block';
+            output.textContent = `= ${result.toFixed(2)}🪙`;
+        } else {
+            output.style.display = 'none';
+        }
+    }
+
     function openChargeModal() {
         document.getElementById('chargeModal').style.display = 'block';
         document.getElementById('chargeOverlay').style.display = 'block';
