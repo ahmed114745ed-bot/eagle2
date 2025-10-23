@@ -97,7 +97,7 @@ class BdController extends AdminController
     {
         $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray() ?? [];
 
         $grid->model()->where('parent_id', $authSuperAdmin->id)
             ->whereIn('country_id', $countries)
@@ -145,11 +145,10 @@ class BdController extends AdminController
 
 
         $grid->column('default', trans('default_status'))
-        ->switch(Common::getSwitchStates())
-        ->display(function ($enable) {
+            ->switch(Common::getSwitchStates())
+            ->display(function ($enable) {
                 return $enable;
-
-        });
+            });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
         //         return $this->default;
@@ -291,8 +290,8 @@ class BdController extends AdminController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
 
-//            $form->switch('default', __('set_as_default'))
-//                ->help(__('make_bd_default'));
+            //            $form->switch('default', __('set_as_default'))
+            //                ->help(__('make_bd_default'));
         }
 
         $user = auth()->user();
@@ -324,7 +323,7 @@ class BdController extends AdminController
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
                 }
-            }else{
+            } else {
                 $selectedCountryId = $form->country_id;
                 $superAdminId = SuperAdmin::where('country_id', $selectedCountryId)->first()?->id ?? SuperAdmin::where('default', 1)->where('country_id', 0)->first()?->id;
 

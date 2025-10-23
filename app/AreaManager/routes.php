@@ -87,7 +87,7 @@ Route::group(
 //        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 //        Route::post('/locale', MultiLanguageController::class . '@locale');
 
-        Route::resource('usersBD', BdController::class);
+        Route::resource('user-Bds', BdController::class);
 
 //        //agencies
         Route::resource('/agencies', AgencyController::class);
@@ -127,7 +127,7 @@ Route::group(
         });
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
-//        Route::resource('professional-bd', ProfessionalBdController::class);
+        Route::resource('professional-bd', ProfessionalBdController::class);
 //
 //        // ajax
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');

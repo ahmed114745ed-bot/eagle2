@@ -240,6 +240,16 @@
                                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
                                 ],
                             ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-briefcase',
+                                'title' => __('BD'),
+                                'permission' => null,
+                                'children' => [
+                                    ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
+                                    ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ],
+                            ],
                             ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users')],
                             [
                                 'uri' => '#',

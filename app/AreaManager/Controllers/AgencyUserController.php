@@ -272,10 +272,10 @@ class AgencyUserController extends MainController
                 $query->where(function ($q) use ($countries) {
                     $q->whereIn('country_id', $countries)
                         ->whereHas('agency', function ($a) use ($countries) {
-                            $a->whereIn('country_id', '!=', $countries);
+                            $a->whereNotIn('country_id', $countries);
                         });
                 })->orWhere(function ($q) use ($countries) {
-                    $q->whereIn('country_id', '!=', $countries)
+                    $q->whereNotIn('country_id', $countries)
                         ->whereHas('agency', function ($a) use ($countries) {
                             $a->whereIn('country_id', $countries);
                         });
@@ -300,15 +300,15 @@ class AgencyUserController extends MainController
         $grid->column('id', __('Id'));
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
+                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
             ";
-        });
+            });
         }
 
         $grid->column('name', __('Name'))
