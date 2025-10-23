@@ -199,12 +199,4 @@ class CodapayService
             'message' => $message,
         ]);
     }
-
-    public function landingPage(Request $request)
-    {
-        $data = $request->all();
-
-        \Log::info('CodaPay Landing Page Response', $data);
-    }
-
 }
