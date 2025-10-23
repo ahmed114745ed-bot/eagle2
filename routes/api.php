@@ -3,6 +3,7 @@
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Services\CodapayService;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
     Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+
+    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
