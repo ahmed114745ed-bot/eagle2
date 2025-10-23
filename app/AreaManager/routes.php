@@ -1,5 +1,7 @@
 <?php
 
+use App\AreaManager\Controllers\SuperAdminChargeController;
+use App\AreaManager\Controllers\SuperAdminChargeReportController;
 use App\AreaManager\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
@@ -116,7 +118,12 @@ Route::group(
 //
 //        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
 //        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-//
+
+        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
+        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
+        });
+
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
 //        Route::resource('professional-bd', ProfessionalBdController::class);
 //
