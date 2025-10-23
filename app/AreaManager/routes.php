@@ -1,8 +1,5 @@
 <?php
 
-use App\AreaManager\Controllers\SuperAdminChargeController;
-use App\AreaManager\Controllers\SuperAdminChargeReportController;
-use App\AreaManager\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\AreaManager\Controllers\BdController;
@@ -16,12 +13,16 @@ use App\AreaManager\Controllers\WalletController;
 use App\AreaManager\Controllers\LiveRoomController;
 use App\AreaManager\Controllers\AgencyUserController;
 use App\AreaManager\Controllers\BdSalariesController;
+use App\AreaManager\Controllers\SuperAdminController;
 use App\AreaManager\Controllers\HomeCarouselController;
 use App\AreaManager\Controllers\MultiLanguageController;
 use App\AreaManager\Controllers\RequestAgencyController;
 use App\AreaManager\Controllers\ProfessionalBdController;
+use App\AreaManager\Controllers\OfficialMessageController;
+use App\AreaManager\Controllers\SuperAdminChargeController;
 use App\AreaManager\Controllers\AreaManagerRewardController;
 use App\AreaManager\Controllers\AppearChargerAgencyController;
+use App\AreaManager\Controllers\SuperAdminChargeReportController;
 use App\AreaManager\Controllers\AreaManagerBannerHistoryController;
 
 Route::prefix('areaManager')->name('areaManager.')->group(function () {
@@ -99,6 +100,7 @@ Route::group(
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
         Route::resource('live-rooms', LiveRoomController::class);
+         Route::resource('official-message', OfficialMessageController::class);
 
 //        //users
        Route::resource('users', 'UserController', [
