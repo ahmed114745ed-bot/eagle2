@@ -351,8 +351,9 @@ class RoomController extends MainController
             ->with([
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-                    'profile:id,user_id,avatar'
-                ])->select(['id', 'uuid', 'special_id', 'name']),
+                    'profile:id,user_id,avatar',
+                    'country:id,flag,name,e_name',
+                ])->select(['id', 'uuid', 'special_id', 'name','country_id']),
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {

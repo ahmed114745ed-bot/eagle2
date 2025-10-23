@@ -283,13 +283,25 @@ class AppearChargerAgencyController extends MainController
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
 
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+             $flagHtml = '';
+            if (!empty($this->owner?->country?->flag)) {
+                $flagPath = getImagePath($this->owner->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->owner->country->name)
+                    : e($this->owner->country->e_name);
 
+                $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+            }
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                        <strong>$name</strong><br>
+                        <strong>$name</strong> {$flagHtml}<br>
                         <span style=' font-size: smaller;'>UID: $uid</span><br>
                         <span style=' font-size: smaller;'>Phone: $phone</span>
                     </div>
