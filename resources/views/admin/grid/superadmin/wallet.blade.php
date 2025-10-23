@@ -357,7 +357,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         const output = document.getElementById('convertedAmount');
         if (amount > 0) {
             output.style.display = 'block';
-            output.textContent = `= ${result.toFixed(2)} coins`;
+            output.textContent = `= ${result.toFixed(2)}🪙`;
         } else {
             output.style.display = 'none';
         }
