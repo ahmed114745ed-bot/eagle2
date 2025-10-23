@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\ShippingAgency;
+use App\Services\CodapayService;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
 use App\Services\PayPalService;
@@ -118,8 +119,19 @@ class CoinService
                 $bladeUrl = url("/paypal/checkout/{$log->id}");
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
-            }
-            else {
+            }  elseif ($paymentMethod == 'codapay') {
+                $active = config('is_codapay_active');
+                // \Log::info("start $active coins");
+
+                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $codapayService = new CodapayService();
+
+                $paymentUrl = $codapayService->initiatePayment($log->id, $coin->usd, $user->id);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+            } else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
         } catch (Exception $exception) {
