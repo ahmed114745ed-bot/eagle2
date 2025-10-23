@@ -267,6 +267,17 @@
                                         ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
                                     ],
                                 ],
+                                 [
+                                    'uri' => '#',
+                                    'icon' => 'fa-home',
+                                    'title' => __('Advertisements'),
+                                    'permission' => null,
+                                    'children' => [
+                                    // ['uri' => '/home-carousel', 'icon' => 'fa-home', 'title' => __('HomeCarousel'), 'permission' => 'banner'],
+                                        ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
+
+                                    ],
+                                ],
                             ];
                         @endphp
 

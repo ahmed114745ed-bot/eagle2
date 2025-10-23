@@ -41,7 +41,7 @@ class OfficialMessageJob implements ShouldQueue
     public function handle(): void
     {
         // Log::info('OfficialMessageJob raw request', $this->request);
-        $feature = $this->request['feature'] ;
+        $feature = $this->request['feature'];
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
 
@@ -63,11 +63,14 @@ class OfficialMessageJob implements ShouldQueue
         //     'feature_ids'  => $featureIds,
         // ]);
 
+        $countriesIds = Common::areaCountries($this->admin->id);
+
         $usersId = [];
 
         if ($feature === 'agency') {
             $agencies = Agency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
@@ -88,6 +91,7 @@ class OfficialMessageJob implements ShouldQueue
                     $q->whereHas('owner', fn($query) => $query->whereIn('country_id', $featureIds));
                 })
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
+                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
 
@@ -104,6 +108,7 @@ class OfficialMessageJob implements ShouldQueue
             $users = User::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
+                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'logout', fn($q) => $q->where('is_logout', 1))
                 ->get();
 
@@ -111,6 +116,7 @@ class OfficialMessageJob implements ShouldQueue
         } elseif ($feature === 'bds') {
             $users = Bd::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->get();
 
@@ -118,6 +124,7 @@ class OfficialMessageJob implements ShouldQueue
         } elseif ($feature === 'shipping_agency') {
             $agencies = ShippingAgency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->get();
