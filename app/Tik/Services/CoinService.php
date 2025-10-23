@@ -131,8 +131,7 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            }
-            else {
+            } else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
         } catch (Exception $exception) {
