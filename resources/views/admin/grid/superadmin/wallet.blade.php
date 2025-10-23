@@ -83,7 +83,7 @@
 
     .transferModal{
         width: 600px;
-        height: 332px;
+        height: 1000px;
         background-color:var(--box-background-color);
         display: none;
         position: fixed;
@@ -225,6 +225,14 @@
 #searchResults .list-group-item:hover {
     /* background-color: #f1f1f1; */
 }
+#chargeModal::-webkit-scrollbar {
+    width: 8px;
+}
+#chargeModal::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
 
 #target_id_search {
     padding: 10px 12px;
@@ -271,9 +279,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     </div>
 </div>
 
-<div id="chargeModal" class="transferModal" style="
-
-    ">
+<div id="chargeModal" class="transferModal large">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
           <h5 class="modal-title" id="modalDescriptionTitle"></h5>
           <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
@@ -292,7 +298,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
-<br>
+
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
