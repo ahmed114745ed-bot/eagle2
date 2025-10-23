@@ -584,7 +584,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins','country_id','img', 'is_frozen'])
             ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
@@ -628,14 +628,26 @@ class AgencyController extends MainController
 
                 return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
+           $flagHtml = '';
+                if (!empty($this->country?->flag)) {
+                    $flagPath = getImagePath($this->country->flag);
+                    $flagTitle = app()->getLocale() === 'ar'
+                        ? e($this->country->name)
+                        : e($this->country->e_name);
 
+                    $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+                }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         {$image}
                         <div style='display: flex; flex-direction: column;'>
-                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>{$flagHtml}<br>
                             <span style='font-size: smaller;'>ID: {$this->id}</span>
                         </div>
                     </div>

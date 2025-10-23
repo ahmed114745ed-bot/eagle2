@@ -224,7 +224,7 @@ class AppearChargerAgencyController extends MainController
         $countryID = session('country_id');
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile')
+        $grid->model()->with('owner.profile','country')
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc('id');
 
@@ -251,6 +251,20 @@ class AppearChargerAgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
+                $flagHtml = '';
+                if (!empty($this->country?->flag)) {
+                    $flagPath = getImagePath($this->country->flag);
+                    $flagTitle = app()->getLocale() === 'ar'
+                        ? e($this->country->name)
+                        : e($this->country->e_name);
+
+                    $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+                }
+
                 $profileUrl = route('admin.shipping.agency.profile', ['id' => $this->id]);
 
                 return "
@@ -258,7 +272,7 @@ class AppearChargerAgencyController extends MainController
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>{$flagHtml}<br>
                                 <span style='font-size: smaller;'>ID: {$this->id}</span>
                             </div>
                         </div>
@@ -283,7 +297,7 @@ class AppearChargerAgencyController extends MainController
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
 
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
-             $flagHtml = '';
+            $flagHtml = '';
             if (!empty($this->owner?->country?->flag)) {
                 $flagPath = getImagePath($this->owner->country->flag);
                 $flagTitle = app()->getLocale() === 'ar'
@@ -493,7 +507,7 @@ class AppearChargerAgencyController extends MainController
 
             $appOwnerId = intval($form->model()->app_owner_id);
 
-            $user = User::find($appOwnerId)  ;
+            $user = User::find($appOwnerId);
             MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
         });
 
