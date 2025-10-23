@@ -585,7 +585,7 @@ class AgencyController extends MainController
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
-            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -644,29 +644,44 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $uid = $this->owner?->uuid;
-            $path = $this->owner?->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
+           
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+            $flagHtml = '';
+            if (!empty($this->owner?->country?->flag)) {
+                $flagPath = getImagePath($this->owner->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->owner->country->name)
+                    : e($this->owner->country->e_name);
+
+                $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+            }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
-
+            $showUrl = $this->owner ? superadmin_url("users/profile/{$this->owner->id}") : 0;
             return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                   <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                    </a>
-                    <span style='font-size: smaller;'>UUID: $uid</span>
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' 
+                        style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            {$flagHtml}
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
                 </div>
-            </div>
-        ";
+            ";
         });
 
         // --- Phone column ---

@@ -336,7 +336,7 @@ class AgencyController extends MainController
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -407,19 +407,6 @@ class AgencyController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            $flagHtml = '';
-            if (!empty($this->owner?->country?->flag)) {
-                $flagPath = getImagePath($this->owner->country->flag);
-                $flagTitle = app()->getLocale() === 'ar'
-                    ? e($this->owner->country->name)
-                    : e($this->owner->country->e_name);
-
-                $flagHtml = "<img src='{$flagPath}' 
-                         class='flag-image' 
-                         alt='flag Image' 
-                         title='{$flagTitle}' 
-                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-            }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->owner ? superadmin_url("users/profile/{$this->owner->id}") : 0;
@@ -427,10 +414,8 @@ class AgencyController extends MainController
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                       <a href='{$showUrl}' 
-                        style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
-                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                            {$flagHtml}
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                         </a>
                         <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
