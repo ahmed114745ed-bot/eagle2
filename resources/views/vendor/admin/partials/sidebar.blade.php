@@ -101,8 +101,9 @@
                     </li>
                 @endforeach
                 @endif
-
-                @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+        @if (!defined('SUPERADMIN_MENU_RENDERED'))
+        @php define('SUPERADMIN_MENU_RENDERED', true); @endphp
+            @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
@@ -230,6 +231,7 @@
                     @endif
                 @endforeach
             @endif
+        @endif
 
 
 
