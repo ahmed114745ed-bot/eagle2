@@ -414,6 +414,10 @@ return [
     'huawei_pay' => 'हुआवेई पे',
     "webhook_url" => "वेबहुक URL",
     'webhook_id' => 'वेबहुक आईडी',
+    'codapay'        => 'CodaPay',
+    'project_id'   => 'प्रोजेक्ट आईडी',
+    'country'      => 'देश',
+    'pay_type'     => 'भुगतान प्रकार',
 
     "target_no" => 'लक्ष्य संख्या',
     "diamonds" => 'हीरे का लक्ष्य',

@@ -429,6 +429,10 @@ return [
     'huawei_pay' => 'هواوي باي',
     "webhook_url" => "عنوان ويب هوك",
     "webhook_id" => "معرف ويب هوك",
+    'codapay'        => 'كودا باي',
+    'project_id'   => 'معرّف المشروع',
+    'country'      => 'الدولة',
+    'pay_type'     => 'نوع الدفع',
 
     "target_no" => 'رقم الهدف',
     "diamonds" => ' الماس',

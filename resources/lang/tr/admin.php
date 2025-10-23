@@ -417,6 +417,10 @@ return [
     'huawei_pay' => 'Huawei Pay',
     "webhook_url" => "Webhook URL'si",
     'webhook_id' => 'Webhook Kimliği',
+    'codapay'        => 'CodaPay',
+    'project_id'   => 'Proje Kimliği',
+    'country'      => 'Ülke',
+    'pay_type'     => 'Ödeme Türü',
 
     "target_no" => 'Hedef Numarası',
     "diamonds" => 'Elmas Hedefi',
