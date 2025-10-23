@@ -106,23 +106,14 @@
 
 
 
-        @if (!session()->has('SUPERADMIN_MENU_RENDERED'))
-            @php session(['SUPERADMIN_MENU_RENDERED' => true]); @endphp
+     
             @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
-                       
-                        [
-                            'uri' => '#',
-                            'icon' => 'fa-building',
-                            'title' => __('charge system'),
-                            'permission' => null,
-                            'children' => [
-                                ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
-                            ],
-                        ],
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
+                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
+                        ,
                         [
                             'uri' => '#',
                             'icon' => 'fa-briefcase',
@@ -236,7 +227,6 @@
                     @endif
                 @endforeach
             @endif
-        @endif
 
 
 
