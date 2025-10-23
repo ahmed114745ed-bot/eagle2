@@ -358,7 +358,7 @@ class WalletController extends MainController
 
         $totalSalary = $from->di;
 
-        if ($totalSalary < $usd) {
+        if ($totalSalary < $coins) {
             throw new \Exception(__('balance not enough'));
         }
 
