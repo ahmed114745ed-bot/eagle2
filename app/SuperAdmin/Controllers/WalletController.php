@@ -343,10 +343,10 @@ class WalletController extends MainController
             throw new \Exception(__('This value is not allowed'));
         }
 
-        $to = ShippingAgency::where('country_id', $from->country?->id)->find($toId);
+        $to = ShippingAgency::find($toId);
 
         if (!$to ) {
-            throw new \Exception(__('This agency not found in your country'));
+            throw new \Exception(__('This agency not found'));
         }
 
         if (!$to || $to->is_frozen == 1) {
