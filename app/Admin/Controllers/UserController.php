@@ -169,7 +169,7 @@ class UserController extends MainController
                 'profile',
                 'agency',
                 'userSetting',
-                'country'
+                'country',
                 //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
                 'senderLevel',
                 'receiverLevel',
