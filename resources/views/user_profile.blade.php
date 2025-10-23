@@ -1117,7 +1117,13 @@
                 <div class="meta-item">
                     <span class="meta-label">{{__("Phone")}}:</span>
                     <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
+                    <span class="meta-label">{{ __("country") }}:</span>
+                 <img src="{{ getImagePath(@$user->country->flag) }}"
+                     class="flag-image"
+                     alt="flag Image"
+                     title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
                 </div>
+               
 
             </div>
             <div class="agency-stats">
