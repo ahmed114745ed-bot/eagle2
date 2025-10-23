@@ -283,6 +283,7 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
+        dd(123);
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
