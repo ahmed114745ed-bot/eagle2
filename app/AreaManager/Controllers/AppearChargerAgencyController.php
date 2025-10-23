@@ -204,10 +204,13 @@ class AppearChargerAgencyController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new ShippingAgency());
 
-        $grid->model()->with('owner.profile')->where('country_id', auth()->user()->country_id)
-             ->orderByDesc('id');
+        $grid = new Grid(new ShippingAgency());
+        $adminId = auth()->user()->id;
+        $countriesIds = Common::areaCountries($adminId);
+
+        $grid->model()->with('owner.profile')->whereIn('country_id',  $countriesIds)
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

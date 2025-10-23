@@ -180,6 +180,28 @@
                                     ],
                                 ],
                                  ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                                 [
+                                    'uri' => '#',
+                                    'icon' => 'fa-building',
+                                    'title' => __('Agencies'),
+                                    'permission' => null,
+                                    'children' => [
+                                        ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                        ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                        ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
+                                        ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                                    ],
+                                ],
+                                 [
+                                    'uri' => '#',
+                                    'icon' => 'fa-building',
+                                    'title' => __('rooms'),
+                                    'permission' => null,
+                                    'children' => [
+                                        ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                        ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                    ],
+                                ],
                             ];
                         @endphp
 
