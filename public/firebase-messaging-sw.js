@@ -1,34 +1,31 @@
-
-
-
-
-
 // Import Firebase scripts (required for background notifications)
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-// Initialize Firebase
-const firebaseConfig = window.firebaseConfig;
+(async () => {
+  try {
+    const response = await fetch('/admin/firebase-config');
+    const firebaseConfig = await response.json();
 
-console.log('Firebase Config:', firebaseConfig);
+    console.log('✅ Firebase Config loaded:', firebaseConfig);
 
-const messaging = firebase.messaging();
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
 
-// // Optional: Handle background notifications
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message:', payload);
-  const { title, body } = payload.notification;
+    messaging.onBackgroundMessage((payload) => {
+      console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
-  if (localStorage.getItem("notificationReceived") === "true") {
-      return;  
+      const { title, body } = payload.notification;
+
+      self.registration.showNotification(title, { body });
+
+      self.registration.showNotification(title, {
+        body,
+        icon: '/images/notification-icon.png', 
+      });
+    });
+
+  } catch (error) {
+    console.error('❌ Failed to initialize Firebase Messaging:', error);
   }
-
-  self.registration.showNotification(title, { body });
-
-  localStorage.setItem("notificationReceived", "true");
-
-  setTimeout(() => {
-      localStorage.removeItem("notificationReceived");
-  }, 5 * 60 * 1000); 
-});
-
+})();

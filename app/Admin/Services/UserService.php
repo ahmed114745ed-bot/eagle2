@@ -51,11 +51,25 @@ class UserService
         // now safely escape
         $name = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $showUrl = $showUrl ?: $this->adminUserUrl($user->id);
+
+        $flagHtml = '';
+        if (!empty($user->country?->flag)) {
+            $flagPath = getImagePath($user->country->flag);
+            $flagTitle = app()->getLocale() === 'ar'
+                ? e($user->country->name)
+                : e($user->country->e_name);
+
+            $flagHtml = "<img src='{$flagPath}' 
+                        class='flag-image' 
+                        alt='flag Image' 
+                        title='{$flagTitle}' 
+                        style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+        }
         return <<<HTML
         <a href="{$showUrl}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
             <div>
-                <strong style="font-size:16px;">{$name}</strong><br>
+                <strong style="font-size:16px;">{$name}</strong>{$flagHtml}<br>
                 <span style="font-size:13px;">
                     UID: <span id="uid-{$user->id}">{$uid}</span>
                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$user->id}')"

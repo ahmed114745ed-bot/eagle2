@@ -19,18 +19,19 @@ class SuperAdminRewardController extends MainController
      *
      * @var string
      */
+    public $permission_name = 'reward-center';
 
     public function index(Content $content)
     {
         session(['last_ware_type' => request()->get('type', 'vip')]);
-        return $content
+        return parent::index($content
             ->title(trans('Rewards Center'))
             ->row(function (Row $row) {
                 $row->column(12, $this->tabsComponent());
             })
             ->row(function (Row $row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
 
@@ -81,20 +82,22 @@ class SuperAdminRewardController extends MainController
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
+
         $grid->column('no_reward', __('No reward'))->display(function () {
             return $this->no_reward - $this->gave_reward_no;
         });
 
+        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('return', __('dedicate'))->display(function () {
 
-        $grid->column('return', __('dedicate'))->display(function () {
-
-            return (new \App\Admin\Actions\SuperAdminDedicateRewardAction($this->id))->render();
-        });
+                return (new \App\Admin\Actions\SuperAdminDedicateRewardAction($this->id))->render();
+            });
+        }
 
         $grid->disableActions();
         $grid->disableRowSelector();
         $grid->disableExport();
-         $grid->disableCreateButton();
+        $grid->disableCreateButton();
         return $grid;
     }
 
@@ -106,7 +109,9 @@ class SuperAdminRewardController extends MainController
         // Define your type mapping
         $typeMap = SELECTED_USED_WARE;
 
-        $types =  ['vip', 'ware',  'badge', /** 'achievement'*/];
+        $types =  ['vip', 'ware',  'badge',
+            /** 'achievement'*/
+        ];
         $currentType = request()->get('type', 'vip');
 
         $box = new Box(content: view('admin.grid.Form.rewardTabs', [

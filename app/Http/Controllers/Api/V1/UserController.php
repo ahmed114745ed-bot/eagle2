@@ -304,6 +304,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    
     public function usersAreaManager(Request $request)
     {
         $key = $request->q;

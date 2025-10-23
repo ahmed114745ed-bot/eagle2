@@ -5,12 +5,14 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use App\SuperAdmin\Controllers\BdController;
 use App\SuperAdmin\Controllers\AuthController;
 use App\SuperAdmin\Controllers\HomeController;
+use App\SuperAdmin\Controllers\RoleController;
 use App\SuperAdmin\Controllers\RoomController;
 use App\SuperAdmin\Controllers\UserController;
 use App\SuperAdmin\Controllers\AgencyController;
 use App\SuperAdmin\Controllers\ChargeController;
 use App\SuperAdmin\Controllers\WalletController;
 use App\SuperAdmin\Controllers\LiveRoomController;
+use App\SuperAdmin\Controllers\AdminUserController;
 use App\SuperAdmin\Controllers\AgencyUserController;
 use App\SuperAdmin\Controllers\BdSalariesController;
 use App\SuperAdmin\Controllers\HomeCarouselController;
@@ -20,6 +22,7 @@ use App\SuperAdmin\Controllers\ProfessionalBdController;
 use App\SuperAdmin\Controllers\SuperAdminRewardController;
 use App\SuperAdmin\Controllers\AppearChargerAgencyController;
 use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
+use App\SuperAdmin\Controllers\OfficialMessengerSuperAdminController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -72,6 +75,7 @@ Route::group(
     ],
     function () {
         Route::get('setting', [AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [AuthController::class, 'getSetting']);
         Route::put('update-setting', [AuthController::class, 'putSetting']);
 
         Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -94,6 +98,7 @@ Route::group(
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
         Route::resource('live-rooms', LiveRoomController::class);
+        Route::resource('official-message', OfficialMessengerSuperAdminController::class);
 
         //users
         Route::resource('users', 'UserController', [
@@ -113,6 +118,7 @@ Route::group(
 
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::get('/sub-admins', [ChargeController::class, 'getSubAdmins'])->name('sub.admins');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
         Route::resource('professional-bd', ProfessionalBdController::class);
@@ -131,7 +137,7 @@ Route::group(
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']); 
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
         });
 
@@ -141,5 +147,7 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
+        Route::resource('roles', RoleController::class);
+        Route::resource('auth-users', AdminUserController::class);
     }
 );

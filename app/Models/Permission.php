@@ -11,4 +11,10 @@ class Permission extends Model
     use HasFactory, TimestampsWithTimezone;
 
     protected $table = 'admin_permissions';
+    protected $guarded = [];
+
+    public function permissionTypes()
+    {
+        return $this->hasMany(PermissionType::class, 'permission_id');
+    }
 }

@@ -60,7 +60,12 @@
                 <input type="password" name="password"
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
             </div>
-
+            <div class="form-group has-feedback">
+                <select name="type" class="form-control input-lg text-center" required>
+                    <option value="superadmin">{{ __('Super Admin') }}</option>
+                    <option value="sub_super_admin">{{ __('Sub Super Admin') }}</option>
+                </select>
+            </div>
             @if(config('admin.auth.remember'))
                 <div class="checkbox icheck text-center" dir="rtl">
                     <label>

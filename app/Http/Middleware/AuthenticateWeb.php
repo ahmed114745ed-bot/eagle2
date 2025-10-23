@@ -22,7 +22,9 @@ class AuthenticateWeb
         $uri = $request->path();
 
         $user = Admin::user();
+       // dd( $user);
         $userType = $user?->type ?? 'admin';
+        //  dd($userType);
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
@@ -36,7 +38,10 @@ class AuthenticateWeb
             if (Str::is($uri, $bdLogin) && $userType === 'bd') {
                 return redirect('/bd');
             }
-            if (Str::is($uri, $superadminLogin) && $userType === 'superadmin') {
+            if (
+                Str::is($uri, $superadminLogin)
+                && in_array($userType, ['superadmin', 'sub_super_admin'], true)
+            ) {
                 return redirect('/superadmin');
             }
             if (Str::is($uri, $areaManagerLogin) && $userType === 'area-manager') {
@@ -59,6 +64,8 @@ class AuthenticateWeb
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
                 } elseif ($userType === 'area-manager') {
                     return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
+                } elseif ($userType === 'sub_super_admin') {
+                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin 1111 portal.']);
                 } else {
                     return redirect('/admin/login')->withErrors(['error' => 'Please login through Admin portal.']);
                 }

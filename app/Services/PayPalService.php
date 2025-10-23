@@ -133,12 +133,12 @@ class PayPalService
 
         return $orderId  = $response->result->id ?? null;
         $status   = $response->result->status ?? null;
-        \Log::info('PayPal order created', ['order_id' => $orderId, 'status' => $status]);
+        // \Log::info('PayPal order created', ['order_id' => $orderId, 'status' => $status]);
 
         foreach ($response->result->links as $link) {
             if ($link->rel === 'approve') {
                 // أرجع الرابط كما هو، بدون أي تعديل
-                \Log::info("PayPal Approve URL", ['url' => $link->href]);
+                // \Log::info("PayPal Approve URL", ['url' => $link->href]);
                 return $link->href;
             }
         }

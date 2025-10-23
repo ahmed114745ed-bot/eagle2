@@ -83,7 +83,7 @@
 
     .transferModal{
         width: 600px;
-        height: 332px;
+        height: 1000px;
         background-color:var(--box-background-color);
         display: none;
         position: fixed;
@@ -225,6 +225,14 @@
 #searchResults .list-group-item:hover {
     /* background-color: #f1f1f1; */
 }
+#chargeModal::-webkit-scrollbar {
+    width: 8px;
+}
+#chargeModal::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
 
 #target_id_search {
     padding: 10px 12px;
@@ -253,7 +261,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('charge_wallet') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 🪙
 
     </div>
 </div> -->
@@ -262,16 +270,16 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 <div class="card-visa">
     <div class="card-content">
         <span class="icon_trans"><i class="fas fa-exchange-alt"></i></span>
+        @if (\Encore\Admin\Facades\Admin::user()->can('add-switch-coin-recharge') || \Encore\Admin\Facades\Admin::user()->can('*'))
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('Charge') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
+        @endif
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 🪙
     </div>
 </div>
 
-<div id="chargeModal" class="transferModal" style="
-
-    ">
+<div id="chargeModal" class="transferModal large">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
           <h5 class="modal-title" id="modalDescriptionTitle"></h5>
           <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
@@ -283,24 +291,46 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <label for="target_type">{{ __('select_target') }}</label>
         <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
             <option value="">{{ __('select') }}</option>
-{{--            <option value="user">{{ __('user') }}</option>--}}
+            @if (auth('admin')->user()->type === "superadmin")
+            <option value="user">{{ __('sub admin') }}</option>
+
+            @endif
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
-<br>
+
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
             <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
 
         </div>
-        <br>
-        <div class="form-group">
-            <label for="amount">{{ __('enter_amount') }}</label>
-            <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
-        </div>
+        @php
+                $rate = App\Helpers\Common::getCoinsValue('shipping_coins'); // e.g. 10 coins per dollar
+            @endphp
 
-        <div class="text-right mt-3 actions">
+            <div class="form-group">
+                <label for="amount">{{ __('enter_amount') }} 💲</label>
+                <input type="number"
+                    name="amount"
+                    id="amount"
+                    class="form-control"
+                    required
+                    step="0.01"
+                    min="0.01"
+                    oninput="updateConvertedAmount()">
+
+                <small class="form-text" style="color: #6c757d; font-style: italic;">
+                    {{ __('Now charge by dollar') }}
+                </small>
+
+                <small id="convertedAmount"
+                    class="form-text"
+                    style="color: #007bff; font-weight: bold; display: none;">
+                </small>
+            </div>
+
+        <div class="text-right mt-1 actions">
             <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
             <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
         </div>
@@ -321,11 +351,27 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
 
 <script>
+
+    
+    const rate = {{ $rate ?? 1 }}; // fallback 1 if null
+
+    function updateConvertedAmount() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const result = amount * rate;
+
+        const output = document.getElementById('convertedAmount');
+        if (amount > 0) {
+            output.style.display = 'block';
+            output.textContent = `= ${result.toFixed(2)}🪙`;
+        } else {
+            output.style.display = 'none';
+        }
+    }
+
     function openChargeModal() {
         document.getElementById('chargeModal').style.display = 'block';
         document.getElementById('chargeOverlay').style.display = 'block';
 
-        // Initialize Select2 only when modal opens
         initSelect2();
     }
 
@@ -335,51 +381,89 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     }
 
     function toggleTargetFields() {
-        const type = document.getElementById('target_type').value;
-        const fields = document.getElementById('target_fields');
-        fields.style.display = type ? 'block' : 'none';
-    }
+    const type = document.getElementById('target_type').value;
+    const fields = document.getElementById('target_fields');
+    fields.style.display = type ? 'block' : 'none';
 
-    const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
-
-    function initSelect2() {
-        if (!$('#target_id').hasClass('select2-hidden-accessible')) {
-            $('#target_id').select2({
-                dropdownParent: $('#chargeModal'), // ✅ ensures dropdown stays inside modal
-                placeholder: '{{ __("Select agency") }}',
-                allowClear: true,
-                 language: {
-                    noResults: function() {
-                        return "{{ __('not_in_same_country') }}";
-                    }
-                },
-                ajax: {
-                    url: '/api/search/superadmin-agencies',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term ,
-                            page: params.page || 1,
-                            country_id: AUTH_COUNTRY_ID
-                        };
-                    },
-                    processResults: function(data, params) {
-                        params.page = params.page || 1;
-                        const items = data.data || data || [];
-                        return {
-                            results: items.map(item => ({
-                                id: item.id,
-                                text: item.name
-                            })),
-                            pagination: {
-                                more: (params.page * 10) < (data.total || 0)
-                            }
-                        };
-                    },
-                    cache: true
-                }
-            });
+    if (type) {
+        const $select = $('#target_id');
+        if ($select.data('select2')) {
+            $select.select2('destroy');
         }
+        initSelect2(type);
     }
+}
+
+const AUTH_COUNTRY_ID = "{{ Auth::user()->country_id }}";
+
+function initSelect2(targetType = null) {
+    if (!targetType) {
+        targetType = document.getElementById('target_type').value;
+    }
+
+    let ajaxUrl = '';
+    let placeholderText = '';
+
+    if (targetType === 'user') {
+        ajaxUrl = '/superadmin/sub-admins';
+        placeholderText = '{{ __("Select sub admin") }}';
+    } else if (targetType === 'agency') {
+        ajaxUrl = '/api/search/superadmin-agencies';
+        placeholderText = '{{ __("Select agency") }}';
+    }
+
+    const $select = $('#target_id');
+
+    $select.select2({
+        dropdownParent: $('#chargeModal'),
+        placeholder: placeholderText,
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "{{ __('not_in_same_country') }}";
+            }
+        },
+        ajax: {
+            url: ajaxUrl,
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    page: params.page || 1,
+                    country_id: AUTH_COUNTRY_ID
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+                const items = Array.isArray(data)
+                            ? (data[0]?.data || [])
+                            : (data.data || []);             
+                
+                return {
+                    results: items.map(item => {
+                        let displayName = targetType === 'user'
+                            ? (item.username || item.name || `ID: ${item.id}`)
+                            : (item.name || item.username || `ID: ${item.id}`);
+
+                        if (item.status) {
+                            displayName += ` (${item.status})`;
+                        }
+
+                        return {
+                            id: item.id,
+                            text: displayName
+                        };
+                    }),
+
+                    pagination: {
+                        more: (params.page * 10) < (data.total || 0)
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+}
+
 </script>
