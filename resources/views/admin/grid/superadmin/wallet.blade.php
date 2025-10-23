@@ -300,7 +300,6 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
 
         </div>
-        <br>
         @php
                 $rate = App\Helpers\Common::getCoinsValue('shipping_coins'); // e.g. 10 coins per dollar
             @endphp
@@ -326,7 +325,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                 </small>
             </div>
 
-        <div class="text-right mt-3 actions">
+        <div class="text-right mt-1 actions">
             <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
             <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
         </div>
