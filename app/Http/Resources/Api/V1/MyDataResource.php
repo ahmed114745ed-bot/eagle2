@@ -147,7 +147,7 @@ class MyDataResource extends JsonResource
             //ColorName
             'has_color_name'       => (bool)UserPackHelper::getColorName($this->resource),
             'vip' =>  [
-                'id'             => $this->UserVip->id,
+                'id'             => $this->UserVip?->id,
                 'level'          => $this->UserVip->level,
                 'vip_upload_gif' => UserPackHelper::hasPack($this->resource, 22),
                 'vip_img'        => UserPackHelper::getVipIcon($this->resource),
