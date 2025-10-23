@@ -75,15 +75,27 @@ class SearchRepository implements SearchRepositoryInterface
 
         $keywords = $user->id;
 
-        return Room::with('owner')
+        return Room::with([
+            'owner',
+            'owner.packs'
+            ])
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
-            ->orderBy('hot', 'desc')
-            ->take(2)
-            ->get();
+            ->where(function ($query) use ($keywords, $blockedUserIds) {
+                $query->where('uid', 'like', $keywords . '%')
+                    ->whereNotIn('uid', $blockedUserIds);
+            })
+            ->where(function ($query) {
+                $query->where('type', '!=', 'live') 
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'live') 
+                                ->where('room_status', 1); 
+                    });
+            })
+                    ->orderBy('hot', 'desc')
+                    ->take(2)
+                    ->get();
     }
 
     public function searchRoomsV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1): array|Collection
@@ -115,14 +127,24 @@ class SearchRepository implements SearchRepositoryInterface
             'owner',
             'owner.packs'
         ])
-            ->whereHas('owner', function ($query) {
-                $query->where('status', 1);
-            })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
-            ->orderBy('hot', 'desc')
-            ->take(2)
-            ->get();
+        ->whereHas('owner', function ($query) {
+            $query->where('status', 1);
+        })
+        ->where(function ($query) use ($keywords, $blockedUserIds) {
+            $query->where('uid', 'like', $keywords . '%')
+                  ->whereNotIn('uid', $blockedUserIds);
+        })
+        ->where(function ($query) {
+            $query->where('type', '!=', 'live') 
+                  ->orWhere(function ($subQuery) {
+                      $subQuery->where('type', 'live') 
+                               ->where('room_status', 1); 
+                  });
+        })
+        ->orderBy('hot', 'desc')
+        ->take(2)
+        ->get();
+    
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
