@@ -51,10 +51,10 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
     public function handle()
     {
   
-        \Log::info('🚀 AllOpeningRoomsZegoRequest started', [
-            'roomID'   => $this->roomID,
-            'senderId' => $this->senderId,
-        ]);
+        // \Log::info('🚀 AllOpeningRoomsZegoRequest started', [
+        //     'roomID'   => $this->roomID,
+        //     'senderId' => $this->senderId,
+        // ]);
         
         $useZego = Config::where('name', 'use_zego')->value('value');
 

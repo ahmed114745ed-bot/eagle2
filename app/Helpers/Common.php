@@ -2147,7 +2147,7 @@ class Common
             $data = [
                 'user_id' => $userId,
                 'badge_id' => $badgeId,
-                'expire' => time() + (($days) * 86400),
+                'expire' => $days == 0 ? 0 : time() + (($days) * 86400),
                 'receive_type' => $type,
             ];
 

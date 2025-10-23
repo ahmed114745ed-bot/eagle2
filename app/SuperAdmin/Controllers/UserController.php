@@ -2,12 +2,7 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\ChangeAgencyAction;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
-use App\Admin\Actions\KickOfAgencyAction;
-use App\Admin\Actions\KickOfFamilyAction;
+use Encore\Admin\Auth\Permission;
 use App\Admin\Controllers\MainController;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
@@ -63,6 +58,10 @@ class UserController extends MainController
 
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-users');
+        }
+
         $content = $content->title(__($this->title));
 
         $content = $content->row(function ($row) {
@@ -389,9 +388,10 @@ class UserController extends MainController
         // });
         $grid->disableActions();
 
-        if (config('app.env') == 'production') $grid->disableCreateButton();
+        $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
+
 
         return $grid;
     }

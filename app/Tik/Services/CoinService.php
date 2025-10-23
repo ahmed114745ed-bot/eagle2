@@ -46,7 +46,7 @@ class CoinService
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $paymentMethod = $coin->paymentCoin->type;
         $userType = $coin->paymentCoin->package_type;
-        \Log::info("start $coin->obtained_coins coins");
+        // \Log::info("start $coin->obtained_coins coins");
 
         $user = $this->resolveCharger($request, $userType);
 
@@ -120,11 +120,13 @@ class CoinService
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
             } elseif ($paymentMethod == 'codapay') {
-                $Active = config('is_codapay_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $active = config('is_codapay_active');
+                // \Log::info("start $active coins");
+
+                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $codapayService = new CodapayService();
 
-                $paymentUrl = $codapayService->makePayment($log->id, $coin->usd, $user->id);
+                $paymentUrl = $codapayService->initiatePayment($log->id, $coin->usd, $user->id);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }

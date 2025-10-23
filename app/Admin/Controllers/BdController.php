@@ -102,7 +102,7 @@ class BdController extends MainController
 
         $grid->model()
             ->when(isset($countryID), function ($query) use ($superAdmin) {
-               
+
                 $query->where('parent_id', @$superAdmin->id);
             })
 
@@ -360,13 +360,13 @@ class BdController extends MainController
         //                }
         //            });
 
-        $form->select('parent_id', __('select super admin'))->options(function ($value) {
-            $ops = [];
-            foreach (SuperAdmin::where('id', $value)->get() as $admin) {
-                $ops[$admin->id] = $admin->username;
-            }
-            return $ops;
-        })->ajax('/api/search/users-superadmin2', 'id', 'name')->rules('required');
+//        $form->select('parent_id', __('select super admin'))->options(function ($value) {
+//            $ops = [];
+//            foreach (SuperAdmin::where('id', $value)->get() as $admin) {
+//                $ops[$admin->id] = $admin->username;
+//            }
+//            return $ops;
+//        })->ajax('/api/search/users-superadmin2', 'id', 'name')->rules('required');
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -385,8 +385,8 @@ class BdController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
 
-            $form->switch('default', __('set_as_default'))
-                ->help(__('make_bd_default'));
+//            $form->switch('default', __('set_as_default'))
+//                ->help(__('make_bd_default'));
         }
 
         $form->select('country_id', trans('country'))->options(function () {
@@ -422,18 +422,24 @@ class BdController extends MainController
 
                 }
             }else{
+                $selectedCountryId = $form->country_id;
+                $superAdminId = SuperAdmin::where('country_id', $selectedCountryId)->first()?->id ?? SuperAdmin::where('default', 1)->where('country_id', 0)->first()?->id;
+
+                if ($superAdminId) {
+                    $form->model()->parent_id = $superAdminId;
+                }
+
                 $userAppId = $form->input('app_id');
                 $userApp = User::find($userAppId);
                 if (isset($userApp)) {
                     $userApp->is_bd = 1;
                     $userApp->save();
                     MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
-
                 }
             }
 
             if ($form->password && $form->model()->password != $form->password) {
-                $form->password   = Hash::make($form->password);
+                $form->password = Hash::make($form->password);
             }
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
@@ -455,7 +461,7 @@ class BdController extends MainController
                 }
             }
 
-            
+
         });
 
         return $form;

@@ -94,21 +94,26 @@ class SuperAdminRewardController extends MainController
             $grid = new Grid(new OVip());
         }
 
-        $grid->column('return', __('dedicate'))->display(function () {
-            $type = request('type');
-            return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
-        });
+        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('return', __('dedicate'))->display(function () {
+                $type = request('type');
+                return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
+            });
+        }
 
         $grid->disableRowSelector();
         $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools) {
-            $url = '/admin/super-admin-rewards-history' . "?type=" . request('type');
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
-            $tools->append($button);
-        });
+        if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $url = '/admin/super-admin-reward-history' . "?type=" . request('type');
+                $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+                $tools->append($button);
+            });
+        }
+
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');

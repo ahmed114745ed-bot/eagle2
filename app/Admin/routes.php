@@ -5,6 +5,7 @@ use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AreaManagerChargeController;
 use App\Admin\Controllers\AreaManagerChargeReportController;
 use App\Admin\Controllers\AreaManagerController;
+use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerHistoryController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
@@ -249,6 +250,9 @@ Route::group(
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles-new', 'RoleControllerNew');
+        Route::resource('roles', 'RoleControllerNew');
+
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
         //     Route::get('/', [RoleControllerNew::class, 'index']);
@@ -487,8 +491,8 @@ Route::group(
         Route::resource('usersBd', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::resource('superadmin-users', SuperAdminController::class);
-//        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
+        Route::resource('superadmin-users', SuperAdminController::class)->except('delete');
+        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
 //        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
@@ -744,14 +748,17 @@ Route::group(
             Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
 
+        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
+
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
             Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
-
-
         });
         Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
             $user = auth()->user();
@@ -759,8 +766,6 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
-
-
     }
 );
 
