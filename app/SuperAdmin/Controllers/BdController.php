@@ -28,7 +28,7 @@ class BdController extends MainController
      * @var string
      */
     protected $title = 'BD';
-    public $permission_name = 'Bd';
+    public $permission_name = 'Bds';
 
     public function index(Content $content)
     {

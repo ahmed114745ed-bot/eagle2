@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Permission;
 use Illuminate\Support\Str;
+use App\Enums\PermissionType;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\RoleRewards\Actions\DeleteRole;
@@ -175,7 +176,19 @@ class RoleControllerNew extends MainController
 
         // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
-        $form->text('name', trans('role name'))->rules('required|unique:admin_roles,name,{{id}}');
+        $form->text('name', trans('role name'))->rules(function ($form) {
+                // Get the record ID if editing, otherwise null
+                $id = $form->model()?->id ?? null;
+
+                // Get the type from request or from existing model when editing
+                $type = PermissionType::ADMIN->value ?? $form->model()?->type;
+
+                // Default to empty string if not found (avoids SQL issues)
+                $type = $type ?? '';
+
+                // Build unique rule with type condition
+                return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
 
         // Hide default listbox and use custom tabbed permission UI
         // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));

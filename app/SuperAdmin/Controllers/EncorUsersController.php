@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use App\Enums\PermissionType;
 
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
@@ -175,12 +176,12 @@ class EncorUsersController extends AdminController
 
         $grid->model()->where(function ($q) {
             $q->where('type', PermissionType::SUB_SUPER_ADMIN->value);
-           })
+        })
             ->where('is_preview', 0)
             ->where('parent_id', auth('admin')->id())
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
-        });
+            });
 
         $grid->column('id', 'ID')->sortable();
         $grid->column('username', trans('admin.username'));
@@ -285,8 +286,29 @@ class EncorUsersController extends AdminController
 
         $form->display('id', 'ID');
         $form->text('username', trans('admin.username'))
-            ->creationRules(['required', "unique:{$connection}.{$userTable}"])
-            ->updateRules(['required', "unique:{$connection}.{$userTable},username,{{id}}"]);
+            ->rules(function ($form) use ($connection, $userTable) {
+                // Build the table name (with or without connection prefix)
+                $table = "{$connection}.{$userTable}";
+
+                // When creating
+                if ($form->isCreating()) {
+                    return [
+                        'required',
+                        Rule::unique($table, 'username')
+                            ->where(fn($query) => $query->where('type', PermissionType::SUB_SUPER_ADMIN->value)),
+                    ];
+                }
+
+                // When editing
+                $id = $form->model()?->id ?? null;
+
+                return [
+                    'required',
+                    Rule::unique($table, 'username')
+                        ->ignore($id) // correctly ignore the current record
+                        ->where(fn($query) => $query->where('type', PermissionType::SUB_SUPER_ADMIN->value)),
+                ];
+            });
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
@@ -309,8 +331,8 @@ class EncorUsersController extends AdminController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
-             $isEditing = $form->isEditing();
-             if ($isEditing) {
+            $isEditing = $form->isEditing();
+            if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
                 if ($originalAppId !=  $newAppId) {
@@ -318,7 +340,6 @@ class EncorUsersController extends AdminController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_sub_super_admin = 0;
                         $OldUserAppId->save();
-                       
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -335,9 +356,8 @@ class EncorUsersController extends AdminController
             if (isset($userApp)) {
                 $userApp->is_sub_super_admin = 1;
                 $userApp->save();
-                
             }
-            });
+        });
 
         return $form;
     }

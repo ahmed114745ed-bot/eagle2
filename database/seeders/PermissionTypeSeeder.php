@@ -296,7 +296,7 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     ['key' => 'banner', 'except' => [], 'additional' => ['action-switch'], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
-                        PermissionType::SUPER_ADMIN->value => ['browse', 'action-switch'],
+                        PermissionType::SUPER_ADMIN->value => ['browse', 'action-switch','create'],
                     ],],
                     ['key' => 'banner-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],

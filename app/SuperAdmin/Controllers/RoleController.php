@@ -184,7 +184,20 @@ class RoleController extends MainController
         $this->disableFormTools($form);
 
 
-        $form->text('name', trans('role name'))->rules('required|unique:admin_roles,name,{{id}}');
+        $form->text('name', trans('role name'))
+            ->rules(function ($form) {
+                // Get the record ID if editing, otherwise null
+                $id = $form->model()?->id ?? null;
+
+                // Get the type from request or from existing model when editing
+                $type = PermissionType::SUPER_ADMIN->value ?? $form->model()?->type;
+
+                // Default to empty string if not found (avoids SQL issues)
+                $type = $type ?? '';
+
+                // Build unique rule with type condition
+                return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
 
 
         $form->html(view('admin.super-admin-permission-tabs', [
@@ -202,14 +215,14 @@ class RoleController extends MainController
             $form->model()->admin_id = Auth::id();
             $form->model()->type = PermissionType::SUPER_ADMIN->value;
             // Automatically generate slug from name *before saving*
-            $form->model()->slug = Str::slug($form->name);
+            $form->model()->slug = Str::slug($form->name. '-' . PermissionType::SUPER_ADMIN->value);
         });
         $form->saving(function (Form $form) {
             $form->ignore('permissions'); // handled manually
         });
 
         $form->saved(function (Form $form) {
-            $form->slug = Str::slug(request('name'));
+            $form->slug = Str::slug(request('name') . '-' . PermissionType::SUPER_ADMIN->value);
             $form->admin_id = Auth::id();
             $all = request('permissions_all');
             $selectedPermissionIds = array_filter(explode(',', $all));
@@ -313,7 +326,7 @@ class RoleController extends MainController
         }
         $role = Role::findOrFail($id);
 
-        UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
+        // UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
 
         return parent::destroy($id);
     }

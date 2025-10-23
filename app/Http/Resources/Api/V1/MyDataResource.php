@@ -119,13 +119,14 @@ class MyDataResource extends JsonResource
         if (self::isStopInvitationValid()) {
             $isStopInvitationValid = true;
         }
+        $vipData = UserPackHelper::getVipData($this->resource);
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
             'name' => @$this->name ?: 'user' . ' ' . '#' . $uuid,
             'phone' => (string)@$this->phone ?: '',
             'firebase_uuid' => (string)@$this->firebase_uuid ?: '',
-            
+
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
@@ -146,8 +147,11 @@ class MyDataResource extends JsonResource
             //ColorName
             'has_color_name'       => (bool)UserPackHelper::getColorName($this->resource),
             'vip' =>  [
-                'vip_img'      => UserPackHelper::getVipIcon($this->resource),
-                'colored_name' => UserPackHelper::getColorName($this->resource),
+                'id'             => $this->UserVip->id,
+                'level'          => $this->UserVip->level,
+                'vip_upload_gif' => UserPackHelper::hasPack($this->resource, 22),
+                'vip_img'        => UserPackHelper::getVipIcon($this->resource),
+                'colored_name'   => UserPackHelper::getColorName($this->resource),
             ],
             //EndColorName
             //AntiBan
