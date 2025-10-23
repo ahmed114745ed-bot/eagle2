@@ -75,27 +75,33 @@ class SearchRepository implements SearchRepositoryInterface
 
         $keywords = $user->id;
 
-        return Room::with([
+        $query = Room::with([
             'owner',
             'owner.packs'
-            ])
-            ->whereHas('owner', function ($query) {
-                $query->where('status', 1);
-            })
-            ->where(function ($query) use ($keywords, $blockedUserIds) {
-                $query->where('uid', 'like', $keywords . '%')
-                    ->whereNotIn('uid', $blockedUserIds);
-            })
-            ->where(function ($query) {
-                $query->where('type', '!=', 'live') 
-                    ->orWhere(function ($subQuery) {
-                        $subQuery->where('type', 'live') 
-                                ->where('room_status', 1); 
-                    });
-            })
-                    ->orderBy('hot', 'desc')
-                    ->take(2)
-                    ->get();
+        ])
+        ->whereHas('owner', function ($query) {
+            $query->where('status', 1);
+        })
+        ->where(function ($query) use ($keywords, $blockedUserIds) {
+            $query->where('uid', 'like', $keywords . '%')
+                  ->whereNotIn('uid', $blockedUserIds);
+        })
+        ->where(function ($query) {
+            $query->where('type', '!=', 'live')
+                  ->orWhere(function ($subQuery) {
+                      $subQuery->where('type', 'live')
+                               ->where('room_status', 1);
+                  });
+        })
+        ->orderBy('hot', 'desc')
+        ->take(2);
+    
+    
+        $rooms = $query->get();
+
+        \Log::info('Room Results:', $rooms->toArray());
+        
+        return $rooms;
     }
 
     public function searchRoomsV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1): array|Collection
