@@ -46,8 +46,6 @@ class OfficialMessageController extends MainController
 
     protected function grid()
     {
-
-
         $grid = new Grid(new OfficialMessage);
         $countryID = session('country_id');
         $grid->model()->where('admin_type', PermissionType::AREA_MANAGER->value)->where('type', 2)->orderByDesc('id');

@@ -2163,6 +2163,6 @@ class Common
             return [];
         }
 
-        return $areaManager->countries->pluck('id')->toArray();
+        return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
 }

@@ -102,21 +102,13 @@
                 @endforeach
                 @endif
 
-                @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+                 @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
-                       
-                        [
-                            'uri' => '#',
-                            'icon' => 'fa-building',
-                            'title' => __('charge system'),
-                            'permission' => null,
-                            'children' => [
-                                ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
-                            ],
-                        ],
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
+                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
+                        ,
                         [
                             'uri' => '#',
                             'icon' => 'fa-briefcase',
@@ -196,8 +188,11 @@
                 @endphp
 
                 @foreach($superadminLinks as $link)
+
                     @if(isset($link['children']))
+
                         @if(hasVisibleChildren($link['children']))
+
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa {{ $link['icon'] }}"></i>
@@ -227,88 +222,90 @@
                                 </a>
                             </li>
                         @endif
-                    @endforeach
-                @endif
+                    @endif
+                @endforeach
+            @endif
 
 
 {{--                area manager--}}
-                    @if (Admin::user()->type == 'area-manager')
-                        @php
-                            $areaManagerLinks = [
-                                ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
-                                [
-                                    'uri' => '#',
-                                    'icon' => 'fa-users',
-                                    'title' => __('Super Admin'),
-                                    'children' => [
-                                        ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
-                                    ],
+                   @if (Admin::user()->type == 'area-manager')
+                    @php
+                        $areaManagerLinks = [
+                            ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-users',
+                                'title' => __('Super Admin'),
+                                'children' => [
+                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
                                 ],
-                                 ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
-                                 [
-                                    'uri' => '#',
-                                    'icon' => 'fa-building',
-                                    'title' => __('Agencies'),
-                                    'permission' => null,
-                                    'children' => [
-                                        ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
-                                        ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
-                                        ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
-                                        ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
-                                    ],
+                            ],
+                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'permission' => null,
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
                                 ],
-                                 [
-                                    'uri' => '#',
-                                    'icon' => 'fa-building',
-                                    'title' => __('rooms'),
-                                    'permission' => null,
-                                    'children' => [
-                                        ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
-                                        ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
-                                    ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('rooms'),
+                                'permission' => null,
+                                'children' => [
+                                    ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                    ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
                                 ],
-                                 [
-                                    'uri' => '#',
-                                    'icon' => 'fa-home',
-                                    'title' => __('Advertisements'),
-                                    'permission' => null,
-                                    'children' => [
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Advertisements'),
+                                'permission' => null,
+                                'children' => [
                                     // ['uri' => '/home-carousel', 'icon' => 'fa-home', 'title' => __('HomeCarousel'), 'permission' => 'banner'],
-                                        ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
-
-                                    ],
+                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
                                 ],
-                            ];
-                        @endphp
+                            ],
+                        ];
+                    @endphp
 
-                        @foreach($areaManagerLinks as $link)
-                            @if(isset($link['children']))
-                                <li class="treeview">
-                                    <a href="#">
-                                        <i class="fa {{ $link['icon'] }}"></i>
-                                        <span>{{ $link['title'] }}</span>
-                                        <i class="fa fa-angle-left pull-right"></i>
-                                    </a>
-                                    <ul class="treeview-menu">
-                                        @foreach($link['children'] as $child)
-                                            <li>
-                                                <a href="{{ areaManager_url($child['uri']) }}">
-                                                    <i class="fa {{ $child['icon'] }}"></i>
-                                                    <span>{{ $child['title'] }}</span>
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </li>
-                            @else
-                                <li>
-                                    <a href="{{ areaManager_url($link['uri']) }}">
-                                        <i class="fa {{ $link['icon'] }}"></i>
-                                        <span>{{ $link['title'] }}</span>
-                                    </a>
-                                </li>
-                            @endif
-                        @endforeach
+                    @foreach($areaManagerLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ areaManager_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i>
+                                                <span>{{ $child['title'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ areaManager_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @endif
+
 
 
                 @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && !session('preview_superadmin'))
