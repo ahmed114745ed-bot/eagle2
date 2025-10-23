@@ -361,7 +361,6 @@ class WalletController extends MainController
         if ($totalSalary < $usd) {
             throw new \Exception(__('balance not enough'));
         }
-        dd($from, $to, $coins, $usd );
 
         $this->performAgencyCharge($from, $to, $coins, $usd);
         return 1;
