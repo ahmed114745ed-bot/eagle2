@@ -7,6 +7,7 @@ use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Traits\AgencyAdditionalInfoTraits;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
@@ -28,6 +29,11 @@ class ShippingAgency extends Model
     public function chargeAgency()
     {
         return $this->hasOne(ChargeAgency::class, 'agency_id');
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function charges()
