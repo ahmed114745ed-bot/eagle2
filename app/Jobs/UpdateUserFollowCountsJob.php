@@ -40,7 +40,7 @@ class UpdateUserFollowCountsJob implements ShouldQueue
                 }
             });
     
-        \Log::info("Updated users count: {$updatedCount}");
+        // \Log::info("Updated users count: {$updatedCount}");
     }
     
     

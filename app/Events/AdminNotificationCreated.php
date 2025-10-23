@@ -50,11 +50,11 @@ class AdminNotificationCreated implements ShouldBroadcastNow
      */
     public function broadcastWith()
     {
-        \Log::info('📡 Broadcasting AdminNotificationCreated', [
-            'id' => $this->notification->id,
-            'title' => $this->notification->title,
-            'channel' => 'public-admin.notifications',
-        ]);
+        // \Log::info('📡 Broadcasting AdminNotificationCreated', [
+        //     'id' => $this->notification->id,
+        //     'title' => $this->notification->title,
+        //     'channel' => 'public-admin.notifications',
+        // ]);
 
         return [
             'id'        => $this->notification->id,

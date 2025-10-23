@@ -738,7 +738,7 @@ Route::get('/codapay/create-payment', function () {
     $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
 
     try {
-        Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
+        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
 
         $response = Http::timeout(15)
             ->withHeaders(['Content-Type' => 'application/json'])
@@ -762,7 +762,7 @@ Route::get('/codapay/create-payment', function () {
 
         $result = $response->json();
 
-        Log::info("✅ Codapay Response Received", ['result' => $result]);
+        // Log::info("✅ Codapay Response Received", ['result' => $result]);
 
         // ✅ تحقق من النجاح
         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {

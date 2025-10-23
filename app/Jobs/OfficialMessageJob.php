@@ -40,7 +40,7 @@ class OfficialMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('OfficialMessageJob raw request', $this->request);
+        // Log::info('OfficialMessageJob raw request', $this->request);
         $feature = $this->request['feature'] ;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
@@ -48,7 +48,7 @@ class OfficialMessageJob implements ShouldQueue
         // Handle feature_ids as array or string
         $featureIds = $this->model->feature_ids ?? [];
 
-        Log::info($featureIds);
+        // Log::info($featureIds);
 
         // ✅ Always make $featureIds an array safely
         if (!is_array($featureIds)) {
@@ -56,12 +56,12 @@ class OfficialMessageJob implements ShouldQueue
             $featureIds = array_filter(explode(',', $featureIds));
         }
 
-        Log::info('OfficialMessageJob started', [
-            'feature'      => $feature,
-            'sub_feature'  => $subFeature,
-            'member_title' => $memberTitle,
-            'feature_ids'  => $featureIds,
-        ]);
+        // Log::info('OfficialMessageJob started', [
+        //     'feature'      => $feature,
+        //     'sub_feature'  => $subFeature,
+        //     'member_title' => $memberTitle,
+        //     'feature_ids'  => $featureIds,
+        // ]);
 
         $usersId = [];
 
@@ -75,7 +75,7 @@ class OfficialMessageJob implements ShouldQueue
             foreach ($agencies as $agency) {
                 if ($memberTitle === 'owner') {
                     $usersId[] = $agency->app_owner_id;
-                    Log::info($usersId);
+                    // Log::info($usersId);
                 } elseif ($memberTitle === 'admin') {
                     $usersId = array_merge($usersId, $agency->admins->pluck('user_id')->toArray());
                 } elseif ($memberTitle === 'members') {
