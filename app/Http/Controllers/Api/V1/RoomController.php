@@ -1311,11 +1311,17 @@ class RoomController extends Controller
         $admin_id = $request->user_id;
         $roomId = $request->room_id;
         if ((!$uid || !$roomId) && !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-
+        Log::info("Incoming request data", [
+            'owner_id' => $uid,
+            'user_id'  => $admin_id,
+            'room_id'  => $roomId
+        ]);
         $room = $roomId
             ? Room::find($roomId)
             : Room::where('uid', $uid)->where('type', 'audio')->first();
-
+            Log::info("Room fetched", [
+                'room' => $room ? $room->toArray() : null
+            ]);
         if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
         $uid  = $room->uid;
         if ($room->uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
