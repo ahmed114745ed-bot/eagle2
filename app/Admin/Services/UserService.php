@@ -53,18 +53,18 @@ class UserService
         $showUrl = $showUrl ?: $this->adminUserUrl($user->id);
 
         $flagHtml = '';
-       
-            $flagPath = getImagePath(@$user->country->flag);
+        if (!empty($user->country?->flag)) {
+            $flagPath = getImagePath($user->country->flag);
             $flagTitle = app()->getLocale() === 'ar'
-                ? e(@$user->country->name)
-                : e(@$user->country->e_name);
+                ? e($user->country->name)
+                : e($user->country->e_name);
 
             $flagHtml = "<img src='{$flagPath}' 
                         class='flag-image' 
                         alt='flag Image' 
                         title='{$flagTitle}' 
                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-        
+        }
         return <<<HTML
         <a href="{$showUrl}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
