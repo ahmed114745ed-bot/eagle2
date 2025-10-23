@@ -188,6 +188,14 @@ Route::group(
 );
 
 Admin::routes();
+
+$routes = collect(app('router')->getRoutes()->get());
+$filtered = $routes->reject(function ($route) {
+    return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
+});
+
+
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -245,9 +253,9 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        Route::resource('auth/roles', 'RoleControllerNew');
-        Route::resource('auth/roles-new', 'RoleControllerNew');
-        Route::resource('roles', 'RoleControllerNew');
+        // Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles', RoleControllerNew::class);
+        // Route::resource('roles', 'RoleControllerNew');
 
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {

@@ -105,7 +105,6 @@
 
 
 
-                <li class="header">{{ trans('admin.menu') }} 1</li>
 
      
             @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
@@ -194,11 +193,10 @@
                 @endphp
 
                 @foreach($superadminLinks as $link)
-
                     @if(isset($link['children']))
 
                         @if(hasVisibleChildren($link['children']))
-
+                      
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa {{ $link['icon'] }}"></i>
@@ -234,7 +232,7 @@
 
 
 
-                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && !session('preview_superadmin'))
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && Admin::user()->type != 'sub_super_admin' && !session('preview_superadmin'))
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @elseif(session('preview_superadmin'))
                     @php

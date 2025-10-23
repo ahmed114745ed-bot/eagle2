@@ -121,7 +121,8 @@ class ChargeController extends MainController
                 });
                 $profileUrl = '';
                 if (!empty($info['uuid'])) {
-                    $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
+                   // dd($info['uuid']);
+                    $profileUrl = url('superadmin/shipping-agencies/profile/'. $info['uuid']);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -181,6 +182,7 @@ class ChargeController extends MainController
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableActions();
+        $grid->disableExport();
         return $grid;
     }
 
