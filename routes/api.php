@@ -103,6 +103,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+    Route::get('codapay-landing-page', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
