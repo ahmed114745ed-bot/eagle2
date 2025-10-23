@@ -283,6 +283,7 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
+       
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
@@ -357,7 +358,7 @@ class WalletController extends MainController
 
         $totalSalary = $from->di;
 
-        if ($totalSalary < $usd) {
+        if ($totalSalary < $coins) {
             throw new \Exception(__('balance not enough'));
         }
 
