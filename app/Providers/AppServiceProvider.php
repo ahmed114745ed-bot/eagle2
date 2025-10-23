@@ -194,6 +194,15 @@ class AppServiceProvider extends ServiceProvider
                 'webhook_id' => $settings['paypal_webhook_id'] ?? '',
             ],
 
+            'codapay' => [
+                'base_url'   => $settings['codapay_base_url'] ?? '',
+                'api_key'    => $settings['codapay_api_key'] ?? '',
+                'project_id' => $settings['codapay_project_id'] ?? '',
+                'country'    => $settings['codapay_country'] ?? '',
+                'pay_type'   => $settings['codapay_pay_type'] ?? '',
+                'currency'   => $settings['codapay_currency'] ?? '',
+            ],
+
             'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
             'is_paypal_active' => $settings['is_paypal_active'] ?? 0,
             'is_utd_fawry_active' => $settings['is_utd_fawry_active'] ?? 0,
@@ -201,6 +210,7 @@ class AppServiceProvider extends ServiceProvider
             'is_strip_active' => $settings['is_strip_active'] ?? 0,
             'is_opay_active' => $settings['is_opay_active'] ?? 0,
             'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
+            'is_codapay_active' => $settings['is_codapay_active'] ?? 0,
         ]);
 
         Cache::put('app_title', $appName, now()->addHours(24));
