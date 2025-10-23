@@ -3,6 +3,7 @@
 namespace App\AreaManager\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\UserCommon;
 use App\Models\SuperAdmin;
 use App\Models\User;
@@ -26,7 +27,7 @@ class SuperAdminChargeReportController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(trans("Reports"))
             ->row(function (Row $row) {
                 $row->column(12, function (Column $column) {
@@ -34,7 +35,7 @@ class SuperAdminChargeReportController extends MainController
                     $box->content($this->combinedContent());
                     $column->append($box);
                 });
-            }));
+            });
     }
 
     private function combinedContent()
@@ -70,6 +71,9 @@ class SuperAdminChargeReportController extends MainController
         if (request("name") == "app") {
             $charger_type = "app";
         }
+//        if (request("name") == UserTypeEnum::AREA_MANAGER) {
+//            $charger_type = UserTypeEnum::AREA_MANAGER;
+//        }
 
         $grid = new Grid(new Charge());
 
@@ -134,9 +138,11 @@ class SuperAdminChargeReportController extends MainController
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
-            $grid->model()->where('charger_type', "dash");
+            $grid->model()->where('charger_type', "dash")
+                ->orWhere('charger_type', UserTypeEnum::AREA_MANAGER);
         } else {
-            $grid->model()->where('charger_type', "!=", "dash");
+            $grid->model()->where('charger_type', "!=", "dash")
+                ->orWhere('charger_type','!=', UserTypeEnum::AREA_MANAGER);
         }
 
 

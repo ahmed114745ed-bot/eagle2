@@ -2,8 +2,8 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Admin\Actions\SuperAdminChargeAction;
 use App\Admin\Controllers\MainController;
+use App\AreaManager\Actions\SuperAdminChargeAction;
 use App\Models\SuperAdmin;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
@@ -23,9 +23,6 @@ class SuperAdminChargeController extends MainController
      */
     public function index(Content $content)
     {
-        if (! Admin::user()->can('*')) {
-            Permission::check('browse-' . $this->permission_name);
-        }
         return $content
             ->title(trans('charges'))
             ->body($this->grid());
@@ -54,6 +51,7 @@ class SuperAdminChargeController extends MainController
         });
 
         $grid->model()
+            ->where('parent_id', auth()->id())
             ->select('id', 'username', 'di', 'avatar')
 //            ->with('profile')
             ->orderByDesc('id');
@@ -103,14 +101,11 @@ class SuperAdminChargeController extends MainController
             ";
         });
 
-        if (Admin::user()->can('add-switch-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('history-switch-' . $this->permission_name)) {
-            $grid->column('actions', __('Actions'))
-                ->display(function () {
-
-                    return (new SuperAdminChargeAction())->setUserId($this->id)->render();
-                })
-                ->style('white-space: nowrap; width: 100px;');
-        }
+        $grid->column('actions', __('Actions'))
+            ->display(function () {
+                return (new SuperAdminChargeAction())->setUserId($this->id)->render();
+            })
+            ->style('white-space: nowrap; width: 100px;');
 
         $grid->disableCreateButton();
         $grid->disableExport();

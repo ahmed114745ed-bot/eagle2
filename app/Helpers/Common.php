@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Models\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
@@ -1846,6 +1847,20 @@ class Common
                     'id' => $admin->id ?? '',
                     'type' => 'dash',
                     'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
                     'image_color' => null,
                     'id_image' => '',
                     'colored_name' => '',
