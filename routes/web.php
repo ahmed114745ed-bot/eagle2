@@ -36,7 +36,9 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\AppearChargerAgencyController;
-
+use App\Models\AgencySallary;
+use App\Models\BDSallary;
+use App\Models\UserSallary;
 
 /*
 |--------------------------------------------------------------------------
@@ -634,7 +636,135 @@ Route::get('remove-new-country', function () {
 });
 
 // Main page route
-Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+// Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
 
-// AJAX API route
-Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
+//         $response = Http::timeout(15)
+//             ->withHeaders(['Content-Type' => 'application/json'])
+//             ->post($url, $payload);
+
+//         if ($response->failed()) {
+//             Log::error("❌ Codapay Connection Failed", [
+//                 'status'  => $response->status(),
+//                 'body'    => $response->body(),
+//                 'headers' => $response->headers(),
+//             ]);
+
+//             return response()->json([
+//                 'error'   => 'Failed to connect Codapay',
+//                 'status'  => $response->status(),
+//                 'details' => $response->body(),
+//                 'url'     => $url,
+//                 'payload' => $payload,
+//             ], 500);
+//         }
+
+//         $result = $response->json();
+
+//         // Log::info("✅ Codapay Response Received", ['result' => $result]);
+
+//         // ✅ تحقق من النجاح
+//         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
+//             $txnId = $result['initResult']['txnId'];
+//             $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
+            
+//             return response()->json([
+//                 'success' => true,
+//                 'message' => 'Payment link generated successfully.',
+//                 'paymentUrl' => $paymentUrl,
+//                 'txnId' => $txnId,
+//                 'result' => $result,
+//             ]);
+//         }
+
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Failed to create payment',
+//             'error_code' => $result['initResult']['resultCode'] ?? null,
+//             'error_desc' => $result['initResult']['resultDesc'] ?? null,
+//             'result'  => $result,
+//         ]);
+
+//     } catch (\Throwable $e) {
+//         Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
+
+//         return response()->json([
+//             'error'   => 'Exception while connecting Codapay',
+//             'details' => $e->getMessage(),
+//         ], 500);
+//     }
+// });
+
+Route::get('remove-minus', function () {
+    try {
+        $currentMonth = date("m");
+        $currentYear = date("Y");
+        
+        // DB::table('user_sallaries')
+        //     ->select('user_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+        //     ->groupBy('user_id')
+        //     ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+        //     ->orderBy('user_id')
+        //     ->chunk(100, function ($users) use ($currentMonth, $currentYear) {
+        //         $insertData = [];
+        //         foreach ($users as $user) {
+        //             $insertData[] = [
+        //                 'user_id' => $user->user_id,
+        //                 'cut_amount' => ($user->total_sallary - $user->total_cut_amount),
+        //                 'month' => $currentMonth,
+        //                 'year' => $currentYear,
+        //                 'sallary' => 0,
+        //                 'created_at' => now(),
+        //                 'updated_at' => now(),
+        //             ];
+        //         }
+        //         DB::table('user_sallaries')->insert($insertData);
+        //     });
+        
+        DB::table('bd_sallaries')
+            ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('bd_id', 'agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('bd_id')
+            ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($bds as $bd) {
+                    $insertData[] = [
+                        'bd_id' => $bd->bd_id,
+                        'agency_id' => $bd->agency_id,
+                        'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('bd_sallaries')->insert($insertData);
+            });
+        
+        DB::table('agency_sallaries')
+            ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('agency_id')
+            ->chunk(100, function ($agencies) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($agencies as $agency) {
+                    $insertData[] = [
+                        'agency_id' => $agency->agency_id,
+                        'cut_amount' => ($agency->total_sallary - $agency->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('agency_sallaries')->insert($insertData);
+            });
+        
+        return 'تم بنجاح';
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});
