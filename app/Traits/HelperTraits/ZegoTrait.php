@@ -80,7 +80,10 @@ Trait ZegoTrait
 
         ];
         try {
-    
+            Log::channel('charisma')->info('Charisma sendToZego sent successfully', [
+                'roomId' => $RoomId,
+                'userIds' => $FromUserId,
+            ]);
         
            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
     
