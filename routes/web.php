@@ -174,25 +174,19 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
 });
 
 Route::get('/run-seeders', function () {
-    config(['database.default' => 'mysql']);
 
-    $seeders = [
-        'CleanUpDuplicateCountriesSeeder',
-        'DefaultSuperAdminBdSeeder',
-        'SyncBdCountrySeeder',
-        'SyncAgencyCountrySeeder',
-        'PermissionTypeSeeder',
-        'SuperAdminRoleSeeder',
-    ];
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
 
-    $output = [];
-
-    foreach ($seeders as $seeder) {
-        Artisan::call('db:seed', ['--class' => $seeder, '--force' => true]);
-        $output[] = Artisan::output();
-    }
-
-    return response('<pre>' . implode("\n", $output) . '</pre>');
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
 });
 Route::get('/clear_clear', function () {
 
