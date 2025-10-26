@@ -801,6 +801,11 @@ Route::get('/codapay/create-payment', function () {
     }
 });
 
+Route::view('/codapay-complete-landing', 'landing', ['title' => 'Complete Landing Page']);
+Route::view('/codapay-atm-pending', 'landing', ['title' => 'ATM Pending Landing Page']);
+Route::view('/codapay-pending-otc', 'landing', ['title' => 'Pending OTC Landing Page']);
+Route::view('/codapay-subscription-notification', 'landing', ['title' => 'Subscription Notification Page']);
+
 Route::get('remove-minus', function () {
     try {
         $currentMonth = date("m");
