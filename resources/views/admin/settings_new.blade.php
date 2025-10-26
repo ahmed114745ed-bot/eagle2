@@ -1154,20 +1154,69 @@ use Modules\Vip\Entities\Vip;
                             </div>
 
 
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="is_auto_preview"
-                                            class="custom-radio libraryRealTime" name="live_library" value="3"
-                                            {{ $liveLibrary == '3' ? 'checked' : '' }}>
-                                        <label for="is_auto_preview" class="switch"></label>
+                         
+                        </div>
+                    </div>
+                </form>
+
+                <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                        @csrf
+                        <div class="form">
+                            <label class="d-block">{{ __('admin.is_preview') }}</label>
+
+                            <div class="row mt-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_auto_preview" value="0">
+
+                                            <input type="checkbox"
+                                                name="is_auto_preview"
+                                                value="1"
+                                                data-bootstrap-switch
+                                                {{ $is_auto_preview ? 'checked' : '' }}>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+
+                    <script>
+                        function initIsPreviewSwitch() {
+                            const $switch = $('input[name="is_auto_preview"][data-bootstrap-switch]');
+
+                            $switch.each(function () {
+                                $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+                            });
+
+                            $switch.on('switchChange.bootstrapSwitch', function (event, state) {
+                                const form = $('#autoPreviewForm');
+                                const formData = form.serializeArray();
+
+                                const newValue = state ? 1 : 0;
+                                formData.push({ name: 'is_auto_preview', value: newValue });
+
+                                $.ajax({
+                                    url: form.attr('action'),
+                                    method: form.attr('method'),
+                                    data: formData,
+                                    success: function () {
+                                        console.log('is_auto_preview updated to', newValue);
+                                    },
+                                    error: function (xhr) {
+                                        console.error('Error updating is_auto_preview:', xhr.responseText);
+                                    }
+                                });
+                            });
+                        }
+
+                        $(document).ready(initIsPreviewSwitch);
+                        $(document).on('pjax:success', initIsPreviewSwitch);
+                    </script>
+
+            
             </div>
 
             <div id="gamesSettings" class="settings-section">
