@@ -140,7 +140,7 @@ class Kernel extends ConsoleKernel
 
     
         $schedule->command('users:update-offline')
-            ->everyFifteenMinutes()
+            ->everyThirtyMinutes()
             ->timezone(getTimezone()) 
             ->withoutOverlapping()
             ->runInBackground();
