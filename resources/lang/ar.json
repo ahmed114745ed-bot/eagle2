@@ -637,6 +637,8 @@
     "Boss" : "رئيس",
     "Recently" : "حديثا",
     "Interested": "المهتم",
+    "This operation has already been done before!": "تمت العملية من قبل!",
+    "There was a problem, please try again!": "حدثت مشكلة، حاول مرة أخرى!",
     "Nearby" : "قريب",
     "New" : "الجديد",
     "PK": "PK",

@@ -6,6 +6,7 @@ use App\Models\ShippingAgency;
 use App\Services\CodapayService;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
+use App\Services\GooglePayService;
 use App\Services\PayPalService;
 use App\Services\StripeService;
 use App\Services\ZiniPaymentService;
@@ -46,7 +47,6 @@ class CoinService
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $paymentMethod = $coin->paymentCoin->type;
         $userType = $coin->paymentCoin->package_type;
-        // \Log::info("start $coin->obtained_coins coins");
 
         $user = $this->resolveCharger($request, $userType);
 
@@ -119,9 +119,13 @@ class CoinService
                 $bladeUrl = url("/paypal/checkout/{$log->id}");
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
+            } else if ($paymentMethod == 'google_pay') {
+                $Active = config('is_google_pay_active');
+                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $googlePayService = new GooglePayService();
+                return $googlePayService->initiatePayment($log->id, $log->trx, $request->purchaseToken);
             } elseif ($paymentMethod == 'codapay') {
                 $active = config('is_codapay_active');
-                // \Log::info("start $active coins");
 
                 if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $codapayService = new CodapayService();

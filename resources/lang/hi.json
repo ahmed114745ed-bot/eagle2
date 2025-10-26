@@ -60,6 +60,8 @@
 "Room Cup Target Details": "कक्ष कप लक्ष्य विवरण",
 "Super Admin Configuration": "सुपर एडमिन विन्यास",
 "Super Admin Details": "सुपर एडमिन विवरण",
+    "This operation has already been done before!": "यह प्रक्रिया पहले ही की जा चुकी है!",
+    "There was a problem, please try again!": "कोई समस्या हुई, कृपया फिर से प्रयास करें!",
 "Link": "लिंक",
 "Copy": "कॉपी",
 "helper links": "सहायक लिंक",
