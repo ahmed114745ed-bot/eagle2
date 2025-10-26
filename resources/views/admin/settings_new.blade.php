@@ -923,6 +923,14 @@ use Modules\Vip\Entities\Vip;
                                                 data-bootstrap-switch
                                                 {{ $zego_filter_enabled ? 'checked' : '' }}>
 
+                                                <input type="checkbox"
+                                                name="is_auto_preview"
+                                                value="1"
+                                                data-bootstrap-switch
+                                                {{ $is_auto_preview ? 'checked' : '' }}>
+
+                                                
+
                                                 <script>
                                                     function initZegoSwitch() {
                                                         $('input[data-bootstrap-switch]').each(function () {
