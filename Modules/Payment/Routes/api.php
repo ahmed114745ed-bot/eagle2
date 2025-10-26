@@ -15,7 +15,7 @@ use Modules\Payment\Http\Controllers\CashFreeController;
 */
 
 
-Route::middleware('auth:sanctum')->group (
+Route::middleware('auth:sanctum' )->group (
     function (){
         Route::get('initial', [\Modules\Payment\Http\Controllers\PaymentController::class, 'initial']);
 

@@ -161,7 +161,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     // all route with auth
-    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
+    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan' ,'update.last.seen'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
