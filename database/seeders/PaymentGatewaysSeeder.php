@@ -1121,11 +1121,6 @@ class PaymentGatewaysSeeder extends Seeder
                 "value" => 289
             ],
             'new_4' => [
-                "name" => "codapay_country",
-                "type" => "input",
-                "value" => 818
-            ],
-            'new_5' => [
                 "name" => "codapay_webhook_url",
                 "type" => "input",
                 "value" => "test"

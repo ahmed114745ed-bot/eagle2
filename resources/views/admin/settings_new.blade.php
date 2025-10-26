@@ -769,6 +769,16 @@ use Modules\Vip\Entities\Vip;
                                 @endforeach
                             </select>
 
+                            <label>{{ __('Default Country:') }}</label>
+                            <select name="default_country" class="form-control select2-country">
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"
+                                        {{ $country->id == ($settings['default_country'] ?? '') ? 'selected' : '' }}>
+                                        {{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             <label class="mt-3">{{ __('Start of week:') }}</label>
                             <select name="week_start" class="form-control">
                                 @foreach ([
@@ -2284,17 +2294,6 @@ use Modules\Vip\Entities\Vip;
                                                                        name="codapay_project_id"
                                                                        placeholder="codapay_project_id"
                                                                        value="{{ $settings['codapay_project_id'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label
-                                                                    for="codapay_country">{{ __('admin.country') }}:</label>
-                                                                <input type="text" id="codapay_country"
-                                                                       name="codapay_country"
-                                                                       placeholder="codapay_country"
-                                                                       value="{{ $settings['codapay_country'] ?? '' }}"
                                                                        class="form-control" required>
                                                             </div>
                                                         </div>
@@ -4202,4 +4201,14 @@ use Modules\Vip\Entities\Vip;
         document.getElementById('background_image_group').style.display = (type === 'image') ? 'block' : 'none';
         document.getElementById('gradient_group').style.display = (type === 'gradient') ? 'block' : 'none';
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-country').select2({
+            placeholder: "{{ __('Select a country') }}",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>

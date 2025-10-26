@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Country;
 use App\Models\PaymentCoin;
 use App\Models\Setting;
 use App\Models\Timezone;
@@ -46,6 +47,7 @@ class SettingController extends MainController
         $supabase_key = Common::getConf('supabase_key');
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
+        $countries = Country::select(['id', 'name', 'e_name'])->get();
 
         
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -80,7 +82,8 @@ class SettingController extends MainController
                 'gamesLibrary',
                 'agora_app_certificate',
                 'zego_filter_enabled',
-                'is_auto_preview'
+                'is_auto_preview',
+                'countries'
             ]))));
     }
 
