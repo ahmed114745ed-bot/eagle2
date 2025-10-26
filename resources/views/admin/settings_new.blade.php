@@ -1168,6 +1168,30 @@ use Modules\Vip\Entities\Vip;
                         </div>
                     </div>
                 </form>
+
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('admin.is_preview') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- RTC Fields -->
+                           
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="is_auto_preview"
+                                            class="custom-radio libraryRealTime" name="is_auto_preview" value="3"
+                                            {{ $is_auto_preview == '3' ? 'checked' : '' }}>
+                                        <label for="is_auto_preview" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            
             </div>
 
             <div id="gamesSettings" class="settings-section">

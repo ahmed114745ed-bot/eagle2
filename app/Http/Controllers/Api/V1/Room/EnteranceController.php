@@ -74,10 +74,11 @@ class EnteranceController extends Controller
         $library = Common::getConfig('video_library');
         $liveLibrary = (int) Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
-        $is_auto_preview = $liveLibrary == 3 ? true : false;
+        $is_auto_preview = (int) Common::getConfig('is_auto_preview');
+
 
         $libraries = ['agora', 'zego', 'tencent'];
-        $liveTypes = ['RTC', 'CDN', 'L3' ,'is_auto_review'];
+        $liveTypes = ['RTC', 'CDN', 'L3' ];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -89,7 +90,7 @@ class EnteranceController extends Controller
                 'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
-            'is_auto_preview' => $is_auto_preview,
+            'is_auto_preview' => $is_auto_preview == 1 ? true : false, 
 
 
         ];
