@@ -594,7 +594,7 @@ Route::get('remove-minus', function () {
                         'updated_at' => now(),
                     ];
                 }
-                DB::table('bd_sallaries')->insert($insertData);
+                DB::table('bd_salaries')->insert($insertData);
             });
         
         DB::table('agency_sallaries')
