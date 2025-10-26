@@ -14,7 +14,7 @@ use Modules\SpecialId\Http\Controllers\Api\SpecialIdController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(function () {
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan' ,'update.last.seen'])->group(function () {
     Route::post('buy-special-id',[SpecialIdController::class,'buySpecialId']);
     Route::post('use-special-id',[SpecialIdController::class,'usePackItem']);
     Route::post('upload-special-id',[SpecialIdController::class,'upload_special_id']);

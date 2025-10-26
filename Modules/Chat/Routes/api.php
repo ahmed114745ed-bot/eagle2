@@ -12,7 +12,7 @@ use Modules\Chat\Http\Controllers\PusherController;
 Route::post('/puhser-edit-user', [PusherController::class, 'edit_user']);
 Route::get('user-status/{id}',   [PusherController::class,'user_status']);
 
-Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization' ,'update.last.seen'])->group(function () {
 
     Route::get('/users/list', [ChatRoomController::class, 'users_list']);
     //Chat Room

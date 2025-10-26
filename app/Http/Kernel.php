@@ -113,5 +113,7 @@ class Kernel extends HttpKernel
         'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
         'local' => \App\Http\Middleware\LocalOnly::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
+        'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
+
     ];
 }

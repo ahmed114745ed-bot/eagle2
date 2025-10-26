@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum','appFeatureEnable:charizma'])->group(function () {
+Route::middleware(['auth:sanctum','appFeatureEnable:charizma' ,'update.last.seen'])->group(function () {
     Route::prefix('charisma')->group(function () {
         Route::post('/change-status', [CharizmaController::class,'changeStatus']);
         Route::post('/reset', 'CharizmaController@reset');
