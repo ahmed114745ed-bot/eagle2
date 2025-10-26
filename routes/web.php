@@ -173,7 +173,21 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
+Route::get('/run-seeders', function () {
 
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 Route::get('/clear_clear', function () {
 
     Artisan::call('cache:clear');
@@ -281,7 +295,7 @@ Route::group(
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
-         Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
+        Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
@@ -496,11 +510,11 @@ Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class
 Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
 Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
 
-Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
+Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
-//    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
-//    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
+    //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
+    //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
 
@@ -508,14 +522,14 @@ Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle
 
 Route::get('/test-games', function () {
 
-    $fromDate= request()->get('fromDate');
-    $toDate= request()->get('toDate');
-    $userId= request()->get('userId');
+    $fromDate = request()->get('fromDate');
+    $toDate = request()->get('toDate');
+    $userId = request()->get('userId');
 
     $records = CoinGameUserAll::where('user_id', $userId)
-    ->whereBetween('created_at', [$fromDate, $toDate])
-    ->orderBy('created_at', 'desc')
-    ->get();
+        ->whereBetween('created_at', [$fromDate, $toDate])
+        ->orderBy('created_at', 'desc')
+        ->get();
 
     return $records;
 })->name('test-games');
@@ -557,7 +571,7 @@ Route::get('/archive-old-coin-games', function () {
 
 Route::get('/update-user-follow-counts', function () {
     UpdateUserFollowCountsJob::dispatch()
-    ->onQueue('follow_counts');
+        ->onQueue('follow_counts');
     return response()->json([
         'success' => true,
         'message' => 'done'
@@ -614,7 +628,7 @@ Route::get('/week-zone', function () {
 
 
 Route::get('update-country-id', function () {
-     Artisan::call('db:seed', [
+    Artisan::call('db:seed', [
         '--class' => 'CleanUpDuplicateCountriesSeeder',
     ]);
 
@@ -710,7 +724,9 @@ Route::get('notifications/test2', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
+
 use Illuminate\Support\Facades\Http;
+
 Route::get('/codapay/create-payment', function () {
     $trxId  = rand(1000, 9999);
     $amount = 1.00;
@@ -790,7 +806,6 @@ Route::get('/codapay/create-payment', function () {
             'error_desc' => $result['initResult']['resultDesc'] ?? null,
             'result'  => $result,
         ]);
-
     } catch (\Throwable $e) {
         Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
 
