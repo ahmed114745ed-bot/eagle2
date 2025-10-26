@@ -55,7 +55,7 @@
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.username') }}"
                        value="{{ old('username') }}" required>
             </div>
-
+           <input type="hidden" name="type" value="area-manager">
             <div class="form-group has-feedback">
                 <input type="password" name="password"
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>

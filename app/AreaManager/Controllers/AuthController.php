@@ -107,7 +107,7 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("areaManager.auth.password", compact('userName','current'));
+        return view("areaManager.auth.password", compact('userName', 'current'));
     }
 
     public function verifyWhatsappCode(Request $request)
@@ -162,23 +162,59 @@ class AuthController extends BaseAuthController
     }
 
 
+    // public function postLogin(Request $request)
+    // {
+    //     $url = $request->url;
+
+    //     $this->loginValidator($request->all())->validate();
+
+    //     $credentials = $request->only([$this->username(), 'password']);
+    //     $remember = $request->get('remember', false);
+
+    //     if ($this->guard()->attempt($credentials, $remember)) {
+    //         return $this->sendLoginResponse($request);
+    //     }
+
+    //     return back()->withInput()->withErrors([
+    //         $this->username() => $this->getFailedLoginMessage(),
+    //     ]);
+    // }
+
     public function postLogin(Request $request)
     {
-        $url = $request->url;
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+            'type'     => 'required|string', // example: superadmin or sub_super_admin
+        ]);
 
-        $this->loginValidator($request->all())->validate();
+        // Fetch admin user by username and type
+        $admin = DB::table('admin_users')
+            ->where('username', $request->username)
+            ->where('type', $request->type)
+            ->first();
 
-        $credentials = $request->only([$this->username(), 'password']);
-        $remember = $request->get('remember', false);
-
-        if ($this->guard()->attempt($credentials, $remember)) {
-            return $this->sendLoginResponse($request);
+        if (!$admin) {
+            return back()->withInput()->withErrors([
+                'username' => trans('admin.username_not_found'),
+            ]);
         }
 
-        return back()->withInput()->withErrors([
-            $this->username() => $this->getFailedLoginMessage(),
-        ]);
+        // Check password manually
+        if (!Hash::check($request->password, $admin->password)) {
+            return back()->withInput()->withErrors([
+                'password' => trans('admin.password_incorrect'),
+            ]);
+        }
+
+        // Login manually via Auth guard
+        Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
+
+        // Successful login response
+        return $this->sendLoginResponse($request);
     }
+
+
 
     public function sendLoginResponse(Request $request)
     {
@@ -301,7 +337,7 @@ class AuthController extends BaseAuthController
             ]);
         }
 
-        $masked = substr($user->phone_code.$user->phone, 0, -5) . '***';
+        $masked = substr($user->phone_code . $user->phone, 0, -5) . '***';
 
         return response()->json([
             'status'        => true,
@@ -309,7 +345,4 @@ class AuthController extends BaseAuthController
             'message'       => 'تم جلب بيانات الرقم بنجاح',
         ]);
     }
-
-
-
 }
