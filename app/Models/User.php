@@ -577,6 +577,7 @@ class User extends Authenticatable
         return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name', 'phone_code', 'iso', 'iso_numeric', 'currency_numeric');
     }
 
+
     public function getLangAttribute()
     {
         if (self::$withoutAppends) {
