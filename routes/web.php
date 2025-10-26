@@ -37,6 +37,9 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Models\AgencySallary;
+use App\Models\BDSallary;
+use App\Models\UserSallary;
 
 /*
 |--------------------------------------------------------------------------
@@ -793,5 +796,80 @@ Route::get('/codapay/create-payment', function () {
             'error'   => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),
         ], 500);
+    }
+});
+
+Route::get('remove-minus', function () {
+    try {
+        $currentMonth = date("m");
+        $currentYear = date("Y");
+        
+        // DB::table('user_sallaries')
+        //     ->select('user_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+        //     ->groupBy('user_id')
+        //     ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+        //     ->orderBy('user_id')
+        //     ->chunk(100, function ($users) use ($currentMonth, $currentYear) {
+        //         $insertData = [];
+        //         foreach ($users as $user) {
+        //             $insertData[] = [
+        //                 'user_id' => $user->user_id,
+        //                 'cut_amount' => ($user->total_sallary - $user->total_cut_amount),
+        //                 'month' => $currentMonth,
+        //                 'year' => $currentYear,
+        //                 'sallary' => 0,
+        //                 'created_at' => now(),
+        //                 'updated_at' => now(),
+        //             ];
+        //         }
+        //         DB::table('user_sallaries')->insert($insertData);
+        //     });
+        
+        DB::table('bd_sallaries')
+            ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('bd_id', 'agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('bd_id')
+            ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($bds as $bd) {
+                    $insertData[] = [
+                        'bd_id' => $bd->bd_id,
+                        'agency_id' => $bd->agency_id,
+                        'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('bd_sallaries')->insert($insertData);
+            });
+        
+        DB::table('agency_sallaries')
+            ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('agency_id')
+            ->chunk(100, function ($agencies) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($agencies as $agency) {
+                    $insertData[] = [
+                        'agency_id' => $agency->agency_id,
+                        'cut_amount' => ($agency->total_sallary - $agency->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('agency_sallaries')->insert($insertData);
+            });
+        
+        return 'تم بنجاح';
+    } catch (\Exception $e) {
+        return $e->getMessage();
     }
 });
