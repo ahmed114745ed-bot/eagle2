@@ -56,6 +56,8 @@
 "application wallet percentage from the lucky gift": "Şans hediyesinden uygulama cüzdanı yüzdesi",
 "owner percentage from the lucky gift": "Şans hediyesinden sahibin yüzdesi",
 "host percentage from the lucky gift": "Şans hediyesinden sunucunun yüzdesi",
+    "This operation has already been done before!": "Bu işlem daha önce yapılmış!",
+    "There was a problem, please try again!": "Bir sorun oluştu, lütfen tekrar deneyin!",
     "User Info": "Kullanıcı Bilgisi",
     "audio": "ses",
     "This Live is closed": "Bu canlı yayın kapalı",

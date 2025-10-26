@@ -934,7 +934,7 @@ use Modules\Vip\Entities\Vip;
                                                 {{ $zego_filter_enabled ? 'checked' : '' }}>
 
 
-                                                
+
 
                                                 <script>
                                                     function initZegoSwitch() {
@@ -1103,7 +1103,7 @@ use Modules\Vip\Entities\Vip;
                             </div>
 
 
-                        
+
                         </div>
                     </div>
                 </form>
@@ -1154,7 +1154,7 @@ use Modules\Vip\Entities\Vip;
                             </div>
 
 
-                         
+
                         </div>
                     </div>
                 </form>
@@ -1216,7 +1216,7 @@ use Modules\Vip\Entities\Vip;
                         $(document).on('pjax:success', initIsPreviewSwitch);
                     </script>
 
-            
+
             </div>
 
             <div id="gamesSettings" class="settings-section">
@@ -2058,18 +2058,6 @@ use Modules\Vip\Entities\Vip;
                                                                    name="google_pay_node_server_name" placeholder="node_server_name"
                                                                    value="{{ $settings['google_pay_node_server_name'] ?? '' }}"
                                                                    class="form-control" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="google_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="google_pay_webhook_url" name="google_pay_webhook_url"
-                                                                       placeholder="google_pay_webhook_url"
-                                                                       value="{{ $settings['google_pay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" readonly>
-                                                                <button type="button" class="copy-button" data-copy-target="google_pay_webhook_url" title="Copy">📋</button>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 @endif

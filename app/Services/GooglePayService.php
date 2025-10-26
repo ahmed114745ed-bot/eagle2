@@ -21,7 +21,7 @@ class GooglePayService
         $this->serverKey = config('googlePay.node_server_name');
     }
 
-    public function initiatePayment($productId, $purchaseToken)
+    public function initiatePayment($productId, $trx, $purchaseToken)
     {
         $client = new Client();
         $url = $this->baseUrl . '/api/google-pay';
@@ -47,19 +47,14 @@ class GooglePayService
                 $data = $this->makePayment($orderId, $productId, $userId, type: "google_pay");
 
                 if ($data === false) {
-//                    return response()->json([
-//                        'status'  => true,
-//                        'trx'     => $coinLog->trx,
-//                        'message' => 'Transaction approved, pending capture.',
-//                    ]);
-                    return Common::apiResponse(0, 'تمت العمليه من قبل!', 402);
+                    return response()->json(['status'  => false, 'trx' => $trx, 'message' => __('This operation has already been done before!')]);
                 } else {
-                    return Common::apiResponse(1, 'تم الاضافه بنجاح', $data, 200);
+                    return response()->json(['status'  => true, 'trx' => $trx, 'message' => __('Added successfully')]);
                 }
             }
         } catch (GuzzleException $e) {
-            return Common::apiResponse(0, 'هناك مشكله حاول مره اخرى!', 402);
+            return response()->json(['status'  => false, 'trx' => $trx, 'message' => __('There was a problem, please try again!')]);
         }
-        return Common::apiResponse(0, 'هناك مشكله حاول مره اخرى!', 402);
+        return response()->json(['status'  => false, 'trx' => $trx, 'message' => __('There was a problem, please try again!')]);
     }
 }

@@ -1076,11 +1076,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => "test"
             ],
-            'new_3' => [
-                "name" => "google_pay_webhook_url",
-                "type" => "input",
-                "value" => "test"
-            ],
+//            'new_3' => [
+//                "name" => "google_pay_webhook_url",
+//                "type" => "input",
+//                "value" => "test"
+//            ],
         ];
 
         foreach ($google_pay_fields as $key => $value) {

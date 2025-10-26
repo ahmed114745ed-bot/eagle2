@@ -123,7 +123,7 @@ class CoinService
                 $Active = config('is_google_pay_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $googlePayService = new GooglePayService();
-                return $googlePayService->initiatePayment($log->id, $request->purchaseToken);
+                return $googlePayService->initiatePayment($log->id, $log->trx, $request->purchaseToken);
             } elseif ($paymentMethod == 'codapay') {
                 $active = config('is_codapay_active');
 
