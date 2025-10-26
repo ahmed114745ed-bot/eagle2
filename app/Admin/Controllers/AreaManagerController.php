@@ -235,6 +235,23 @@ class AreaManagerController extends MainController
                 return back()->with(compact('error'))->withInput();
             }
 
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId) {
+                    $OldUserAppId = User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_area_manager = 0;
+                        $OldUserAppId->save();
+                    }
+
+                    $newUserAppId = User::find($newAppId);
+                    $newUserAppId->is_area_manager = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
+                }
+            }
+
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
@@ -243,7 +260,12 @@ class AreaManagerController extends MainController
         $form->saved(function (Form $form) {
             $areaManager = $form->model();
             $userId = $form->model()->id;
-
+            $userAppId = $form->model()->app_id;
+           $userApp = User::find($userAppId);
+            if (isset($userApp)) {
+                $userApp->is_area_manager = 1;
+                $userApp->save();
+            }
             $coveredCountries = request('covered_countries');
             if ($coveredCountries) {
                 $countries = json_decode($coveredCountries, true);
