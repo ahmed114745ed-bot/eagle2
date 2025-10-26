@@ -74,7 +74,7 @@ class EnteranceController extends Controller
         $library = Common::getConfig('video_library');
         $liveLibrary = Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
-        $is_auto_preview = Common::getConfig('is_auto_preview');
+        $is_auto_preview = $liveLibrary == 3 ? true : false;
 
         $libraries = ['agora', 'zego', 'tencent'];
         $liveTypes = ['RTC', 'CDN', 'L3'];
@@ -86,7 +86,7 @@ class EnteranceController extends Controller
                 'app_id' => $zego_app_id,
                 'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
-                'is_auto_preview' => $is_auto_preview == 1 ? true : false,
+                'is_auto_preview' => $is_auto_preview,
                 'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
