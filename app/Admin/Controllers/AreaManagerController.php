@@ -123,7 +123,7 @@ class AreaManagerController extends MainController
 
         $grid->column('appUser.name', __('User'))->display(function ($name) {
             $user = $this->appUser;
-            if (!$user) return "<span style='color:red;'>".__('Not Linked')."</span>";
+            if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
             $uid = $user->uuid ?? __('Unknown');
             $url = getImagePath($user->profile?->avatar) ?? asset("images/businessman-icon.jpg");
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -159,9 +159,9 @@ class AreaManagerController extends MainController
      *
      * @return Form
      */
-  
 
-     protected function form()
+
+    protected function form()
     {
         $form = new Form(new AreaManager());
         $this->disableFormTools($form);
@@ -173,7 +173,7 @@ class AreaManagerController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
-       
+
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -184,7 +184,7 @@ class AreaManagerController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-area-manager', 'id', 'name')
                 ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')
-               ;
+            ;
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -205,11 +205,11 @@ class AreaManagerController extends MainController
             $isEditing = $form->isEditing();
             $superAdmin = AreaManager::where('phone_code', request('phone_code'))
                 ->where('phone', request('phone'));
-            
+
             if ($isEditing) {
                 $superAdmin->where('id', '!=', $form->model()->id);
             }
-            
+
             $exists = $superAdmin->exists();
 
             if ($exists) {
@@ -228,17 +228,33 @@ class AreaManagerController extends MainController
         $form->saved(function (Form $form) {
             $areaManager = $form->model();
             $userId = $form->model()->id;
-            
+
             $coveredCountries = request('covered_countries');
             if ($coveredCountries) {
                 $countries = json_decode($coveredCountries, true);
-                $countryIds = array_column($countries, 'id'); 
+                $countryIds = array_column($countries, 'id');
                 Country::whereIn('id', $countryIds)
                     ->update(['area_manager_id' => $userId]);
             }
+            $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
         });
 
-        
+
 
         return $form;
     }
@@ -251,14 +267,14 @@ class AreaManagerController extends MainController
             }
             return '[]';
         });
-    
+
         $form->hidden('covered_countries')->default(function ($form) {
             if ($form->model()->polygon_coordinates && $form->model()->covered_countries) {
                 return json_encode($form->model()->covered_countries);
             }
             return '[]';
         });
-    
+
         $form->html('<div class="form-group">
             <div class="col-sm-12">
                 <div id="map" style="height: 500px; width: 100%; border: 1px solid #ddd;"></div>
@@ -272,14 +288,14 @@ class AreaManagerController extends MainController
                 </div>
             </div>
         </div>');
-    
+
         Admin::script($this->mapJs());
     }
-    
+
     protected function mapJs()
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY', '');
-        
+
         $translations = json_encode([
             'please_select_area' => __('Please select an area on the map first'),
             'searching_countries' => __('Searching for countries... This may take a few seconds'),
@@ -293,7 +309,7 @@ class AreaManagerController extends MainController
             'error_fetching' => __('An error occurred while searching for countries. Please check your Google Maps API Key.'),
             'show_selected_countries' => __('Show Selected Countries'),
         ]);
-        
+
         return <<<JS
         const translations = {$translations};
         
@@ -662,7 +678,4 @@ class AreaManagerController extends MainController
 
         return $show;
     }
-
-
-
 }

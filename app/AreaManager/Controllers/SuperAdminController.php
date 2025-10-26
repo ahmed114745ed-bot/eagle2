@@ -38,14 +38,14 @@ class SuperAdminController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid2()
@@ -65,9 +65,9 @@ class SuperAdminController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('Super Admin'))
-            ->body($this->profile($id));
+            ->body($this->profile($id)));
     }
 
     public function showPreview(Content $content)
@@ -85,16 +85,16 @@ class SuperAdminController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('Super Admin'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Super Admin'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**

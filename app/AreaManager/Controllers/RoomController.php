@@ -53,7 +53,7 @@ class RoomController extends MainController
         $grid = $this->grid();
         $content = $content->body($grid);
 
-        return $content;
+        return parent::index($content);
     }
 
     /**
@@ -196,7 +196,7 @@ class RoomController extends MainController
             '8' => 8,
         ];
 
-        return $content
+        return parent::show($id, $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
@@ -209,7 +209,7 @@ class RoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes
-            ]));
+            ])));
     }
     /**
      * Edit interface.
@@ -571,7 +571,7 @@ class RoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
-             $showUrl = url("superadmin/rooms/{$id}");
+            $showUrl = url("superadmin/rooms/{$id}");
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>

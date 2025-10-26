@@ -27,7 +27,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
-    public $permission_name = 'appear-charger-agency';
+    public $permission_name = 'shipping-agency';
 
     public function index(Content $content)
     {
@@ -36,7 +36,7 @@ class AppearChargerAgencyController extends MainController
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
         });
-        return $content;
+        return parent::index($content);
     }
 
     public function transferSalary(Request $request)
@@ -57,9 +57,9 @@ class AppearChargerAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('appear-charger-agency'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -71,16 +71,16 @@ class AppearChargerAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('appear-charger-agency'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('appear-charger-agency'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function profile($id, Request $request, Content $content)

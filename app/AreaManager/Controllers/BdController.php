@@ -23,7 +23,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 
-class BdController extends AdminController
+class BdController extends MainController
 {
     /**
      * Title for current resource.
@@ -31,18 +31,18 @@ class BdController extends AdminController
      * @var string
      */
     protected $title = 'BD';
-    public $permission_name = 'BD';
+    public $permission_name = 'Bds';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid2()
@@ -62,9 +62,9 @@ class BdController extends AdminController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('BD'))
-            ->body($this->profile($id));
+            ->body($this->profile($id)));
     }
 
     /**
@@ -76,16 +76,16 @@ class BdController extends AdminController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('BD'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('BD'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**
