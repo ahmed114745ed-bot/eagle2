@@ -808,15 +808,18 @@ class PermissionTypeSeeder extends Seeder
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 29],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 9],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 8],
                 ],
                 'permissions' => [
                     ['key' => 'auth-users', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                         PermissionType::SUPER_ADMIN->value => $defaultMethods,
+                        PermissionType::AREA_MANAGER->value => $defaultMethods,
                     ],],
                     ['key' => 'roles', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                         PermissionType::SUPER_ADMIN->value => $defaultMethods,
+                        PermissionType::AREA_MANAGER->value => $defaultMethods,
                     ],],
                     ['key' => 'roles-reward', 'except' => ['show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
