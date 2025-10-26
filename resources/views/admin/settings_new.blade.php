@@ -1159,28 +1159,43 @@ use Modules\Vip\Entities\Vip;
                     </div>
                 </form>
 
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
-                    @csrf
-                    <div class="form">
-                        <label class="d-block">{{ __('admin.is_preview') }}</label>
+                <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                        @csrf
+                        <div class="form">
+                            <label class="d-block">{{ __('admin.is_preview') }}</label>
 
-                        <div class="row mt-4">
-                            <!-- RTC Fields -->
-                           
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="is_auto_preview"
-                                            class="custom-radio libraryRealTime" name="is_auto_preview" value="3"
-                                            {{ $is_auto_preview == '3' ? 'checked' : '' }}>
-                                        <label for="is_auto_preview" class="switch"></label>
+                            <div class="row mt-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <!-- السويتش -->
+                                            <input type="checkbox" id="is_auto_preview" name="is_auto_preview"
+                                                class="custom-switch"
+                                                {{ $is_auto_preview ? 'checked' : '' }}>
+
+                                            <label for="is_auto_preview" class="switch"></label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+
+                    <script>
+                        document.getElementById('is_auto_preview').addEventListener('change', function() {
+                            const form = document.getElementById('autoPreviewForm');
+
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'is_auto_preview';
+                            hiddenInput.value = this.checked ? 'true' : 'false';
+
+                            form.appendChild(hiddenInput);
+                            form.submit();
+                        });
+                    </script>
+
             
             </div>
 
