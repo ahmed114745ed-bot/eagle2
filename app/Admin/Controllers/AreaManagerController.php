@@ -2,9 +2,9 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
+use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -12,6 +12,7 @@ use Encore\Admin\Show;
 use App\Models\Country;
 use App\Models\AreaManager;
 use Encore\Admin\Layout\Row;
+use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -167,9 +168,23 @@ class AreaManagerController extends MainController
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
-        $form->text('username', __('username'))
-            ->creationRules(['required', "unique:admin_users,username,{{id}}"])
-            ->updateRules(['required', "unique:admin_users,username,{{id}}"]);
+        // $form->text('username', __('username'))
+        //     ->creationRules(['required', "unique:admin_users,username,{{id}}"])
+        //     ->updateRules(['required', "unique:admin_users,username,{{id}}"]);
+        $form->text('username', trans('admin.username'))
+            ->rules(function ($form) {
+                // Get the record ID if editing, otherwise null
+                $id = $form->model()?->id ?? null;
+
+                // Get the type from request or from existing model when editing
+                $type =  PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
+
+                // Default to empty string if not found (avoids SQL issues)
+                $type = $type ?? '';
+
+                // Build unique rule with type condition
+                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
