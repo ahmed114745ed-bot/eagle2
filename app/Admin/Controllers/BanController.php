@@ -91,11 +91,13 @@ class BanController extends MainController
     {
         $now = now();
         $grid = new Grid(new Ban);
+        $countryID = session('country_id');
         $grid->disableRowSelector();
 
         $reason = app()->getLocale() == 'ar' ? 'description_ar' : 'description_en';
 
         $grid->model()->whereHas('user')
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->select($reason,'user_id', 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
             ->groupBy([$reason, 'user_id','uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id','img'])->orderByDesc('created_at');
@@ -103,7 +105,7 @@ class BanController extends MainController
         // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
         $grid->column('user_id', __('User'))->display(function () {
-            $user = $this->user; 
+            $user = $this->user;
             if (!$user) return '-';
 
             $name = $user->name;
@@ -235,9 +237,9 @@ class BanController extends MainController
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
                 $deleteLabel = __('Delete');
-                return "<button class='btn btn-danger btn-sm delete-ban' 
-            data-uid='{$this->uid}' 
-            data-type='{$this->type}' 
+                return "<button class='btn btn-danger btn-sm delete-ban'
+            data-uid='{$this->uid}'
+            data-type='{$this->type}'
             data-ban-type-id='{$this->ban_type_id}'>
             {$deleteLabel}
         </button>";

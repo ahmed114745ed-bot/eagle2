@@ -76,6 +76,31 @@ return [
 
     ],
 
+    'superadmin_route' => [
+        'prefix' => 'superadmin',
+        'namespace' => 'App\\SuperAdmin\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            'multiLanguage',
+            ],
+    ],
+
+    'area_manager_route' => [
+        'prefix' => 'areaManager',
+        'namespace' => 'App\\AreaManager\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            'multiLanguage',
+        ],
+    ],
 
     'agency_route' => [
 

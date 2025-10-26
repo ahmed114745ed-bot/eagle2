@@ -916,12 +916,17 @@
             </h1>
         </div>
 
-        <div class="super-admin-card" onclick="alert('{{ __('Open Profile') }}')">
+        <div class="super-admin-card" onclick="sendMessage({{$superAdmin->user?->id ?? 303}})">
             <div class="admin-crown">👑</div>
             <div class="admin-header">
+                @php
+                    $avatarUrl = getImagePath($superAdmin->user?->profile?->avatar)
+                        ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23FFD700'/%3E%3Cstop offset='1' stop-color='%23FF6B6B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='90' height='90' fill='url(%23g)'/%3E%3C/svg%3E";
+                @endphp
+
                 <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23FFD700'/%3E%3Cstop offset='1' stop-color='%23FF6B6B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='90' height='90' fill='url(%23g)'/%3E%3C/svg%3E"
-                    alt="Super Admin"
+                    src="{{ $avatarUrl }}"
+                    alt="{{ $superAdmin->name ?? 'Super Admin' }}"
                     class="admin-avatar"
                 />
                 <div class="admin-info">
@@ -1122,6 +1127,14 @@
 </script>
 <script>
     // إنشاء الجزيئات المتحركة function createParticles() { const particlesContainer = document.getElementById('particles'); for (let i = 0; i < 50; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 15 + 's'; particle.style.animationDuration = (15 + Math.random() * 10) + 's'; particlesContainer.appendChild(particle); } } // إنشاء النجوم function createStars() { const body = document.body; for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%'; star.style.animationDelay = Math.random() * 3 + 's'; body.appendChild(star); } } // تبديل اللغة function switchLanguage(lang) { const arContent = document.getElementById('ar-content'); const enContent = document.getElementById('en-content'); const langBtns = document.querySelectorAll('.lang-btn'); langBtns.forEach(btn => btn.classList.remove('active')); if (lang === 'ar') { arContent.classList.remove('hidden'); enContent.classList.add('hidden'); langBtns[0].classList.add('active'); document.dir = 'rtl'; } else { arContent.classList.add('hidden'); enContent.classList.remove('hidden'); langBtns[1].classList.add('active'); document.dir = 'ltr'; } } // تأثيرات صوتية عند الضغط document.querySelectorAll('.top-item, .stat-card, .level-item').forEach(item => { item.addEventListener('click', function() { this.style.animation = 'none'; setTimeout(() => { this.style.animation = ''; }, 10); // تأثير موجة عند الضغط const ripple = document.createElement('div'); ripple.style.position = 'absolute'; ripple.style.width = '100px'; ripple.style.height = '100px'; ripple.style.borderRadius = '50%'; ripple.style.background = 'rgba(255, 255, 255, 0.5)'; ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.pointerEvents = 'none'; ripple.style.animation = 'ripple 0.6s ease-out'; const rect = this.getBoundingClientRect(); ripple.style.left = event.clientX - rect.left + 'px'; ripple.style.top = event.clientY - rect.top + 'px'; this.style.position = 'relative'; this.style.overflow = 'hidden'; this.appendChild(ripple); setTimeout(() => ripple.remove(), 600); }); }); // تأثير الكتابة المتحركة للأرقام function animateNumbers() { document.querySelectorAll('.stat-number').forEach(element => { const target = parseInt(element.textContent.replace(',', '')); let current = 0; const increment = target / 50; const timer = setInterval(() => { current += increment; if (current >= target) { current = target; clearInterval(timer); } element.textContent = Math.floor(current).toLocaleString(); }, 30); }); } // تحديث الإحصائيات بشكل دوري setInterval(() => { const statNumbers = document.querySelectorAll('.stat-number'); statNumbers.forEach(num => { const current = parseInt(num.textContent.replace(',', '')); const variation = Math.floor(Math.random() * 100) - 50; num.textContent = (current + variation).toLocaleString(); }); }, 10000); // تهيئة الصفحة createParticles(); createStars(); setTimeout(animateNumbers, 500); // إضافة تأثير ripple CSS const style = document.createElement('style'); style.textContent = ` @keyframes ripple { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 200px; height: 200px; opacity: 0; } } `; document.head.appendChild(style);
+</script>
+
+<script>
+    function sendMessage(userId) {
+        const message = `open_profile:${userId}`;
+        window.postMessage(message, '*');
+        console.log("✅ Sent message to Flutter:", message);
+    }
 </script>
 </body>
 </html>

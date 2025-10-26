@@ -91,7 +91,7 @@ class AgencyController extends MainController
         $agency = Agency::query()
             // ->where('bd_id' ,$user->app_id )
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
+            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type')
             ->find($id);
 
 
@@ -99,7 +99,7 @@ class AgencyController extends MainController
             $agency =  ShippingAgency::query()
                 // ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type')
                 ->find($id);
         }
 
@@ -113,7 +113,7 @@ class AgencyController extends MainController
             throw new \Exception(__('Agency not found'));
         }
         if ($agency->type == 2) {
-            
+
             return self::shippingProfile($agency, $request, $content);
         }
 
@@ -233,12 +233,12 @@ class AgencyController extends MainController
         // });
 
         $sumTargets = GiftLog::where('agency_id', $agencyId)
-        ->whereBetween('created_at', [
-            Carbon::now()->startOfMonth(),
-            Carbon::now()->endOfMonth(),
-        ])
-        ->sum('giftPrice');
-        
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth(),
+            ])
+            ->sum('giftPrice');
+
 
         return $content
             ->title(__('agency profile'))
@@ -260,7 +260,7 @@ class AgencyController extends MainController
             ));
     }
 
-    public static function shippingProfile(ShippingAgency $agency ,req $request,  Content $content)
+    public static function shippingProfile(ShippingAgency $agency, req $request,  Content $content)
     {
         $tab = $request->input('tab', 'charges');
 
@@ -398,13 +398,13 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-        ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
-        ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
-        ->where(function ($query) {
-            $query
-                ->whereDoesntHave('additionalInfo')
-                ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
-        })
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
+            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
+            ->where(function ($query) {
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+            })
 
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
@@ -479,14 +479,14 @@ class AgencyController extends MainController
 
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
-        
+
             $iconUrl = asset('images/phone.jpg');
             $phoneCode = $this->phone_code;
             $locale = app()->getLocale();
-        
+
             $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
             $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
-        
+
             return "
                 <div style='display: ; align-items: center; flex-direction: {$direction};'>
                     <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
@@ -656,24 +656,26 @@ class AgencyController extends MainController
     protected function form()
     {
         $form = new Form(new Agency());
-    
+
         $form->display('ID');
-    
+
         $this->addMainFields($form);
         $this->addPhoneFields($form);
         $this->addSavingLogic($form);
         $this->addSavedLogic($form);
         $this->addFooter($form);
-    
+
         return $form;
     }
-    
+
     protected function addMainFields(Form $form)
     {
+
         if (!$form->isEditing()) {
             $form->row(function ($row) {
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
+                $row->width(12)->hidden('country_id', __('Country'))->value(auth()->user()->country_id);
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->hidden('status', __('status'))->default(1);
                 $row->width(12)->hidden('bd_id')->default(Auth::id());
@@ -682,14 +684,14 @@ class AgencyController extends MainController
             $form->tools(function (Form\Tools $tools) {
                 $tools->disableDelete();
             });
-    
+
             $form->row(function ($row) {
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->hidden('status', __('status'))->default(1);
             });
         }
     }
-    
+
     protected function ownerOptions()
     {
         return function ($value) {
@@ -700,7 +702,7 @@ class AgencyController extends MainController
             return $ops;
         };
     }
-    
+
     protected function addPhoneFields(Form $form)
     {
         $form->row(function ($row) {
@@ -713,19 +715,19 @@ class AgencyController extends MainController
                     }
                     return null;
                 });
-    
+
             $row->hidden('phone_code')->default(function ($form) {
                 return $form->model()->phone_code ?? '';
             });
         });
-    
+
         if (Session::has('show_alert')) {
             $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
         }
-    
+
         Admin::script($this->phoneJs());
     }
-    
+
 
     protected function phoneJs()
     {
@@ -734,24 +736,25 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
                     form.addEventListener('submit', function(){
                         // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                         // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-                         hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                    hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
                     });
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
@@ -765,21 +768,20 @@ class AgencyController extends MainController
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-    
+
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
-    
+
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
                     'is_host' => 0,
                 ]);
                 uploadMonthlyDiamondReceive($originalOwnerId, 0);
-
             }
-    
+
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => 2,
                 'is_host' => 1,
@@ -787,27 +789,23 @@ class AgencyController extends MainController
             ]);
         });
     }
-    
+
     protected function addSavedLogic(Form $form)
     {
         $form->saved(function (Form $form) {
             $appOwnerId = intval($form->model()->app_owner_id);
-    
+
             User::where('id', $appOwnerId)->update([
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
-    
-
-            $user = User::find($appOwnerId);  
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,
                 'type' => 1,
             ])->whereNull('leave_date')->exists();
-    
+
             if (!$exists) {
                 UsersJoinedAgency::create([
                     'user_id' => $appOwnerId,
@@ -819,7 +817,7 @@ class AgencyController extends MainController
             }
         });
     }
-    
+
     protected function addFooter(Form $form)
     {
         $form->footer(function ($footer) {

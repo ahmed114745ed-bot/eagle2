@@ -4,6 +4,7 @@ namespace App\Models;
 
 use DB;
 use Modules\Vip\Entities\Vip;
+use Modules\Chat\Entities\ChatMessage;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Traits\TimestampsWithTimezone;
 use Modules\LuckyBox\Traits\RoomBoxes;
@@ -128,7 +129,7 @@ class Room extends Model
     {
         return $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
             ->selectRaw('SUM(giftPrice) as exp, sender_id, roomowner_id')
-            ->whereHas('sender') // Ensures only valid senders are included
+            ->whereHas('sender')
             ->groupBy('sender_id', 'roomowner_id')
             ->orderByDesc('exp');
     }
@@ -283,6 +284,12 @@ class Room extends Model
     {
         return $this->belongsTo(Background::class, 'room_background');
     }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
+    }
+
 
     public function getFinalRoomImageAttribute()
     {

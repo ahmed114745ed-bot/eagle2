@@ -8,6 +8,7 @@ use App\Http\Middleware\AuthenticateWeb;
 use App\Http\Middleware\CheckLoginAdmin;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
+use App\Http\Middleware\PreviewSuperAdmin;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
@@ -51,6 +52,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SetCountry::class,
         ],
 
         'api' => [
@@ -102,6 +104,7 @@ class Kernel extends HttpKernel
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
+        'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
 //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
@@ -109,6 +112,6 @@ class Kernel extends HttpKernel
         'web-agency-feature' => WebAgencyFeatureEnable::class,
         'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
         'local' => \App\Http\Middleware\LocalOnly::class,
-
+        'preview.superadmin' => PreviewSuperAdmin::class,
     ];
 }

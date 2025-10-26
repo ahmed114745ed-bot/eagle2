@@ -26,48 +26,31 @@ class MilestoneHelper
 
     public static function grantMilestoneToUser(User|int $user, string $slug): void
     {
-        Log::info("Granting milestone '{$slug}' to user", [
-            'user' => $user instanceof User ? $user->id : $user,
-        ]);
+      
 
-        // تأكد أن $user هو موديل
         if (! $user instanceof User) {
             $user = User::find($user);
             if (! $user) {
-                Log::warning("User not found for milestone '{$slug}'");
                 return;
             }
         }
 
-        // هات milestone بالـ slug
         $milestone = Milestone::where('slug', $slug)->first();
         if (! $milestone) {
-            Log::warning("Milestone with slug '{$slug}' not found");
             return;
         }
 
-        Log::info("Found milestone '{$milestone->name}' (ID {$milestone->id}) for user {$user->id}");
 
-        // تحقق من وجود rewards
         if (! $milestone->rewards || $milestone->rewards->isEmpty()) {
-            Log::info("No rewards found for milestone '{$slug}'");
             return;
         }
 
-        // مر على كل الهدايا وأضفها
         foreach ($milestone->rewards as $mr) {
-            Log::info("Granting reward to user", [
-                'user_id' => $user->id,
-                'milestone_id' => $milestone->id,
-                'reward_id' => $mr->id,
-                'rewardable_type' => $mr->rewardable_type,
-                'rewardable_id' => $mr->rewardable_id,
-            ]);
+           
 
             self::giveRewardToUser($user, $mr);
         }
 
-        Log::info("Finished granting milestone '{$slug}' to user {$user->id}");
     }
 
 
@@ -75,29 +58,34 @@ class MilestoneHelper
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
-        $exists = UserHistoryReward::where('user_id', $user->id)
+        $existing = UserHistoryReward::withTrashed()
+            ->where('user_id', $user->id)
             ->where('receive_type', $receiveType)
             ->where('rewardable_type', $mr->rewardable_type)
-            ->where('rewardable_id', $mr->rewardable_id)->where('is_deleted', 0)
-            ->exists();
-
-        if ($exists) {
-            return;
+            ->where('rewardable_id', $mr->rewardable_id)
+            ->first();
+    
+        if ($existing) {
+            if (!$existing->trashed()) {
+                return;
+            }
+    
+            $existing->forceDelete();
         }
-
+    
         UserHistoryReward::create([
-            'user_id'        => $user->id,
-            'receive_type'   => $receiveType,
-            'sub_type'       => 'milestons',
-            'rewardable_id'  => $mr->rewardable_id,
+            'user_id'         => $user->id,
+            'receive_type'    => $receiveType,
+            'sub_type'        => 'milestons',
+            'rewardable_id'   => $mr->rewardable_id,
             'rewardable_type' => $mr->rewardable_type,
-            'extra'          => json_encode([
+            'extra'           => json_encode([
                 'reward' => $mr?->reward,
                 'type'   => $mr?->type,
                 'expire' => $mr?->expire,
             ]),
         ]);
-
+    
         self::applyRewardEffect($user, $mr);
     }
 
@@ -155,10 +143,11 @@ class MilestoneHelper
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->get();
-
-        foreach ($rewards as $r) {
-            self::removeRewardEffect($user, $r);
-            $r->delete();
+        if ($rewards) {
+            foreach ($rewards as $r) {
+                self::removeRewardEffect($user, $r);
+                $r->delete();
+            }
         }
     }
 
@@ -200,6 +189,16 @@ class MilestoneHelper
     public static function removeReward($user, $slug)
     {
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
-        if ($milestone && $milestone->rewards)  self::revokeRewardFromUser($user, $milestone->rewards);
-    }
+        if ($milestone && $milestone->rewards && $milestone->rewards->count()) {
+            foreach ($milestone->rewards as $reward) {
+          
+    
+                self::revokeRewardFromUser($user, $reward);
+            }
+        } else {
+            Log::warning('No rewards found for milestone', [
+                'milestone_slug' => $slug,
+                'user_id' => $user->id ?? null,
+            ]);
+        }    }
 }

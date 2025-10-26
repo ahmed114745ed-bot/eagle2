@@ -107,7 +107,14 @@ class GroupChatController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GroupChat);
-        $grid->model()->orderByDesc('id');
+        $countryID = session('country_id');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                });
+            });
+        })->orderByDesc('id');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

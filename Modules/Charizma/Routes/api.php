@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum','appFeatureEnable:charizma'])->group(function () {
     Route::prefix('charisma')->group(function () {
         Route::post('/change-status', [CharizmaController::class,'changeStatus']);
-        Route::get('/{owner_id}/room', [CharizmaController::class,'extraDataInRoom']);
         Route::post('/reset', 'CharizmaController@reset');
 //        Route::post('/remove-user-when-leave-mic/{user_id}/{room_id}/room', [UserCharismaService::class,'RemoveUserRoomWhenLeaveMic']);
 //        Route::post('/sendGift/{room_id}/{user_id}/{earned_coins}/room', [UserCharismaService::class,'AddTotalEarnedCoinsInUserRoom']);

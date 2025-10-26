@@ -47,11 +47,15 @@ class SallariesController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
+        $countryID = session('country_id');
+
         $grid->disableRowSelector();
 
         $model =
             //$grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
-            $grid->model()->where('agency_id', '!=', 0);
+            $grid->model()
+                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+                ->where('agency_id', '!=', 0);
 
         // $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'), DB::raw('SUM(user_sallaries.sallary) AS salary'), DB::raw('SUM(user_sallaries.cut_amount) AS withdrawal'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
 
@@ -143,6 +147,10 @@ class SallariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
+        $countryID = session('country_id');
+
+        $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID));
+
         $grid->disableRowSelector();
 
 

@@ -37,6 +37,7 @@ class PaymentGatewaysSeeder extends Seeder
             'googlepay.png',
 //            'huaweipay.png',
 //            'zinipay.jpg',
+            'codapay.webp',
         ];
 
         foreach ($images as $img) {
@@ -1086,6 +1087,55 @@ class PaymentGatewaysSeeder extends Seeder
             Setting::updateOrCreate([
                 'key' => $value['name'],
                 'item_id' => $google_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
+        //codapay
+        $codapay_id = PaymentCoin::updateOrCreate([
+            'title' => 'codapay',
+        ], [
+            'photo' => 'images/codapay.webp',
+            'status' => 1,
+            'type' => 'codapay',
+            'package_type' => 'user'
+        ]);
+
+        $codapay_fields = [
+            'new_1' => [
+                "name" => "codapay_base_url",
+                "type" => "input",
+                "value" => "https://sandbox.codapayments.com/airtime"
+            ],
+            'new_2' => [
+                "name" => "codapay_api_key",
+                "type" => "input",
+                "value" => "test_kgaDbBSnvQZwiOGYulZfX561bae"
+            ],
+            'new_3' => [
+                "name" => "codapay_project_id",
+                "type" => "input",
+                "value" => 289
+            ],
+            'new_4' => [
+                "name" => "codapay_country",
+                "type" => "input",
+                "value" => 818
+            ],
+            'new_5' => [
+                "name" => "codapay_webhook_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+        ];
+
+        foreach ($codapay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $codapay_id->id,
                 'type' => 'payment'
             ], [
                 'value' => $value['value'],

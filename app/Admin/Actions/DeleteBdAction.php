@@ -4,10 +4,12 @@ namespace App\Admin\Actions;
 
 use App\Models\Agency;
 use App\Models\Bd;
+use App\Models\User;
 use App\Models\UserSallary;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteBdAction extends RowAction
 {
@@ -48,7 +50,10 @@ class DeleteBdAction extends RowAction
     
                 Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->app_id]);
             }
-    
+            $owner = User::find($model->app_id);
+
+            MilestoneHelper::removeReward($owner, 'bd');
+
             $model->delete();
     
             return $this->response()->success('BD deleted successfully.')->refresh();

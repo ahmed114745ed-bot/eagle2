@@ -4,8 +4,7 @@ namespace App\Tik\Services;
 
 use App\Helpers\Common;
 use App\Tik\Repositories\CountryRepository;
-
-
+use Illuminate\Database\Eloquent\Collection;
 
 
 class CountryService
@@ -24,7 +23,10 @@ class CountryService
         return $this->countryRepository->getCountriesWithSupporters();
     }
 
-
+    public function indexByHotAndSupporters(): Collection|array
+    {
+        return $this->countryRepository->orderByHotAndSupporters();
+    }
     public function findById($id)
     {
         return $this->countryRepository->findById($id);

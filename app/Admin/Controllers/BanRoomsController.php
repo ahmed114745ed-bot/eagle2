@@ -2,20 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Ban;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\BanRoom;
-use App\Models\BanType;
-use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\DeleteBans;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\BanRoomAction;
-use App\Http\Controllers\Controller;
-use App\Admin\Actions\DedicateAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -92,10 +85,12 @@ class BanRoomsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BanRoom());
+        $countryID = session('country_id');
         $grid->disableRowSelector();
         $grid->model()->whereHas('room')
+            ->when($countryID, fn($q) => $q->whereHas('room', fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
-            // ->select('id','room_id', 'duration', 'staff_id',  
+            // ->select('id','room_id', 'duration', 'staff_id',
             //     DB::raw('(SELECT MAX(created_at) FROM bans_rooms WHERE bans_rooms.room_id = bans_rooms.room_id) AS created_at')
             // )
             // ->groupBy(['room_id', 'duration', 'staff_id'])
@@ -123,10 +118,12 @@ class BanRoomsController extends MainController
                         <div>
                             <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
                             <span style='color: var(--uuid-color); font-size: smaller;'>Room Id: $room_id</span><br>
-                           
+
                         </div>
                     </div>";
         });
+
+        $grid->column('room.type', __('room type'));
 
         $grid->column('user_id', __('owner'))->display(function () {
             $user = $this->room->owner; // العلاقة مع المستخدم
@@ -214,16 +211,18 @@ class BanRoomsController extends MainController
         $grid->disableRowSelector();
         $grid->disableActions();
         $grid->disableCreateButton();
-        // $grid->actions(function ($actions) {
-        //     $actions->disableEdit();
-        //     $actions->disableView();
-        //     // $actions->add(new DedicateAction());
-        // });
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('room_id', __('Room Id'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->equal('room.type', __('room type'))->select([
+                    'audio' => trans('audio'),
+                    'live' => trans('live'),
+                ]);
             });
         });
 

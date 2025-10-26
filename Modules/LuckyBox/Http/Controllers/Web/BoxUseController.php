@@ -103,7 +103,7 @@ class BoxUseController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BoxUse);
-
+        $countryID = session('country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -115,7 +115,16 @@ class BoxUseController extends MainController
             });
         });
 
-        $grid->model()->orderByDesc('id');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                })
+                    ->orWhereHas('room.owner', function ($subQuery) use ($countryID) {
+                        $subQuery->where('country_id', $countryID);
+                    });
+            });
+        })->orderByDesc('id');
 
         $grid->id(__('ID'));
 
@@ -147,7 +156,7 @@ class BoxUseController extends MainController
         });
 
         $grid->column('box_id', __('Box'))->display(function () {
-           
+
 
             $name = $this->type == 0 ? __('normal') : __('super');
 

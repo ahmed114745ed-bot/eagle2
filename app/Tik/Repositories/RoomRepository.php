@@ -376,7 +376,7 @@ class RoomRepository extends AbstractRepository
     public function mine($req, $id)
     {
         $user     = User::find($id);
-        $query = $this->baseRoomQueryMine($user);
+        $query = $this->baseRoomQueryMyMine($user);
 
 
         $audio = (clone $query)->where('type', 'audio')->first();
@@ -500,6 +500,60 @@ class RoomRepository extends AbstractRepository
                 $query->whereColumn('user_id', 'rooms.uid');
             })
             ->where('room_status', 1)
+            ->orderByDesc('pin')
+            ->orderByDesc('room_visitors_count')
+            ->orderByDesc('hour_hot');
+    }
+
+    private function baseRoomQueryMyMine($user)
+    {
+        return $this->model
+            ->where('uid', $user->id)
+            ->select([
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'room_background',
+                'type',
+                'mode',
+                'created_at'
+            ])
+            ->with([
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'lastPk:id,room_id',
+                'background:id,img',
+                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors.user.packs',
+                'owner.enabledMedals',
+                'owner.country',
+                'owner.eligiblePacks.ware',
+                'owner.profile',
+                'owner.medals.achievementLevel.achievement',
+                'boxUse',
+            ])
+            ->withCount('roomVisitors')
             ->orderByDesc('pin')
             ->orderByDesc('room_visitors_count')
             ->orderByDesc('hour_hot');

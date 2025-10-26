@@ -16,6 +16,7 @@ return [
     'username'              => 'Kullanıcı Adı',
     'password'              => 'Şifre',
     'password_confirmation' => 'Şifre Onayı',
+    'login.titleAreaManager' => 'Bölge yönetici paneline giriş yap',
 
     'user_setting'          => 'Kullanıcı Ayarları',
     'avatar'                => 'Avatar',
