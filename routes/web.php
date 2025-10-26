@@ -825,7 +825,7 @@ Route::get('remove-minus', function () {
         //         DB::table('user_sallaries')->insert($insertData);
         //     });
         
-        DB::table('bd_sallaries')
+        DB::table('bd_salaries')
             ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
             ->groupBy('bd_id', 'agency_id')
             ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
