@@ -82,7 +82,6 @@ class SettingController extends MainController
                 'gamesLibrary',
                 'agora_app_certificate',
                 'zego_filter_enabled',
-                'is_auto_preview',
                 'countries'
             ]))));
     }
