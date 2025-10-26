@@ -769,6 +769,16 @@ use Modules\Vip\Entities\Vip;
                                 @endforeach
                             </select>
 
+                            <label>{{ __('Default Country:') }}</label>
+                            <select name="default_country" class="form-control select2-country">
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"
+                                        {{ $country->id == ($settings['default_country'] ?? '') ? 'selected' : '' }}>
+                                        {{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             <label class="mt-3">{{ __('Start of week:') }}</label>
                             <select name="week_start" class="form-control">
                                 @foreach ([
@@ -4194,4 +4204,14 @@ use Modules\Vip\Entities\Vip;
         document.getElementById('background_image_group').style.display = (type === 'image') ? 'block' : 'none';
         document.getElementById('gradient_group').style.display = (type === 'gradient') ? 'block' : 'none';
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-country').select2({
+            placeholder: "{{ __('Select a country') }}",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>
