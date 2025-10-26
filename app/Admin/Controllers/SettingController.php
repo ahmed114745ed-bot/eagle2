@@ -46,8 +46,10 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
+        $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
 
+        
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))

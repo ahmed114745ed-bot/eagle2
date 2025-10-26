@@ -19,6 +19,7 @@ return [
     'create'                => 'انشاء',
     'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
+    'is_preview' => 'عرض مباشر',
 
     'lifetime_help' => '💡 إذا أدخلت <strong>0</strong>، فهذا يعني أن العنصر لن تنتهي صلاحيته أبدًا (مدى الحياة).',
 
