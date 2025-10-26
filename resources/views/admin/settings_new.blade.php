@@ -1154,17 +1154,7 @@ use Modules\Vip\Entities\Vip;
                             </div>
 
 
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="is_auto_preview"
-                                            class="custom-radio libraryRealTime" name="live_library" value="3"
-                                            {{ $liveLibrary == '3' ? 'checked' : '' }}>
-                                        <label for="is_auto_preview" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
+                         
                         </div>
                     </div>
                 </form>
