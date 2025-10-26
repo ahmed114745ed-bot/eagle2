@@ -359,6 +359,8 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'phone_code' => $phone ?: $country->phone_code,
                     'status'     => $country->status == 1 ? 1 : 0,
                     'flag'       => $imagePath,
+                    'iso_numeric' => $data['iso_numeric'],
+                    'currency_numeric' => $data['currency_numeric'],
                 ]);
 
                 $this->command->info("🔄 Updated existing country: {$prettyName} (ID {$country->id})");
@@ -371,6 +373,8 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
                     'phone_code' => $phone,
                     'status'     => 0,
                     'flag'       => $imagePath,
+                    'iso_numeric' => $data['iso_numeric'],
+                    'currency_numeric' => $data['currency_numeric'],
                 ]);
 
                 $this->command->info("➕ Created new country: {$prettyName} (ID {$new->id})");
