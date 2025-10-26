@@ -55,11 +55,11 @@ class CodapayService
             'Content-Type' => 'application/json',
         ])->post($url, $body);
 
-         Log::info('Codapay Payment Response', [
-             'trx' => $trx,
-             'body' => $body,
-             'response' => $response->json(),
-         ]);
+        // Log::info('Codapay Payment Response', [
+        //     'trx' => $trx,
+        //     'body' => $body,
+        //     'response' => $response->json(),
+        // ]);
 
         $json = $response->json();
         $txnId = $json['initResult']['txnId'];
@@ -70,7 +70,6 @@ class CodapayService
 
     protected function getBodyForCodapay($trx, $amount, $userId): array
     {
-        info($this->country);
         return [
             'initRequest' => [
                 'country'   => $this->country,
