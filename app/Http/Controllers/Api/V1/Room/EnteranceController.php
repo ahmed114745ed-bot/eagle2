@@ -72,7 +72,7 @@ class EnteranceController extends Controller
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('video_library');
-        $liveLibrary = Common::getConfig('live_library');
+        $liveLibrary = (int) Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
         $is_auto_preview = $liveLibrary == 3 ? true : false;
    dd( $liveLibrary);
