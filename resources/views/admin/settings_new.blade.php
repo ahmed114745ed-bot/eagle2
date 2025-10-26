@@ -2311,7 +2311,18 @@ use Modules\Vip\Entities\Vip;
                                                                 <button type="button" class="copy-button" data-copy-target="codapay_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="codapay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                                <div class="copy-container">
+                                                                    <input type="text" id="codapay_webhook_url" name="codapay_webhook_url"
+                                                                           placeholder="codapay_webhook_url"
+                                                                           value="{{ url('/api/codapay-callback') }}"
+                                                                           class="form-control" required>
+                                                                    <button type="button" class="copy-button" data-copy-target="codapay_webhook_url" title="Copy">📋</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                 @endif
 {{--                                            @if ($coin->type == 'huawei_pay')--}}
 {{--                                                    <div class="col-md-6">--}}
