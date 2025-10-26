@@ -2291,17 +2291,6 @@ use Modules\Vip\Entities\Vip;
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="form-group">
-                                                                <label
-                                                                    for="codapay_country">{{ __('admin.country') }}:</label>
-                                                                <input type="text" id="codapay_country"
-                                                                       name="codapay_country"
-                                                                       placeholder="codapay_country"
-                                                                       value="{{ $settings['codapay_country'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
                                                                 <label for="codapay_webhook_url">{{ __('admin.webhook_url') }}:</label>
                                                                 <div class="copy-container">
                                                                     <input type="text" id="codapay_webhook_url" name="codapay_webhook_url"
