@@ -1160,7 +1160,7 @@ use Modules\Vip\Entities\Vip;
                                     <div class="d-flex align-items-center">
                                         <input type="radio" id="is_auto_preview"
                                             class="custom-radio libraryRealTime" name="live_library" value="3"
-                                            {{ $videoLibrary == '3' ? 'checked' : '' }}>
+                                            {{ $liveLibrary == '3' ? 'checked' : '' }}>
                                         <label for="is_auto_preview" class="switch"></label>
                                     </div>
                                 </div>
