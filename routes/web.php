@@ -188,6 +188,22 @@ Route::get('/seed', function () {
     return "Seeded!";
 });
 
+Route::get('/run-seeders', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 Route::get('/change_agencies_type_test', function () {
 
     DB::table('agencies')
