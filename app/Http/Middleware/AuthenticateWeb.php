@@ -22,7 +22,7 @@ class AuthenticateWeb
         $uri = $request->path();
 
         $user = Admin::user();
-       // dd( $user);
+        // dd( $user);
         $userType = $user?->type ?? 'admin';
         //  dd($userType);
 
@@ -44,8 +44,10 @@ class AuthenticateWeb
             ) {
                 return redirect('/superadmin');
             }
-            if (Str::is($uri, $areaManagerLogin) 
-            && in_array($userType, ['area-manager', 'sub_area_manager'], true)
+           // dd($uri, $areaManagerLogin);
+            if (
+                Str::is($uri, $areaManagerLogin)
+                && in_array($userType, ['area-manager', 'sub_area_manager'], true)
             ) {
                 return redirect('/areaManager');
             }
@@ -53,7 +55,7 @@ class AuthenticateWeb
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
                 (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
-                (Str::startsWith($uri, 'areaManager') && $userType !== 'area-manager') ||
+                (Str::startsWith($uri, 'areaManager') && $userType !== 'area-manager' && $userType !== 'sub_area_manager') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
                 Admin::guard()->logout();
@@ -65,6 +67,8 @@ class AuthenticateWeb
                 } elseif ($userType === 'superadmin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
                 } elseif ($userType === 'area-manager') {
+                    return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
+                } elseif ($userType === 'sub_area_manager') {
                     return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
                 } elseif ($userType === 'sub_super_admin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin 1111 portal.']);
