@@ -142,6 +142,12 @@ class UserService
         return $this->userRepository->supSuperAdminUsers($key, $page, $perPage);
     }
 
+    public function subAreaManager($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->subAreaManager($key, $page, $perPage);
+    }
+
     public function superAdminUsers2($key, $page)
     {
         $perPage = 10;

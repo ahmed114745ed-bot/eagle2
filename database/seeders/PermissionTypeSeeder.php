@@ -1041,7 +1041,7 @@ class PermissionTypeSeeder extends Seeder
                 'name' => 'Bds',
                 'sort' => 38,
                 'types' => [
-                    PermissionType::AREA_MANAGER->value => ['sort' => 19],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 3],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 3],
                 ],
                 'permissions' => [

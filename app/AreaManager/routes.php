@@ -12,6 +12,7 @@ use App\AreaManager\Controllers\AgencyController;
 use App\AreaManager\Controllers\ChargeController;
 use App\AreaManager\Controllers\WalletController;
 use App\AreaManager\Controllers\LiveRoomController;
+use App\AreaManager\Controllers\AdminUserController;
 use App\AreaManager\Controllers\AgencyUserController;
 use App\AreaManager\Controllers\BdSalariesController;
 use App\AreaManager\Controllers\SuperAdminController;

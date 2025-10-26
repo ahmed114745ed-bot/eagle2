@@ -229,9 +229,12 @@ class AuthController extends BaseAuthController
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
-
+           
         switch ($user->type) {
             case 'area-manager':
+                return redirect()->route('areaManager.home');
+            case 'sub_area_manager':
+
                 return redirect()->route('areaManager.home');
             default:
                 $this->guard()->logout();

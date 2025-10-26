@@ -14,70 +14,68 @@ use App\AreaManager\Controllers\EncorUsersController;
 
 class AdminUserController extends EncorUsersController
 {
-// \Encore\Admin\Controllers\UserController
+    // \Encore\Admin\Controllers\UserController
 
     protected $model;
 
     public $permission_name = 'auth-users';
 
-    public function __construct ()
+    public function __construct()
     {
         $userModel = Admin::class;
         $this->model = new $userModel;
     }
 
-    public function edit ( $id , Content $content )
+    public function edit($id, Content $content)
     {
 
-        return parent ::edit ( $id , $content );
+        return parent::edit($id, $content);
     }
 
-    public function grid ()
+    public function grid()
     {
 
         $grid =  parent::grid();
 
-        $grid->actions(function ( $actions) {
-                $actions->disableDelete();
-                $actions->add(new DeleteSubSuperAdmin());
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->add(new DeleteSubSuperAdmin());
         });
 
         return $grid;
-
     }
 
-    public function update ( $id )
+    public function update($id)
     {
-        $user = Admin::query ()->findOrFail ($id);
-        if (\request ('password') != $user->password || \request ('username') != $user->username){
-            Agent::where("id",$user->id)->update([
+        $user = Admin::query()->findOrFail($id);
+        if (\request('password') != $user->password || \request('username') != $user->username) {
+            Agent::where("id", $user->id)->update([
                 "remember_token" => null
             ]);
-            DB::table ('sessions')->where ('user_id',$user->id)->delete ();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
         }
-        return parent ::update ($id);
+        return parent::update($id);
     }
 
-    public function destroy ( $id )
+    public function destroy($id)
     {
 
         $user = $this->model->find($id);
-        if ($user){
-            if ($user->isRole('admin') || $user->isRole('developer')){
-                return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+        if ($user) {
+            if ($user->isRole('admin') || $user->isRole('developer')) {
+                return response()->json(['error' => '', 'message' => __('admin cant be deleted')]);
             }
         }
-        Agency::query ()->where ('owner_id',$id)->delete ();
+        Agency::query()->where('owner_id', $id)->delete();
 
 
-        return parent ::destroy ($id);
-
+        return parent::destroy($id);
     }
 
-    public function form ()
+    public function form()
     {
 
-        $form =  parent ::form ();
+        $form =  parent::form();
         $form->select('app_id', __('validation.select_user'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
@@ -87,6 +85,4 @@ class AdminUserController extends EncorUsersController
         })->ajax('/api/search/users-subsuperadmin', 'id', 'name')->rules('required');
         return $form;
     }
-
-
 }

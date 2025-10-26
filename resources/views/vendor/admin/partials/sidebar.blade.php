@@ -228,7 +228,7 @@
 
 
 {{--                area manager--}}
-                   @if (Admin::user()->type == 'area-manager')
+                   @if (in_array(Admin::user()->type, ['area-manager', 'sub_area_manager']))
                     @php
                         $areaManagerLinks = [
                             ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard')],
@@ -283,6 +283,16 @@
                                     ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
                                 ],
                             ],
+                            [
+                            'uri' => '#',
+                            'icon' => 'fa-home',
+                            'title' => __('Employees and Permissions'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                            ],
+                        ],
                         ];
                     @endphp
 
