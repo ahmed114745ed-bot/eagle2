@@ -622,7 +622,9 @@ Route::get('update-country-id', function () {
 });
 
 Route::get('remove-new-country', function () {
-    User::where('country_id', 266)->update(['country_id' => null]);
+    User::where('country_id', 488)->update(['country_id' => null]);
+
+    Country::where('id', 488)->delete();
 
     return 'done';
 });
@@ -771,7 +773,7 @@ Route::get('/codapay/create-payment', function () {
         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
             $txnId = $result['initResult']['txnId'];
             $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Payment link generated successfully.',
@@ -803,7 +805,7 @@ Route::get('remove-minus', function () {
     try {
         $currentMonth = date("m");
         $currentYear = date("Y");
-        
+
         // DB::table('user_sallaries')
         //     ->select('user_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
         //     ->groupBy('user_id')
@@ -824,7 +826,7 @@ Route::get('remove-minus', function () {
         //         }
         //         DB::table('user_sallaries')->insert($insertData);
         //     });
-        
+
         DB::table('bd_sallaries')
             ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
             ->groupBy('bd_id', 'agency_id')
@@ -846,7 +848,7 @@ Route::get('remove-minus', function () {
                 }
                 DB::table('bd_sallaries')->insert($insertData);
             });
-        
+
         DB::table('agency_sallaries')
             ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
             ->groupBy('agency_id')
@@ -867,7 +869,7 @@ Route::get('remove-minus', function () {
                 }
                 DB::table('agency_sallaries')->insert($insertData);
             });
-        
+
         return 'تم بنجاح';
     } catch (\Exception $e) {
         return $e->getMessage();
