@@ -1099,15 +1099,14 @@
         <div class="motivational-message">
             <h2 class="message-title">
                 <small>{{ $country->iso }}</small> {{ __('Epic Message to Heroes of :country', ['country' => $countryName]) }} <small>{{ $country->iso }}</small>            </h2>
-            <p class="message-text">
-                <span class="fire-emoji">🔥</span> {{ __('TEMPO LIFE Legends') }} <span class="fire-emoji">🔥</span><br/><br/>
+            <p class="message-text"><span class="fire-emoji">🔥</span>{{ __(':app LIFE Legends', ['app' => config('app.name')]) }}<span class="fire-emoji">🔥</span><br/><br/>
                 {{ __('You are not just players... You are the Entertainment Army!') }} 🎮<br/>
                 {{ __('Every room you open becomes an arena of joy and laughter!') }} 🎉<br/>
                 {{ __('Every gift you send plants smiles on faces!') }} 💝<br/>
                 {{ __('Every game you play writes :country\'s name in golden letters!', ['country' => $countryName]) }} ⚡<br/><br/>
                 <strong style="font-size:24px;color:#ffd700;">🏆 {{ __('Make the World Dance to :country\'s rhythm', ['country' => $countryName]) }} 🏆</strong><br/><br/>
                 {{ __('Play... Dance... Sing... Laugh... Spread Happiness!') }} 🎊<br/>
-                {{ __('Make every minute in TEMPO LIFE an authentic celebration!') }} 🎪<br/><br/>
+                {{ __('Make every minute in :app LIFE an authentic celebration!', ['app' => config('app.name')]) }} 🎪<br/><br/>
                 <strong style="font-size:20px;">{{ __(':country is strong with you... First place awaits!', ['country' => $countryName]) }} 🦅</strong>
             </p>
         </div>
