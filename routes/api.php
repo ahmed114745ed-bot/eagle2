@@ -103,8 +103,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
-    Route::get('codapay-success', [CodapayService::class, 'success'])->name('paypal.success');
-    Route::get('codapay-failed', [CodapayService::class, 'failed'])->name('paypal.cancel');
+    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -123,6 +122,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
         Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
+        Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
+        Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
@@ -137,8 +138,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
         Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
-
-        
     });
 
     // authorization
@@ -332,7 +331,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('home_carousels')->group(function () {
-                Route::get('/',[HomeCarouselController::class, 'index']);
+                Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
 
@@ -383,7 +382,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
-                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
+                Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
@@ -665,7 +664,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
-
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');

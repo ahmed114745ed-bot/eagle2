@@ -1,27 +1,30 @@
 <?php
 
-use App\AreaManager\Controllers\SuperAdminChargeController;
-use App\AreaManager\Controllers\SuperAdminChargeReportController;
-use App\AreaManager\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\AreaManager\Controllers\BdController;
 use App\AreaManager\Controllers\AuthController;
 use App\AreaManager\Controllers\HomeController;
+use App\AreaManager\Controllers\RoleController;
 use App\AreaManager\Controllers\RoomController;
 use App\AreaManager\Controllers\UserController;
 use App\AreaManager\Controllers\AgencyController;
 use App\AreaManager\Controllers\ChargeController;
 use App\AreaManager\Controllers\WalletController;
 use App\AreaManager\Controllers\LiveRoomController;
+use App\AreaManager\Controllers\AdminUserController;
 use App\AreaManager\Controllers\AgencyUserController;
 use App\AreaManager\Controllers\BdSalariesController;
+use App\AreaManager\Controllers\SuperAdminController;
 use App\AreaManager\Controllers\HomeCarouselController;
 use App\AreaManager\Controllers\MultiLanguageController;
 use App\AreaManager\Controllers\RequestAgencyController;
 use App\AreaManager\Controllers\ProfessionalBdController;
+use App\AreaManager\Controllers\OfficialMessageController;
+use App\AreaManager\Controllers\SuperAdminChargeController;
 use App\AreaManager\Controllers\AreaManagerRewardController;
 use App\AreaManager\Controllers\AppearChargerAgencyController;
+use App\AreaManager\Controllers\SuperAdminChargeReportController;
 use App\AreaManager\Controllers\AreaManagerBannerHistoryController;
 
 Route::prefix('areaManager')->name('areaManager.')->group(function () {
@@ -74,51 +77,54 @@ Route::group(
         'as' => 'areaManager.',
     ],
     function () {
-//        Route::get('setting', [AuthController::class, 'getSetting']);
-//        Route::put('update-setting', [AuthController::class, 'putSetting']);
-//
+        //        Route::get('setting', [AuthController::class, 'getSetting']);
+        //        Route::put('update-setting', [AuthController::class, 'putSetting']);
+        //
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::resource('superadmin-users', SuperAdminController::class);
         Route::get('superadmin/profile', [SuperAdminController::class, 'showPreview']);
 
         Route::resource('/bd-salaries', BdSalariesController::class);
-//        Route::resource('/charges', ChargeController::class);
-//        // Route::resource('/wallet', 'WalletController');
-//        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
-//        Route::post('/locale', MultiLanguageController::class . '@locale');
+        //        Route::resource('/charges', ChargeController::class);
+        //        // Route::resource('/wallet', 'WalletController');
+        //        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        //        Route::post('/locale', MultiLanguageController::class . '@locale');
 
-        Route::resource('usersBD', BdController::class);
+        Route::resource('user-Bds', BdController::class);
+        Route::resource('roles', RoleController::class);
+        Route::resource('auth-users', AdminUserController::class);
 
-//        //agencies
+        //        //agencies
         Route::resource('/agencies', AgencyController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
-//        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+        //        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-//        Route::resource('/request-agencies', RequestAgencyController::class);
+        //        Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
             Route::resource('users', AgencyUserController::class);
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
         Route::resource('live-rooms', LiveRoomController::class);
+        Route::resource('official-message', OfficialMessageController::class);
 
-//        //users
-       Route::resource('users', 'UserController', [
-           'names' => [
-               'index' => 'users',
-               'show' => 'users.show'
-           ]
-       ]);
-//
+        //        //users
+        Route::resource('users', 'UserController', [
+            'names' => [
+                'index' => 'users',
+                'show' => 'users.show'
+            ]
+        ]);
+        //
         Route::resource('rooms', RoomController::class);
-//        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
-//
-//        Route::resource('home-carousel', HomeCarouselController::class);
-//
-//        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
-//        Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
-//
-//        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
-//        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        //        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
+        //
+        //        Route::resource('home-carousel', HomeCarouselController::class);
+        //
+        //        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
+        //        Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
+        //
+        //        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        //        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
         Route::group(['prefix' => 'superadmin-charges-report'], function () {
@@ -126,30 +132,30 @@ Route::group(
         });
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
-//        Route::resource('professional-bd', ProfessionalBdController::class);
-//
-//        // ajax
+        Route::resource('professional-bd', ProfessionalBdController::class);
+        //
+        //        // ajax
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
-//        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
-//        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
-//        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
-//        ->name('banner.resend');
-//
-//        Route::prefix('notifications')->group(function () {
-//            Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
-//            Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
-//            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
-//            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
-//            Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
-//        });
-//
-//        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
-//            $user = auth()->user();
-//            $user->fcm_token = $request->token;
-//            $user->save();
-//            return response()->json(['status' => 'success']);
-//        });
+        //        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
+        //        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
+        //        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
+        //        ->name('banner.resend');
+        //
+        //        Route::prefix('notifications')->group(function () {
+        //            Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
+        //            Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
+        //            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
+        //            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
+        //            Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
+        //        });
+        //
+        //        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+        //            $user = auth()->user();
+        //            $user->fcm_token = $request->token;
+        //            $user->save();
+        //            return response()->json(['status' => 'success']);
+        //        });
     }
 );

@@ -16,14 +16,11 @@ class HomeCarouselController extends Controller
     {
     
         $user = Auth::user();
-        $displayType = request('display_at');
-        $country = request('country_id');
+        $displayType = $request->get('display_at'); 
         $timezone = getTimezone();
-
         $now = Carbon::now($timezone);
-        $offset = Carbon::now($timezone)->format('P');
-
-
+        $offset = $now->format('P');
+        $country = request('country_id');
         if ($request->hasHeader('x-notification-id') && $user->notification_id !== $request->header('x-notification-id')) {
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
@@ -46,7 +43,9 @@ class HomeCarouselController extends Controller
                         });
                 });
             })
-
+            ->when($country, fn($q) => $q->whereHas('countries', function ($q) use($country) {
+                    $q->where('country_id', $country);
+                }))
             ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
             ->orderBy('sort')

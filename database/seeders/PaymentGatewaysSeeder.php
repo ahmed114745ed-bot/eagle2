@@ -1098,7 +1098,7 @@ class PaymentGatewaysSeeder extends Seeder
         $codapay_id = PaymentCoin::updateOrCreate([
             'title' => 'codapay',
         ], [
-            'photo' => 'images/codapay.png',
+            'photo' => 'images/codapay.webp',
             'status' => 1,
             'type' => 'codapay',
             'package_type' => 'user'
@@ -1108,7 +1108,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_1' => [
                 "name" => "codapay_base_url",
                 "type" => "input",
-                "value" => "https://sandbox.codapayments.com/airtime/api/restful/v2.0/Payment/init.json"
+                "value" => "https://sandbox.codapayments.com/airtime"
             ],
             'new_2' => [
                 "name" => "codapay_api_key",
@@ -1126,16 +1126,6 @@ class PaymentGatewaysSeeder extends Seeder
                 "value" => 818
             ],
             'new_5' => [
-                "name" => "codapay_pay_type",
-                "type" => "input",
-                "value" => 338
-            ],
-            'new_6' => [
-                "name" => "codapay_currency",
-                "type" => "input",
-                "value" => 818
-            ],
-            'new_7' => [
                 "name" => "codapay_webhook_url",
                 "type" => "input",
                 "value" => "test"

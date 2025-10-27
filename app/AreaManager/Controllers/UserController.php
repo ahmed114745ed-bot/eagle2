@@ -69,7 +69,7 @@ class UserController extends MainController
             $row->column(12, $this->grid());
         })->row(view('admin.same_device_users_modal'));
 
-        return $content;
+        return parent::index($content);
     }
 
     // public function edit($id, Content $content)
@@ -196,12 +196,12 @@ class UserController extends MainController
 
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
-        return $content
+        return parent::show($id,$content
             ->title(__('user profile'))
             ->view(
                 'super_user_profile',
                 $data
-            );
+            ));
     }
 
     public function countries()

@@ -2283,32 +2283,10 @@ use Modules\Vip\Entities\Vip;
                                                             <div class="form-group">
                                                                 <label
                                                                     for="codapay_country">{{ __('admin.country') }}:</label>
-                                                                <input type="text" id="paypal_currency"
+                                                                <input type="text" id="codapay_country"
                                                                        name="codapay_country"
                                                                        placeholder="codapay_country"
                                                                        value="{{ $settings['codapay_country'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label
-                                                                    for="codapay_pay_type">{{ __('admin.pay_type') }}:</label>
-                                                                <input type="text" id="codapay_pay_type"
-                                                                       name="codapay_pay_type"
-                                                                       placeholder="codapay_pay_type"
-                                                                       value="{{ $settings['codapay_pay_type'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label
-                                                                    for="codapay_currency">{{ __('admin.currency') }}:</label>
-                                                                <input type="text" id="codapay_currency"
-                                                                       name="codapay_currency"
-                                                                       placeholder="codapay_currency"
-                                                                       value="{{ $settings['codapay_currency'] ?? '' }}"
                                                                        class="form-control" required>
                                                             </div>
                                                         </div>

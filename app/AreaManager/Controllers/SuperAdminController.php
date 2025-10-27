@@ -38,14 +38,14 @@ class SuperAdminController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid2()
@@ -65,9 +65,9 @@ class SuperAdminController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('Super Admin'))
-            ->body($this->profile($id));
+            ->body($this->profile($id)));
     }
 
     public function showPreview(Content $content)
@@ -85,16 +85,16 @@ class SuperAdminController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('Super Admin'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Super Admin'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**
@@ -188,12 +188,12 @@ class SuperAdminController extends MainController
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();
-            $actions->add(new DeleteSuperAdminAction());
+            $actions->disableEdit();
         });
 
         $grid->disableRowSelector();
 
-//        $this->extendGrid($grid);
+        //        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -242,8 +242,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-//            $form->switch('default', __('set_superadmin_as_default'))
-//                ->help(__('make_super_admin_default'));
+            //            $form->switch('default', __('set_superadmin_as_default'))
+            //                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form);
 
@@ -336,9 +336,9 @@ class SuperAdminController extends MainController
 
                 Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
 
-                Agency::where('country_id', $superAdmin->country_id)->where(function ($q){
+                Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
                     $q->whereDoesntHave('bd')
-                        ->orWhereHas('bd', function($q){
+                        ->orWhereHas('bd', function ($q) {
                             $q->where([
                                 'default' => 1,
                                 'country_id' => 0

@@ -2,9 +2,9 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
+use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -12,6 +12,7 @@ use Encore\Admin\Show;
 use App\Models\Country;
 use App\Models\AreaManager;
 use Encore\Admin\Layout\Row;
+use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -123,7 +124,7 @@ class AreaManagerController extends MainController
 
         $grid->column('appUser.name', __('User'))->display(function ($name) {
             $user = $this->appUser;
-            if (!$user) return "<span style='color:red;'>".__('Not Linked')."</span>";
+            if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
             $uid = $user->uuid ?? __('Unknown');
             $url = getImagePath($user->profile?->avatar) ?? asset("images/businessman-icon.jpg");
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -159,21 +160,35 @@ class AreaManagerController extends MainController
      *
      * @return Form
      */
-  
 
-     protected function form()
+
+    protected function form()
     {
         $form = new Form(new AreaManager());
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
-        $form->text('username', __('username'))
-            ->creationRules(['required', "unique:admin_users,username,{{id}}"])
-            ->updateRules(['required', "unique:admin_users,username,{{id}}"]);
+        // $form->text('username', __('username'))
+        //     ->creationRules(['required', "unique:admin_users,username,{{id}}"])
+        //     ->updateRules(['required', "unique:admin_users,username,{{id}}"]);
+        $form->text('username', trans('admin.username'))
+            ->rules(function ($form) {
+                // Get the record ID if editing, otherwise null
+                $id = $form->model()?->id ?? null;
+
+                // Get the type from request or from existing model when editing
+                $type =  PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
+
+                // Default to empty string if not found (avoids SQL issues)
+                $type = $type ?? '';
+
+                // Build unique rule with type condition
+                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
-       
+
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -184,7 +199,7 @@ class AreaManagerController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-area-manager', 'id', 'name')
                 ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')
-               ;
+            ;
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -205,11 +220,11 @@ class AreaManagerController extends MainController
             $isEditing = $form->isEditing();
             $superAdmin = AreaManager::where('phone_code', request('phone_code'))
                 ->where('phone', request('phone'));
-            
+
             if ($isEditing) {
                 $superAdmin->where('id', '!=', $form->model()->id);
             }
-            
+
             $exists = $superAdmin->exists();
 
             if ($exists) {
@@ -220,6 +235,23 @@ class AreaManagerController extends MainController
                 return back()->with(compact('error'))->withInput();
             }
 
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId) {
+                    $OldUserAppId = User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_area_manager = 0;
+                        $OldUserAppId->save();
+                    }
+
+                    $newUserAppId = User::find($newAppId);
+                    $newUserAppId->is_area_manager = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
+                }
+            }
+
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
@@ -228,17 +260,38 @@ class AreaManagerController extends MainController
         $form->saved(function (Form $form) {
             $areaManager = $form->model();
             $userId = $form->model()->id;
-            
+            $userAppId = $form->model()->app_id;
+           $userApp = User::find($userAppId);
+            if (isset($userApp)) {
+                $userApp->is_area_manager = 1;
+                $userApp->save();
+            }
             $coveredCountries = request('covered_countries');
             if ($coveredCountries) {
                 $countries = json_decode($coveredCountries, true);
-                $countryIds = array_column($countries, 'id'); 
+                $countryIds = array_column($countries, 'id');
                 Country::whereIn('id', $countryIds)
                     ->update(['area_manager_id' => $userId]);
             }
+            $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
         });
 
-        
+
 
         return $form;
     }
@@ -251,14 +304,14 @@ class AreaManagerController extends MainController
             }
             return '[]';
         });
-    
+
         $form->hidden('covered_countries')->default(function ($form) {
             if ($form->model()->polygon_coordinates && $form->model()->covered_countries) {
                 return json_encode($form->model()->covered_countries);
             }
             return '[]';
         });
-    
+
         $form->html('<div class="form-group">
             <div class="col-sm-12">
                 <div id="map" style="height: 500px; width: 100%; border: 1px solid #ddd;"></div>
@@ -272,14 +325,14 @@ class AreaManagerController extends MainController
                 </div>
             </div>
         </div>');
-    
+
         Admin::script($this->mapJs());
     }
-    
+
     protected function mapJs()
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY', '');
-        
+
         $translations = json_encode([
             'please_select_area' => __('Please select an area on the map first'),
             'searching_countries' => __('Searching for countries... This may take a few seconds'),
@@ -293,7 +346,7 @@ class AreaManagerController extends MainController
             'error_fetching' => __('An error occurred while searching for countries. Please check your Google Maps API Key.'),
             'show_selected_countries' => __('Show Selected Countries'),
         ]);
-        
+
         return <<<JS
         const translations = {$translations};
         
@@ -662,7 +715,4 @@ class AreaManagerController extends MainController
 
         return $show;
     }
-
-
-
 }

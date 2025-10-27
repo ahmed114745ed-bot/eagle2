@@ -31,7 +31,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class LiveRoomController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'rooms';
+    public $permission_name = 'live-rooms';
 
     static $usersCache;
     protected static $microphoneCache = [];
@@ -50,7 +50,7 @@ class LiveRoomController extends MainController
         $grid = $this->grid();
         $content = $content->body($grid);
 
-        return $content;
+        return parent::index($content);
     }
 
     /**
@@ -193,7 +193,7 @@ class LiveRoomController extends MainController
             '8' => 8,
         ];
 
-        return $content
+        return parent::show($id,$content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
@@ -206,7 +206,7 @@ class LiveRoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes
-            ]));
+            ])));
     }
     /**
      * Edit interface.

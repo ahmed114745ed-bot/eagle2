@@ -32,6 +32,7 @@ class DefaultSuperAdminBdSeeder extends Seeder
             $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
         }else {
             Bd::create([
+                'parent_id' => $defaultSuperAdmin->id,
                 'username' => 'defaultBd',
                 'password' => Hash::make('defaultBd'),
                 'name' => 'default Bd',

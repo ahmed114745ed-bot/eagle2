@@ -53,13 +53,13 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-        \Log::info('Zego Room Count Update Request:', [
-            'url' => $request->fullUrl(),
-            // 'method' => $request->method(),
-            // 'headers' => $request->headers->all(),
-            'body' => $request->all(),
-            // 'ip' => $request->ip(),
-        ]);
+        // \Log::info('Zego Room Count Update Request:', [
+        //     'url' => $request->fullUrl(),
+        //     // 'method' => $request->method(),
+        //     // 'headers' => $request->headers->all(),
+        //     'body' => $request->all(),
+        //     // 'ip' => $request->ip(),
+        // ]);
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
@@ -250,7 +250,7 @@ class EnteranceController extends Controller
     {
         $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
-        if (!$app_feature && !is_null($app_feature)) {
+        if ($app_feature &&$app_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();

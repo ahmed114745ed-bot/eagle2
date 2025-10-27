@@ -2,7 +2,7 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
+
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -10,13 +10,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\ChangeAgencyAction;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
-use App\Admin\Actions\KickOfAgencyAction;
-use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Selectable\ImageColors;
 use App\Facades\UserHandling;
@@ -25,8 +19,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Encore\Admin\Auth\Permission;
 use Session;
 
 class AgencyUserController extends MainController
@@ -37,7 +30,7 @@ class AgencyUserController extends MainController
      * @var string
      */
     protected $title;
-    public $permission_name = 'hosts';
+    public $permission_name = 'host';
 
     public function __construct()
     {
@@ -53,28 +46,28 @@ class AgencyUserController extends MainController
             $row->column(12, $this->grid());
         })->row(view('admin.same_device_users_modal'));
 
-        return $content;
+        return parent::index($content);
     }
 
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(__($this->title))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(__($this->title))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(__($this->title))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -84,6 +77,9 @@ class AgencyUserController extends MainController
 
     public function indexProfessionals(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-professional-users');
+        }
         $content = $content->title(__($this->title));
 
         $content = $content->row(function ($row) {
@@ -272,10 +268,10 @@ class AgencyUserController extends MainController
                 $query->where(function ($q) use ($countries) {
                     $q->whereIn('country_id', $countries)
                         ->whereHas('agency', function ($a) use ($countries) {
-                            $a->whereIn('country_id', '!=', $countries);
+                            $a->whereNotIn('country_id', $countries);
                         });
                 })->orWhere(function ($q) use ($countries) {
-                    $q->whereIn('country_id', '!=', $countries)
+                    $q->whereNotIn('country_id', $countries)
                         ->whereHas('agency', function ($a) use ($countries) {
                             $a->whereIn('country_id', $countries);
                         });
@@ -300,15 +296,15 @@ class AgencyUserController extends MainController
         $grid->column('id', __('Id'));
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
+                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
             ";
-        });
+            });
         }
 
         $grid->column('name', __('Name'))

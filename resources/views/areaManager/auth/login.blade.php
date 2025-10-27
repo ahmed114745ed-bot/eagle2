@@ -61,6 +61,13 @@
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
             </div>
 
+               <div class="form-group has-feedback">
+                <select name="type" class="form-control input-lg text-center" required>
+                    <option value="area-manager">{{ __('Area manager') }}</option>
+                    <option value="sub_area_manager">{{ __('Sub area manager') }}</option>
+                </select>
+            </div>
+
             @if(config('admin.auth.remember'))
                 <div class="checkbox icheck text-center" dir="rtl">
                     <label>

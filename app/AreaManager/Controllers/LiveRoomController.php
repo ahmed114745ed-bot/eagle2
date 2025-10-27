@@ -51,7 +51,7 @@ class LiveRoomController extends MainController
         $grid = $this->grid();
         $content = $content->body($grid);
 
-        return $content;
+        return parent::index($content);
     }
 
     /**
@@ -194,7 +194,7 @@ class LiveRoomController extends MainController
             '8' => 8,
         ];
 
-        return $content
+        return parent::show($id, $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
@@ -207,7 +207,7 @@ class LiveRoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes
-            ]));
+            ])));
     }
     /**
      * Edit interface.
@@ -238,14 +238,13 @@ class LiveRoomController extends MainController
 
     protected function grid2()
     {
-        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function() {
+        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function () {
             return settings()->get('make_rooms_top');
         });
-            return (new Box(
-                title: __('admin.Actions'),
-                content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
-            ));
-
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
+        ));
     }
 
     /**
@@ -257,7 +256,7 @@ class LiveRoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->where('type','live');
+        $grid->model()->where('type', 'live');
         $filterType = request('filter', 'all');
         $user = auth()->user();
         $this->setupBaseModel($grid, $user);
@@ -324,7 +323,7 @@ class LiveRoomController extends MainController
         $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $grid->model()
-            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
+            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("
                 CASE room_status
                     WHEN 1 THEN 100
                     WHEN 2 THEN 10
@@ -401,7 +400,7 @@ class LiveRoomController extends MainController
                 $grid->model()
                     ->orderByDesc('top_room')
                     ->orderByDesc('pin');
-                    // ->orderByDesc('room_visitors_count');
+                // ->orderByDesc('room_visitors_count');
                 break;
 
             case 'last_create':
@@ -549,7 +548,7 @@ class LiveRoomController extends MainController
             $users = collect();
             if (!empty($allIds)) {
                 $users = User::select(['id', 'name'])
-                ->with('profile:id,user_id,avatar')
+                    ->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
                     ->keyBy('id');
@@ -559,7 +558,7 @@ class LiveRoomController extends MainController
             $collection->each(function ($row) use ($users) {
                 $ids = array_filter(explode(',', (string) $row->microphone));
                 $row->microphone_users = collect($ids)
-                    ->map(fn ($id) => $users->get($id))
+                    ->map(fn($id) => $users->get($id))
                     ->filter()
                     ->values();
             });
@@ -585,10 +584,10 @@ class LiveRoomController extends MainController
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50){
-                $name = substr($name,0,50) . ' ...';
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
             }
-             $showUrl = url("superadmin/rooms/{$id}");
+            $showUrl = url("superadmin/rooms/{$id}");
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
@@ -608,7 +607,7 @@ class LiveRoomController extends MainController
                 return __('No User');
             }
 
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
 
         $grid->column('session', __('Gifts'))->display(function () {
@@ -617,8 +616,6 @@ class LiveRoomController extends MainController
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
-
-
     }
 
 
@@ -741,7 +738,7 @@ class LiveRoomController extends MainController
             });
             </script>
             HTML);
-        }
+    }
     /**
      * Make a show builder.
      *
@@ -926,14 +923,14 @@ class LiveRoomController extends MainController
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "") {
                     $newList[] = $item;
                 }
             }
 
             $newList = array_filter($newList);
 
-            $blackList= implode(',', $newList) ?: null;
+            $blackList = implode(',', $newList) ?: null;
         }
 
         $room->room_black = $blackList;

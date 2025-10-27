@@ -461,10 +461,10 @@ class WareTabController extends MainController
                 if ($img2 instanceof UploadedFile) {
             
 
-                    Log::info('🖼 img2 uploaded', [
-                        'original_name' => $img2->getClientOriginalName(),
-                        'mime' => $img2->getMimeType(),
-                    ]);
+                    // Log::info('🖼 img2 uploaded', [
+                    //     'original_name' => $img2->getClientOriginalName(),
+                    //     'mime' => $img2->getMimeType(),
+                    // ]);
         
                     /** @var FileService $fileService*/
                     $fileService = app( FileService::class);

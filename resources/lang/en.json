@@ -16,6 +16,14 @@
     "Email": "Email",
     "action": "Action",
     "not_in_same_country":"not in same country",
+    "Browse coin recharge" : "Browse charges",
+    "Add switch coin recharge" : "Add charge",
+    "Coin Recharge" : "charges",
+    "super rewards": "Super Rewards",
+    "Reward Center": "Gift Rewards",
+    "Browse reward center": "Browse Gift Rewards",
+    "Dedicate switch reward center": "Dedicate Gift Rewards",
+    
 
     "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
@@ -1296,10 +1304,7 @@
 "areaManagerDescription":"To ensure smooth operations, it is necessary to create a default Area Manager under your supervision. All countries or agencies that do not belong to a specific Area Manager are automatically assigned to this default manager. When an Area Manager is deleted, the associated countries or agencies are transferred to the default manager, ensuring uninterrupted management. If no default Area Manager exists, users must specify an Area Manager when opening any country or agency, and they will not be able to operate it without a designated manager. Therefore, it is always recommended to create and manage a default Area Manager to guarantee continuous operational workflow without complications."
 ,"area_manager_default":"Default Area Manager",
 "Area Manager": "Area Manager",
-"User": "User",
-"Unknown": "Unknown",
 "Not Linked": "Not Linked",
-"Created at": "Created at",
 "areaManagerDescriptionTitle": "Area Manager Description",
 "Clear Selection": "Clear Selection",
 "Show Selected Countries": " Selecte Countries",
@@ -1309,18 +1314,11 @@
 "Searching...": "Searching...",
 "No countries found in the selected area. Try expanding the area.": "No countries found in the selected area. Try expanding the area.",
 "Found": "Found",
-"country": "country",
 "Arabic Name": "Arabic Name",
 "English Name": "English Name",
 "Phone Code": "Phone Code",
-"An error occurred while searching for countries. Please check your Google Maps API Key.": "An error occurred while searching for countries. Please check your Google Maps API Key."
-
-
-
-
-
-
-
-
-
+"An error occurred while searching for countries. Please check your Google Maps API Key.": "An error occurred while searching for countries. Please check your Google Maps API Key.",
+"Banner approved successfully": "Banner approved successfully",
+"Banner rejected successfully": "Banner rejected successfully",
+"sub admin" : "Sup Admin"
 }

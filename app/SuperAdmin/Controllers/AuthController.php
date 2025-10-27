@@ -3,13 +3,14 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Models\SuperAdmin;
-use App\Models\User;
 use Exception;
+use App\Models\User;
 use App\Models\Agent;
 use Encore\Admin\Form;
 use App\Helpers\Common;
+use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
+use App\Enums\PermissionType;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Services\WhatsappOtp;
@@ -109,7 +110,7 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("superadmin.auth.password", compact('userName','current'));
+        return view("superadmin.auth.password", compact('userName', 'current'));
     }
 
     public function verifyWhatsappCode(Request $request)
@@ -167,22 +168,63 @@ class AuthController extends BaseAuthController
     }
 
 
+    // public function postLogin(Request $request)
+    // {
+    //     $url = $request->url;
+
+    //     $this->loginValidator($request->all())->validate();
+    //     $admin = DB::table('admin_users')
+    //         ->where('username', request('username'))
+    //         ->where('type', request('type'))
+    //         ->exists();
+
+    //     if ($admin) {
+    //         $credentials = $request->only([$this->username(), 'password']);
+    //         $remember = $request->get('remember', false);
+
+    //         if ($this->guard()->attempt($credentials, $remember)) {
+
+    //             return $this->sendLoginResponse($request);
+    //         }
+    //     }
+    //     return back()->withInput()->withErrors([
+    //         dd(123),
+    //         $this->username() => $this->getFailedLoginMessage(),
+    //     ]);
+    // }
+
     public function postLogin(Request $request)
     {
-        $url = $request->url;
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+            'type'     => 'required|string', // example: superadmin or sub_super_admin
+        ]);
 
-        $this->loginValidator($request->all())->validate();
+        // Fetch admin user by username and type
+        $admin = DB::table('admin_users')
+            ->where('username', $request->username)
+            ->where('type', $request->type)
+            ->first();
 
-        $credentials = $request->only([$this->username(), 'password']);
-        $remember = $request->get('remember', false);
-
-        if ($this->guard()->attempt($credentials, $remember)) {
-            return $this->sendLoginResponse($request);
+        if (!$admin) {
+            return back()->withInput()->withErrors([
+                'username' => trans('admin.username_not_found'),
+            ]);
         }
 
-        return back()->withInput()->withErrors([
-            $this->username() => $this->getFailedLoginMessage(),
-        ]);
+        // Check password manually
+        if (!Hash::check($request->password, $admin->password)) {
+            return back()->withInput()->withErrors([
+                'password' => trans('admin.password_incorrect'),
+            ]);
+        }
+
+        // Login manually via Auth guard
+        Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
+
+        // Successful login response
+        return $this->sendLoginResponse($request);
     }
 
     public function sendLoginResponse(Request $request)
@@ -191,7 +233,7 @@ class AuthController extends BaseAuthController
 
         $request->session()->regenerate();
 
-        $user = $this->guard()->user();
+        $user = Auth::guard('admin')->user();
 
         if (!$user) {
             return back()->withInput()->withErrors([
@@ -202,8 +244,10 @@ class AuthController extends BaseAuthController
         switch ($user->type) {
             case 'superadmin':
                 return redirect()->route('superadmin.home');
+            case 'sub_super_admin':
+                return redirect()->route('superadmin.home');
             default:
-                $this->guard()->logout();
+                Auth::guard('admin')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
                 return back()->withInput()->withErrors([
@@ -211,6 +255,38 @@ class AuthController extends BaseAuthController
                 ]);
         }
     }
+
+
+    // public function sendLoginResponse(Request $request)
+    // {
+    //     admin_toastr(trans('admin.login_successful'));
+
+    //     $request->session()->regenerate();
+
+    //     $user = $this->guard()->user();
+
+
+    //     if (!$user) {
+    //         return back()->withInput()->withErrors([
+    //             $this->username() => $this->getFailedLoginMessage(),
+    //         ]);
+    //     }
+    //     // dd($user->type);
+    //     switch ($user->type) {
+
+    //         case 'superadmin':
+    //             return redirect()->route('superadmin.home');
+    //         case 'sub_super_admin':
+    //             return redirect()->route('superadmin.home');
+    //         default:
+    //             $this->guard()->logout();
+    //             $request->session()->invalidate();
+    //             $request->session()->regenerateToken();
+    //             return back()->withInput()->withErrors([
+    //                 $this->username() => $this->getFailedLoginMessage(),
+    //             ]);
+    //     }
+    // }
 
     public function logout(Request $request)
     {
@@ -266,6 +342,8 @@ class AuthController extends BaseAuthController
                 });
         }
 
+        $this->addPhoneFields($form, 'sometimes');
+
         $form->setAction(superadmin_url('update-setting'));
 
         $form->ignore(['password_confirmation']);
@@ -299,15 +377,15 @@ class AuthController extends BaseAuthController
         $username = $request->input('username');
 
         $user = SuperAdmin::where('username', $username)->first();
-    
+
         if (! $user || ! $user->phone) {
             return response()->json([
                 'status'  => false,
                 'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
             ]);
         }
-             
-        $masked = substr($user->phone_code.$user->phone, 0, -5) . '***';
+
+        $masked = substr($user->phone_code . $user->phone, 0, -5) . '***';
 
         return response()->json([
             'status'        => true,
@@ -316,6 +394,57 @@ class AuthController extends BaseAuthController
         ]);
     }
 
-    
- 
+    protected function addPhoneFields(Form $form, $rules = 'required')
+    {
+
+        $form->text('phone', __('whatsApp number'))
+            ->rules($rules)
+            ->attribute('id', 'phone-input')
+            ->attribute('maxlength', 12)
+            ->default(function ($form) {
+                if ($form->model()->phone && $form->model()->phone_code) {
+                    return $form->model()->phone;
+                }
+                return null;
+            });
+
+        $form->hidden('phone_code')->default(function ($form) {
+            return $form->model()->phone_code ?? '';
+        });
+
+
+        Admin::script($this->phoneJs());
+    }
+
+    protected function phoneJs()
+    {
+        return <<<JS
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.E164);
+                                hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
+                    });
+                    form.classList.add('phone-init');
+        }
+    }
+
+    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
+    initAllPhones();
+    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+    JS;
+    }
 }

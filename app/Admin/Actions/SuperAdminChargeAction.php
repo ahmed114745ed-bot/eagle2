@@ -188,13 +188,13 @@ class SuperAdminChargeAction extends Action
 
         $html = '';
 
-        if (Admin::user()->can('add-switch-charge-to-user') || Admin::user()->can('*')) {
+        if (Admin::user()->can('add-switch-charge-to-superadmin') || Admin::user()->can('*')) {
             $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
                 . htmlspecialchars($title) .
                 '</a>';
         }
 
-        if (Admin::user()->can('history-switch-charge-to-user') || Admin::user()->can('*')) {
+        if (Admin::user()->can('history-switch-charge-to-superadmin') || Admin::user()->can('*')) {
             $html .= '<a href="' . htmlspecialchars($url) . '"
             class="shipping_report btn btn-sm text-white"
             onclick="initDatePickersAfterNav()"
