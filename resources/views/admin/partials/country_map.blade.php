@@ -30,7 +30,9 @@
         $.getScript(first)
             .done(() => loadScriptsSequentially(rest, callback))
             .fail((xhr, status, error) => {
+            
                 console.error('[Map Error] فشل تحميل:', first, error);
+                window.location.reload();
             });
     }
 
@@ -101,40 +103,54 @@
                         normalizeFunction: 'polynomial'
                     }]
                 },
-                onRegionClick: function(e, code) {
-                    const mapObj = $('#world-map').vectorMap('get', 'mapObject');
-                    const iso = code.toUpperCase();
-                    const country = countryMap[iso];
+                onRegionClick: function (e, code) {
+    const mapObj = $('#world-map').vectorMap('get', 'mapObject');
+    const iso = code.toUpperCase();
+    const country = countryMap[iso];
 
-                    if (country && country.area_manager_id && 
-                        country.area_manager_id !== currentAreaManagerId &&
-                        (!country.area_manager || country.area_manager.default !== 1)) {
-                        e.preventDefault();
-                        if (typeof toastr !== 'undefined') {
-                            toastr.warning('❌ لا يمكن تحديد هذه الدولة لأنها تابعة لمدير آخر.');
-                        }
-                        return;
-                    }
+    // منع التحديد إذا الدولة تابعة لمدير آخر
+    if (
+        country &&
+        country.area_manager_id &&
+        country.area_manager_id !== currentAreaManagerId &&
+        (!country.area_manager || country.area_manager.default !== 1)
+    ) {
+        e.preventDefault();
+        if (typeof toastr !== 'undefined') {
+            toastr.warning('❌ لا يمكن تحديد هذه الدولة لأنها تابعة لمدير آخر.');
+        }
+        return;
+    }
 
-                    let selectedRegions = mapObj.getSelectedRegions();
-                    const isSelected = selectedRegions.includes(iso);
+    // الحصول على الدول المحددة حاليًا
+    let selectedRegions = mapObj.getSelectedRegions();
+    const isSelected = selectedRegions.includes(code);
 
-                    if (isSelected) {
-                        selectedRegions = selectedRegions.filter(c => c !== iso);
-                        if (country.area_manager_id === currentAreaManagerId) {
-                            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' });
-                        } else {
-                            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' });
-                        }
-                    } else {
-                        selectedRegions.push(iso);
-                        mapObj.series.regions[0].setValues({ [iso]: '#2196F3' });
-                    }
+    if (isSelected) {
+        // ✅ إذا كانت محددة → أزلها من القائمة
+        selectedRegions = selectedRegions.filter(c => c !== code);
+        mapObj.clearSelectedRegions(); // امسح التحديد القديم
+        mapObj.setSelectedRegions(selectedRegions); // أعد التحديد الجديد بدون هذه الدولة
 
-                    mapObj.setSelectedRegions(selectedRegions);
-                    updateSelectedCountries(mapObj);
-                    updateCountryList(mapObj);
-                },
+        // أعد اللون الأصلي للدولة بعد الإزالة
+        if (country && country.area_manager_id === currentAreaManagerId) {
+            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' }); // الأخضر = تخصك
+        } else {
+            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' }); // الرمادي = عادي
+        }
+
+    } else {
+        // ✅ إذا غير محددة → أضفها إلى التحديد
+        selectedRegions.push(code);
+        mapObj.setSelectedRegions(selectedRegions);
+        mapObj.series.regions[0].setValues({ [iso]: '#2196F3' }); // الأزرق = جديد
+    }
+
+    // تحديث البيانات في الحقول والقوائم
+    updateSelectedCountries(mapObj);
+    updateCountryList(mapObj);
+},
+
                 onRegionTipShow: function(e, el, code) {
                     const c = countryMap[code.toUpperCase()];
                     if (c) {
