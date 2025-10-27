@@ -235,7 +235,7 @@ class AppearChargerAgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                $profileUrl = url("areaManager/shipping-agencies/profile/{$this->id}");
+                $profileUrl = url("areaManager/profile-shipping-agency/{$this->id}");
                // route('areaManager.shipping.agency.profile', ['id' => $this->id]);
 
                 return "

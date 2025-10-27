@@ -386,7 +386,7 @@ class AgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                $profileUrl = url("areaManager/agencies/profile/{$this->id}");
+                $profileUrl = url("areaManager/profile-agency/{$this->id}");
               //  route('areaManager.agency.profile', ['id' => $this->id]);
 
                 return "
