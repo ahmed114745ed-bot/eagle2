@@ -79,6 +79,7 @@ Route::group(
 //
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::get('superadmin/profile', [SuperAdminController::class, 'showPreview']);
 
         Route::resource('/bd-salaries', BdSalariesController::class);
 //        Route::resource('/charges', ChargeController::class);
