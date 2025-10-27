@@ -347,8 +347,14 @@ protected function phoneJs()
         });
 
 
-        if (window.__countryMapInitialized) return;
-                window.__countryMapInitialized = true;
+        $(document).on('pjax:complete', function () {
+            console.log('🔁 PJAX complete - إعادة تحميل الخريطة');
+
+            if (typeof $.fn.vectorMap === 'undefined') {
+                const scripts = [
+                    'https://cdn.jsdelivr.net/npm/jvectormap-next/jquery-jvectormap.min.js',
+                    'https://cdn.jsdelivr.net/npm/jvectormap-content/world-mill.js'
+                ];
 
                 function loadScriptsSequentially(scripts, callback) {
                     if (!scripts.length) return callback();
@@ -356,18 +362,21 @@ protected function phoneJs()
                     $.getScript(first)
                         .done(() => loadScriptsSequentially(rest, callback))
                         .fail((xhr, status, error) => {
-                        
                             console.error('[Map Error] فشل تحميل:', first, error);
                             window.location.reload();
                         });
                 }
 
-                const scripts = [
-                    'https://cdn.jsdelivr.net/npm/jvectormap-next/jquery-jvectormap.min.js',
-                    'https://cdn.jsdelivr.net/npm/jvectormap-content/world-mill.js'
-                ];
+                loadScriptsSequentially(scripts, function () {
+                    if (typeof initWorldMap === 'function') {
+                        initWorldMap();
+                    }
+                });
+            } else if (typeof initWorldMap === 'function') {
+                initWorldMap();
+            }
+        });
 
-                loadScriptsSequentially(scripts, initWorldMap);
     JS;
 }
     public function profile($id)
