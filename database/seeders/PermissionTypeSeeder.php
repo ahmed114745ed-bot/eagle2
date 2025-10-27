@@ -1137,7 +1137,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => [],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'edit', 'delete'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create'],
 
                         ],
                     ],
