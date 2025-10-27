@@ -98,8 +98,8 @@ class BdController extends MainController
         $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
         $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray() ?? [];
-
-        $grid->model()->where('parent_id', $authSuperAdmin->id)
+         //dd($countries);
+        $grid->model()
             ->whereIn('country_id', $countries)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
