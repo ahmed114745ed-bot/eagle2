@@ -311,7 +311,7 @@ class ChatRoomService
         return ChatMessage::where('chat_room_id', $chatRoomId)
             ->with('reacts', 'albums')
             ->orderBy('id', 'desc')
-            ->paginate(15);
+            ->cursorPaginate(5);
     }
 
     public function markMessagesAsSeen($checkRoom, $user)
