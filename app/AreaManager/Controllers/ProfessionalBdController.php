@@ -247,6 +247,7 @@ class ProfessionalBdController extends MainController
         });
 
         $grid->disableRowSelector();
+        $grid->disableCreateButton ();
 
         return $grid;
     }
