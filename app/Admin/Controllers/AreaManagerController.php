@@ -164,6 +164,8 @@ class AreaManagerController extends MainController
 
 protected function form($id = null)
 {
+
+  
     $form = new Form(new AreaManager());
     $this->disableFormTools($form);
 
