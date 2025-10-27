@@ -93,7 +93,7 @@ class ProfessionalBdController extends MainController
         $grid = new Grid(new Bd());
 
         $countriesIds = Common::areaCountries($authSuperAdmin->id);
-        $grid->model()->where('parent_id', $authSuperAdmin->id)
+        $grid->model()
             ->whereNotIn('country_id', $countriesIds)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
