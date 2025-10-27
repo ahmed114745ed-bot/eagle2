@@ -126,6 +126,10 @@ class UserRepository extends Repository
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where('is_bd', 0)
+            ->where('is_area_manager', 0)
+            ->where('is_super_admin', 0)
+            ->where('is_area_manager', 0)
+            ->where('is_sub_super_admin', 0)
             ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
