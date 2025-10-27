@@ -305,6 +305,7 @@ protected function addPhoneFields(Form $form)
 
 protected function phoneJs()
 {
+
     return <<<JS
         function initPhoneInputById(inputId, hiddenId) {
             const input = document.querySelector(inputId);
@@ -344,6 +345,29 @@ protected function phoneJs()
         $(document).on('pjax:complete', function () { 
             setTimeout(initAllPhones, 100); 
         });
+
+
+        if (window.__countryMapInitialized) return;
+                window.__countryMapInitialized = true;
+
+                function loadScriptsSequentially(scripts, callback) {
+                    if (!scripts.length) return callback();
+                    const [first, ...rest] = scripts;
+                    $.getScript(first)
+                        .done(() => loadScriptsSequentially(rest, callback))
+                        .fail((xhr, status, error) => {
+                        
+                            console.error('[Map Error] فشل تحميل:', first, error);
+                            window.location.reload();
+                        });
+                }
+
+                const scripts = [
+                    'https://cdn.jsdelivr.net/npm/jvectormap-next/jquery-jvectormap.min.js',
+                    'https://cdn.jsdelivr.net/npm/jvectormap-content/world-mill.js'
+                ];
+
+                loadScriptsSequentially(scripts, initWorldMap);
     JS;
 }
     public function profile($id)
