@@ -98,7 +98,7 @@ class AgencyController extends MainController
         $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $agency = Agency::query()
-            ->whereIn('country_id', $countries)
+           // ->whereIn('country_id', $countries)
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
             ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
             ->find($id);
