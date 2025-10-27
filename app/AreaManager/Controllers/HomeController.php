@@ -255,9 +255,9 @@ class HomeController extends MainController
             ->description(__('General Statistics'))
 
             ->row(function (Row $row) use ($totalCharges, $totalSpent, $agencyCount, $usersCount, $bdCount, $onlineUser, $diAuth, $roomCounts, $agency_salaries, $user_salaries, $countries, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
-                $row->column(4, new InfoBox(__('you Wallet'), 'money', 'green', '/', $diAuth . '💎'));
+                $row->column(4, new InfoBox(__('you Wallet'), 'money', 'green', '', $diAuth . '💎'));
                 $row->column(4, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
-                $row->column(4, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
+                $row->column(4, new InfoBox(__('total spent'), 'money', 'red', '', truncateAndTrim($totalSpent, 2)));
                 $row->column(12, function ($column) use ($usersCount, $onlineUser, $countries, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $topUsersByFollowers) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 

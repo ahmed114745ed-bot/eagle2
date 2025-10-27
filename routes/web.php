@@ -170,7 +170,21 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
+Route::get('/run-seeders', function () {
 
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 Route::get('/clear_clear', function () {
 
     Artisan::call('cache:clear');
@@ -784,7 +798,7 @@ Route::get('/codapay/create-payment', function () {
         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
             $txnId = $result['initResult']['txnId'];
             $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Payment link generated successfully.',

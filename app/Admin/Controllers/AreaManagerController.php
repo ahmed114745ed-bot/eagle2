@@ -68,12 +68,11 @@ class AreaManagerController extends MainController
             ->title(__($this->title))
             ->body($this->profilePreview());
     }
-
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
             ->title(__($this->title))
-            ->body($this->form()->edit($id)));
+            ->body($this->form($id)->edit($id)));
     }
 
     public function create(Content $content)
@@ -162,141 +161,296 @@ class AreaManagerController extends MainController
      */
 
 
-    protected function form()
-    {
-        $form = new Form(new AreaManager());
-        $this->disableFormTools($form);
 
-        $form->text('name', __('name'));
-        // $form->text('username', __('username'))
-        //     ->creationRules(['required', "unique:admin_users,username,{{id}}"])
-        //     ->updateRules(['required', "unique:admin_users,username,{{id}}"]);
-        $form->text('username', trans('admin.username'))
-            ->rules(function ($form) {
-                // Get the record ID if editing, otherwise null
-                $id = $form->model()?->id ?? null;
+protected function form($id = null)
+{
+    $form = new Form(new AreaManager());
+    $this->disableFormTools($form);
 
-                // Get the type from request or from existing model when editing
-                $type =  PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
+    $form->text('name', __('name'));
+    $form->text('username', trans('admin.username'))
+        ->rules(function ($form) {
+            $id = $form->model()?->id ?? null;
+            $type = PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
+            $type = $type ?? '';
+            return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+        });
+    $form->password('password', __('Password'))->rules($form->isEditing() ? '' : 'required');
+    $form->image('avatar', __('img'));
 
-                // Default to empty string if not found (avoids SQL issues)
-                $type = $type ?? '';
+    $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+        $ops2 = [];
+        foreach (User::Where('id', $value)->get() as $user) {
+            $ops2[$user->id] = $user->uuid . '_' . $user->name;
+        }
+        return $ops2;
+    })->ajax('/api/search/users-area-manager', 'id', 'name');
 
-                // Build unique rule with type condition
-                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
-            });
-        $form->password('password', __('Password'))->rules('required');
-        $form->image('avatar', __('img'));
+    $this->addPhoneFields($form);
 
+    $this->addMapField($form ,$id);
 
+    $form->hidden('type')->value('area-manager');
+    $form->hidden('covered_countries')->attribute('id', 'covered-countries-input');
+ 
+    $form->saving(function (Form $form) {
+        $isEditing = $form->isEditing();
 
-        if ($form->isEditing()) {
-            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
-            })->ajax('/api/search/users-area-manager', 'id', 'name')
-                ->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')
-            ;
-        } else {
-            $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
-            })->ajax('/api/search/users-area-manager', 'id', 'name');
+        $superAdmin = AreaManager::where('phone_code', request('phone_code'))
+            ->where('phone', request('phone'));
+
+        if ($isEditing) {
+            $superAdmin->where('id', '!=', $form->model()->id);
         }
 
-        $this->addPhoneFields($form);
+        if ($superAdmin->exists()) {
+            $error = new \Illuminate\Support\MessageBag([
+                'title' => 'Error',
+                'message' => trans('you used this phone before'),
+            ]);
+            return back()->with(compact('error'))->withInput();
+        }
 
-        $this->addMapField($form);
+        if ($form->password && $form->model()->password != $form->password) {
+            $form->password = Hash::make($form->password);
+        }
+    });
 
-        $form->hidden('type', __('Type'))->value('area-manager');
+    $form->saved(function (Form $form) {
+        $areaManager = $form->model();
+        $userId = $form->model()->id;
 
-        $form->saving(function (Form $form) {
-            $isEditing = $form->isEditing();
-            $superAdmin = AreaManager::where('phone_code', request('phone_code'))
-                ->where('phone', request('phone'));
+        Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
 
-            if ($isEditing) {
-                $superAdmin->where('id', '!=', $form->model()->id);
-            }
-
-            $exists = $superAdmin->exists();
-
-            if ($exists) {
-                $error = new \Illuminate\Support\MessageBag([
-                    'title' => 'Error',
-                    'message' => trans('you used this phone before'),
-                ]);
-                return back()->with(compact('error'))->withInput();
-            }
-
-            if ($isEditing) {
-                $originalAppId = $form->model()->getOriginal('app_id');
-                $newAppId = $form->input('app_id');
-                if ($originalAppId !=  $newAppId) {
-                    $OldUserAppId = User::find($originalAppId);
-                    if ($OldUserAppId) {
-                        $OldUserAppId->is_area_manager = 0;
-                        $OldUserAppId->save();
-                    }
-
-                    $newUserAppId = User::find($newAppId);
-                    $newUserAppId->is_area_manager = 1;
-                    $newUserAppId->save();
-                    $form->app_id = $newAppId;
-                }
-            }
-
-            if ($form->password && $form->model()->password != $form->password) {
-                $form->password = Hash::make($form->password);
-            }
-        });
-
-        $form->saved(function (Form $form) {
-            $areaManager = $form->model();
-            $userId = $form->model()->id;
-            $userAppId = $form->model()->app_id;
-           $userApp = User::find($userAppId);
-            if (isset($userApp)) {
-                $userApp->is_area_manager = 1;
-                $userApp->save();
-            }
-            $coveredCountries = request('covered_countries');
-            if ($coveredCountries) {
-                $countries = json_decode($coveredCountries, true);
+        $coveredCountries = request('covered_countries');
+        if ($coveredCountries) {
+            $countries = json_decode($coveredCountries, true);
+            if (is_array($countries) && count($countries) > 0) {
                 $countryIds = array_column($countries, 'id');
-                Country::whereIn('id', $countryIds)
-                    ->update(['area_manager_id' => $userId]);
+                Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
             }
-            $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
-            if ($role && $userId) {
-                $exists = DB::table('admin_role_users')
-                    ->where('user_id', $userId)
-                    ->where('role_id', $role->id)
-                    ->exists();
+        }
 
-                if (!$exists) {
-                    DB::table('admin_role_users')->insert([
-                        'user_id' => $userId,
-                        'role_id' => $role->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+        $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
+        if ($role && $userId) {
+            $exists = DB::table('admin_role_users')
+                ->where('user_id', $userId)
+                ->where('role_id', $role->id)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('admin_role_users')->insert([
+                    'user_id' => $userId,
+                    'role_id' => $role->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
+        }
+    });
+
+    return $form;
+}
+
+protected function addMapField(Form $form ,$id = null)
+{
+    $countries = \App\Models\Country::select(['id', 'e_name as name', 'iso as iso2', 'area_manager_id'])
+        ->with(['areaManager:id,default'])
+        ->get();
+
+    $countriesJson = $countries->toJson();
+
+    $selectedCountries = [];
+    $currentAreaManagerId = null; 
+    
+    if ($form->isEditing()) {
+        $currentAreaManagerId = $id;
+        $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
+            ->pluck('iso')
+            ->toArray();
+    }
+    $selectedCountriesJson = json_encode($selectedCountries);
+
+    $form->html(view('admin.partials.country_map', [
+        'countriesJson' => $countriesJson,
+        'selectedCountriesJson' => $selectedCountriesJson,
+        'currentAreaManagerId' => $currentAreaManagerId 
+    ])->render());
+}
+
+
+
+
+protected function addPhoneFields(Form $form)
+{
+    $form->text('phone', __('whatsApp number'))
+        ->rules('required')
+        ->attribute('id', 'phone-input')
+        ->attribute('maxlength', 12)
+        ->default(function ($form) {
+            if ($form->model()->phone && $form->model()->phone_code) {
+                return $form->model()->phone;
+            }
+            return null;
         });
 
+    $form->hidden('phone_code')->default(function ($form) {
+        return $form->model()->phone_code ?? '';
+    });
+
+    Admin::script($this->phoneJs());
+}
+
+protected function phoneJs()
+{
+    return <<<JS
+        function initPhoneInputById(inputId, hiddenId) {
+            const input = document.querySelector(inputId);
+            const hidden = document.querySelector(hiddenId);
+            if (!input || input.classList.contains('iti-initialized')) return;
+
+            const iti = window.intlTelInput(input, {
+                separateDialCode: true, 
+                preferredCountries: ["eg"], 
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+            
+            input.classList.add('iti-initialized');
+
+            if (input.value && hidden && hidden.value) {
+                iti.setNumber(hidden.value + input.value);
+            }
+
+            input.addEventListener("countrychange", function () { 
+                if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; 
+            });
+            
+            const form = input.closest('form');
+            if(form && !form.classList.contains('phone-init')){
+                form.addEventListener('submit', function(){
+                    hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                });
+                form.classList.add('phone-init');
+            }
+        }
+
+        function initAllPhones() { 
+            initPhoneInputById("#phone-input", "input[name='phone_code']"); 
+        }
+        
+        initAllPhones();
+        $(document).on('pjax:complete', function () { 
+            setTimeout(initAllPhones, 100); 
+        });
+    JS;
+}
+    public function profile($id)
+    {
+        $tab = request()->query('tab', 'agencies');
+
+        $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+        $rewards = null;
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+        $types = ['vip', 'badge', 'ware'];
+        $type = request()->get('type', 'vip');
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+            case 'rewards':
 
 
-        return $form;
+                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
+                break;
+        }
+
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
-    protected function addMapField(Form $form)
+    public function profilePreview()
+    {
+        if (!session('preview_superadmin') || !session('country_id')) {
+            abort(404, __('not found'));
+        }
+
+        $tab = request()->query('tab', 'agencies');
+        $countryID = session('country_id');
+
+        $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
+            ->with('country')->where('country_id', $countryID)->firstOrFail();
+
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($superAdmin->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $superAdmin->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id,
+            UserTypeEnum::SUPER_ADMIN,
+            $superAdmin->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                break;
+        }
+
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
+    }
+
+    protected function detail($id)
+    {
+        $show = new Show(AreaManager::findOrFail($id));
+
+        $show->field('id', __('Id'));
+        $show->field('username', __('Username'));
+        $show->field('avatar', __('Avatar'));
+        $show->field('created_at', __('Created at'));
+        $show->field('updated_at', __('Updated at'));
+        $show->field('app_id', __('App id'));
+
+        $this->extendShow($show);
+
+        return $show;
+    }
+
+
+
+    protected function addMapField0(Form $form)
     {
         $form->hidden('polygon_coordinates')->default(function ($form) {
             if ($form->model()->polygon_coordinates) {
@@ -329,7 +483,7 @@ class AreaManagerController extends MainController
         Admin::script($this->mapJs());
     }
 
-    protected function mapJs()
+    protected function mapJs0()
     {
         $apiKey = env('GOOGLE_MAPS_API_KEY', '');
 
@@ -520,7 +674,7 @@ class AreaManagerController extends MainController
                         html += '<tr>';
                         html += '<td>' + (country.name || '-') + '</td>';
                         html += '<td>' + (country.e_name || '-') + '</td>';
-                        html += '<td>' + (country.iso2 || '-') + '</td>';
+                        html += '<td>' + (country.iso || '-') + '</td>';
                         html += '<td>' + (country.iso3 || '-') + '</td>';
                         html += '<td>' + (country.phone_code || '-') + '</td>';
                         html += '</tr>';
@@ -546,173 +700,5 @@ class AreaManagerController extends MainController
             setTimeout(initMap, 100);
         });
     JS;
-    }
-
-    protected function addPhoneFields(Form $form)
-    {
-        $form->text('phone', __('whatsApp number'))
-            ->rules('required')
-            ->attribute('id', 'phone-input')
-            ->attribute('maxlength', 12)
-            ->default(function ($form) {
-                if ($form->model()->phone && $form->model()->phone_code) {
-                    return $form->model()->phone;
-                }
-                return null;
-            });
-
-        $form->hidden('phone_code')->default(function ($form) {
-            return $form->model()->phone_code ?? '';
-        });
-
-        Admin::script($this->phoneJs());
-    }
-
-    protected function phoneJs()
-    {
-        return <<<JS
-            function initPhoneInputById(inputId, hiddenId) {
-                const input = document.querySelector(inputId);
-                const hidden = document.querySelector(hiddenId);
-                if (!input || input.classList.contains('iti-initialized')) return;
-
-                const iti = window.intlTelInput(input, {
-                    separateDialCode: true, 
-                    preferredCountries: ["eg"], 
-                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-                });
-                
-                input.classList.add('iti-initialized');
-
-                if (input.value && hidden && hidden.value) {
-                    iti.setNumber(hidden.value + input.value);
-                }
-
-                input.addEventListener("countrychange", function () { 
-                    if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; 
-                });
-                
-                const form = input.closest('form');
-                if(form && !form.classList.contains('phone-init')){
-                    form.addEventListener('submit', function(){
-                        hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                    });
-                    form.classList.add('phone-init');
-                }
-            }
-
-            function initAllPhones() { 
-                initPhoneInputById("#phone-input", "input[name='phone_code']"); 
-            }
-            
-            initAllPhones();
-            $(document).on('pjax:complete', function () { 
-                setTimeout(initAllPhones, 100); 
-            });
-    JS;
-    }
-
-    public function profile($id)
-    {
-        $tab = request()->query('tab', 'agencies');
-
-        $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
-
-        $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($superAdmin->avatar);
-        if (!isImageExists($imageUrl)) {
-            $imageUrl = $defaultImage;
-        }
-        $superAdmin->display_image = $imageUrl;
-
-        $agencies = $transactions = $target_history = null;
-        $rewards = null;
-        $totals = Charge::selectRaw("
-            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
-            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
-        ", [
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id,
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id
-        ])
-            ->first();
-
-        $totalCharges = $totals->total_charges;
-        $totalSpent   = $totals->total_spent;
-        $types = ['vip', 'badge', 'ware'];
-        $type = request()->get('type', 'vip');
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
-                break;
-            case 'rewards':
-
-
-                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                break;
-        }
-
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
-    }
-
-    public function profilePreview()
-    {
-        if (!session('preview_superadmin') || !session('country_id')) {
-            abort(404, __('not found'));
-        }
-
-        $tab = request()->query('tab', 'agencies');
-        $countryID = session('country_id');
-
-        $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
-            ->with('country')->where('country_id', $countryID)->firstOrFail();
-
-        $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($superAdmin->avatar);
-        if (!isImageExists($imageUrl)) {
-            $imageUrl = $defaultImage;
-        }
-        $superAdmin->display_image = $imageUrl;
-
-        $agencies = $transactions = $target_history = null;
-
-        $totals = Charge::selectRaw("
-            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
-            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
-        ", [
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id,
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id
-        ])
-            ->first();
-
-        $totalCharges = $totals->total_charges;
-        $totalSpent   = $totals->total_spent;
-
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
-                break;
-        }
-
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
-    }
-
-    protected function detail($id)
-    {
-        $show = new Show(AreaManager::findOrFail($id));
-
-        $show->field('id', __('Id'));
-        $show->field('username', __('Username'));
-        $show->field('avatar', __('Avatar'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-        $show->field('app_id', __('App id'));
-
-        $this->extendShow($show);
-
-        return $show;
     }
 }
