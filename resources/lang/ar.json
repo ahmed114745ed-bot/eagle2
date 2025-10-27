@@ -22,6 +22,8 @@
     "Delete superadmin" : "حذف المشرف العام",
     "Area manager" : "مدير المنطقة",
 "Sub area manager" : "مدير المنطقة الفرعية",
+"Select area manager": "اختر مدير المنطقة",
+"go to the preview": "الذهاب إلى المعاينة",
     "App": "التطبيق",
    "Dedicated successfully": "تم الإهداء بنجاح",
 "Something went wrong": "حدث خطأ ما",

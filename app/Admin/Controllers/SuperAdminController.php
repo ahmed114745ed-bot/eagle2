@@ -106,7 +106,8 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $grid->model()->with(['appUser.packs'])
+        $countryID = session('country_id');
+        $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID))->with(['appUser.packs'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {

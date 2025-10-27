@@ -237,7 +237,7 @@
                                 'icon' => 'fa-users',
                                 'title' => __('Super Admin'),
                                 'children' => [
-                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
+                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'),'permission' => 'superadmin'],
                                 ],
                             ],
                             [
@@ -331,7 +331,7 @@
                 @endphp
 
 
-                @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin'))
+                @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin') &&!session('preview_area_manager'))
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @elseif(session('preview_superadmin'))
                     @php
@@ -358,6 +358,59 @@
                     @endphp
 
                     @foreach($superadminPreviewLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ admin_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i> {{ $child['title'] }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ admin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i> {{ $link['title'] }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @endif
+
+
+                @if (!in_array(Admin::user()->type, $adminTypes)&& !session('preview_superadmin') && !session('preview_area_manager'))
+                    @each('admin::partials.menu', $filteredMenu, 'item')
+                @elseif(session('preview_area_manager'))
+                    @php
+                        $areaManagerPreviewLinks = [
+                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
+                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')], 
+                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                ],
+                            ],
+                                    ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'),],
+                                    ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms')],
+                    
+                        ];
+                    @endphp
+
+                    @foreach($areaManagerPreviewLinks as $link)
                         @if(isset($link['children']))
                             <li class="treeview">
                                 <a href="#">

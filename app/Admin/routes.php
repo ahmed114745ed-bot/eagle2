@@ -716,6 +716,14 @@ Route::group(
             session()->forget('preview_superadmin');
         });
 
+         Route::post('/set-preview-area-manager', function () {
+            session(['preview_area_manager' => true]);
+        });
+
+        Route::post('/unset-preview-area-manager', function () {
+            session()->forget('preview_area_manager');
+        });
+
         Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
             Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
