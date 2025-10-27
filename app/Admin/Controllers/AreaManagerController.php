@@ -192,7 +192,7 @@ protected function form($id = null)
 
     $form->hidden('type')->value('area-manager');
     $form->hidden('covered_countries')->attribute('id', 'covered-countries-input');
- 
+
     $form->saving(function (Form $form) {
         $isEditing = $form->isEditing();
 
@@ -261,8 +261,8 @@ protected function addMapField(Form $form ,$id = null)
     $countriesJson = $countries->toJson();
 
     $selectedCountries = [];
-    $currentAreaManagerId = null; 
-    
+    $currentAreaManagerId = null;
+
     if ($form->isEditing()) {
         $currentAreaManagerId = $id;
         $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
@@ -274,7 +274,7 @@ protected function addMapField(Form $form ,$id = null)
     $form->html(view('admin.partials.country_map', [
         'countriesJson' => $countriesJson,
         'selectedCountriesJson' => $selectedCountriesJson,
-        'currentAreaManagerId' => $currentAreaManagerId 
+        'currentAreaManagerId' => $currentAreaManagerId
     ])->render());
 }
 
@@ -310,21 +310,21 @@ protected function phoneJs()
             if (!input || input.classList.contains('iti-initialized')) return;
 
             const iti = window.intlTelInput(input, {
-                separateDialCode: true, 
-                preferredCountries: ["eg"], 
+                separateDialCode: true,
+                preferredCountries: ["eg"],
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
-            
+
             input.classList.add('iti-initialized');
 
             if (input.value && hidden && hidden.value) {
                 iti.setNumber(hidden.value + input.value);
             }
 
-            input.addEventListener("countrychange", function () { 
-                if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; 
+            input.addEventListener("countrychange", function () {
+                if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
             });
-            
+
             const form = input.closest('form');
             if(form && !form.classList.contains('phone-init')){
                 form.addEventListener('submit', function(){
@@ -334,13 +334,13 @@ protected function phoneJs()
             }
         }
 
-        function initAllPhones() { 
-            initPhoneInputById("#phone-input", "input[name='phone_code']"); 
+        function initAllPhones() {
+            initPhoneInputById("#phone-input", "input[name='phone_code']");
         }
-        
+
         initAllPhones();
-        $(document).on('pjax:complete', function () { 
-            setTimeout(initAllPhones, 100); 
+        $(document).on('pjax:complete', function () {
+            setTimeout(initAllPhones, 100);
         });
     JS;
 }
@@ -348,14 +348,14 @@ protected function phoneJs()
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
+        $areaManager = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->findOrFail($id);
 
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($superAdmin->avatar);
+        $imageUrl = getImagePath($areaManager->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-        $superAdmin->display_image = $imageUrl;
+        $areaManager->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
         $rewards = null;
@@ -363,10 +363,10 @@ protected function phoneJs()
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id,
-            UserTypeEnum::SUPER_ADMIN,
-            $superAdmin->id
+            UserTypeEnum::AREA_MANAGER,
+            $areaManager->id,
+            UserTypeEnum::AREA_MANAGER,
+            $areaManager->id
         ])
             ->first();
 
@@ -376,16 +376,14 @@ protected function phoneJs()
         $type = request()->get('type', 'vip');
         switch ($tab) {
             case 'agencies':
-                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+                $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
                 break;
-            case 'rewards':
-
-
-                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                break;
+//            case 'rewards':
+//                $rewards = SuperAdminReward::where('super_admin_id', $areaManager->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
+//                break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types'));
     }
 
     public function profilePreview()
@@ -503,7 +501,7 @@ protected function phoneJs()
 
         return <<<JS
         const translations = {$translations};
-        
+
         if (!window.google || !window.google.maps) {
             const script = document.createElement('script');
             script.src = 'https://maps.googleapis.com/maps/api/js?key={$apiKey}&libraries=drawing,geometry';
@@ -514,24 +512,24 @@ protected function phoneJs()
         } else {
             initMap();
         }
-    
+
         let map, drawingManager, currentPolygon;
         let polygonCoordinates = [];
-    
+
         function initMap() {
             if (!document.getElementById('map')) {
                 setTimeout(initMap, 100);
                 return;
             }
-    
+
             const center = { lat: 26.8206, lng: 30.8025 };
-    
+
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 6,
                 center: center,
                 mapTypeId: 'roadmap'
             });
-    
+
             drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.POLYGON,
                 drawingControl: true,
@@ -549,9 +547,9 @@ protected function phoneJs()
                     zIndex: 1
                 }
             });
-    
+
             drawingManager.setMap(map);
-    
+
             const savedCoordinates = document.querySelector('input[name="polygon_coordinates"]');
             if (savedCoordinates && savedCoordinates.value && savedCoordinates.value !== '[]') {
                 try {
@@ -564,20 +562,20 @@ protected function phoneJs()
                     console.error('Error parsing saved coordinates:', e);
                 }
             }
-    
+
             google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
                 if (currentPolygon) {
                     currentPolygon.setMap(null);
                 }
                 currentPolygon = polygon;
                 updatePolygonCoordinates();
-                
+
                 drawingManager.setDrawingMode(null);
-    
+
                 google.maps.event.addListener(polygon.getPath(), 'set_at', updatePolygonCoordinates);
                 google.maps.event.addListener(polygon.getPath(), 'insert_at', updatePolygonCoordinates);
             });
-    
+
             document.getElementById('clear-polygon').addEventListener('click', function() {
                 if (currentPolygon) {
                     currentPolygon.setMap(null);
@@ -589,16 +587,16 @@ protected function phoneJs()
                     drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
                 }
             });
-    
+
             document.getElementById('get-countries').addEventListener('click', getCountriesInPolygon);
         }
-    
+
         function drawSavedPolygon(coordinates) {
             const polygonPath = coordinates.map(coord => ({
                 lat: parseFloat(coord.lat),
                 lng: parseFloat(coord.lng)
             }));
-    
+
             currentPolygon = new google.maps.Polygon({
                 paths: polygonPath,
                 fillColor: '#2196F3',
@@ -609,25 +607,25 @@ protected function phoneJs()
                 editable: true,
                 zIndex: 1
             });
-    
+
             currentPolygon.setMap(map);
-            
+
             google.maps.event.addListener(currentPolygon.getPath(), 'set_at', updatePolygonCoordinates);
             google.maps.event.addListener(currentPolygon.getPath(), 'insert_at', updatePolygonCoordinates);
-    
+
             const bounds = new google.maps.LatLngBounds();
             polygonPath.forEach(point => bounds.extend(point));
             map.fitBounds(bounds);
-    
+
             polygonCoordinates = coordinates;
         }
-    
+
         function updatePolygonCoordinates() {
             if (!currentPolygon) return;
-    
+
             const path = currentPolygon.getPath();
             polygonCoordinates = [];
-    
+
             for (let i = 0; i < path.getLength(); i++) {
                 const point = path.getAt(i);
                 polygonCoordinates.push({
@@ -635,23 +633,23 @@ protected function phoneJs()
                     lng: point.lng()
                 });
             }
-    
+
             document.querySelector('input[name="polygon_coordinates"]').value = JSON.stringify(polygonCoordinates);
         }
-    
+
         function getCountriesInPolygon() {
             if (!polygonCoordinates || polygonCoordinates.length === 0) {
                 alert(translations.please_select_area);
                 return;
             }
-    
+
             document.getElementById('countries-content').innerHTML = '<p><i class="fa fa-spinner fa-spin"></i> ' + translations.searching_countries + '</p>';
             document.getElementById('countries-list').style.display = 'block';
-            
+
             const btn = document.getElementById('get-countries');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> ' + translations.searching;
-    
+
             fetch('/api/countries-in-polygon', {
                 method: 'POST',
                 headers: {
@@ -663,13 +661,13 @@ protected function phoneJs()
             .then(response => response.json())
             .then(data => {
                 const countries = data.countries;
-                
+
                 if (countries.length === 0) {
                     document.getElementById('countries-content').innerHTML = '<div class="alert alert-warning">' + translations.no_countries_found + '</div>';
                 } else {
                     let html = '<div class="alert alert-success">' + translations.found + ' ' + countries.length + ' ' + translations.country + '</div>';
                     html += '<table class="table table-bordered table-striped"><thead><tr><th>' + translations.arabic_name + '</th><th>' + translations.english_name + '</th><th>ISO2</th><th>ISO3</th><th>' + translations.phone_code + '</th></tr></thead><tbody>';
-                    
+
                     countries.forEach(country => {
                         html += '<tr>';
                         html += '<td>' + (country.name || '-') + '</td>';
@@ -679,10 +677,10 @@ protected function phoneJs()
                         html += '<td>' + (country.phone_code || '-') + '</td>';
                         html += '</tr>';
                     });
-                    
+
                     html += '</tbody></table>';
                     document.getElementById('countries-content').innerHTML = html;
-                    
+
                     document.querySelector('input[name="covered_countries"]').value = JSON.stringify(countries);
                 }
             })
@@ -695,7 +693,7 @@ protected function phoneJs()
                 btn.innerHTML = translations.show_selected_countries;
             });
         }
-    
+
         $(document).on('pjax:complete', function() {
             setTimeout(initMap, 100);
         });

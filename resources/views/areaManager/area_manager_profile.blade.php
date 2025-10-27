@@ -825,38 +825,38 @@
 <!-- Header Section -->
 <div class="agency-header">
     <div class="agency-avatar">
-        <img src="{{ getImagePath($superAdmin->avatar) }}" alt="Agency Logo" class="logo-img">
+        <img src="{{ getImagePath($areaManager->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $superAdmin->name ??'' }}</h1>
+        <h1 class="agency-name">{{ $areaManager->name ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
-                <span class="meta-value">{{ $superAdmin->id }}</span>
+                <span class="meta-value">{{ $areaManager->id }}</span>
             </div>
             <div class="meta-item">
                 <span class="meta-label">{{ __("username") }}:</span>
-                <span class="meta-value">{{ $superAdmin->username ?? '' }}</span>
+                <span class="meta-value">{{ $areaManager->username ?? '' }}</span>
             </div>
         </div>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("salary") }}:</span>
-                <span class="meta-value">{{ $superAdmin->di }}</span>
+                <span class="meta-value">{{ $areaManager->di }}</span>
             </div>
             <div class="meta-item">
                 <span class="meta-label">{{ __("country") }}:</span>
-                 <img src="{{ getImagePath(@$superAdmin->country->flag) }}"
+                 <img src="{{ getImagePath(@$areaManager->country->flag) }}"
                      class="flag-image"
                      alt="flag Image"
-                     title="{{ app()->getLocale() === 'ar' ? @$superAdmin->country->name : @$superAdmin->country->e_name }}">
+                     title="{{ app()->getLocale() === 'ar' ? @$areaManager->country->name : @$areaManager->country->e_name }}">
             </div>
         </div>
     </div>
- 
-        
-        
- 
+
+
+
+
     <a href="{{ url('admin/usersBd') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
     </a>
@@ -874,7 +874,7 @@
 
 
 {{--                            <a href="#" >--}}
-{{--                               {{  truncateAndTrim( $superAdmin->total_salary)  }}--}}
+{{--                               {{  truncateAndTrim( $areaManager->total_salary)  }}--}}
 {{--                            </a>--}}
 {{--                    </div>--}}
 
@@ -911,10 +911,7 @@
 
 <div class="agency-tabs">
     <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
-    <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>
-
-
-
+{{--    <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>--}}
 </div>
 
 <!-- Loading Overlay -->
@@ -1001,83 +998,83 @@
     </div>
 @endif
 
-@if($activeTab === 'rewards')
-    <div class="tab-content active" id="rewards-tab">
-        <div class="card">
-            <div class="card-header">
-                <h3>{{ __('rewards') }}</h3>
-                <span class="badge count-badge">{{ optional($rewards)->total() ?? 0 }}</span>
-            </div>
+{{--@if($activeTab === 'rewards')--}}
+{{--    <div class="tab-content active" id="rewards-tab">--}}
+{{--        <div class="card">--}}
+{{--            <div class="card-header">--}}
+{{--                <h3>{{ __('rewards') }}</h3>--}}
+{{--                <span class="badge count-badge">{{ optional($rewards)->total() ?? 0 }}</span>--}}
+{{--            </div>--}}
 
-            <div class="box-body">
-                <div class="nav-scroll-container {{ app()->getLocale() == 'ar' ? 'nav-right' : 'nav-left' }}">
-                    <ul class="nav nav-pills">
-                        @foreach($types as $name)
-                            <li class="{{ $type == $name ? 'active' : '' }}">
-                                <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}" class="charge_action">
-                                    {{ __($name) }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-            @if($rewards && $rewards->count())
-                <div class="table-responsive">
-                   
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('image') }}</th>
-                                <th>{{ __('count') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($rewards as $index => $reward)
-                                @php
-                                    $name = '';
-                                    $image = '';
+{{--            <div class="box-body">--}}
+{{--                <div class="nav-scroll-container {{ app()->getLocale() == 'ar' ? 'nav-right' : 'nav-left' }}">--}}
+{{--                    <ul class="nav nav-pills">--}}
+{{--                        @foreach($types as $name)--}}
+{{--                            <li class="{{ $type == $name ? 'active' : '' }}">--}}
+{{--                                <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}" class="charge_action">--}}
+{{--                                    {{ __($name) }}--}}
+{{--                                </a>--}}
+{{--                            </li>--}}
+{{--                        @endforeach--}}
+{{--                    </ul>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--            @if($rewards && $rewards->count())--}}
+{{--                <div class="table-responsive">--}}
 
-                                    if (request('type') == 'ware') {
-                                        $name = @$reward->ware->name ?? '';
-                                        $image = @$reward->ware->image ?? '';
-                                    } elseif (request('type') == 'vip') {
-                                        $name = @$reward->vip->name ?? '';
-                                        $image = @$reward->vip->image ?? '';
-                                    } elseif (request('type') == 'badge') {
-                                        $name = @$reward->badge->name ?? '';
-                                        $image = @$reward->badge->image ?? '';
-                                    }
-                                @endphp
+{{--                    <table class="data-table">--}}
+{{--                        <thead>--}}
+{{--                            <tr>--}}
+{{--                                <th>#</th>--}}
+{{--                                <th>{{ __('Name') }}</th>--}}
+{{--                                <th>{{ __('image') }}</th>--}}
+{{--                                <th>{{ __('count') }}</th>--}}
+{{--                            </tr>--}}
+{{--                        </thead>--}}
+{{--                        <tbody>--}}
+{{--                            @foreach($rewards as $index => $reward)--}}
+{{--                                @php--}}
+{{--                                    $name = '';--}}
+{{--                                    $image = '';--}}
 
-                                <tr>
-                                    <td>{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>
-                                    <td>{{ $name }}</td>
-                                    <td>
-                                        @if($image)
-                                            <img src="{{ getImagePath($image) }}" alt="Image" width="40" height="40">
-                                        @endif
-                                    </td>
-                                    <td>{{ $reward->no_reward }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-wrapper">
-                    {{ $rewards->appends(['tab' => 'rewards'])->links('vendor.pagination.default') }}
-                </div>
-            @else
-                <div class="empty-table">
-                    <i class="fas fa-users-slash"></i>
-                    <p>{{ __('No reward found') }}</p>
-                </div>
-            @endif
-        </div>
-    </div>
-@endif
+{{--                                    if (request('type') == 'ware') {--}}
+{{--                                        $name = @$reward->ware->name ?? '';--}}
+{{--                                        $image = @$reward->ware->image ?? '';--}}
+{{--                                    } elseif (request('type') == 'vip') {--}}
+{{--                                        $name = @$reward->vip->name ?? '';--}}
+{{--                                        $image = @$reward->vip->image ?? '';--}}
+{{--                                    } elseif (request('type') == 'badge') {--}}
+{{--                                        $name = @$reward->badge->name ?? '';--}}
+{{--                                        $image = @$reward->badge->image ?? '';--}}
+{{--                                    }--}}
+{{--                                @endphp--}}
+
+{{--                                <tr>--}}
+{{--                                    <td>{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>--}}
+{{--                                    <td>{{ $name }}</td>--}}
+{{--                                    <td>--}}
+{{--                                        @if($image)--}}
+{{--                                            <img src="{{ getImagePath($image) }}" alt="Image" width="40" height="40">--}}
+{{--                                        @endif--}}
+{{--                                    </td>--}}
+{{--                                    <td>{{ $reward->no_reward }}</td>--}}
+{{--                                </tr>--}}
+{{--                            @endforeach--}}
+{{--                        </tbody>--}}
+{{--                    </table>--}}
+{{--                </div>--}}
+{{--                <div class="pagination-wrapper">--}}
+{{--                    {{ $rewards->appends(['tab' => 'rewards'])->links('vendor.pagination.default') }}--}}
+{{--                </div>--}}
+{{--            @else--}}
+{{--                <div class="empty-table">--}}
+{{--                    <i class="fas fa-users-slash"></i>--}}
+{{--                    <p>{{ __('No reward found') }}</p>--}}
+{{--                </div>--}}
+{{--            @endif--}}
+{{--        </div>--}}
+{{--    </div>--}}
+{{--@endif--}}
 
 {{--@if($activeTab === 'transactions')--}}
 
