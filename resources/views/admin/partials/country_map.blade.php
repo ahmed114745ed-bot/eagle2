@@ -60,7 +60,7 @@
                 const iso = country.iso2.toUpperCase();
                 countryMap[iso] = country;
 
-                if (country.area_manager_id === currentAreaManagerId) {
+                if (country.area_manager_id === currentAreaManagerId  &&  currentAreaManagerId != null ) {
                     regionColors[iso] = '#4CAF50';
                     myCountries.push(iso); 
                 } else if (country.area_manager_id && 
@@ -108,7 +108,6 @@
     const iso = code.toUpperCase();
     const country = countryMap[iso];
 
-    // منع التحديد إذا الدولة تابعة لمدير آخر
     if (
         country &&
         country.area_manager_id &&
@@ -122,31 +121,26 @@
         return;
     }
 
-    // الحصول على الدول المحددة حاليًا
     let selectedRegions = mapObj.getSelectedRegions();
     const isSelected = selectedRegions.includes(code);
 
     if (isSelected) {
-        // ✅ إذا كانت محددة → أزلها من القائمة
         selectedRegions = selectedRegions.filter(c => c !== code);
-        mapObj.clearSelectedRegions(); // امسح التحديد القديم
-        mapObj.setSelectedRegions(selectedRegions); // أعد التحديد الجديد بدون هذه الدولة
+        mapObj.clearSelectedRegions();
+        mapObj.setSelectedRegions(selectedRegions); 
 
-        // أعد اللون الأصلي للدولة بعد الإزالة
         if (country && country.area_manager_id === currentAreaManagerId) {
-            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' }); // الأخضر = تخصك
+            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' });
         } else {
-            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' }); // الرمادي = عادي
+            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' });
         }
 
     } else {
-        // ✅ إذا غير محددة → أضفها إلى التحديد
         selectedRegions.push(code);
         mapObj.setSelectedRegions(selectedRegions);
-        mapObj.series.regions[0].setValues({ [iso]: '#2196F3' }); // الأزرق = جديد
+        mapObj.series.regions[0].setValues({ [iso]: '#2196F3' }); 
     }
 
-    // تحديث البيانات في الحقول والقوائم
     updateSelectedCountries(mapObj);
     updateCountryList(mapObj);
 },
