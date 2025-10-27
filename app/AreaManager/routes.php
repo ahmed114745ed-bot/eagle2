@@ -96,8 +96,8 @@ Route::group(
         //        //agencies
         Route::resource('/agencies', AgencyController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
-        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
-        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+        Route::get('profile-shipping-agency/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+        Route::get('profile-agency/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         //        Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
             Route::resource('users', AgencyUserController::class);
