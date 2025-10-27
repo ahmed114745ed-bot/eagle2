@@ -47,6 +47,11 @@ class AreaManager extends Authenticatable
         return $this->hasOne(AreaPolygon::class, 'area_manager_id');
     }
 
+    public function agencies()
+    {
+        return $this->hasManyThrough(Agency::class, Country::class, 'area_manager_id', 'country_id', 'id', 'id');
+    }
+
     public function countries()
     {
         return $this->hasMany(Country::class, 'area_manager_id');

@@ -482,6 +482,7 @@ Route::group(
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('area-manager-users', AreaManagerController::class);
+        Route::get('area-manager-users/profile', [SuperAdminController::class, 'showPreview']);
 
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
@@ -716,6 +717,14 @@ Route::group(
 
         Route::post('/unset-preview-superadmin', function () {
             session()->forget('preview_superadmin');
+        });
+
+         Route::post('/set-preview-area-manager', function () {
+            session(['preview_area_manager' => true]);
+        });
+
+        Route::post('/unset-preview-area-manager', function () {
+            session()->forget('preview_area_manager');
         });
 
         Route::group(['middleware' => 'local'], function () {
