@@ -130,7 +130,7 @@ class SuperAdminController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/superadmin-users/{$this->id}");
+            $showUrl = url("areaManager/superadmin-users/{$this->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -162,7 +162,7 @@ class SuperAdminController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
+            $showUrl = url("areaManager/users/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>

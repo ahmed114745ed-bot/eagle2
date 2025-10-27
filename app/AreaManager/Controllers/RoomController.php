@@ -571,7 +571,7 @@ class RoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
-            $showUrl = url("superadmin/rooms/{$id}");
+            $showUrl = url("areaManager/rooms/{$id}");
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
@@ -590,8 +590,8 @@ class RoomController extends MainController
             if (! $user) {
                 return __('No User');
             }
-
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+            $showUrl = url("areaManager/users/profile/{$this->id}");
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
         });
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {

@@ -152,7 +152,7 @@ class AgencyUserController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 50, 50);
-                $showUrl = url("superadmin/users/profile/{$this->id}");
+                $showUrl = url("areaManager/users/profile/{$this->id}");
 
                 return "
                         <div style='display: flex; align-items: center; gap: 10px;'>
@@ -194,7 +194,9 @@ class AgencyUserController extends MainController
                     return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
                 });
 
-                $profileUrl = route('superadmin.agency.profile', ['id' => $this->agency_id]);
+                $profileUrl = url("areaManager/profile-agency/{$this->agency_id}");
+                
+               // route('areaManager.agency.profile', ['id' => $this->agency_id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -237,7 +239,7 @@ class AgencyUserController extends MainController
                 var userId = $(this).data('user-id');
                 $('#sameDeviceUsersModal .modal-body').html('Loading...');
                 $('#sameDeviceUsersModal').modal('show');
-                $.get('/superadmin/users/' + userId + '/same-device-users-table', function(html) {
+                $.get('/areaManager/users/' + userId + '/same-device-users-table', function(html) {
                     $('#sameDeviceUsersModal .modal-body').html(html);
                 });
             });
@@ -327,7 +329,7 @@ class AgencyUserController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 50, 50);
-                $showUrl = url("superadmin/users/profile/{$this->id}");
+                $showUrl = url("areaManager/users/profile/{$this->id}");
                 $country = app()->getLocale() == 'ar' ? $this->country?->name : $this->country?->e_name;
 
                 return "
@@ -371,7 +373,8 @@ class AgencyUserController extends MainController
                     return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
                 });
 
-                $profileUrl = route('superadmin.agency.profile', ['id' => $this->agency_id]);
+                $profileUrl = url("areaManager/profile-agency/{$this->agency_id}");
+                //route('areaManager.agency.profile', ['id' => $this->agency_id]);
                 $country = app()->getLocale() == 'ar' ? $this->agency->country?->name : $this->agency->country?->e_name;
 
                 return "
@@ -416,7 +419,7 @@ class AgencyUserController extends MainController
                 var userId = $(this).data('user-id');
                 $('#sameDeviceUsersModal .modal-body').html('Loading...');
                 $('#sameDeviceUsersModal').modal('show');
-                $.get('/superadmin/users/' + userId + '/same-device-users-table', function(html) {
+                $.get('/areaManager/users/' + userId + '/same-device-users-table', function(html) {
                     $('#sameDeviceUsersModal .modal-body').html(html);
                 });
             });

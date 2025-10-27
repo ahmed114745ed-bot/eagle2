@@ -196,7 +196,7 @@ class UserController extends MainController
 
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(__('user profile'))
             ->view(
                 'super_user_profile',
@@ -321,7 +321,7 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user, false, superadmin_url("users/profile/{$user->id}"));
+                return app(UserService::class)->adminUserAvatar($user, false, areaManager_url("users/profile/{$user->id}"));
             });
 
         $grid->column('agency_id', __('Agency'))
@@ -371,26 +371,17 @@ class UserController extends MainController
                 var userId = $(this).data('user-id');
                 $('#sameDeviceUsersModal .modal-body').html('Loading...');
                 $('#sameDeviceUsersModal').modal('show');
-                $.get('/superadmin/users/' + userId + '/same-device-users-table', function(html) {
+                $.get('/areaManager/users/' + userId + '/same-device-users-table', function(html) {
                     $('#sameDeviceUsersModal .modal-body').html(html);
                 });
             });
         ");
 
-        // $grid->actions(function ($actions) {
-        //     $model = $actions->row;
-        //     $actions->add(new ChargeSwitchAction());
-        //     $actions->add(new InviteSwitchAction());
 
-        //     $row = $actions->row;
-        //     $actions->add(new CanPlaySwitchAction($row['can_play']));
-
-        //     $actions->add(new KickOfAgencyAction());
-        //     $actions->add(new KickOfFamilyAction());
-
-        //     $actions->add(new ChangeAgencyAction($model->id));
-        // });
         $grid->disableActions();
+        if (!Admin::user()->can('create-' . $this->permission_name) && !Admin::user()->can('*')) {
+            $grid->disableCreateButton();
+        }
 
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
