@@ -106,7 +106,7 @@
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
                         ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
                         ,
                         [
@@ -167,13 +167,13 @@
 
                     function hasPermission($permission) {
                         if (Admin::user()->can('*')) {
-                            return true; 
+                            return true;
                         }
-                        
+
                         if (is_null($permission)) {
-                            return true; 
+                            return true;
                         }
-                        
+
                         return Admin::user()->can('browse-' . $permission);
                     }
 
@@ -328,7 +328,7 @@
 
 
 
-                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && !session('preview_superadmin'))
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin'&& Admin::user()->type != 'area-manager' && !session('preview_superadmin'))
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @elseif(session('preview_superadmin'))
                     @php
