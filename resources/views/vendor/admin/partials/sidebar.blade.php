@@ -326,9 +326,12 @@
                     @endforeach
                 @endif
 
+                @php
+                $adminTypes = ['bd', 'superadmin', 'sub_super_admin', 'area-manager', 'sub_area_manager'];
+                @endphp
 
 
-                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin'&& Admin::user()->type != 'area-manager' && !session('preview_superadmin'))
+                @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin'))
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @elseif(session('preview_superadmin'))
                     @php
