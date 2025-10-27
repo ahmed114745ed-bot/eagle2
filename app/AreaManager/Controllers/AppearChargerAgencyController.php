@@ -235,7 +235,7 @@ class AppearChargerAgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                $profileUrl = route('superadmin.shipping.agency.profile', ['id' => $this->id]);
+                $profileUrl = route('areaManager.shipping.agency.profile', ['id' => $this->id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -266,7 +266,7 @@ class AppearChargerAgencyController extends MainController
             // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
 
-            $showUrl = $this->owner ? url("superadmin/users/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? url("areaManager/users/{$this->owner->id}") : 0;
 
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>

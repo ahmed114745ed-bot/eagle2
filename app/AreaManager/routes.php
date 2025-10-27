@@ -82,7 +82,7 @@ Route::group(
         //
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::resource('superadmin-users', SuperAdminController::class);
-
+        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::resource('/bd-salaries', BdSalariesController::class);
         //        Route::resource('/charges', ChargeController::class);
         //        // Route::resource('/wallet', 'WalletController');
@@ -96,7 +96,7 @@ Route::group(
         //        //agencies
         Route::resource('/agencies', AgencyController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
-        //        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         //        Route::resource('/request-agencies', RequestAgencyController::class);
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
@@ -119,8 +119,8 @@ Route::group(
         //
         //        Route::resource('home-carousel', HomeCarouselController::class);
         //
-        //        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
-        //        Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
+
+        Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
         //        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         //        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
