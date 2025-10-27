@@ -67,4 +67,18 @@ class Country extends Model
               });
         });
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($country) {
+            if (empty($country->area_manager_id)) {
+                $defaultManager = AreaManager::where('default', 1)->first();
+                if ($defaultManager) {
+                    $country->area_manager_id = $defaultManager->id;
+                }
+            }
+        });
+    }
 }
