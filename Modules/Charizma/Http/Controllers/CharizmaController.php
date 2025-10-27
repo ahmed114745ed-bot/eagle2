@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -124,7 +125,10 @@ class CharizmaController extends Controller
             ]
         ];
         $json = json_encode($ms);
-
+        Log::channel('charisma')->info('Charisma sendToZego sent successfully', [
+            'charizma_status' => $room->charizma_status,
+            'json' => $json,
+        ]);
         Common::sendToZego('SendCustomCommand', $roomId, Auth::id(), $json);
 
         //delete all charisma in room
