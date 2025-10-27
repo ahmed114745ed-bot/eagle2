@@ -194,7 +194,9 @@ class AgencyUserController extends MainController
                     return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
                 });
 
-                $profileUrl = route('areaManager.agency.profile', ['id' => $this->agency_id]);
+                $profileUrl = url("areaManager/agencies/profile/{$this->id}");
+                
+               // route('areaManager.agency.profile', ['id' => $this->agency_id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -371,7 +373,8 @@ class AgencyUserController extends MainController
                     return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
                 });
 
-                $profileUrl = route('areaManager.agency.profile', ['id' => $this->agency_id]);
+                $profileUrl = url("areaManager/agencies/profile/{$this->id}");
+                //route('areaManager.agency.profile', ['id' => $this->agency_id]);
                 $country = app()->getLocale() == 'ar' ? $this->agency->country?->name : $this->agency->country?->e_name;
 
                 return "
