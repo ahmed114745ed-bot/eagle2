@@ -220,32 +220,67 @@
         </a>
 
         @php
+            $areaManagers = \App\Models\AreaManager::select(['id','name','username','avatar'])->get();
+            $selectAreaManagerId = session('area_manager_id') ?? request('area_manager_id');
+            $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);
-            $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+
+            $countries = \App\Models\Country::when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
             $areaManagerCountries = \App\Models\Country::where('area_manager_id', auth()->id())->select(['id', 'name', 'flag'])->get();
+
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
-            $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
+            $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
+
+            $selectedAreaManagerCountryId = session('area_manager_country_id') ?? request('area_manager_country_id') ?? Admin::user()->country_id;
+            $selectedAreaManagerCountry   = $areaManagerCountries->firstWhere('id', (int) $selectedAreaManagerCountryId);
         @endphp
 
-{{--        @if(!session('preview_superadmin'))--}}
-            @if (request()->is('admin*'))
-                <a class="nav-item select-country">
-                    <select id="country-select" class="form-control" style="width:190px;">
-                        <option value="">{{ __('Select Country...') }}</option>
-                        @foreach($countries as $currentCountry)
-                            <option
-                                value="{{ $currentCountry->id }}"
-                                data-flag="{{ getImagePath($currentCountry->flag) }}"
-                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                {{ $currentCountry->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </a>
-            @endif
+        @if (request()->is('admin*'))
+            <a class="nav-item select-country">
+                <select id="area-Manager-select" class="form-control" style="width:190px;">
+                    <option value="">{{ __('Select area manager') }}</option>
+                    @foreach($areaManagers as $areaManager)
+                        <option
+                            value="{{ $areaManager->id }}"
+                            data-flag="{{ getImagePath($areaManager->avatar) }}"
+                            {{ (string)$selectAreaManagerId === (string)$areaManager->id ? 'selected' : '' }}>
+                            {{ $areaManager->name ?? $areaManager->username }}
+                        </option>
+                    @endforeach
+                </select>
+            </a>
+            <a class="nav-item select-country">
+                <select id="country-select" class="form-control" style="width:190px;">
+                    <option value="">{{ __('Select Country...') }}</option>
+                    @foreach($countries as $currentCountry)
+                        <option
+                            value="{{ $currentCountry->id }}"
+                            data-flag="{{ getImagePath($currentCountry->flag) }}"
+                            {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                            {{ $currentCountry->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </a>
+        @endif
 
-            <script>window.enableCountryHeader = true;</script>
-{{--        @endif--}}
+        @if (request()->is('areaManager*'))
+            <a class="nav-item select-country">
+                <select id="country-select" class="form-control" style="width:190px;">
+                    <option value="">{{ __('Select Country...') }}</option>
+                    @foreach($areaManagerCountries as $currentCountry)
+                        <option
+                            value="{{ $currentCountry->id }}"
+                            data-flag="{{ getImagePath($currentCountry->flag) }}"
+                            {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                            {{ $currentCountry->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </a>
+        @endif
+        <script>window.enableCountryHeader = true;</script>
+
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
         {!! Admin::getNavbar()->render('left') !!}
@@ -318,7 +353,7 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('country_id'))
+                @if(!session('preview_superadmin') && session('country_id') && !session('area_manager_id'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
@@ -326,9 +361,17 @@
                             </button>
                         </li>
                     @endif
+                @elseif(!session('preview_area_manager') && session('country_id') && session('area_manager_id') )
+                @if (request()->is('admin*'))
+                        <li style="padding: 10px;">
+                            <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
+                                <i class="fa fa-eye"></i> {{ __('go to the preview') }}
+                            </button>
+                        </li>
+                    @endif
                 @endif
 
-                @if(session('preview_superadmin'))
+                @if(session('preview_superadmin') || session('preview_area_manager') )
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
@@ -348,7 +391,27 @@
 <script>
     $(document).ready(function () {
         const $countrySelect = $('#country-select');
+        const $AreaManagerSelect = $('#area-Manager-select');
+        const isPreviewSuperadmin = @json(session('preview_superadmin'));
+        const isPreviewAreaManager = @json(session('preview_area_manager'));
 
+          $('#area-Manager-select').select2({
+                placeholder: '{{ __("Select area manager") }}',
+                allowClear: true, // ✅ Enables the "X"
+                width: '190px'
+            });
+         $AreaManagerSelect.on('change', function () {
+                const areaMangerId = $(this).val();
+                const url = new URL(window.location.href);
+
+                if (areaMangerId && areaMangerId !== 'null') {
+                    url.searchParams.set('area_manager_id', areaMangerId);
+                } else {
+                    url.searchParams.set('area_manager_id', 'null');
+                }
+
+                window.location.href = url.toString();
+            });
         if ($countrySelect.length) {
             $countrySelect.select2({
                 placeholder: "{{ __('Select Country') }}",
@@ -357,6 +420,8 @@
                 templateSelection: formatCountry,
                 escapeMarkup: function (markup) { return markup; }
             });
+
+
 
             $countrySelect.on('change', function () {
                 const countryId = $(this).val();
@@ -371,6 +436,21 @@
                 window.location.href = url.toString();
             });
 
+            @if(request()->is('areaManager*'))
+            $countrySelect.on('change', function () {
+                const countryId = $(this).val();
+                const url = new URL(window.location.href);
+
+                if (countryId && countryId !== 'null') {
+                    url.searchParams.set('area_manager_country_id', countryId);
+                } else {
+                    url.searchParams.set('area_manager_country_id', 'null');
+                }
+
+                window.location.href = url.toString();
+            });
+            @endif
+
             $(document).on('click', '.select2-selection__clear', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -379,6 +459,17 @@
                 url.searchParams.set('country_id', 'null');
                 window.location.href = url.toString();
             });
+
+            @if(request()->is('areaManager*'))
+                $(document).on('click', '.select2-selection__clear', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('area_manager_country_id', 'null');
+                    window.location.href = url.toString();
+                });
+            @endif
         }
 
         function formatCountry(country) {
@@ -417,6 +508,9 @@
         const previewBtn = document.getElementById('preview-superadmin-btn');
         const exitBtn = document.getElementById('exit-preview-btn');
 
+        const previewBtnArea = document.getElementById('preview-area-manger-btn');
+
+
         if (previewBtn) {
             previewBtn.addEventListener('click', function () {
                 fetch('/admin/set-preview-superadmin', {
@@ -426,14 +520,43 @@
             });
         }
 
-        if (exitBtn) {
+        // if (exitBtn) {
+        //     exitBtn.addEventListener('click', function () {
+        //         fetch('/admin/unset-preview-superadmin', {
+        //             method: 'POST',
+        //             headers: { 'X-CSRF-TOKEN': csrf }
+        //         }).then(() => window.location.reload());
+        //     });
+        // }
+
+        if (previewBtnArea) {
+            previewBtnArea.addEventListener('click', function () {
+                fetch('/admin/set-preview-area-manager', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
+
+    if (exitBtn) {
+        if (isPreviewSuperadmin) {
             exitBtn.addEventListener('click', function () {
                 fetch('/admin/unset-preview-superadmin', {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrf }
                 }).then(() => window.location.reload());
             });
+        } else if (isPreviewAreaManager) {
+            exitBtn.addEventListener('click', function () {
+                fetch('/admin/unset-preview-area-manager', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
         }
+    }
+
+
     });
 </script>
 
@@ -455,8 +578,6 @@
 
 
 <script>
-
-
     window.handleNotificationClick = function(id, url) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
