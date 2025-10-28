@@ -334,7 +334,7 @@ class AgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency);
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = Common::areaCountries();
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
