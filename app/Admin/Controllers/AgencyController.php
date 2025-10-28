@@ -579,11 +579,11 @@ class AgencyController extends MainController
 
     protected function grid()
     {
-        $countryID = session('country_id');
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins','country_id','img', 'is_frozen'])
             ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {

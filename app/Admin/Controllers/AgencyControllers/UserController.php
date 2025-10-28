@@ -465,12 +465,12 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        $countryID = session('country_id');
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'ownerRoom:id,uid',

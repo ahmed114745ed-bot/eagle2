@@ -42,7 +42,8 @@ class AllStatisticController extends MainController
     public function index(Content $content)
     {
 
-        $countryID =request('country_id');
+        $countryID =empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
+
         $balance = GameWallet::query();
         $balanceDollar = GameChargeHistory::query();
         if (request("date") != null) {
@@ -65,33 +66,33 @@ class AllStatisticController extends MainController
 
 
         $usersCount = User::when($countryID, function ($query, $countryID) {
-                        return $query->where('country_id', $countryID);
+                        return $query->whereIn('country_id', $countryID);
                     })->count();
 
         //users
         $newSignUpsToday = User::whereDate('created_at', today())->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
+                                return $query->whereIn('country_id', $countryID);
                             })->count();
         $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
+                                    return $query->whereIn('country_id', $countryID);
                                 })->count();
         $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
+                                return $query->whereIn('country_id', $countryID);
                             })->count();
         $onlineUser = User::when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
+                                    return $query->whereIn('country_id', $countryID);
                                 })->where('online', 1)->count();
         $topUsersByFollowers = User::withCount('followers')
             ->with('packs', 'profile')
              ->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             })
             ->orderByDesc('followers_count')
             ->take(10)
             ->get();
         $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
                     })
             ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
@@ -102,14 +103,14 @@ class AllStatisticController extends MainController
             ->first();
         $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })
             ->whereDate('created_at', today())
             ->count();
         $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })
             ->whereMonth('created_at', now()->month)
@@ -117,18 +118,18 @@ class AllStatisticController extends MainController
             ->count();
         $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 });
         })
             ->distinct('user_id')
             ->count('user_id');
         $totalUsers = User::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
                     })->count();
                     $usersWhoNeverSend = $totalUsers - $usersWhoSend;
                     $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
                         $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })
             ->whereDate('created_at', today())
@@ -136,7 +137,7 @@ class AllStatisticController extends MainController
             ->count('chat_room_id');
         $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
                 $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 });
         })
             ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
@@ -147,7 +148,7 @@ class AllStatisticController extends MainController
 
         $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })->selectRaw("
             SUM(total_played) as total_played,
@@ -159,7 +160,7 @@ class AllStatisticController extends MainController
 
         //rooms
         $roomCounts = Room::whereHas('owner.country', function ($q) use ($countryID) {
-            $q->where('id', $countryID);
+            $q->whereIn('id', $countryID);
         })
             ->whereHas('roomVisitors')
             ->selectRaw("type, COUNT(*) as total")
@@ -167,7 +168,7 @@ class AllStatisticController extends MainController
             ->pluck('total', 'type');
         $totalRoomsJoined = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })
             ->withCount('roomVisitors')
@@ -175,11 +176,11 @@ class AllStatisticController extends MainController
             ->sum('room_visitors_count');
         $totalRooms = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
         });
         })->count();
         $longestActiveRoom = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
         }))
             ->with(['roomVisitors' => function ($q) {
                 $q->select('id', 'room_id', 'created_at');
@@ -198,7 +199,7 @@ class AllStatisticController extends MainController
             ->max() ?? 0;
         $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
         });
         })
             ->where('type', 'live')
@@ -210,7 +211,7 @@ class AllStatisticController extends MainController
         $liveRoomsFalse = $liveRooms[0] ?? 0;
         $mostVisitedRoom = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
         });
         })
             ->withCount('roomVisitors')
@@ -219,7 +220,7 @@ class AllStatisticController extends MainController
         $mostVisitedRoomCount = $mostVisitedRoom?->room_visitors_count ?? 0;
         $avgVisitorsPerRoom = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })
             ->withCount('roomVisitors')
@@ -227,7 +228,7 @@ class AllStatisticController extends MainController
             ->avg('room_visitors_count');
 
         $avgMicPerRoom = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             }))
             ->pluck('microphone')
             ->filter()
@@ -235,7 +236,7 @@ class AllStatisticController extends MainController
             ->avg();
 
         $roomsWithMic = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             }))
             ->whereNotNull('microphone')
             ->where('microphone', '!=', '')
@@ -244,82 +245,82 @@ class AllStatisticController extends MainController
 
         //agencies
         $agencyCount = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
+            return $query->whereIn('country_id', $countryID);
         })->count();
         $user_salaries = UserSallary::query()
             ->whereHas('user', function ($q) use ($countryID) {
                 $q->where('agency_id', '!=', 0)
                     ->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 })
                     ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 }));
             })
             ->sum(DB::raw('sallary - cut_amount'));
         $agency_salaries = AgencySallary::query()->whereHas('agency', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             });
         })->sum(DB::raw('sallary - cut_amount'));
 
         $activeAgencies = Agency::when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             })
             ->whereHas('agencySalaries', fn($q) => $q->where('month', now()->month)
                 ->where('year', now()->year))
             ->count();
         $newAgenciesToday = Agency::when($countryID, function ($query, $countryID) {
-                        return $query->where('country_id', $countryID);
+                        return $query->whereIn('country_id', $countryID);
                 })->whereDate('created_at', today())->count();
         $newAgenciesMonth = Agency::when($countryID, function ($query, $countryID) {
-                     return $query->where('country_id', $countryID);
+                     return $query->whereIn('country_id', $countryID);
                 })
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
         $topAgencies = Agency::when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             })
             ->orderByDesc('coins')
             ->take(10)
             ->get(['id', 'name', 'coins']);
         $avgAgencyWallet = Agency::when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
+                return $query->whereIn('country_id', $countryID);
             })->avg('coins');
         $totalMembers = User::when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 })
             ->where('agency_id', '!=', 0)
             ->whereHas('agency', function ($q) use ($countryID) {
                 $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 });
             })
             ->count();
         $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
         $pendingJoins = Agency::when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 })
             ->whereHas('joinRequests', fn($q) => $q->where('status', 1))
             ->count();
         $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 }))
             ->whereHas('agency', function ($q) use ($countryID) {
                 $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 });
             })
             ->sum('achieved_diamond');
 
         $bdCount = Bd::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 })->count();
 
 
         $totalSalaries = BD::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
+                    return $query->whereIn('country_id', $countryID);
                 })
             ->withSum('salaries', 'salary')
             ->withSum('salaries', 'cut_amount')
