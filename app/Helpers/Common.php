@@ -2165,7 +2165,7 @@ class Common
         }
         $countryID = session('area_manager_country_id');
         if ($countryID) {
-            return $countryID;
+            return (array)$countryID;
         }
         return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
