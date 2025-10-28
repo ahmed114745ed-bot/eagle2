@@ -95,9 +95,8 @@ class BdController extends MainController
      */
     protected function grid()
     {
-        $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray() ?? [];
+        $countries =  Common::areaCountries();
          //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)

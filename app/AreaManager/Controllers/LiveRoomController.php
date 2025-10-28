@@ -320,7 +320,8 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        
+        $countries = Common::areaCountries();
 
         $grid->model()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("

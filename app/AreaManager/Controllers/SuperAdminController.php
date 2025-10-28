@@ -2,14 +2,14 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Admin\Controllers\MainController;
-use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
+use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
@@ -19,11 +19,12 @@ use Encore\Admin\Facades\Admin;
 use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteSuperAdminAction;
-use Illuminate\Support\MessageBag;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -105,8 +106,12 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
+        $countries = Common::areaCountries();
         $grid->model()->with(['appUser.packs'])
             ->where('parent_id', auth()->id())
+            ->when($countries, function ($q) use ($countries) {
+                $q->where('country_id',  $countries);
+            })
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {

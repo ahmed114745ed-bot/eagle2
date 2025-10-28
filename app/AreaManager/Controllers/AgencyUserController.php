@@ -97,7 +97,7 @@ class AgencyUserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = Common::areaCountries();
 
         $grid->model()->ofAgency()
             ->with(['profile', 'packs'])

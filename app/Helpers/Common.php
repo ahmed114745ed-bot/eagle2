@@ -2186,14 +2186,18 @@ class Common
         }
     }
 
-    public static function areaCountries($adminId)
+    public static function areaCountries()
     {
+        $adminId = auth()->user()->id;
         $areaManager = AreaManager::with('countries')->find($adminId);
 
         if (!$areaManager) {
             return [];
         }
-
+        $countryID = session('area_manager_country_id');
+        if ($countryID) {
+            return (array)$countryID;
+        }
         return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
 }
