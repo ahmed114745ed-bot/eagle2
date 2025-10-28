@@ -658,7 +658,7 @@ Route::get('update-target', function () {
             ->where('year', now()->year)->first();
         $data[] = [
             'agency_id' => $agency->id,
-            'new' => $salary->salary ?? 0,
+            'new' => $salary->sallary ?? 0,
             'old' => null
         ];
     }
