@@ -31,6 +31,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])
 
 
 
+
 Route::get('/test-room-zego', function (Request $request) {
 
     $roomId = $request->query('room_id');

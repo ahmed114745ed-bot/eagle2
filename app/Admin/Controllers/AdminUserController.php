@@ -39,12 +39,11 @@ class AdminUserController extends EncorUsersController
     public function grid ()
     {
 
-        $grid =  parent::grid(); 
+        $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
                 $actions->disableDelete();
                 $actions->add(new DeleteUser());
-            
         });
 
         return $grid;
@@ -65,7 +64,7 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
-      
+
         $user = $this->model->find($id);
         if ($user){
             if ($user->isRole('admin') || $user->isRole('developer')){
@@ -82,7 +81,7 @@ class AdminUserController extends EncorUsersController
     public function form ()
     {
 
-        $form =  parent ::form (); 
+        $form =  parent ::form ();
         $form->select('app_id', __('validation.select_user'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
@@ -94,14 +93,14 @@ class AdminUserController extends EncorUsersController
 
         $form->saving(function (Form $form) {
             $model = $form->model();
-        
+
             $oldAppId  = $model->getOriginal('app_id');
             $newAppId  = $form->app_id;
-        
+
             $oldRoles = $model->exists
                 ? $model->roles()->get(['id', 'slug'])->map(fn($r) => ['id' => (int)$r->id, 'slug' => $r->slug])->toArray()
                 : [];
-        
+
             $newRoles = collect($form->roles ?? [])
                 ->filter()
                 ->map(function ($id) {
@@ -110,7 +109,7 @@ class AdminUserController extends EncorUsersController
                 })
                 ->filter()
                 ->toArray();
-        
+
             if ($model->exists) {
 
                 if ($oldAppId && $oldAppId != $newAppId) {
@@ -121,40 +120,40 @@ class AdminUserController extends EncorUsersController
                         }
                     }
                 }
-        
+
                 $rolesRemoved = array_udiff($oldRoles, $newRoles, fn($a, $b) => $a['id'] <=> $b['id']);
                 $rolesAdded   = array_udiff($newRoles, $oldRoles, fn($a, $b) => $a['id'] <=> $b['id']);
-        
+
                 $user = User::find($newAppId);
                 if ($user) {
                     foreach ($rolesRemoved as $role) {
                         UserRoleRewardHelper::revokeRoleRewards($user, $role['id'], $role['slug']);
                     }
-        
+
                     foreach ($rolesAdded as $role) {
                         UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
                     }
                 }
             }
         });
-        
+
         $form->saved(function (Form $form) {
             $model = $form->model();
             $user  = User::find($model->app_id);
-        
+
             $newRoles = $model->roles()->get(['id', 'slug'])->map(fn($r) => ['id' => (int)$r->id, 'slug' => $r->slug]);
-        
+
             if ($user) {
                 foreach ($newRoles as $role) {
                     UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
                 }
             }
         });
-        
+
         $form->deleted(function (Form $form) {
             $model = $form->model();
             $user  = User::find($model->app_id);
-        
+
             if ($user) {
                 foreach ($model->roles as $role) {
                     UserRoleRewardHelper::revokeRoleRewards($user, (int)$role->id, $role->slug);

@@ -1,7 +1,13 @@
 <?php
 
+use App\Models\Country;
 use App\Models\Agency;
 use Carbon\Carbon;
+use App\Enums\AdminNotificationType;
+use App\Enums\SuperAdminNotificationType;
+use App\Helpers\AdminNotificationHelper;
+use App\Helpers\SuperAdminNotificationHelper;
+use App\Models\AdminNotification;
 use App\Models\Ban;
 use App\Models\Room;
 use App\Models\User;
@@ -165,7 +171,21 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
+Route::get('/run-seeders', function () {
 
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 Route::get('/clear_clear', function () {
 
     Artisan::call('cache:clear');
@@ -181,6 +201,22 @@ Route::get('/seed', function () {
     Artisan::call('db:seed');
 
     return "Seeded!";
+});
+
+Route::get('/run-seeders', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
 });
 
 Route::get('/change_agencies_type_test', function () {
@@ -277,7 +313,50 @@ Route::group(
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
+        Route::resource('auth/users', 'AdminUserController')->names([
+            'index' => 'auth.users.index',
+            'create' => 'auth.users.create',
+            'store' => 'auth.users.store',
+            'show' => 'auth.users.show',
+            'edit' => 'auth.users.edit',
+            'update' => 'auth.users.update',
+            'destroy' => 'auth.users.destroy',
+        ]);
+
+        Route::get('/firebase-config', function () {
+            return response()->json([
+                'apiKey' => config('firebase.apiKey'),
+                'authDomain' => config('firebase.authDomain'),
+                'projectId' => config('firebase.projectId'),
+                'storageBucket' => config('firebase.storageBucket'),
+                'messagingSenderId' => config('firebase.messagingSenderId'),
+                'appId' => config('firebase.appId'),
+                'vapidKey' => config('firebase.vapid_key'),
+            ]);
+        });
+
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'superadmin',
+        'namespace' => 'App\\SuperAdmin\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            // 'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => 'superadmin.',
+    ],
+    function () {
+        Route::get('auth/setting', [\App\SuperAdmin\Controllers\AuthController::class, 'getSetting']);
     }
 );
 
@@ -536,7 +615,17 @@ Route::get('/fix-bans-user-id', function () {
 });
 
 
+Route::get('update/countries', function () {
+    $userCountries = User::whereNotNull('country_id')->get()->pluck('country_id')->toArray();
 
+    $unique = array_unique($userCountries);
+
+    Country::whereIn('id', $unique)->update(['status' => 1]);
+
+    Country::whereNotIn('id', $unique)->update(['status' => 0]);
+
+    return 'done';
+});
 
 Route::get('/week-zone', function () {
 
@@ -576,4 +665,190 @@ Route::get('update-target', function () {
     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
 
     return 'Target records imported successfully';
+});
+
+Route::get('update-country-id', function () {
+     Artisan::call('db:seed', [
+        '--class' => 'CleanUpDuplicateCountriesSeeder',
+    ]);
+
+    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
+});
+
+Route::get('remove-new-country', function () {
+    User::where('country_id', 266)->update(['country_id' => null]);
+
+    return 'done';
+});
+
+// Main page route
+Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
+Route::get('/fix-agencies-bd', function () {
+    Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
+    ]);
+
+    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
+});
+
+
+
+Route::get('/migrate-home-carousel', function () {
+
+    $carousels = DB::table('home_carousels')->get();
+
+    foreach ($carousels as $carousel) {
+
+        $displayTypes = [];
+
+        if ($carousel->display_home_top) $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle) $displayTypes[] = 'home_middle';
+        if ($carousel->display_live) $displayTypes[] = 'live';
+        if ($carousel->display_country) $displayTypes[] = 'country';
+        if ($carousel->display_discover) $displayTypes[] = 'discover';
+
+        foreach ($displayTypes as $type) {
+            foreach ($displayTypes as $type) {
+                DB::table('home_carousel_displays')->updateOrInsert(
+                    [
+                        'home_carousel_id' => $carousel->id,
+                        'display_type'     => $type,
+                    ],
+                    [
+                        'end_at'        => now()->addDays(30),
+                        'duration'      => 30,
+                        'duration_unit' => 'days',
+                        'created_at'    => $carousel->created_at,
+                        'updated_at'    => $carousel->updated_at,
+                    ]
+                );
+            }
+        }
+    }
+
+    return "Migration completed successfully!";
+});
+
+
+Route::get('notifications/test', function () {
+    AdminNotificationHelper::notify(
+        AdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        null
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+
+
+Route::get('notifications/test2', function () {
+    SuperAdminNotificationHelper::notify(
+        SuperAdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+
+
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        95,
+
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+use Illuminate\Support\Facades\Http;
+Route::get('/codapay/create-payment', function () {
+    $trxId  = rand(1000, 9999);
+    $amount = 1.00;
+    $userId = 123;
+
+    $payload = [
+        'initRequest' => [
+            'country'    => "784",    // ✅ UAE (الإمارات)
+            'currency'   => 840,      // ✅ USD (دولار أمريكي)
+            'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
+            'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
+            'orderId'    => (string) $trxId,
+            'returnUrl'  => url('/codapay/success'),
+            'failUrl'    => url('/codapay/fail'),
+            'items'      => [
+                [
+                    'code'  => '1',
+                    'price' => (float) $amount,
+                    'name'  => "Order #{$trxId}"
+                ]
+            ],
+            'profile' => [
+                'entry' => [
+                    ['key' => 'user_id', 'value' => (string) $userId],
+                ],
+            ],
+        ],
+    ];
+
+    $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
+
+    try {
+        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
+
+        $response = Http::timeout(15)
+            ->withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, $payload);
+
+        if ($response->failed()) {
+            Log::error("❌ Codapay Connection Failed", [
+                'status'  => $response->status(),
+                'body'    => $response->body(),
+                'headers' => $response->headers(),
+            ]);
+
+            return response()->json([
+                'error'   => 'Failed to connect Codapay',
+                'status'  => $response->status(),
+                'details' => $response->body(),
+                'url'     => $url,
+                'payload' => $payload,
+            ], 500);
+        }
+
+        $result = $response->json();
+
+        // Log::info("✅ Codapay Response Received", ['result' => $result]);
+
+        // ✅ تحقق من النجاح
+        if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
+            $txnId = $result['initResult']['txnId'];
+            $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment link generated successfully.',
+                'paymentUrl' => $paymentUrl,
+                'txnId' => $txnId,
+                'result' => $result,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create payment',
+            'error_code' => $result['initResult']['resultCode'] ?? null,
+            'error_desc' => $result['initResult']['resultDesc'] ?? null,
+            'result'  => $result,
+        ]);
+
+    } catch (\Throwable $e) {
+        Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
+
+        return response()->json([
+            'error'   => 'Exception while connecting Codapay',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
 });

@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Enums;
 
 enum UserCoinLogType: string
 {
     case ADMIN_CHARGES = 'admin_charge';
+    case AREA_MANAGER_CHARGES = 'area_manager_charge';
     case BD_CHARGES = 'bd_charge';
     case APP_CHARGE = 'app_charge';
     case ROOM_COMMENT = 'comment';
@@ -32,12 +34,10 @@ enum UserCoinLogType: string
     case INVITATION_CODE = 'invitation_code';
     case ROOM_BOOM = 'room_boom';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
+    case SUPER_ADMIN_REWARD = 'super_admin_reward';
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
-
-
-
-     public function meta(): array
+    public function meta(): array
     {
         return match ($this) {
             self::ADMIN_CHARGES => [
@@ -59,6 +59,11 @@ enum UserCoinLogType: string
             self::ROOM_COMMENT => [
                 'sub_type' => 'rooms',
                 'item_name' => 'Special Bar',
+                'queue_job' => null,
+            ],
+            self::SUPER_ADMIN_REWARD => [
+                'sub_type' => 'super_admin_reward',
+                'item_name' => 'rewards',
                 'queue_job' => null,
             ],
 
@@ -195,12 +200,6 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
 
-            self::MILESTONE => [
-                'sub_type' => 'milestones',
-                'item_name' => 'milestone',
-                'queue_job' => null,
-            ],
-
             self::ROOM_CUP => [
                 'sub_type' => 'room_cup',
                 'item_name' => 'room_cup',
@@ -211,4 +210,3 @@ enum UserCoinLogType: string
         };
     }
 }
-

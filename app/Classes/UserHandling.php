@@ -4,6 +4,7 @@ namespace App\Classes;
 
 use Carbon\Carbon;
 use App\Models\Ban;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use Modules\Vip\Entities\OVip;
@@ -123,6 +124,7 @@ class UserHandling
         $user->type_user = User::TYPE_REGULAR;
         $user->monthly_days = 0;
         $user->save();
+        MilestoneHelper::removeReward($user, 'host');
 
         uploadMonthlyDiamondReceive($user->id, 0);
     }

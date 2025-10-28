@@ -142,7 +142,7 @@ class ChatMessagesController extends Controller
 
     private function isValidFileExtension($file, $validExtensions)
     {
-        $extension = $file->getClientOriginalExteension();
+        $extension = $file->getClientOriginalExtension();
 
         return in_array($extension, $validExtensions);
     }

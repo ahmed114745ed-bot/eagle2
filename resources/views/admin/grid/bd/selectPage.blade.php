@@ -87,7 +87,7 @@ input:checked + .slider:before {
     </label>
 
     <label class="switch">
-        <input type="checkbox" id="salaryTransferSwitch" 
+        <input type="checkbox" id="salaryTransferSwitch"
                {{ $transfer_salary ? 'checked' : '' }}>
         <span class="slider" data-label-on="{{ __('Yes') }}" data-label-off="{{ __('No') }}"></span>
     </label>
@@ -122,42 +122,42 @@ document.getElementById('salaryTransferSwitch').addEventListener('change', funct
 
 
  <!-- *** ***************************************************************************************************** -->
-<div style="" class="bck-bt">
-    <a href="{{ route('admin.usersBd.index') }}" class="btn btn-secondary mt-3">{{ __('back') }}</a>
-</div>
-<div style="width: 50%; margin: 20px auto; padding: 10px;  border-radius: 10px;">
- 
-<p>
-&#9432;  
-        <!-- <strong> -->
-       
-            {{ __('default_current') }}:
-            <span title="{{ __('default_current_info') }}" style="cursor: help; color: #007bff;">
-              
-            </span>
-        <!-- </strong> -->
-       
-    </p>
-</div>
+{{--<div style="" class="bck-bt">--}}
+{{--    <a href="{{ route('admin.usersBd.index') }}" class="btn btn-secondary mt-3">{{ __('back') }}</a>--}}
+{{--</div>--}}
+{{--<div style="width: 50%; margin: 20px auto; padding: 10px;  border-radius: 10px;">--}}
+{{-- --}}
+{{--<p>--}}
+{{--&#9432;  --}}
+{{--        <!-- <strong> -->--}}
+{{--       --}}
+{{--            {{ __('default_current') }}:--}}
+{{--            <span title="{{ __('default_current_info') }}" style="cursor: help; color: #007bff;">--}}
+{{--              --}}
+{{--            </span>--}}
+{{--        <!-- </strong> -->--}}
+{{--       --}}
+{{--    </p>--}}
+{{--</div>--}}
 
-<form action="{{ route('admin.make-bd-default') }}" method="POST" style="
-    padding: 20px 86px;
-    border: 2px;
-    border-radius: 30px;
-    width: 50%;
-    margin: 10px auto 88px;
-    ">
-    @csrf
-    <div class="form-group">
-        <label for="bd_id">{{ __('select_default_bd') }}:</label>
-        <select name="bd_id" id="bd_id" class="form-control" required>
-            @foreach($bds as $bd)
-                <option value="{{ $bd->id }}" {{ ($defaultBd && $bd->id == $defaultBd->id) ? 'selected' : '' }}>
-                    {{ $bd->name }} - {{ $bd->username }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary mt-2">{{ __('set_as_default') }}</button>
-</form>
+{{--<form action="{{ route('admin.make-bd-default') }}" method="POST" style="--}}
+{{--    padding: 20px 86px;--}}
+{{--    border: 2px;--}}
+{{--    border-radius: 30px;--}}
+{{--    width: 50%;--}}
+{{--    margin: 10px auto 88px;--}}
+{{--    ">--}}
+{{--    @csrf--}}
+{{--    <div class="form-group">--}}
+{{--        <label for="bd_id">{{ __('select_default_bd') }}:</label>--}}
+{{--        <select name="bd_id" id="bd_id" class="form-control" required>--}}
+{{--            @foreach($bds as $bd)--}}
+{{--                <option value="{{ $bd->id }}" {{ ($defaultBd && $bd->id == $defaultBd->id) ? 'selected' : '' }}>--}}
+{{--                    {{ $bd->name }} - {{ $bd->username }}--}}
+{{--                </option>--}}
+{{--            @endforeach--}}
+{{--        </select>--}}
+{{--    </div>--}}
+{{--    <button type="submit" class="btn btn-primary mt-2">{{ __('set_as_default') }}</button>--}}
+{{--</form>--}}
 

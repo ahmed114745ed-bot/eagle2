@@ -26,6 +26,7 @@ use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Models\RealtimeProject;
+use App\Http\Services\EnterRoomService;
 use App\Tik\Services\EnteranceRoomServices;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
@@ -53,7 +54,13 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-          \Log::info("test zego Webhook");
+        // \Log::info('Zego Room Count Update Request:', [
+        //     'url' => $request->fullUrl(),
+        //     // 'method' => $request->method(),
+        //     // 'headers' => $request->headers->all(),
+        //     'body' => $request->all(),
+        //     // 'ip' => $request->ip(),
+        // ]);
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
@@ -240,10 +247,11 @@ class EnteranceController extends Controller
     /**
      * @throws \Exception
      */
-    public function enter_room(Request $request): JsonResponse
+    public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
+        $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
-        if (!$app_feature && !is_null($app_feature)) {
+        if ($app_feature &&$app_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();
@@ -259,13 +267,10 @@ class EnteranceController extends Controller
             return $this->errorResponse(__('Room not found.'), 404);
         }
 
-        if ($this->isRoomBanned($room->uid)) {
-            return $this->errorResponse(
-                __('This room has been closed. Wait until moderators lift the ban.'),
-                403,
-                ['ban' => true]
-            );
+        if ($banResponse = $enterRoomServices->checkRoomBan($user, $room)) {
+            return $banResponse;
         }
+
         $type  =  $room->type;
 
 
@@ -273,6 +278,7 @@ class EnteranceController extends Controller
 
         return $this->handleRoomType($type, $user, $request, $roomPass, $room);
     }
+
 
     private function errorResponse(string $message, int $code, array $extra = []): JsonResponse
     {
@@ -284,9 +290,9 @@ class EnteranceController extends Controller
         return Room::find($roomId);
     }
 
-    private function isRoomBanned(int $ownerId): bool
+    private function isRoomBanned(int $ownerId, string $roomType): bool
     {
-        return Common::ifRoomHasband($ownerId);
+        return Common::ifRoomHasband($ownerId, $roomType);
     }
 
     private function setDefaultBackground(): void
@@ -540,9 +546,9 @@ class EnteranceController extends Controller
 
             if ($type) {
                 $room->type = $type;
-                if ($request->type == 'live' ) {
+                if ($request->type == 'live') {
                     $room->is_live = true;
-                }else{
+                } else {
                     $room->is_live = false;
                 }
             }

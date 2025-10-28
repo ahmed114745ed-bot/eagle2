@@ -34,6 +34,8 @@ class UserTargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserTarget);
+        $countryID = session('country_id');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -51,7 +53,13 @@ class UserTargetController extends MainController
                 $filter->equal('agency.id', __('agency id'));
             });
         });
-        $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
+        $grid->model()
+            ->when($countryID, fn($q) =>
+                $q->where(function ($q) use ($countryID) {
+                    $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+                }))
+            ->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name = @$this->user->name ?? '';

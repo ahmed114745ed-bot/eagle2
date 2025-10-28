@@ -25,18 +25,18 @@ class UserHistoryRewardController extends MainController
 
     public function index(Content $content )
     {
-      
+
         return parent::index($content
             ->header(__('User history rewards'))
             ->description(__('User history rewards'))
             ->body($this->grid())
         );
     }
-  
+
     protected function grid()
     {
         $grid = new Grid(new VUserHistoryReward());
-    
+
         $grid->model()->with([
             'user' => function ($query) {
                 $query->select(['id', 'name', 'uuid'])
@@ -46,19 +46,19 @@ class UserHistoryRewardController extends MainController
                       ]);
             }
         ])
-        ->orderByDesc('id');            
-    
+        ->orderByDesc('id');
+
         $grid->column('id', __('ID'))->sortable();
-    
+
         $grid->column('user_id', __('User'))->display(function () {
             if (! $this->user) {
                 return __('No User');
             }
             return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
         });
-    
+
         $grid->column('receive_name', __('receive_type'));
-    
+
         $grid->column('reward', __('Rewards'))->display(function () {
             if ($this->reward_value) {
                 if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
@@ -66,42 +66,42 @@ class UserHistoryRewardController extends MainController
                     $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
                     return $imgTag ;
                 }
-                return $this->reward_value;  
+                return $this->reward_value;
             }
-        
-         
+
+
                 $path = $this->reward_img ?? 'coin.png';
                 $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
-             
+
                 return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
-            
-    
+
+
         });
-        
-    
+
+
         $grid->column('created_at', __('Created At'))
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
-    
+
         $grid->filter(function ($filter) {
             $filter->equal('receive_category', __('receive_type'))->select([
                 'Role' => __('Role'),
                 'Milestone' => __('Milestone'),
             ]);
         });
-    
+
         $grid->disableCreateButton();
         $grid->disableActions();
-    
+
         Admin::script("
             if (window.innerWidth >= 1024) {
                 $('.table-responsive').removeClass('table-responsive');
             }
         ");
-    
+
         return $grid;
     }
-    
-     
+
+
 
     /**
      * Make a show builder.

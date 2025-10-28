@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Models\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
@@ -77,6 +78,7 @@ use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
 use App\Models\RealtimeProject;
+use App\Models\AreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -1498,15 +1500,6 @@ class Common
                 $params['MessageContent'] = $messageContent;
                 $promises[rand(1, 999) . ''] = $client->getAsync($url, ['query' => $params]);
             }
-          
-         
-    
-            Log::info('🛰️ Sending Zego request', [
-                'sendToZego3' => '',
-                'params' => $params,
-            ]);
-          
-    
             return $promises;
         } catch (\Exception $e) {
         }
@@ -1708,9 +1701,9 @@ class Common
     }
 
 
-    public static function ifRoomHasband($owner_id)
+    public static function ifRoomHasband($owner_id, $roomType)
     {
-        $room = Room::where('uid', $owner_id)->first();
+        $room = Room::where('uid', $owner_id)->where('type', $roomType)->first();
 
         if ($room) {
             $ban = $room->bans()
@@ -1718,8 +1711,55 @@ class Common
                 ->first();
             return $ban ? true : false;
         }
-
         return false;
+    }
+
+
+    public static function banDuration($owner_id, $roomType)
+    {
+        $room = Room::where('uid', $owner_id)->where('type', $roomType)->first();
+        $deuration = 0;
+        $remaining = 0;
+
+        if ($room) {
+            $ban = $room->bans()
+                ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
+                ->first();
+
+            $deuration = $ban->duration;
+            $remaining = self::remaining($ban);
+        }
+
+        return [$deuration, $remaining];
+    }
+
+    public static function remaining($ban)
+    {
+        $timezone = getTimezone();
+
+        // Get raw UTC datetime
+        $createdAt = \Carbon\Carbon::parse($ban->getAttributes()['created_at'], 'UTC');
+
+        // Add ban duration and convert to user's timezone
+        $banExpiration = $createdAt->addHours($ban->duration)->setTimezone($timezone);
+
+        $now = now($timezone);
+
+        // Get total remaining minutes
+        $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+        if ($diffInMinutes <= 0) {
+            return 'منتهي'; // Expired
+        }
+
+        $hours = floor($diffInMinutes / 60);
+        $minutes = $diffInMinutes % 60;
+
+        if ($hours >= 1) {
+            return "{$hours}h:{$minutes}m";
+        } else {
+            return "{$minutes}" . ' ' . __('minute');
+        }
     }
 
 
@@ -1838,6 +1878,20 @@ class Common
                     'id' => $admin->id ?? '',
                     'type' => 'dash',
                     'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
                     'image_color' => null,
                     'id_image' => '',
                     'colored_name' => '',
@@ -2124,11 +2178,26 @@ class Common
             $data = [
                 'user_id' => $userId,
                 'badge_id' => $badgeId,
-                'expire' => time() + (($days) * 86400),
+                'expire' => $days == 0 ? 0 : time() + (($days) * 86400),
                 'receive_type' => $type,
             ];
 
             UserBadge::query()->create($data);
         }
+    }
+
+    public static function areaCountries()
+    {
+        $adminId =  session('area_manager_id') ?? auth()->user()->id;
+        $areaManager = AreaManager::with('countries')->find($adminId);
+
+        if (!$areaManager) {
+            return [];
+        }
+        $countryID = session('area_manager_country_id');
+        if ($countryID) {
+            return (array)$countryID;
+        }
+        return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
 }

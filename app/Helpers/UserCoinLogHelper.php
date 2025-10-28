@@ -15,7 +15,8 @@ class UserCoinLogHelper
         ?string $itemNameOverride = null,
         float $helperAmount = 0,
         ?string $fromDate = null,
-        ?string $toDate = null
+        ?string $toDate = null,
+        ?string $userType = null
     ): void {
         $meta = $type->meta();
 
@@ -29,6 +30,7 @@ class UserCoinLogHelper
             'helper_amount' => $helperAmount,
             'from_date'     => $fromDate ?? now(),
             'to_date'       => $toDate ?? now(),
+            'user_type'     => $userType,
         ];
 
         if ($meta['queue_job']) {

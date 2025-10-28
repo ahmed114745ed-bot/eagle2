@@ -2,12 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
-use App\helper\UserFollowHelper;
-use App\Http\Resources\InvitationEarningResource;
-use App\Jobs\UserVisitJob;
-use App\Models\BlackList;
 use DB;
 use Cache;
 use Exception;
@@ -15,8 +9,14 @@ use Carbon\Carbon;
 use App\Models\Code;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Models\Country;
 use App\Models\GiftLog;
+use App\Models\BlackList;
+use App\Jobs\UserVisitJob;
 use App\Facades\UserHandling;
+use App\Enums\UserCoinLogType;
+use App\helper\UserFollowHelper;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
 use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
@@ -24,9 +24,10 @@ use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
+use App\Tik\Repositories\BdRepository;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Config;
 use App\Http\Services\RoomGameServices;
-use Modules\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
@@ -36,6 +37,7 @@ use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\ProfileRepository;
+use Modules\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
@@ -43,7 +45,9 @@ use App\Tik\Repositories\RoomVisitorRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Http\Resources\InvitationEarningResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -51,7 +55,6 @@ use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
-use Illuminate\Support\Facades\Config;
 
 class UserService
 {
@@ -67,8 +70,10 @@ class UserService
         private readonly UserTargetRepository $userTargetRepository,
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
+        private readonly ShippingAgencyRepository $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
+        private readonly BdRepository $bdRepository,
         private readonly CpRepository $cpRepository,
         private readonly WareRepository $wareRepository,
         private readonly UserRepository $userRepository,
@@ -76,8 +81,7 @@ class UserService
         private readonly FollowRepository $followRepository,
         private readonly BlackListRepository $blackListRepository,
 
-    ) {
-    }
+    ) {}
 
     public function searchUsers($key, $family)
     {
@@ -104,6 +108,15 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+
+    public function bdCountryUsers($key, $page,$country_id)
+    {
+        $perPage = 10;
+        return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
+    }
+
+    
+
     public function user_bd($key, $page)
     {
         $perPage = 10;
@@ -116,11 +129,55 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
+    public function superAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers($key, $page, $perPage);
+    }
+    
+
+    public function subSuperAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->supSuperAdminUsers($key, $page, $perPage);
+    }
+
+    public function subAreaManager($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->subAreaManager($key, $page, $perPage);
+    }
+
+    public function superAdminUsers2($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers2($key, $page, $perPage);
+    }
+
+
+    public function usersAreaManager($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->usersAreaManager($key, $page, $perPage);
+    }
+
+    public function usersByCountry($superAdminId, $key, $page)
+    {
+        $perPage = 10;
+
+        return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
+    }
 
     public function searchInAgency($key, $page)
     {
         $perPage = 10;
         return $this->userRepository->searchInAgency($key, $page, $perPage);
+    }
+
+    public function superAdminAgencies($key, $page, $countryId)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminAgencies($key, $page, $perPage, $countryId);
     }
 
     public function searchInHostAgency($key, $page)
@@ -181,8 +238,17 @@ class UserService
         return true;
     }
 
-    public function processUserData($user, $deviceToken, $lat, $long)
+    public function processUserData($user, $deviceToken, $lat, $long, $iso)
     {
+        $countryId = $user->country_id;
+
+        if ($iso) {
+            $country = Country::where('iso', strtoupper($iso))->first();
+            if ($country) {
+                $countryId = $country->id;
+            }
+        }
+
         $this->userRepository->updateDeviceToken($user, $deviceToken);
 
         $currentTime = time();
@@ -192,14 +258,36 @@ class UserService
         // update location
         if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
             $this->userRepository->updateLocation($user->id, $lat, $long);
+//            if (!$countryId) {
+//                $countryId = getCountryIdFromLatLong($lat, $long, false);
+//            }
         }
         // end update location
 
-        $userWithMedals = $this->userRepository->getUserWithMedals($user->id);
+        $this->userRepository->updateCountry($user, $countryId);
+//        $this->updateCountryAgencyAndBD($user->id, $countryId);
 
-        return $userWithMedals;
+        return $this->userRepository->getUserWithMedals($user->id);
     }
 
+    public function updateCountryAgencyAndBD($userId, $countryId)
+    {
+        $agency = $this->agencyRepository->findByOwner($userId);
+        if ($agency) {
+            $agency->country_id = $countryId;
+            $agency->save();
+        }
+        $shippingAgency = $this->shippingAgencyRepository->findAgencyByOwnerId($userId);
+        if ($shippingAgency) {
+            $shippingAgency->country_id = $countryId;
+            $shippingAgency->save();
+        }
+        $bd = $this->bdRepository->findByAppUser($userId);
+        if ($bd) {
+            $bd->country_id = $countryId;
+            $bd->save();
+        }
+    }
     public function update_user_multi_images($user, $id, $src)
     {
 
@@ -297,7 +385,7 @@ class UserService
             $this->followRepository->updateFollowStatus($follow, 1);
         }
 
-        UserFollowHelper::updateCounts( $request->user());
+        UserFollowHelper::updateCounts($request->user());
         UserFollowHelper::updateCounts($receiver);
 
         return Common::apiResponse(true, 'follow done', null, 201);
@@ -332,7 +420,7 @@ class UserService
         $this->userRepository->update($unFollowStatus, $unFollower->id);
         $this->userRepository->update($userStatus, $auth->id);
 
-        UserFollowHelper::updateCounts( $request->user());
+        UserFollowHelper::updateCounts($request->user());
         UserFollowHelper::updateCounts($unFollower);
 
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
@@ -410,21 +498,21 @@ class UserService
         $userId = $user->id;
 
         $with = [
-//            'room' => function ($query) {
-//                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-//            },
+            //            'room' => function ($query) {
+            //                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+            //            },
             'followPacks',
             'profile:id,user_id,avatar',
             'ware',
             'UserVip',
-//            'manager',
+            //            'manager',
             'packs',
-//            'country',
+            //            'country',
             'color_image',
             'followedByAuthUser',
             'followerByAuthUser'
-//            'eligiblePacks',
-//            'friends',
+            //            'eligiblePacks',
+            //            'friends',
         ];
 
         if ($type == 1) {
@@ -468,7 +556,7 @@ class UserService
     }
     public function getLevel($levelsList, $type = 1)
     {
-//        return $this->vipRepository->getByLevels($levelsList, $type);
+        //        return $this->vipRepository->getByLevels($levelsList, $type);
         return $this->vipRepository->getByLevelsV2($levelsList, $type);
     }
 
@@ -497,7 +585,7 @@ class UserService
         return $user;
     }
 
-    public function showUserCheck( int $userId, bool $isVisit)
+    public function showUserCheck(int $userId, bool $isVisit)
     {
         if (!$this->userRepository->exists($userId)) {
             throw new Exception('User not founded');
@@ -505,7 +593,7 @@ class UserService
 
         $authId = \Auth::id();
 
-        if ($this->blackListRepository->exists($authId, $userId)){
+        if ($this->blackListRepository->exists($authId, $userId)) {
             throw new Exception('User is in blacklist');
         }
 
@@ -517,7 +605,7 @@ class UserService
     public function showUser($userId)
     {
         return  $this->userRepository->getUserWithMedals($userId);
-//        $this->packRepository->deleteAllExpiredPacks();
+        //        $this->packRepository->deleteAllExpiredPacks();
     }
 
     private function getUserWithRelations($userId)
@@ -1210,7 +1298,7 @@ class UserService
 
     public function getEarningsForParent(int $parentId)
     {
-        return InvitationEarningResource::collection( $this->userRepository->getByParentId($parentId));
+        return InvitationEarningResource::collection($this->userRepository->getByParentId($parentId));
     }
 
     public function claimEarning(int $parentId, int $earningId)

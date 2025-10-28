@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('time_enter_rooms', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('room_id');
-            $table->unsignedInteger('start_time');
-            $table->string('end_time')->nullable();
-            $table->string('seconds')->nullable();
-            $table->timestamps();
-        });
+        // Schema::create('time_enter_rooms', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('user_id');
+        //     $table->unsignedBigInteger('room_id');
+        //     $table->unsignedInteger('start_time');
+        //     $table->string('end_time')->nullable();
+        //     $table->string('seconds')->nullable();
+        //     $table->timestamps();
+        // });
     }
 
     /**
