@@ -76,10 +76,10 @@ class HomeCarouselController extends MainController
         $grid ->model()->with('displays');
 
         $grid->id(__('ID'));
-        
+
         // Display banner images with consistent width
         $grid->column('img', __('Banner'))->display(function ($img) {
-            $url = $img ? asset($img) : '';
+            $url = $img ? getImagePath($img) : null;
             return "<div style='width: 250px; height: 80px; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
                         <img src='{$url}' style='width: 100%; height: 100%; object-fit: cover; display: block;' alt='Banner'>
                     </div>";
