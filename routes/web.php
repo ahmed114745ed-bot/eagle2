@@ -39,6 +39,7 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Models\BDSallary;
 
 /*
 |--------------------------------------------------------------------------
@@ -654,10 +655,10 @@ Route::get('update-target', function () {
     $data = [];
 
     foreach ($agencies as $agency){
-       $salary = AgencySallary::where('agency_id', $agency->id)->where('month', now()->month)
+       $salary = BDSallary::where('agency_id', $agency->id)->where('month', now()->month)
             ->where('year', now()->year)->first();
         $data[] = [
-            'agency_id' => $agency->id,
+            'bd_id' => $agency->id,
             'new' => $salary->sallary ?? 0,
         ];
     }
@@ -666,9 +667,9 @@ Route::get('update-target', function () {
 
     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
 
-    $rows = json_decode(File::get($path), true);
+    // $rows = json_decode(File::get($path), true);
 
-    foreach ($rows as $row) {
+    // foreach ($rows as $row) {
 //        AgencySallary::create([
 //            'agency_id' => $row['agency_id'],
 //            'sallary' => 0,
@@ -680,14 +681,51 @@ Route::get('update-target', function () {
 //            'updated_at' => now(),
 //        ]);
 
-        foreach ($data as &$row) {
-            $row['old'] = $row['new'];
-        }
+    //     foreach ($data as &$row) {
+    //         $row['old'] = $row['new'];
+    //     }
 
-        File::put($path, json_encode($data, JSON_PRETTY_PRINT));
-    }
+    //     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
+    // }
 
     return 'Target records imported successfully';
+});
+
+use Illuminate\Support\Facades\File;
+
+Route::get('update-target-agency', function () {
+    $path = public_path('result.json');
+    
+    if (!File::exists($path)) {
+        return 'الملف غير موجود!';
+    }
+    
+    try {
+        $content = File::get($path);
+        $rows = json_decode($content, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return 'خطأ في تنسيق JSON: ' . json_last_error_msg();
+        }
+        
+        foreach ($rows as $row) {
+            AgencySallary::create([
+                'agency_id' => $row['agency_id'],
+                'sallary' => 0,
+                'cut_amount' => -($row['old'] - $row['new']),
+                'month' => now()->month,
+                'year' => now()->year,
+                'is_paid' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        
+        return 'تم تنفيذ الأمر بنجاح! عدد السجلات: ' . count($rows);
+        
+    } catch (\Exception $e) {
+        return 'حدث خطأ: ' . $e->getMessage();
+    }
 });
 
 Route::get('update-country-id', function () {
