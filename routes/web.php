@@ -659,7 +659,6 @@ Route::get('update-target', function () {
         $data[] = [
             'agency_id' => $agency->id,
             'new' => $salary->sallary ?? 0,
-            'old' => null
         ];
     }
 
