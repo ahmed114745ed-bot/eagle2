@@ -374,7 +374,7 @@
                 @if(session('preview_superadmin') || session('preview_area_manager') )
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
-                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn">
                             <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
                             </button>
                         </li>
