@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Agency;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -550,3 +551,29 @@ Route::get('/week-zone', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+Route::get('update-target', function () {
+    $type = request('type', 'new');
+    $path = public_path('target.json');
+
+    if (!File::exists($path)) {
+        File::put($path, json_encode([], JSON_PRETTY_PRINT));
+    }
+
+    $agencies = Agency::with('agencySalaries')->get();
+
+    $data = [];
+
+    foreach ($agencies as $agency){
+        $data[] = [
+            'agency_id' => $agency->id,
+            'new' => $agency->salary,
+            'old' => null
+        ];
+    }
+
+    $path = public_path('target.json');
+
+    File::put($path, json_encode($data, JSON_PRETTY_PRINT));
+
+    return 'Target records imported successfully';
+});
