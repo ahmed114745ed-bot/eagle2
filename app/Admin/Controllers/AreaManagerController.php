@@ -162,151 +162,174 @@ class AreaManagerController extends MainController
 
 
 
-protected function form($id = null)
-{
+    protected function form($id = null)
+    {
+        $form = new Form(new AreaManager());
+        $this->disableFormTools($form);
 
-  
-    $form = new Form(new AreaManager());
-    $this->disableFormTools($form);
+        $form->text('name', __('name'));
+        $form->text('username', trans('admin.username'))
+            ->rules(function ($form) {
+                $id = $form->model()?->id ?? null;
+                $type = PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
+                $type = $type ?? '';
+                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            });
+        $form->password('password', __('Password'))->rules($form->isEditing() ? '' : 'required');
+        $form->image('avatar', __('img'));
 
-    $form->text('name', __('name'));
-    $form->text('username', trans('admin.username'))
-        ->rules(function ($form) {
-            $id = $form->model()?->id ?? null;
-            $type = PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
-            $type = $type ?? '';
-            return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
-        });
-    $form->password('password', __('Password'))->rules($form->isEditing() ? '' : 'required');
-    $form->image('avatar', __('img'));
-
-    $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-        $ops2 = [];
-        foreach (User::Where('id', $value)->get() as $user) {
-            $ops2[$user->id] = $user->uuid . '_' . $user->name;
-        }
-        return $ops2;
-    })->ajax('/api/search/users-area-manager', 'id', 'name');
-
-    $this->addPhoneFields($form);
-
-    $this->addMapField($form ,$id);
-
-    $form->hidden('type')->value('area-manager');
-    $form->hidden('covered_countries')->attribute('id', 'covered-countries-input');
-
-    $form->saving(function (Form $form) {
-        $isEditing = $form->isEditing();
-
-        $superAdmin = AreaManager::where('phone_code', request('phone_code'))
-            ->where('phone', request('phone'));
-
-        if ($isEditing) {
-            $superAdmin->where('id', '!=', $form->model()->id);
-        }
-
-        if ($superAdmin->exists()) {
-            $error = new \Illuminate\Support\MessageBag([
-                'title' => 'Error',
-                'message' => trans('you used this phone before'),
-            ]);
-            return back()->with(compact('error'))->withInput();
-        }
-
-        if ($form->password && $form->model()->password != $form->password) {
-            $form->password = Hash::make($form->password);
-        }
-    });
-
-    $form->saved(function (Form $form) {
-        $areaManager = $form->model();
-        $userId = $form->model()->id;
-
-        Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
-
-        $coveredCountries = request('covered_countries');
-        if ($coveredCountries) {
-            $countries = json_decode($coveredCountries, true);
-            if (is_array($countries) && count($countries) > 0) {
-                $countryIds = array_column($countries, 'id');
-                Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
+        $form->select('app_id', __('validation.select_user'))->options(function ($value) {
+            $ops2 = [];
+            foreach (User::Where('id', $value)->get() as $user) {
+                $ops2[$user->id] = $user->uuid . '_' . $user->name;
             }
-        }
+            return $ops2;
+        })->ajax('/api/search/users-area-manager', 'id', 'name');
 
-        $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
-        if ($role && $userId) {
-            $exists = DB::table('admin_role_users')
-                ->where('user_id', $userId)
-                ->where('role_id', $role->id)
-                ->exists();
+        $this->addPhoneFields($form);
 
-            if (!$exists) {
-                DB::table('admin_role_users')->insert([
-                    'user_id' => $userId,
-                    'role_id' => $role->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+        $this->addMapField($form, $id);
+
+        $form->hidden('type')->value('area-manager');
+        $form->hidden('covered_countries')->attribute('id', 'covered-countries-input');
+
+        $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
+
+            $superAdmin = AreaManager::where('phone_code', request('phone_code'))
+                ->where('phone', request('phone'));
+
+            if ($isEditing) {
+                $superAdmin->where('id', '!=', $form->model()->id);
+            }
+
+            if ($superAdmin->exists()) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => trans('you used this phone before'),
                 ]);
+                return back()->with(compact('error'))->withInput();
             }
-        }
-    });
 
-    return $form;
-}
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId) {
+                    $OldUserAppId = User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_area_manager = 0;
+                        $OldUserAppId->save();
+                        MilestoneHelper::removeReward($OldUserAppId, 'area-manager');
+                    }
 
-protected function addMapField(Form $form ,$id = null)
-{
-    $countries = \App\Models\Country::select(['id', 'e_name as name', 'iso as iso2', 'area_manager_id'])
-        ->with(['areaManager:id,default'])
-        ->get();
-
-    $countriesJson = $countries->toJson();
-
-    $selectedCountries = [];
-    $currentAreaManagerId = null;
-
-    if ($form->isEditing()) {
-        $currentAreaManagerId = $id;
-        $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
-            ->pluck('iso')
-            ->toArray();
-    }
-    $selectedCountriesJson = json_encode($selectedCountries);
-
-    $form->html(view('admin.partials.country_map', [
-        'countriesJson' => $countriesJson,
-        'selectedCountriesJson' => $selectedCountriesJson,
-        'currentAreaManagerId' => $currentAreaManagerId
-    ])->render());
-}
-
-
-
-
-protected function addPhoneFields(Form $form)
-{
-    $form->text('phone', __('whatsApp number'))
-        ->rules('required')
-        ->attribute('id', 'phone-input')
-        ->attribute('maxlength', 12)
-        ->default(function ($form) {
-            if ($form->model()->phone && $form->model()->phone_code) {
-                return $form->model()->phone;
+                    $newUserAppId = User::find($newAppId);
+                    $newUserAppId->is_area_manager = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
+                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'area-manager');
+                }
             }
-            return null;
+
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = Hash::make($form->password);
+            }
         });
 
-    $form->hidden('phone_code')->default(function ($form) {
-        return $form->model()->phone_code ?? '';
-    });
+        $form->saved(function (Form $form) {
+            $userAppId = $form->model()->app_id;
+            $userApp = User::find($userAppId);
+            if (isset($userApp)) {
+                $userApp->is_area_manager = 1;
+                $userApp->save();
+                MilestoneHelper::grantMilestoneToUser($userApp->id, 'area-manager');
+            }
+            $userId = $form->model()->id;
 
-    Admin::script($this->phoneJs());
-}
+            Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
 
-protected function phoneJs()
-{
+            $coveredCountries = request('covered_countries');
+            if ($coveredCountries) {
+                $countries = json_decode($coveredCountries, true);
+                if (is_array($countries) && count($countries) > 0) {
+                    $countryIds = array_column($countries, 'id');
+                    Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
+                }
+            }
 
-    return <<<JS
+            $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        });
+
+        return $form;
+    }
+
+    protected function addMapField(Form $form, $id = null)
+    {
+        $countries = \App\Models\Country::select(['id', 'e_name as name', 'iso as iso2', 'area_manager_id'])
+            ->with(['areaManager:id,default'])
+            ->get();
+
+        $countriesJson = $countries->toJson();
+
+        $selectedCountries = [];
+        $currentAreaManagerId = null;
+
+        if ($form->isEditing()) {
+            $currentAreaManagerId = $id;
+            $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
+                ->pluck('iso')
+                ->toArray();
+        }
+        $selectedCountriesJson = json_encode($selectedCountries);
+
+        $form->html(view('admin.partials.country_map', [
+            'countriesJson' => $countriesJson,
+            'selectedCountriesJson' => $selectedCountriesJson,
+            'currentAreaManagerId' => $currentAreaManagerId
+        ])->render());
+    }
+
+
+
+
+    protected function addPhoneFields(Form $form)
+    {
+        $form->text('phone', __('whatsApp number'))
+            ->rules('required')
+            ->attribute('id', 'phone-input')
+            ->attribute('maxlength', 12)
+            ->default(function ($form) {
+                if ($form->model()->phone && $form->model()->phone_code) {
+                    return $form->model()->phone;
+                }
+                return null;
+            });
+
+        $form->hidden('phone_code')->default(function ($form) {
+            return $form->model()->phone_code ?? '';
+        });
+
+        Admin::script($this->phoneJs());
+    }
+
+    protected function phoneJs()
+    {
+
+        return <<<JS
         function initPhoneInputById(inputId, hiddenId) {
             const input = document.querySelector(inputId);
             const hidden = document.querySelector(hiddenId);
@@ -378,7 +401,7 @@ protected function phoneJs()
         });
 
     JS;
-}
+    }
     public function profile($id)
     {
         $tab = request()->query('tab', 'agencies');
@@ -413,9 +436,9 @@ protected function phoneJs()
             case 'agencies':
                 $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
                 break;
-//            case 'rewards':
-//                $rewards = SuperAdminReward::where('super_admin_id', $areaManager->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-//                break;
+                //            case 'rewards':
+                //                $rewards = SuperAdminReward::where('super_admin_id', $areaManager->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
+                //                break;
         }
 
         return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types'));
