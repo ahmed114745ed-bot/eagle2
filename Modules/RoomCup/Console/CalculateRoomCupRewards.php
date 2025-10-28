@@ -119,13 +119,10 @@ class CalculateRoomCupRewards extends Command
 
         $room = Room::find($gift->room_id);
 
-
         if (!$room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
             return;
         }
-
-
 
         $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
