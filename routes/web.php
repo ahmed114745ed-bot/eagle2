@@ -648,49 +648,34 @@ Route::get('update-target', function () {
     $type = request('type', 'new');
     $path = public_path('target.json');
 
-    if (!File::exists($path)) {
+    if (File::exists($path)) {
+        $existingData = json_decode(File::get($path), true) ?? [];
+    } else {
+        $existingData = [];
         File::put($path, json_encode([], JSON_PRETTY_PRINT));
     }
 
     $bds = Bd::get();
-
     $data = [];
 
-    foreach ($bds as $bd){
-       $salary = BdSalary::where('bd_id', $bd->id)->where('month', now()->month)
-            ->where('year', now()->year)->first();
+    foreach ($bds as $bd) {
+        $salary = BdSalary::where('bd_id', $bd->id)
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->first();
+        
+        $existingRecord = collect($existingData)->firstWhere('bd_id', $bd->id);
+        
         $data[] = [
             'bd_id' => $bd->id,
-            'old' => $salary->salary ?? 0,
+            'old' => $existingRecord['old'] ?? ($salary->salary ?? 0),
+            'new' => $salary->salary ?? 0, 
         ];
     }
 
-    $path = public_path('target.json');
-
     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
 
-    // $rows = json_decode(File::get($path), true);
-
-    // foreach ($rows as $row) {
-//        AgencySallary::create([
-//            'agency_id' => $row['agency_id'],
-//            'sallary' => 0,
-//            'cut_amount' => -($row['old'] - $row['new']),
-//            'month' => now()->month,
-//            'year' => now()->year,
-//            'is_paid' => 0,
-//            'created_at' => now(),
-//            'updated_at' => now(),
-//        ]);
-
-    //     foreach ($data as &$row) {
-    //         $row['old'] = $row['new'];
-    //     }
-
-    //     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
-    // }
-
-    return 'Target records imported successfully';
+    return 'Target records updated successfully with new values';
 });
 
 use Illuminate\Support\Facades\File;
