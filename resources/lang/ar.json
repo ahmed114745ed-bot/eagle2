@@ -14,7 +14,18 @@
     "User Info":"معلومات المستخدم",
     "Permission": "الصلاحيات",
     "Menu": "القوائم",
+   "Area managers" : "مديرو المناطق",
+  "charges area manager": "رسوم مدير المنطقة",
     "Operation log": "سجل العمليات",
+  
+
+"Browse area manager": "تصفح مديري المناطق",
+"Create area manager": "إنشاء مدير منطقة",
+"Delete area manager": "حذف مدير المنطقة",
+"Edit area manager": "تعديل مدير المنطقة",
+"Show area manager": "عرض مدير المنطقة",
+"Charge To Area Manager": "تحصيل من مدير المنطقة",
+"Browse charge to area manager": "تصفح عمليات التحصيل من مديري المناطق",
     "SuperAdmin" : "المشرف العام",
     "Browse superadmin" : "عرض المشرف العام",
     "Create superadmin" : "إنشاء مشرف عام",
