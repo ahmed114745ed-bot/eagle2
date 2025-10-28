@@ -305,13 +305,22 @@ class ChatRoomService
         return $chatRoom;
     }
 
-    public function getChatMessages($chatRoomId)
+    public function getChatMessages($chatRoomId, $request = null)
     {
         // Get messages with reacts and albums for the chat room
-        return ChatMessage::where('chat_room_id', $chatRoomId)
+        $query = ChatMessage::where('chat_room_id', $chatRoomId)
             ->with('reacts', 'albums')
-            ->orderBy('id', 'desc')
-            ->cursorPaginate(5);
+            ->orderBy('id', 'desc');
+
+        if ($request && $request->type && $request->message_id){
+            if ($request->type == 'new') {
+                $query->where('id', '>', $request->message_id);
+            } elseif ($request->type == 'old') {
+                $query->where('id', '<', $request->message_id);
+            }
+        }
+
+        return $query->get();
     }
 
     public function markMessagesAsSeen($checkRoom, $user)

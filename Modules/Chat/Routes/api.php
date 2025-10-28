@@ -17,6 +17,7 @@ Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localizati
     Route::get('/users/list', [ChatRoomController::class, 'users_list']);
     //Chat Room
     Route::get('/Chat-room/search-user', [ChatRoomController::class, 'findUserByUUid']);
+    Route::post('/Chat-room/cursor', [ChatRoomController::class, 'cursor']);
     Route::resource('/Chat-room', ChatRoomController::class);
     Route::post('/Chat-room/accept-request', [ChatRoomController::class,'accept_request']);
     Route::get('/close-chat', [ChatRoomController::class,'close_Chat']);
