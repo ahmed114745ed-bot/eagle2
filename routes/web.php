@@ -670,16 +670,16 @@ Route::get('update-target', function () {
     $rows = json_decode(File::get($path), true);
 
     foreach ($rows as $row) {
-        AgencySallary::create([
-            'agency_id' => $row['agency_id'],
-            'sallary' => 0,
-            'cut_amount' => -($row['old'] - $row['new']),
-            'month' => now()->month,
-            'year' => now()->year,
-            'is_paid' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+//        AgencySallary::create([
+//            'agency_id' => $row['agency_id'],
+//            'sallary' => 0,
+//            'cut_amount' => -($row['old'] - $row['new']),
+//            'month' => now()->month,
+//            'year' => now()->year,
+//            'is_paid' => 0,
+//            'created_at' => now(),
+//            'updated_at' => now(),
+//        ]);
 
         foreach ($data as &$row) {
             $row['old'] = $row['new'];
