@@ -15,9 +15,9 @@ class SetCountry
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $countryId = $request->get('country_id');
-        $areaManagerCountryId = $request->get('area_manager_country_id');
-        $areaManagerId = $request->get('area_manager_id');
+        $countryId = $request->get('country_id', session('country_id'));
+        $areaManagerCountryId = $request->get('area_manager_country_id', session('area_manager_country_id'));
+        $areaManagerId = $request->get('area_manager_id', session('area_manager_id'));
 
         if (($countryId === null || $countryId === '' || $countryId === 'null') && !session('preview_superadmin') && !session('preview_area_manager')) {
             session()->forget('country_id');
