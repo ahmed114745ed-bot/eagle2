@@ -323,7 +323,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = Common::areaCountries();
 
         $grid->model()
             ->audio()
