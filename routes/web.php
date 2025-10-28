@@ -39,6 +39,7 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Models\AgencySallary;
 
 /*
 |--------------------------------------------------------------------------
@@ -649,14 +650,16 @@ Route::get('update-target', function () {
         File::put($path, json_encode([], JSON_PRETTY_PRINT));
     }
 
-    $agencies = Agency::with('agencySalaries')->get();
+    $agencies = Agency::get();
 
     $data = [];
 
     foreach ($agencies as $agency){
+       $salary = AgencySallary::where('agency_id', $agency->id)->where('month', now()->month)
+            ->where('year', now()->year)->first();
         $data[] = [
             'agency_id' => $agency->id,
-            'new' => $agency->salary,
+            'new' => $salary->sallary ?? 0,
             'old' => null
         ];
     }
