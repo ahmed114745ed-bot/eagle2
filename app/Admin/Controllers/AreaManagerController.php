@@ -147,6 +147,24 @@ class AreaManagerController extends MainController
             return $carbonDate->translatedFormat('d F Y H:i');
         });
 
+        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $url = url('admin/milestones'); // Generates absolute URL for /admin/milestones
+                $milestone = __('milestone');   // Translates 'milestone' via your language files
+
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                         {$milestone}
+                    </a>
+                </div>
+            HTML;
+
+                // Append the custom HTML button to the grid's toolbar
+                $tools->append($customButtonHTML);
+            });
+        } 
+
         $grid->disableRowSelector();
         $this->extendGrid($grid);
 
