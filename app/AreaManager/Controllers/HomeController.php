@@ -8,6 +8,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
+use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
@@ -32,7 +33,7 @@ class HomeController extends MainController
 
     public function index(Content $content)
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = Common::areaCountries();
         $superAdmins = SuperAdmin::where('parent_id', auth()->id())->pluck('id')->toArray();
         $usersCount = User::whereIn('country_id', $countries)->count();
 
