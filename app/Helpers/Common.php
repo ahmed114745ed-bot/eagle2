@@ -2188,7 +2188,7 @@ class Common
 
     public static function areaCountries()
     {
-        $adminId = auth()->user()->id;
+        $adminId =  session('area_manager_id') ?? auth()->user()->id;
         $areaManager = AreaManager::with('countries')->find($adminId);
 
         if (!$areaManager) {

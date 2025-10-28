@@ -327,7 +327,7 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = session('country_id');
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
 
         $grid->model()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
@@ -350,7 +350,7 @@ class LiveRoomController extends MainController
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
-                $q->where('id',  $countryID);
+                $q->whereIn('id',  $countryID);
             }))
             ->withCount('roomVisitors');
 

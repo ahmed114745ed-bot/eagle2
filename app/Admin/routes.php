@@ -490,6 +490,7 @@ Route::group(
         });
 
         Route::resource('usersBd', BdController::class);
+         Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
         Route::resource('superadmin-users', SuperAdminController::class)->except('delete');

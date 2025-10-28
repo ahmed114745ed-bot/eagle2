@@ -9,6 +9,7 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Permission;
 use App\Models\SuperAdmin;
@@ -106,8 +107,9 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $countryID = session('country_id');
-        $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID))->with(['appUser.packs'])
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
+    // dd($countryID ,session('country_id'),Common::areaCountries() );
+        $grid->model()->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -317,8 +319,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-//            $form->switch('default', __('set_superadmin_as_default'))
-//                ->help(__('make_super_admin_default'));
+            //            $form->switch('default', __('set_superadmin_as_default'))
+            //                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form, 'sometimes');
 

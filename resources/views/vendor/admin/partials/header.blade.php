@@ -361,7 +361,7 @@
                             </button>
                         </li>
                     @endif
-                @elseif(!session('preview_area_manager') && session('country_id') && session('area_manager_id') )
+                @elseif(!session('preview_area_manager')  && session('area_manager_id') )
                 @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">

@@ -321,7 +321,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = session('country_id');
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
 
         $grid->model()
             ->audio()
@@ -357,7 +357,7 @@ class RoomController extends MainController
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
-                $q->where('id',  $countryID);
+                $q->whereIn('id',  $countryID);
             }))
             ->withCount('roomVisitors');
 

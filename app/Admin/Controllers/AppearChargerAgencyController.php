@@ -221,11 +221,11 @@ class AppearChargerAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
-        $countryID = session('country_id');
+        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile','country')
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
