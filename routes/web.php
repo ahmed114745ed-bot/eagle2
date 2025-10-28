@@ -39,7 +39,6 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
-use App\Models\AgencySallary;
 
 /*
 |--------------------------------------------------------------------------
@@ -681,6 +680,12 @@ Route::get('update-target', function () {
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        foreach ($data as &$row) {
+            $row['old'] = $row['new'];
+        }
+
+        File::put($path, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     return 'Target records imported successfully';
