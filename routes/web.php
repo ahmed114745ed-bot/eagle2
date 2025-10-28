@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Models\Bd;
+use App\Models\BdSalary;
 use App\Models\BDSallary;
 
 /*
@@ -656,7 +657,7 @@ Route::get('update-target', function () {
     $data = [];
 
     foreach ($bds as $bd){
-       $salary = BDSallary::where('bd_id', $bd->id)->where('month', now()->month)
+       $salary = BdSalary::where('bd_id', $bd->id)->where('month', now()->month)
             ->where('year', now()->year)->first();
         $data[] = [
             'bd_id' => $bd->id,
