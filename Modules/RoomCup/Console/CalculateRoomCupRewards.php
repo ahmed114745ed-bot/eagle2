@@ -140,10 +140,11 @@ class CalculateRoomCupRewards extends Command
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
-
+        $room->additional_admin = 0 ;
+        $room->save();
          self::adjustAdminsBasedOnTarget( $room , $target);
        
-        $room->save();
+       
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
             $targetId = $target->id;
@@ -248,13 +249,14 @@ class CalculateRoomCupRewards extends Command
     public function adjustAdminsBasedOnTarget($room, $target): void
     {
         $currentTotal = $room->total_admins; 
-        $targetTotal = (int) $target->number_of_admins; 
-
+        $targetTotal  = (int) $target->number_of_admins; 
+    
         $difference = $targetTotal - $currentTotal;
-
+    
         if ($difference === 0) {
             return;
         }
+    
         if ($difference > 0) {
             $room->additional_admin += $difference;
         } else {
@@ -262,6 +264,26 @@ class CalculateRoomCupRewards extends Command
             $room->additional_admin = max(0, $room->additional_admin - $difference);
         }
         $room->save();
+        $this->normalizeRoomAdmins($room);
     }
+    
+    private function normalizeRoomAdmins($room): void
+    {
+        $roomAdmin = $room->room_admin;
+        $roomMax   = $room->total_admins; 
+        $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
+    
+        $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+        $adm_arr = array_filter(array_unique($adm_arr)); 
+    
+        $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
+    
+        if (count($adm_arr) > $allowedMax) {
+            $adm_arr = array_slice($adm_arr, 0, $allowedMax);
+        }
+        $str = implode(",", $adm_arr);
+        $room->update(['room_admin' => $str]);
+    }
+    
 
 }
