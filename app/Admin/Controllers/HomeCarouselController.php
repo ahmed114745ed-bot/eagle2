@@ -106,7 +106,7 @@ class HomeCarouselController extends MainController
         // Make table header sticky when scrolling
         Admin::style('
             .table-responsive {
-                max-height: calc(100vh - 250px);
+                max-height: calc(100vh - 150px);
                 overflow-y: auto;
             }
             .grid-table thead th {
