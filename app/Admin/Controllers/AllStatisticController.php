@@ -41,8 +41,8 @@ class AllStatisticController extends MainController
 
     public function index(Content $content)
     {
-        
-        $countryID =request('country_id' ,null) ;
+
+        $countryID =request('country_id');
         $balance = GameWallet::query();
         $balanceDollar = GameChargeHistory::query();
         if (request("date") != null) {
@@ -62,8 +62,8 @@ class AllStatisticController extends MainController
         $data = [$balance->used ?? 0, $availableBalance ?? 0];
         $user = Auth::user();
         $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
-        
-        
+
+
         $usersCount = User::when($countryID, function ($query, $countryID) {
                         return $query->where('country_id', $countryID);
                     })->count();
@@ -233,7 +233,7 @@ class AllStatisticController extends MainController
             ->filter()
             ->map(fn($mics) => count(array_filter(explode(',', $mics))))
             ->avg();
-   
+
         $roomsWithMic = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
                 return $query->where('country_id', $countryID);
             }))
@@ -316,7 +316,7 @@ class AllStatisticController extends MainController
         $bdCount = Bd::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
                     return $query->where('country_id', $countryID);
                 })->count();
-       
+
 
         $totalSalaries = BD::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
                     return $query->where('country_id', $countryID);

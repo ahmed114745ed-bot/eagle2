@@ -397,7 +397,7 @@
 
           $('#area-Manager-select').select2({
                 placeholder: '{{ __("Select area manager") }}',
-                allowClear: true, // ✅ Enables the "X"
+                allowClear: true,
                 width: '190px'
             });
          $AreaManagerSelect.on('change', function () {
@@ -407,7 +407,7 @@
                 if (areaMangerId && areaMangerId !== 'null') {
                     url.searchParams.set('area_manager_id', areaMangerId);
                 } else {
-                    url.searchParams.set('area_manager_id', 'null');
+                    url.searchParams.delete('area_manager_id');
                 }
 
                 window.location.href = url.toString();
@@ -430,7 +430,7 @@
                 if (countryId && countryId !== 'null') {
                     url.searchParams.set('country_id', countryId);
                 } else {
-                    url.searchParams.set('country_id', 'null');
+                    url.searchParams.delete('country_id');
                 }
 
                 window.location.href = url.toString();
@@ -444,7 +444,7 @@
                 if (countryId && countryId !== 'null') {
                     url.searchParams.set('area_manager_country_id', countryId);
                 } else {
-                    url.searchParams.set('area_manager_country_id', 'null');
+                    url.searchParams.delete('area_manager_country_id');
                 }
 
                 window.location.href = url.toString();
@@ -456,7 +456,7 @@
                 e.stopPropagation();
 
                 const url = new URL(window.location.href);
-                url.searchParams.set('country_id', 'null');
+                url.searchParams.delete('country_id');
                 window.location.href = url.toString();
             });
 
@@ -466,7 +466,7 @@
                     e.stopPropagation();
 
                     const url = new URL(window.location.href);
-                    url.searchParams.set('area_manager_country_id', 'null');
+                    url.searchParams.delete('area_manager_country_id');
                     window.location.href = url.toString();
                 });
             @endif
