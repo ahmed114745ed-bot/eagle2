@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AgencySallary;
 use App\Models\Country;
 use App\Models\Agency;
 use Carbon\Carbon;
@@ -663,6 +664,21 @@ Route::get('update-target', function () {
     $path = public_path('target.json');
 
     File::put($path, json_encode($data, JSON_PRETTY_PRINT));
+
+    $rows = json_decode(File::get($path), true);
+
+    foreach ($rows as $row) {
+        AgencySallary::create([
+            'agency_id' => $row['agency_id'],
+            'sallary' => 0,
+            'cut_amount' => -($row['old'] - $row['new']),
+            'month' => now()->month,
+            'year' => now()->year,
+            'is_paid' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 
     return 'Target records imported successfully';
 });
