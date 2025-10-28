@@ -19,7 +19,7 @@ class SetCountry
         $areaManagerCountryId = $request->get('area_manager_country_id');
         $areaManagerId = $request->get('area_manager_id');
 
-        if ($countryId === null || $countryId === '' || $countryId === 'null') {
+        if (($countryId === null || $countryId === '' || $countryId === 'null') && !session('preview_superadmin') && !session('preview_area_manager')) {
             session()->forget('country_id');
         } else {
             session(['country_id' => $countryId]);
@@ -31,7 +31,7 @@ class SetCountry
             session(['area_manager_country_id' => $areaManagerCountryId]);
         }
 
-        if ($areaManagerId === null || $areaManagerId === '' || $areaManagerId === 'null') {
+        if (($areaManagerId === null || $areaManagerId === '' || $areaManagerId === 'null') && !session('preview_superadmin') && !session('preview_area_manager')) {
             session()->forget('area_manager_id');
         } else {
             session(['area_manager_id' => $areaManagerId]);
