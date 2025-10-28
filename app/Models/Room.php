@@ -375,4 +375,10 @@ class Room extends Model
         return User::whereIn('id', explode(',', $this->room_admin ?? ''))
                 ->get();
     }
+
+    public function getTotalAdminsAttribute(): int
+    {
+        return (int) $this->max_admin + (int) $this->additional_admin;
+    }
+
 }
