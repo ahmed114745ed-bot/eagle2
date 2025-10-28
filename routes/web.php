@@ -645,7 +645,6 @@ Route::get('/week-zone', function () {
 });
 
 Route::get('update-target', function () {
-    $type = request('type', 'new');
     $path = public_path('target.json');
 
     if (File::exists($path)) {
@@ -669,7 +668,7 @@ Route::get('update-target', function () {
         $data[] = [
             'bd_id' => $bd->id,
             'old' => $existingRecord['old'] ?? ($salary->salary ?? 0),
-            'new' => $salary->salary ?? 0, 
+            'new' => $existingRecord['new'] ?? ($salary->salary ?? 0), // ⬅️ هنا التعديل
         ];
     }
 
