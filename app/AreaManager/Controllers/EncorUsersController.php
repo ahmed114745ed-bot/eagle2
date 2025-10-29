@@ -323,7 +323,7 @@ class EncorUsersController extends AdminController
         $form->ignore(['password_confirmation']);
         $form->hidden('type', __('Type'))->value(PermissionType::SUB_AREA_MANAGER->value);
 
-        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('id', $roleAuthId)->where('type', PermissionType::AREA_MANAGER->value)->pluck('name', 'id'));
+        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('admin_id', $roleAuthId)->where('type', PermissionType::AREA_MANAGER->value)->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));
