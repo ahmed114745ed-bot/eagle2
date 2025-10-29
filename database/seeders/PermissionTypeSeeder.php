@@ -234,6 +234,7 @@ class PermissionTypeSeeder extends Seeder
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 7],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 3],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 3],
                 ],
                 'permissions' => [
                     [
@@ -262,6 +263,7 @@ class PermissionTypeSeeder extends Seeder
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'add-switch', 'charge-report-switch'],
                             PermissionType::SUPER_ADMIN->value => ['browse', 'add-switch'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'add-switch'],
                         ],
                     ],
                     [
