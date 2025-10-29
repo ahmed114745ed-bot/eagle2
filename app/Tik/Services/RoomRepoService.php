@@ -107,8 +107,24 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-            $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+            \Log::info('✅ رفع ملف جديد room_cover', [
+                'file_name' => $request->file('room_cover')->getClientOriginalName(),
+                'file_size' => $request->file('room_cover')->getSize(),
+                'file_type' => $request->file('room_cover')->getMimeType(),
+            ]);
+        
+            $uploadedPath = Common::upload('rooms', $request->file('room_cover'));
+        
+            \Log::info('📦 تم رفع الملف وتخزين المسار:', [
+                'path' => $uploadedPath,
+            ]);
+        
+            $room->room_cover = $uploadedPath;
         } else {
+            \Log::info('⚠️ لا يوجد ملف مرفوع. استخدام القيمة القديمة أو المرسلة من الفورم.', [
+                'request_room_cover' => $request->room_cover,
+            ]);
+        
             $room->room_cover = $request->room_cover;
         }
 
