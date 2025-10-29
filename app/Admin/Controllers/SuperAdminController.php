@@ -26,6 +26,7 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -248,10 +249,58 @@ class SuperAdminController extends MainController
             //            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
             //                $actions->add(new DeleteSuperAdminAction());
             //            }
+
+           
         });
 
+
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {});
+            
+            $grid->tools(function (Grid\Tools $tools) {
+                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                 $milestone = __('Acquisitions');   
+ 
+                 $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+ 
+                 $tools->append($customButtonHTML);
+             });
+            
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.superadmin.logout'); 
+                $loginText = __('login'); 
+                $areaManagerUrl = url('/superadmin/login');
+
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>   
+                    </button>
+
+                </div>
+                     <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
+                HTML;
+
+                $tools->append($customButtonHTML);
+            });
         }
 
         $grid->disableRowSelector();
@@ -334,6 +383,7 @@ class SuperAdminController extends MainController
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
+            $country_id = $form->input('country_id');
             $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'));
             if ($isEditing) $superAdmin->where('id', '!=', $form->model()->id);
             $exists = $superAdmin->exists();
@@ -381,12 +431,27 @@ class SuperAdminController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
+
+           
         });
 
         $form->saved(function (Form $form) {
+            /** @var \App\Models\AdminUser $superAdmin */
             $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
+              
+  
+            $country = Country::find($superAdmin->country_id);
+
+            if ($country && $country->area_manager_id) {
+                if ($superAdmin->parent_id != $country->area_manager_id) {
+                    $superAdmin->update([
+                        'parent_id' => $country->area_manager_id,
+                    ]);
+                }
+            }
+           
 
             $userApp = User::find($userAppId);
             if (isset($userApp)) {

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
@@ -290,11 +291,54 @@ class BdController extends MainController
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
+   
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
+            
             $grid->tools(function (Grid\Tools $tools) {
-                // $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
-            });
-        }
+                $milestoneId = Milestone::where('slug', 'bd')->first();
+                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                 $milestone = __('Acquisitions');   
+ 
+                 $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+ 
+                 $tools->append($customButtonHTML);
+             });
+            $grid->tools(function ($tools) {
+               $logoutUrl = route('admin.bd.logout'); 
+               $loginText = __('login'); 
+               $areaManagerUrl = url('/bd/login');
+
+               $customButtonHTML = <<<HTML
+               <div style="display: contents; align-items: center;">
+                   <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                       <i class="fa fa-sign-in"></i> {$loginText}
+                   </a>
+                   <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                       <i class="fa fa-copy"></i>   
+                   </button>
+
+               </div>
+                    <script>
+                   function copyAreaManagerUrl() {
+                       const url = '{$areaManagerUrl}';
+                       navigator.clipboard.writeText(url).then(() => {
+                           toastr.success('تم نسخ الرابط بنجاح');
+                       }).catch(() => {
+                           alert('تعذر نسخ الرابط');
+                       });
+                   }
+               </script>
+               HTML;
+
+               $tools->append($customButtonHTML);
+           });
+       }
         $grid->disableRowSelector();
 
         $this->extendGrid($grid);
