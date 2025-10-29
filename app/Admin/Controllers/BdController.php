@@ -315,23 +315,16 @@ class BdController extends MainController
         $this->extendGrid($grid);
         return $grid;
     }
+}
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    // protected function detail($id)
-    // {
-    //    return $this->profile($id);
-    // }
+
 
     /**
      * Make a form builder.
      *
      * @return Form
      */
+
     protected function form()
     {
         $form = new Form(new Bd());
