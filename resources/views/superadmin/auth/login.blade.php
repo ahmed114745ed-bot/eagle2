@@ -61,8 +61,8 @@
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
             </div>
             <div class="form-group has-feedback">
-                <select name="type" class="form-control input-lg text-center" required>
-                    <option value="superadmin">{{ __('Super Admin') }}</option>
+                <select id="type" name="type" class="form-control input-lg text-center" required>
+                    <option value="superadmin"selected>{{ __('Super Admin') }}</option>
                     <option value="sub_super_admin">{{ __('Sub Super Admin') }}</option>
                 </select>
             </div>
@@ -93,6 +93,7 @@
         <form action="{{ superadmin_url('change-password-view') }}" method="get" id="forget-password-form" style="display:none; margin-top:15px;">
             @csrf
             <input type="hidden" name="username" id="forget-username">
+             <input type="hidden" name="type" id="forget-type">
             <label for="whatsapp_code" style="font-weight:bold; display:block; margin-bottom:8px;">
                     {{ __('dashboard.login.enter_code') }}
             </label>
@@ -209,6 +210,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         let username = $('#username').val()?.trim();
+        let type = $('#type').val()?.trim();
 
         // 1) لو ما فيه username -> عرض مودال خطأ
         if (!username) {
@@ -216,11 +218,18 @@ $(document).ready(function () {
             $('#errorModal').modal('show');
             return;
         }
+        if (!type) {
+            $('#errorModalText').text("{{ __('login.error.enter_type') }}");
+            $('#errorModal').modal('show');
+            return;
+        }
 
         $.ajax({
             url: "{{ superadmin_url('send-whatsapp-code-preview') }}",
             method: "POST",
-            data: { username: username },
+            data: { username: username,
+                type:type
+             },
             dataType: "json",
             beforeSend: function () {
                 // optional: show loading state
@@ -245,7 +254,9 @@ $(document).ready(function () {
                     $.ajax({
                         url: "{{ superadmin_url('send-whatsapp-code') }}",
                         method: "POST",
-                        data: { username: username },
+                        data: { username: username,
+                            type:type,
+                         },
                         dataType: "json",
                         success: function (res) {
                             $btn.prop('disabled', false).text("{{ __('dashboard.login.confirm') }}");
@@ -256,7 +267,7 @@ $(document).ready(function () {
                                 $('#successModal').modal('show');
 
                                 $('#forget-username').val(username);
-
+                                $('#forget-type').val(type);
                                 $('#forget-password-form').fadeIn();
                                 document.getElementById('forget-password-form').style.display = 'block';
 
@@ -298,6 +309,7 @@ $('#forget-password-form').on('submit', function (e) {
 
     var username = $('#forget-username').val();
     var code     = $('#whatsapp_code').val();
+    var type = $('#forget-type').val();
 
     $btn.text("{{ __('dashboard.login.loading.check_code') }}");
 
@@ -307,6 +319,7 @@ $('#forget-password-form').on('submit', function (e) {
         data: {
             username: username,
             code: code,
+            type:type,
             _token: $('meta[name="csrf-token"]').attr('content') 
         },
         dataType: "json",

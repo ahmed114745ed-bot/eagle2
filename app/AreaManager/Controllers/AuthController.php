@@ -73,7 +73,7 @@ class AuthController extends BaseAuthController
 
     public function sendCodeWhatsapp(Request $request)
     {
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $phone =  $auth->phone_code . $auth->phone;
         try {
             (new WhatsappOtp())->sendOtpMessage($phone);
@@ -88,6 +88,7 @@ class AuthController extends BaseAuthController
     {
 
         $userName = $request->username;
+        $type = $request->type;
         // $auth = \App\Models\Admin::where('username', $request->username)->first();
         // if (!$auth) {
         //     return back()->withErrors(['username' => __('User not found')]);
@@ -107,15 +108,16 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("areaManager.auth.password", compact('userName', 'current'));
+        return view("areaManager.auth.password", compact('userName', 'current', 'type'));
     }
 
     public function verifyWhatsappCode(Request $request)
     {
         $username = $request->username;
         $code     = $request->code;
+        $type = $request->type;
 
-        $auth = \App\Models\Admin::where('username', $username)->first();
+        $auth = \App\Models\Admin::where('username', $username)->where('type', $type)->first();
         if (!$auth) {
             return response()->json([
                 'success' => false,
@@ -142,7 +144,7 @@ class AuthController extends BaseAuthController
             $current = Cookie::get($cookie_name);
         }
 
-        $redirect = areaManager_url('change-password-view') . '?username=' . urlencode($username);
+        $redirect = areaManager_url('change-password-view') . '?username=' . urlencode($username) . '&type=' . urlencode($type);
 
 
         return response()->json([
@@ -154,7 +156,7 @@ class AuthController extends BaseAuthController
 
     public function changePassword(Request $request)
     {
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $auth->password = Hash::make($request->password);
         $auth->save();
         return redirect(areaManager_url('login'))
@@ -185,13 +187,12 @@ class AuthController extends BaseAuthController
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-            'type'     => 'required|string', // example: superadmin or sub_super_admin
+            // 'type'     => 'required|string', 
         ]);
 
-        // Fetch admin user by username and type
         $admin = DB::table('admin_users')
             ->where('username', $request->username)
-            ->where('type', $request->type)
+            // ->where('type', $request->type)
             ->first();
 
         if (!$admin) {
@@ -200,17 +201,14 @@ class AuthController extends BaseAuthController
             ]);
         }
 
-        // Check password manually
         if (!Hash::check($request->password, $admin->password)) {
             return back()->withInput()->withErrors([
                 'password' => trans('admin.password_incorrect'),
             ]);
         }
 
-        // Login manually via Auth guard
         Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
 
-        // Successful login response
         return $this->sendLoginResponse($request);
     }
 
@@ -229,7 +227,7 @@ class AuthController extends BaseAuthController
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
-           
+
         switch ($user->type) {
             case 'area-manager':
                 return redirect()->route('areaManager.home');
@@ -330,8 +328,9 @@ class AuthController extends BaseAuthController
     public function send_whatsapp_code_preview(Request $request)
     {
         $username = $request->input('username');
+        $type = $request->input('type');
 
-        $user = AreaManager::where('username', $username)->first();
+        $user = AreaManager::where('username', $username)->where('type', $type)->first();
 
         if (! $user || ! $user->phone) {
             return response()->json([

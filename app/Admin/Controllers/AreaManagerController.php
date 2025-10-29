@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
@@ -149,7 +150,8 @@ class AreaManagerController extends MainController
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $url = url('admin/milestones'); // Generates absolute URL for /admin/milestones
+               $milestoneId = Milestone::where('slug', 'area-manager')->first();
+                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('milestone');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
@@ -161,6 +163,21 @@ class AreaManagerController extends MainController
             HTML;
 
                 // Append the custom HTML button to the grid's toolbar
+                $tools->append($customButtonHTML);
+            });
+
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.custom.logout'); 
+                $loginText = __('login'); 
+            
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                </div>
+                HTML;
+            
                 $tools->append($customButtonHTML);
             });
         } 

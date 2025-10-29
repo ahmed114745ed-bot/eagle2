@@ -76,7 +76,7 @@ class AuthController extends BaseAuthController
 
     public function sendCodeWhatsapp(Request $request)
     {
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $phone =  $auth->phone_code . $auth->phone;
         try {
             (new WhatsappOtp())->sendOtpMessage($phone);
@@ -91,6 +91,7 @@ class AuthController extends BaseAuthController
     {
 
         $userName = $request->username;
+        $type = $request->type;
         // $auth = \App\Models\Admin::where('username', $request->username)->first();
         // if (!$auth) {
         //     return back()->withErrors(['username' => __('User not found')]);
@@ -110,15 +111,15 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("superadmin.auth.password", compact('userName', 'current'));
+        return view("superadmin.auth.password", compact('userName', 'current', 'type'));
     }
 
     public function verifyWhatsappCode(Request $request)
     {
         $username = $request->username;
         $code     = $request->code;
-
-        $auth = \App\Models\Admin::where('username', $username)->first();
+        $type = $request->type;
+        $auth = \App\Models\Admin::where('username', $username)->where('type', $type)->first();
         if (!$auth) {
             return response()->json([
                 'success' => false,
@@ -145,7 +146,7 @@ class AuthController extends BaseAuthController
             $current = Cookie::get($cookie_name);
         }
 
-        $redirect = superadmin_url('change-password-view') . '?username=' . urlencode($username);
+        $redirect = superadmin_url('change-password-view') . '?username=' . urlencode($username) . '&type=' . urlencode($type);
 
 
         return response()->json([
@@ -158,7 +159,7 @@ class AuthController extends BaseAuthController
     public function changePassword(Request $request)
     {
         //  dd(123,$request->username);
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $auth->password = Hash::make($request->password);
         $auth->save();
         return redirect(superadmin_url('login'))
@@ -375,13 +376,14 @@ class AuthController extends BaseAuthController
     public function send_whatsapp_code_preview(Request $request)
     {
         $username = $request->input('username');
+        $type = $request->input('type');
 
-        $user = SuperAdmin::where('username', $username)->first();
+        $user = SuperAdmin::where('username', $username)->where('type', $type)->first();
 
         if (! $user || ! $user->phone) {
             return response()->json([
                 'status'  => false,
-                'message' => 'المستخدم غير موجود أو ليس له رقم واتساب',
+                'message' => __('The user does not exist or does not have a WhatsApp number'),
             ]);
         }
 
@@ -390,7 +392,7 @@ class AuthController extends BaseAuthController
         return response()->json([
             'status'        => true,
             'masked_number' => $masked,
-            'message'       => 'تم جلب بيانات الرقم بنجاح',
+            'message'       => __('The number data has been retrieved successfully'),
         ]);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AuthController;
 use App\Models\Country;
 use Carbon\Carbon;
 use App\Enums\AdminNotificationType;
@@ -383,6 +384,7 @@ Route::get('/clear-admin-error', function () {
     return 'Session cleared!';
 });
 
+Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 

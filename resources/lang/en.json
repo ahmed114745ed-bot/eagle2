@@ -1251,7 +1251,8 @@
   "dashboard.login.cancel": "Cancel",
   "dashboard.login.success": "Success",
   "dashboard.login.error.enter_username_first": "Please enter the username first",
-  "dashboard.login.loading.prepare": "Preparing...",
+  "login.error.enter_type":"Please enter the type first",
+  
   "dashboard.login.error.try_again": "An error occurred, please try again later",
   "dashboard.login.whatsapp.send_to_number": "A code will be sent via WhatsApp to the number:",
   "dashboard.login.loading.sending": "Sending...",
