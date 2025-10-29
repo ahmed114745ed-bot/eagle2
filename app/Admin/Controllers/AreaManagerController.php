@@ -153,7 +153,7 @@ class AreaManagerController extends MainController
             $grid->tools(function (Grid\Tools $tools) {
                $milestoneId = Milestone::where('slug', 'area-manager')->first();
                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('milestone');   // Translates 'milestone' via your language files
+                $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
