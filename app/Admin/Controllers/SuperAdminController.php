@@ -267,24 +267,29 @@ class SuperAdminController extends MainController
      */
     protected function form()
     {
+        $userTable = config('admin.database.users_table');
+        $connection = config('admin.database.connection');
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
 
         $form->text('username', trans('admin.username'))
-            ->rules(function ($form) {
-                // Get the record ID if editing, otherwise null
-                $id = $form->model()?->id ?? null;
-
-                // Get the type from request or from existing model when editing
-                $type =  PermissionType::SUPER_ADMIN->value ?? $form->model()?->type;
-
-                // Default to empty string if not found (avoids SQL issues)
-                $type = $type ?? '';
-
-                // Build unique rule with type condition
-                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            ->rules(function ($form) use ($connection, $userTable) {
+                $table = "{$connection}.{$userTable}";
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (! $form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
+                }
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
