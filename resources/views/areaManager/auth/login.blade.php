@@ -222,17 +222,17 @@ $(document).ready(function () {
             $('#errorModal').modal('show');
             return;
         }
-        if (!type) {
-            $('#errorModalText').text("{{ __('login.error.enter_type') }}");
-            $('#errorModal').modal('show');
-            return;
-        }
+        // if (!type) {
+        //     $('#errorModalText').text("{{ __('login.error.enter_type') }}");
+        //     $('#errorModal').modal('show');
+        //     return;
+        // }
 
         $.ajax({
             url: "{{ areaManager_url('send-whatsapp-code-preview') }}",
             method: "POST",
             data: { username: username,
-                type:type
+                // type:type
              },
             dataType: "json",
             beforeSend: function () {
