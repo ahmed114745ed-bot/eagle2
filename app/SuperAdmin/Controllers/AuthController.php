@@ -92,6 +92,7 @@ class AuthController extends BaseAuthController
 
         $userName = $request->username;
         $type = $request->type;
+    
         // $auth = \App\Models\Admin::where('username', $request->username)->first();
         // if (!$auth) {
         //     return back()->withErrors(['username' => __('User not found')]);
@@ -118,8 +119,8 @@ class AuthController extends BaseAuthController
     {
         $username = $request->username;
         $code     = $request->code;
-
-        $auth = \App\Models\Admin::where('username', $username)->first();
+        $type = $request->type;
+        $auth = \App\Models\Admin::where('username', $username)->where('type', $type)->first();
         if (!$auth) {
             return response()->json([
                 'success' => false,
@@ -146,7 +147,7 @@ class AuthController extends BaseAuthController
             $current = Cookie::get($cookie_name);
         }
 
-        $redirect = superadmin_url('change-password-view') . '?username=' . urlencode($username);
+        $redirect = superadmin_url('change-password-view') . '?username=' . urlencode($username) . '&type=' . urlencode($type);
 
 
         return response()->json([
