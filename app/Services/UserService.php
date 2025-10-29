@@ -115,7 +115,7 @@ class UserService
         return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
     }
 
-    
+
 
     public function user_bd($key, $page)
     {
@@ -134,7 +134,7 @@ class UserService
         $perPage = 10;
         return $this->userRepository->superAdminUsers($key, $page, $perPage);
     }
-    
+
 
     public function subSuperAdminUsers($key, $page)
     {

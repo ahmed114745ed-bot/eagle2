@@ -1950,8 +1950,6 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-
-
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
                     'uuid' => $resource->receiveragency->id ?? '',
@@ -1960,6 +1958,32 @@ class Common
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+
+                ];
+            case 'sub_area_manager':
+                return [
+                    'name' => $resource->receiverSubAreaManager->name ?? '',
+                    'image' => $resource->receiverSubAreaManager->img ?? '',
+                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
+                    'id' => $resource->receiverSubAreaManager->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiverSubAreaManager ? url("admin/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+                    'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
+                    'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+
+                ];
+            case 'super_admin':
+                return [
+                    'name' => $resource->receiverSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSuperAdmin->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiverSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
 
                 ];

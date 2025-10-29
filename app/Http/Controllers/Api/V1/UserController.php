@@ -275,7 +275,7 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    
+
     public function user_bd(Request $request)
     {
         $key = $request->q;
@@ -324,7 +324,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
-    
+
     public function usersAreaManager(Request $request)
     {
         $key = $request->q;
@@ -334,7 +334,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
-    
+
     public function superAdminUsers2(Request $request): JsonResponse
     {
         $key = $request->q;

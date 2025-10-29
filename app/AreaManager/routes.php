@@ -122,13 +122,13 @@ Route::group(
 
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
-        //        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
-        //        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
-        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
-        Route::group(['prefix' => 'superadmin-charges-report'], function () {
-            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
-        });
+//        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
+//        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+//            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
+//        });
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
         Route::resource('professional-bd', ProfessionalBdController::class);
@@ -137,6 +137,8 @@ Route::group(
         Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
+
         //        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         //        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
         //        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
