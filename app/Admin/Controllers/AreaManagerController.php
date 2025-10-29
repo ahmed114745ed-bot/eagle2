@@ -163,6 +163,21 @@ class AreaManagerController extends MainController
                 // Append the custom HTML button to the grid's toolbar
                 $tools->append($customButtonHTML);
             });
+
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.custom.logout'); 
+                $loginText = __('login'); 
+            
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                </div>
+                HTML;
+            
+                $tools->append($customButtonHTML);
+            });
         } 
 
         $grid->disableRowSelector();

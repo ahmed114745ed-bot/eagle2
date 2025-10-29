@@ -111,6 +111,7 @@ class AuthController extends BaseAuthController
     // }
 
 
+
     public function postLogin(Request $request)
     {
         $this->loginValidator($request->all())->validate();
@@ -218,4 +219,15 @@ class AuthController extends BaseAuthController
 
         return $form;
     }
+
+
+    public function customLogout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return redirect('/areaManager/login');
+    }
+    
 }
