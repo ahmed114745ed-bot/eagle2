@@ -319,6 +319,8 @@ class ChatRoomService
                 return $query->where('id', '<', $request->message_id)->paginate(request('per_page', 10));
             }
         }
+
+        return $query->paginate();
     }
 
     public function markMessagesAsSeen($checkRoom, $user)
