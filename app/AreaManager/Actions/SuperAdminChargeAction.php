@@ -57,7 +57,7 @@ class SuperAdminChargeAction extends Action
         $typeCharge = $request->charge_type;
 
         $userCoins = Cache::rememberForever('super_admin_coins', function () {
-            $setting =   Setting::where('key', 'super_admin_coins')->first();
+            $setting = Setting::where('key', 'super_admin_coins')->first();
             return $setting?->value;
         });
 
@@ -65,6 +65,12 @@ class SuperAdminChargeAction extends Action
             $coins = $amount * $userCoins;
         } else {
             $coins = $amount;
+        }
+
+        if ($typeCharge === 'increment') {
+            if ($authAreaManager->di < abs($coins)) {
+                return $this->response()->error(__('You do not have enough coins, please recharge!'))->refresh();
+            }
         }
 
         if ($coins < 0 && $superAdmin->di < abs($amount)) {
@@ -75,7 +81,7 @@ class SuperAdminChargeAction extends Action
             return $this->response()->error(__('please set super admin coins in configs'))->refresh();
         }
 
-        DB::transaction(function () use ($request, $superAdmin,  $amount, $coins, $typeCharge) {
+        DB::transaction(function () use ($request, $superAdmin,  $amount, $coins, $typeCharge, $authAreaManager) {
 
             $amountBefore = $superAdmin->di; //Common::getCurrentBalance($superAdmin->id);
 
@@ -95,6 +101,16 @@ class SuperAdminChargeAction extends Action
             }
 
             $superAdmin->save();
+
+            if ($request->charge_type == 'increment') {
+                $authAreaManager->di -= abs($coins);
+                $authAreaManager->save();
+            }
+
+            if ($request->charge_type == 'decrement') {
+                $authAreaManager->di += abs($coins);
+                $authAreaManager->save();
+            }
 
             $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $request->amount);
         });
