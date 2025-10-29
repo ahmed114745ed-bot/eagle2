@@ -111,7 +111,7 @@ class SuperAdminController extends MainController
         $grid->model()->with(['appUser.packs'])
             // ->where('parent_id', auth()->id())
             ->when($countries, function ($q) use ($countries) {
-                $q->where('country_id',  $countries);
+                $q->whereIn('country_id',  $countries);
             })
             ->orderByDesc('id');
 
