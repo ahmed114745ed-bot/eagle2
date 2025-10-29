@@ -582,7 +582,8 @@ class AgencyController extends MainController
             $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
             $row->width(12)->hidden('agency_manger_id', __('app manger id'));
             $row->width(12)->text('name', __('agency name'))->rules('required');
-            $row->width(12)->switch('status', __('status'));
+             $row->hidden('status', __('status'))->default(1);
+           // $row->width(12)->switch('status', __('status'));
             $row->width(12)->hidden('country_id')->default(Auth::user()->country_id);
         });
     }
