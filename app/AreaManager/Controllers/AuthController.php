@@ -73,7 +73,7 @@ class AuthController extends BaseAuthController
 
     public function sendCodeWhatsapp(Request $request)
     {
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $phone =  $auth->phone_code . $auth->phone;
         try {
             (new WhatsappOtp())->sendOtpMessage($phone);
@@ -88,6 +88,7 @@ class AuthController extends BaseAuthController
     {
 
         $userName = $request->username;
+        $type = $request->type;
         // $auth = \App\Models\Admin::where('username', $request->username)->first();
         // if (!$auth) {
         //     return back()->withErrors(['username' => __('User not found')]);
@@ -107,15 +108,16 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("areaManager.auth.password", compact('userName', 'current'));
+        return view("areaManager.auth.password", compact('userName', 'current','type'));
     }
 
     public function verifyWhatsappCode(Request $request)
     {
         $username = $request->username;
         $code     = $request->code;
+        $type = $request->type;
 
-        $auth = \App\Models\Admin::where('username', $username)->first();
+        $auth = \App\Models\Admin::where('username', $username)->where('type', $type)->first();
         if (!$auth) {
             return response()->json([
                 'success' => false,
@@ -154,7 +156,7 @@ class AuthController extends BaseAuthController
 
     public function changePassword(Request $request)
     {
-        $auth = \App\Models\Admin::where('username', $request->username)->first();
+        $auth = \App\Models\Admin::where('username', $request->username)->where('type', $request->type)->first();
         $auth->password = Hash::make($request->password);
         $auth->save();
         return redirect(areaManager_url('login'))
@@ -229,7 +231,7 @@ class AuthController extends BaseAuthController
                 $this->username() => $this->getFailedLoginMessage(),
             ]);
         }
-           
+
         switch ($user->type) {
             case 'area-manager':
                 return redirect()->route('areaManager.home');
@@ -330,8 +332,9 @@ class AuthController extends BaseAuthController
     public function send_whatsapp_code_preview(Request $request)
     {
         $username = $request->input('username');
+        $type = $request->input('type');
 
-        $user = AreaManager::where('username', $username)->first();
+        $user = AreaManager::where('username', $username)->where('type', $type)->first();
 
         if (! $user || ! $user->phone) {
             return response()->json([
