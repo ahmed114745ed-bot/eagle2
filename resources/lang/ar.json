@@ -17,7 +17,7 @@
    "Area managers" : "مديرين المناطق",
   "charges area manager": "رسوم مدير المنطقة",
     "Operation log": "سجل العمليات",
-  
+
 "Area mangers": "مديرين المناطق",
 "Browse area manager": "تصفح مديري المناطق",
 "Create area manager": "إنشاء مدير منطقة",
@@ -3816,7 +3816,8 @@
 "Your agency has received rewards from the event!": "لقد حصلت وكالتك على مكافآت من الفعالية!",
 "One or more users are not eligible or do not belong to this agency.": "مستخدم واحد أو أكثر غير مؤهل أو لا ينتمي إلى هذه الوكالة.",
 "Not enough available quantity for this reward.": "ليست هناك كمية كافية متاحة لهذه المكافأة.",
-"You have already sent/received a CP request before.": "لقد قمت بارسال أو استلام طلب cp من قبل",
+    "sub area manager": "مدير المنطقة الفرعية",
+    "You have already sent/received a CP request before.": "لقد قمت بارسال أو استلام طلب cp من قبل",
 "You can only send this relation to one user only.": "لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط",
 "There is no CP relation.": "لا يوجد cp relations",
 "There is no CP relation between the users.": "لا يوجد cp relations بين المستخدمين",
