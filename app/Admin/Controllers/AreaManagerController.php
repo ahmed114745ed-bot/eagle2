@@ -153,7 +153,7 @@ class AreaManagerController extends MainController
             $grid->tools(function (Grid\Tools $tools) {
                $milestoneId = Milestone::where('slug', 'area-manager')->first();
                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('milestone');   // Translates 'milestone' via your language files
+                $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
@@ -168,15 +168,30 @@ class AreaManagerController extends MainController
             });
 
             $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.custom.logout');
-                $loginText = __('login');
+                $logoutUrl = route('admin.custom.logout'); 
+                $loginText = __('login'); 
+                $areaManagerUrl = url('/areaManager/login');
 
                 $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
                     <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
                         <i class="fa fa-sign-in"></i> {$loginText}
                     </a>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>   
+                    </button>
+
                 </div>
+                     <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
                 HTML;
 
                 $tools->append($customButtonHTML);

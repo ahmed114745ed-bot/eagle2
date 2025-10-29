@@ -1321,5 +1321,7 @@
 "An error occurred while searching for countries. Please check your Google Maps API Key.": "An error occurred while searching for countries. Please check your Google Maps API Key.",
 "Banner approved successfully": "Banner approved successfully",
 "Banner rejected successfully": "Banner rejected successfully",
-"sub admin" : "Sup Admin"
+"sub admin" : "Sup Admin",
+"Acquisitions":"Acquisitions"
+
 }
