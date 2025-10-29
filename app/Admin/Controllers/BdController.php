@@ -339,6 +339,8 @@ class BdController extends MainController
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
+
+
                 if ($originalAppId !=  $newAppId) {
                     $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
@@ -349,8 +351,11 @@ class BdController extends MainController
                     }
 
                     $newUserAppId = User::find($newAppId);
-                    $newUserAppId->is_bd = 1;
-                    $newUserAppId->save();
+                    if (isset($newUserAppId)) {
+                        $newUserAppId->is_bd = 1;
+                        $newUserAppId->save();
+                    }
+
                     $form->app_id = $newAppId;
                     MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
 
