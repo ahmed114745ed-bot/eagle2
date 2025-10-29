@@ -2,6 +2,7 @@
 
 namespace App\AreaManager\Controllers;
 
+use App\Helpers\Common;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -272,6 +273,7 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
         $permissionModel = config('admin.database.permissions_model');
         $roleModel = config('admin.database.roles_model');
+        $roleAuthId = Common::getRoleAuthId(auth()->id());
 
         $form = new Form(new $userModel());
         if (request()->is('*edit*')) {
@@ -285,29 +287,25 @@ class EncorUsersController extends AdminController
         $connection = config('admin.database.connection');
 
         $form->display('id', 'ID');
+
+
+
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
-                // Build the table name (with or without connection prefix)
                 $table = "{$connection}.{$userTable}";
-
-                // When creating
-                if ($form->isCreating()) {
-                    return [
-                        'required',
-                        Rule::unique($table, 'username')
-                            ->where(fn($query) => $query->where('type', PermissionType::SUB_AREA_MANAGER->value)),
-                    ];
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (! $form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
                 }
-
-                // When editing
-                $id = $form->model()?->id ?? null;
-
-                return [
-                    'required',
-                    Rule::unique($table, 'username')
-                        ->ignore($id) // correctly ignore the current record
-                        ->where(fn($query) => $query->where('type', PermissionType::SUB_AREA_MANAGER->value)),
-                ];
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
 
         $form->text('name', trans('admin.name'))->rules('required');
@@ -321,7 +319,7 @@ class EncorUsersController extends AdminController
         $form->ignore(['password_confirmation']);
         $form->hidden('type', __('Type'))->value(PermissionType::SUB_AREA_MANAGER->value);
 
-        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('type', PermissionType::AREA_MANAGER->value)->pluck('name', 'id'));
+        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('admin_id', $roleAuthId)->where('type', PermissionType::AREA_MANAGER->value)->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));

@@ -270,7 +270,7 @@ class UserController extends Controller
         $key = $request->q;
         $country_id = $request->country_id;
         $page = $request->get('page', 1);
-        $users = $this->userService->bdCountryUsers($key, $page,$country_id);
+        $users = $this->userService->bdCountryUsers($key, $page, $country_id);
 
         return response()->json($users);
     }
@@ -295,6 +295,16 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function userBdByCountries(Request $request)
+    {
+         $areaManager = $request->get('area_manager_id');
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->userBdByCountries($areaManager,$key, $page);
+
+        return response()->json($users);
+    }
+
     public function superAdminUsers(Request $request)
     {
         $key = $request->q;
@@ -308,7 +318,7 @@ class UserController extends Controller
     public function subSuperAdminUsers(Request $request)
     {
         $key = $request->q;
-
+        
         $page = $request->get('page', 1);
         $users = $this->userService->subSuperAdminUsers($key, $page);
 
@@ -352,6 +362,17 @@ class UserController extends Controller
         $page = $request->get('page', 1);
 
         $users = $this->userService->usersByCountry($superAdminId, $key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersByCountries(Request $request): JsonResponse
+    {
+        $areaManager = $request->get('area_manager_id');
+        $key = $request->get('q'); // search keyword
+        $page = $request->get('page', 1);
+
+        $users = $this->userService->usersByCountries($areaManager, $key, $page);
 
         return response()->json($users);
     }

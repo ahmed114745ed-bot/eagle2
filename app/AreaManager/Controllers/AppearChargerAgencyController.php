@@ -358,7 +358,7 @@ class AppearChargerAgencyController extends MainController
                 }
                 return $ops2;
             })
-            ->ajax('/api/search/users5', 'id', 'name')->rules('required');
+           ->ajax('/api/search/users-by-countries?area_manager_id=' . auth()->id(), 'id', 'name')->rules('required');
 
         $form->hidden('agency_manger_id', __('app manger id'));
 
@@ -368,8 +368,8 @@ class AppearChargerAgencyController extends MainController
         $form->url('url', __('url'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
         $form->hidden('type', __('type'))->default(2);
-        $form->hidden('country_id')->default(Auth::user()->country_id);
-
+        // $form->hidden('country_id')->default(Auth::user()->country_id);
+        $form->hidden('admin_id')->default(Auth::user()->id);
 
         // --- عرض تنبيه لو موجود في السيشن ---
         if (Session::has('show_alert')) {
@@ -440,22 +440,9 @@ class AppearChargerAgencyController extends MainController
 
             $form->phone_code = request('phone_code');
             $appOwnerId = $form->input('app_owner_id');
-            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
-            $newOwnerId = $form->model()->app_owner_id;
-
-            if (!$form->model()->exists) {
-                //  Common::createUserAdmin($appOwnerId);
-            }
-
-            if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-                //  Common::createUserAdmin($appOwnerId);
-
-                $user = User::find($originalOwnerId);
-                $agencyId = $form->model()->id;
-
-
-                Admin::where('username', $user->uuid)->delete();
-            }
+            $user = User::find($appOwnerId);
+           // dd($user->country_id);
+            $form->model()->country_id = $user->country_id;
         });
 
         // $form->saved(function (Form $form) {

@@ -26,6 +26,7 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -248,10 +249,58 @@ class SuperAdminController extends MainController
             //            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
             //                $actions->add(new DeleteSuperAdminAction());
             //            }
+
+           
         });
 
+
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {});
+            
+            $grid->tools(function (Grid\Tools $tools) {
+                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                 $milestone = __('Acquisitions');   
+ 
+                 $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+ 
+                 $tools->append($customButtonHTML);
+             });
+            
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.superadmin.logout'); 
+                $loginText = __('login'); 
+                $areaManagerUrl = url('/superadmin/login');
+
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>   
+                    </button>
+
+                </div>
+                     <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
+                HTML;
+
+                $tools->append($customButtonHTML);
+            });
         }
 
         $grid->disableRowSelector();
@@ -267,24 +316,29 @@ class SuperAdminController extends MainController
      */
     protected function form()
     {
+        $userTable = config('admin.database.users_table');
+        $connection = config('admin.database.connection');
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
 
         $form->text('username', trans('admin.username'))
-            ->rules(function ($form) {
-                // Get the record ID if editing, otherwise null
-                $id = $form->model()?->id ?? null;
-
-                // Get the type from request or from existing model when editing
-                $type =  PermissionType::SUPER_ADMIN->value ?? $form->model()?->type;
-
-                // Default to empty string if not found (avoids SQL issues)
-                $type = $type ?? '';
-
-                // Build unique rule with type condition
-                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            ->rules(function ($form) use ($connection, $userTable) {
+                $table = "{$connection}.{$userTable}";
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (! $form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
+                }
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));

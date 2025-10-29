@@ -2193,4 +2193,22 @@ class Common
         }
         return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
+
+
+
+    public static function getRoleAuthId($userId)
+    {
+        $userId = $userId ?? auth()->id();
+        $user = DB::table('admin_users')->where('id', $userId)->first();
+        if (! $user) {
+            return null;
+        }
+        if ($user->type === 'area-manager') {
+            return $user->id;
+        }
+        if ($user->type === 'sub_area_manager') {
+            return $user->parent_id;
+        }
+        return $user->id;
+    }
 }

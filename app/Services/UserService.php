@@ -129,6 +129,12 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
+    public function userBdByCountries($areaManagerId,$key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->userBdByCountries($areaManagerId,$key, $page, $perPage);
+    }
+
     public function superAdminUsers($key, $page)
     {
         $perPage = 10;
@@ -166,6 +172,13 @@ class UserService
         $perPage = 10;
 
         return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
+    }
+
+     public function usersByCountries($areaManager, $key, $page)
+    {
+        $perPage = 10;
+
+        return $this->userRepository->usersByCountries($areaManager, $key, $page, $perPage);
     }
 
     public function searchInAgency($key, $page)
