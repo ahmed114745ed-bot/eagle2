@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Bd;
+use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -192,10 +193,10 @@ class AreaManagerController extends MainController
                     }
                 </script>
                 HTML;
-            
+
                 $tools->append($customButtonHTML);
             });
-        } 
+        }
 
         $grid->disableRowSelector();
         $this->extendGrid($grid);
@@ -303,6 +304,8 @@ class AreaManagerController extends MainController
                 if (is_array($countries) && count($countries) > 0) {
                     $countryIds = array_column($countries, 'id');
                     Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
+
+                    SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $userId]);
                 }
             }
 
