@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Illuminate\Validation\Rule;
 
 class AreaManagerController extends MainController
 {
@@ -150,22 +151,7 @@ class AreaManagerController extends MainController
         });
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {
-               $milestoneId = Milestone::where('slug', 'area-manager')->first();
-                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
-
-                $customButtonHTML = <<<HTML
-                <div style="display: contents; align-items: center;">
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                         {$milestone}
-                    </a>
-                </div>
-            HTML;
-
-                // Append the custom HTML button to the grid's toolbar
-                $tools->append($customButtonHTML);
-            });
+           
 
             $grid->tools(function ($tools) {
                 $logoutUrl = route('admin.custom.logout'); 
@@ -215,17 +201,31 @@ class AreaManagerController extends MainController
 
     protected function form($id = null)
     {
+        $userTable = config('admin.database.users_table');
+        $connection = config('admin.database.connection');
+
         $form = new Form(new AreaManager());
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
         $form->text('username', trans('admin.username'))
-            ->rules(function ($form) {
-                $id = $form->model()?->id ?? null;
-                $type = PermissionType::AREA_MANAGER->value ?? $form->model()?->type;
-                $type = $type ?? '';
-                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            ->rules(function ($form) use ($connection, $userTable) {
+                $table = "{$connection}.{$userTable}";
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (!$form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
+                }
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
+
         $form->password('password', __('Password'))->rules($form->isEditing() ? '' : 'required');
         $form->image('avatar', __('img'));
 
