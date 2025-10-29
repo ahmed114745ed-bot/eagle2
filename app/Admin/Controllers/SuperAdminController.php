@@ -26,6 +26,7 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -254,7 +255,24 @@ class SuperAdminController extends MainController
 
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-             $grid->tools(function ($tools) {
+            
+            $grid->tools(function (Grid\Tools $tools) {
+                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                 $milestone = __('Acquisitions');   
+ 
+                 $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+ 
+                 $tools->append($customButtonHTML);
+             });
+            
+            $grid->tools(function ($tools) {
                 $logoutUrl = route('admin.superadmin.logout'); 
                 $loginText = __('login'); 
                 $areaManagerUrl = url('/superadmin/login');
