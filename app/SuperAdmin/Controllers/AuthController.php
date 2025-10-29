@@ -92,6 +92,7 @@ class AuthController extends BaseAuthController
 
         $userName = $request->username;
         $type = $request->type;
+        dd($type);
         // $auth = \App\Models\Admin::where('username', $request->username)->first();
         // if (!$auth) {
         //     return back()->withErrors(['username' => __('User not found')]);
