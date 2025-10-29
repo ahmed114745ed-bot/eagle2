@@ -91,14 +91,14 @@ class AgencyController extends MainController
         if (! Admin::user()->can('*')) {
             Permission::check('show-' . $this->permission_name);
         }
-        
+
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab', 'members');
         $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $agency = Agency::query()
-           // ->whereIn('country_id', $countries)
+            // ->whereIn('country_id', $countries)
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
             ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
             ->find($id);
@@ -387,7 +387,7 @@ class AgencyController extends MainController
                 });
 
                 $profileUrl = url("areaManager/profile-agency/{$this->id}");
-              //  route('areaManager.agency.profile', ['id' => $this->id]);
+                //  route('areaManager.agency.profile', ['id' => $this->id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -578,12 +578,13 @@ class AgencyController extends MainController
         }
 
         $form->row(function ($row) {
-            $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
+            $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd-by-countries?area_manager_id=' . auth()->id(), 'id', 'name');
             $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
             $row->width(12)->hidden('agency_manger_id', __('app manger id'));
             $row->width(12)->text('name', __('agency name'))->rules('required');
             $row->width(12)->hidden('status', __('status'))->default(1);
-            $row->width(12)->hidden('country_id')->default(Auth::user()->country_id);
+            //  $row->width(12)->hidden('country_id')->default(Auth::user()->country_id);
+            $row->width(12)->hidden('admin_id')->default(Auth::user()->id);
         });
     }
 
@@ -680,7 +681,7 @@ class AgencyController extends MainController
                 }
             }
             $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
-            $form->country_id = $bd->country_id;
+            $form->model()->country_id = $bd->country_id;
 
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
