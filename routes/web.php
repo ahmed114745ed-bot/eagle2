@@ -570,6 +570,13 @@ Route::get('update-country-id', function () {
     return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
 });
 
+Route::get('remove-new-country', function () {
+    User::where('country_id', 249)->update(['country_id' => null]);
+
+    Country::where('id', 249)->delete();
+
+    return 'done';
+});
 
 // Main page route
 Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
