@@ -314,7 +314,7 @@ class AppearChargerAgencyController extends MainController
 
             $tools->append('<a href="' . $exportUrl . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('superadmin.exportExcel') . '</a>');
         });
-
+       $this->extendGrid($grid);
         return $grid;
     }
 
