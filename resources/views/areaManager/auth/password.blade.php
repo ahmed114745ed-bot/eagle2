@@ -37,7 +37,7 @@
     </div>
 
     <div class="login-box-body">
-        <form id="password-form" action="{{ superadmin_url('change-password') }}" method="post">
+        <form id="password-form" action="{{ areaManager_url('change-password') }}" method="post">
             @csrf
 
             <div class="form-group">
@@ -48,6 +48,7 @@
                        placeholder="{{ trans('admin.password') }}" 
                        name="password" required>
                 <input type="hidden" name="username" value="{{ @$userName }}">
+                 <input type="hidden" name="type" value="{{ @$type }}">
             </div>
 
             <div class="form-group">
@@ -89,7 +90,7 @@
         let locale = (current_locale === 'ar') ? 'en' : 'ar';
 
         $.ajax({
-            url: "{{ superadmin_url('/locale') }}",
+            url: "{{ areaManager_url('/locale') }}",
             type: "POST",
             data: { locale: locale },
             success: function () {
