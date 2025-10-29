@@ -102,7 +102,7 @@ class AgencyUserController extends MainController
         $grid->model()->ofAgency()
             ->with(['profile', 'packs'])
             ->where('is_host', 1)
-            ->whereNotIn('country_id','!=', $countries)
+            ->whereNotIn('country_id', $countries)
             ->withCount('sameDeviceUsers');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
