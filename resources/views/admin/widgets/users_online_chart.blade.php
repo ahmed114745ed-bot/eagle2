@@ -8,19 +8,20 @@
 </div>
 
 @php
-    if (request()->is('admin') || request()->is('admin/*')) {
+    $path = request()->path();
+
+    if (str_starts_with($path, 'admin')) {
         $fetchUrl = admin_url('superadmin/users-online-stats');
-    } elseif (request()->is('superadmin') || request()->is('superadmin/*')) {
+    } elseif (str_starts_with($path, 'superadmin')) {
         $fetchUrl = superAdmin_url('users-online-stats');
-    } elseif (request()->is('areaManager') || request()->is('areaManager/*')) {
+    } elseif (str_starts_with($path, 'areaManager')) {
         $fetchUrl = areaManager_url('users-online-stats');
     } else {
         $fetchUrl = url('users-online-stats');
     }
 @endphp
 
-{{--|| request()->is('areaManager')--}}
-@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics'))
+@if(request()->is('superadmin') || request()->is('areaManager') || request()->is('admin/superadmin/statistics'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
