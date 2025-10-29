@@ -281,7 +281,7 @@
                 'title' => __('Advertisements'),
                 'permission' => null,
                 'children' => [
-                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
+                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                 ],
             ],
             [
