@@ -15,31 +15,30 @@ class SetCountry
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (session('preview_superadmin') || session('preview_area_manager')) {
-            $countryId = $request->get('country_id', session('country_id'));
-            $areaManagerCountryId = $request->get('area_manager_country_id', session('area_manager_country_id'));
-            $areaManagerId = $request->get('area_manager_id', session('area_manager_id'));
-        } else {
-            $countryId = $request->get('country_id');
-            $areaManagerCountryId = $request->get('area_manager_country_id');
-            $areaManagerId = $request->get('area_manager_id');
-        }
+        $countryId = $request->get('country_id');
+        $shouldClearCountry = $request->get('clear_country');
 
-        if (($countryId === null || $countryId === '' || $countryId === 'null') && !session('preview_superadmin') && !session('preview_area_manager')) {
+        $areaManagerCountryId = $request->get('area_manager_country_id');
+        $shouldClearAreaManagerCountry = $request->get('clear_area_manager_country');
+
+        $areaManagerId = $request->get('area_manager_id');
+        $shouldClear = $request->get('clear_area_manager');
+
+        if ($shouldClearCountry == 1) {
             session()->forget('country_id');
-        } else {
+        } elseif ($countryId !== null && $countryId !== '' && $countryId !== 'null') {
             session(['country_id' => $countryId]);
         }
 
-        if ($areaManagerCountryId === null || $areaManagerCountryId === '' || $areaManagerCountryId === 'null') {
+        if ($shouldClearAreaManagerCountry == 1) {
             session()->forget('area_manager_country_id');
-        } else {
+        } elseif ($areaManagerCountryId !== null && $areaManagerCountryId !== '' && $areaManagerCountryId !== 'null') {
             session(['area_manager_country_id' => $areaManagerCountryId]);
         }
 
-        if (($areaManagerId === null || $areaManagerId === '' || $areaManagerId === 'null') && !session('preview_superadmin') && !session('preview_area_manager')) {
+        if ($shouldClear == 1) {
             session()->forget('area_manager_id');
-        } else {
+        } elseif ($areaManagerId !== null && $areaManagerId !== '' && $areaManagerId !== 'null') {
             session(['area_manager_id' => $areaManagerId]);
         }
 
