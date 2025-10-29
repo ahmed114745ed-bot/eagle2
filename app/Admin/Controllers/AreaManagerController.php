@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Bd;
+use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -167,9 +168,9 @@ class AreaManagerController extends MainController
             });
 
             $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.custom.logout'); 
-                $loginText = __('login'); 
-            
+                $logoutUrl = route('admin.custom.logout');
+                $loginText = __('login');
+
                 $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
                     <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
@@ -177,10 +178,10 @@ class AreaManagerController extends MainController
                     </a>
                 </div>
                 HTML;
-            
+
                 $tools->append($customButtonHTML);
             });
-        } 
+        }
 
         $grid->disableRowSelector();
         $this->extendGrid($grid);
@@ -288,6 +289,8 @@ class AreaManagerController extends MainController
                 if (is_array($countries) && count($countries) > 0) {
                     $countryIds = array_column($countries, 'id');
                     Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
+
+                    SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $userId]);
                 }
             }
 
