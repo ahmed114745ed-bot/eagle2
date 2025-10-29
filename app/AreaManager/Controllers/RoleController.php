@@ -293,7 +293,7 @@ class RoleController extends MainController
 
 
             Admin::user()->load('roles', 'permissions');
-            Cache::forget('admin_user_permissions_' . Admin::user()->id);
+            // Cache::forget('admin_user_permissions_' . Admin::user()->id);
 
             // 🔹 Logout other users with this role (optional)
             $userIds = DB::table('admin_role_users')
@@ -303,7 +303,7 @@ class RoleController extends MainController
 
             foreach ($userIds as $uid) {
                 if ($uid != Admin::user()->id) {
-                    Cache::forget('admin_user_permissions_' . $uid);
+                    // Cache::forget('admin_user_permissions_' . $uid);
                 }
             }
             admin_toastr(__('Updated successfully'), 'success');
