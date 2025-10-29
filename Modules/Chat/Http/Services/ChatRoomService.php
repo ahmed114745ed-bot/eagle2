@@ -320,7 +320,7 @@ class ChatRoomService
             }
         }
 
-        return $query->paginate();
+        return $query->paginate(request('per_page', 10));
     }
 
     public function markMessagesAsSeen($checkRoom, $user)
