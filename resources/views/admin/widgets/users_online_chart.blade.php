@@ -19,7 +19,8 @@
     }
 @endphp
 
-@if(request()->is('*superadmin') || request()->is('*areaManager') || request()->is('admin/superadmin/statistics'))
+{{--|| request()->is('areaManager')--}}
+@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
