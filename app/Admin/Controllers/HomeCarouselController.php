@@ -76,7 +76,14 @@ class HomeCarouselController extends MainController
         $grid ->model()->with('displays');
 
         $grid->id(__('ID'));
-            $grid->column('img', __('img'))->image('', 235, 77);
+
+        // Display banner images with consistent width
+        $grid->column('img', __('Banner'))->display(function ($img) {
+            $url = $img ? getImagePath($img) : null;
+            return "<div style='width: 250px; height: 80px; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
+                        <img src='{$url}' style='width: 100%; height: 100%; object-fit: cover; display: block;' alt='Banner'>
+                    </div>";
+        });
 
             $types = [
                 'displayDiscover' => 'Discover',
@@ -106,7 +113,7 @@ class HomeCarouselController extends MainController
         // Make table header sticky when scrolling
         Admin::style('
             .table-responsive {
-                max-height: calc(100vh - 150px);
+                max-height: calc(100vh - 250px);
                 overflow-y: auto;
             }
             .grid-table thead th {
