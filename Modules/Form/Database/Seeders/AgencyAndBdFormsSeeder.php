@@ -88,7 +88,7 @@ class AgencyAndBdFormsSeeder extends Seeder
             'title' => $title,
             'form_type' => $formType,
             'description' => $desc,
-            'created_by' => 1,
+            // 'created_by' => 1,
             'is_active' => true,
             'can_not_delete'=>true
         ]);
