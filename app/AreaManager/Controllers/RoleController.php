@@ -2,6 +2,7 @@
 
 namespace App\AreaManager\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Role;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -38,6 +39,15 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
+        $roleAuthId = Common::getRoleAuthId(auth()->id());
+        $role = Role::where('id', $id)
+                    ->where('admin_id', $roleAuthId)
+                    ->first();
+    
+        if (! $role) {
+            abort(403, __('You do not have permission to edit this role.'));
+        }
+        
         return  parent::edit($id, $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
@@ -81,9 +91,10 @@ class RoleController extends MainController
     {
         \Admin::js('js/admin/preview.js');
         $roleModel = config('admin.database.roles_model');
+        $roleAuthId = Common::getRoleAuthId(auth()->id());
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('admin_id', auth()->id());
+        $grid->model()->where('admin_id', $roleAuthId);
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 
@@ -209,8 +220,10 @@ class RoleController extends MainController
         $form->image('image', __('Image'))->help('');
 
         $form->saving(function (Form $form) {
+            $roleAuthId = Common::getRoleAuthId(auth()->id());
+
             $form->ignore('permissions');
-            $form->model()->admin_id = Auth::id();
+            $form->model()->admin_id =  $roleAuthId;
             $form->model()->type = PermissionType::AREA_MANAGER->value;
             // Automatically generate slug from name *before saving*
             $form->model()->slug = Str::slug($form->name. '-' . PermissionType::AREA_MANAGER->value);
