@@ -187,13 +187,12 @@ class AuthController extends BaseAuthController
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-            'type'     => 'required|string', // example: superadmin or sub_super_admin
+            // 'type'     => 'required|string', 
         ]);
 
-        // Fetch admin user by username and type
         $admin = DB::table('admin_users')
             ->where('username', $request->username)
-            ->where('type', $request->type)
+            // ->where('type', $request->type)
             ->first();
 
         if (!$admin) {
@@ -202,17 +201,14 @@ class AuthController extends BaseAuthController
             ]);
         }
 
-        // Check password manually
         if (!Hash::check($request->password, $admin->password)) {
             return back()->withInput()->withErrors([
                 'password' => trans('admin.password_incorrect'),
             ]);
         }
 
-        // Login manually via Auth guard
         Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
 
-        // Successful login response
         return $this->sendLoginResponse($request);
     }
 
