@@ -354,6 +354,9 @@ class BdController extends MainController
                     if (isset($newUserAppId)) {
                         $newUserAppId->is_bd = 1;
                         $newUserAppId->save();
+                        $form->app_id = $newAppId;
+                        MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                    
                     }
 
                     $form->app_id = $newAppId;
