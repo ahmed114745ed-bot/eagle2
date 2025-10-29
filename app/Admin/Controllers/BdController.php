@@ -360,7 +360,7 @@ class BdController extends MainController
                     }
 
                     $form->app_id = $newAppId;
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                    // MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
 
                 }
             }else{
