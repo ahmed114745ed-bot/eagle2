@@ -56,12 +56,12 @@
                        value="{{ old('username') }}" required>
             </div>
 
-                <!-- <div class="form-group has-feedback">
+                 {{-- <div class="form-group has-feedback">
                     <select id="type" name="type" class="form-control input-lg text-center" required>
                         <option value="area-manager"selected>{{ __('Area manager') }}</option>
                         <option value="sub_area_manager">{{ __('Sub area manager') }}</option>
                     </select>
-                </div> -->
+                </div> --}}
 
             <div class="form-group has-feedback">
                 <input type="password" name="password"
@@ -222,17 +222,17 @@ $(document).ready(function () {
             $('#errorModal').modal('show');
             return;
         }
-        if (!type) {
-            $('#errorModalText').text("{{ __('login.error.enter_type') }}");
-            $('#errorModal').modal('show');
-            return;
-        }
+        // if (!type) {
+        //     $('#errorModalText').text("{{ __('login.error.enter_type') }}");
+        //     $('#errorModal').modal('show');
+        //     return;
+        // }
 
         $.ajax({
             url: "{{ areaManager_url('send-whatsapp-code-preview') }}",
             method: "POST",
             data: { username: username,
-                type:type
+                // type:type
              },
             dataType: "json",
             beforeSend: function () {
