@@ -4,6 +4,10 @@ namespace App\AreaManager\Controllers;
 
 use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\ShippingAgencyHelper;
+use App\Models\AreaManager;
+use App\Models\Setting;
+use App\Models\SubAdmin;
+use App\Models\SubAreaManager;
 use App\Models\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -291,7 +295,8 @@ class WalletController extends MainController
             ]);
 
             $types = [
-//                'user' => [$this, 'chargeToUser'],
+                'subAreaManager' => [$this, 'chargeToSubAreaManager'],
+                'superAdmin' => [$this, 'chargeToSuperAdmin'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 
@@ -314,18 +319,19 @@ class WalletController extends MainController
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function chargeToAgency(array $data)
     {
         $user = Auth::user();
-        $from = SuperAdmin::find($user->id);
+        $from = AreaManager::find($user->id);
         $usd = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
         if (settings()->get("stop_charge", 0)) {
-
             throw new \Exception(__('api_responses.freez_charge'));
         }
-
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
@@ -335,18 +341,18 @@ class WalletController extends MainController
             throw new \Exception(__('This value is not allowed'));
         }
 
-        $to = ShippingAgency::where('country_id', $from->country?->id)->find($toId);
+        $to = ShippingAgency::find($toId);
 
         if (!$to ) {
-            throw new \Exception(__('This agency not found in your country'));
+            throw new \Exception(__('This agency is not found'));
         }
 
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('it_agency_freez_charge'));
         }
+
         if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
             throw new \Exception(__('not_verified_agency'));
-
         }
 
         $rate = Common::getCoinsValue('shipping_coins');
@@ -365,7 +371,7 @@ class WalletController extends MainController
         return 1;
     }
 
-    private function performAgencyCharge(SuperAdmin $fromUser, ShippingAgency $toAgency, $coins, $usd)
+    private function performAgencyCharge(AreaManager $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
         $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
@@ -383,7 +389,7 @@ class WalletController extends MainController
 
         $data = [
             'charger_id' => $fromUser->id,
-            'charger_type' => UserTypeEnum::SUPER_ADMIN,
+            'charger_type' => UserTypeEnum::AREA_MANAGER,
             'user_id' => $toAgency->id,
             'agency_id' => null,
             'user_type' => 'agency',
@@ -391,12 +397,108 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => UserTypeEnum::SUPER_ADMIN
+            'user_charger_type' => UserTypeEnum::AREA_MANAGER
 
         ];
 
         Charge::create($data);
 
         return true;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function chargeToSubAreaManager(array $data)
+    {
+        $user = Auth::user();
+        $usd = $data['amount'] ?? 0;
+        $toId = $data['target_id'] ?? null;
+
+        if (!$usd || !$toId) {
+            throw new \Exception(__('Invalid request data.'));
+        }
+
+        $subAdmin = SubAreaManager::where('parent_id', $user->id)->find($toId);
+
+        if (!$subAdmin) {
+            throw new \Exception(__('This sub admin not found under your account.'));
+        }
+
+        $userCoins = \Cache::rememberForever('zones_coins', function () {
+            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        });
+
+        $coins = $usd * $userCoins;
+
+        if ($user->di < $coins) {
+            throw new \Exception(__('Insufficient balance.'));
+        }
+
+        $subAdmin->di += $coins;
+        $subAdmin->save();
+
+        $user->di -= $coins;
+        $user->save();
+
+        $this->createChargeRecord($data, $subAdmin, $coins, $usd, UserTypeEnum::SUB_AREA_MANAGER);
+
+
+        return true;
+    }
+
+    public function chargeToSuperAdmin(array $data)
+    {
+        $user = Auth::user();
+        $usd = $data['amount'] ?? 0;
+        $toId = $data['target_id'] ?? null;
+
+        if (!$usd || !$toId) {
+            throw new \Exception(__('Invalid request data.'));
+        }
+
+        $subAdmin = SuperAdmin::find($toId);
+
+        if (!$subAdmin) {
+            throw new \Exception(__('Super Admin not found.'));
+        }
+
+        $userCoins = \Cache::rememberForever('super_admin_coins', function () {
+            return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
+        });
+
+        $coins = $usd * $userCoins;
+
+        if ($user->di < $coins) {
+            throw new \Exception(__('Insufficient balance.'));
+        }
+
+        $subAdmin->di += $coins;
+        $subAdmin->save();
+
+        $user->di -= $coins;
+        $user->save();
+
+        $this->createChargeRecord($data, $subAdmin, $coins, $usd, UserTypeEnum::SUPER_ADMIN);
+
+
+        return true;
+    }
+
+    private function createChargeRecord( $request, $receiver, $coins = 0, $usdAmount, $receiverType)
+    {
+
+        $charge = new Charge();
+        $charge->charger_id = Auth::id();
+        $charge->charger_type =  UserTypeEnum::AREA_MANAGER;
+        $charge->user_id = $receiver->id;
+        $charge->agency_id =   null;
+        $charge->user_type = $receiverType;
+        $charge->amount = $coins;
+        $charge->usd = $usdAmount ;
+        $charge->balance_before =  $receiver->di  - $coins;
+        $charge->save();
+
+        return  true;
     }
 }
