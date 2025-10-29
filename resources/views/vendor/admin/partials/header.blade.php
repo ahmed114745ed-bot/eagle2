@@ -400,7 +400,26 @@
                 allowClear: true,
                 width: '190px'
             });
+
         $AreaManagerSelect.on('change', function () {
+            const $this = $(this);
+            if (!$this.val()) {
+                setTimeout(() => $this.select2('close'), 0);
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('clear_area_manager', 1);
+                url.searchParams.delete('area_manager_id');
+
+                if ($.pjax) {
+                    setTimeout(() => {
+                        $.pjax({ url: url.toString(), container: '#pjax-container' });
+                    }, 1);
+                } else {
+                    window.location.href = url.toString();
+                }
+                return;
+            }
+
             const areaManagerId = $(this).val();
             const url = new URL(window.location.href);
 
@@ -412,8 +431,15 @@
                 url.searchParams.delete('area_manager_id');
             }
 
-            window.location.href = url.toString();
+            if ($.pjax) {
+                setTimeout(() => {
+                    $.pjax({url: url.toString(), container: '#pjax-container'});
+                }, 1);
+            } else {
+                window.location.href = url.toString();
+            }
         });
+
         if ($countrySelect.length) {
             $countrySelect.select2({
                 placeholder: "{{ __('Select Country') }}",
@@ -424,6 +450,24 @@
             });
 
             $countrySelect.on('change', function () {
+                const $this = $(this);
+                if (!$this.val()) {
+                    setTimeout(() => $this.select2('close'), 0);
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('clear_country', 1);
+                    url.searchParams.delete('country_id');
+
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({ url: url.toString(), container: '#pjax-container' });
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
+                    return;
+                }
+
                 const countryId = $(this).val();
                 const url = new URL(window.location.href);
 
@@ -435,11 +479,35 @@
                     url.searchParams.delete('country_id');
                 }
 
-                window.location.href = url.toString();
+                if ($.pjax) {
+                    setTimeout(() => {
+                        $.pjax({url: url.toString(), container: '#pjax-container'});
+                    }, 1);
+                } else {
+                    window.location.href = url.toString();
+                }
             });
 
             @if(request()->is('areaManager*'))
                 $countrySelect.on('change', function () {
+                const $this = $(this);
+                if (!$this.val()) {
+                    setTimeout(() => $this.select2('close'), 0);
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('clear_area_manager_country', 1);
+                    url.searchParams.delete('area_manager_country_id');
+
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({ url: url.toString(), container: '#pjax-container' });
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
+                    return;
+                }
+
                     const countryId = $(this).val();
                     const url = new URL(window.location.href);
 
@@ -451,27 +519,13 @@
                         url.searchParams.delete('area_manager_country_id');
                     }
 
-                    window.location.href = url.toString();
-                });
-            @endif
-
-            $(document).on('click', '.select2-selection__clear', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const url = new URL(window.location.href);
-                url.searchParams.delete('country_id');
-                window.location.href = url.toString();
-            });
-
-            @if(request()->is('areaManager*'))
-                $(document).on('click', '.select2-selection__clear', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete('area_manager_country_id');
-                    window.location.href = url.toString();
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
                 });
             @endif
         }

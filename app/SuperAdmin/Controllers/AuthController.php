@@ -200,13 +200,13 @@ class AuthController extends BaseAuthController
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-            'type'     => 'required|string', // example: superadmin or sub_super_admin
+            // 'type'     => 'required|string', // example: superadmin or sub_super_admin
         ]);
 
         // Fetch admin user by username and type
         $admin = DB::table('admin_users')
             ->where('username', $request->username)
-            ->where('type', $request->type)
+            // ->where('type', $request->type)
             ->first();
 
         if (!$admin) {
