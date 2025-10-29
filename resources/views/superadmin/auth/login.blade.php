@@ -61,8 +61,8 @@
                        class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
             </div>
             <div class="form-group has-feedback">
-                <select name="type" class="form-control input-lg text-center" required>
-                    <option value="superadmin">{{ __('Super Admin') }}</option>
+                <select id="type" name="type" class="form-control input-lg text-center" required>
+                    <option value="superadmin"selected>{{ __('Super Admin') }}</option>
                     <option value="sub_super_admin">{{ __('Sub Super Admin') }}</option>
                 </select>
             </div>
