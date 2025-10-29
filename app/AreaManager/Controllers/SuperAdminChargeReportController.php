@@ -138,11 +138,15 @@ class SuperAdminChargeReportController extends MainController
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
-            $grid->model()->where('charger_type', "dash")
-                ->orWhere('charger_type', UserTypeEnum::AREA_MANAGER);
+            $grid->model()->where('charger_type', UserTypeEnum::AREA_MANAGER);
+
+//            $grid->model()->where('charger_type', "dash")
+//                ->orWhere('charger_type', UserTypeEnum::AREA_MANAGER);
         } else {
-            $grid->model()->where('charger_type', "!=", "dash")
-                ->orWhere('charger_type','!=', UserTypeEnum::AREA_MANAGER);
+            $grid->model()->where('charger_type', "!=", UserTypeEnum::AREA_MANAGER);
+
+//            $grid->model()->where('charger_type', "!=", "dash")
+//                ->orWhere('charger_type','!=', UserTypeEnum::AREA_MANAGER);
         }
 
 
