@@ -314,13 +314,11 @@ class ChatRoomService
 
         if ($request && $request->type && $request->message_id){
             if ($request->type == 'new') {
-                $query->where('id', '>', $request->message_id);
+                return $query->where('id', '>', $request->message_id)->get();
             } elseif ($request->type == 'old') {
-                $query->where('id', '<', $request->message_id);
+                return $query->where('id', '<', $request->message_id)->paginate(request('per_page', 10));
             }
         }
-
-        return $query->get();
     }
 
     public function markMessagesAsSeen($checkRoom, $user)
