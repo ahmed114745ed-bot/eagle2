@@ -3,16 +3,19 @@
 namespace App\AreaManager\Controllers;
 
 use App\Enums\Charges\UserTypeEnum;
+use App\Enums\PermissionType;
 use App\Helpers\Common;
 use App\Models\Agency;
 use App\Models\Charge;
 use App\Models\ShippingAgency;
+use DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 
@@ -37,8 +40,8 @@ class ChargeController extends MainController
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::SUPER_ADMIN, $user->id,
-            UserTypeEnum::SUPER_ADMIN, $user->id
+            UserTypeEnum::AREA_MANAGER, $user->id,
+            UserTypeEnum::AREA_MANAGER, $user->id
         ])
             ->first();
 
@@ -51,7 +54,7 @@ class ChargeController extends MainController
             ->description(trans('Charges'))
 
             ->row(function ($row) use ($finalSalary) {
-                $row->column(12, view('admin.grid.superadmin.wallet', ['finalSalary' => $finalSalary]));
+                $row->column(12, view('admin.grid.area_manager.wallet', ['finalSalary' => $finalSalary]));
             })
             ->row(function (Row $row) use ($totalCharges, $totalSpent ) {
                 $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
@@ -65,7 +68,7 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new Charge());
 
-        $grid->model()->where('charger_type', UserTypeEnum::SUPER_ADMIN)
+        $grid->model()->where('charger_type', UserTypeEnum::AREA_MANAGER)
             ->with('receiverUser', 'receiveragency')
             ->where('charger_id', Auth::user()->id)
             ->orderBy('id', 'desc');
@@ -222,5 +225,33 @@ class ChargeController extends MainController
         $form->number('agency_id', __('Agency id'));
 
         return $form;
+    }
+
+    public function subAreaManagers(Request $request){
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $perPage = 10;
+        $offset = ($page - 1) * $perPage;
+
+        $query = DB::table('admin_users')
+            ->where('type', PermissionType::SUB_AREA_MANAGER->value)
+            ->where('is_preview', 0)
+            ->where('parent_id', auth('admin')->id());
+
+
+        if ($key) {
+            $query->where(function ($q) use ($key) {
+                $q->where('name', 'like', "%{$key}%")
+                    ->orWhere('username', 'like', "%{$key}%")
+                    ->orWhere('id', $key);
+            });
+        }
+
+        $total = $query->count();
+
+        $users = $query->select('id', 'name', 'username')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([$users]);
     }
 }
