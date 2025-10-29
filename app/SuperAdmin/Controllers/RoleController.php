@@ -85,7 +85,7 @@ class RoleController extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('type', PermissionType::SUPER_ADMIN->value);
+        $grid->model()->where('admin_id', auth()->id());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 

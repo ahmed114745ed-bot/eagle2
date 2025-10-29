@@ -109,7 +109,7 @@ class SuperAdminController extends MainController
         $countries = Common::areaCountries();
         \Log::info( $countries);
         $grid->model()->with(['appUser.packs'])
-            ->where('parent_id', auth()->id())
+            // ->where('parent_id', auth()->id())
             ->when($countries, function ($q) use ($countries) {
                 $q->where('country_id',  $countries);
             })
