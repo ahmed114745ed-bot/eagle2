@@ -229,5 +229,24 @@ class AuthController extends BaseAuthController
     
         return redirect('/areaManager/login');
     }
+
+    public function customBdLogout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return redirect('/bd/login');
+    }
+    public function customSuperadminLogout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return redirect('/superadmin/login');
+    }
+
+    
     
 }
