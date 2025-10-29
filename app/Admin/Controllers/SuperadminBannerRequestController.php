@@ -37,7 +37,8 @@ class SuperadminBannerRequestController extends AdminController
     {
         return parent::index($content
             ->title(__('SuperadminBannerRequest'))
-            ->body($this->grid()));
+            // ->body($this->grid())
+        );
     }
     /**
      * Make a grid builder.
