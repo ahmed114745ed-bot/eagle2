@@ -108,7 +108,7 @@ class AuthController extends BaseAuthController
         if (Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("areaManager.auth.password", compact('userName', 'current','type'));
+        return view("areaManager.auth.password", compact('userName', 'current', 'type'));
     }
 
     public function verifyWhatsappCode(Request $request)
@@ -144,7 +144,7 @@ class AuthController extends BaseAuthController
             $current = Cookie::get($cookie_name);
         }
 
-        $redirect = areaManager_url('change-password-view') . '?username=' . urlencode($username);
+        $redirect = areaManager_url('change-password-view') . '?username=' . urlencode($username) . '&type=' . urlencode($type);
 
 
         return response()->json([
