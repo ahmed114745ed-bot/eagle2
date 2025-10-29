@@ -400,18 +400,20 @@
                 allowClear: true,
                 width: '190px'
             });
-         $AreaManagerSelect.on('change', function () {
-                const areaMangerId = $(this).val();
-                const url = new URL(window.location.href);
+        $AreaManagerSelect.on('change', function () {
+            const areaManagerId = $(this).val();
+            const url = new URL(window.location.href);
 
-                if (areaMangerId && areaMangerId !== 'null') {
-                    url.searchParams.set('area_manager_id', areaMangerId);
-                } else {
-                    url.searchParams.delete('area_manager_id');
-                }
+            if (areaManagerId && areaManagerId !== 'null') {
+                url.searchParams.set('area_manager_id', areaManagerId);
+                url.searchParams.delete('clear_area_manager');
+            } else {
+                url.searchParams.set('clear_area_manager', 1);
+                url.searchParams.delete('area_manager_id');
+            }
 
-                window.location.href = url.toString();
-            });
+            window.location.href = url.toString();
+        });
         if ($countrySelect.length) {
             $countrySelect.select2({
                 placeholder: "{{ __('Select Country') }}",
@@ -421,15 +423,15 @@
                 escapeMarkup: function (markup) { return markup; }
             });
 
-
-
             $countrySelect.on('change', function () {
                 const countryId = $(this).val();
                 const url = new URL(window.location.href);
 
                 if (countryId && countryId !== 'null') {
                     url.searchParams.set('country_id', countryId);
+                    url.searchParams.delete('clear_country');
                 } else {
+                    url.searchParams.set('clear_country', 1);
                     url.searchParams.delete('country_id');
                 }
 
@@ -437,18 +439,20 @@
             });
 
             @if(request()->is('areaManager*'))
-            $countrySelect.on('change', function () {
-                const countryId = $(this).val();
-                const url = new URL(window.location.href);
+                $countrySelect.on('change', function () {
+                    const countryId = $(this).val();
+                    const url = new URL(window.location.href);
 
-                if (countryId && countryId !== 'null') {
-                    url.searchParams.set('area_manager_country_id', countryId);
-                } else {
-                    url.searchParams.delete('area_manager_country_id');
-                }
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('area_manager_country_id', countryId);
+                        url.searchParams.delete('clear_area_manager_country');
+                    } else {
+                        url.searchParams.set('clear_area_manager_country', 1);
+                        url.searchParams.delete('area_manager_country_id');
+                    }
 
-                window.location.href = url.toString();
-            });
+                    window.location.href = url.toString();
+                });
             @endif
 
             $(document).on('click', '.select2-selection__clear', function (e) {
