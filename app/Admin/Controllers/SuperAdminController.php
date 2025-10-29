@@ -383,6 +383,7 @@ class SuperAdminController extends MainController
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
+            $country_id = $form->input('country_id');
             $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'));
             if ($isEditing) $superAdmin->where('id', '!=', $form->model()->id);
             $exists = $superAdmin->exists();
@@ -430,12 +431,27 @@ class SuperAdminController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
+
+           
         });
 
         $form->saved(function (Form $form) {
+            /** @var \App\Models\AdminUser $superAdmin */
             $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
+              
+  
+            $country = Country::find($superAdmin->country_id);
+
+            if ($country && $country->area_manager_id) {
+                if ($superAdmin->parent_id != $country->area_manager_id) {
+                    $superAdmin->update([
+                        'parent_id' => $country->area_manager_id,
+                    ]);
+                }
+            }
+           
 
             $userApp = User::find($userAppId);
             if (isset($userApp)) {

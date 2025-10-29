@@ -2,19 +2,21 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Role;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Permission;
 use Illuminate\Support\Str;
 use App\Enums\PermissionType;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
 use Modules\RoleRewards\Actions\DeleteRole;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission as chPermission;
 
 class RoleController extends MainController
@@ -41,13 +43,13 @@ class RoleController extends MainController
     {
         $roleAuthId = Common::getRoleAuthId(auth()->id());
         $role = Role::where('id', $id)
-                    ->where('admin_id', $roleAuthId)
-                    ->first();
-    
+            ->where('admin_id', $roleAuthId)
+            ->first();
+
         if (! $role) {
             abort(403, __('You do not have permission to edit this role.'));
         }
-        
+
         return  parent::edit($id, $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
@@ -226,7 +228,7 @@ class RoleController extends MainController
             $form->model()->admin_id =  $roleAuthId;
             $form->model()->type = PermissionType::AREA_MANAGER->value;
             // Automatically generate slug from name *before saving*
-            $form->model()->slug = Str::slug($form->name. '-' . PermissionType::AREA_MANAGER->value);
+            $form->model()->slug = Str::slug($form->name . '-' . PermissionType::AREA_MANAGER->value);
         });
         $form->saving(function (Form $form) {
             $form->ignore('permissions'); // handled manually
@@ -288,6 +290,22 @@ class RoleController extends MainController
 
             $form->model()->permissions()->sync($finalPermissionIds);
 
+
+
+            Admin::user()->load('roles', 'permissions');
+            // Cache::forget('admin_user_permissions_' . Admin::user()->id);
+
+            // 🔹 Logout other users with this role (optional)
+            $userIds = DB::table('admin_role_users')
+                ->where('role_id', $form->model()->id)
+                ->pluck('user_id')
+                ->toArray();
+
+            foreach ($userIds as $uid) {
+                if ($uid != Admin::user()->id) {
+                    // Cache::forget('admin_user_permissions_' . $uid);
+                }
+            }
             admin_toastr(__('Updated successfully'), 'success');
         });
 

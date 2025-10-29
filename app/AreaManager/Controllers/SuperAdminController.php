@@ -254,7 +254,7 @@ class SuperAdminController extends MainController
 
         $user = auth()->user();
         $form->hidden('type', __('Type'))->value('superadmin');
-        $form->hidden('parent_id', __('Super Admin'))->value($user->id);
+        $form->hidden('parent_id', __('Super Admin'))->value(auth()->id());
         //        $form->hidden('transfer_salary', __('transfer_salary'));
 
         $form->saving(function (Form $form) {
