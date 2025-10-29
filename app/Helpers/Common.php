@@ -2188,34 +2188,16 @@ class Common
 
     public static function areaCountries()
     {
-        \Log::info('--- Start areaCountries() ---');
-    
-        $adminId = session('area_manager_id') ?? auth()->user()?->id;
-        \Log::info('Detected admin ID: ' . $adminId);
-    
-        $areaManager = \App\Models\AreaManager::with('countries')->find($adminId);
-        \Log::info('Loaded AreaManager:', ['areaManager' => $areaManager]);
-    
+        $adminId =  session('area_manager_id') ?? auth()->user()->id;
+        $areaManager = AreaManager::with('countries')->find($adminId);
+
         if (!$areaManager) {
-            \Log::warning('No AreaManager found for ID: ' . $adminId);
-            \Log::info('--- End areaCountries(): returning [] ---');
             return [];
         }
-    
         $countryID = session('area_manager_country_id');
-        \Log::info('Session country ID: ' . json_encode($countryID));
-    
         if ($countryID) {
-            \Log::info('Returning session country ID as array');
-            \Log::info('--- End areaCountries() ---');
             return (array)$countryID;
         }
-    
-        $countries = $areaManager->countries->pluck('id')->toArray() ?? [];
-        \Log::info('Countries from relation:', $countries);
-        \Log::info('--- End areaCountries() ---');
-    
-        return $countries;
+        return @$areaManager->countries->pluck('id')->toArray() ?? [];
     }
-    
 }
