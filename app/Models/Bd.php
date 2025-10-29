@@ -15,6 +15,8 @@ class Bd extends Model
 
     protected $table = 'admin_users';
 
+    protected $guarded = [];
+
     protected $attributes = [
         'type' => 'bd',
     ];

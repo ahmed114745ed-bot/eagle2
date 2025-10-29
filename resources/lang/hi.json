@@ -3316,7 +3316,23 @@
     "banner_rejected_title": "बैनर अनुरोध अस्वीकृत कर दिया गया है",
     "banner_rejected_message": "प्रशासक :name (आईडी: :id) ने बैनर अनुरोध अस्वीकृत कर दिया है।",
       "Banner approved successfully": "बैनर सफलतापूर्वक अनुमोदित किया गया",
-  "Banner rejected successfully": "बैनर को सफलतापूर्वक अस्वीकृत कर दिया गया"
+  "Banner rejected successfully": "बैनर को सफलतापूर्वक अस्वीकृत कर दिया गया",
+  "requests_title": "अनुरोध",
+  "name": "नाम",
+  "bd_id": "BD ID",
+  "agency_name": "एजेंसी का नाम",
+  "whatsapp_number": "व्हाट्सएप नंबर",
+  "country": "देश",
+  "form_template_type": "फॉर्म प्रकार",
+  "status": "स्थिति",
+  "additional_info": "अतिरिक्त जानकारी",
+  "approve": "स्वीकृत करें",
+  "reject": "अस्वीकृत करें",
+  "approved_message": "अनुरोध सफलतापूर्वक स्वीकृत किया गया!",
+  "rejected_message": "अनुरोध अस्वीकार कर दिया गया!",
+  "Host Agency": "होस्ट एजेंसी",
+  "BD Form": "बीडी फॉर्म",
+  "Shaping Agency": "शेपिंग एजेंसी"
 
 
 

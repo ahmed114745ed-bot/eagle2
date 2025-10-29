@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AllStatisticController;
+use App\Admin\Controllers\FormRequestController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\SuperadminBannerHistoryController;
 use App\Admin\Controllers\SuperadminBannerRequestController;
@@ -751,6 +752,13 @@ Route::group(
         Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
 
+
+        Route::resource('form-requests', FormRequestController::class);
+
+        Route::prefix('requests')->group(function () {
+            Route::post('{id}/approve', [FormRequestController::class, 'approve'])->name('requests.approve');
+            Route::post('{id}/reject', [FormRequestController::class, 'reject'])->name('requests.reject');
+        });
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
