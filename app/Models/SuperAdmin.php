@@ -14,6 +14,7 @@ class SuperAdmin extends Model
     use TimestampsWithTimezone;
 
     protected $table = 'admin_users';
+    protected $guarded = [];
 
     protected $attributes = [
         'type' => 'superadmin',
