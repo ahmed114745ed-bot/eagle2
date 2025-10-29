@@ -241,6 +241,7 @@
                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                 ],
             ],
+            ['uri' => '/superadmin-charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'charge-to-superadmin'],
             [
                 'uri' => '#',
                 'icon' => 'fa-briefcase',
@@ -414,7 +415,7 @@
                         $areaManagerPreviewLinks = [
                              ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
                                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
-                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')], 
+                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')],
                             ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users')],
                             [
                                 'uri' => '#',
@@ -428,7 +429,7 @@
                             ],
                            ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'),],
                            ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms')],
-                    
+
                         ];
                     @endphp
 
