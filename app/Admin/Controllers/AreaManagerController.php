@@ -151,7 +151,22 @@ class AreaManagerController extends MainController
         });
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-           
+            $grid->tools(function (Grid\Tools $tools) {
+                $milestoneId = Milestone::where('slug', 'area-manager')->first();
+                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
+ 
+                 $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+ 
+                 // Append the custom HTML button to the grid's toolbar
+                 $tools->append($customButtonHTML);
+             });
 
             $grid->tools(function ($tools) {
                 $logoutUrl = route('admin.custom.logout'); 
