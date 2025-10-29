@@ -550,6 +550,8 @@ class AgencyController extends MainController
             }
         ");
 
+        $this->extendGrid($grid);
+
         return $grid;
     }
 
