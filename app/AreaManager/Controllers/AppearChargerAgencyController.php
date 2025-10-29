@@ -2,24 +2,25 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Models\Charge;
-use App\Models\CoinLog;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\CoinLog;
 use App\Models\GiftLog;
+use Encore\Admin\Layout\Row;
+use Illuminate\Http\Request;
 use App\Models\AgencySallary;
+use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteShippingAgencyAction;
@@ -57,7 +58,7 @@ class AppearChargerAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('appear-charger-agency'))
             ->body($this->detail($id)));
     }
@@ -71,7 +72,7 @@ class AppearChargerAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('appear-charger-agency'))
             ->body($this->form()->edit($id)));
     }
@@ -236,7 +237,7 @@ class AppearChargerAgencyController extends MainController
                 });
 
                 $profileUrl = url("areaManager/profile-shipping-agency/{$this->id}");
-               // route('areaManager.shipping.agency.profile', ['id' => $this->id]);
+                // route('areaManager.shipping.agency.profile', ['id' => $this->id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -362,13 +363,12 @@ class AppearChargerAgencyController extends MainController
         $form->hidden('agency_manger_id', __('app manger id'));
 
         $form->text('name', __('name'))->rules('required');
-        $form->switch('status', __('status'));
-
+        $form->hidden('status', __('status'))->default(1);
         $form->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input');
         $form->url('url', __('url'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
         $form->hidden('type', __('type'))->default(2);
-
+        $form->hidden('country_id')->default(Auth::user()->country_id);
 
 
         // --- عرض تنبيه لو موجود في السيشن ---
