@@ -97,7 +97,7 @@
         <form action="{{ areaManager_url('change-password-view') }}" method="get" id="forget-password-form" style="display:none; margin-top:15px;">
             @csrf
             <input type="hidden" name="username" id="forget-username">
-            <input type="hidden" name="type" id="forget-type">
+            {{-- <input type="hidden" name="type" id="forget-type"> --}}
             <label for="whatsapp_code" style="font-weight:bold; display:block; margin-bottom:8px;">
                     {{ __('dashboard.login.enter_code') }}
             </label>
@@ -208,13 +208,13 @@ $(document).ready(function () {
         }
     });
 
- console.log("Proceeding with forget password for:", username, type);
+//  console.log("Proceeding with forget password for:", username, type);
     // نقر على "نسيت كلمة المرور"
     $('#forget-password').on('click', function (e) {
         e.preventDefault();
 
         let username = $('#username').val()?.trim();
-         let type = $('#type').val()?.trim();
+        //  let type = $('#type').val()?.trim();
 
         // 1) لو ما فيه username -> عرض مودال خطأ
         if (!username) {
@@ -259,7 +259,7 @@ $(document).ready(function () {
                         url: "{{ areaManager_url('send-whatsapp-code') }}",
                         method: "POST",
                         data: { username: username,
-                            type:type
+                            // type:type
                          },
                         dataType: "json",
                         success: function (res) {
@@ -271,7 +271,7 @@ $(document).ready(function () {
                                 $('#successModal').modal('show');
 
                                 $('#forget-username').val(username);
-                                $('#forget-type').val(type);
+                                // $('#forget-type').val(type);
 
                                 $('#forget-password-form').fadeIn();
                                 document.getElementById('forget-password-form').style.display = 'block';
@@ -314,7 +314,7 @@ $('#forget-password-form').on('submit', function (e) {
 
     var username = $('#forget-username').val();
     var code     = $('#whatsapp_code').val();
-    var type = $('#forget-type').val();
+    // var type = $('#forget-type').val();
 
 
     $btn.text("{{ __('dashboard.login.loading.check_code') }}");
@@ -325,7 +325,7 @@ $('#forget-password-form').on('submit', function (e) {
         data: {
             username: username,
             code: code,
-             type:type,
+            //  type:type,
             _token: $('meta[name="csrf-token"]').attr('content')
         },
         dataType: "json",
