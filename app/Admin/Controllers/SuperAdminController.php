@@ -381,8 +381,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-            $form->switch('default', __('set_superadmin_as_default'))
-                ->help(__('make_super_admin_default'));
+//            $form->switch('default', __('set_superadmin_as_default'))
+//                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form, 'sometimes');
 
