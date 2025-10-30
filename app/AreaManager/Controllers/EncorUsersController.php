@@ -356,6 +356,9 @@ class EncorUsersController extends AdminController
                 $userApp->sub_area_manger = 1;
                 $userApp->save();
             }
+
+            $updatedUser = Admin::user()->find($form->model()->id);
+            Admin::guard()->setUser($updatedUser);
         });
 
         return $form;
