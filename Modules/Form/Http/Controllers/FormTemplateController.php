@@ -26,10 +26,12 @@ class FormTemplateController extends Controller
             });
     }
 
-    public function show(FormTemplate $formTemplate)
+    public function show($id,Content $content)
     {
-        $template = $formTemplate->load('sections.fields');
-        return view('Form::form-templates.show', compact('template'));
+        $template = FormTemplate::with(['sections.fields'])->findOrFail($id);
+        return $content
+        ->title(__('Preview'))
+        ->body(view('Form::form-templates.show', compact('template')));
     }
 
     public function create()
@@ -111,9 +113,8 @@ class FormTemplateController extends Controller
                 }
             }
         }
-
-        return redirect()->route('form-templates.index')
-            ->with('success', __('Form template created successfully!'));
+        admin_success(__('Form template created successfully!'));
+        return redirect(admin_url('form-templates'));
     }
 
     public function edit($id, Content $content)
@@ -209,29 +210,31 @@ class FormTemplateController extends Controller
                 }
             }
         }
-
-        return redirect()->route('form-templates.index')
-            ->with('success', __('Form template updated successfully!'));
+        admin_success(__('Form template updated successfully!'));
+        return redirect(admin_url('form-templates'));
     }
 
     public function destroy(FormTemplate $formTemplate)
     {
         $formTemplate->delete();
-        return redirect()->route('form-templates.index')
+        return redirect(admin_url('form-templates'))
             ->with('success', __('Form template deleted successfully!'));
     }
 
 
-    public function showByType()
+    public function showByType(Request $request)
     {
         $type =request('type');
+        $locale = $request->header('Accept-Language', app()->getLocale());
+        $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : app()->getLocale();
+        app()->setLocale($locale);
+
         $template = FormTemplate::with(['sections.fields'])
             ->where('form_type', $type)
             ->where('is_active', true)
             ->firstOrFail();
 
-       
-            return view('Form::web-view.dynamic-form', compact('template'));
+        return view('Form::web-view.dynamic-form', compact('template','locale'));
     }
 
     public function storeSubmission(Request $request, string $type)
@@ -240,7 +243,7 @@ class FormTemplateController extends Controller
 
         FormRequest::create([
             'form_template_id' => $template->id,
-            'submitted_by'=> Auth::user()?->id ?? 1174 ,
+            'submitted_by'=> Auth::user()->id  ,
             'bd_id' => $request->bd_id,
             'name' => $request->agency_name ?? $request->bd_name,
             'whatsapp_number' => $request->whatsapp_number,
@@ -249,8 +252,10 @@ class FormTemplateController extends Controller
             'created_at' => now(),
          
         ]);
-        
-        return redirect()->back()->with('success', 'Form submitted successfully!');
+        return response()->json([
+            'success' => true,
+            'message' => __('Form submitted successfully!'),
+        ], 200);
     }
 
     public function getTranslations( Request $request)

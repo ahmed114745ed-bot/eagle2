@@ -37,7 +37,7 @@
                 {{ $required ? 'required' : '' }}
                 rows="5"
                 maxlength="1000"
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none"
+                class="w-full px-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none"
                 placeholder="{{ $placeholder }}"
                 oninput="updateCharCount(this, 1000)"
             >{{ old($fieldName, $value) }}</textarea>
@@ -53,7 +53,7 @@
                 id="field-{{ $fieldId }}"
                 name="{{ $fieldName }}"
                 {{ $required ? 'required' : '' }}
-                class="w-full px-4 py-3 pr-10 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 appearance-none bg-white"
+                class="w-full px-4 py-3 pr-10 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 appearance-none bg-white"
                 @if(isset($field->data_source)) 
                     data-source="{{ $field->data_source }}" 
                     data-load-on-init="true"
@@ -78,7 +78,7 @@
         <div class="space-y-3">
             @if($field->options)
                 @foreach($field->options as $optionValue => $optionLabel)
-                    <label class="flex items-center p-3 border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all duration-200 group">
+                    <label class="flex items-center p-3 border-2   rounded-xl hover:border-blue-300 hover:  cursor-pointer transition-all duration-200 group">
                         <input 
                             type="{{ $fieldType }}"
                             name="{{ $fieldName }}{{ $fieldType === 'checkbox' ? '[]' : '' }}"
@@ -105,7 +105,7 @@
                 onchange="handleFileSelect(this)"
                 accept="image/*,.pdf,.doc,.docx">
             
-            <label for="field-{{ $fieldId }}" class="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group">
+            <label for="field-{{ $fieldId }}" class="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 cursor-pointer hover:border-blue-500 hover:  transition-all duration-200 group">
                 <div class="file-preview mb-3" id="preview-{{ $fieldId }}" style="display: none;">
                     <img class="preview-image max-h-32 rounded-lg shadow-md" alt="Preview">
                 </div>
@@ -125,7 +125,7 @@
                 </div>
                 
                 <div class="file-info mt-3 hidden">
-                    <div class="flex items-center bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200">
+                    <div class="flex items-center bg-white rounded-lg px-4 py-2 shadow-sm border  ">
                         <i class="fas fa-file-alt text-blue-500 mr-2"></i>
                         <span class="file-name text-sm text-gray-700 font-medium"></span>
                         <span class="file-size text-xs text-gray-500 ml-2"></span>
@@ -146,7 +146,7 @@
                 name="{{ $fieldName }}"
                 value="{{ old($fieldName, $value) }}"
                 {{ $required ? 'required' : '' }}
-                class="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                class="w-full pl-11 pr-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
                 placeholder="{{ $placeholder }}">
         </div>
 
@@ -162,7 +162,7 @@
                 name="{{ $fieldName }}"
                 value="{{ old($fieldName, $value) }}"
                 {{ $required ? 'required' : '' }}
-                class="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                class="w-full pl-11 pr-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
                 placeholder="{{ $placeholder }}">
         </div>
 
@@ -178,7 +178,7 @@
                 name="{{ $fieldName }}"
                 value="{{ old($fieldName, $value) }}"
                 {{ $required ? 'required' : '' }}
-                class="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200">
+                class="w-full pl-11 pr-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200">
         </div>
 
     @elseif($fieldType === 'number')
@@ -189,7 +189,7 @@
             name="{{ $fieldName }}"
             value="{{ old($fieldName, $value) }}"
             {{ $required ? 'required' : '' }}
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+            class="w-full px-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
             placeholder="{{ $placeholder }}">
 
     @else
@@ -200,7 +200,7 @@
             name="{{ $fieldName }}"
             value="{{ old($fieldName, $value) }}"
             {{ $required ? 'required' : '' }}
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+            class="w-full px-4 py-3 border-2   rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
             placeholder="{{ $placeholder }}">
     @endif
 </div>

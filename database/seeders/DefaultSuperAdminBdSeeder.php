@@ -13,7 +13,10 @@ class DefaultSuperAdminBdSeeder extends Seeder
      */
     public function run(): void
     {
-        $defaultSuperAdmin = SuperAdmin::where('default', 1)->where('country_id', 0 )->first();
+        $defaultSuperAdmin = SuperAdmin::where('default', 1)->where(function ($q) {
+            $q->where('country_id', 0)
+                ->orWhereNull('country_id');
+        })->first();
 
         if (!$defaultSuperAdmin){
             $defaultSuperAdmin = SuperAdmin::create([
@@ -24,11 +27,22 @@ class DefaultSuperAdminBdSeeder extends Seeder
                 'default' => 1,
                 'country_id' => 0,
             ]);
+        } else {
+            if (is_null($defaultSuperAdmin->country_id)) {
+                $defaultSuperAdmin->update(['country_id' => 0]);
+            }
         }
 
-        $defaultBd = Bd::where('default', 1)->where('country_id', 0 )->first();
+        $defaultBd = Bd::where('default', 1)->where(function ($q) {
+            $q->where('country_id', 0)
+                ->orWhereNull('country_id');
+        })->first();
 
         if ($defaultBd){
+            if (is_null($defaultBd->country_id)) {
+                $defaultBd->update(['country_id' => 0]);
+            }
+
             $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
         }else {
             Bd::create([
