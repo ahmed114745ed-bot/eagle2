@@ -42,9 +42,7 @@ class OfficialMessageController extends MainController
     {
         $grid = new Grid(new OfficialMessage);
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-        $grid->model()->when(request('filter_by') == 'date', function ($q) {
-            return $q->where('admin_id', auth()->id())->orWhere('admin_id', auth()->user()->parent_id);
-        })->where('type', 2)->orderByDesc('id');
+        $grid->model()->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -150,7 +148,8 @@ class OfficialMessageController extends MainController
         $form->hidden('admin_type', __('type'))->default(PermissionType::AREA_MANAGER->value);
         $form->hidden('type', __('type'))->default(2);
         $this->selectFeature($form);
-        $form->hidden('admin_id', __('type'))->default(Auth::user()->id);
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $form->hidden('admin_id', __('type'))->default($authId);
 
         return $form;
     }
