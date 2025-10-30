@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AuthController;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -325,6 +326,8 @@ Route::group(
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
+
+Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 Route::group(
     [
