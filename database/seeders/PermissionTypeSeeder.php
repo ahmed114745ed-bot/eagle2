@@ -1186,7 +1186,7 @@ class PermissionTypeSeeder extends Seeder
                 'sort' => 41,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 41],
-                   // PermissionType::AREA_MANAGER->value => ['sort' => 3],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 3],
                 ],
                 'permissions' => [
                     [
@@ -1195,7 +1195,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['add-switch', 'history-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-                          //  PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
 
                         ],
                     ],
