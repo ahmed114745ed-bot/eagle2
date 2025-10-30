@@ -8,6 +8,7 @@ use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;
 use App\Models\Room;
+use App\Models\SubAreaManager;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
@@ -2210,19 +2211,27 @@ class Common
         }
     }
 
-    public static function areaCountries()
+    public static function areaCountries(): array
     {
-        $adminId =  session('area_manager_id') ?? auth()->user()->id;
-        $areaManager = AreaManager::with('countries')->find($adminId);
+        $adminId = session('area_manager_id') ?? auth()->user()->id;
 
-        if (!$areaManager) {
+        $authAdmin = AreaManager::with('countries')->find($adminId);
+
+        if (!$authAdmin) {
+            $authAdmin = SubAreaManager::with('countries')->find($adminId);
+        }
+
+        if (!$authAdmin) {
             return [];
         }
+
         $countryID = session('area_manager_country_id');
+
         if ($countryID) {
             return (array)$countryID;
         }
-        return @$areaManager->countries->pluck('id')->toArray() ?? [];
+
+        return @$authAdmin->countries->pluck('id')->toArray() ?? [];
     }
 
 

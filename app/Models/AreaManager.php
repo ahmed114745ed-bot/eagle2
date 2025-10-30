@@ -26,7 +26,7 @@ class AreaManager extends Authenticatable
 
         static::deleting(function ($manager) {
             $defaultManager = self::where('default', 1)->first();
-    
+
             if (!$defaultManager) {
                 throw new \Exception('❌ لا يمكن الحذف — لا يوجد مدير افتراضي محدد.');
             }

@@ -34,7 +34,8 @@ class HomeController extends MainController
     public function index(Content $content)
     {
         $countries = Common::areaCountries();
-        $superAdmins = SuperAdmin::where('parent_id', auth()->id())->pluck('id')->toArray();
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $superAdmins = SuperAdmin::where('parent_id', $authId)->pluck('id')->toArray();
         $usersCount = User::whereIn('country_id', $countries)->count();
 
         //users

@@ -225,8 +225,10 @@
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);
 
-            $countries = \App\Models\Country::when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
-            $areaManagerCountries = \App\Models\Country::where('area_manager_id', auth()->id())->select(['id', 'name', 'flag'])->get();
+            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
+
+            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+            $areaManagerCountries = \App\Models\Country::where('area_manager_id', $authId)->select(['id', 'name', 'flag'])->get();
 
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);

@@ -325,7 +325,7 @@ class WalletController extends MainController
     public function chargeToAgency(array $data)
     {
         $user = Auth::user();
-        $from = AreaManager::find($user->id);
+        $from = AreaManager::find($user->id) ?? SubAreaManager::find($user->id);
         $usd = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
@@ -371,8 +371,10 @@ class WalletController extends MainController
         return 1;
     }
 
-    private function performAgencyCharge(AreaManager $fromUser, ShippingAgency $toAgency, $coins, $usd)
+    private function performAgencyCharge($fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
+        $type = $fromUser->type == 'area-manager' ? UserTypeEnum::AREA_MANAGER : UserTypeEnum::SUB_AREA_MANAGER;
+
         $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
 
@@ -389,7 +391,7 @@ class WalletController extends MainController
 
         $data = [
             'charger_id' => $fromUser->id,
-            'charger_type' => UserTypeEnum::AREA_MANAGER,
+            'charger_type' => $type,
             'user_id' => $toAgency->id,
             'agency_id' => null,
             'user_type' => 'agency',
@@ -397,8 +399,7 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => UserTypeEnum::AREA_MANAGER
-
+            'user_charger_type' => $type
         ];
 
         Charge::create($data);
@@ -443,7 +444,6 @@ class WalletController extends MainController
 
         $this->createChargeRecord($data, $subAdmin, $coins, $usd, UserTypeEnum::SUB_AREA_MANAGER);
 
-
         return true;
     }
 
@@ -481,24 +481,24 @@ class WalletController extends MainController
 
         $this->createChargeRecord($data, $subAdmin, $coins, $usd, UserTypeEnum::SUPER_ADMIN);
 
-
         return true;
     }
 
-    private function createChargeRecord( $request, $receiver, $coins = 0, $usdAmount, $receiverType)
+    private function createChargeRecord($request, $receiver, $coins = 0, $usdAmount, $receiverType)
     {
+        $type = auth()->user()->type == 'area-manager' ? UserTypeEnum::AREA_MANAGER : UserTypeEnum::SUB_AREA_MANAGER;
 
         $charge = new Charge();
         $charge->charger_id = Auth::id();
-        $charge->charger_type =  UserTypeEnum::AREA_MANAGER;
+        $charge->charger_type = $type;
         $charge->user_id = $receiver->id;
-        $charge->agency_id =   null;
+        $charge->agency_id = null;
         $charge->user_type = $receiverType;
         $charge->amount = $coins;
         $charge->usd = $usdAmount ;
         $charge->balance_before =  $receiver->di  - $coins;
         $charge->save();
 
-        return  true;
+        return true;
     }
 }

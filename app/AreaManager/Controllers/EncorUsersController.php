@@ -174,12 +174,12 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
-
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $grid->model()->where(function ($q) {
             $q->where('type', PermissionType::SUB_AREA_MANAGER->value);
         })
             ->where('is_preview', 0)
-            ->where('parent_id', auth('admin')->id())
+            ->where('parent_id', $authId)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
             });
@@ -281,7 +281,8 @@ class EncorUsersController extends AdminController
                 $tools->disableDelete();
             });
         }
-        $form->hidden('parent_id')->default(auth('admin')->id());
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $form->hidden('parent_id')->default($authId);
 
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');
@@ -293,18 +294,18 @@ class EncorUsersController extends AdminController
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
                 $table = "{$connection}.{$userTable}";
-        
+
                 $rules = ['required'];
-        
+
                 $uniqueRule = Rule::unique($table, 'username');
-        
+
                 if (! $form->isCreating()) {
                     $id = $form->model()?->id ?? null;
                     $uniqueRule->ignore($id);
                 }
-        
+
                 $rules[] = $uniqueRule;
-        
+
                 return $rules;
             });
 

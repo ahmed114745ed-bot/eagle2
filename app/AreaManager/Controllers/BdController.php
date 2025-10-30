@@ -62,7 +62,7 @@ class BdController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('BD'))
             ->body($this->profile($id)));
     }
@@ -76,7 +76,7 @@ class BdController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('BD'))
             ->body($this->form()->edit($id)));
     }
@@ -97,7 +97,7 @@ class BdController extends MainController
     {
         $grid = new Grid(new Bd());
         $countries =  Common::areaCountries();
-         //dd($countries);
+        //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
@@ -252,6 +252,7 @@ class BdController extends MainController
         });
 
         $grid->disableRowSelector();
+         $grid->disableExport();
 
         return $grid;
     }
@@ -298,7 +299,8 @@ class BdController extends MainController
         $form->hidden('transfer_salary', __('transfer_salary'));
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
-            $countries = Country::where('area_manager_id', auth()->id())->get();
+            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+            $countries = Country::where('area_manager_id', $authId)->get();
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }

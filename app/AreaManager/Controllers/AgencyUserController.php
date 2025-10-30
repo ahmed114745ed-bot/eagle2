@@ -195,8 +195,8 @@ class AgencyUserController extends MainController
                 });
 
                 $profileUrl = url("areaManager/profile-agency/{$this->agency_id}");
-                
-               // route('areaManager.agency.profile', ['id' => $this->agency_id]);
+
+                // route('areaManager.agency.profile', ['id' => $this->agency_id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -244,7 +244,7 @@ class AgencyUserController extends MainController
                 });
             });
         ");
-
+        $grid->disableExport();
         $grid->disableCreateButton();
         $grid->actions(
             function ($actions) {
@@ -428,6 +428,7 @@ class AgencyUserController extends MainController
         $grid->disableActions();
 
         $grid->disableCreateButton();
+        $grid->disableExport();
         $grid->actions(
             function ($actions) {
                 $actions->disableEdit();
@@ -504,7 +505,8 @@ class AgencyUserController extends MainController
         $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
-            $countries = Country::all();
+            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+            $countries = Country::where('area_manager_id', $authId)->get();
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }

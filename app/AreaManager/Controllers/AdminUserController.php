@@ -41,6 +41,7 @@ class AdminUserController extends EncorUsersController
             $actions->disableDelete();
             $actions->add(new DeleteSubSuperAdmin());
         });
+         $grid->disableExport();
 
         return $grid;
     }
