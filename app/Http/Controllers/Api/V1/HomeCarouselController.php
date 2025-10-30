@@ -52,8 +52,8 @@ class HomeCarouselController extends Controller
                         ->where(function ($inner) use ($now, $offset) {
                             $inner->whereRaw("
                                 CONVERT_TZ(end_at, '+00:00', ?) > ?
-                            ", [$offset, $now]);
-                            // ->orWhere('duration', 0);
+                            ", [$offset, $now])
+                            ->orWhere('duration', 0);
                         });
                 });
             })
