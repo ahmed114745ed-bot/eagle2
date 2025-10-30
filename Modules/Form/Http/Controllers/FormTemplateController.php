@@ -113,9 +113,8 @@ class FormTemplateController extends Controller
                 }
             }
         }
-
-        return redirect(admin_url('form-templates'))
-            ->with('success', __('Form template created successfully!'));
+        admin_success(__('Form template created successfully!'));
+        return redirect(admin_url('form-templates'));
     }
 
     public function edit($id, Content $content)
@@ -211,9 +210,8 @@ class FormTemplateController extends Controller
                 }
             }
         }
-
-        return redirect(admin_url('form-templates'))
-            ->with('success', __('Form template updated successfully!'));
+        admin_success(__('Form template updated successfully!'));
+        return redirect(admin_url('form-templates'));
     }
 
     public function destroy(FormTemplate $formTemplate)
