@@ -2,11 +2,11 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Helpers\Common;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Enums\PermissionType;
 
 use Encore\Admin\Facades\Admin;
@@ -15,6 +15,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Encore\Admin\Controllers\AdminController;
 
 class EncorUsersController extends AdminController
@@ -356,7 +357,8 @@ class EncorUsersController extends AdminController
                 $userApp->sub_area_manger = 1;
                 $userApp->save();
             }
-
+            Cache::forget("user_permissions_{$form->model()->id}");
+            Cache::forget("admin_user_permissions_{$form->model()->id}");
             $updatedUser = Admin::user()->find($form->model()->id);
             Admin::guard()->setUser($updatedUser);
         });
