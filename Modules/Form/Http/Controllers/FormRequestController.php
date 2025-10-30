@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace  Modules\Form\Http\Controllers;
 
 
 use App\Models\Agency;
@@ -34,7 +34,7 @@ class FormRequestController extends AdminController
         $buttons = [
             'host_agency'    => __('Host Agency'),
             'bd_form'        => __('BD Form'),
-            'shaping_agency' => __('Shaping Agency'),
+            'shipping_agency' => __('Shaping Agency'),
         ];
 
         $header = '<div style="margin-bottom:15px;">';
@@ -43,9 +43,8 @@ class FormRequestController extends AdminController
             $header .= "<a href='?type={$key}' class='btn btn-sm' style='margin-right:5px;{$active}'>{$label}</a>";
         }
         $header .= '</div>';
-
         return $content
-            ->title($this->title)
+            ->title(__('requests_title'))
             ->row($header)
             ->row($this->getGrid($type)->render());
     }
@@ -71,7 +70,7 @@ class FormRequestController extends AdminController
 
         $grid->column('name', __('name'));
 
-        if($type != 'bd_form'){
+        if($type != 'bd_form' && $type != 'shipping_agency'){
             $grid->column('bd_id', __('Bd'))->display(function ($name) {
                 if (request()->filled('_export_')) {
                     return $name;
@@ -118,107 +117,126 @@ class FormRequestController extends AdminController
         ]);
 
         $grid->column('actions', __('Actions'))->display(function () {
-            $approveUrl = route('admin.requests.approve', $this->id);
-            $rejectUrl  = route('admin.requests.reject', $this->id);
-    
+            $approveUrl = admin_url("requests/{$this->id}/approve");
+            $rejectUrl  = admin_url("requests/{$this->id}/reject");
+        
             if ($this->status === 'rejected') {
                 return '<span class="text-danger">' . __('Rejected') . '</span>';
             }
-    
+        
             if ($this->status === 'approved') {
                 return '<span class="text-success">' . __('Approved') . '</span>';
             }
-    
+        
             $approveText = __('Approved');
             $rejectText  = __('Reject');
-    
+        
             return <<<HTML
                 <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
                 <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
             HTML;
         });
-    
+        
         Admin::script("
-            document.addEventListener('DOMContentLoaded', function () {
+        function initFormRequestActions() {
     
-                function sendRequest(url) {
-                    return fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': LA.token,
-                            'Accept': 'application/json',
+            function sendRequest(url) {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': LA.token,
+                        'Accept': 'application/json',
+                    },
+                }).then(res => res.json());
+            }
+    
+            function handleAction(button, actionType) {
+                button.addEventListener('click', function(e){
+                    e.preventDefault();
+    
+                    const messages = {
+                        approve: {
+                            title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                            confirm: 'نعم',
+                            cancel: 'إلغاء',
+                            color: '#28a745'
                         },
-                    }).then(res => res.json());
-                }
+                        reject: {
+                            title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                            confirm: 'نعم',
+                            cancel: 'إلغاء',
+                            color: '#dc3545'
+                        },
+                        success: {
+                            en: 'Action completed successfully!',
+                            ar: 'تمت العملية بنجاح!',
+                            hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                            tr: 'İşlem başarıyla tamamlandı!'
+                        },
+                        error: {
+                            en: 'An error occurred!',
+                            ar: 'حدث خطأ أثناء العملية',
+                            hi: 'एक त्रुटि हुई!',
+                            tr: 'İşlem sırasında hata oluştu!'
+                        }
+                    };
     
-                function handleAction(button, actionType) {
-                    button.addEventListener('click', function(e){
-                        e.preventDefault();
+                    const locale = document.documentElement.lang || 'ar';
     
-                        const messages = {
-                            approve: {
-                                title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                                confirm: 'نعم',
-                                cancel: 'إلغاء',
-                                color: '#28a745'
-                            },
-                            reject: {
-                                title: 'هل أنت متأكد من رفض هذا الطلب؟',
-                                confirm: 'نعم',
-                                cancel: 'إلغاء',
-                                color: '#dc3545'
-                            },
-                            success: {
-                                en: 'Action completed successfully!',
-                                ar: 'تمت العملية بنجاح!',
-                                hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                                tr: 'İşlem başarıyla tamamlandı!'
-                            },
-                            error: {
-                                en: 'An error occurred!',
-                                ar: 'حدث خطأ أثناء العملية',
-                                hi: 'एक त्रुटि हुई!',
-                                tr: 'İşlem sırasında hata oluştu!'
-                            }
-                        };
+                    Swal.fire({
+                        title: messages[actionType].title,
+                        type: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: messages[actionType].confirm,
+                        cancelButtonText: messages[actionType].cancel,
+                        confirmButtonColor: messages[actionType].color,
+                        cancelButtonColor: '#6c757d',
+                    }).then((result) => {
+                        if (result.value) {
+                            const url = button.dataset.url;
+                            sendRequest(url).then(res => {
     
-                        const locale = document.documentElement.lang || 'ar';
+                                console.group('Form Request Action Response');
+                                console.log('Request URL:', url);
+                                console.log('Response:', res);
+                                console.groupEnd();
     
-                        Swal.fire({
-                            title: messages[actionType].title,
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonText: messages[actionType].confirm,
-                            cancelButtonText: messages[actionType].cancel,
-                            confirmButtonColor: messages[actionType].color,
-                            cancelButtonColor: '#6c757d',
-                        }).then((result) => {
-                            if (result.value) {
-                                const url = button.dataset.url;
-                                sendRequest(url).then(res => {
-                                    if (res.success) {
-                                        Swal.fire({
-                                            title: res.message || messages.success[locale],
-                                            icon: 'success',
-                                            timer: 2000,
-                                            showConfirmButton: false
-                                        });
-                                        button.closest('tr').remove();
-                                    } else {
-                                        Swal.fire('خطأ', res.message || messages.error[locale], 'error');
-                                    }
-                                }).catch(() => {
-                                    Swal.fire('خطأ', messages.error[locale], 'error');
-                                });
-                            }
-                        });
+                                if (res.success) {
+                                    Swal.fire({
+                                        title: res.message || messages.success[locale],
+                                        type: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+    
+                                    // إعادة تحميل محتوى الـ grid بدون refresh
+                                    $.pjax.reload('#pjax-container');
+                                } else {
+                                    Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                }
+                            }).catch((err) => {
+                                console.error('Fetch error:', err);
+                                Swal.fire('خطأ', messages.error[locale], 'error');
+                            });
+                        }
                     });
-                }
+                });
+            }
     
-                document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-                document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
-            });
-        ");
+            document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+            document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+        }
+    
+        // يعمل أول مرة عند تحميل الصفحة
+        initFormRequestActions();
+    
+        // يعمل بعد كل تحديث PJAX (reload)
+        $(document).off('pjax:end').on('pjax:end', function() {
+            initFormRequestActions();
+        });
+    ");
+    
+        
     
         $grid->disableActions();
         $grid->disableCreateButton();
@@ -269,7 +287,6 @@ class FormRequestController extends AdminController
     public function approve($id)
     {
         $request = FormRequest::findOrFail($id);
-    
         switch ($request->form_template_type) {
             case 'host_agency':
                 return $this->approveHostAgency($request);
@@ -277,7 +294,7 @@ class FormRequestController extends AdminController
             case 'bd_form':
                 return $this->approveBdForm($request);
     
-            case 'shaping_agency':
+            case 'shipping_agency':
                 return $this->approveShapingAgency($request);
     
             default:
@@ -291,6 +308,22 @@ class FormRequestController extends AdminController
     {
       
         $owner= User::where('id',$request->submitted_by)->first();
+
+        if (!$owner) {
+            return response()->json([
+                'success' => false,
+                'message' => __('user_not_found')
+            ], 404);
+        }
+    
+        if ($this->checkUserAlreadyOwnsEntity($owner, Agency::class)) {
+            return response()->json([
+                'success' => false,
+                'key'     => 'user_already_has_agency',
+                'message' => __('user_already_has_agency'),
+            ], 400);
+        }
+
         Agency::create([
                 'name' => $request->name,
                 'phone' => $request->whatsapp_number,
@@ -311,10 +344,25 @@ class FormRequestController extends AdminController
         if (is_string($data)) {
             $data = json_decode(trim($data, '"'), true);
         }
-    
-       
-        
         $phoneUser= User::where('id',$request->submitted_by)->first();
+
+        if (!$phoneUser) {
+            return response()->json([
+                'success' => false,
+                'message' => __('user_not_found')
+            ], 404);
+        }
+    
+        if ($this->checkUserAlreadyOwnsEntity($phoneUser, Bd::class)) {
+            return response()->json([
+                'success' => false,
+                'key'     => 'user_already_has_bd',
+                'message' => __('user_already_has_bd'),
+            ], 400);
+
+            
+        }
+
         Bd::create([
                 'username' => $request->name,
                 'app_id' => $phoneUser->id,
@@ -331,6 +379,23 @@ class FormRequestController extends AdminController
     protected function approveShapingAgency($request)
     {
         $owner= User::where('id',$request->submitted_by)->first();
+
+        if (!$owner) {
+            return response()->json([
+                'success' => false,
+                'message' => __('user_not_found')
+            ], 404);
+        }
+    
+        if ($this->checkUserAlreadyOwnsEntity($owner,  ShippingAgency::class)) {
+           
+            return response()->json([
+                'success' => false,
+                'key'     => 'user_already_has_shipping_agency',
+                'message' => __('user_already_has_shipping_agency'),
+            ], 400);
+        }
+
         ShippingAgency::create([
                 'name' => $request->name,
                 'phone' => $request->whatsapp_number,
@@ -345,7 +410,31 @@ class FormRequestController extends AdminController
 
 
 
+    protected function checkUserAlreadyOwnsEntity(User $user, string $modelClass): bool
+    {
+        if (! class_exists($modelClass)) {
+            throw new \InvalidArgumentException("Invalid model class: {$modelClass}");
+        }
     
+        $model = new $modelClass;
+        $table = $model->getTable();
+    
+        if (! \Schema::hasTable($table)) {
+            throw new \RuntimeException("Table for model {$modelClass} does not exist.");
+        }
+    
+        $columns = \Schema::getColumnListing($table);
+        $validFields = array_intersect(['app_owner_id', 'app_id'], $columns);
+    
+        foreach ($validFields as $field) {
+            if ($modelClass::where($field, $user->id)->exists()) {
+                return true;
+            }
+        }
+    
+        return false;
+    }
+
     public function reject($id)
     {
         $request = FormRequest::findOrFail($id);

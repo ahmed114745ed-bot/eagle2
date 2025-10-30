@@ -63,7 +63,7 @@
         <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('Submitted Data') }}</h2>
 
         @foreach($submission->template->sections->sortBy('display_order') as $section)
-            <div class="mb-8 pb-8 border-b border-gray-200 last:border-b-0">
+            <div class="mb-8 pb-8 border-b   last:border-b-0">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                     {{ $section->getTranslation('section_name', app()->getLocale()) }}
                 </h3>
@@ -74,7 +74,7 @@
                             $value = $submission->values->where('field_id', $field->id)->first();
                         @endphp
 
-                        <div class="bg-gray-50 rounded-lg p-4">
+                        <div class=" rounded-lg p-4">
                             <p class="text-sm font-medium text-gray-700 mb-2">
                                 {{ $field->getTranslation('field_name', app()->getLocale()) }}
                             </p>

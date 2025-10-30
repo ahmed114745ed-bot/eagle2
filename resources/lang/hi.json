@@ -3332,7 +3332,31 @@
   "rejected_message": "अनुरोध अस्वीकार कर दिया गया!",
   "Host Agency": "होस्ट एजेंसी",
   "BD Form": "बीडी फॉर्म",
-  "Shaping Agency": "शेपिंग एजेंसी"
+  "Shaping Agency": "शेपिंग एजेंसी",
+  "user_not_found": "उपयोगकर्ता नहीं मिला।",
+  "user_already_has_agency": "यह उपयोगकर्ता पहले से ही एक एजेंसी का मालिक है।",
+  "user_already_has_bd": "यह उपयोगकर्ता पहले से ही BD खाता रखता है।",
+  "user_already_has_shipping_agency": "यह उपयोगकर्ता पहले से ही एक शिपिंग एजेंसी का मालिक है।",
+  "approved_successfully": "सफलतापूर्वक स्वीकृत।",
+  "Template Information": "टेम्पलेट जानकारी",
+  "Form Title": "फॉर्म शीर्षक",
+  "Form Type": "फॉर्म प्रकार",
+  "Description": "विवरण",
+  "Form Description": "फॉर्म विवरण",
+  "Add Section": "सेक्शन जोड़ें",
+  "Cancel": "रद्द करें",
+  "Create Template": "टेम्पलेट बनाएं",
+  "Requests": "अनुरोध",
+  "Placeholder Text": "प्लेसहोल्डर टेक्स्ट",
+  "Field Label": "फील्ड लेबल",
+  "Field Name": "फील्ड नाम",
+  "Required": "आवश्यक",
+  "Enabled": "सक्रिय",
+  "BD Registration Form": "BD पंजीकरण फॉर्म",
+  "Main Section": "मुख्य अनुभाग",
+  "Submit Form": "फॉर्म जमा करें",
+  "Section Title": "सेक्शन शीर्षक",
+  "Form Requests": "फॉर्म अनुरोध"
 
 
 

@@ -36,11 +36,28 @@ class AgencyAndBdFormsSeeder extends Seeder
             ],
         ];
 
+        $shippingAgency = [
+            [
+                'label' => ['en' => 'Agency Name', 'ar' => 'اسم الوكالة'],
+                'name' => 'agency_name',
+                'type' => 'text',
+                'placeholder' => ['en' => 'Enter Agency Name', 'ar' => 'أدخل اسم الوكالة'],
+                'order' => 2,
+            ],
+            [
+                'label' => ['en' => 'WhatsApp Number', 'ar' => 'رقم الواتساب'],
+                'name' => 'whatsapp_number',
+                'type' => 'text',
+                'placeholder' => ['en' => 'Enter WhatsApp number', 'ar' => 'أدخل رقم الواتساب'],
+                'order' => 3,
+            ],
+        ];
+
         $this->createForm(
-            ['en' => 'Host Agency Form', 'ar' => 'نموذج وكالة مضيفة'],
+            ['en' => 'Host Agency Form', 'ar' => 'نموذج وكالة مضيفين'],
             'host_agency',
             'agency',
-            ['en' => 'Form to register a host agency', 'ar' => 'نموذج لتسجيل وكالة مضيفة'],
+            ['en' => 'Form to register a host agency', 'ar' => 'نموذج لتسجيل وكالة مضيفين'],
             $sharedFields
         );
 
@@ -49,7 +66,7 @@ class AgencyAndBdFormsSeeder extends Seeder
             'shipping_agency',
             'agency',
             ['en' => 'Form to register a shipping agency', 'ar' => 'نموذج لتسجيل وكالة شحن'],
-            $sharedFields
+            $shippingAgency
         );
 
         $this->createForm(

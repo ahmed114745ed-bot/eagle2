@@ -1,7 +1,7 @@
 @csrf
 
 {{-- Form Template Info --}}
-<div class="mb-8 p-6 bg-gray-50 rounded-lg border-2 border-gray-200">
+<div class="mb-8 p-6 rounded-lg border-2  ">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">{{ __('Template Information') }}</h2>
         <button type="button" onclick="toggleSection(this)" class="text-gray-600 hover:text-gray-800">
@@ -59,7 +59,7 @@
 {{-- Sections --}}
 <div id="sectionsContainer" class="mb-6">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">{{ __('Form Sections') }}</h2>
+        <h2 class="text-xl font-bold">{{ __('Section') }}</h2>
         <button type="button" onclick="addSection()" 
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             <i class="fas fa-plus {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
@@ -143,7 +143,7 @@ function addSection(data = null) {
     fieldCounts[sectionCount] = data ? data.fields.length : 0;
 
     const sectionHtml = `
-        <div class="section-item mb-6 p-6 bg-blue-50 rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
+        <div class="section-item mb-6 p-6   rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center">
                     <span class="section-drag-handle cursor-move px-2">
@@ -225,7 +225,7 @@ function addField(sectionId, data = null) {
     const fieldId = fieldCounts[sectionId];
 
     const fieldHtml = `
-        <div class="field-item bg-white p-4 rounded-lg border" data-field="${sectionId}-${fieldId}">
+        <div class="field-item  p-4 rounded-lg border" data-field="${sectionId}-${fieldId}">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center">
                     <span class="field-drag-handle cursor-move px-2">

@@ -23,8 +23,8 @@
     
     @stack('styles')
 </head>
-<body class="bg-gray-50 antialiased">
-    <nav class="bg-white shadow-lg border-b border-gray-200">
+<body class=" antialiased">
+    <nav class="bg-white shadow-lg border-b  ">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
              
