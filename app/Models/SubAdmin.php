@@ -16,7 +16,7 @@ class SubAdmin extends Model
     protected $table = 'admin_users';
 
     protected $attributes = [
-        'type' => 'superadmin',
+        'type' => 'sub_super_admin',
     ];
 
     public function appUser()
@@ -34,6 +34,11 @@ class SubAdmin extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function superAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SuperAdmin::class, 'parent_id');
+    }
+
     protected static function booted(): void
     {
 
@@ -41,22 +46,15 @@ class SubAdmin extends Model
             $builder->where('type', 'sub_super_admin');
         });
 
-        self::deleting(function (SuperAdmin $superAdmin) {
-        });
+        self::deleting(function (SuperAdmin $superAdmin) {});
     }
 
     protected static function boot()
     {
         parent::boot();
 
-        self::creating(function ($model) {
-          
-        });
+        self::creating(function ($model) {});
 
-        self::updating(function ($model) {
-            
-        });
+        self::updating(function ($model) {});
     }
-
-
 }
