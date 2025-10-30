@@ -114,7 +114,7 @@ class FormTemplateController extends Controller
             }
         }
 
-        return redirect()->route('form-templates.index')
+        return redirect(admin_url('form-templates'))
             ->with('success', __('Form template created successfully!'));
     }
 
@@ -212,14 +212,14 @@ class FormTemplateController extends Controller
             }
         }
 
-        return redirect()->route('form-templates.index')
+        return redirect(admin_url('form-templates'))
             ->with('success', __('Form template updated successfully!'));
     }
 
     public function destroy(FormTemplate $formTemplate)
     {
         $formTemplate->delete();
-        return redirect()->route('form-templates.index')
+        return redirect(admin_url('form-templates'))
             ->with('success', __('Form template deleted successfully!'));
     }
 

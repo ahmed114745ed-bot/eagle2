@@ -9,12 +9,12 @@
     }
 </style>
 <div class=" mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-6">
+    <!-- <div class="mb-6">
         <a href="{{ admin_url('form-templates') }}" class="text-blue-600 hover:underline">
             <i class="fas fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }} {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
             {{ __('Back') }}
         </a>
-    </div>
+    </div> -->
 
     <div class=" rounded-lg shadow-lg p-8">
         <div class="border-b   pb-6 mb-6">
