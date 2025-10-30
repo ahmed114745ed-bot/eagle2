@@ -46,9 +46,9 @@ class HomeCarouselController extends Controller
                 ->whereHas('displays', function ($sub) use ($now, $offset) {
                     $sub->where(function ($inner) use ($now, $offset) {
                         $inner->whereRaw("
-                            CONVERT_TZ(end_at, '+00:00', ?) > ?
+                        CONVERT_TZ(home_carousel_displays.end_at, '+00:00', ?) > ?
                         ", [$offset, $now])
-                        ->orWhere('duration', 0);
+                        ->orWhere('home_carousel_displays.duration', 0); 
                     });
                 });
             })
