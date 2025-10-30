@@ -4,7 +4,7 @@ on:
     branches: ["tempoApp"]
 jobs:
   run_tempo_hub:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     steps:
     - name: print out Tempo
       uses: appleboy/ssh-action@v1.2.1
@@ -27,7 +27,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_tempo_app:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_tempo_hub
     steps:
     - name: print out Tempo
@@ -67,7 +67,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_tempo_job:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_tempo_hub
     steps:
     - name: print out Tempo Job
