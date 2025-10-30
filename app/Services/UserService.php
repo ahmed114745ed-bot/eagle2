@@ -108,6 +108,15 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+
+    public function bdCountryUsers($key, $page,$country_id)
+    {
+        $perPage = 10;
+        return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
+    }
+
+    
+
     public function user_bd($key, $page)
     {
         $perPage = 10;
@@ -120,11 +129,41 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
+    public function superAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers($key, $page, $perPage);
+    }
+
+    public function subSuperAdminUsers($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->supSuperAdminUsers($key, $page, $perPage);
+    }
+
+    public function superAdminUsers2($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminUsers2($key, $page, $perPage);
+    }
+
+    public function usersByCountry($superAdminId, $key, $page)
+    {
+        $perPage = 10;
+
+        return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
+    }
 
     public function searchInAgency($key, $page)
     {
         $perPage = 10;
         return $this->userRepository->searchInAgency($key, $page, $perPage);
+    }
+
+    public function superAdminAgencies($key, $page, $countryId)
+    {
+        $perPage = 10;
+        return $this->userRepository->superAdminAgencies($key, $page, $perPage, $countryId);
     }
 
     public function searchInHostAgency($key, $page)
@@ -187,7 +226,7 @@ class UserService
 
     public function processUserData($user, $deviceToken, $lat, $long, $iso)
     {
-        $countryId = null;
+        $countryId = $user->country_id;
 
         if ($iso) {
             $country = Country::where('iso', strtoupper($iso))->first();
@@ -205,9 +244,9 @@ class UserService
         // update location
         if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
             $this->userRepository->updateLocation($user->id, $lat, $long);
-            if (!$countryId) {
-                $countryId = getCountryIdFromLatLong($lat, $long);
-            }
+//            if (!$countryId) {
+//                $countryId = getCountryIdFromLatLong($lat, $long, false);
+//            }
         }
         // end update location
 

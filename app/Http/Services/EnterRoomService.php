@@ -39,7 +39,6 @@ class EnterRoomService
                 ['ban' => true]
             );
         }
-                Log::info(['out']);
 
         return null;
     }

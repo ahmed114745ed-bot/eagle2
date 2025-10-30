@@ -13,6 +13,7 @@ trait DefaultBdAssignmentTrait
             if (empty($model->bd_id)) {
                 $defaultBd = Bd::where('type', 'bd')
                                 ->where('default', true)
+                                ->where('country_id', $model->country_id)
                                 ->first();
 
                 if ($defaultBd) {
@@ -27,6 +28,7 @@ trait DefaultBdAssignmentTrait
             if (empty($model->bd_id)) {
                 $defaultBd = Bd::where('type', 'bd')
                                 ->where('default', true)
+                                ->where('country_id', $model->country_id)
                                 ->first();
 
                 if ($defaultBd) {

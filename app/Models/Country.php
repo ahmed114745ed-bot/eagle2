@@ -48,4 +48,9 @@ class Country extends Model
     {
         return $this->hasManyThrough(Room::class, User::class, 'country_id', 'uid');
     }
+
+    public function superAdmin()
+    {
+        return $this->hasMany( SuperAdmin::class,'country_id');
+    }
 }

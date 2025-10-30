@@ -28,8 +28,13 @@ class VipDedicateAction extends Action
     public function handle(Request $request)
     {
         try {
+            $countryID = session('country_id');
+
             // Validate user
-            $user = User::query()->searchByUuid($request->user_uuid)->first();
+            $user = User::query()
+                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+                ->searchByUuid($request->user_uuid)->first();
+
             if (!$user) {
                 return $this->response()->error(__('dashboard.userNotFound'))->refresh();
             }

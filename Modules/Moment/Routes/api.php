@@ -17,7 +17,7 @@ use Modules\Moment\Http\Controllers\ReportController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'appFeatureEnable:moment'])->group(
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'appFeatureEnable:moment' ,'update.last.seen'])->group(
     function () {
         Route::apiResource('/moment', 'MomentController')->middleware('ban.user.actions:moment');
          Route::get('moments/users/{id}/gifts',  [MomentUserGiftsController::class, 'userGift']);

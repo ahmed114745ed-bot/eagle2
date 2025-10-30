@@ -56,6 +56,9 @@ class VersionController extends Controller
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
+       
+       $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
+       
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version,
@@ -84,6 +87,8 @@ class VersionController extends Controller
             'youtube_status' => (bool) ($settings['youtube_status'] ?? true),
             'live_status'    => (bool) ($settings['live_status'] ?? true),
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
+            'default_room_background'    => $default_background ?? '',
+            
         ];
 
         //update current version for user

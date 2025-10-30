@@ -63,48 +63,52 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($orderId, $method = null)
+    public function webhookPayment($orderId, $method = null, $newTrx = null)
     {
         $coinLog = $this->findCoinLog($orderId, $method);
-    
+
         if (!$coinLog) {
             return $this->transactionNotFoundResponse();
         }
-    
+
         if ($this->isAlreadyProcessed($coinLog)) {
             return $this->alreadyProcessedResponse();
         }
-    
-        $this->updateCoinLogAsPaid($coinLog);
-    
+
+        $this->updateCoinLogAsPaid($coinLog, $newTrx);
+
         $this->resolveCoinLogOwner($coinLog);
-    
+
         return $this->finalizeResponse($coinLog);
     }
-    
+
     private function findCoinLog($orderId, $method = null): ?CoinLog
     {
         return CoinLog::where('id', $orderId)
             ->when($method != null, fn($q) => $q->where('method', $method))
             ->first();
     }
-    
+
     private function isAlreadyProcessed(CoinLog $coinLog): bool
     {
         return $coinLog->status == 1;
     }
-    
-    private function updateCoinLogAsPaid(CoinLog $coinLog): void
+
+    private function updateCoinLogAsPaid(CoinLog $coinLog, $newTrx = null): void
     {
         $coinLog->update(['status' => 1]);
-    
+
+        if ($newTrx){
+            $coinLog->update(['trx' => $newTrx]);
+        }
+
         LogHelper::info('CoinLog processed', [
             'coinLogId' => $coinLog->id,
             'trx'       => $coinLog->trx,
             'user_id'   => $coinLog->user_id,
         ]);
     }
-    
+
     private function resolveCoinLogOwner(CoinLog $coinLog)
     {
         $owner = $coinLog->owner;
@@ -118,32 +122,30 @@ trait PaymentTrait
         }
 
     }
-    
+
     private function processUserPayment(User $user, CoinLog $coinLog): void
     {
         $amountBefore = $user->di;
         $user->increment('di', $coinLog->obtained_coins);
-    
+
         UserCoinLogHelper::logByType(
             $user->id,
             $coinLog->obtained_coins,
             $amountBefore,
             UserCoinLogType::PAYMENT
         );
-    
+
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
-    
+
         (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
-    
-        Log::info("Stripe Webhook: User {$user->id} credited with {$coinLog->obtained_coins} coins");
+
     }
-    
+
     private function processAgencyPayment(ShippingAgency $agency, CoinLog $coinLog): void
     {
         $agency->increment('coins', $coinLog->obtained_coins);
-        Log::info("Stripe Webhook: Agency {$agency->id} credited with {$coinLog->obtained_coins} coins");
     }
-    
+
     private function transactionNotFoundResponse()
     {
         return response()->json([
@@ -151,7 +153,7 @@ trait PaymentTrait
             'reason' => 'Transaction not found',
         ]);
     }
-    
+
     private function alreadyProcessedResponse()
     {
         return response()->json([
@@ -159,7 +161,7 @@ trait PaymentTrait
             'reason' => 'Transaction already processed',
         ]);
     }
-    
+
     private function finalizeResponse(CoinLog $coinLog)
     {
         return response()->json([
@@ -168,6 +170,6 @@ trait PaymentTrait
             'message' => 'Transaction completed successfully.',
         ]);
     }
-    
+
 
 }

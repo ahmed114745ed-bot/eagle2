@@ -21,6 +21,7 @@
  use Encore\Admin\Form;
  use App\Admin\Extensions\Form\Field\DynamicFields;
  use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\Navbar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Bd\Controllers\AuthController;
 use App\Bd\Controllers\BdSalariesController;
 use App\Bd\Controllers\ChargeController;
 use App\Bd\Controllers\MultiLanguageController;
@@ -18,7 +19,7 @@ use App\Bd\Controllers\RequestAgencyController;
 
 
 Route::prefix('bd')->name('bd.')->group(function () {
-    Route::post('logout', [\App\Bd\Controllers\AuthController::class, 'logout'])->name('logout');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     // Route::middleware(['auth:bd'])->group(function () {
     //     Route::get('/', [\App\Bd\Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -37,13 +38,13 @@ Route::group(
     ],
     function () {
         if (MultiLanguage::config("show-login-page", true)) {
-            Route::get('login', [\App\Bd\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+            Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
         }
-        Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
-        Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
+        Route::post('login', [AuthController::class, 'postLogin']);
+        Route::get('logout', [AuthController::class, 'logout']);
 
 
-        
+
     }
 );
 
@@ -64,8 +65,8 @@ Route::group(
         'as' => 'bd.',
     ],
     function () {
-        Route::get('setting', [\App\Bd\Controllers\AuthController::class, 'getSetting']);
-        Route::put('update-setting', [\App\Bd\Controllers\AuthController::class, 'putSetting']);
+        Route::get('setting', [AuthController::class, 'getSetting']);
+        Route::put('update-setting', [AuthController::class, 'putSetting']);
 
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
