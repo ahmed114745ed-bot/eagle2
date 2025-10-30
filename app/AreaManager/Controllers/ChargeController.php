@@ -2,6 +2,7 @@
 
 namespace App\AreaManager\Controllers;
 
+use App\Models\SubAreaManager;
 use DB;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -38,12 +39,22 @@ class ChargeController extends MainController
     public function index(Content $content): Content
     {
         $user = Auth::user();
+        $authUser = auth()->user();
+
+        if ($authUser->type == 'area-manager'){
+            $authId = auth()->id();
+            $type = UserTypeEnum::AREA_MANAGER;
+        } else {
+            $authId = $authUser->parent_id;
+            $type = UserTypeEnum::SUB_AREA_MANAGER;
+        }
+
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            UserTypeEnum::AREA_MANAGER, $user->id,
-            UserTypeEnum::AREA_MANAGER, $user->id
+            $type, $authId,
+            $type, $authId
         ])
             ->first();
 
@@ -69,10 +80,32 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge());
+        $authUser = auth()->user();
 
-        $grid->model()->where('charger_type', UserTypeEnum::AREA_MANAGER)
+        $isAreaManager = $authUser->type == 'area-manager';
+        if ($isAreaManager){
+            $type = UserTypeEnum::AREA_MANAGER;
+        } else {
+            $type = UserTypeEnum::SUB_AREA_MANAGER;
+        }
+
+        $grid->model()
+            ->where(function ($q) use ($isAreaManager, $type) {
+                $q->where('charger_type', $type);
+
+                if ($isAreaManager) {
+                    $q->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER);
+                }
+            })
             ->with('receiverUser', 'receiveragency')
-            ->where('charger_id', Auth::user()->id)
+            ->where(function ($q) use ($isAreaManager, $authUser) {
+                $q->where('charger_id', $authUser->id);
+
+                if ($isAreaManager) {
+                    $subAreaManagers = SubAreaManager::where('parent_id', $authUser->id)->pluck('id')->toArray();
+                    $q->orWhereIn('charger_id', $subAreaManagers);
+                }
+            })
             ->orderBy('id', 'desc');
 
         $grid->filter(function (Grid\Filter $filter) {

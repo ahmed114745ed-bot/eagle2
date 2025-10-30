@@ -294,7 +294,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             @if (auth('admin')->user()->type == "area-manager")
             <option value="subAreaManager">{{ __('sub area manager') }}</option>
             <option value="superAdmin">{{ __('super admin') }}</option>
-
+            @elseif(auth('admin')->user()->type == "sub_area_manager")
+                <option value="superAdmin">{{ __('super admin') }}</option>
             @endif
             <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
