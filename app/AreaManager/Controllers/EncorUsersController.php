@@ -226,6 +226,10 @@ class EncorUsersController extends AdminController
                 $actions->disableDelete();
             });
         });
+        if (! Admin::user()->can('create-' . $permission_name)) {
+            $grid->disableCreateButton();
+        }
+
 
         return $grid;
     }
