@@ -124,7 +124,6 @@ class AuthService
 //                $user->country_id = @$country->id;
 //            }
 
-            info($request);
             $user->is_points_first = 1;
             if (!$this->checkDeviceToken(@$request->device_token)) {
                 $user->di = 20000;
