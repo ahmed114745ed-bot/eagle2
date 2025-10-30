@@ -26,20 +26,16 @@ class HomeCarouselController extends Controller
         }
 
         $items = HomeCarousel::query()
-            ->with(['user', 'room', 'generalRole', 'countriesLite'])
+            ->with(['user', 'room', 'generalRole', 'countriesLite', 'displays'])
             ->where('enable', 1)
-
             ->when($displayType, function ($q) use ($displayType, $now, $offset) {
                 $q->whereHas('displays', function ($sub) use ($displayType, $now, $offset) {
                     $sub->where('display_type', $displayType)
                         ->where(function ($inner) use ($now, $offset) {
-                            // $inner->whereRaw("
-                            //     CONVERT_TZ(end_at, '+00:00', ?) > ?
-                            // ", [$offset, $now]);
                             $inner->whereRaw("
-                                CONVERT_TZ(end_at, '+00:00', ?) > ?
+                                CONVERT_TZ(home_carousel_displays.end_at, '+00:00', ?) > ?
                                 ", [$offset, $now])
-                                ->orWhere('duration', 0); 
+                                ->orWhere('home_carousel_displays.duration', 0); 
                         });
                 });
             })
