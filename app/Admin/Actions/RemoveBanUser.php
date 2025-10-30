@@ -27,12 +27,15 @@ class RemoveBanUser extends Action
 
     public function handle(Request $request)
     {
+        $countryID = session('country_id');
 
         if (!Admin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);
         }
-     
-        $user = User::query()->searchByUuid( $request->uid)->first();
+
+        $user = User::query()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->searchByUuid( $request->uid)->first();
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }

@@ -1,0 +1,66 @@
+name: Merge Test to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch to merge from'
+        required: true
+        default: 'test'
+        type: string
+      target_branches:
+        description: 'Target branches (comma-separated: tempoApp,uv-live,moonlight,5live,vibe,dang,zion)'
+        required: true
+        type: string
+        default: 'tempoApp,uv-live,moonlight,5live,vibe,dang,zion'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest #[self-hosted]
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Create matrix from input
+        id: set-matrix
+        run: |
+          # Convert comma-separated string to JSON array
+          BRANCHES=$(echo "${{ inputs.target_branches }}" | jq -R -s -c 'split(",") | map(gsub("^\\s+|\\s+$";""))')
+          echo "matrix={\"branch\":$BRANCHES}" >> $GITHUB_OUTPUT
+
+  merge:
+    needs: prepare
+    runs-on: ubuntu-latest #[self-hosted]
+    strategy:
+      fail-fast: false  # Continue other jobs even if one fails
+      matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
+    
+    name: Merge to ${{ matrix.branch }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+      
+      - name: Merge ${{ inputs.source_branch }} to ${{ matrix.branch }}
+        run: |
+          echo "🔀 Merging ${{ inputs.source_branch }} into ${{ matrix.branch }}"
+          git fetch origin ${{ matrix.branch }}
+          git checkout ${{ matrix.branch }}
+          git merge origin/${{ inputs.source_branch }} --no-ff -m "Merge ${{ inputs.source_branch }} into ${{ matrix.branch }}"
+          git push origin ${{ matrix.branch }}
+          echo "✅ Successfully merged to ${{ matrix.branch }}"
+      
+      - name: Merge failed
+        if: failure()
+        run: |
+          echo "❌ Failed to merge to ${{ matrix.branch }}"
+          echo "This is likely due to merge conflicts."
+          echo "Please resolve conflicts manually and re-run this job."
+          exit 1

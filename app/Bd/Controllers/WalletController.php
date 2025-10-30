@@ -299,7 +299,7 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
-       
+
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
@@ -313,7 +313,7 @@ class WalletController extends MainController
             ];
 
             $type = $request->input('target_type');
-          
+
 
             if (!array_key_exists($type, $types)) {
                 admin_toastr('نوع الوجهة غير موجود', 'error');
@@ -333,13 +333,13 @@ class WalletController extends MainController
 
     public function chargeToUser(array $data)
     {
-       
+
         $bdId = Auth::user()->id;
         // $sender = Auth::user();
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
 
-     
+
         if (settings()->get("bd_stop_charge", 0)) {
 
             throw new \Exception(__('api_responses.freez_charge'));
@@ -396,7 +396,7 @@ class WalletController extends MainController
                 'message' => 'transfer_to_',
             ]);
 
-     
+
 
             $data = [
                 'charger_id' => $sender->id,
@@ -412,7 +412,7 @@ class WalletController extends MainController
             ];
 
             $charge =  Charge::create($data);
-          
+
             UserCommon::UserEarnedInvitation($receiver->id, $coins ,$charge->id);
 
             DB::commit();
@@ -441,7 +441,7 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
-        
+
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }

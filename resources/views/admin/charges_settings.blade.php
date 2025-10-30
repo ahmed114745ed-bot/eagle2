@@ -4,6 +4,7 @@
     $user_coinsConfig = App\Models\Config::where ('name', '=','one_usd_value_in_coins')->first();
     $shipping_coins = cache()->get('shipping_coins', $settings['shipping_coins'] ?? '');
     $user_coins = cache()->get('user_coins', $user_coinsConfig['value'] ?? '');
+    $superadmin_coins = cache()->get('super_admin_coins', $settings['super_admin_coins'] ?? '');
 
 @endphp
 
@@ -516,8 +517,7 @@
                     <div class="form-group ">
                         <label>{{ __('Super Admin') }}</label>
                         <input type="text" name="super_admin_coins" id="super_admin_coins"
-                               value="00000" class="form-control" disabled>
-                               <!-- value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control"> -->
+                               value="{{ $superadmin_coins }}" class="form-control">
                         <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}

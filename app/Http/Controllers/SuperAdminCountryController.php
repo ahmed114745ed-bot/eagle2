@@ -14,6 +14,7 @@ use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\Room;
+use App\Models\SuperAdmin;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
@@ -36,10 +37,7 @@ class SuperAdminCountryController extends Controller
             'online' => 1,
         ])->count();
 
-        $superAdmin = Admin::where([
-            'country_id' => $countryID,
-            'type' => 'super_admin',
-        ])->first();
+        $superAdmin = SuperAdmin::where(['country_id' => $countryID])->first();
 
         $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
             ->with(['owner:id,name,country_id'])

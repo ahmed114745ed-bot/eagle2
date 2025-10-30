@@ -26,6 +26,7 @@ use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Session;
@@ -578,25 +579,38 @@ class AgencyController extends MainController
 
     protected function grid()
     {
+        $countryID = session('country_id');
+
         $grid = new Grid(new Agency);
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
-            ->with([
-                'owner:id,name,uuid', // only needed fields
-                'owner.profile:id,user_id,avatar',
-                'owner.packs' => fn($q) => $q
-                    ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                    ->where('type', 25)
-                    ->where('is_used', true)
-                    ->with('ware:id,value'),
-            ])
-            ->available()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins','country_id','img', 'is_frozen'])
+            ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->where(function ($query) {
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+            })
             ->orderByDesc('id');
-        if (request()->has('active')) {
-            $grid->model()->whereHas('agencySalaries', function ($q) {
+
+        if (request("active") == true) {
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
                     ->where('year', now()->year);
             });
+        }
+
+        if (request()->created == 'today') {
+            $grid->model()->whereDate('created_at', today());
+        }
+
+        if (request()->created == 'month') {
+            $grid->model()->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        if (request()->pending == 1) {
+            $grid->model()->whereHas('joinRequests', fn($q) => $q->where('status', 1));
         }
 
         // --- Agency name column ---
@@ -614,14 +628,26 @@ class AgencyController extends MainController
 
                 return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
+           $flagHtml = '';
+                if (!empty($this->country?->flag)) {
+                    $flagPath = getImagePath($this->country->flag);
+                    $flagTitle = app()->getLocale() === 'ar'
+                        ? e($this->country->name)
+                        : e($this->country->e_name);
 
+                    $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+                }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         {$image}
                         <div style='display: flex; flex-direction: column;'>
-                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>{$flagHtml}<br>
                             <span style='font-size: smaller;'>ID: {$this->id}</span>
                         </div>
                     </div>
@@ -630,29 +656,44 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $uid = $this->owner?->uuid;
-            $path = $this->owner?->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
+           
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+            $flagHtml = '';
+            if (!empty($this->owner?->country?->flag)) {
+                $flagPath = getImagePath($this->owner->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->owner->country->name)
+                    : e($this->owner->country->e_name);
+
+                $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+            }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
-
+            $showUrl = $this->owner ? superadmin_url("users/profile/{$this->owner->id}") : 0;
             return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                   <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                    </a>
-                    <span style='font-size: smaller;'>UUID: $uid</span>
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' 
+                        style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            {$flagHtml}
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
                 </div>
-            </div>
-        ";
+            ";
         });
 
         // --- Phone column ---
@@ -933,12 +974,12 @@ class AgencyController extends MainController
                 const input = document.querySelector(inputId);
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
-            
+
                 const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
                 input.classList.add('iti-initialized');
-            
+
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-            
+
                 input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
                 const form = input.closest('form');
                 if(form && !form.classList.contains('phone-init')){
@@ -946,11 +987,12 @@ class AgencyController extends MainController
                         // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                         // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
                          hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+
                     });
                     form.classList.add('phone-init');
         }
     }
-    
+
     function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
     initAllPhones();
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
@@ -963,6 +1005,16 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
+
+            if (!$form->bd_id && !$form->model()->bd_id) {
+                $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
+
+                if ($defaultBd) {
+                    $form->bd_id = $defaultBd->id;
+                } else {
+                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                }
+            }
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
@@ -987,6 +1039,10 @@ class AgencyController extends MainController
             if (!request('bd_id') && $isEditing) {
                 $admin =  Bd::where('default', 1)->first();
                 $form->bd_id = $admin->id;
+            }
+            $bd = Bd::find($form->bd_id);
+            if ($bd) {
+                $form->model()->country_id = $bd->country_id;
             }
         });
     }
@@ -1338,7 +1394,7 @@ class AgencyController extends MainController
         $user->agency_id = 0;
         $user->type_user = 0;
         $user->save();
-        
+
         MilestoneHelper::removeReward($user, 'host');
 
 

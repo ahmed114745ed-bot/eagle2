@@ -769,6 +769,16 @@ use Modules\Vip\Entities\Vip;
                                 @endforeach
                             </select>
 
+                            <label>{{ __('Default Country:') }}</label>
+                            <select name="default_country" class="form-control select2-country">
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"
+                                        {{ $country->id == ($settings['default_country'] ?? '') ? 'selected' : '' }}>
+                                        {{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             <label class="mt-3">{{ __('Start of week:') }}</label>
                             <select name="week_start" class="form-control">
                                 @foreach ([
@@ -922,6 +932,9 @@ use Modules\Vip\Entities\Vip;
                                                 value="1"
                                                 data-bootstrap-switch
                                                 {{ $zego_filter_enabled ? 'checked' : '' }}>
+
+
+
 
                                                 <script>
                                                     function initZegoSwitch() {
@@ -1088,6 +1101,9 @@ use Modules\Vip\Entities\Vip;
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </form>
@@ -1136,9 +1152,71 @@ use Modules\Vip\Entities\Vip;
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </form>
+
+                <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                        @csrf
+                        <div class="form">
+                            <label class="d-block">{{ __('admin.is_preview') }}</label>
+
+                            <div class="row mt-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_auto_preview" value="0">
+
+                                            <input type="checkbox"
+                                                name="is_auto_preview"
+                                                value="1"
+                                                data-bootstrap-switch
+                                                {{ $is_auto_preview ? 'checked' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <script>
+                        function initIsPreviewSwitch() {
+                            const $switch = $('input[name="is_auto_preview"][data-bootstrap-switch]');
+
+                            $switch.each(function () {
+                                $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+                            });
+
+                            $switch.on('switchChange.bootstrapSwitch', function (event, state) {
+                                const form = $('#autoPreviewForm');
+                                const formData = form.serializeArray();
+
+                                const newValue = state ? 1 : 0;
+                                formData.push({ name: 'is_auto_preview', value: newValue });
+
+                                $.ajax({
+                                    url: form.attr('action'),
+                                    method: form.attr('method'),
+                                    data: formData,
+                                    success: function () {
+                                        console.log('is_auto_preview updated to', newValue);
+                                    },
+                                    error: function (xhr) {
+                                        console.error('Error updating is_auto_preview:', xhr.responseText);
+                                    }
+                                });
+                            });
+                        }
+
+                        $(document).ready(initIsPreviewSwitch);
+                        $(document).on('pjax:success', initIsPreviewSwitch);
+                    </script>
+
+
             </div>
 
             <div id="gamesSettings" class="settings-section">
@@ -1982,18 +2060,6 @@ use Modules\Vip\Entities\Vip;
                                                                    class="form-control" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="google_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="google_pay_webhook_url" name="google_pay_webhook_url"
-                                                                       placeholder="google_pay_webhook_url"
-                                                                       value="{{ $settings['google_pay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" readonly>
-                                                                <button type="button" class="copy-button" data-copy-target="google_pay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 @endif
                                             @if ($coin->type == 'sky_pay')
                                                 <div class="col-md-6">
@@ -2246,6 +2312,51 @@ use Modules\Vip\Entities\Vip;
                                                             </div>
                                                         </div>
                                                     </div>
+                                                @endif
+                                                    @if ($coin->type == 'codapay')
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label
+                                                                    for="codapay_base_url">{{ __('admin.base_url') }}:</label>
+                                                                <input type="text" id="codapay_base_url"
+                                                                       name="codapay_base_url" placeholder="codapay_base_url"
+                                                                       value="{{ $settings['codapay_base_url'] ?? '' }}"
+                                                                       class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label
+                                                                    for="codapay_api_key">{{ __('admin.api_key') }}:</label>
+                                                                <input type="text" id="codapay_api_key"
+                                                                       name="codapay_api_key" placeholder="codapay_api_key"
+                                                                       value="{{ $settings['codapay_api_key'] ?? '' }}"
+                                                                       class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label
+                                                                    for="codapay_project_id">{{ __('admin.project_id') }}:</label>
+                                                                <input type="text" id="codapay_project_id"
+                                                                       name="codapay_project_id"
+                                                                       placeholder="codapay_project_id"
+                                                                       value="{{ $settings['codapay_project_id'] ?? '' }}"
+                                                                       class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="codapay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                                <div class="copy-container">
+                                                                    <input type="text" id="codapay_webhook_url" name="codapay_webhook_url"
+                                                                           placeholder="codapay_webhook_url"
+                                                                           value="{{ url('/api/codapay-callback') }}"
+                                                                           class="form-control" required>
+                                                                    <button type="button" class="copy-button" data-copy-target="codapay_webhook_url" title="Copy">📋</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                 @endif
 
 {{--                                            @if ($coin->type == 'huawei_pay')--}}
@@ -4138,4 +4249,14 @@ use Modules\Vip\Entities\Vip;
         document.getElementById('background_image_group').style.display = (type === 'image') ? 'block' : 'none';
         document.getElementById('gradient_group').style.display = (type === 'gradient') ? 'block' : 'none';
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-country').select2({
+            placeholder: "{{ __('Select a country') }}",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>

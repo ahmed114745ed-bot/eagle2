@@ -64,6 +64,11 @@ class Family extends Model
         return $fu;
     }
 
+    public function admins()
+    {
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 1);
+    }
+
     public function getLevelAttribute()
     {
         $giftLogs = $this->total_diamond;

@@ -98,7 +98,7 @@ class MilestoneRewardController
                 } elseif ($this->type === "achievement") {
                     $path = $this->reward;
                 } elseif ($this->type === "badge") {
-                    $path = $this->rewardable?->icon;
+                    $path = $this->rewardable?->image;
                 } else {
                     $path = 'coin.png';
                 }
@@ -146,11 +146,11 @@ class MilestoneRewardController
         ])
             ->when("ware", function (Form $form) {
                 $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
-                $form->number('expire', __('Expire'))->default(1);
+                $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
                 $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
-                $form->number('expire', __('Expire'))->default(1);
+                $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {
 
@@ -158,11 +158,11 @@ class MilestoneRewardController
                     ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
                     ->disk('gcs');
 
-                $form->number('expire', __('Expire'))->default(1);
+                $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("badge", function () use ($form) {
                 $this->addBadgeField($form);
-                $form->number('expire', __('Expire'))->default(1);
+                $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("coins", function (Form $form) {
                 $form->number("reward2", __('Coins'))->rules('required|integer|min:1');

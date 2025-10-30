@@ -1,5 +1,14 @@
 <?php
 
+use App\Admin\Controllers\AdminNotification;
+use App\Admin\Controllers\AllStatisticController;
+use App\Admin\Controllers\FormRequestController;
+use App\Admin\Controllers\NotificationController;
+use App\Admin\Controllers\SuperadminBannerHistoryController;
+use App\Admin\Controllers\SuperadminBannerRequestController;
+use App\Admin\Controllers\SuperAdminHomeCarouselController;
+use App\Admin\Controllers\SuperAdminStatisticController;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +54,7 @@ use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
+use App\SuperAdmin\Controllers\AuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\FeatureAppController;
@@ -52,11 +62,11 @@ use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
+use App\Admin\Controllers\SuperAdminController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
@@ -92,6 +102,9 @@ use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\PusherStatisticsController;
+use App\Admin\Controllers\SuperAdminChargeController;
+use App\Admin\Controllers\SuperAdminRewardController;
+use App\Admin\Controllers\SuperAdminSelectController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -112,11 +125,13 @@ use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\SuperAdminChargeReportController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
+use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 
 Route::group(
     [
@@ -134,6 +149,19 @@ Route::group(
         Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
     }
 );
+
+Route::group([
+    'prefix' => config('admin.route.prefix'),
+    'middleware' => [
+        'web',
+        'adminIp',
+        'multiLanguage',
+    ],
+], function () {
+
+    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
+        ->name('admin.change-password-view');
+});
 
 Route::group(
     [
@@ -161,6 +189,14 @@ Route::group(
 );
 
 Admin::routes();
+
+$routes = collect(app('router')->getRoutes()->get());
+$filtered = $routes->reject(function ($route) {
+    return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
+});
+
+
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -218,7 +254,10 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        Route::resource('auth/roles', 'RoleControllerNew');
+        // Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles', RoleControllerNew::class);
+        // Route::resource('roles', 'RoleControllerNew');
+
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
         //     Route::get('/', [RoleControllerNew::class, 'index']);
@@ -295,6 +334,8 @@ Route::group(
             ]
         ]);
          Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -305,12 +346,11 @@ Route::group(
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
-        Route::resource('countries', 'CountryController')->only(['index', 'show']);
+        Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
@@ -353,6 +393,19 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+
+        Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
+            Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
+            Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
+            Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
+            Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+            Route::get('profile', [SuperAdminController::class, 'showPreview']);
+            Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('superadmin.home-carousel.history');
+            Route::resource('home-carousel', SuperAdminHomeCarouselController::class);
+            Route::post('home-carousel/resend-banner-request/{banner}', [SuperAdminHomeCarouselController::class, 'resendBannerRequest'])
+                ->name('superadmin.banner.resend');
+        });
 
         Route::get('/soon', 'AllStatisticController@index2');
         Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');
@@ -437,15 +490,16 @@ Route::group(
         Route::resource('usersBd', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])
-        ->name('bd.toggle-salary-transfer');
+        Route::resource('superadmin-users', SuperAdminController::class)->except('delete');
+        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
+
+        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
-        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
-        // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+        Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
+        Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
 
         // Route::resource('ovip', 'OVipController');
@@ -467,9 +521,9 @@ Route::group(
         // Route::prefix('ware-gifts')->group(function () {
 
 
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
@@ -524,6 +578,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
+            Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
             Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
@@ -592,6 +647,8 @@ Route::group(
             }
             dD("goold");
         });
+        Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
+        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::get('background-count', function () {
             $backgrounds = \App\Models\Background::get();
             if ($backgrounds) {
@@ -633,21 +690,32 @@ Route::group(
         Route::resource('ware-management', WareTabController::class);
 
         Route::resource('user-charges', UsersChargeController::class);
+        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
+        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
+        });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
-        Route::get('coin-game-users/details', [CoinGameUserAllController::class,'index_details']);
-        Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
+        Route::get('coin-game-users/details', [CoinGameUserAllController::class, 'index_details']);
+        Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
-    ->name('coin-game-users.ajax');
-
+            ->name('coin-game-users.ajax');
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-        Route::group(['middleware' => 'local'], function (){
+        Route::post('/set-preview-superadmin', function () {
+            session(['preview_superadmin' => true]);
+        });
+
+        Route::post('/unset-preview-superadmin', function () {
+            session()->forget('preview_superadmin');
+        });
+
+        Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
             Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view']);
 
@@ -674,13 +742,43 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+            Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
+            Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
+            Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
-    });
+
+        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
+
+
+        Route::resource('form-requests', FormRequestController::class);
+
+        Route::prefix('requests')->group(function () {
+            Route::post('{id}/approve', [FormRequestController::class, 'approve'])->name('requests.approve');
+            Route::post('{id}/reject', [FormRequestController::class, 'reject'])->name('requests.reject');
+        });
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
+            Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'markAllRead']);
+            Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
+        });
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
+    }
+);
 
 
 Route::group([
     'prefix' => 'admin',
     'middleware' => ['web', 'admin'],
-], function() {
+], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
 });

@@ -17,6 +17,7 @@ return [
     'new'                   => 'नया',
     'create'                => 'सृजन करना',
     'delete'                => 'हटाएं',
+    'lifetime_help' => '💡 यदि आप <strong>0</strong> दर्ज करते हैं, तो इसका अर्थ है कि यह आइटम कभी समाप्त नहीं होगा (आजीवन)।',
     'remove'                => 'निकालें',
     'edit'                  => 'संपादित करें',
     'view'                  => 'देखें',
@@ -401,6 +402,7 @@ return [
     'mada'          => 'मडा',
     'liqpay'        => 'लिकपे',
     'paypal'        => 'पेपल',
+    'codapay'        => 'CodaPay',
     'paytm'         => 'पेटीएम',
     'paytabs'       => 'पेयटैब्स',
     'bkash'         => 'बीकैश',
@@ -414,6 +416,9 @@ return [
     'huawei_pay' => 'हुआवेई पे',
     "webhook_url" => "वेबहुक URL",
     'webhook_id' => 'वेबहुक आईडी',
+    'project_id'   => 'प्रोजेक्ट आईडी',
+    'country'      => 'देश',
+    'pay_type'     => 'भुगतान प्रकार',
 
     "target_no" => 'लक्ष्य संख्या',
     "diamonds" => 'हीरे का लक्ष्य',
@@ -428,4 +433,6 @@ return [
     "CDN"=> "CDN",
     "L3"=> "L3",
     "charge_level" => "चार्ज स्तर",
+    'is_preview' => 'लाइव पूर्वावलोकन',
+
 ];

@@ -49,7 +49,14 @@ class HostDiamondController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GiftLog());
+        $countryID = session('country_id');
+
         $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }))
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
             ->with(['receiver.profile', 'agency']) // assuming these are relationships
             ->where('agency_id', '!=', 0)

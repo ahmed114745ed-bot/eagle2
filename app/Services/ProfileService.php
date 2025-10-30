@@ -30,12 +30,20 @@ class ProfileService
 
     public function updateProfile(ProfileRequest $request)
     {
-        Log::info('Google login request', [
-            'data' => $request->only('email')
-        ]);
-        $data = $request->only(['name', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
+        $data = [];
+
+        $fields = ['name', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id'];
+        foreach ($fields as $field) {
+            if ($request->has($field) && !empty($request->$field)) {
+                $data[$field] = $request->$field;
+            }
+        }
+
         if ($request->email) {
             $data['email'] = $request->email;
+        }
+        if ($request->uuid) {
+            $data['firebase_uuid'] = $request->uuid;
         }
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
@@ -58,20 +66,6 @@ class ProfileService
             $this->profileRepo->updateAvatar($profile, $newImagePass);
         }
 
-        // if ($request->hasFile('multi_image')) {
-        //     foreach ($user->images as $image) {
-        //         Storage::delete('profile/' . $image->img);
-        //         $image->delete();
-        //     }
-
-        //     foreach ($request->file('multi_image') as $file) {
-        //         $imagePath = Common::upload('profile', $file);
-
-        //         $user->images()->create([
-        //             'img' => $imagePath,
-        //         ]);
-        //     }
-        // }
         if ($request->has('old_multi_image')) {
             $newImages =  explode(',', $request->old_multi_image);
 

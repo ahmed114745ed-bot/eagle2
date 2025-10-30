@@ -75,18 +75,37 @@ class SearchRepository implements SearchRepositoryInterface
 
         $keywords = $user->id;
 
-        return Room::with('owner')
-            ->whereHas('owner', function ($query) {
-                $query->where('status', 1);
-            })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
-            ->orderBy('hot', 'desc')
-            ->take(2)
-            ->get();
+        $query = Room::with([
+            'owner',
+            'owner.packs'
+        ])
+        ->whereHas('owner', function ($query) {
+            $query->where('status', 1);
+        })
+        ->where(function ($query) use ($keywords, $blockedUserIds) {
+            $query->where('uid', 'like', $keywords . '%')
+                  ->whereNotIn('uid', $blockedUserIds);
+        })
+        ->where(function ($query) {
+            $query->where('type', '!=', 'live')
+                  ->orWhere(function ($subQuery) {
+                      $subQuery->where('type', 'live')
+                               ->where('room_status', 1)
+                               ->where('is_live', 1);
+                  });
+        })
+        ->orderBy('hot', 'desc')
+        ->take(2);
+    
+    
+        $rooms = $query->get();
+
+        // \Log::info('Room Results:', $rooms->toArray());
+        
+        return $rooms;
     }
 
-    public function searchRoomsV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): array|Collection
+    public function searchRoomsV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1): array|Collection
     {
         $user = User::query()
             ->fitterByUuid($keywords)
@@ -115,14 +134,24 @@ class SearchRepository implements SearchRepositoryInterface
             'owner',
             'owner.packs'
         ])
-            ->whereHas('owner', function ($query) {
-                $query->where('status', 1);
-            })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
-            ->orderBy('hot', 'desc')
-            ->take(2)
-            ->get();
+        ->whereHas('owner', function ($query) {
+            $query->where('status', 1);
+        })
+        ->where(function ($query) use ($keywords, $blockedUserIds) {
+            $query->where('uid', 'like', $keywords . '%')
+                  ->whereNotIn('uid', $blockedUserIds);
+        })
+        ->where(function ($query) {
+            $query->where('type', '!=', 'live') 
+                  ->orWhere(function ($subQuery) {
+                      $subQuery->where('type', 'live') 
+                               ->where('room_status', 1); 
+                  });
+        })
+        ->orderBy('hot', 'desc')
+        ->take(2)
+        ->get();
+    
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
@@ -184,7 +213,7 @@ class SearchRepository implements SearchRepositoryInterface
         return $users;
     }
 
-    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1)
+    public function userSearchHandV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
             return [];
@@ -223,7 +252,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderByDesc('total_score')
             ->take(10)
             ->get();
-//            ->paginate(10, ['*'], 'page', $page);
+        //            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
@@ -290,7 +319,9 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
 
         $official = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
+            ->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -311,7 +342,11 @@ class SearchRepository implements SearchRepositoryInterface
     public function getNotifications(int $userId, int $type): AnonymousResourceCollection
     {
         $messages = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
+
+            ->when($type == 2, fn($q) => $q->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }))
+            ->when($type != 2, fn($q) => $q->whereIn('user_id', [0, $userId]))
             ->where('type', $type)
             ->orderBy('created_at', 'desc')
             ->paginate(10);

@@ -173,6 +173,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 8,
                 'permissions' => [
                     ['key' => 'banner', 'except' => [], 'additional' => []],
+                    ['key' => 'banner-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'splash', 'except' => [], 'additional' => []],
                     ['key' => 'official-messages', 'except' => [], 'additional' => []],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => []],
@@ -449,14 +450,42 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
-
-           
             [
                 'name' => 'Milestone',
                 'sort' => 37,
                 'permissions' => [
                     ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch']],
                     ['key' => 'user-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin',
+                'sort' => 38,
+                'permissions' => [
+                    ['key' => 'superadmin', 'except' => ['show'], 'additional' => []],
+                    ['key' => 'superadmin-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Charge',
+                'sort' => 39,
+                'permissions' => [
+                    ['key' => 'charge-to-superadmin', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['add-switch', 'history-switch']],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Banners',
+                'sort' => 40,
+                'permissions' => [
+                    ['key' => 'superadmin-banners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['add-switch', 'history-switch']],
+                ],
+            ],
+            [
+                'name' => 'SuperAdmin Rewards',
+                'sort' => 41,
+                'permissions' => [
+                    ['key' => 'super-admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch', 'history-switch']],
+                    ['key' => 'super-admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
         ];
