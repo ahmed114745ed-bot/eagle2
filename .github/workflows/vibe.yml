@@ -27,7 +27,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_vibe_app:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_vibe_hub
     steps:
     - name: print out vibe
@@ -67,7 +67,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_vibe_job:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_vibe_hub
     steps:
     - name: print out vibe Job
