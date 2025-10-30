@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SubAreaManager extends Model
 {
@@ -32,6 +33,11 @@ class SubAreaManager extends Model
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function countries(): HasMany
+    {
+        return $this->hasMany(Country::class, 'area_manager_id', 'parent_id');
     }
 
     protected static function booted(): void
