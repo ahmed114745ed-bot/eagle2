@@ -33,35 +33,52 @@ class SuperAdmin extends Model
     {
         return $this->belongsTo(Country::class);
     }
-//
-//    public function transactions()
-//    {
-//        return $this->hasMany(Charge::class, 'charger_id', 'id')
-//            ->where('user_charger_type', 'bd');
-//    }
 
-//    public function getAgenciesCountAttribute()
-//    {
-//        return $this->agencies()->count();
-//    }
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    // 👥 One user can have many children (subordinates)
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    // 🔁 Optional: recursive relation to get *all descendants* (children of children)
+    public function allChildren()
+    {
+        return $this->children()->with('allChildren');
+    }
+    //
+    //    public function transactions()
+    //    {
+    //        return $this->hasMany(Charge::class, 'charger_id', 'id')
+    //            ->where('user_charger_type', 'bd');
+    //    }
+
+    //    public function getAgenciesCountAttribute()
+    //    {
+    //        return $this->agencies()->count();
+    //    }
 
 
-//    public function getTotalSalaryAttribute()
-//    {
-//        return $this->bdSalaries()->sum('salary');
-//    }
-//    public function getTotalCutAttribute()
-//    {
-//        return $this->bdSalaries()->sum('cut_amount');
-//    }
-//
-//    public function getNetSallaryAttribute()
-//    {
-//        $userSallary = $this->bdSalaries()
-//        ->sum(DB::raw('salary - cut_amount'));
-//
-//       return floor($userSallary);
-//    }
+    //    public function getTotalSalaryAttribute()
+    //    {
+    //        return $this->bdSalaries()->sum('salary');
+    //    }
+    //    public function getTotalCutAttribute()
+    //    {
+    //        return $this->bdSalaries()->sum('cut_amount');
+    //    }
+    //
+    //    public function getNetSallaryAttribute()
+    //    {
+    //        $userSallary = $this->bdSalaries()
+    //        ->sum(DB::raw('salary - cut_amount'));
+    //
+    //       return floor($userSallary);
+    //    }
 
     protected static function booted(): void
     {
@@ -125,34 +142,33 @@ class SuperAdmin extends Model
                     $userApp->save();
                 }
             }
-
         });
     }
 
 
-//    public function incrementCutAmountInBdSallary(int $amount)
-//    {
-//        $lastBdSalary = $this->bdSalaries()->latest()->first();
-//
-//        if ($lastBdSalary) {
-//            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
-//            $lastBdSalary->update(['cut_amount' => $newAmount]);
-//
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//    public function bdSalaries()
-//    {
-//        return $this->hasMany(BdSalary::class,  'bd_id', 'id');
-//    }
-//    public function getBdSalaryAttribute()
-//    {
-//        $userSallary = $this->bdSalaries()
-//            ->sum(DB::raw('salary - cut_amount'));
-//
-//        return floor($userSallary);
-//    }
+    //    public function incrementCutAmountInBdSallary(int $amount)
+    //    {
+    //        $lastBdSalary = $this->bdSalaries()->latest()->first();
+    //
+    //        if ($lastBdSalary) {
+    //            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
+    //            $lastBdSalary->update(['cut_amount' => $newAmount]);
+    //
+    //            return true;
+    //        }
+    //
+    //        return false;
+    //    }
+    //
+    //    public function bdSalaries()
+    //    {
+    //        return $this->hasMany(BdSalary::class,  'bd_id', 'id');
+    //    }
+    //    public function getBdSalaryAttribute()
+    //    {
+    //        $userSallary = $this->bdSalaries()
+    //            ->sum(DB::raw('salary - cut_amount'));
+    //
+    //        return floor($userSallary);
+    //    }
 }
