@@ -29,22 +29,22 @@ class CalculateRoomCupRewards extends Command
 
     public function handle(): int
     {
-        $settings = $this->getRoomCupSettings();
-        $type     = $settings['type'] ?? 'daily';
-        $this->type = $type ;
-        if (!$this->isEnabledRoomCup($settings)) {
-            $this->warn("⛔ Room Cup not enabled");
-            return EnumCommand::SUCCESS;
-        }
+        // $settings = $this->getRoomCupSettings();
+        // $type     = $settings['type'] ?? 'daily';
+        // $this->type = $type ;
+        // if (!$this->isEnabledRoomCup($settings)) {
+        //     $this->warn("⛔ Room Cup not enabled");
+        //     return EnumCommand::SUCCESS;
+        // }
 
-        [$start, $end] = $this->getPeriodByType($type);
+        // [$start, $end] = $this->getPeriodByType($type);
  
 
-        $this->logStart($start, $end);
+        // $this->logStart($start, $end);
 
-        $this->processGiftsInPeriod($start, $end , );
+        // $this->processGiftsInPeriod($start, $end , );
 
-        $this->logEnd();
+        // $this->logEnd();
 
         return EnumCommand::SUCCESS;
     }
