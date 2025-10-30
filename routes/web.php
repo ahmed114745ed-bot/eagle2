@@ -40,7 +40,8 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
-
+use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -741,9 +742,6 @@ Route::get('notifications/test2', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
-
-use App\Http\Controllers\BdSalaryMigrationController;
-use App\Http\Controllers\SuperAdminCountryController;
 
 Route::get('/codapay/create-payment', function () {
     $trxId  = rand(1000, 9999);
