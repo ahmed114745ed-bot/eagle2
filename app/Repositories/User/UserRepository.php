@@ -376,7 +376,7 @@ class UserRepository extends Repository
     public function usersByCountries($areaManagerId, $key, $page, $perPage)
     {
         $areaManager = AreaManager::find($areaManagerId);
-        if (!$areaManager) $areaManager = SubAreaManager::with('countries')->find($adminId);
+        if (!$areaManager) $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
         $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
