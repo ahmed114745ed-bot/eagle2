@@ -197,6 +197,7 @@ class SuperAdminController extends MainController
         });
         $grid->disableExport();
         $grid->disableRowSelector();
+        $this->extendGrid($grid);
 
         //        $this->extendGrid($grid);
         return $grid;

@@ -148,7 +148,7 @@ class RoleController extends MainController
 
 
         $grid->disableExport();
-        // $this->extendGrid($grid);
+         $this->extendGrid($grid);
         return $grid;
     }
 
