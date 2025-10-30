@@ -80,32 +80,12 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge());
-        $authUser = auth()->user();
-
-        $isAreaManager = $authUser->type == 'area-manager';
-        if ($isAreaManager){
-            $type = UserTypeEnum::AREA_MANAGER;
-        } else {
-            $type = UserTypeEnum::SUB_AREA_MANAGER;
-        }
 
         $grid->model()
-            ->where(function ($q) use ($isAreaManager, $type) {
-                $q->where('charger_type', $type);
-
-                if ($isAreaManager) {
-                    $q->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER);
-                }
-            })
+            ->where('charger_type', UserTypeEnum::AREA_MANAGER)
+            ->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER)
             ->with('receiverUser', 'receiveragency')
-            ->where(function ($q) use ($isAreaManager, $authUser) {
-                $q->where('charger_id', $authUser->id);
-
-                if ($isAreaManager) {
-                    $subAreaManagers = SubAreaManager::where('parent_id', $authUser->id)->pluck('id')->toArray();
-                    $q->orWhereIn('charger_id', $subAreaManagers);
-                }
-            })
+//            ->where('charger_id', $authUser->id)
             ->orderBy('id', 'desc');
 
         $grid->filter(function (Grid\Filter $filter) {

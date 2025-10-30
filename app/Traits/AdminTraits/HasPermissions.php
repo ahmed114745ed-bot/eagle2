@@ -13,7 +13,7 @@ trait HasPermissions
      */
     public function allPermissions(): Collection
     {
-        return \Cache::rememberForever("user_permissions_{$this->id}", function () {
+//        return \Cache::rememberForever("user_permissions_{$this->id}", function () {
             return $this->roles()
                 ->with('permissions:id,slug') // load only needed fields
                 ->get()
@@ -22,14 +22,15 @@ trait HasPermissions
                 ->merge($this->permissions) // direct permissions
                 ->unique('id')
                 ->values();
-        });    }
+//        });
+    }
 
     public function cachedPermissions()
     {
-        return cache()->remember("admin_user_permissions_{$this->id}", 600, function () {
+//        return cache()->remember("admin_user_permissions_{$this->id}", 600, function () {
             return $this->roles()->with('permissions')->get()
                 ->pluck('permissions')->flatten()->pluck('slug')->unique();
-        });
+//        });
     }
 
     /**
