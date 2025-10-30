@@ -248,21 +248,70 @@ class SuperAdminController extends MainController
             //            }
         });
 
-        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+//        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+//            $grid->tools(function (Grid\Tools $tools) {
+//                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+//                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+//                $milestone = __('milestone');   // Translates 'milestone' via your language files
+//
+//                $customButtonHTML = <<<HTML
+//                <div style="display: contents; align-items: center;">
+//                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+//                         {$milestone}
+//                    </a>
+//                </div>
+//            HTML;
+//
+//                // Append the custom HTML button to the grid's toolbar
+//                $tools->append($customButtonHTML);
+//            });
+//        }
+
+        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
+
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'super-admin')->first();
                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('milestone');   // Translates 'milestone' via your language files
+                $milestone = __('Acquisitions');
+
+                $customButtonHTML = <<<HTML
+                 <div style="display: contents; align-items: center;">
+                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                          {$milestone}
+                     </a>
+                 </div>
+             HTML;
+
+                $tools->append($customButtonHTML);
+            });
+
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.superadmin.logout');
+                $loginText = __('login');
+                $areaManagerUrl = url('/superadmin/login');
 
                 $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                         {$milestone}
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
                     </a>
-                </div>
-            HTML;
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>
+                    </button>
 
-                // Append the custom HTML button to the grid's toolbar
+                </div>
+                     <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
+                HTML;
+
                 $tools->append($customButtonHTML);
             });
         }

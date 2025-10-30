@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AuthController;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -40,7 +41,8 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
-
+use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\SuperAdminCountryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -324,6 +326,8 @@ Route::group(
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
+
+Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 Route::group(
     [
@@ -741,9 +745,6 @@ Route::get('notifications/test2', function () {
 
     return 'تم إرسال الإشعار ✉️';
 });
-
-use App\Http\Controllers\BdSalaryMigrationController;
-use App\Http\Controllers\SuperAdminCountryController;
 
 Route::get('/codapay/create-payment', function () {
     $trxId  = rand(1000, 9999);
