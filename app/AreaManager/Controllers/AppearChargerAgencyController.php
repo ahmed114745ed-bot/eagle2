@@ -314,7 +314,7 @@ class AppearChargerAgencyController extends MainController
 
             $tools->append('<a href="' . $exportUrl . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('superadmin.exportExcel') . '</a>');
         });
-       $this->extendGrid($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -358,7 +358,7 @@ class AppearChargerAgencyController extends MainController
                 }
                 return $ops2;
             })
-           ->ajax('/api/search/users-by-countries?area_manager_id=' . auth()->id(), 'id', 'name')->rules('required');
+            ->ajax('/api/search/users-by-countries?area_manager_id=' . auth()->id(), 'id', 'name')->rules('required');
 
         $form->hidden('agency_manger_id', __('app manger id'));
 
@@ -441,8 +441,8 @@ class AppearChargerAgencyController extends MainController
             $form->phone_code = request('phone_code');
             $appOwnerId = $form->input('app_owner_id');
             $user = User::find($appOwnerId);
-           // dd($user->country_id);
-            $form->model()->country_id = $user->country_id;
+            // dd($user->country_id);
+            if ($user)  $form->model()->country_id = $user->country_id;
         });
 
         // $form->saved(function (Form $form) {
