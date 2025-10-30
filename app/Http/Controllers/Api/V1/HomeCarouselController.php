@@ -14,7 +14,7 @@ class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
-    
+       
         $user = Auth::user();
         $displayType = $request->get('display_at'); 
         $timezone = getTimezone();
@@ -25,6 +25,7 @@ class HomeCarouselController extends Controller
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
+        dd($country);
         $items = HomeCarousel::query()
         ->with(['user', 'room', 'generalRole', 'countriesLite', 'displays'])
         ->where('enable', 1)
