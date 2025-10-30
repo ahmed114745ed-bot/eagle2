@@ -25,7 +25,6 @@ class HomeCarouselController extends Controller
             $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
-        dd($country);
         $items = HomeCarousel::query()
         ->with(['user', 'room', 'generalRole', 'countriesLite', 'displays'])
         ->where('enable', 1)
@@ -33,9 +32,9 @@ class HomeCarouselController extends Controller
         ->whereHas('displays', function ($sub) use ($now, $offset) {
             $sub->where(function ($inner) use ($now, $offset) {
                 $inner->whereRaw("
-                    CONVERT_TZ(home_carousel_displays.end_at, '+00:00', ?) > ?
+                    CONVERT_TZ(end_at, '+00:00', ?) > ?
                 ", [$offset, $now])
-                ->orWhere('home_carousel_displays.duration', 0);
+                ->orWhere('duration', 0);
             });
         })
     
