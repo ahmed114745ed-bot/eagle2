@@ -128,7 +128,11 @@ class AreaManagerController extends MainController
             $user = $this->appUser;
             if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
             $uid = $user->uuid ?? __('Unknown');
-            $url = getImagePath($user->profile?->avatar) ?? asset("images/businessman-icon.jpg");
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
+            if (! isImageExists($url)) {
+            $url = $defaultImage;
+        }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/users/{$user->id}");
 
