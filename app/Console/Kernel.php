@@ -136,7 +136,7 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->runInBackground();
 
-        $this->scheduleRoomCupRewards($schedule);
+        // $this->scheduleRoomCupRewards($schedule);
 
     
         $schedule->command('users:update-offline')
@@ -168,15 +168,15 @@ class Kernel extends ConsoleKernel
         $type     = $settings['type'] ?? 'daily';
         $time     =  '23:59';
     
-        $command = $schedule->command('roomcup:calculate-rewards')
-                            ->timezone(getTimezone());
+        // $command = $schedule->command('roomcup:calculate-rewards')
+        //                     ->timezone(getTimezone());
     
-        match ($type) {
-            'daily'   => $command->dailyAt($time),
-            'weekly'  => $command->weeklyOn(1, $time),   
-            'monthly' => $command->monthlyOn(1, $time),
-            default   => $command->dailyAt($time),
-        };
+        // match ($type) {
+        //     'daily'   => $command->dailyAt($time),
+        //     'weekly'  => $command->weeklyOn(1, $time),   
+        //     'monthly' => $command->monthlyOn(1, $time),
+        //     default   => $command->dailyAt($time),
+        // };
     }
     
     private function getRoomCupSettings(): array
