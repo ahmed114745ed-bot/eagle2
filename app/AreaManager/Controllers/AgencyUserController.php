@@ -244,7 +244,7 @@ class AgencyUserController extends MainController
                 });
             });
         ");
-
+        $grid->disableExport();
         $grid->disableCreateButton();
         $grid->actions(
             function ($actions) {
@@ -428,6 +428,7 @@ class AgencyUserController extends MainController
         $grid->disableActions();
 
         $grid->disableCreateButton();
+        $grid->disableExport();
         $grid->actions(
             function ($actions) {
                 $actions->disableEdit();

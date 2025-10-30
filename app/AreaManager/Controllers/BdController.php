@@ -252,6 +252,7 @@ class BdController extends MainController
         });
 
         $grid->disableRowSelector();
+         $grid->disableExport();
 
         return $grid;
     }

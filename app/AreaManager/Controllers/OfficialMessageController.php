@@ -2,24 +2,18 @@
 
 namespace App\AreaManager\Controllers;
 
-use Carbon\Carbon;
+
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Illuminate\Support\Str;
 use App\Enums\PermissionType;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use App\Models\OfficialMessage;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
-use App\Models\AdminNotification;
-use Illuminate\Support\Facades\App;
-use App\Http\Controllers\Controller;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
 use App\Selectables\ShippingAgencies;
-use App\Models\SuperAdminNotification;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -47,8 +41,8 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $countryID = session('country_id');
-        $grid->model()->where('admin_id', auth()->id())->where('type', 2)->orderByDesc('id');
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $grid->model()->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -207,7 +201,7 @@ class OfficialMessageController extends MainController
                 ])->default('owner');
             });;
         });
-        
+
 
         $form->saved(function (Form $form) {
             $model = $form->model();

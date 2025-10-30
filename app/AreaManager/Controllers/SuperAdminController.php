@@ -195,7 +195,7 @@ class SuperAdminController extends MainController
             $actions->disableDelete();
             $actions->disableEdit();
         });
-
+        $grid->disableExport();
         $grid->disableRowSelector();
 
         //        $this->extendGrid($grid);

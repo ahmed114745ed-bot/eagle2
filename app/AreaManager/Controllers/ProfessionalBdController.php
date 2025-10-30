@@ -56,7 +56,7 @@ class ProfessionalBdController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('BD'))
             ->body($this->profile($id)));
     }
@@ -70,7 +70,7 @@ class ProfessionalBdController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('BD'))
             ->body($this->form()->edit($id)));
     }
@@ -138,11 +138,11 @@ class ProfessionalBdController extends MainController
         });
 
 
-//        $grid->column('default', trans('default_status'))
-//            ->switch(Common::getSwitchStates())
-//            ->display(function ($enable) {
-//                return $enable;
-//            });
+        //        $grid->column('default', trans('default_status'))
+        //            ->switch(Common::getSwitchStates())
+        //            ->display(function ($enable) {
+        //                return $enable;
+        //            });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
         //         return $this->default;
@@ -250,7 +250,9 @@ class ProfessionalBdController extends MainController
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();
+            $actions->disableDelete();
         });
+        $grid->disableExport();
         return $grid;
     }
 
