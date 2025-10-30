@@ -95,13 +95,13 @@
             </div>
         </div>
         @empty
-        <div class="col-span-full text-center py-12">
+        <!-- <div class="col-span-full text-center py-12">
             <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
             <p class="text-gray-500 text-lg mb-4">{{ __('No form templates yet') }}</p>
             <a href="{{ admin_url('form-templates/create') }}" class="text-blue-600 hover:underline">
                 {{ __('Create your first template') }}
             </a>
-        </div>
+        </div> -->
         @endforelse
     </div>
 </div>
