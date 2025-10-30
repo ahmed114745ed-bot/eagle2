@@ -12,22 +12,31 @@
         </a>
     </div> -->
 
-    @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
-        {{ session('success') }}
-    </div>
-    @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <style>
+        .form-templates-btn {
+            margin: 0px 9px;
+        }
+        h3,h2{
+        font-size: 24px !important;
+            font-weight: bold;
+        }
+        p{
+            font-size: 13px;
+        }
+
+    </style>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         @forelse($templates as $template)
         <div class="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col justify-between">
             <div class="p-6">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        <h3 class=" font-bold text-gray-900 mb-2">
                             {{ $template->title }}
                         </h3>
-                        <p class="text-sm text-gray-600 mb-3 h-12 overflow-hidden">
+                        <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
                             {{ $template->description }}
                         </p>
                     </div>
@@ -36,7 +45,7 @@
                     </span>
                 </div>
 
-                <div class="flex items-center text-sm text-gray-500 mb-4 space-x-4">
+                <!-- <div class="flex items-center text-sm text-gray-500 mb-4 space-x-4">
                     <span>
                         <i class="fas fa-layer-group {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                         {{ $template->sections->count() }} {{ __('Sections') }}
@@ -45,7 +54,7 @@
                         <i class="fas fa-list {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                         {{ $template->sections->sum(fn($s) => $s->fields->count()) }} {{ __('Fields') }}
                     </span>
-                </div>
+                </div> -->
             </div>
 
             <div class="p-6 bg-gray-50">
@@ -54,41 +63,41 @@
                     <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type]) }}', this)"
                             class="w-full bg-green-600 text-white text-center px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
                         <i class="fas fa-link {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
-                        <span class="button-text">{{ __('Copy Form Link') }}</span>
+                        <span class="button-text">{{ __('Copy') }}</span>
                     </button>
                 </div>
 
                 {{-- Action Buttons --}}
                 <div class="flex space-x-2">
                     <a href="{{ admin_url('form-templates/' . $template->id) }}"
-                       class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                       class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition form-templates-btn">
                         <i class="fas fa-eye {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                         {{ __('Preview') }}
                     </a>
                     <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
-                       class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition">
+                       class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition form-templates-btn">
                         <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                         {{ __('Edit') }}
                     </a>
-                    <form action="{{ admin_url('form-templates/' . $template->id) }} method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}');" class="flex-1">
+                    <!-- <form action="{{ admin_url('form-templates/' . $template->id) }} method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}');" class="flex-1">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full bg-red-600 text-white text-center px-4 py-2 rounded-lg hover:bg-red-700 transition">
                             <i class="fas fa-trash-alt {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                             {{ __('Delete') }}
                         </button>
-                    </form>
+                    </form> -->
                 </div>
             </div>
         </div>
         @empty
-        <div class="col-span-full text-center py-12">
+        <!-- <div class="col-span-full text-center py-12">
             <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
             <p class="text-gray-500 text-lg mb-4">{{ __('No form templates yet') }}</p>
             <a href="{{ admin_url('form-templates/create') }}" class="text-blue-600 hover:underline">
                 {{ __('Create your first template') }}
             </a>
-        </div>
+        </div> -->
         @endforelse
     </div>
 </div>

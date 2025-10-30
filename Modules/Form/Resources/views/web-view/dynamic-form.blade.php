@@ -112,7 +112,8 @@
 </style>
 
 @php
-    $currentLocale = app()->getLocale();
+    $currentLocale = $locale ?? app()->getLocale();
+    $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 
 <div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}">
@@ -121,10 +122,6 @@
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
 
-        <button type="button" class="btn btn-outline-primary" id="toggle-lang">
-            <i class="fa fa-globe"></i>
-            <span>{{ $currentLocale === 'ar' ? 'English' : 'عربي' }}</span>
-        </button>
     </div>
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">

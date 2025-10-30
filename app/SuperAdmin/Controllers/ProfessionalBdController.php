@@ -91,8 +91,9 @@ class ProfessionalBdController extends MainController
     {
         $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $grid->model()->where('parent_id', $authSuperAdmin->id)
-            ->where('country_id','!=', $authSuperAdmin->country_id)
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $grid->model()->where('parent_id', $authId)
+            ->where('country_id', '!=', $authSuperAdmin->country_id)
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -140,7 +141,6 @@ class ProfessionalBdController extends MainController
             ->switch(Common::getSwitchStates())
             ->display(function ($enable) {
                 return $enable;
-
             });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
@@ -285,8 +285,8 @@ class ProfessionalBdController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
 
-//            $form->switch('default', __('set_as_default'))
-//                ->help(__('make_bd_default'));
+            //            $form->switch('default', __('set_as_default'))
+            //                ->help(__('make_bd_default'));
         }
 
         $user = auth()->user();

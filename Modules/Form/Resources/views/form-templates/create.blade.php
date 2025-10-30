@@ -4,21 +4,21 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-6">
+    <!-- <div class="mb-6">
         <a href="{{ route('form-templates.index') }}" class="text-blue-600 hover:underline">
             <i class="fas fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }} {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-            {{ __('Back to Templates') }}
+            {{ __('Back') }}
         </a>
-    </div>
+    </div> -->
 
-    <div class="bg-white rounded-lg shadow-lg p-8">
+    <div class=" rounded-lg shadow-lg p-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ __('Create New Form Template') }}</h1>
 
         <form id="formBuilder" action="{{ route('form-templates.store') }}" method="POST">
             @csrf
 
             {{-- Form Template Info --}}
-            <div class="mb-8 p-6 bg-gray-50 rounded-lg border-2 border-gray-200">
+            <div class="mb-8 p-6  rounded-lg border-2  ">
                 <h2 class="text-xl font-bold mb-4">{{ __('Template Information') }}</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -62,7 +62,7 @@
             {{-- Sections --}}
             <div id="sectionsContainer" class="mb-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">{{ __('Form Sections') }}</h2>
+                    <h2 class="text-xl font-bold">{{ __('Section') }}</h2>
                     <button type="button" onclick="addSection()" 
                             class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                         <i class="fas fa-plus {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
@@ -98,7 +98,7 @@ function addSection() {
     fieldCounts[sectionCount] = 0;
 
     const sectionHtml = `
-        <div class="section-item mb-6 p-6 bg-blue-50 rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
+        <div class="section-item mb-6 p-6   rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
             <div class="flex justify-between items-start mb-4">
                 <h3 class="text-lg font-bold text-blue-800">{{ __('Section') }} #${sectionCount}</h3>
                 <button type="button" onclick="removeSection(${sectionCount})" 
@@ -147,7 +147,7 @@ function addField(sectionId) {
     const fieldId = fieldCounts[sectionId];
 
     const fieldHtml = `
-        <div class="field-item bg-white p-4 rounded-lg border" data-field="${sectionId}-${fieldId}">
+        <div class="field-item  p-4 rounded-lg border" data-field="${sectionId}-${fieldId}">
             <div class="flex justify-between items-start mb-3">
                 <h4 class="font-semibold text-gray-700">{{ __('Field') }} #${fieldId}</h4>
                 <button type="button" onclick="removeField(${sectionId}, ${fieldId})" 

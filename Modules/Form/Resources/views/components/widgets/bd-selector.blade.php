@@ -35,7 +35,7 @@
     </div>
 
     {{-- BD Users List --}}
-    <div class="bd-users-container max-h-96 overflow-y-auto border-2 border-gray-200 rounded-lg bg-gray-50">
+    <div class="bd-users-container max-h-96 overflow-y-auto border-2   rounded-lg bg-gray-50">
         @if($bdUsers->isEmpty())
             <div class="p-4 text-center text-gray-500">
                 {{ __('No BD users available') }}
@@ -43,7 +43,7 @@
         @else
             <div class="divide-y divide-gray-200">
                 @foreach($bdUsers as $user)
-                    <label class="flex items-center p-4 hover:bg-blue-50 cursor-pointer transition-colors bd-user-item"
+                    <label class="flex items-center p-4 hover:  cursor-pointer transition-colors bd-user-item"
                            data-user-id="{{ $user->id }}"
                            data-user-name="{{ $user->name }}"
                            data-user-email="{{ $user->email }}">
@@ -124,10 +124,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (checkbox && checkmark) {
                 if (checkbox.checked) {
                     checkmark.classList.remove('hidden');
-                    item.classList.add('bg-blue-50');
+                    item.classList.add(' ');
                 } else {
                     checkmark.classList.add('hidden');
-                    item.classList.remove('bg-blue-50');
+                    item.classList.remove(' ');
                 }
             }
         });

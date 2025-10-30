@@ -15,10 +15,18 @@
     $availableWidgets = Modules\Form\Entities\CustomFieldWidget::where('is_active', true)->get();
 @endphp
 
+<style>
+
+.checkbox {
+        margin: 0px 8px !important
+    }
+
+</style>
+
 {{-- Form Template Info --}}
-<div class="mb-8 p-6 bg-gray-50 rounded-lg border-2 border-gray-200">
+<div class="mb-8 p-6  rounded-lg border-2  ">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">{{ __('Template Information') }}</h2>
+        <h2 class=" font-bold">{{ __('Template Information') }}</h2>
         <button type="button" onclick="toggleSection(this)" class="text-gray-600 hover:text-gray-800">
             <i class="fas fa-chevron-up"></i>
         </button>
@@ -27,7 +35,7 @@
     <div class="section-content">
         {{-- Title Fields (dynamic locales) --}}
         <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-3">{{ __('Form Title') }} *</h3>
+            <h3 class=" font-semibold mb-3">{{ __('Form Title') }} *</h3>
             <div class="grid grid-cols-1 md:grid-cols-{{ min(3, count($locales)) }} gap-4">
                 @foreach($locales as $locale)
                     <div class="relative">
@@ -66,7 +74,7 @@
 {{-- Sections --}}
 <div id="sectionsContainer" class="mb-6">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">{{ __('Form Sections') }}</h2>
+        <h2 class=" font-bold">{{ __('Section') }}</h2>
         <button type="button" onclick="addSection()"
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
             <i class="fas fa-plus {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
@@ -77,11 +85,12 @@
 </div>
 
 <div class="flex justify-end space-x-4">
-    <a href="{{ route('form-templates.index') }}"
+    <a href="{{ admin_url('form-templates') }}"
        class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
         {{ __('Cancel') }}
     </a>
     <button type="submit"
+             style="margin: 0px 13px;"
             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg">
         <i class="fas fa-save {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
         {{ $buttonText ?? __('Create Template') }}
@@ -180,7 +189,7 @@ function addSection(data = null) {
                 <i class="fas fa-lock"></i>
             </button>`;
     const sectionHtml = `
-        <div class="section-item mb-6 p-6 bg-blue-50 rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
+        <div class="section-item mb-6 p-6   rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center">
                     <span class="section-drag-handle cursor-move px-2">
@@ -294,7 +303,7 @@ function addField(sectionId, data = null) {
             <i class="fas fa-lock"></i>
         </button>`;
     const fieldHtml = `
-        <div class="field-item bg-white p-4 rounded-lg border" data-field="${sectionId}-${fieldId}" id="field-${sectionId}-${fieldId}">
+        <div class="field-item  p-4 rounded-lg border" data-field="${sectionId}-${fieldId}" id="field-${sectionId}-${fieldId}">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center">
                     <span class="field-drag-handle cursor-move px-2">
@@ -376,7 +385,7 @@ function addField(sectionId, data = null) {
                     </h5>
                     
                     <!-- Options Type Selector -->
-                    <div class="mb-3 bg-gray-50 p-3 rounded-lg">
+                    <div class="mb-3  p-3 rounded-lg">
                         <label class="block text-xs font-semibold mb-2">${'{{ __('Options Type') }}'}</label>
                         <div class="flex gap-4">
                             <label class="flex items-center cursor-pointer">
@@ -441,11 +450,11 @@ function addField(sectionId, data = null) {
 
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center text-sm">
-                        <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][required]" value="1" ${data && data.is_required ? 'checked' : ''} class="mr-2">
+                        <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][required]" value="1" ${data && data.is_required ? 'checked' : ''} class="mr-2 checkbox">
                         ${'{{ __('Required') }}'}
                     </label>
                     <label class="flex items-center text-sm">
-                        <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][enabled]" value="1" ${data && data.is_enabled ? 'checked' : ''} class="mr-2">
+                        <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][enabled]" value="1" ${data && data.is_enabled ? 'checked' : ''} class="mr-2 checkbox">
                         ${'{{ __('Enabled') }}'}
                     </label>
                 </div>

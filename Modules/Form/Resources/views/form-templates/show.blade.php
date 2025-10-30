@@ -3,16 +3,21 @@
 @section('title', $template->title)
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-6">
-        <a href="{{ route('form-templates.index') }}" class="text-blue-600 hover:underline">
+<style>
+    form{
+        padding: 20px;
+    }
+</style>
+<div class=" mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- <div class="mb-6">
+        <a href="{{ admin_url('form-templates') }}" class="text-blue-600 hover:underline">
             <i class="fas fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }} {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-            {{ __('Back to Templates') }}
+            {{ __('Back') }}
         </a>
-    </div>
+    </div> -->
 
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <div class="border-b border-gray-200 pb-6 mb-6">
+    <div class=" rounded-lg shadow-lg p-8">
+        <div class="border-b   pb-6 mb-6">
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">
@@ -22,7 +27,7 @@
                         {{ $template->description }}
                     </p>
                 </div>
-                <a href="{{ route('form-templates.edit', $template->id) }}" 
+                <a  href="{{ admin_url('form-templates/' . $template->id . '/edit') }}" 
                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                     <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
                     {{ __('Edit') }}
@@ -30,7 +35,7 @@
             </div>
 
             @if($template->admin_notice)
-            <div class="bg-blue-50 border-{{ app()->getLocale() == 'ar' ? 'r' : 'l' }}-4 border-blue-500 p-4 rounded">
+            <div class="  border-{{ app()->getLocale() == 'ar' ? 'r' : 'l' }}-4 border-blue-500 p-4 rounded">
                 <p class="text-blue-800">
                     <i class="fas fa-info-circle {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
                     {{ $template->admin_notice }}
@@ -44,7 +49,7 @@
             <input type="hidden" name="form_template_id" value="{{ $template->id }}">
 
             @foreach($template->sections as $section)
-            <div class="mb-8 bg-gray-50 rounded-lg p-6 border-2 border-gray-200">
+            <div class="mb-8 rounded-lg p-6 border-2  ">
                 <h2 class="text-2xl font-bold text-blue-700 mb-2 border-b-2 border-blue-200 pb-2">
                     {{ $section->title }}
                 </h2>
@@ -57,7 +62,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($section->fields as $field)
-                    <div class="bg-white p-4 rounded-lg border">
+                    <div class=" p-4 rounded-lg border">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             {{ $field->field_label }}
                             @if($field->is_required)

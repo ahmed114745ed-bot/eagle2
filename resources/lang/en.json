@@ -1321,7 +1321,36 @@
 "rejected_message": "Request rejected successfully!",
 "Host Agency": "Host Agency",
 "BD Form": "BD Form",
-"Shaping Agency": "Shaping Agency"
+"Shaping Agency": "Shaping Agency",
+"user_not_found": "User not found.",
+"user_already_has_agency": "This user already owns an agency.",
+"user_already_has_bd": "This user already has a BD account.",
+"user_already_has_shipping_agency": "This user already owns a shipping agency.",
+"approved_successfully": "Approved successfully.",
+"Preview":"Preview",
+"Form-templates":"Form-templates",
+"Edit Form Template":"Edit Form Template",    "Template Information": "Template Information",
+"Form Title": "Form Title",
+"Form Type": "Form Type",
+"Description": "Description",
+"Form Description": "Form Description",
+"Add Section": "Add Section",
+"Cancel": "Cancel",
+"Create Template": "Create Template",
+"Requests": "Requests",
+"Placeholder Text": "Placeholder Text",
+"Field Label": "Field Label",
+"Field Name": "Field Name",
+"Required": "Required",
+"Enabled": "Enabled",
+"BD Registration Form": "BD Registration Form",
+"Main Section": "Main Section",
+"Submit Form": "Submit Form",
+"Section Title": "Section Title",
+"Form Requests": "Form Requests",
+"Form-requests": "Form Requests",
+"form-requests": "Form Requests"
+
 
 
 
