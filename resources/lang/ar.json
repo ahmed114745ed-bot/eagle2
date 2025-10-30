@@ -4213,6 +4213,22 @@
 "banner_rejected_message": "قام المشرف :name (رقم المعرف: :id) برفض طلب البانر.",
   "Banner approved successfully": "تمت الموافقة على البانر بنجاح",
   "Banner rejected successfully": "تم رفض البانر بنجاح",
-  "sub admin":"المشرف الفرعي"
+  "sub admin":"المشرف الفرعي",
+  "requests_title": "الطلبات",
+  "name": "الاسم",
+  "bd_id": "BD ID",
+  "agency_name": "اسم الوكالة",
+  "whatsapp_number": "رقم الواتساب",
+  "country": "الدولة",
+  "form_template_type": "نوع النموذج",
+  "status": "الحالة",
+  "additional_info": "معلومات إضافية",
+  "approve": "موافق",
+  "reject": "رفض",
+  "approved_message": "تم الموافقة على الطلب بنجاح!",
+  "rejected_message": "تم رفض الطلب بنجاح!",
+  "Host Agency": "وكالة المضيفين",
+  "BD Form": "مدير وكالات",
+  "Shaping Agency": "وكالة شحن"
 
 }

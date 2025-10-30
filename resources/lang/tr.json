@@ -3713,6 +3713,22 @@
     "Settings updated successfully.": "Ayarlar başarıyla güncellendi.",
     "banner_rejected_message": "Yönetici :name (Kimlik No: :id), afiş talebini reddetti.",
     "Banner approved successfully": "Afiş başarıyla onaylandı",
-    "Banner rejected successfully": "Afiş başarıyla reddedildi"
+    "Banner rejected successfully": "Afiş başarıyla reddedildi",
+    "requests_title": "İstekler",
+    "name": "İsim",
+    "bd_id": "BD ID",
+    "agency_name": "Ajans Adı",
+    "whatsapp_number": "WhatsApp Numarası",
+    "country": "Ülke",
+    "form_template_type": "Form Türü",
+    "status": "Durum",
+    "additional_info": "Ek Bilgiler",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "approved_message": "İstek başarıyla onaylandı!",
+    "rejected_message": "İstek reddedildi!",
+    "Host Agency": "Ev Sahibi Ajansı",
+    "BD Form": "BD Formu",
+    "Shaping Agency": "Şekillendirme Ajansı"
 
 }

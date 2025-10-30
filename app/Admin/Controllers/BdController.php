@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
@@ -290,9 +291,10 @@ class BdController extends MainController
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
-         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $url = url('admin/milestones'); // Generates absolute URL for /admin/milestones
+                $milestoneId = Milestone::where('slug', 'bd')->first();
+                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('milestone');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
@@ -306,29 +308,23 @@ class BdController extends MainController
                 // Append the custom HTML button to the grid's toolbar
                 $tools->append($customButtonHTML);
             });
-        
+        }
+
         $grid->disableRowSelector();
 
         $this->extendGrid($grid);
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    // protected function detail($id)
-    // {
-    //    return $this->profile($id);
-    // }
+
+
 
     /**
      * Make a form builder.
      *
      * @return Form
      */
+
     protected function form()
     {
         $form = new Form(new Bd());
@@ -418,6 +414,8 @@ class BdController extends MainController
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
+
+
                 if ($originalAppId !=  $newAppId) {
                     $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
@@ -427,10 +425,14 @@ class BdController extends MainController
                     }
 
                     $newUserAppId = User::find($newAppId);
-                    $newUserAppId->is_bd = 1;
-                    $newUserAppId->save();
-                    $form->app_id = $newAppId;
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                    if (isset($newUserAppId)) {
+                        $newUserAppId->is_bd = 1;
+                        $newUserAppId->save();
+                        $form->app_id = $newAppId;
+                        MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                    
+                    }
+
                 }
             } else {
                 $selectedCountryId = $form->country_id;

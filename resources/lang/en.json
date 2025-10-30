@@ -1305,7 +1305,23 @@
 "banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request.",
 "Banner approved successfully": "Banner approved successfully",
 "Banner rejected successfully": "Banner rejected successfully",
-"sub admin" : "Sup Admin"
+"sub admin" : "Sup Admin",
+"requests_title": "Requests",
+"name": "Name",
+"bd_id": "BD ID",
+"agency_name": "Agency Name",
+"whatsapp_number": "WhatsApp Number",
+"country": "Country",
+"form_template_type": "Form Type",
+"status": "Status",
+"additional_info": "Additional Information",
+"approve": "Approve",
+"reject": "Reject",
+"approved_message": "Request approved successfully!",
+"rejected_message": "Request rejected successfully!",
+"Host Agency": "Host Agency",
+"BD Form": "BD Form",
+"Shaping Agency": "Shaping Agency"
 
 
 
