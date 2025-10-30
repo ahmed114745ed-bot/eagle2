@@ -2,22 +2,23 @@
 
 namespace App\AreaManager\Controllers;
 
-use App\Enums\Charges\UserTypeEnum;
-use App\Enums\PermissionType;
-use App\Helpers\Common;
+use DB;
 use App\Models\Agency;
 use App\Models\Charge;
-use App\Models\ShippingAgency;
-use DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Row;
+use Illuminate\Http\Request;
+use App\Enums\PermissionType;
+use App\Models\ShippingAgency;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
-use Illuminate\Http\Request;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeController extends MainController
 {
@@ -27,6 +28,7 @@ class ChargeController extends MainController
      * @var string
      */
     protected $title = 'Charge';
+    public $permission_name = 'coin-recharge';
 
     /**
      * Make a grid builder.
