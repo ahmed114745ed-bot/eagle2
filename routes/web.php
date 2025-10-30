@@ -665,33 +665,50 @@ Route::get('/migrate-home-carousel', function () {
     foreach ($carousels as $carousel) {
 
         $displayTypes = [];
+        if ($carousel->display_home_top)     $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle)  $displayTypes[] = 'home_middle';
+        if ($carousel->display_live)         $displayTypes[] = 'live';
+        if ($carousel->display_country)      $displayTypes[] = 'country';
+        if ($carousel->display_discover)     $displayTypes[] = 'discover';
 
-        if ($carousel->display_home_top) $displayTypes[] = 'home_top';
-        if ($carousel->display_home_middle) $displayTypes[] = 'home_middle';
-        if ($carousel->display_live) $displayTypes[] = 'live';
-        if ($carousel->display_country) $displayTypes[] = 'country';
-        if ($carousel->display_discover) $displayTypes[] = 'discover';
+ 
+        $unitMap = [
+            0 => null,
+            1 => 'hours',
+            2 => 'days',
+            3 => 'months',
+        ];
+
+        $unit = $unitMap[$carousel->form ?? 2] ?? 'days'; 
+
+        $endAt = null;
+        if (!empty($carousel->input) && $carousel->input > 0) {
+            $endAt = match ($unit) {
+                'hours'  => Carbon::parse($carousel->created_at)->addHours($carousel->input),
+                'days'   => Carbon::parse($carousel->created_at)->addDays($carousel->input),
+                'months' => Carbon::parse($carousel->created_at)->addMonths($carousel->input),
+                default  => null,
+            };
+        }
 
         foreach ($displayTypes as $type) {
-            foreach ($displayTypes as $type) {
-                DB::table('home_carousel_displays')->updateOrInsert(
-                    [
-                        'home_carousel_id' => $carousel->id,
-                        'display_type'     => $type,
-                    ],
-                    [
-                        'end_at'        => now()->addDays(30),
-                        'duration'      => 30,
-                        'duration_unit' => 'days',
-                        'created_at'    => $carousel->created_at,
-                        'updated_at'    => $carousel->updated_at,
-                    ]
-                );
-            }
+            DB::table('home_carousel_displays')->updateOrInsert(
+                [
+                    'home_carousel_id' => $carousel->id,
+                    'display_type'     => $type,
+                ],
+                [
+                    'end_at'        => $endAt,
+                    'duration'      => $carousel->input ?? 0,
+                    'duration_unit' => $unit,
+                    'created_at'    => $carousel->created_at,
+                    'updated_at'    => $carousel->updated_at,
+                ]
+            );
         }
     }
 
-    return "Migration completed successfully!";
+    return "✅ Migration completed successfully!";
 });
 
 
