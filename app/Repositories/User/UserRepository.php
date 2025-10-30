@@ -12,6 +12,7 @@ use App\Models\AreaManager;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
+use App\Models\SubAreaManager;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\select;
@@ -175,6 +176,7 @@ class UserRepository extends Repository
     public function userBdByCountries($areaManagerId, $key, $page, $perPage)
     {
         $areaManager = AreaManager::find($areaManagerId);
+        if (!$areaManager)  $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
         $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
@@ -374,6 +376,7 @@ class UserRepository extends Repository
     public function usersByCountries($areaManagerId, $key, $page, $perPage)
     {
         $areaManager = AreaManager::find($areaManagerId);
+        if (!$areaManager) $areaManager = SubAreaManager::with('countries')->find($adminId);
         if (!$areaManager) return collect();
         $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
