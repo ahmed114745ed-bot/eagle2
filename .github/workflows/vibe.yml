@@ -4,7 +4,7 @@ on:
     branches: ["vibe"]
 jobs:
   run_vibe_hub:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     steps:
     - name: print out vibe
       uses: appleboy/ssh-action@v1.2.1
