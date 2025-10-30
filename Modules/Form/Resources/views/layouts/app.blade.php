@@ -23,7 +23,7 @@
     
     @stack('styles')
 </head>
-<body class="bg-gray-50 antialiased">
+<body class=" antialiased">
     
     <main class="py-8">
         @yield('content')
