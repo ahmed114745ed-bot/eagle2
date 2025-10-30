@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\Country;
+use App\Models\User;
 use DB;
 use Google_Client;
 use Mockery\Exception;
@@ -122,7 +123,14 @@ class AuthService
 //                $country = $this->countryRepository->findByPhoneCode('101');
 //                $user->country_id = @$country->id;
 //            }
+
+            info($request);
             $user->is_points_first = 1;
+            if (!$this->checkDeviceToken(@$request->device_token)) {
+                $user->di = 20000;
+            }
+
+            $user->device_token = $request->device_token;
             $user->save();
             $token = $user->createToken('api_token')->plainTextToken;
             //  UserHandling::AddUserVip($user, 'register');
@@ -228,6 +236,10 @@ class AuthService
                 }
 
                 $user = $this->userRepository->create($data);
+                if (!$this->checkDeviceToken(@$request['device_token'])) {
+                    $user->di = 20000;
+                    $user->save();
+                }
                 $is_new = true;
                 $this->storeImage($request, $data, $user);
 
@@ -427,6 +439,10 @@ class AuthService
         return true;
     }
 
+    public function checkDeviceToken($deviceToken)
+    {
+        return User::where('device_token', $deviceToken)->exists();
+    }
 
     public function verifyHuaweiID($idToken, $huaweiId)
     {
