@@ -10,6 +10,8 @@
 @php
     $path = request()->path();
 
+    info($path);
+
     if (str_starts_with($path, 'admin')) {
         $fetchUrl = admin_url('superadmin/users-online-stats');
     } elseif (str_starts_with($path, 'superadmin')) {
@@ -21,7 +23,7 @@
     }
 @endphp
 
-@if(request()->is('superadmin') || request()->is('areaManager') || request()->is('admin/superadmin/statistics'))
+@if(request()->is('superadmin') || request()->is('areaManager') || request()->is('areaManager') || request()->is('admin/superadmin/statistics'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

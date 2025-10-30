@@ -102,7 +102,7 @@ class AgencyUserController extends MainController
         $grid->model()->ofAgency()
             ->with(['profile', 'packs'])
             ->where('is_host', 1)
-            ->whereNotIn('country_id', $countries)
+            ->whereIn('country_id', $countries)
             ->withCount('sameDeviceUsers');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
@@ -265,7 +265,7 @@ class AgencyUserController extends MainController
             ->where('is_host', 1)
             ->withCount('sameDeviceUsers')
             ->where(function ($query) {
-                $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+               $countries = Common::areaCountries();
 
                 $query->where(function ($q) use ($countries) {
                     $q->whereIn('country_id', $countries)
