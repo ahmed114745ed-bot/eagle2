@@ -30,7 +30,7 @@ class FormTemplateController extends Controller
     {
         $template = FormTemplate::with(['sections.fields'])->findOrFail($id);
         return $content
-        ->title(__('Edit Form Template'))
+        ->title(__('Preview'))
         ->body(view('Form::form-templates.show', compact('template')));
     }
 
