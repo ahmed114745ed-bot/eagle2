@@ -1,9 +1,15 @@
 @php
     use App\Models\RoleCategory;
-
+    use App\Enums\PermissionType;
     // Group permissions by category first
     $grouped = $permissions->groupBy('category');
-    $categories = RoleCategory::orderBy('sort')->select('slug')->get();
+    $categories = RoleCategory::orderBy('sort')
+    ->select('slug', 'type')
+    ->where(function ($q) {
+        $q->where('type', PermissionType::ADMIN->value)
+          ->orWhere('slug', 'general');
+    })->get();
+    //dd($categories);
     $selected = $selectedPermissions ?? [];
 
     // Pre-process all permissions by category and group

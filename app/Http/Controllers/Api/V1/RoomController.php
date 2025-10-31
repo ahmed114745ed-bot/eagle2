@@ -1324,14 +1324,15 @@ class RoomController extends Controller
         if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
         $roomAdmin = $room->room_admin;
-        $roomMax   = $room->max_admin;
+        $roomMax   = $room->total_admins;
         $adm_arr   = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
         if (count($adm_arr) > 0 && $adm_arr[0] == '') unset($adm_arr[0]);
         $adm_arr   = array_unique($adm_arr);
 
         if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
-       
-        if (count($adm_arr) == ($roomMax >= Common::getConfig('max_room_admin') ? $roomMax : Common::getConfig('max_room_admin'))) return Common::apiResponse(0, 'room manager is full', null, 404);
+        $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
+
+        if (count($adm_arr) == ($roomMax >= $configMaxRoom ? $roomMax : $configMaxRoom)) return Common::apiResponse(0, 'room manager is full', null, 404);
 
 
         $adm_arr = array_merge($adm_arr, [$admin_id]);

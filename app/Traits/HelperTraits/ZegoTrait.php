@@ -80,15 +80,17 @@ Trait ZegoTrait
 
         ];
         try {
-            Log::info('🛰️ Sending Zego request', [
-                'sendToZego' => '',
-                'params' => $params,
+            Log::channel('charisma')->info('Charisma sendToZego sent successfully', [
+                'roomId' => $RoomId,
+                'userIds' => $FromUserId,
             ]);
         
            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
     
         }catch (\Exception $exception){
-
+            Log::info('Exception Charisma sendToZego ', [
+                'getMessage' => $exception->getMessage() ,
+            ]);
         }
 
         return null;
@@ -151,10 +153,7 @@ Trait ZegoTrait
 
         ];
         try {
-            Log::info('🛰️ Sending Zego request', [
-                'sendToZego_3' => '',
-                'params' => $params,
-            ]);
+   
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 

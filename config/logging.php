@@ -125,6 +125,13 @@ return [
             'path' => storage_path('logs/custom.log'),
             'level' => 'debug',
         ],
+
+
+        'charisma' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/charisma.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];

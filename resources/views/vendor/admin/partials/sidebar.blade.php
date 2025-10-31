@@ -40,8 +40,16 @@
 
                     @endif
 
+                        @if (Admin::user()->type == 'superadmin')
 
-                    @if (Admin::user()->type != 'bd')
+                            @foreach(Admin::menuLinks() as $link)
+                                <li>
+                                    <a href="{{ superadmin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                                </li>
+                            @endforeach
+                        @endif
+
+                    @if (Admin::user()->type != 'bd' || Admin::user()->type != 'superadmin')
 
                         @foreach(Admin::menuLinks() as $link)
                             <li>
@@ -73,7 +81,7 @@
                 <li class="header">{{ trans('admin.menu') }}</li>
 
                 @if (Admin::user()->type == 'bd')
-  
+
                 @php
                     $bdLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Home')],
@@ -86,8 +94,7 @@
 
                 @foreach($bdLinks as $link)
                     <li>
-                        <a href="{{  bd_url($link['uri']) }}">
-
+                        <a href="{{ bd_url($link['uri']) }}">
                             <i class="fa {{ $link['icon'] }}"></i>
                             
                             <span>{{ $link['title'] }}</span>
@@ -95,7 +102,190 @@
                     </li>
                 @endforeach
                 @endif
-                @each('admin::partials.menu', $filteredMenu, 'item')
+
+
+
+
+
+     
+            @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+                @php
+                    $superadminLinks = [
+                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
+                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
+                        ,
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-briefcase',
+                            'title' => __('BD'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                            ],
+                        ],
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-building',
+                            'title' => __('Agencies'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
+                                ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                            ],
+                        ],
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-building',
+                            'title' => __('rooms'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                            ],
+                        ],
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-home',
+                            'title' => __('Advertisements'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/home-carousel', 'icon' => 'fa-home', 'title' => __('HomeCarousel'), 'permission' => 'banner'],
+                                ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
+
+                            ],
+                        ],
+                        ['uri' => '/super-admin-rewards', 'icon' => 'fa-home', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
+                        [
+                            'uri' => '#',
+                            'icon' => 'fa-home',
+                            'title' => __('Employees and Permissions'),
+                            'permission' => null,
+                            'children' => [
+                                ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                            ],
+                        ],
+                    ];
+
+                    function hasPermission($permission) {
+                        if (Admin::user()->can('*')) {
+                            return true; 
+                        }
+                        
+                        if (is_null($permission)) {
+                            return true; 
+                        }
+                        
+                        return Admin::user()->can('browse-' . $permission);
+                    }
+
+                    function hasVisibleChildren($children) {
+                        foreach ($children as $child) {
+                            if (hasPermission($child['permission'] ?? null)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                @endphp
+
+                @foreach($superadminLinks as $link)
+                    @if(isset($link['children']))
+
+                        @if(hasVisibleChildren($link['children']))
+                      
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        @if(hasPermission($child['permission'] ?? null))
+                                            <li>
+                                                <a href="{{ superadmin_url($child['uri']) }}">
+                                                    <i class="fa {{ $child['icon'] }}"></i>
+                                                    <span>{{ $child['title'] }}</span>
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endif
+                    @else
+                        @if(hasPermission($link['permission'] ?? null))
+                            <li>
+                                <a href="{{ superadmin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif
+                    @endif
+                @endforeach
+            @endif
+
+
+
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && Admin::user()->type != 'sub_super_admin' && !session('preview_superadmin'))
+                    @each('admin::partials.menu', $filteredMenu, 'item')
+                @elseif(session('preview_superadmin'))
+                    @php
+                        $superadminPreviewLinks = [
+                            ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
+                            ['uri' => '/superadmin/profile','icon' => 'fa-home','title' => __('Super Admin Profile')],
+                            ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
+                            ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('Agencies'),
+                                'children' => [
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
+                                ],
+                            ],
+                            ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
+                            ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
+                            ['uri' => '/superadmin/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                        ];
+                    @endphp
+
+                    @foreach($superadminPreviewLinks as $link)
+                        @if(isset($link['children']))
+                            <li class="treeview">
+                                <a href="#">
+                                    <i class="fa {{ $link['icon'] }}"></i>
+                                    <span>{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+                                <ul class="treeview-menu">
+                                    @foreach($link['children'] as $child)
+                                        <li>
+                                            <a href="{{ admin_url($child['uri']) }}">
+                                                <i class="fa {{ $child['icon'] }}"></i> {{ $child['title'] }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ admin_url($link['uri']) }}">
+                                    <i class="fa {{ $link['icon'] }}"></i> {{ $link['title'] }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @endif
             </ul>
 
 

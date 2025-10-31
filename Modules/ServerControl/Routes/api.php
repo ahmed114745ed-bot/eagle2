@@ -20,7 +20,7 @@ Route::middleware('auth:api')->get('/servercontrol', function (Request $request)
 });
 
 
-Route::prefix('')->middleware(['auth:sanctum'])->group(function(){
+Route::prefix('')->middleware(['auth:sanctum' ,'update.last.seen'])->group(function(){
     Route::resource('configs', ConfigControlController::class)->middleware("configM");
     Route::get('app-earned', [AppEarnedController::class, 'index'])->middleware("configM");
 });

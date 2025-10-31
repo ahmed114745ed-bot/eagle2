@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\V1\LeaderCCgameController;
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'generalBan'])
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'generalBan'  ,'update.last.seen'])
     ->group(function () {
 
         Route::prefix('game')->group(function () {

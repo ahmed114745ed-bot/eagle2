@@ -111,7 +111,7 @@ Route::middleware([])->group(function () {
         Route::get('/category', [ConfigController::class, "config"]);
     });
     
-Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
+    Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
 
     Route::prefix('families')->group(function () {
         Route::get('/', [FamilyController::class, 'index']);

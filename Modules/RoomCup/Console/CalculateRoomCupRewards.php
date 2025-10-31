@@ -25,27 +25,24 @@ class CalculateRoomCupRewards extends Command
 {
     protected $signature = 'roomcup:calculate-rewards';
     protected $description = 'Calculate RoomCup rewards and distribute profits to the owner and admins if the target is achieved';
+    protected string $type;
 
     public function handle(): int
     {
         $settings = $this->getRoomCupSettings();
         $type     = $settings['type'] ?? 'daily';
-
+        $this->type = $type ;
         if (!$this->isEnabledRoomCup($settings)) {
             $this->warn("⛔ Room Cup not enabled");
             return EnumCommand::SUCCESS;
         }
 
         [$start, $end] = $this->getPeriodByType($type);
-        Log::info('Period by type', [
-            'type'  => $type,
-            'start' => $start,
-            'end'   => $end,
-        ]);
+ 
 
         $this->logStart($start, $end);
 
-        $this->processGiftsInPeriod($start, $end);
+        $this->processGiftsInPeriod($start, $end , );
 
         $this->logEnd();
 
@@ -95,7 +92,7 @@ class CalculateRoomCupRewards extends Command
         };
     }
 
-    private function processGiftsInPeriod(Carbon $start, Carbon $end): void
+    private function processGiftsInPeriod(Carbon $start, Carbon $end ): void
     {
         TotalRoomGift::whereBetween('created_at', [$start, $end])
             ->orderBy('id')
@@ -122,13 +119,10 @@ class CalculateRoomCupRewards extends Command
 
         $room = Room::find($gift->room_id);
 
-
         if (!$room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
             return;
         }
-
-
 
         $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
@@ -137,22 +131,17 @@ class CalculateRoomCupRewards extends Command
 
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
         if ($gift->room_id == 215) {
-            Log::info('Gift Debug Data', [
-                'target' => $target,
-                'room'   => $room,
-            ]);
-           
-            Log::info('count', [
-                'visitor' => $visitorsCount,
-                'admin'   => $adminsCount,
-            ]);
+         
         }
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
             return;
         }
-        $room->max_admin = $target->number_of_admins;
+        $room->additional_admin = 0 ;
         $room->save();
+         self::adjustAdminsBasedOnTarget( $room , $target);
+       
+       
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
             $targetId = $target->id;
@@ -172,11 +161,36 @@ class CalculateRoomCupRewards extends Command
             }
 
             foreach ($rewards as $reward) {
-                $exists = RoomCupReward::where('room_id', $reward['room_id'])
-                    ->where('total_room_gift_id', $reward['total_room_gift_id'])
+                $tz = getTimezone();
+
+                $query = RoomCupReward::where('room_id', $reward['room_id'])
                     ->where('user_id', $reward['user_id'])
-                    ->where('type', $reward['type'])
-                    ->exists();
+                    ->where('type', $reward['type']);
+                
+                switch ($this->type) {
+                    case 'daily':
+                        $start = Carbon::now($tz)->startOfDay();
+                        $end   = Carbon::now($tz)->endOfDay();
+                        $query->whereBetween('created_at', [$start, $end]);
+                        break;
+                
+                    case 'weekly':
+                        $start = Carbon::now($tz)->startOfWeek();
+                        $end   = Carbon::now($tz)->endOfWeek();
+                        $query->whereBetween('created_at', [$start, $end]);
+                        break;
+                
+                    case 'monthly':
+                        $start = Carbon::now($tz)->startOfMonth();
+                        $end   = Carbon::now($tz)->endOfMonth();
+                        $query->whereBetween('created_at', [$start, $end]);
+                        break;
+                
+                    default:
+                        break;
+                }
+                
+                $exists = $query->exists();
 
                 if ($exists) {
                     $this->line("⏭️ Skipping duplicate reward for user {$reward['user_id']} in room {$reward['room_id']} (gift {$reward['total_room_gift_id']})");
@@ -227,4 +241,46 @@ class CalculateRoomCupRewards extends Command
             'updated_at'         => now(),
         ];
     }
+
+
+    public function adjustAdminsBasedOnTarget($room, $target): void
+    {
+        $currentTotal = $room->total_admins; 
+        $targetTotal  = (int) $target->number_of_admins; 
+    
+        $difference = $targetTotal - $currentTotal;
+    
+        if ($difference === 0) {
+            return;
+        }
+    
+        if ($difference > 0) {
+            $room->additional_admin += $difference;
+        } else {
+            $difference = abs($difference);
+            $room->additional_admin = max(0, $room->additional_admin - $difference);
+        }
+        $room->save();
+        $this->normalizeRoomAdmins($room);
+    }
+    
+    private function normalizeRoomAdmins($room): void
+    {
+        $roomAdmin = $room->room_admin;
+        $roomMax   = $room->total_admins; 
+        $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
+    
+        $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+        $adm_arr = array_filter(array_unique($adm_arr)); 
+    
+        $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
+    
+        if (count($adm_arr) > $allowedMax) {
+            $adm_arr = array_slice($adm_arr, 0, $allowedMax);
+        }
+        $str = implode(",", $adm_arr);
+        $room->update(['room_admin' => $str]);
+    }
+    
+
 }

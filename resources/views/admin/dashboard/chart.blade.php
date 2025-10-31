@@ -40,7 +40,7 @@ ul.list-unstyled {
 }
 </style>
 
-<div class="card cardHome">
+<div class="card cardHome" style="margin-bottom: 15px;">
     <div class="row">
         <!-- Left content with table -->
         <div class="col-md-6 d-flex align-items-center justify-content-center">
@@ -120,7 +120,7 @@ ul.list-unstyled {
                 },
                 title: {
                     display: true,
-                    text: '{{ __('admin.game_recharge_rate') }}' // Translation from Laravel lang files
+                    text: '{{ __('admin.game_recharge_rate') }}' 
                 }
             }
         }

@@ -138,6 +138,14 @@ class Kernel extends ConsoleKernel
 
         $this->scheduleRoomCupRewards($schedule);
 
+    
+        $schedule->command('users:update-offline')
+            ->everyThirtyMinutes()
+            ->timezone(getTimezone()) 
+            ->withoutOverlapping()
+            ->runInBackground();
+        
+
         // $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
 
 

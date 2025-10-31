@@ -57,12 +57,19 @@ class UserAchievementLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserAchievementLevel());
-
+        $countryID = session('country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1/2, function ($filter) {
                 $filter->equal('user.uuid',__('uuid'));
 
+            });
+        });
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                });
             });
         });
         $grid->disableCreateButton();

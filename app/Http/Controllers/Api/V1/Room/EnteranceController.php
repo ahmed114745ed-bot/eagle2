@@ -53,6 +53,13 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
+        \Log::info('Zego Room Count Update Request:', [
+            'url' => $request->fullUrl(),
+            // 'method' => $request->method(),
+            // 'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            // 'ip' => $request->ip(),
+        ]);
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
@@ -65,11 +72,13 @@ class EnteranceController extends Controller
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('video_library');
-        $liveLibrary = Common::getConfig('live_library');
+        $liveLibrary = (int) Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+        $is_auto_preview = (int) Common::getConfig('is_auto_preview');
+
 
         $libraries = ['agora', 'zego', 'tencent'];
-        $liveTypes = ['RTC', 'CDN', 'L3'];
+        $liveTypes = ['RTC', 'CDN', 'L3' ];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -81,6 +90,8 @@ class EnteranceController extends Controller
                 'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
+            'is_auto_preview' => $is_auto_preview == 1 ? true : false, 
+
 
         ];
         return Common::apiResponse(1, '', $data);
@@ -243,7 +254,7 @@ class EnteranceController extends Controller
     {
         $user = $request->user();
         $app_feature = \Cache::get('zego_feature');
-        if (!$app_feature && !is_null($app_feature)) {
+        if ($app_feature &&$app_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();

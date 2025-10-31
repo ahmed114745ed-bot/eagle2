@@ -7,12 +7,15 @@ use DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bd extends Model
 {
     use TimestampsWithTimezone;
 
     protected $table = 'admin_users';
+
+    protected $guarded = [];
 
     protected $attributes = [
         'type' => 'bd',
@@ -21,6 +24,16 @@ class Bd extends Model
     public function appUser()
     {
         return $this->belongsTo(User::class, 'app_id');
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(SuperAdmin::class, 'parent_id');
     }
 
     public function agencies()
@@ -59,22 +72,28 @@ class Bd extends Model
 
     protected static function booted(): void
     {
-
+        // scope يجيب بس ال BD
         self::addGlobalScope('bdOnly', function (Builder $builder) {
             $builder->where('type', 'bd');
         });
-
+    
+        // عند الحذف
         self::deleting(function (Bd $bd) {
+            // نجيب الافتراضي الآخر لنفس السوبر ادمن
             $defaultBd = self::where('default', 1)
+                ->where('parent_id', $bd->parent_id)
                 ->where('id', '!=', $bd->id)
                 ->first();
-
+    
             if ($defaultBd) {
+                // ننقل الوكالات لل BD الافتراضي
                 Agency::where('bd_id', $bd->id)
                     ->update(['bd_id' => $defaultBd->id]);
             } else {
-                throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                throw new Exception('لا يوجد BD افتراضي آخر لنقل الوكالات إليه.');
             }
+    
+            // نفصل علاقة المستخدم لو مرتبطة
             $userApp = User::find($bd->app_id);
             if ($userApp) {
                 $userApp->is_bd = 0;
@@ -84,44 +103,58 @@ class Bd extends Model
             }
         });
     }
-
+    
     protected static function boot()
     {
         parent::boot();
-
-        self::creating(function ($model) {
+    
+        // عند الإنشاء
+        self::creating(function (Bd $model) {
             $model->type = 'bd';
-
+    
             if ($model->default) {
-                static::query()->update(['default' => 0]);
+                // نخلي باقي BDs لنفس السوبر = 0
+                static::where('parent_id', $model->parent_id)
+                    ->update(['default' => 0]);
+    
+                // نربط الوكالات اللي مالهاش BD بالافتراضي الجديد
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
                 })->update(['bd_id' => $model->id]);
             }
         });
-
-        self::updating(function ($model) {
+    
+        // عند التحديث
+        self::updating(function (Bd $model) {
             if ($model->default) {
-                static::where('id', '!=', $model->id)->update(['default' => 0]);
+                // نخلي الافتراضي واحد بس لنفس السوبر
+                static::where('parent_id', $model->parent_id)
+                    ->where('id', '!=', $model->id)
+                    ->update(['default' => 0]);
+    
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
                 })->update(['bd_id' => $model->id]);
             }
-
-            if ($model->app_id) {
-                $userApp = User::find($model->getOriginal('app_id')); 
-                if ($userApp) {
-                    $userApp->is_bd = 0;
-                    $userApp->type_user = 0;
-                    $userApp->agency_id = 0;
-                    $userApp->save();
+    
+            // لو غيرنا app_id → نفضي القديم
+            if ($model->isDirty('app_id')) {
+                $oldAppId = $model->getOriginal('app_id');
+                if ($oldAppId) {
+                    $userApp = User::find($oldAppId);
+                    if ($userApp) {
+                        $userApp->is_bd = 0;
+                        $userApp->type_user = 0;
+                        $userApp->agency_id = 0;
+                        $userApp->save();
+                    }
                 }
             }
-
         });
     }
+    
 
 
     public function incrementCutAmountInBdSallary(int $amount)
@@ -148,5 +181,11 @@ class Bd extends Model
             ->sum(DB::raw('salary - cut_amount'));
 
         return floor($userSallary);
+    }
+
+    public function salaries()
+    {
+        return $this->hasMany(BdSalary::class, 'bd_id', 'id');
+    
     }
 }
