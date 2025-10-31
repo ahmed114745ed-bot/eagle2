@@ -6,7 +6,7 @@ on:
       - zion
 jobs:
   run_zion_hub:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest #[self-hosted]
     steps:
       - name: print out Zion Hub
         uses: appleboy/ssh-action@v1.2.1
@@ -32,7 +32,7 @@ jobs:
               echo "Disk space is within acceptable limits $current% "
             fi
   run_zion_app:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest #[self-hosted]
     needs: run_zion_hub
     steps:
       - name: print out Zion App
@@ -78,7 +78,7 @@ jobs:
               echo "Disk space is within acceptable limits $current% "
             fi
   run_zion_job:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest #[self-hosted]
     needs: run_zion_hub
     steps:
       - name: print out Zion Job
