@@ -178,10 +178,10 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
 Route::get('/run-seeders', function () {
 
     // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
-    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    // Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    // Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    // Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    // Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
     Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
 
