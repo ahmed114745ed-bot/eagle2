@@ -1,0 +1,86 @@
+name: SSh-tempo-pipline
+on:
+  push:
+    branches: ["tempoAppLive"]
+jobs:
+  run_tempo_hub:
+    runs-on: [self-hosted] #ubuntu-latest
+    steps:
+    - name: print out Tempo
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.56.160"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        script: |
+          cd /var/www/tempo
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_tempo_app:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_tempo_hub
+    steps:
+    - name: print out Tempo
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.56.160"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/tempo
+          pwd
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t tempo:${{ github.sha }} .
+          docker service update --image tempo:${{ github.sha }} tempo-app
+
+          # Get container ID of task 5live-app.1
+          CONTAINER_ID=$(docker ps --filter "name=tempo-app.1." --format "{{.ID}}" | head -n 1)
+
+          # Run artisan command inside that container
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
+          else
+            echo "No running container found for tempo-app.1. service task"
+            exit 1
+          fi
+
+          # check again
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_tempo_job:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_tempo_hub
+    steps:
+    - name: print out Tempo Job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.56.160"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/tempo
+          pwd
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t tempo-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image tempo-job:${{ github.sha }} tempo-job
