@@ -106,7 +106,7 @@ class RestoreSuperAdminController extends MainController
         });
 
         $grid->column('country.name', __('country'));
-        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('restore'))->display(function () {
                 $superAdmin = SuperAdmin::where('country_id', $this->country_id)->first();
                 return  $superAdmin ? __('can not restore this super admin') : (new \App\Admin\Actions\RestoreSuperAdminAction($this->id))->render();
