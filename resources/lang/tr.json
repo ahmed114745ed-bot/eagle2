@@ -26,6 +26,7 @@
     "Family Owner": "Aile Sahibi",
     "Area Manager": "Bölge Müdürü",
     "Acquisitions": "Edinimler",
+    "user joined agency before": "Kullanıcı daha önce ajansa katıldı",
     "Top 3 Most Active BD": "En Aktif 3 BD",
      "feature": "özellik",
     "BDs": "İş Geliştiriciler (BDs)",
@@ -3764,7 +3765,9 @@
     "Options Type": "Seçenek Türü",
     "Custom Options": "Özel Seçenekler",
     "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Her satıra bir seçenek girin veya çeviriler için JSON formatını kullanın: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
-    ,  "Field":"Alan"
+    ,  "Field":"Alan",
+    "Field Type":"Alan Gönder"
+
 
 
 }

@@ -2802,6 +2802,7 @@
     "Level Interval": "هدايا المستوى",
     "Acquisitions":"المكتسبات",
     "Gold Coins": "سيلفر كوينز",
+    "user joined agency before": "المستخدم انضم إلى الوكالة من قبل",
     "BD": "BD",
     "Version": "الإصدار",
     "Manger Agency Manager": "مدير وكالة المدير",
@@ -4271,7 +4272,9 @@
   "Options Type": "نوع الخيارات",
   "Custom Options": "خيارات مخصصة",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "أدخل خيارًا في كل سطر، أو استخدم تنسيق JSON للترجمات مثل: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}",
-  "Field":"حقل"
+  "Field":"حقل",
+  "Field Type":"نوع الحقل"
+
 
 
 

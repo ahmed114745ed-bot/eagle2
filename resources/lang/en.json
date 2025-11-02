@@ -1355,7 +1355,9 @@
 "Options Type": "Options Type",
 "Custom Options": "Custom Options",
 "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
-,  "Field":"Field"
+,  "Field":"Field",
+"Field Type":"Field Type"
+
 
 
 
