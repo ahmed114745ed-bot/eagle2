@@ -553,6 +553,87 @@ class MicService
         return $room;
     }
 
+    public function mic2($data, $type)
+    {
+        $user = request()->user();
+        $position = $data['position'];
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
+        if (!$room) throw new Exception(__('room fot found'));
+//        if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
+//            throw new Exception(__('you do not have permission'));
+//        }
+//        $data['owner_id'] = $room->uid;
+//
+//        if ($room['mode'] == 0) {
+//            if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
+//        } else {
+//            if ($position < 0 || $position > 17) throw new Exception(__('api_responses.position_error'));
+//        }
+//        $admins = $room->room_admin;
+//        $admins = explode(',', $admins);
+//
+//        if ($data->user()->id != $data['owner_id'] && !in_array($data->user()->id, $admins)) {
+//            return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
+//        }
+
+        $admins = $room->room_admin ? explode(',', $room->room_admin) : [];
+
+        if ($user->id != $room->uid && !in_array($user->id, $admins)) {
+            throw new Exception(__('you do not have permission'));
+        }
+
+        $data['owner_id'] = $room->uid;
+
+        // position validation based on room mode
+        $maxPositions = $room->mode == 0 ? 9 : 17;
+        if ($position < 0 || $position > $maxPositions) {
+            throw new Exception(__('api_responses.position_error'));
+        }
+
+        // $microphone = $room->getOriginal('microphone');
+//        $microphone = $room->all_microphone;
+        //        logger('microphone:', [$microphone]);
+
+//        $microphone = $this->micType($type, $microphone, $position);
+        //        logger(' end microphone:', [$microphone]);
+
+        $micSeat = $room->microphones()->where('position', $position)->first();
+
+        if (!$micSeat) {
+            $micSeat = $room->microphones()->create([
+                'position' => $position,
+                'user_id'  => null,
+                'status'   => 0,
+            ]);
+        }
+
+        $this->micType2($type, $micSeat);
+
+        return $room;
+    }
+
+    public function micType2(string $type, $micSeat)
+    {
+        $userId = $micSeat->user_id ?? 0;
+        $status = $micSeat->status ?? 0;
+
+        if ($type === 'mute') {
+            $status = -2;
+        } elseif ($type === 'unmute' || $type === 'open') {
+            $status = 0;
+        } elseif ($type === 'shut') {
+            $status = -1;
+        }
+
+        $micSeat->update([
+            'status' => $status,
+        ]);
+
+        return $micSeat;
+    }
 
     public function kickMicrophone($data)
     {

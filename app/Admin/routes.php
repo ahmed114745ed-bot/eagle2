@@ -1,13 +1,5 @@
 <?php
 
-use App\Admin\Controllers\AdminNotification;
-use App\Admin\Controllers\AllStatisticController;
-use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\SuperadminBannerHistoryController;
-use App\Admin\Controllers\SuperadminBannerRequestController;
-use App\Admin\Controllers\SuperAdminHomeCarouselController;
-use App\Admin\Controllers\SuperAdminStatisticController;
-use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +23,7 @@ use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\TargetController;
+use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
@@ -73,8 +66,10 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ZegoFeatureController;
+use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\HomeCarouselController;
+use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -108,6 +103,7 @@ use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\RestoreSuperAdminController;
 use App\Admin\Controllers\UserChargeHistoryController;
 use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
@@ -120,17 +116,22 @@ use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
+use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
+use App\Admin\Controllers\SuperAdminHomeCarouselController;
+use App\Admin\Controllers\SuperadminBannerHistoryController;
+use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 
 Route::group(
     [
@@ -490,6 +491,7 @@ Route::group(
         Route::resource('usersBd-settings', BdSelectController::class);
 
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::resource('restore-super-admins', RestoreSuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
