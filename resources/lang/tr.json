@@ -3759,6 +3759,13 @@
     "Main Section": "Ana Bölüm",
     "Submit Form": "Formu Gönder",
     "Section Title": "Bölüm Başlığı",
-    "Form Requests": "Form Talepleri"
+    "Form Requests": "Form Talepleri",
+    "Select Options Configuration": "Seçenek Yapılandırması",
+    "Pre-defined Data": "Önceden Tanımlanmış Veriler",
+    "Options Type": "Seçenek Türü",
+    "Custom Options": "Özel Seçenekler",
+    "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Her satıra bir seçenek girin veya çeviriler için JSON formatını kullanın: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
+    ,  "Field":"Alan"
+
 
 }

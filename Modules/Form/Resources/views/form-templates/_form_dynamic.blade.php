@@ -70,7 +70,7 @@
 </div>
 
 <div class="flex justify-end space-x-4">
-    <a href="{{ route('form-templates.index') }}" 
+    <a href="{{ admin_url('form-templates') }}" 
        class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
         {{ __('Cancel') }}
     </a>
