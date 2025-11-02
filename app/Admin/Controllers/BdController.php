@@ -308,6 +308,36 @@ class BdController extends MainController
                 // Append the custom HTML button to the grid's toolbar
                 $tools->append($customButtonHTML);
             });
+
+              $grid->tools(function ($tools) {
+               $logoutUrl = route('admin.bd.logout'); 
+               $loginText = __('login'); 
+               $areaManagerUrl = url('/bd/login');
+
+               $customButtonHTML = <<<HTML
+               <div style="display: contents; align-items: center;">
+                   <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                       <i class="fa fa-sign-in"></i> {$loginText}
+                   </a>
+                   <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                       <i class="fa fa-copy"></i>   
+                   </button>
+
+               </div>
+                    <script>
+                   function copyAreaManagerUrl() {
+                       const url = '{$areaManagerUrl}';
+                       navigator.clipboard.writeText(url).then(() => {
+                           toastr.success('تم نسخ الرابط بنجاح');
+                       }).catch(() => {
+                           alert('تعذر نسخ الرابط');
+                       });
+                   }
+               </script>
+               HTML;
+
+               $tools->append($customButtonHTML);
+           });
         }
 
         $grid->disableRowSelector();
