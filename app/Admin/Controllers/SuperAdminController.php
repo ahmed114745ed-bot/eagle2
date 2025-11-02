@@ -357,7 +357,7 @@ class SuperAdminController extends MainController
             $ops       = [null => __('no country')];
             $countries = Country::doesntHave('superAdmin')->orWhere('id', $value)->get();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
             }
             return $ops;
         })->required();

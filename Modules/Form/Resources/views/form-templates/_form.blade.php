@@ -32,8 +32,16 @@
     .text-lg {
     font-size: 1.425rem !important;
     }
-
-</style>
+    .secondary{
+        background: var(--secondary-color) !important;
+    }
+    
+    .field-item{
+        /* background: #959595 !important; */
+        border: 2px solid #959595 !important;
+    }
+    
+    </style>
 
 {{-- Form Template Info --}}
 <div class="mb-8 p-6  rounded-lg border-2  ">
@@ -48,15 +56,15 @@
         {{-- Title Fields (dynamic locales) --}}
         <div class="mb-6">
             <h3 class=" font-semibold mb-3">{{ __('Form Title') }} *</h3>
-            <div class="grid grid-cols-1 md:grid-cols-{{ min(2, count($locales)) }} gap-4">
-                @foreach($locales as $locale)
+            <div class="grid grid-cols-1 md:grid-cols-{{ min(4, count($locales)) }} gap-4">
+                @foreach($locales as $key =>$locale)
                     <div class="relative">
-                        <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
+                        <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
                         <input type="text" name="title[{{ $locale }}]" {{ $loop->first ? 'required' : '' }}
                                @if($locale === 'ar') dir="rtl" @endif
                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                                placeholder="{{ __('Form Title') }}"
-                               value="{{ old('title.'.$locale, $template->getTranslation('title', $locale)) }}">
+                               value="{{ old('title.'.$key, $template->getTranslation('title', $key)) }}">
                     </div>
                 @endforeach
             </div>
@@ -70,13 +78,14 @@
         </div>
 
         {{-- Description Fields (dynamic locales) --}}
-        <div id="descriptionInputs" class="grid grid-cols-1 md:grid-cols-{{ min(2, count($locales)) }} gap-4">
-            @foreach($locales as $locale)
+        <div id="descriptionInputs" class="grid grid-cols-1 md:grid-cols-{{ min(4, count($locales)) }} gap-4">
+            @foreach($locales as $key =>$locale)
+        
                 <div class="relative">
-                    <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
+                    <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
                     <textarea name="description[{{ $locale }}]" rows="3" @if($locale === 'ar') dir="rtl" @endif
                               class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                              placeholder="{{ __('Form description') }}">{{ old('description.'.$locale, $template->getTranslation('description', $locale)) }}</textarea>
+                              placeholder="{{ __('Form description') }}">{{ old('description.'.$key, $template->getTranslation('description', $key)) }}</textarea>
                 </div>
             @endforeach
         </div>
@@ -184,14 +193,14 @@ function addSection(data = null) {
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
         return `
             <div class="relative">
-                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${locale.toUpperCase()}</div>
+                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">${locale.toUpperCase()}</div>
                 <input type="text" name="sections[${sectionCount}][title][${locale}]" ${locale === locales[0] ? 'required' : ''} ${dir}
                     class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                     placeholder="" value="${escapeHtml(val)}">
             </div>`;
     }).join('');
     const canDeleteSection = !data || data.can_not_delete != 1;
-    console.log(data);
+    // console.log(data);
 
     const deleteSectionButton = canDeleteSection
         ? `  <button type="button" onclick="removeSection(${sectionCount})"
@@ -203,7 +212,7 @@ function addSection(data = null) {
                 <i class="fas fa-lock"></i>
             </button>`;
     const sectionHtml = `
-        <div class="section-item mb-6 p-6   rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
+        <div class="section-item mb-6 p-6  section-style  rounded-lg border-2 border-blue-300" data-section="${sectionCount}">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center">
                     <span class="section-drag-handle cursor-move px-2">
@@ -222,7 +231,7 @@ function addSection(data = null) {
             <div class="section-content">
                 <div class="mb-4">
                     <h4 class="text-md font-semibold mb-3">${'{{ __('Section Title') }}'} *</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(2, locales.length)} gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-4">
                         ${titlesHtml}
                     </div>
                 </div>
@@ -272,7 +281,10 @@ function addField(sectionId, data = null) {
     }
     const fieldId = fieldCounts[sectionId];
   
-    
+    const canDeleteSection = data && data.can_not_delete;
+
+    // console.log(canDeleteSection);
+    // console.log(data);
 
     // build multilingual label inputs
     const labelHtml = locales.map(locale => {
@@ -280,7 +292,7 @@ function addField(sectionId, data = null) {
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
         return `
             <div class="relative">
-                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${locale.toUpperCase()}</div>
+                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">${locale.toUpperCase()}</div>
                 <input type="text" name="sections[${sectionId}][fields][${fieldId}][label][${locale}]" ${locale === locales[0] ? 'required' : ''} ${dir}
                     class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg"
                     placeholder="" value="${escapeHtml(val)}">
@@ -293,7 +305,7 @@ function addField(sectionId, data = null) {
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
         return `
             <div class="relative">
-                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${locale.toUpperCase()}</div>
+                <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">${locale.toUpperCase()}</div>
                 <input type="text" name="sections[${sectionId}][fields][${fieldId}][placeholder][${locale}]" ${dir}
                     class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg"
                     placeholder="" value="${escapeHtml(val)}">
@@ -338,21 +350,21 @@ function addField(sectionId, data = null) {
             <div class="section-content">
                 <div class="mb-4">
                     <h5 class="text-lg font-semibold mb-2">${'{{ __('Field Label') }}'} *</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(2, locales.length)} gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-3">
                         ${labelHtml}
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                     <div class="field-name-container">
-                        <label class="block text-xs font-semibold mb-1">${'{{ __('Field Name') }}'} *</label>
-                        <input type="text" name="sections[${sectionId}][fields][${fieldId}][name]" required
+                        <label class="block text-lg font-semibold mb-1">${'{{ __('Field Name') }}'} *</label>
+                        <input type="text" ${canDeleteSection ? 'readonly' : ''} name="sections[${sectionId}][fields][${fieldId}][name]" required
                             class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg field-name-input"
                             placeholder="full_name" value="${data ? escapeHtml(data.field_name || '') : ''}">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold mb-1">${'{{ __('Field Type') }}'} *</label>
-                        <select name="sections[${sectionId}][fields][${fieldId}][type]" required
+                        <label class="block text-lg font-semibold mb-1">${'{{ __('Field Type') }}'} *</label>
+                        <select ${canDeleteSection ? 'disabled' : ''} name="sections[${sectionId}][fields][${fieldId}][type]" required
                                 class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg field-type-select"
                                 onchange="handleFieldTypeChange(${sectionId}, ${fieldId}, this)">
                             <option value="text" ${data && data.field_type === 'text' ? 'selected' : ''}>${'{{ __('Text') }}'}</option>
@@ -372,7 +384,7 @@ function addField(sectionId, data = null) {
 
                 <!-- Custom Widget Selector (shown only when field type is 'custom') -->
                 <div class="mb-4 widget-selector-container" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
-                    <label class="block text-xs font-semibold mb-1">
+                    <label class="block text-lg font-semibold mb-1">
                         <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>
                         ${'{{ __('Select Custom Widget') }}'} *
                     </label>
@@ -381,14 +393,14 @@ function addField(sectionId, data = null) {
                         <option value="">-- ${'{{ __('Choose a widget') }}'} --</option>
                         ${widgetOptionsHtml}
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="text-lg text-gray-500 mt-1">
                         <i class="fas fa-info-circle"></i> ${'{{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}'}
                     </p>
                 </div>
 
                 <div class="mb-4 placeholder-container" style="display: ${data && data.field_type === 'custom' ? 'none' : 'block'};">
                     <h5 class="text-lg font-semibold mb-2">${'{{ __('Placeholder Text') }}'}</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(2, locales.length)} gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-3">
                         ${placeholderHtml}
                     </div>
                 </div>
@@ -402,7 +414,7 @@ function addField(sectionId, data = null) {
                     
                     <!-- Options Type Selector -->
                     <div class="mb-3  p-3 rounded-lg">
-                        <label class="block text-xs font-semibold mb-2">${'{{ __('Options Type') }}'}</label>
+                        <label class="block text-lg font-semibold mb-2">${'{{ __('Options Type') }}'}</label>
                         <div class="flex gap-4">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sections[${sectionId}][fields][${fieldId}][options_type]" 
@@ -433,7 +445,7 @@ function addField(sectionId, data = null) {
                                   rows="4" 
                                   class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg font-mono"
                                   placeholder="${'{{ __('Enter one option per line or JSON format') }}'}\nOption 1\nOption 2\nOption 3">${data && data.options ? (typeof data.options === 'object' ? JSON.stringify(data.options, null, 2) : data.options) : ''}</textarea>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-lg text-gray-500 mt-1">
                             <i class="fas fa-info-circle"></i> 
                             ${'{{ __('Enter one option per line, or use JSON format for translations: {"en":"Option 1","ar":"خيار 1"}') }}'}
                         </p>
@@ -457,7 +469,7 @@ function addField(sectionId, data = null) {
                                 <i class="fas fa-dollar-sign"></i> ${'{{ __('Currencies') }}'}
                             </option>
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-lg text-gray-500 mt-1">
                             <i class="fas fa-info-circle"></i> 
                             ${'{{ __('Options will be loaded dynamically from server') }}'}
                         </p>

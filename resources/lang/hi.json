@@ -40,6 +40,8 @@
 "All Agencies in your Country": "आपके देश की सभी एजेंसियाँ",
 "Bds in Specific Country": "किसी विशिष्ट देश में बीडीज़",
 "Shipping Agencies in Specific Country": "किसी विशिष्ट देश में शिपिंग एजेंसियाँ",
+    "user joined agency before": "उपयोगकर्ता पहले ही एजेंसी में शामिल हो चुका है",
+    "You cannot delete the default BD for this country.": "आप इस देश के डिफ़ॉल्ट BD को नहीं हटा सकते हैं।",
     "all agencies": "सभी एजेंसियाँ",
     "All Agencies in Country": "देश की सभी एजेंसियाँ",
     "Specific Agency by ID": "आईडी द्वारा विशेष एजेंसी",
@@ -3367,8 +3369,11 @@
   "Options Type": "विकल्प का प्रकार",
   "Custom Options": "कस्टम विकल्प",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "प्रत्येक पंक्ति में एक विकल्प दर्ज करें, या अनुवादों के लिए JSON प्रारूप का उपयोग करें: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
+  ,  "Field":"फील्ड",
+  "Field Type":"फॉर्म फील्ड"
 
-  
+
+
 
 
 

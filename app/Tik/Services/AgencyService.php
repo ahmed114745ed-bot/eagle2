@@ -171,25 +171,25 @@ class AgencyService
 
     public function stars($agencyId, $request)
     {
-        $timezone = getTimezone(); 
+        $timezone = getTimezone();
         $year = $request->year ?? Carbon::now($timezone)->year;
         $month = $request->month ?? Carbon::now($timezone)->month;
-    
+
         $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
         $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
-    
+
         return $this->giftLogRepository->getByAgency('receiver', $start, $end, $agencyId, 'receiver_id', 10, $request->page);
     }
-    
+
     public function heroes($agencyId, $request)
     {
         $timezone = getTimezone();
         $year = $request->year ?? Carbon::now($timezone)->year;
         $month = $request->month ?? Carbon::now($timezone)->month;
-    
+
         $start = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfMonth()->utc();
         $end = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->utc();
-    
+
         return $this->giftLogRepository->getByAgency('sender', $start, $end, $agencyId, 'sender_id', 10, $request->page);
     }
 
@@ -229,7 +229,7 @@ class AgencyService
         if (!$agency) throw new Exception('u_not_owner_agncy');
         if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
 
-        if ($user->agency_id) throw new Exception('user joined agency before');
+        if ($user->agency_id) throw new Exception(__('user joined agency before'));
 
         $action = $this->agencyJoinRequestRepository->findRequest($user->id, $agency->id);
 

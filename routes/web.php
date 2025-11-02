@@ -1,6 +1,8 @@
 <?php
 
 use App\Admin\Controllers\AuthController;
+use App\Models\Bd;
+use App\Models\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -688,7 +690,26 @@ Route::get('/fix-agencies-bd', function () {
     return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
 });
 
+Route::get('assign-super-admin-bd', function () {
+    $bds = Bd::whereNull('parent_id')->get();
 
+    foreach ($bds as $bd) {
+        if (!$bd->country_id) {
+            continue;
+        }
+
+        $superAdmin = SuperAdmin::where('country_id', $bd->country_id)
+            ->where('type', 'superadmin')
+            ->first();
+
+        if ($superAdmin) {
+            $bd->parent_id = $superAdmin->id;
+            $bd->save();
+        }
+    }
+
+    return "Parent IDs updated successfully.";
+});
 
 Route::get('/migrate-home-carousel', function () {
 
