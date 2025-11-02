@@ -3,7 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Bd;
-use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -11,12 +10,14 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Country;
+use App\Models\SuperAdmin;
 use App\Models\AreaManager;
 use Encore\Admin\Layout\Row;
 use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
 use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +26,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
-use Illuminate\Validation\Rule;
 
 class AreaManagerController extends MainController
 {
@@ -131,8 +132,8 @@ class AreaManagerController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
             if (! isImageExists($url)) {
-            $url = $defaultImage;
-        }
+                $url = $defaultImage;
+            }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/users/{$user->id}");
 
@@ -157,24 +158,24 @@ class AreaManagerController extends MainController
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'area-manager')->first();
-                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
- 
-                 $customButtonHTML = <<<HTML
+                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
+                $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
+
+                $customButtonHTML = <<<HTML
                  <div style="display: contents; align-items: center;">
                      <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                           {$milestone}
                      </a>
                  </div>
              HTML;
- 
-                 // Append the custom HTML button to the grid's toolbar
-                 $tools->append($customButtonHTML);
-             });
+
+                // Append the custom HTML button to the grid's toolbar
+                $tools->append($customButtonHTML);
+            });
 
             $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.custom.logout'); 
-                $loginText = __('login'); 
+                $logoutUrl = route('admin.custom.logout');
+                $loginText = __('login');
                 $areaManagerUrl = url('/areaManager/login');
 
                 $customButtonHTML = <<<HTML
@@ -205,6 +206,13 @@ class AreaManagerController extends MainController
 
         $grid->disableRowSelector();
         $this->extendGrid($grid);
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteAreaManagerAction());
+            }
+        });
 
         return $grid;
     }
@@ -230,18 +238,18 @@ class AreaManagerController extends MainController
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
                 $table = "{$connection}.{$userTable}";
-        
+
                 $rules = ['required'];
-        
+
                 $uniqueRule = Rule::unique($table, 'username');
-        
+
                 if (!$form->isCreating()) {
                     $id = $form->model()?->id ?? null;
                     $uniqueRule->ignore($id);
                 }
-        
+
                 $rules[] = $uniqueRule;
-        
+
                 return $rules;
             });
 

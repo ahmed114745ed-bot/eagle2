@@ -2,23 +2,26 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubAreaManager extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
 
     protected $attributes = [
         'type' => 'area-manager',
     ];
+
+    protected $dates = ['deleted_at'];
 
     public function appUser()
     {
@@ -47,22 +50,15 @@ class SubAreaManager extends Model
             $builder->where('type', 'sub_area_manager');
         });
 
-        self::deleting(function (SuperAdmin $superAdmin) {
-        });
+        self::deleting(function (SuperAdmin $superAdmin) {});
     }
 
     protected static function boot()
     {
         parent::boot();
 
-        self::creating(function ($model) {
+        self::creating(function ($model) {});
 
-        });
-
-        self::updating(function ($model) {
-
-        });
+        self::updating(function ($model) {});
     }
-
-
 }
