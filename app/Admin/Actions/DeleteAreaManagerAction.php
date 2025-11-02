@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Models\AreaManager;
 use App\Models\Country;
 use App\Models\SubAreaManager;
 use App\Models\User;
@@ -36,7 +37,8 @@ class DeleteAreaManagerAction extends RowAction
             $user->save();
             MilestoneHelper::removeReward($user, 'area-manager');
         }
-
+        $default = AreaManager::where('default', 1)->first();
+        if ($default) SuperAdmin::where('parent_id', $model->id)->update(['parent_id' => $default->id]);
         $subAppId = SubAreaManager::where('parent_id', $model->id)->pluck('app_id')->toArray();
         if (!empty($subAppId)) {
             User::whereIn('id', $subAppId)->update(['sub_area_manger' => 0]);
