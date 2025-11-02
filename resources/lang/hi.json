@@ -3361,7 +3361,14 @@
   "Main Section": "मुख्य अनुभाग",
   "Submit Form": "फॉर्म जमा करें",
   "Section Title": "सेक्शन शीर्षक",
-  "Form Requests": "फॉर्म अनुरोध"
+  "Form Requests": "फॉर्म अनुरोध",
+  "Select Options Configuration": "विकल्प कॉन्फ़िगरेशन चुनें",
+  "Pre-defined Data": "पूर्वनिर्धारित डेटा",
+  "Options Type": "विकल्प का प्रकार",
+  "Custom Options": "कस्टम विकल्प",
+  "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "प्रत्येक पंक्ति में एक विकल्प दर्ज करें, या अनुवादों के लिए JSON प्रारूप का उपयोग करें: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
+
+  
 
 
 

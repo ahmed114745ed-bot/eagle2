@@ -1349,7 +1349,12 @@
 "Section Title": "Section Title",
 "Form Requests": "Form Requests",
 "Form-requests": "Form Requests",
-"form-requests": "Form Requests"
+"form-requests": "Form Requests",
+"Select Options Configuration": "Select Options Configuration",
+"Pre-defined Data": "Pre-defined Data",
+"Options Type": "Options Type",
+"Custom Options": "Custom Options",
+"Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
 
 
 
