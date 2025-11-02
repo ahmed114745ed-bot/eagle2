@@ -1,6 +1,8 @@
 <?php
 
 use App\Admin\Controllers\AuthController;
+use App\Models\Bd;
+use App\Models\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -390,6 +392,9 @@ Route::get('/clear-admin-error', function () {
     return 'Session cleared!';
 });
 
+Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
+Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
+Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
@@ -660,7 +665,26 @@ Route::get('/fix-agencies-bd', function () {
     return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
 });
 
+Route::get('assign-super-admin-bd', function () {
+    $bds = Bd::whereNull('parent_id')->get();
 
+    foreach ($bds as $bd) {
+        if (!$bd->country_id) {
+            continue;
+        }
+
+        $superAdmin = SuperAdmin::where('country_id', $bd->country_id)
+            ->where('type', 'superadmin')
+            ->first();
+
+        if ($superAdmin) {
+            $bd->parent_id = $superAdmin->id;
+            $bd->save();
+        }
+    }
+
+    return "Parent IDs updated successfully.";
+});
 
 Route::get('/migrate-home-carousel', function () {
 
@@ -675,7 +699,7 @@ Route::get('/migrate-home-carousel', function () {
         if ($carousel->display_country)      $displayTypes[] = 'country';
         if ($carousel->display_discover)     $displayTypes[] = 'discover';
 
- 
+
         $unitMap = [
             0 => null,
             1 => 'hours',
@@ -683,7 +707,7 @@ Route::get('/migrate-home-carousel', function () {
             3 => 'months',
         ];
 
-        $unit = $unitMap[$carousel->form ?? 2] ?? 'days'; 
+        $unit = $unitMap[$carousel->form ?? 2] ?? 'days';
 
         $endAt = null;
         if (!empty($carousel->input) && $carousel->input > 0) {

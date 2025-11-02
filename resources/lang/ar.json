@@ -2802,6 +2802,7 @@
     "Level Interval": "هدايا المستوى",
     "Acquisitions":"المكتسبات",
     "Gold Coins": "سيلفر كوينز",
+    "user joined agency before": "المستخدم انضم إلى الوكالة من قبل",
     "BD": "BD",
     "Version": "الإصدار",
     "Manger Agency Manager": "مدير وكالة المدير",
@@ -2940,7 +2941,8 @@
   "Delete close room": "حذف الغلق",
   "Edit close room": "تعديل غرفة مغلقة",
   "Show close room": "عرض غرفة مغلقة",
-  "close room":"غرفة مغلقة",
+    "You cannot delete the default BD for this country.": "لا يمكنك حذف الفرع الافتراضي لهذا البلد.",
+    "close room":"غرفة مغلقة",
   "Create special uuid requests": "إنشاء طلبات المعرف المميز خاصة",
   "Delete special uuid requests": "حذف طلبات المعرف المميز خاصة",
   "Edit special uuid requests": "تعديل طلبات المعرف المميز خاصة",
@@ -4265,7 +4267,15 @@
   "Section": "القسم",
   "Form Requests": "طلبات النماذج",
   "Form-requests": "طلبات النماذج",
-  "form-requests": "طلبات النماذج"
+  "form-requests": "طلبات النماذج",
+  "Select Options Configuration": "إعدادات خيارات التحديد",
+  "Pre-defined Data": "بيانات محددة مسبقًا",
+  "Options Type": "نوع الخيارات",
+  "Custom Options": "خيارات مخصصة",
+  "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "أدخل خيارًا في كل سطر، أو استخدم تنسيق JSON للترجمات مثل: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}",
+  "Field":"حقل",
+  "Field Type":"نوع الحقل"
+
 
 
 

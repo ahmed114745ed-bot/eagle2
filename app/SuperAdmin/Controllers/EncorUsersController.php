@@ -173,9 +173,10 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
 
-        $grid->model()->where(function ($q) {
-            $q->where('type', PermissionType::SUB_SUPER_ADMIN->value);
+        $grid->model()->where(function ($q) use ($authId) {
+            $q->where('parent_id', $authId);
         })
             ->where('is_preview', 0)
             ->where('country_id', auth()->user()->country_id)
