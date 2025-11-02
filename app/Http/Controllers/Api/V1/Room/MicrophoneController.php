@@ -197,7 +197,7 @@ class MicrophoneController extends Controller
     {
         $data = $request;
         try {
-            $room = $this->microphoneService->mic2($data, 'open');
+            $room = $this->microphoneService->mic($data, 'open');
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
@@ -222,7 +222,7 @@ class MicrophoneController extends Controller
     {
         $data = $request;
         try {
-            $room = $this->microphoneService->mic($data, 'open');
+            $room = $this->microphoneService->mic2($data, 'open');
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
