@@ -193,23 +193,24 @@ Route::get('/run-seeders', function () {
     ]);
 });
 Route::get('/give-role-toSuper', function () {
-    $supers = AdminUser::where('type','superadmin')->get();
-        $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
-    if(count($supers) > 0){
+    $supers = AdminUser::where('type', 'superadmin')->get();
+    $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
+    dd($supers, $role);
+    if (count($supers) > 0) {
         foreach ($supers as $super) {
             $exists = DB::table('admin_role_users')
-                            ->where('user_id', $super->id)
-                            ->where('role_id', $role->id)
-                            ->exists();
-        
-                        if (!$exists) {
-                            DB::table('admin_role_users')->insert([
-                                'user_id' => $super->id,
-                                'role_id' => $role->id,
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
-                        }
+                ->where('user_id', $super->id)
+                ->where('role_id', $role->id)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('admin_role_users')->insert([
+                    'user_id' => $super->id,
+                    'role_id' => $role->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
     return "Cleared!";
@@ -699,7 +700,7 @@ Route::get('/migrate-home-carousel', function () {
         if ($carousel->display_country)      $displayTypes[] = 'country';
         if ($carousel->display_discover)     $displayTypes[] = 'discover';
 
- 
+
         $unitMap = [
             0 => null,
             1 => 'hours',
@@ -707,7 +708,7 @@ Route::get('/migrate-home-carousel', function () {
             3 => 'months',
         ];
 
-        $unit = $unitMap[$carousel->form ?? 2] ?? 'days'; 
+        $unit = $unitMap[$carousel->form ?? 2] ?? 'days';
 
         $endAt = null;
         if (!empty($carousel->input) && $carousel->input > 0) {
