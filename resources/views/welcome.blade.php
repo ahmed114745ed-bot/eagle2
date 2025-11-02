@@ -1467,7 +1467,7 @@
         <nav id="nav">
             <a href="#features" data-translate="nav.features">Features</a>
             <a href="#gallery" data-translate="nav.gallery">Gallery</a>
-            <a href="{{ $settings['about_us_link'] }}" data-translate="nav.about">About</a>
+            <a href="{{ @$settings['about_us_link'] }}" data-translate="nav.about">About</a>
             <div class="lang-switcher" id="langSwitcher">
                 <svg class="lang-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -1636,15 +1636,15 @@
     <section class="stats" id="stats">
         <div class="stats-grid">
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ $settings['landing_users_count'] }}">{{ $settings['landing_users_count'] }}</span><span data-translate="stats.million">M+</span></h2>
+                <h2><span class="stat-number" data-target="{{ @$settings['landing_users_count'] }}">{{ @$settings['landing_users_count'] }}</span><span data-translate="stats.million">M+</span></h2>
                 <p data-translate="stats1.desc">Active Users</p>
             </div>
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ $settings['landing_countries_count'] }}">{{ $settings['landing_countries_count'] }}</span>+</h2>
+                <h2><span class="stat-number" data-target="{{ @$settings['landing_countries_count'] }}">{{ @$settings['landing_countries_count'] }}</span>+</h2>
                 <p data-translate="stats2.desc">Countries</p>
             </div>
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ $settings['landing_live_count'] }}">{{ $settings['landing_live_count'] }}</span><span data-translate="stats.million">M+</span></h2>
+                <h2><span class="stat-number" data-target="{{ @$settings['landing_live_count'] }}">{{ @$settings['landing_live_count'] }}</span><span data-translate="stats.million">M+</span></h2>
                 <p data-translate="stats3.desc">Daily Streams</p>
             </div>
             <div class="stat-item">
@@ -1659,21 +1659,21 @@
         <h2 data-translate="cta.title">Ready to Join {{ $appName }}?</h2>
         <p data-translate="cta.subtitle">Download now and start connecting with millions of people worldwide</p>
         <div class="app-stores">
-            <a href="{{ $settings['ios_link'] }}" class="store-badge">
+            <a href="{{ @$settings['ios_link'] }}" class="store-badge">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z'/%3E%3C/svg%3E" alt="Apple" class="store-icon">
                 <div style="text-align: left;">
                     <div style="font-size: 10px; opacity: 0.8;" data-translate="store.apple1">Download on the</div>
                     <div data-translate="store.apple2">App Store</div>
                 </div>
             </a>
-            <a href="{{ $settings['android_link'] ?? '' }}" class="store-badge">
+            <a href="{{ @$settings['android_link'] ?? '' }}" class="store-badge">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M3,20.5A0.5,0.5 0 0,1 2.5,20V3.5A0.5,0.5 0 0,1 3,3H10.75L21,13.25A0.5,0.5 0 0,1 21,14H10.5L2.5,20A0.5,0.5 0 0,1 3,20.5M10.55,2L2.04,19.25L10.3,13H19.96L10.55,2Z'/%3E%3C/svg%3E" alt="Google Play" class="store-icon">
                 <div style="text-align: left;">
                     <div style="font-size: 10px; opacity: 0.8;" data-translate="store.google1">GET IT ON</div>
                     <div data-translate="store.google2">Google Play</div>
                 </div>
             </a>
-            <a href="{{ $settings['gallery_app_link'] ?? '' }}" class="store-badge">
+            <a href="{{ @@$settings['gallery_app_link'] ?? '' }}" class="store-badge">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M12,8A3,3 0 0,0 9,11A3,3 0 0,0 12,14A3,3 0 0,0 15,11A3,3 0 0,0 12,8M12,16A5,5 0 0,1 7,11H5A7,7 0 0,0 12,18A7,7 0 0,0 19,11H17A5,5 0 0,1 12,16Z'/%3E%3C/svg%3E" alt="Huawei" class="store-icon">
                 <div style="text-align: left;">
                     <div style="font-size: 10px; opacity: 0.8;" data-translate="store.huawei1">EXPLORE IT ON</div>
@@ -1704,24 +1704,24 @@
                 
                 <div class="social-links flex gap-4">
 
-                @if(!empty($settings['facebook_link']))
-                    <a href="{{ $settings['facebook_link'] }}" target="_blank" class="social-icon">
+                @if(!empty(@$settings['facebook_link']))
+                    <a href="{{ @$settings['facebook_link'] }}" target="_blank" class="social-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg">
                             <path d="M22 12C22 6.477 17.523 2 12 2S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.462h-1.26c-1.243 0-1.63.772-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.987C18.343 21.128 22 16.991 22 12z"/>
                         </svg>
                     </a>
                 @endif
 
-                @if(!empty($settings['twitter_link']))
-                    <a href="{{ $settings['twitter_link'] }}" target="_blank" class="social-icon">
+                @if(!empty(@$settings['twitter_link']))
+                    <a href="{{ @$settings['twitter_link'] }}" target="_blank" class="social-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="#1DA1F2" xmlns="http://www.w3.org/2000/svg">
                             <path d="M23 3a10.9 10.9 0 01-3.14.86 4.48 4.48 0 001.95-2.48 9.07 9.07 0 01-2.88 1.1 4.52 4.52 0 00-7.69 4.12A12.86 12.86 0 013 4s-4 9 5 13a13 13 0 01-8 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
                         </svg>
                     </a>
                 @endif
 
-                @if(!empty($settings['whatsapp_link']))
-            <a href="{{ $settings['whatsapp_link'] }}" target="_blank" class="social-icon whatsapp">
+                @if(!empty(@$settings['whatsapp_link']))
+            <a href="{{ @$settings['whatsapp_link'] }}" target="_blank" class="social-icon whatsapp">
                 <i class="fab fa-whatsapp"></i>
             </a>
     @endif
