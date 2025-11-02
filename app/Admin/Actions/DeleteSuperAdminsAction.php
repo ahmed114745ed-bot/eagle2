@@ -39,7 +39,7 @@ class DeleteSuperAdminsAction extends RowAction
             $user->save();
             MilestoneHelper::removeReward($user, 'super-admin');
         }
-        $defaultSuperAdmin = SuperAdmin::whereNull('country_id')->first();
+        $defaultSuperAdmin = SuperAdmin::where('default', 1)->first();
         if ($defaultSuperAdmin) Bd::where('parent_id', $model->id)->update(['parent_id' => $defaultSuperAdmin->id]);
 
         $subAdmins =  SubAdmin::where('parent_id', $model->id)->pluck('app_id')->toArray();
