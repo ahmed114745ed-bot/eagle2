@@ -14,15 +14,19 @@ class ChatRoomPusherV2Resource extends JsonResource
     {
         if($this->user_id == $request->user()->id)
         {
-            $user2 = User::find($this->user_id2);  
+            $user2 = User::find($this->user_id);  
         }
         else{
-            $user2 = User::find($this->user_id); 
+            $user2 = User::find($this->user_id2); 
         }
         \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'id' => $this->id]);
 
-
-        $total_undread_message = ChatMessage::where('chat_room_id',$this->id)->where('user_id',$user2->id)->where('status','not Like','seen')->count();
+        $currentUserId = $request->user()->id;
+        $total_undread_message = ChatMessage::where('chat_room_id', $this->id)
+        ->where('user_id', '!=', $currentUserId) 
+        ->where('status', '!=', 'seen')
+        ->count();
+        
         \Log::info(' $total_undread_message: ', ['total_undread_message' =>  $total_undread_message]);
 
         return [
