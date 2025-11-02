@@ -34,22 +34,11 @@ class SuperAdmin extends Model
         return $this->belongsTo(Country::class);
     }
 
-    public function parent()
+    public function subSuperAdmins()
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $this->hasMany(SubAdmin::class, 'parent_id', 'id');
     }
 
-    // 👥 One user can have many children (subordinates)
-    public function children()
-    {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    // 🔁 Optional: recursive relation to get *all descendants* (children of children)
-    public function allChildren()
-    {
-        return $this->children()->with('allChildren');
-    }
     //
     //    public function transactions()
     //    {

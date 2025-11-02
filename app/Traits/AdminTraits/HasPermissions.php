@@ -22,7 +22,7 @@ trait HasPermissions
             ->merge($this->permissions) // direct permissions
             ->unique('id')
             ->values();
-        // });    
+        // });   
     }
 
     public function cachedPermissions()
