@@ -92,11 +92,26 @@ class RoomResource extends JsonResource
 
         if ($request['show']) {
 
+            $micString = $this->microphones()
+                ->orderBy('position')
+                ->get()
+                ->map(function ($mic) {
+                    $userId = $mic->user_id ?? 0;
+                    $status = $mic->status ?? 0;
+
+                    if ($userId > 0) {
+                        return "{$userId}#{$status}";
+                    } else {
+                        return (string)$status;
+                    }
+                })
+                ->implode(',');
 
             $data = array_merge($data, [
                 'room_users' => Common::get_room_users($this->owner()?->id, $request->user()->id),
                 'background' => $this->final_room_image ?: $this->room_background,
-                'mics' => $this->microphone ? explode(',', $this->microphone) : [],
+//                'mics' => $this->microphone ? explode(',', $this->microphone) : [],
+                'mics' => $micString ? explode(',', $micString) : [],
                 'is_mics_free' => $this->free_mic ?: 0,
                 'owner' => $this->owner(),
                 'admins' => $this->admins(),

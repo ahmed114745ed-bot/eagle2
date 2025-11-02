@@ -4280,7 +4280,7 @@
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "أدخل خيارًا في كل سطر، أو استخدم تنسيق JSON للترجمات مثل: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}",
   "Field":"حقل",
   "Field Type":"نوع الحقل",
-  "land settings": "إعدادات صفحة الهبوط",
+  "land settings": "إعدادات الموقع الرئيسي",
   "Number of Users": "عدد المستخدمين",
   "Number of Countries": "عدد الدول",
   "Number of Live Streams": "عدد البث المباشر",
