@@ -72,7 +72,8 @@ class ChatMessagesController extends Controller
             ], 404);
         }
 
-        //get user 2
+        \Log::info('$chatRoom->user_id: ', ['$chatRoom->user_id' => $chatRoom->user_id, 'user->id' => $user->id ]);
+        \Log::info('$chatRoom->user_id: ', [ '$request->user_id' => $request->user_id]);
         if ($chatRoom->user_id == $user->id) {
             $user2 = User::withoutAppends()->find($chatRoom->user_id2);
         } else {
