@@ -10,14 +10,15 @@
     <style>
         :root {
             /* Enhanced color scheme */
-            --primary-color: #7c3aed;
-            --secondary-color: #ec4899;
+            --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};     
+            --secondary-color:{{ data_get($settings, 'app_primary_color', '#32e5ac') }};
             --accent-color: #06b6d4;
             --dark-bg: #0f0f23;
             --text-color: #1a1a2e;
-            --text-light: #6b7280;
-            --background: #ffffff;
-            --background-alt: #fafafe;
+            --text-light: {{ data_get($settings, 'text_header_color', '#fff') }};
+            
+            --background:{{ data_get($settings, 'background_color', '#fff') }};
+            --background-alt:{{ data_get($settings, 'background_color', '#fff') }};
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -358,7 +359,8 @@
         .logo-icon {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -384,7 +386,8 @@
         .logo-text {
             font-size: 28px;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -424,7 +427,8 @@
         }
 
         .download-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             color: white !important;
             padding: 12px 30px;
             border-radius: 25px;
@@ -488,7 +492,8 @@
         .hero {
             margin-top: 80px;
             min-height: 100vh;
-            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            /* background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%); */
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }} ;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -844,7 +849,9 @@
             transform: translateX(-50%);
             width: 60px;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+
+            /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 2px;
         }
 
@@ -883,7 +890,8 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             transform: scaleX(0);
             transition: transform 0.4s;
         }
@@ -911,7 +919,9 @@
         .feature-icon {
             width: 90px;
             height: 90px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+
+            /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -947,7 +957,8 @@
 
         /* Stats Section */
         .stats {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             padding: 80px 8%;
             color: white;
             position: relative;
@@ -1019,7 +1030,7 @@
         /* Gallery Section */
         .gallery {
             padding: 100px 8%;
-            background: white;
+            background: {{ data_get($settings, 'background_color', '#fff') }};
         }
 
         .gallery-grid {
@@ -1080,7 +1091,8 @@
         .cta {
             padding: 100px 8%;
             text-align: center;
-            background: linear-gradient(135deg, #fafafe 0%, #f3f4f6 100%);
+            background: {{ data_get($settings, 'background_color', '#fff') }};
+            /* background: linear-gradient(135deg, #fafafe 0%, #f3f4f6 100%); */
             position: relative;
             overflow: hidden;
         }
@@ -1352,7 +1364,8 @@
             left: 0;
             width: 0%;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             z-index: 1001;
             transition: width 0.1s;
         }
