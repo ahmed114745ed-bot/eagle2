@@ -973,6 +973,10 @@
    "agency_id": "معرف الوكالة",
    "app-editing": "اعدادات التطبيق",
    "configs" : "التكوينات",
+   "restore super admin": "استعادة المشرف الأعلى",
+
+"can not restore this super admin": "لا يمكن استعادة هذا المشرف الأعلى",
+"can not restore this super admin user taken": "لا يمكن استعادة هذا المشرف الأعلى لأن المستخدم مأخوذ بالفعل",
    "User Status Options" :"خيارات حالة المستخدم",
     "Room":"غرف",
     "level-intervals":"فترات المستوى",
