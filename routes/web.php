@@ -195,7 +195,7 @@ Route::get('/run-seeders', function () {
 Route::get('/give-role-toSuper', function () {
     $supers = AdminUser::where('type', 'superadmin')->get();
     $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
-    dd($supers, $role);
+   // dd($supers, $role);
     if (count($supers) > 0) {
         foreach ($supers as $super) {
             $exists = DB::table('admin_role_users')
