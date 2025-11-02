@@ -32,7 +32,9 @@
     .text-lg {
     font-size: 1.425rem !important;
     }
-
+    .secondary{
+        background: var(--secondary-color) !important;
+    }
 </style>
 
 {{-- Form Template Info --}}
