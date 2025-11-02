@@ -1356,7 +1356,19 @@
 "Custom Options": "Custom Options",
 "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
 ,  "Field":"Field",
-"Field Type":"Field Type"
+"Field Type":"Field Type",
+"land settings": "Landing Page Settings",
+"Number of Users": "Number of Users",
+"Number of Countries": "Number of Countries",
+"Number of Live Streams": "Number of Live Streams",
+"Google Play Link": "Google Play Link",
+"Apple Store Link": "Apple Store Link",
+"Gallery App Link": "Gallery App Link",
+"Facebook Link": "Facebook Link",
+"Twitter Link": "Twitter Link",
+"WhatsApp Link": "WhatsApp Link",
+"About Us Link": "About Us Link",
+"Save": "Save"
 
 
 

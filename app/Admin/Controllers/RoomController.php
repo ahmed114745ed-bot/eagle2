@@ -321,7 +321,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()
             ->audio()

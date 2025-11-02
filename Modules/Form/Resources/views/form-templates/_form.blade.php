@@ -57,14 +57,14 @@
         <div class="mb-6">
             <h3 class=" font-semibold mb-3">{{ __('Form Title') }} *</h3>
             <div class="grid grid-cols-1 md:grid-cols-{{ min(4, count($locales)) }} gap-4">
-                @foreach($locales as $locale)
+                @foreach($locales as $key =>$locale)
                     <div class="relative">
                         <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
                         <input type="text" name="title[{{ $locale }}]" {{ $loop->first ? 'required' : '' }}
                                @if($locale === 'ar') dir="rtl" @endif
                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                                placeholder="{{ __('Form Title') }}"
-                               value="{{ old('title.'.$locale, $template->getTranslation('title', $locale)) }}">
+                               value="{{ old('title.'.$key, $template->getTranslation('title', $key)) }}">
                     </div>
                 @endforeach
             </div>
@@ -79,12 +79,13 @@
 
         {{-- Description Fields (dynamic locales) --}}
         <div id="descriptionInputs" class="grid grid-cols-1 md:grid-cols-{{ min(4, count($locales)) }} gap-4">
-            @foreach($locales as $locale)
+            @foreach($locales as $key =>$locale)
+        
                 <div class="relative">
                     <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
                     <textarea name="description[{{ $locale }}]" rows="3" @if($locale === 'ar') dir="rtl" @endif
                               class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                              placeholder="{{ __('Form description') }}">{{ old('description.'.$locale, $template->getTranslation('description', $locale)) }}</textarea>
+                              placeholder="{{ __('Form description') }}">{{ old('description.'.$key, $template->getTranslation('description', $key)) }}</textarea>
                 </div>
             @endforeach
         </div>
@@ -282,9 +283,8 @@ function addField(sectionId, data = null) {
   
     const canDeleteSection = data && data.can_not_delete;
 
-    console.log(canDeleteSection);
-    console.log(data);
-    console.log('kkkkkk');
+    // console.log(canDeleteSection);
+    // console.log(data);
 
     // build multilingual label inputs
     const labelHtml = locales.map(locale => {

@@ -20,6 +20,7 @@
     "audio": "आवाज़",
     "Host Agency Owner": "होस्ट एजेंसी मालिक",
     "Charge Agency Owner": "चार्ज एजेंसी मालिक",
+    "can not delete default super admin": "डिफ़ॉल्ट सुपर एडमिन को हटाया नहीं जा सकता",
     "Family Owner": "परिवार मालिक",
     "Area Manager": "क्षेत्र प्रबंधक",
     "dedicate badges": "समर्पित बैज",
@@ -3370,7 +3371,19 @@
   "Custom Options": "कस्टम विकल्प",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "प्रत्येक पंक्ति में एक विकल्प दर्ज करें, या अनुवादों के लिए JSON प्रारूप का उपयोग करें: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
   ,  "Field":"फील्ड",
-  "Field Type":"फॉर्म फील्ड"
+  "Field Type":"फॉर्म फील्ड",
+  "land settings": "लैंडिंग पेज सेटिंग्स",
+  "Number of Users": "उपयोगकर्ताओं की संख्या",
+  "Number of Countries": "देशों की संख्या",
+  "Number of Live Streams": "लाइव स्ट्रीम की संख्या",
+  "Google Play Link": "गूगल प्ले लिंक",
+  "Apple Store Link": "एप्पल स्टोर लिंक",
+  "Gallery App Link": "गैलरी ऐप लिंक",
+  "Facebook Link": "फेसबुक लिंक",
+  "Twitter Link": "ट्विटर लिंक",
+  "WhatsApp Link": "व्हाट्सएप लिंक",
+  "About Us Link": "हमारे बारे में लिंक",
+  "Save": "सहेजें"
 
 
 

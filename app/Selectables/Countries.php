@@ -13,7 +13,6 @@ class Countries extends Selectable
     public function make()
     {
         $this->column('id', 'ID');
-        $this->column('code', __('Code'));
         $this->column('flag', __('flag'))->display(function ($path) {
             /** @var OVip $this */
             $url = getImagePath($path);

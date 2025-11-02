@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AuthController;
+use App\Http\Controllers\WelcomeController;
 use App\Models\Bd;
 use App\Models\SuperAdmin;
 use Carbon\Carbon;
@@ -257,9 +258,8 @@ Route::get('delete-account', function () {
     return view('deleteAccount', compact("data"));
 });
 
-Route::get('/', function () {
-    return response()->json();
-});
+Route::get('/', [WelcomeController::class, 'index']);
+
 
 Route::group(
     [

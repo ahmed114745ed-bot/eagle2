@@ -968,6 +968,7 @@
    "ignored deleted successfully": "تمت الغاء التجنب بنجاح",
    "ignored added successfully": "تمت اضافه التجنب بنجاح",
    "question": "السؤال",
+   "can not delete default super admin":"لا يمكن حذف المشرف الأعلى الافتراضي",
    "answer": "الجواب",
    "agency_id": "معرف الوكالة",
    "app-editing": "اعدادات التطبيق",
@@ -4274,7 +4275,19 @@
   "Custom Options": "خيارات مخصصة",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "أدخل خيارًا في كل سطر، أو استخدم تنسيق JSON للترجمات مثل: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}",
   "Field":"حقل",
-  "Field Type":"نوع الحقل"
+  "Field Type":"نوع الحقل",
+  "land settings": "إعدادات صفحة الهبوط",
+  "Number of Users": "عدد المستخدمين",
+  "Number of Countries": "عدد الدول",
+  "Number of Live Streams": "عدد البث المباشر",
+  "Google Play Link": "رابط جوجل بلاي",
+  "Apple Store Link": "رابط أب ستور",
+  "Gallery App Link": "رابط معرض التطبيقات",
+  "Facebook Link": "رابط فيسبوك",
+  "Twitter Link": "رابط تويتر",
+  "WhatsApp Link": "رابط واتساب",
+  "About Us Link": "رابط من نحن",
+  "Save": "حفظ"
 
 
 

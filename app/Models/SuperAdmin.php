@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SuperAdmin extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
+
+    protected $dates = ['deleted_at'];
 
     protected $attributes = [
         'type' => 'superadmin',
@@ -77,6 +80,10 @@ class SuperAdmin extends Model
         });
 
         self::deleting(function (SuperAdmin $superAdmin) {
+
+            if ($superAdmin->default == 1) {
+                throw new Exception(__('can not delete default super admin'));
+            }
             $defaultSuperAdmin = self::where('default', 1)
                 ->where('id', '!=', $superAdmin->id)
                 ->first();
@@ -85,6 +92,7 @@ class SuperAdmin extends Model
                 Bd::where('parent_id', $superAdmin->id)
                     ->update(['parent_id' => $defaultSuperAdmin->id]);
             } else {
+
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
             $userApp = User::find($superAdmin->app_id);

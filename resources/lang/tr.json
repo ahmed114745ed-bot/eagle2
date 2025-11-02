@@ -23,6 +23,7 @@
     "Top 3 Recharge Agencies": "En Büyük 3 Yükleme Ajansı",
     "Host Agency Owner": "Ev Sahibi Acente Sahibi",
     "Charge Agency Owner": "Yükleme Acente Sahibi",
+    "can not delete default super admin": "Varsayılan süper yönetici silinemez",
     "Family Owner": "Aile Sahibi",
     "Area Manager": "Bölge Müdürü",
     "Acquisitions": "Edinimler",
@@ -3767,7 +3768,20 @@
     "Custom Options": "Özel Seçenekler",
     "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Her satıra bir seçenek girin veya çeviriler için JSON formatını kullanın: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
     ,  "Field":"Alan",
-    "Field Type":"Alan Gönder"
+    "Field Type":"Alan Gönder",
+    "land settings": "Açılış Sayfası Ayarları",
+    "Number of Users": "Kullanıcı Sayısı",
+    "Number of Countries": "Ülke Sayısı",
+    "Number of Live Streams": "Canlı Yayın Sayısı",
+    "Google Play Link": "Google Play Bağlantısı",
+    "Apple Store Link": "Apple Store Bağlantısı",
+    "Gallery App Link": "Galeri Uygulama Bağlantısı",
+    "Facebook Link": "Facebook Bağlantısı",
+    "Twitter Link": "Twitter Bağlantısı",
+    "WhatsApp Link": "WhatsApp Bağlantısı",
+    "About Us Link": "Hakkımızda Bağlantısı",
+    "Save": "Kaydet"
+
 
 
 
