@@ -45,6 +45,7 @@ class SuperAdminRewardController extends MainController
         $grid->model()->where('type',  $type);
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
         $grid->model()->where('super_admin_id', $authId);
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {

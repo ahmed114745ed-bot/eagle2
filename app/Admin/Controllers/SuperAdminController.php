@@ -248,28 +248,10 @@ class SuperAdminController extends MainController
             //            }
         });
 
-        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {
-                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('milestone');   // Translates 'milestone' via your language files
-
-                $customButtonHTML = <<<HTML
-                <div style="display: contents; align-items: center;">
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                         {$milestone}
-                    </a>
-                </div>
-            HTML;
-
-                // Append the custom HTML button to the grid's toolbar
-                $tools->append($customButtonHTML);
-            });
-        }
-
 //        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
 //            $grid->tools(function (Grid\Tools $tools) {
-//                $url = url('admin/milestones'); // Generates absolute URL for /admin/milestones
+//                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+//                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
 //                $milestone = __('milestone');   // Translates 'milestone' via your language files
 //
 //                $customButtonHTML = <<<HTML
@@ -375,7 +357,7 @@ class SuperAdminController extends MainController
             $ops       = [null => __('no country')];
             $countries = Country::doesntHave('superAdmin')->orWhere('id', $value)->get();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
             }
             return $ops;
         })->required();
@@ -399,8 +381,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-            $form->switch('default', __('set_superadmin_as_default'))
-                ->help(__('make_super_admin_default'));
+//            $form->switch('default', __('set_superadmin_as_default'))
+//                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form, 'sometimes');
 

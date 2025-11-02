@@ -168,7 +168,7 @@ class ChargeCountryController extends MainController
                         ->get();
 
                     foreach ($ps as $p) {
-                        $ops[$p->id] = $p->name;
+                        $ops[$p->id] = app()->getLocale() === 'ar' ? $p->name : $p->e_name;
                     }
 
                     return $ops;

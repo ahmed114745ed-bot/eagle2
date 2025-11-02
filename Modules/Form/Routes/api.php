@@ -9,7 +9,7 @@ use Modules\Form\Http\Controllers\Api\DataSourceController;
 
 Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
-        Route::apiResource('form-templates', FormTemplateController::class);
+        // Route::apiResource('form-templates', FormTemplateController::class);
         Route::apiResource('form-sections', FormSectionController::class);
         Route::apiResource('form-fields', FormFieldController::class);
         Route::post('form-submissions', [FormSubmissionController::class, 'store']);
