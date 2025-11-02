@@ -1455,7 +1455,7 @@
 
             <div class="logo-icon">
                 @if(!empty($logo))
-                    <img src="{{ getImagePath($logo) }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
+                    <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
                 @else
                     <div class="h-12 w-12 flex items-center justify-center bg-gray-300 rounded-full text-xl font-bold text-white">
                         {{ strtoupper(substr($appName, 0, 1)) }}
@@ -1690,7 +1690,7 @@
                 <div class="logo-container">
                     <div class="logo-icon">
                         @if(!empty($logo))
-                            <img src="{{ getImagePath($logo) }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
+                            <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
                         @else
                             <div class="h-12 w-12 flex items-center justify-center bg-gray-300 rounded-full text-xl font-bold text-white">
                                 {{ strtoupper(substr($appName, 0, 1)) }}
