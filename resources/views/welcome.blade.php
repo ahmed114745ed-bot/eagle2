@@ -1428,6 +1428,9 @@
             transform: scale(1.1);
             background: #e0e0e0;
         }
+        .logo-icon img{
+            width: 100% !important;
+        }
 
     </style>
 </head>
@@ -1457,9 +1460,7 @@
                 @if(!empty($logo))
                     <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
                 @else
-                    <div class="h-12 w-12 flex items-center justify-center bg-gray-300 rounded-full text-xl font-bold text-white">
                         {{ strtoupper(substr($appName, 0, 1)) }}
-                    </div>
                 @endif
             </div>
             <div class="logo-text">{{  $appName }}</div>
@@ -1692,9 +1693,7 @@
                         @if(!empty($logo))
                             <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
                         @else
-                            <div class="h-12 w-12 flex items-center justify-center bg-gray-300 rounded-full text-xl font-bold text-white">
                                 {{ strtoupper(substr($appName, 0, 1)) }}
-                            </div>
                         @endif
                     </div>
                 
