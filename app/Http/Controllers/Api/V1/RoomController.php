@@ -268,6 +268,7 @@ class RoomController extends Controller
     {
         $request['show'] = true;
         $room = $this->roomService->findRoom($id);
+//        $room->load('microphones');
         if (!$room) {
             return Common::apiResponse(0, 'not found', null, 404);
         }

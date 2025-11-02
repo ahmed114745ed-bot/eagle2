@@ -260,7 +260,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
-                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
+                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone2']);
                 Route::post('up-microphone2', [MicrophoneController::class, 'upMicrophone2']);
                 Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
                 Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
