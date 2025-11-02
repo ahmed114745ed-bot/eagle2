@@ -168,6 +168,29 @@ class MicrophoneController extends Controller
         }
     }
 
+    public function shut_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic2($data, 'shut');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if ($room) {
+            $ms = [
+                'messageContent' => [
+                    'message' => 'lockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_unlocked_the_microphone'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_unlock_microphone'), null, 400);
+        }
+    }
 
     //open mic place
     public function open_microphone(Request $request)
@@ -195,7 +218,30 @@ class MicrophoneController extends Controller
         }
     }
 
-
+    public function open_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic($data, 'open');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if (true) {
+            $room = Room::query()->where('uid', $data['owner_id'])->first();
+            $ms = [
+                'messageContent' => [
+                    'message' => 'unLockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_unlocked_the_microphone'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_unlock_microphone'), null, 400);
+        }
+    }
 
     public function calcTime($uid)
     {
