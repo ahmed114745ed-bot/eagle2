@@ -4273,7 +4273,9 @@
   "Options Type": "نوع الخيارات",
   "Custom Options": "خيارات مخصصة",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "أدخل خيارًا في كل سطر، أو استخدم تنسيق JSON للترجمات مثل: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}",
-  "Field":"حقل"
+  "Field":"حقل",
+  "Field Type":"نوع الحقل"
+
 
 
 
