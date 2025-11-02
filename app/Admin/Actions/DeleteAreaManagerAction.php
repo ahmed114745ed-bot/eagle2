@@ -31,6 +31,7 @@ class DeleteAreaManagerAction extends RowAction
 
     public function handle(Model $model, Request $request)
     {
+        if($model->default ==1)  return $this->response()->error('can not delete default area admin')->refresh();
         $user = User::find($model->app_id);
         if ($user) {
             $user->is_area_manager = 0;

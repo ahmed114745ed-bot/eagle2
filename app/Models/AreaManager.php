@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,10 @@ class AreaManager extends Authenticatable
 
 
         static::deleting(function ($manager) {
+
+            if ($manager->default == 1) {
+                throw new Exception(__('can not delete default area admin'));
+            }
             $defaultManager = self::where('default', 1)->first();
 
             if (!$defaultManager) {
