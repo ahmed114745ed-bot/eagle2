@@ -38,7 +38,7 @@ class SuperAdminStatisticController extends MainController
     {
         Permission::check('browse-' . $this->permission_name);
 
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         if (!$countryID) {
             $countryID = Country::first();

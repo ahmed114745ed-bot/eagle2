@@ -57,7 +57,7 @@ class UserAchievementLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserAchievementLevel());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1/2, function ($filter) {

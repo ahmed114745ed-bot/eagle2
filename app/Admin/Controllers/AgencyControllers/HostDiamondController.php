@@ -49,7 +49,7 @@ class HostDiamondController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GiftLog());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()
             ->when($countryID, fn($q) =>

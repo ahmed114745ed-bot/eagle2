@@ -32,7 +32,7 @@ class BanUser extends Action
 
     public function handle(Request $request)
     {
-        $countryID = session('country_id');
+        $countryID = session('filter_country_id');
 
         if (!AuthAdmin::user()->can('*')) {
             Permission::check('create-' . $this->permission_name);

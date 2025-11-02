@@ -103,7 +103,7 @@ class BoxUseController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BoxUse);
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 

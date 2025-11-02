@@ -627,7 +627,7 @@ class SuperAdminController extends MainController
         }
 
         $tab = request()->query('tab', 'agencies');
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();
