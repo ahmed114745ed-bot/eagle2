@@ -13,6 +13,7 @@ use Modules\Chat\Entities\ChatRoom as EntitiesChatRoom;
 use Modules\Chat\Http\Repositories\MessageAlbumRepository;
 use Modules\Chat\Http\Repositories\MessageRepository;
 use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomPusherV2Resource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Traits\FfmpegTrait;
 use Modules\Public\Events\UnreadCounterIndividual;
@@ -168,7 +169,7 @@ class MessageService
         // Return the message and chat room resources
         return [
             'message_resource' => new ChatMessageResource($this->messageRepo->findMessageById($message->id)),
-            'room_resource' => new ChatRoomResourcePusher($chatRoom)
+            'room_resource' => new ChatRoomPusherV2Resource($chatRoom)
         ];
     }
 
