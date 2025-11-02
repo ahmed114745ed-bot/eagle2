@@ -41,7 +41,12 @@ class DeleteSuperAdminsAction extends RowAction
         }
         $defaultSuperAdmin = SuperAdmin::whereNull('country_id')->first();
         if ($defaultSuperAdmin) Bd::where('parent_id', $model->id)->update(['parent_id' => $defaultSuperAdmin->id]);
-        SubAdmin::where('parent_id', $model->id)->delete();
+
+        $subAdmins =  SubAdmin::where('parent_id', $model->id)->pluck('app_id')->toArray();
+        if (!empty($subAdmins)) {
+            User::whereIn('id', $subAdmins)->update(['sub_area_manger' => 0]);
+            SubAdmin::where('parent_id', $model->id)->delete();
+        }
 
         $model->delete();
 
