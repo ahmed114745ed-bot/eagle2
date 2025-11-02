@@ -19,10 +19,12 @@ class ChatRoomPusherV2Resource extends JsonResource
         else{
             $user2 = User::find($this->user_id2); 
         }
-        \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name]);
+        \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'id' => $this->id]);
 
 
         $total_undread_message = ChatMessage::where('chat_room_id',$this->id)->where('user_id',$user2->id)->where('status','not Like','seen')->count();
+        \Log::info(' $total_undread_message: ', ['total_undread_message' =>  $total_undread_message]);
+
         return [
             'user_id'             => $user2->id,
             'name'                => $user2->name,
