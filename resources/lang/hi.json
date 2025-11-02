@@ -3367,6 +3367,7 @@
   "Options Type": "विकल्प का प्रकार",
   "Custom Options": "कस्टम विकल्प",
   "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "प्रत्येक पंक्ति में एक विकल्प दर्ज करें, या अनुवादों के लिए JSON प्रारूप का उपयोग करें: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
+  ,  "Field":"फील्ड"
 
   
 
