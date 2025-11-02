@@ -53,6 +53,21 @@ class MicrophoneController extends Controller
     }
     //leave mic
 
+    public function upMicrophone2(Request $request)
+    {
+        $data = $request;
+        $user_id = $request->user_id;
+        if ((!$data['owner_id'] && !$request->room_id) || !$user_id) return Common::apiResponse(0, __('api_responses.Missing_data'), null, 422);
+        try {
+            [$user, $room] = $this->microphoneService->upMic2($data);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+
+        // (new CpServices())->sendZegoMap($user, $room);
+        return Common::apiResponse(1, __('api_responses.Success_on_the_mic'));
+    }
+
     public function goMicrophone(Request $request)
     {
         $data = $request;

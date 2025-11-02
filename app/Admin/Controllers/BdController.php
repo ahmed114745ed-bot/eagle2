@@ -95,7 +95,7 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $superAdmin = [];
         if ($countryID) {
             $superAdmin = SuperAdmin::select(['id', 'country_id'])->where('country_id', $countryID)->first();

@@ -85,6 +85,11 @@ class Room extends Model
         return $this->belongsTo(AllGame::class, 'game_id');
     }
 
+    public function microphones(): HasMany
+    {
+        return $this->hasMany(RoomMicrophone::class);
+    }
+
     public function getLangAttribute()
     {
         if (self::$withoutAppends) {
@@ -271,7 +276,7 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
-    
+
 
     public function getVisitorsImages()
     {

@@ -968,6 +968,7 @@
    "ignored deleted successfully": "تمت الغاء التجنب بنجاح",
    "ignored added successfully": "تمت اضافه التجنب بنجاح",
    "question": "السؤال",
+   "can not delete default super admin":"لا يمكن حذف المشرف الأعلى الافتراضي",
    "answer": "الجواب",
    "agency_id": "معرف الوكالة",
    "app-editing": "اعدادات التطبيق",
