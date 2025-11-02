@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 
 class AreaManager extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'admin_users';
 
     protected $attributes = [
         'type' => 'area-manager',
     ];
+
+    protected $dates = ['deleted_at'];
 
 
     protected static function booted(): void
