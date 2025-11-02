@@ -445,7 +445,7 @@ class BdController extends MainController
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
 
-                $superAdmin = SuperAdmin::where('country_id', request('country_id'))->first() ?? SuperAdmin::whereNull('country_id')->first();
+                $superAdmin = SuperAdmin::where('country_id', request('country_id'))->first() ?? SuperAdmin::where('default', 1)->first();
                 $form->model()->parent_id = $superAdmin->id;
 
                 if ($originalAppId !=  $newAppId) {

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use App\Admin\Actions\DeleteSuperAdminsAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -243,29 +244,29 @@ class SuperAdminController extends MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
-            //            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-            //                $actions->add(new DeleteSuperAdminAction());
-            //            }
+            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteSuperAdminsAction());
+            }
         });
 
-//        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-//            $grid->tools(function (Grid\Tools $tools) {
-//                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-//                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-//                $milestone = __('milestone');   // Translates 'milestone' via your language files
-//
-//                $customButtonHTML = <<<HTML
-//                <div style="display: contents; align-items: center;">
-//                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-//                         {$milestone}
-//                    </a>
-//                </div>
-//            HTML;
-//
-//                // Append the custom HTML button to the grid's toolbar
-//                $tools->append($customButtonHTML);
-//            });
-//        }
+        //        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+        //            $grid->tools(function (Grid\Tools $tools) {
+        //                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+        //                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+        //                $milestone = __('milestone');   // Translates 'milestone' via your language files
+        //
+        //                $customButtonHTML = <<<HTML
+        //                <div style="display: contents; align-items: center;">
+        //                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+        //                         {$milestone}
+        //                    </a>
+        //                </div>
+        //            HTML;
+        //
+        //                // Append the custom HTML button to the grid's toolbar
+        //                $tools->append($customButtonHTML);
+        //            });
+        //        }
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
 
@@ -381,8 +382,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-//            $form->switch('default', __('set_superadmin_as_default'))
-//                ->help(__('make_super_admin_default'));
+            //            $form->switch('default', __('set_superadmin_as_default'))
+            //                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form, 'sometimes');
 

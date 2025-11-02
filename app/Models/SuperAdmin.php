@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SuperAdmin extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
+
+    protected $dates = ['deleted_at'];
 
     protected $attributes = [
         'type' => 'superadmin',
