@@ -37,8 +37,8 @@
     }
     
     .field-item{
-        background: #959595 !important;
-
+        /* background: #959595 !important; */
+        border: 2px solid #959595 !important;
     }
     
     </style>
