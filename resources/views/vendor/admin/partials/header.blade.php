@@ -220,8 +220,10 @@
         </a>
 
         @php
+            $lang = app()->getLocale();
+            
             $country   = \App\Models\Country::find(Admin::user()->country_id);
-            $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+            $countries = \App\Models\Country::select(['id', 'name','e_name', 'flag'])->get();
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
@@ -236,7 +238,7 @@
                                 value="{{ $currentCountry->id }}"
                                 data-flag="{{ getImagePath($currentCountry->flag) }}"
                                 {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                {{ $currentCountry->name }}
+                                {{$lang === 'ar' ? $currentCountry->name : ($currentCountry->e_name ?? $currentCountry->e_name)  }}
                             </option>
                         @endforeach
                     </select>
