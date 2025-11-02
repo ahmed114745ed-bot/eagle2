@@ -80,6 +80,10 @@ class SuperAdmin extends Model
         });
 
         self::deleting(function (SuperAdmin $superAdmin) {
+
+            if ($superAdmin->default == 1) {
+                throw new Exception(__('can not delete default super admin'));
+            }
             $defaultSuperAdmin = self::where('default', 1)
                 ->where('id', '!=', $superAdmin->id)
                 ->first();
@@ -88,6 +92,7 @@ class SuperAdmin extends Model
                 Bd::where('parent_id', $superAdmin->id)
                     ->update(['parent_id' => $defaultSuperAdmin->id]);
             } else {
+
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
             $userApp = User::find($superAdmin->app_id);

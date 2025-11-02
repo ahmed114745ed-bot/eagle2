@@ -33,6 +33,7 @@ class DeleteSuperAdminsAction extends RowAction
     public function handle(Model $model, Request $request)
     {
 
+        if ($model->default == 1) $this->response()->error(__('can not delete default super admin'))->refresh();
         $user = User::find($model->app_id);
         if ($user) {
             $user->is_super_admin = 0;
