@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('room_microphones', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('room_id');
-            $table->bigInteger('user_id');
+            $table->bigInteger('user_id')->nullable();
             $table->integer('position')->default(0);
             $table->string('status')->default('0');
             $table->timestamps();
