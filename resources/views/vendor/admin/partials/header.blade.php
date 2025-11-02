@@ -221,7 +221,6 @@
 
         @php
             $lang = app()->getLocale();
-            
             $country   = \App\Models\Country::find(Admin::user()->country_id);
             $countries = \App\Models\Country::select(['id', 'name','e_name', 'flag'])->get();
             $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
