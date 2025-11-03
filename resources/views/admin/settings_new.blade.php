@@ -4380,7 +4380,7 @@ use Modules\Vip\Entities\Vip;
     transform: translateY(-1px);
 }
 .tab-btn.active {
-    background: var(--secondary-color); /* bootstrap primary */
+    background: var(--box-background-color); /* bootstrap primary */
     color: #fff;
     border-color: rgba(13,110,253,0.9);
 }
