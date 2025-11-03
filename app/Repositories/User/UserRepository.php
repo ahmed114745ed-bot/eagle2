@@ -7,12 +7,13 @@ use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Follow;
-use App\Models\SuperAdmin;
 use App\Models\AreaManager;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
 use App\Models\SubAreaManager;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\select;

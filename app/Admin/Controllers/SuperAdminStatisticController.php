@@ -4,7 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Bd;
 use App\Models\Country;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;

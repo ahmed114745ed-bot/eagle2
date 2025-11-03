@@ -4,9 +4,9 @@ namespace App\Admin\Actions;
 
 use App\Models\Bd;
 use App\Models\User;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
-use App\Models\SuperAdminReward;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Encore\Admin\Actions\Action;
 
 class RestoreSuperAdminAction extends Action

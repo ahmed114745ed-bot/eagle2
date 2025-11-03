@@ -6,7 +6,7 @@ use App\Models\Country;
 use App\Models\Agency;
 use App\Http\Controllers\WelcomeController;
 use App\Models\Bd;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;

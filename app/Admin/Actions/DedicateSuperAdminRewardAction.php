@@ -4,8 +4,8 @@ namespace App\Admin\Actions;
 
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
-use App\Models\SuperAdmin;
-use App\Models\SuperAdminReward;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 class DedicateSuperAdminRewardAction extends Action
 {

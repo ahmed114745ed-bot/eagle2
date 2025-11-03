@@ -2,7 +2,7 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

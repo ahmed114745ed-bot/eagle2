@@ -10,7 +10,7 @@ use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Enums\UserCoinLogType;
 use Modules\Vip\Entities\OVip;
-use App\Models\SuperAdminReward;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
