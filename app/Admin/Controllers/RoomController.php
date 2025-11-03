@@ -630,60 +630,44 @@ class RoomController extends MainController
 
 
         $grid->column(__('microphone'))->display(function () {
-            $mics = $this->microphones()
+
+            $microphones = $this->microphones()
                 ->with('user.profile')
                 ->orderBy('position')
                 ->get();
 
-            if ($mics->isEmpty()) {
+            if ($microphones->isEmpty()) {
                 return '';
             }
 
             $html = '<div class="image-container">';
 
-            foreach ($mics as $mic) {
+            foreach ($microphones as $mic) {
                 $user = $mic->user;
 
-                if (!$user) {
-                    $statusLabel = match ((string)$mic->status) {
-                        '-1' => '🔒',
-                        '-2' => '🔇',
-                        default => '➕',
-                    };
-                    $statusColor = match ((string)$mic->status) {
-                        '-1' => '#e74c3c',
-                        '-2' => '#f1c40f',
-                        default => '#bdc3c7',
-                    };
-
-                    $html .= <<<HTML
-                <div class="image-wrapper" title="{$statusLabel}"
-                    style="width:40px;height:40px;border-radius:50%;
-                           background-color:{$statusColor};
-                           display:flex;align-items:center;justify-content:center;
-                           color:white;font-size:16px;font-weight:bold;">
-                    {$statusLabel}
-                </div>
-            HTML;
-                    continue;
-                }
+                if (!$user) continue;
 
                 $url = $user->profile?->avatar
                     ? getImagePath($user->profile->avatar)
                     : asset("images/businessman-icon.jpg");
 
                 $name = e($user->name);
-                $userId = e($user->id);
+                $id   = e($user->id);
 
                 $html .= <<<HTML
-            <div class="image-wrapper" onclick="window.location.href='/admin/users/{$userId}'" title="{$name}">
-                <img src="{$url}" alt="{$name}" />
+            <div class="image-wrapper" onclick="window.location.href='{$id}'">
+                <img src="{$url}" title="{$name}"
+                style="width: 40px; height: 40px; border-radius: 50%;
+                        object-fit: cover; border: 2px solid white;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                        transition: transform 0.3s ease;"/>
             </div>
         HTML;
             }
 
             $html .= '</div>';
 
+            // Add the same CSS block only once
             static $appended = false;
             if (!$appended) {
                 $html .= '
@@ -692,7 +676,7 @@ class RoomController extends MainController
                 display: flex;
                 justify-content: start;
                 align-items: center;
-                gap: -10px;
+                gap: -10px; /* Overlap the images slightly */
                 padding: 8px 0;
                 overflow-y: overlay;
                 width: 218px;
@@ -702,7 +686,6 @@ class RoomController extends MainController
                 display: inline-block;
                 position: relative;
                 margin-right: -12px;
-                cursor: pointer;
             }
             .image-wrapper img {
                 width: 40px;
@@ -712,6 +695,7 @@ class RoomController extends MainController
                 border: 2px solid #fff;
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
             }
             .image-wrapper img:hover {
                 transform: scale(1.2);
