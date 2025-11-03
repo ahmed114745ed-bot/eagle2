@@ -9,7 +9,7 @@ use App\Models\Bd;
 use App\Models\Follow;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\User;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\Auth;

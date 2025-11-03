@@ -5,7 +5,7 @@ namespace App\Admin\Actions;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\SubAdmin;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;

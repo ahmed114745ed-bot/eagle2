@@ -14,7 +14,7 @@ use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\Room;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;

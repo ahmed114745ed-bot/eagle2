@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use App\Events\SuperAdminNotificationCreated;
 use App\Jobs\SendFirebaseNotificationsToAdmins;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Enums\SuperAdminNotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;

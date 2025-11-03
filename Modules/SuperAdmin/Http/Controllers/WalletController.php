@@ -8,7 +8,7 @@ use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Setting;
 use App\Models\SubAdmin;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

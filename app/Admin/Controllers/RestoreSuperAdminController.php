@@ -5,7 +5,7 @@ namespace App\Admin\Controllers;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;

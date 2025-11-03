@@ -4,7 +4,7 @@ namespace App\helper;
 
 use App\Models\HomeCarousel;
 use App\Models\Setting;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Exception;
 use App\Helpers\Common;
 
