@@ -1438,7 +1438,8 @@ class Common
     }
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
-    {            Log::error('start sendToZego3');
+    {           
+         Log::info('start sendToZego3');
 
         try {
 

@@ -438,6 +438,7 @@ class RoomRepoService
 
     public function changeMode($request, $currentMode)
     {
+        \Log::info('start changeMode');
         $user = request()->user();
         $roomId = $request->room_id;
         $room = $roomId
@@ -500,7 +501,7 @@ class RoomRepoService
         } catch (\Throwable $e) {
             // \Log::error("changeMode: Zego send failed - " . $e->getMessage());
         }
-        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
 
         return Common::apiResponse(1, 'done', null, 201);
