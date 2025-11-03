@@ -198,10 +198,11 @@ class MicService
                 ->orWhere("user_two_id", $user->id)
                 ->delete();
 
-            $existingMic->update([
-                'user_id' => null,
-                'status'  => $existingMic->status,
-            ]);
+            $existingMic->delete();
+//            $existingMic->update([
+//                'user_id' => null,
+//                'status'  => $existingMic->status,
+//            ]);
         }
 
 //        $base_mic[$position] = $user->id . '#' . $old_status;
