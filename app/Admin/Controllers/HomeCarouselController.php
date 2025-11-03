@@ -187,9 +187,9 @@ class HomeCarouselController extends MainController
     {
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
-        $form->image('img', trans('img'))
+        $form->image('img', trans('img'));
         /**->setResolution(80)*/
-         ->required();
+        // ->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }
 
@@ -291,6 +291,8 @@ class HomeCarouselController extends MainController
     protected function syncCountriesAfterSave(Form $form)
     {
         $form->saved(function (Form $form) {
+
+
             $types = [
                 'displayDiscover'   => 'discover',
                 'displayHomeTop'    => 'home_top',
@@ -309,7 +311,7 @@ class HomeCarouselController extends MainController
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
             $formInput = request('input') ?? ($form->model()->input ?? 0);
             $formForm  = request('form') ?? ($form->model()->form ?? 1);
-        
+
             $displaysOrg = $form->display_at ?? $form->model()->display_at;
 
 
@@ -326,17 +328,22 @@ class HomeCarouselController extends MainController
                 $displays = [];
             }
 
-
+            $displays = array_filter($displays, fn($v) => !is_null($v) && $v !== '');
+            // dd( $displays);
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
+
                 $toDelete = array_diff($existing, $displays);
+
                 if ($toDelete) {
                     $form->model()->displays()->whereIn('display_type', $toDelete)->delete();
                 }
 
-                $toAdd = array_diff($displays, $existing);
+                // $toAdd = array_diff($displays, $existing);
+                // $toAdd = array_filter($toAdd);
+                //  $toAdd = array_filter($toAdd, fn($v) => $v !== null && $v !== '');
 
-                $toAdd = array_filter($toAdd);
-                foreach ($toAdd as $type) {
+                foreach ($displays as $type) {
+
                     $display = $form->model()->displays()->where('display_type', $type)->first();
                     switch ($formForm) {
                         case 1:
@@ -351,9 +358,8 @@ class HomeCarouselController extends MainController
                         default:
                             $duration_unit = 'hours';
                     }
-                  
+
                     if ($display) {
-                dd($formForm,$duration_unit);
                         $display->update([
                             'duration'      => $formInput,
                             'duration_unit' => $duration_unit,
