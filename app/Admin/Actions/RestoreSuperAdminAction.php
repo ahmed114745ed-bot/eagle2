@@ -27,6 +27,8 @@ class RestoreSuperAdminAction extends Action
     {
         try {
             $superAdmin = SuperAdmin::withTrashed()->find($request->uid);
+            $anotherSuPerAdmin = SuperAdmin::where('country_id', $superAdmin->country_id)->first();
+            if ($anotherSuPerAdmin) return $this->response()->error(__('can not restore this super admin'))->refresh();
             $user = User::find($superAdmin->app_id);
             if ($user->is_super_admin) return $this->response()->error(__('can not restore this super admin user taken'))->refresh();
             $superAdmin->restore();
