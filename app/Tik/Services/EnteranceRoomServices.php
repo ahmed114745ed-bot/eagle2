@@ -29,7 +29,6 @@ use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
-use Modules\CP\Entities\CpRoomHistory;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 
 class EnteranceRoomServices
