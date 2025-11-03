@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Dashboard\Notification;
 
 use App\Http\Controllers\Controller;
-use App\Models\SuperAdminNotification;
 use Illuminate\Http\Request;
+use Modules\SuperAdmin\Entities\SuperAdminNotification;
 
 class SuperAdminNotificationController extends Controller
 {
@@ -18,7 +18,7 @@ class SuperAdminNotificationController extends Controller
     {
         $notifications = SuperAdminNotification::latest()->limit(20)->get();
 
-        return view('superadmin.notifications.list', compact('notifications'));
+        return view('SuperAdmin::notifications.list', compact('notifications'));
     }
 
     public function markAsRead($id)
