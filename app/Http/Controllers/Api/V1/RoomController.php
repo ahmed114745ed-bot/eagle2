@@ -268,6 +268,7 @@ class RoomController extends Controller
     {
         $request['show'] = true;
         $room = $this->roomService->findRoom($id);
+//        $room->load('microphones');
         if (!$room) {
             return Common::apiResponse(0, 'not found', null, 404);
         }
@@ -1324,7 +1325,7 @@ class RoomController extends Controller
         if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
         $roomAdmin = $room->room_admin;
-        $roomMax   = $room->max_admin;
+        $roomMax   = $room->total_admins;
         $adm_arr   = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
         if (count($adm_arr) > 0 && $adm_arr[0] == '') unset($adm_arr[0]);
         $adm_arr   = array_unique($adm_arr);

@@ -5,7 +5,6 @@ namespace App\Helpers;
 use App\Events\SuperAdminNotificationCreated;
 use App\Jobs\SendFirebaseNotificationsToAdmins;
 use App\Models\SuperAdmin;
-use App\Models\SuperAdminNotification;
 use App\Enums\SuperAdminNotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -14,6 +13,7 @@ use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Google_Client;
 use Illuminate\Support\Str;
+use Modules\SuperAdmin\Entities\SuperAdminNotification;
 class SuperAdminNotificationHelper
 {
     public static function notify(

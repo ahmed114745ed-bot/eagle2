@@ -112,6 +112,7 @@ use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\RestoreSuperAdminController;
 use App\Admin\Controllers\UserChargeHistoryController;
 use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
@@ -129,6 +130,7 @@ use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
+
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
@@ -192,6 +194,14 @@ Route::group(
 );
 
 Admin::routes();
+
+$routes = collect(app('router')->getRoutes()->get());
+$filtered = $routes->reject(function ($route) {
+    return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
+});
+
+
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -249,9 +259,9 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        Route::resource('auth/roles', 'RoleControllerNew');
-        Route::resource('auth/roles-new', 'RoleControllerNew');
-        Route::resource('roles', 'RoleControllerNew');
+        // Route::resource('auth/roles', 'RoleControllerNew');
+        Route::resource('auth/roles', RoleControllerNew::class);
+        // Route::resource('roles', 'RoleControllerNew');
 
         Route::resource('auth/rolesTest', 'RoleController');
         // Route::prefix('auth/rolesTest')->group(function () {
@@ -341,7 +351,7 @@ Route::group(
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
-        Route::resource('countries', 'CountryController')->only(['index', 'show']);
+        Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
@@ -493,7 +503,8 @@ Route::group(
          Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::resource('superadmin-users', SuperAdminController::class)->except('delete');
+        Route::resource('superadmin-users', SuperAdminController::class);
+        Route::resource('restore-super-admins', RestoreSuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
@@ -765,6 +776,9 @@ Route::group(
         Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
 
+
+
+   
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);

@@ -46,7 +46,7 @@ class CoinReportController extends MainController
     protected function lucky_gift()
     {
         $grid = new Grid(new UserLuckyGift());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
 
@@ -112,7 +112,7 @@ class CoinReportController extends MainController
     protected function games()
     {
         $grid = new Grid(new CoinGameUser());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
 

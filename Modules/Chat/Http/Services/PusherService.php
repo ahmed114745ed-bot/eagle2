@@ -44,6 +44,7 @@ class PusherService
     {
         $user->online = 0;
         $user->current_room_chat = null;
+        $user->game_id = null;
         $user->save();
     }
 

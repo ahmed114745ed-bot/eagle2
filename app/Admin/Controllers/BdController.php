@@ -95,7 +95,7 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
+        $countryID =session('filter_country_id');
         $superAdmin = [];
        
         if ($countryID) {
@@ -293,30 +293,30 @@ class BdController extends MainController
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
-   
-        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-            
+        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'bd')->first();
-                 $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-                 $milestone = __('Acquisitions');   
- 
-                 $customButtonHTML = <<<HTML
-                 <div style="display: contents; align-items: center;">
-                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                          {$milestone}
-                     </a>
-                 </div>
-             HTML;
- 
-                 $tools->append($customButtonHTML);
-             });
-            $grid->tools(function ($tools) {
-               $logoutUrl = route('admin.bd.logout'); 
-               $loginText = __('login'); 
-               $areaManagerUrl = url('/bd/login');
+                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                $milestone = __('milestone');   // Translates 'milestone' via your language files
 
-               $customButtonHTML = <<<HTML
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                         {$milestone}
+                    </a>
+                </div>
+            HTML;
+
+                // Append the custom HTML button to the grid's toolbar
+                $tools->append($customButtonHTML);
+            });
+
+            $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.bd.logout');
+                $loginText = __('login');
+                $areaManagerUrl = url('/bd/login');
+
+                $customButtonHTML = <<<HTML
                <div style="display: contents; align-items: center;">
                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
                        <i class="fa fa-sign-in"></i> {$loginText}
@@ -338,31 +338,25 @@ class BdController extends MainController
                </script>
                HTML;
 
-               $tools->append($customButtonHTML);
-           });
-       }
+                $tools->append($customButtonHTML);
+            });
+        }
+
         $grid->disableRowSelector();
 
         $this->extendGrid($grid);
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    // protected function detail($id)
-    // {
-    //    return $this->profile($id);
-    // }
+
+
 
     /**
      * Make a form builder.
      *
      * @return Form
      */
+
     protected function form()
     {
         $form = new Form(new Bd());
@@ -406,13 +400,13 @@ class BdController extends MainController
         //                }
         //            });
 
-//        $form->select('parent_id', __('select super admin'))->options(function ($value) {
-//            $ops = [];
-//            foreach (SuperAdmin::where('id', $value)->get() as $admin) {
-//                $ops[$admin->id] = $admin->username;
-//            }
-//            return $ops;
-//        })->ajax('/api/search/users-superadmin2', 'id', 'name')->rules('required');
+        //        $form->select('parent_id', __('select super admin'))->options(function ($value) {
+        //            $ops = [];
+        //            foreach (SuperAdmin::where('id', $value)->get() as $admin) {
+        //                $ops[$admin->id] = $admin->username;
+        //            }
+        //            return $ops;
+        //        })->ajax('/api/search/users-superadmin2', 'id', 'name')->rules('required');
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
@@ -431,15 +425,15 @@ class BdController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
 
-//            $form->switch('default', __('set_as_default'))
-//                ->help(__('make_bd_default'));
+            //            $form->switch('default', __('set_as_default'))
+            //                ->help(__('make_bd_default'));
         }
 
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $countries = Country::all();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
             }
             return $ops;
         })->required();
@@ -452,6 +446,10 @@ class BdController extends MainController
             if ($isEditing) {
                 $originalAppId = $form->model()->getOriginal('app_id');
                 $newAppId = $form->input('app_id');
+
+                $superAdmin = SuperAdmin::where('country_id', request('country_id'))->first() ?? SuperAdmin::where('default', 1)->first();
+                $form->model()->parent_id = $superAdmin->id;
+
                 if ($originalAppId !=  $newAppId) {
                     $OldUserAppId = User::find($originalAppId);
                     if ($OldUserAppId) {
@@ -461,13 +459,14 @@ class BdController extends MainController
                     }
 
                     $newUserAppId = User::find($newAppId);
-                    $newUserAppId->is_bd = 1;
-                    $newUserAppId->save();
-                    $form->app_id = $newAppId;
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
-
+                    if (isset($newUserAppId)) {
+                        $newUserAppId->is_bd = 1;
+                        $newUserAppId->save();
+                        $form->app_id = $newAppId;
+                        MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                    }
                 }
-            }else{
+            } else {
                 $selectedCountryId = $form->country_id;
                 $superAdminId = SuperAdmin::where('country_id', $selectedCountryId)->first()?->id ?? SuperAdmin::where('default', 1)->where('country_id', 0)->first()?->id;
 
@@ -506,8 +505,6 @@ class BdController extends MainController
                     ]);
                 }
             }
-
-
         });
 
         return $form;

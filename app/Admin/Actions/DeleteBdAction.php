@@ -35,7 +35,7 @@ class DeleteBdAction extends RowAction
         public function handle(Model $model, Request $request)
         {
             if ($model->default == 1) {
-                return $this->response()->error(__('You cannot delete the default BD.'))->refresh();
+                return $this->response()->error(__('You cannot delete the default BD for this country.'))->refresh();
             }
 
             if ($model->created_by == 'owner') {
@@ -56,7 +56,7 @@ class DeleteBdAction extends RowAction
 
             $model->delete();
 
-            return $this->response()->success(__('BD deleted successfully.'))->refresh();
+            return $this->response()->success('BD deleted successfully.')->refresh();
         }
 
 

@@ -220,69 +220,31 @@
         </a>
 
         @php
-            $areaManagers = \App\Models\AreaManager::select(['id','name','username','avatar'])->get();
-            $selectAreaManagerId = session('area_manager_id') ?? request('area_manager_id');
-            $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
+            $lang = app()->getLocale();
             $country   = \App\Models\Country::find(Admin::user()->country_id);
-
-            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
-
-            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $areaManagerCountries = \App\Models\Country::where('area_manager_id', $authId)->select(['id', 'name', 'flag'])->get();
-
-            $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
-            $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
-
-            $selectedAreaManagerCountryId = session('area_manager_country_id') ?? request('area_manager_country_id') ?? Admin::user()->country_id;
-            $selectedAreaManagerCountry   = $areaManagerCountries->firstWhere('id', (int) $selectedAreaManagerCountryId);
+            $countries = \App\Models\Country::select(['id', 'name','e_name', 'flag'])->get();
+            $selectedCountryId = session('filter_country_id') ?? request('country_id') ?? Admin::user()->country_id;
+            $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
 
-        @if (request()->is('admin*'))
-            <a class="nav-item select-country">
-                <select id="area-Manager-select" class="form-control" style="width:190px;">
-                    <option value="">{{ __('Select area manager') }}</option>
-                    @foreach($areaManagers as $areaManager)
-                        <option
-                            value="{{ $areaManager->id }}"
-                            data-flag="{{ getImagePath($areaManager->avatar) }}"
-                            {{ (string)$selectAreaManagerId === (string)$areaManager->id ? 'selected' : '' }}>
-                            {{ $areaManager->name ?? $areaManager->username }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
-            <a class="nav-item select-country">
-                <select id="country-select" class="form-control" style="width:190px;">
-                    <option value="">{{ __('Select Country...') }}</option>
-                    @foreach($countries as $currentCountry)
-                        <option
-                            value="{{ $currentCountry->id }}"
-                            data-flag="{{ getImagePath($currentCountry->flag) }}"
-                            {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
-        @endif
-
-        @if (request()->is('areaManager*'))
-            <a class="nav-item select-country">
-                <select id="country-select" class="form-control" style="width:190px;">
-                    <option value="">{{ __('Select Country...') }}</option>
-                    @foreach($areaManagerCountries as $currentCountry)
-                        <option
-                            value="{{ $currentCountry->id }}"
-                            data-flag="{{ getImagePath($currentCountry->flag) }}"
-                            {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
-        @endif
-        <script>window.enableCountryHeader = true;</script>
-
+{{--        @if(!session('preview_superadmin'))--}}
+            @if (request()->is('admin*'))
+                <a class="nav-item select-country">
+                    <select id="country-select" class="form-control" style="width:190px;">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option
+                                value="{{ $currentCountry->id }}"
+                                data-flag="{{ getImagePath($currentCountry->flag) }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{$lang === 'ar' ? $currentCountry->name : ($currentCountry->e_name ?? $currentCountry->e_name)  }}
+                            </option>
+                        @endforeach
+                    </select>
+                </a>
+            @endif
+            <script>window.enableCountryHeader = true;</script>
+{{--        @endif--}}
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
         {!! Admin::getNavbar()->render('left') !!}
@@ -315,8 +277,8 @@
                 @endif
 
                 @if ($admin->type == 'superadmin')
-
-                   @include('superadmin.notifications.super')
+          
+                   @include('SuperAdmin::notifications.super')
 
                 @endif
 
@@ -355,7 +317,7 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('country_id') && !session('area_manager_id'))
+                @if(!session('preview_superadmin') && session('filter_country_id'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
@@ -474,11 +436,9 @@
                 const url = new URL(window.location.href);
 
                 if (countryId && countryId !== 'null') {
-                    url.searchParams.set('country_id', countryId);
-                    url.searchParams.delete('clear_country');
+                    url.searchParams.set('filter_country_id', countryId);
                 } else {
-                    url.searchParams.set('clear_country', 1);
-                    url.searchParams.delete('country_id');
+                    url.searchParams.set('filter_country_id', 'null');
                 }
 
                 if ($.pjax) {
@@ -496,40 +456,10 @@
                 if (!$this.val()) {
                     setTimeout(() => $this.select2('close'), 0);
 
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('clear_area_manager_country', 1);
-                    url.searchParams.delete('area_manager_country_id');
-
-                    if ($.pjax) {
-                        setTimeout(() => {
-                            $.pjax({ url: url.toString(), container: '#pjax-container' });
-                        }, 1);
-                    } else {
-                        window.location.href = url.toString();
-                    }
-                    return;
-                }
-
-                    const countryId = $(this).val();
-                    const url = new URL(window.location.href);
-
-                    if (countryId && countryId !== 'null') {
-                        url.searchParams.set('area_manager_country_id', countryId);
-                        url.searchParams.delete('clear_area_manager_country');
-                    } else {
-                        url.searchParams.set('clear_area_manager_country', 1);
-                        url.searchParams.delete('area_manager_country_id');
-                    }
-
-                    if ($.pjax) {
-                        setTimeout(() => {
-                            $.pjax({url: url.toString(), container: '#pjax-container'});
-                        }, 1);
-                    } else {
-                        window.location.href = url.toString();
-                    }
-                });
-            @endif
+                const url = new URL(window.location.href);
+                url.searchParams.set('filter_country_id', 'null');
+                window.location.href = url.toString();
+            });
         }
 
         function formatCountry(country) {

@@ -61,7 +61,9 @@ class MilestoneController extends MainController
         $grid = new Grid(new Milestone());
 
         $grid->column('id', __('ID'))->sortable();
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->display(function ($value) {
+            return __($value);
+        });
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('rewards', __('rewards'))->display(function () {
                 $url =  admin_url("milestone-rewards/" . $this->id);

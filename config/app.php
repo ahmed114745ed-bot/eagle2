@@ -208,8 +208,9 @@ return [
         App\Bd\BdServiceProvider::class,
         App\Providers\TimeServiceProvider::class,
 
-        App\SuperAdmin\SuperAdminServiceProvider::class,
         App\AreaManager\AreaManagerServiceProvider::class,
+        Modules\SuperAdmin\Providers\SuperAdminServiceProvider::class,
+
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 

@@ -21,6 +21,7 @@ return [
     'delete'                => 'مسح',
     "password_incorrect" => 'كلمة المرور غير صحيحة',
     "username_not_found" => 'اسم المستخدم غير موجود',
+    'is_preview' => 'عرض مباشر',
 
     'lifetime_help' => '💡 إذا أدخلت <strong>0</strong>، فهذا يعني أن العنصر لن تنتهي صلاحيته أبدًا (مدى الحياة).',
 

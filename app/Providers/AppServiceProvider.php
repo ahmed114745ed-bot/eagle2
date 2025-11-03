@@ -110,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
             config(['admin.route' => config('admin.area_manager_route')]);
             Admin::routes();
         } elseif ($prefix === 'admin') {
-            Admin::routes();
+            // Admin::routes();
             config(['admin.route' => $originalConfig]);
         }
     }
@@ -223,6 +223,11 @@ class AppServiceProvider extends ServiceProvider
                 'currency'   => $settings['codapay_currency'] ?? '',
             ],
 
+            'googlePay' => [
+                'payment_url' => $settings['google_pay_payment_url'] ?? '',
+                'node_server_name' => $settings['google_pay_node_server_name'] ?? '',
+            ],
+
             'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
             'is_paypal_active' => $settings['is_paypal_active'] ?? 0,
             'is_utd_fawry_active' => $settings['is_utd_fawry_active'] ?? 0,
@@ -230,6 +235,7 @@ class AppServiceProvider extends ServiceProvider
             'is_strip_active' => $settings['is_strip_active'] ?? 0,
             'is_opay_active' => $settings['is_opay_active'] ?? 0,
             'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
+            'is_google_pay_active' => $settings['is_google_pay_active'] ?? 0,
             'is_codapay_active' => $settings['is_codapay_active'] ?? 0,
         ]);
 

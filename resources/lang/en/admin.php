@@ -459,4 +459,6 @@ return [
     'creator' => 'admin',
     'custom_img_image' => 'The file must be an image.',
     'custom_img_mimes' => 'Only jpeg, png, jpg images are allowed.',
+    'is_preview' => 'Live Preview',
+
 ];

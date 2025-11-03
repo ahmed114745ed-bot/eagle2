@@ -83,7 +83,7 @@ class SuperAdminHomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()->whereHas('countries', function ($q) use ($countryID){
             $q->where('countries.id', $countryID);
@@ -339,7 +339,7 @@ class SuperAdminHomeCarouselController extends MainController
      protected function syncCountryRelationsAfterSave(Form $form)
      {
          $form->saved(function (Form $form) {
-             $countryID = session('country_id');
+             $countryID =session('filter_country_id');
              $model = $form->model();
 
              $formInput = request('input') ?? $model->input ?? 0;
@@ -379,7 +379,7 @@ class SuperAdminHomeCarouselController extends MainController
      public function storeBannerRequest($bannerId, Request $request)
      {
          $banner = HomeCarousel::findOrFail($bannerId);
-         $countryID = session('country_id');
+         $countryID =session('filter_country_id');
          $user = SuperAdmin::where('country_id', $countryID)->first();
 
          $field  = $request->field;
@@ -497,7 +497,7 @@ class SuperAdminHomeCarouselController extends MainController
      public function resendBannerRequest($bannerId, Request $request)
     {
         $bannerRequest = $this->getLatestBannerRequest($bannerId);
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $user = SuperAdmin::where('country_id', $countryID)->first();
 
         if (!$bannerRequest) {
@@ -519,7 +519,7 @@ class SuperAdminHomeCarouselController extends MainController
 
     protected function getLatestBannerRequest($bannerId)
     {
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $superAdmin = SuperAdmin::where('country_id', $countryID)->first();
 
         return SuperadminBannerRequest::where('home_carousel_id', $bannerId)

@@ -511,6 +511,8 @@ use Modules\Vip\Entities\Vip;
     <div class="settings-sidebar">
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
+            <button onclick="showSection('landPageSettings')">{{ __('land settings') }}</button>
+            
             <button onclick="showSection('workSettings')" class="position-relative">
                 {{ __('Work') }}
             </button>
@@ -549,66 +551,155 @@ use Modules\Vip\Entities\Vip;
 
 
         <div class="settings-content">
-            <div id="brandSettings" class="settings-section active">
+        <div id="brandSettings" class="settings-section active">
 
-                <h3> {{ __('Brand settings') }}</h3>
+            <h3> {{ __('Brand settings') }}</h3>
 
-                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="form row">
+            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="form row">
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Application title en:') }} </label>
-                                <input type="text" name="app_title_en" value="{{ $settings['app_title_en'] ?? '' }}"
-                                    class="form-control">
-                            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('Application title en:') }} </label>
+                            <input type="text" name="app_title_en" value="{{ $settings['app_title_en'] ?? '' }}"
+                                class="form-control">
                         </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Application title ar:') }} </label>
-                                <input type="text" name="app_title_ar" value="{{ $settings['app_title_ar'] ?? '' }}"
-                                    class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Application logo:') }}</label>
-                                <input type="file" name="app_logo" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <!-- Image Preview -->
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Application Fav Icon:') }}</label>
-                                <input type="file" name="app_fav_icon" class="form-control"
-                                    onchange="previewFavIcon(event)">
-
-                                <!-- Image Preview -->
-                                <img id="favIconPreview"
-                                    src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-
-                        <button type="submit">{{ __('save') }}</button>
-
-
                     </div>
 
-                </form>
-            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('Application title ar:') }} </label>
+                            <input type="text" name="app_title_ar" value="{{ $settings['app_title_ar'] ?? '' }}"
+                                class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('Application logo:') }}</label>
+                            <input type="file" name="app_logo" class="form-control"
+                                onchange="previewImage(event)">
+
+                            <!-- Image Preview -->
+                            <img id="imagePreview"
+                                src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
+                                width="100" class="mt-2"
+                                style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                onclick="openFullScreen(this)">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('Application Fav Icon:') }}</label>
+                            <input type="file" name="app_fav_icon" class="form-control"
+                                onchange="previewFavIcon(event)">
+
+                            <!-- Image Preview -->
+                            <img id="favIconPreview"
+                                src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
+                                width="100" class="mt-2"
+                                style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
+                                onclick="openFullScreen(this)">
+                        </div>
+                    </div>
+
+                    <button type="submit">{{ __('save') }}</button>
+
+
+                </div>
+
+            </form>
+        </div>
+        <div id="landPageSettings" class="settings-section">
+    <h3 class="mb-4">{{ __('Landing Page Settings') }}</h3>
+
+    <div class="settings-container">
+        <!-- Sidebar Tabs -->
+        <div class="tabs-sidebar" role="tablist" aria-orientation="vertical">
+            <button class="tab-btn active" data-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
+                {{ __('General Settings') }}
+            </button>
+            <button class="tab-btn" data-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">
+                {{ __('Statistics Settings') }}
+            </button>
+            <button class="tab-btn" data-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
+                {{ __('Social Media Settings') }}
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="landingSettingsForm">
+                @csrf
+
+                <!-- General Settings -->
+                <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                    <h5>{{ __('General Settings') }}</h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>{{ __('About Us Link') }}</label>
+                            <input type="url" name="about_us_link" value="{{ $settings['about_us_link'] ?? '' }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{ __('Gallery App Link') }}</label>
+                            <input type="url" name="gallery_app_link" value="{{ $settings['gallery_app_link'] ?? '' }}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Settings -->
+                <div class="tab-pane" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                    <h5>{{ __('Statistics Settings') }}</h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>{{ __('Number of Users') }}</label>
+                            <input type="number" name="landing_users_count" value="{{ $settings['landing_users_count'] ?? '' }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('Number of Countries') }}</label>
+                            <input type="number" name="landing_countries_count" value="{{ $settings['landing_countries_count'] ?? '' }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('Number of Live Streams') }}</label>
+                            <input type="number" name="landing_live_count" value="{{ $settings['landing_live_count'] ?? '' }}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Settings -->
+                <div class="tab-pane" id="social" role="tabpanel" aria-labelledby="social-tab">
+                    <h5>{{ __('Social Media Settings') }}</h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>{{ __('Facebook Link') }}</label>
+                            <input type="url" name="facebook_link" value="{{ $settings['facebook_link'] ?? '' }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('Twitter Link') }}</label>
+                            <input type="url" name="twitter_link" value="{{ $settings['twitter_link'] ?? '' }}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('WhatsApp Link') }}</label>
+                            <input type="url" name="whatsapp_link" value="{{ $settings['whatsapp_link'] ?? '' }}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
@@ -765,6 +856,16 @@ use Modules\Vip\Entities\Vip;
                                     <option value="{{ $timezone->name }}"
                                         {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
                                         {{ $timezone->name }} ({{ $timezone->offset }})
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <label>{{ __('Default Country:') }}</label>
+                            <select name="default_country" class="form-control select2-country">
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"
+                                        {{ $country->id == ($settings['default_country'] ?? '') ? 'selected' : '' }}>
+                                        {{ app()->getLocale() === 'ar' ? $country->name : $country->e_name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -943,6 +1044,9 @@ use Modules\Vip\Entities\Vip;
                                                 data-bootstrap-switch
                                                 {{ $zego_filter_enabled ? 'checked' : '' }}>
 
+
+
+
                                                 <script>
                                                     function initZegoSwitch() {
                                                         $('input[data-bootstrap-switch]').each(function () {
@@ -1108,6 +1212,9 @@ use Modules\Vip\Entities\Vip;
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </form>
@@ -1156,9 +1263,71 @@ use Modules\Vip\Entities\Vip;
                                     </div>
                                 </div>
                             </div>
+
+
+
                         </div>
                     </div>
                 </form>
+
+                <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                        @csrf
+                        <div class="form">
+                            <label class="d-block">{{ __('admin.is_preview') }}</label>
+
+                            <div class="row mt-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.is_preview') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_auto_preview" value="0">
+
+                                            <input type="checkbox"
+                                                name="is_auto_preview"
+                                                value="1"
+                                                data-bootstrap-switch
+                                                {{ $is_auto_preview ? 'checked' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <script>
+                        function initIsPreviewSwitch() {
+                            const $switch = $('input[name="is_auto_preview"][data-bootstrap-switch]');
+
+                            $switch.each(function () {
+                                $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+                            });
+
+                            $switch.on('switchChange.bootstrapSwitch', function (event, state) {
+                                const form = $('#autoPreviewForm');
+                                const formData = form.serializeArray();
+
+                                const newValue = state ? 1 : 0;
+                                formData.push({ name: 'is_auto_preview', value: newValue });
+
+                                $.ajax({
+                                    url: form.attr('action'),
+                                    method: form.attr('method'),
+                                    data: formData,
+                                    success: function () {
+                                        console.log('is_auto_preview updated to', newValue);
+                                    },
+                                    error: function (xhr) {
+                                        console.error('Error updating is_auto_preview:', xhr.responseText);
+                                    }
+                                });
+                            });
+                        }
+
+                        $(document).ready(initIsPreviewSwitch);
+                        $(document).on('pjax:success', initIsPreviewSwitch);
+                    </script>
+
+
             </div>
 
             <div id="gamesSettings" class="settings-section">
@@ -2002,18 +2171,6 @@ use Modules\Vip\Entities\Vip;
                                                                    class="form-control" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="google_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="google_pay_webhook_url" name="google_pay_webhook_url"
-                                                                       placeholder="google_pay_webhook_url"
-                                                                       value="{{ $settings['google_pay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" readonly>
-                                                                <button type="button" class="copy-button" data-copy-target="google_pay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 @endif
                                             @if ($coin->type == 'sky_pay')
                                                 <div class="col-md-6">
@@ -2296,17 +2453,6 @@ use Modules\Vip\Entities\Vip;
                                                                        name="codapay_project_id"
                                                                        placeholder="codapay_project_id"
                                                                        value="{{ $settings['codapay_project_id'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label
-                                                                    for="codapay_country">{{ __('admin.country') }}:</label>
-                                                                <input type="text" id="codapay_country"
-                                                                       name="codapay_country"
-                                                                       placeholder="codapay_country"
-                                                                       value="{{ $settings['codapay_country'] ?? '' }}"
                                                                        class="form-control" required>
                                                             </div>
                                                         </div>
@@ -4207,6 +4353,182 @@ use Modules\Vip\Entities\Vip;
 </body>
 
 
+<style>
+/* Container */
+#landPageSettings {
+    max-width: 1020px;
+    margin: 18px auto;
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: #222;
+}
+
+/* layout */
+.settings-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* sidebar */
+.tabs-sidebar {
+    min-width: 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-right: 1px solid #eee;
+    padding-right: 12px;
+}
+.tab-btn {
+    /* background: #f7f7f7; */
+    border: 1px solid #e6e6e6;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    transition: all .18s ease;
+    font-weight: 600;
+    color: #333;
+}
+.tab-btn:hover {
+    transform: translateY(-1px);
+}
+.tab-btn.active {
+    background: #0d6efd; /* bootstrap primary */
+    color: #fff;
+    border-color: rgba(13,110,253,0.9);
+}
+
+/* content */
+.tab-content {
+    flex: 1;
+    min-width: 0;
+}
+.tab-pane {
+    display: none;
+}
+.tab-pane.show {
+    display: block;
+}
+
+/* header and hr */
+#landPageSettings h5 {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+#landPageSettings hr {
+    margin-top: 8px;
+    margin-bottom: 14px;
+    border: none;
+    height: 1px;
+    /* background: linear-gradient(90deg,#eee,#f5f5f5); */
+}
+
+/* responsive: on small screens show tabs horizontally above content */
+@media (max-width: 767px) {
+    .settings-container {
+        flex-direction: column;
+    }
+    .tabs-sidebar {
+        order: 0;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-right: 0;
+        padding-bottom: 10px;
+        flex-direction: row;
+        gap: 10px;
+        overflow-x: auto;
+    }
+    .tab-btn {
+        white-space: nowrap;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    .tab-content {
+        margin-top: 12px;
+    }
+}
+
+/* small improvements for inputs */
+.form-control {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.row { display:flex; flex-wrap:wrap; gap:12px; }
+.col-md-6 { flex: 0 0 calc(50% - 12px); min-width: 240px; }
+.col-md-4 { flex: 0 0 calc(33.333% - 12px); min-width: 160px; }
+
+@media (max-width: 767px) {
+    .col-md-6, .col-md-4 { flex: 1 1 100%; min-width: 0; }
+}
+</style>
+
+<script>
+(function(){
+    // Tab logic (vanilla JS)
+    const tabButtons = document.querySelectorAll('#landPageSettings .tab-btn');
+    const panes = document.querySelectorAll('#landPageSettings .tab-pane');
+
+    function activateTab(btn) {
+        // deactivate buttons
+        tabButtons.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+        });
+        // hide panes
+        panes.forEach(p => {
+            p.classList.remove('show','active');
+            p.setAttribute('aria-hidden', 'true');
+        });
+
+        // activate clicked
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        const target = btn.getAttribute('data-target');
+        if (!target) return;
+        const pane = document.querySelector(target);
+        if (pane) {
+            pane.classList.add('show','active');
+            pane.setAttribute('aria-hidden', 'false');
+            // focus first input in pane for accessibility
+            const firstInput = pane.querySelector('input, select, textarea, button');
+            if (firstInput) firstInput.focus({preventScroll:true});
+        }
+    }
+
+    // attach listeners
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', function(e){
+            e.preventDefault();
+            activateTab(this);
+            // smooth scroll to top of content on small screens
+            if (window.innerWidth < 768) {
+                document.querySelector('#landPageSettings .tab-content').scrollIntoView({behavior:'smooth'});
+            }
+        });
+    });
+
+    // set initial active (first one) if none active
+    const initiallyActive = document.querySelector('#landPageSettings .tab-btn.active') || tabButtons[0];
+    if (initiallyActive) activateTab(initiallyActive);
+
+    // Optional: allow switching tabs by hash (e.g., #stats)
+    function checkHash() {
+        if (location.hash) {
+            const btn = document.querySelector('#landPageSettings .tab-btn[data-target="'+location.hash+'"]');
+            if (btn) activateTab(btn);
+        }
+    }
+    window.addEventListener('hashchange', checkHash);
+    checkHash();
+})();
+</script>
+
 <script>
     function toggleBackgroundInput() {
         let type = document.querySelector('[name="background_type"]').value;
@@ -4214,4 +4536,14 @@ use Modules\Vip\Entities\Vip;
         document.getElementById('background_image_group').style.display = (type === 'image') ? 'block' : 'none';
         document.getElementById('gradient_group').style.display = (type === 'gradient') ? 'block' : 'none';
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2-country').select2({
+            placeholder: "{{ __('Select a country') }}",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>

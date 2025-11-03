@@ -102,11 +102,16 @@
                 @endforeach
                 @endif
 
-                 @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+
+
+
+
+     
+            @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
                         ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
                         ,
                         [
@@ -192,7 +197,6 @@
                     @if(isset($link['children']))
 
                         @if(hasVisibleChildren($link['children']))
-
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa {{ $link['icon'] }}"></i>
@@ -296,65 +300,7 @@
             ],
         ];
 
-        function hasPermission($permission) {
-            if (Admin::user()->can('*')) return true;
-            if (is_null($permission)) return true;
-            return Admin::user()->can('browse-' . $permission);
-        }
-
-        function hasVisibleChildren($children) {
-            foreach ($children as $child) {
-                if (hasPermission($child['permission'] ?? null)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    @endphp
-
-    @foreach($areaManagerLinks as $link)
-        @if(isset($link['children']))
-            @if(hasVisibleChildren($link['children']))
-                <li class="treeview">
-                    <a href="#">
-                        <i class="fa {{ $link['icon'] }}"></i>
-                        <span>{{ $link['title'] }}</span>
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </a>
-                    <ul class="treeview-menu">
-                        @foreach($link['children'] as $child)
-                            @if(hasPermission($child['permission'] ?? null))
-                                <li>
-                                    <a href="{{ areaManager_url($child['uri']) }}">
-                                        <i class="fa {{ $child['icon'] }}"></i>
-                                        <span>{{ $child['title'] }}</span>
-                                    </a>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
-                </li>
-            @endif
-        @else
-            @if(hasPermission($link['permission'] ?? null))
-                <li>
-                    <a href="{{ areaManager_url($link['uri']) }}">
-                        <i class="fa {{ $link['icon'] }}"></i>
-                        <span>{{ $link['title'] }}</span>
-                    </a>
-                </li>
-            @endif
-        @endif
-    @endforeach
-@endif
-
-
-                @php
-                $adminTypes = ['bd', 'superadmin', 'sub_super_admin', 'area-manager', 'sub_area_manager'];
-                @endphp
-
-
-                @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin') &&!session('preview_area_manager'))
+                @if (Admin::user()->type != 'bd' && Admin::user()->type != 'superadmin' && Admin::user()->type != 'sub_super_admin' && !session('preview_superadmin'))
                     @each('admin::partials.menu', $filteredMenu, 'item')
                 @elseif(session('preview_superadmin'))
                     @php
