@@ -1650,15 +1650,15 @@
     <section class="stats" id="stats">
         <div class="stats-grid">
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ (int)(@$settings['landing_users_count'] ?? 0) }}">{{ @$settings['landing_users_count'] ?? 0 }}</span><span data-translate="stats.million">M+</span></h2>
+                <h2>{{numToStringNew( (int)@$settings['landing_users_count'] )?? 0 }}</h2>
                 <p data-translate="stats1.desc">Active Users</p>
             </div>
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ (int)(@$settings['landing_countries_count'] ?? 0) }}">{{ (int)($settings['landing_countries_count'] ?? 0) }}</span>+</h2>
+                <h2>{{numToStringNew( (int)($settings['landing_countries_count'] )?? 0) }}</h2>
                 <p data-translate="stats2.desc">Countries</p>
             </div>
             <div class="stat-item">
-                <h2><span class="stat-number" data-target="{{ (int)(@$settings['landing_live_count'] ?? 0) }}">{{ @$settings['landing_live_count'] ?? 0 }}</span><span data-translate="stats.million">M+</span></h2>
+                <h2>{{numToStringNew( @$settings['landing_live_count'] )?? 0 }}</h2>
                 <p data-translate="stats3.desc">Daily Streams</p>
             </div>
             <div class="stat-item">
