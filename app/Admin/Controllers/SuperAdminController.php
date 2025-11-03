@@ -12,6 +12,7 @@ use Encore\Admin\Show;
 use App\Models\Country;
 use App\Models\Permission;
 use App\Models\SuperAdmin;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
@@ -503,7 +504,11 @@ class SuperAdminController extends MainController
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-
+                $defaultBd =  Bd::where('country_id', $superAdmin->country_id)->where('default', 1)->first();
+                if ($defaultBd) {
+                    $defaultBd->password   = Hash::make(Str::random(10));
+                    $defaultBd->save();
+                }
                 Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
 
                 Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
@@ -627,7 +632,7 @@ class SuperAdminController extends MainController
         }
 
         $tab = request()->query('tab', 'agencies');
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();

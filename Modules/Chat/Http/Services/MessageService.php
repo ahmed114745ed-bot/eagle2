@@ -180,6 +180,8 @@ class MessageService
 
         if ($user2->online == 1) {
             $condition = ($user2->current_room_chat == $chatRoom->id);
+            \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
+
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
             if (!$condition) {
