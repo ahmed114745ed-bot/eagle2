@@ -535,10 +535,11 @@ class MicService
 //        $position = array_search($user->id, $microphone);
 //        if ($position === false) return 0;
 
-        $micSeat->update([
-            'user_id' => null,
-            'status'  => 0,
-        ]);
+        $micSeat->delete();
+//        $micSeat->update([
+//            'user_id' => null,
+//            'status'  => 0,
+//        ]);
 
         // Remove user
 //        $microphone[$position] = "0";
