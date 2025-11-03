@@ -398,7 +398,7 @@ class RoomRepoService
         $room = $roomId
             ? $this->repository->findById($roomId)
             : $this->repository->findRoomUserEnableAudio($request->owner_id);
-        // \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
+        \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
@@ -411,6 +411,9 @@ class RoomRepoService
         $jsons = [];
         $map = [];
         $mode = '';
+        \Log::info('Zego Mode Change', [
+            'currentMode' => $currentMode,
+        ]);
         try {
             if ($currentMode == '1') {
                 $mode = 'party';
@@ -436,7 +439,9 @@ class RoomRepoService
             }
         } catch (\Throwable $e) {
             \Log::error("changeMode: Exception - " . $e->getMessage());
-
+            \Log::info('Zego Mode Change', [
+                '$e->getMessage()' => $e->getMessage(),
+            ]);
             return Common::apiResponse(0, $e->getMessage());
         }
         $ms   = [
