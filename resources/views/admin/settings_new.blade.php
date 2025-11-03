@@ -4366,7 +4366,7 @@ use Modules\Vip\Entities\Vip;
 }
 
 .tab-btn {
-    background-color: #d9a5f3;
+    background-color: var(--secondary-color);
     border: none;
     padding: 10px 15px;
     border-radius: 10px;
