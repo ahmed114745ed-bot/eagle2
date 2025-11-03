@@ -95,14 +95,14 @@ class RoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-        $microphones = $room->microphones()
-            ->whereNotNull('user_id')
-            ->where('user_id', '>', 0)
-            ->orderBy('position')
-            ->get(['user_id', 'position']);
-        foreach ($microphones as $mic) {
-            $micPositions[$mic->user_id] = $mic->position + 1;
-        }
+//        $microphones = $room->microphones()
+//            ->whereNotNull('user_id')
+//            ->where('user_id', '>', 0)
+//            ->orderBy('position')
+//            ->get(['user_id', 'position']);
+//        foreach ($microphones as $mic) {
+//            $micPositions[$mic->user_id] = $mic->position + 1;
+//        }
 
 
         // Blacklist
