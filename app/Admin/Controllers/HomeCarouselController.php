@@ -3,20 +3,21 @@
 namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Country;
 use App\Models\Setting;
 use App\Models\HomeCarousel;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Validation\Rule;
-use App\Models\Country;
 use App\Selectables\Countries;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+use App\Models\HomeCarouselDisplay;
 use App\Tik\Services\Files\ImageConverter;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class HomeCarouselController extends MainController
 {
@@ -188,8 +189,8 @@ class HomeCarouselController extends MainController
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
         $form->image('img', trans('img'))
-        /**->setResolution(80)*/
-         ->required();
+            /**->setResolution(80)*/
+            ->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }
 
@@ -456,5 +457,33 @@ class HomeCarouselController extends MainController
         }
         $config = Setting::whereIn('key', ['live', 'home_middle', 'home_top', 'discover'])->pluck('value', 'key')->toArray();
         return $content->view('homeCarouselSetting', compact('config'));
+    }
+
+
+    public function updateBannerDisplay()
+    {
+        $bannerDisplay = HomeCarouselDisplay::whereHas('carousel')->with('carousel')->get();
+
+        foreach ($bannerDisplay as $banner) {
+            $formForm = $banner->carousel->form;
+            switch ($formForm) {
+                case 1:
+                    $duration_unit = 'hours';
+                    break;
+                case 2:
+                    $duration_unit = 'days';
+                    break;
+                case 3:
+                    $duration_unit = 'months';
+                    break;
+                default:
+                    $duration_unit = 'hours';
+            }
+            $banner->update([
+                'duration'      => $banner->carousel->input,
+                'duration_unit' => $duration_unit,
+            ]);
+        }
+        return 'done';
     }
 }
