@@ -447,7 +447,7 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
