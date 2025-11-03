@@ -254,10 +254,8 @@ class EnterRoomCollection extends JsonResource
     {
 //        $microphones = trim($microphones);
 
-        $microphones = $this->microphones()
-            ->with(['user.profile'])
-            ->orderBy('position')
-            ->get();
+        $microphones = $this->microphones
+            ->sortBy('position')->values();
 
 //        $mainMicrophone = trim($mainMicrophone);
 //        if ($microphones == '') return [];
