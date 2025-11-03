@@ -561,14 +561,6 @@ class MicService
 //            }
 //        }
 
-        $mainSeat = $room->mainMicrophones()
-            ->where('position', $micSeat->position)
-            ->first();
-
-        if ($mainSeat && $mainSeat->user_id == $user->id) {
-            $mainSeat->update(['user_id' => null]);
-        }
-
         $micString = $room->microphones()
             ->orderBy('position')
             ->get()

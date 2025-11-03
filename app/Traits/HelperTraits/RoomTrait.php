@@ -319,10 +319,11 @@ trait RoomTrait
 //            $baseMic[$position] = $mainMicrophone[$position];
 //        }
 
-        $micSeat->update([
-            'user_id' => null,
-            'status'  => 0,
-        ]);
+        $micSeat->delete();
+//        $micSeat->update([
+//            'user_id' => null,
+//            'status'  => 0,
+//        ]);
 
         $micString = $room->microphones()
             ->orderBy('position')
