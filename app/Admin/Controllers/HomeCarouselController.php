@@ -351,9 +351,9 @@ class HomeCarouselController extends MainController
                         default:
                             $duration_unit = 'hours';
                     }
-                   // dd($formForm,$duration_unit);
+                  
                     if ($display) {
-
+                dd($formForm,$duration_unit);
                         $display->update([
                             'duration'      => $formInput,
                             'duration_unit' => $duration_unit,
