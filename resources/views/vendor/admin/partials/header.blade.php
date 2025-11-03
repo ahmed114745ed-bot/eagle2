@@ -42,7 +42,7 @@
             justify-content: center;
             z-index: 1000;
         }
-
+        
         .modal-no {
             background: white;
             border-radius: 12px;
@@ -52,7 +52,7 @@
             overflow: hidden;
             animation: modal-appear 0.3s ease-out;
         }
-
+        
         @keyframes modal-appear {
             from {
                 opacity: 0;
@@ -63,7 +63,7 @@
                 transform: translateY(0);
             }
         }
-
+        
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -72,13 +72,13 @@
             border-bottom: 1px solid #e9ecef;
             background-color: #f8f9fa;
         }
-
+        
         .modal-header h5 {
             margin: 0;
             font-weight: 600;
             color: #343a40;
         }
-
+        
         .close-btn {
             background: none;
             border: none;
@@ -88,47 +88,47 @@
             transition: color 0.2s;
             line-height: 1;
         }
-
+        
         .close-btn:hover {
             color: #343a40;
         }
-
+        
         .modal-body2 {
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
         }
-
+        
         .notification-item {
             padding: 14px 20px;
             border-bottom: 1px solid #f1f3f4;
             transition: background-color 0.2s;
             cursor: pointer;
         }
-
+        
         .notification-item:hover {
             background-color: #f8f9fa;
         }
-
+        
         .notification-item.unread {
             background-color: #e7f1ff;
         }
-
+        
         .notification-item.unread:hover {
             background-color: #dbe9fd;
         }
-
+        
         .notification-title {
             font-weight: 500;
             margin-bottom: 4px;
             color: #212529;
         }
-
+        
         .notification-time {
             font-size: 0.85rem;
             color: #6c757d;
         }
-
+        
         .modal-footer {
             display: flex;
             justify-content: space-between;
@@ -137,27 +137,27 @@
             border-top: 1px solid #e9ecef;
             background-color: #f8f9fa;
         }
-
+        
         .btn-footer {
             border-radius: 6px;
             font-weight: 500;
             padding: 8px 16px;
             transition: all 0.2s;
         }
-
+        
         .btn-mark-all {
             background-color: var(--primary-color);
             border: 1px solid #0d6efd;
             color: white;
         }
-
+        
         .btn-mark-all:hover {
             background-color: var(--primary-color);
             border-color: #0a58ca;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
         }
-
+        
         .btn-show-more {
             background-color: var(--primary-color);
             border: 1px solid #6c757d;
@@ -166,55 +166,55 @@
             display: inline-flex;
             align-items: center;
         }
-
+        
         .btn-show-more:hover {
             background-color:var(--primary-color);
             color: white;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
         }
-
+        
         .btn-show-more i {
             margin-left: 6px;
             font-size: 0.9em;
         }
-
+        
         .text-center {
             text-align: center;
         }
-
+        
         .text-muted {
             color: #6c757d !important;
         }
-
+        
         .p-3 {
             padding: 1rem !important;
         }
-
+        
         /* Responsive adjustments */
         @media (max-width: 576px) {
             .modal-no {
                 width: 95%;
             }
-
+            
             .modal-footer {
                 flex-direction: column;
                 gap: 12px;
             }
-
+            
             .btn-footer {
                 width: 100%;
             }
         }
     </style>
 <header class="main-header">
-
+  
 <a href="{{ admin_url('/') }}" class="logo">
         <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
         <span class="logo-lg">{!! config('admin.logo', config('admin.name')) !!}</span>
     </a>
     <nav class="navbar navbar-static-top" role="navigation">
-
+  
         <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
             <span class="sr-only">Toggle navigation</span>
         </a>
@@ -263,13 +263,13 @@
 
             <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
         @if (!Admin::user()->type || Admin::user()->type == '')
-
+        
                 @endif
 
 
                 @php
                     $admin = Auth::user();
-
+                 
                 @endphp
 
                 @if (empty($admin->type))
@@ -325,19 +325,12 @@
                             </button>
                         </li>
                     @endif
-                @elseif(!session('preview_area_manager')  && session('area_manager_id') )
-                @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
-                                <i class="fa fa-eye"></i> {{ __('go to the preview') }}
-                            </button>
-                        </li>
                 @endif
 
-                @if(session('preview_superadmin') || session('preview_area_manager') )
+                @if(session('preview_superadmin'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
-                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn">
+                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
                             <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
                             </button>
                         </li>
@@ -354,54 +347,6 @@
 <script>
     $(document).ready(function () {
         const $countrySelect = $('#country-select');
-        const $AreaManagerSelect = $('#area-Manager-select');
-        const isPreviewSuperadmin = @json(session('preview_superadmin'));
-        const isPreviewAreaManager = @json(session('preview_area_manager'));
-
-          $('#area-Manager-select').select2({
-                placeholder: '{{ __("Select area manager") }}',
-                allowClear: true,
-                width: '190px'
-            });
-
-        $AreaManagerSelect.on('change', function () {
-            const $this = $(this);
-            if (!$this.val()) {
-                setTimeout(() => $this.select2('close'), 0);
-
-                const url = new URL(window.location.href);
-                url.searchParams.set('clear_area_manager', 1);
-                url.searchParams.delete('area_manager_id');
-
-                if ($.pjax) {
-                    setTimeout(() => {
-                        $.pjax({ url: url.toString(), container: '#pjax-container' });
-                    }, 1);
-                } else {
-                    window.location.href = url.toString();
-                }
-                return;
-            }
-
-            const areaManagerId = $(this).val();
-            const url = new URL(window.location.href);
-
-            if (areaManagerId && areaManagerId !== 'null') {
-                url.searchParams.set('area_manager_id', areaManagerId);
-                url.searchParams.delete('clear_area_manager');
-            } else {
-                url.searchParams.set('clear_area_manager', 1);
-                url.searchParams.delete('area_manager_id');
-            }
-
-            if ($.pjax) {
-                setTimeout(() => {
-                    $.pjax({url: url.toString(), container: '#pjax-container'});
-                }, 1);
-            } else {
-                window.location.href = url.toString();
-            }
-        });
 
         if ($countrySelect.length) {
             $countrySelect.select2({
@@ -413,24 +358,6 @@
             });
 
             $countrySelect.on('change', function () {
-                const $this = $(this);
-                if (!$this.val()) {
-                    setTimeout(() => $this.select2('close'), 0);
-
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('clear_country', 1);
-                    url.searchParams.delete('country_id');
-
-                    if ($.pjax) {
-                        setTimeout(() => {
-                            $.pjax({ url: url.toString(), container: '#pjax-container' });
-                        }, 1);
-                    } else {
-                        window.location.href = url.toString();
-                    }
-                    return;
-                }
-
                 const countryId = $(this).val();
                 const url = new URL(window.location.href);
 
@@ -440,20 +367,12 @@
                     url.searchParams.set('filter_country_id', 'null');
                 }
 
-                if ($.pjax) {
-                    setTimeout(() => {
-                        $.pjax({url: url.toString(), container: '#pjax-container'});
-                    }, 1);
-                } else {
-                    window.location.href = url.toString();
-                }
+                window.location.href = url.toString();
             });
 
-            @if(request()->is('areaManager*'))
-                $countrySelect.on('change', function () {
-                const $this = $(this);
-                if (!$this.val()) {
-                    setTimeout(() => $this.select2('close'), 0);
+            $(document).on('click', '.select2-selection__clear', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
                 const url = new URL(window.location.href);
                 url.searchParams.set('filter_country_id', 'null');
@@ -497,9 +416,6 @@
         const previewBtn = document.getElementById('preview-superadmin-btn');
         const exitBtn = document.getElementById('exit-preview-btn');
 
-        const previewBtnArea = document.getElementById('preview-area-manger-btn');
-
-
         if (previewBtn) {
             previewBtn.addEventListener('click', function () {
                 fetch('/admin/set-preview-superadmin', {
@@ -509,43 +425,14 @@
             });
         }
 
-        // if (exitBtn) {
-        //     exitBtn.addEventListener('click', function () {
-        //         fetch('/admin/unset-preview-superadmin', {
-        //             method: 'POST',
-        //             headers: { 'X-CSRF-TOKEN': csrf }
-        //         }).then(() => window.location.reload());
-        //     });
-        // }
-
-        if (previewBtnArea) {
-            previewBtnArea.addEventListener('click', function () {
-                fetch('/admin/set-preview-area-manager', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
-        }
-
-    if (exitBtn) {
-        if (isPreviewSuperadmin) {
+        if (exitBtn) {
             exitBtn.addEventListener('click', function () {
                 fetch('/admin/unset-preview-superadmin', {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrf }
                 }).then(() => window.location.reload());
             });
-        } else if (isPreviewAreaManager) {
-            exitBtn.addEventListener('click', function () {
-                fetch('/admin/unset-preview-area-manager', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
         }
-    }
-
-
     });
 </script>
 
@@ -567,6 +454,8 @@
 
 
 <script>
+
+
     window.handleNotificationClick = function(id, url) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
