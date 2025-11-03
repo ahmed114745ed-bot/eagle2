@@ -256,6 +256,7 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
+        $grid->model()->with(['microphones.user.profile']);
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
@@ -632,10 +633,8 @@ class RoomController extends MainController
 
         $grid->column(__('microphone'))->display(function () {
 
-            $microphones = $this->microphones()
-                ->with('user.profile')
-                ->orderBy('position')
-                ->get();
+            $microphones = $this->microphones->sortBy('position');
+
 
             if ($microphones->isEmpty()) {
                 return '';
