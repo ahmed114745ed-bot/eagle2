@@ -47,7 +47,7 @@ class UserCharismaService
         if (!$user || !$room) {
             return Common::apiResponse(0, 'User Or Room does not exist', null, 404);
         }
-      
+
         // Delete the ExtraDataInRoom record for the specified user
         $deleted = ExtraDataInRoom::where('user_id', $userId)->where('room_id', $roomId)->delete();
 
@@ -90,6 +90,41 @@ class UserCharismaService
             }
         }
 
+
+        return $allDataChanges;
+    }
+
+    public function addTotalEarnedCoinsInUserRoom2(Room $room, array $userIds, $earnedCoins = null): false|array
+    {
+        $roomId = $room->id;
+
+        if ( !$room) {
+            return false;
+        }
+
+        $users = $room->microphones()
+            ->whereIn('user_id', $userIds)
+            ->get(['user_id', 'position']);
+
+        $allDataChanges = [];
+
+        foreach ($userIds as $userId) {
+
+            if ($earnedCoins) {                                                                                                                                                                                                                            // Find or create the ExtraDataInRoom record
+                $extraDataInRoom = ExtraDataInRoom::firstOrNew([
+                    'user_id' => $userId, 'room_id' => $roomId
+                ]);                                                                                                                                                                               // Update the total earned coins
+                $extraDataInRoom->total   += $earnedCoins;
+                $extraDataInRoom->room_id = $roomId;
+                $extraDataInRoom->save();
+            }
+
+            $user = $users->where('user_id', $userId)->first();
+            if ($user){
+                $user['total'] = @$extraDataInRoom?->total ?? 0;
+                $allDataChanges[] = $user;
+            }
+        }
 
         return $allDataChanges;
     }
