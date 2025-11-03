@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Agent;
 use Encore\Admin\Form;
 use App\Helpers\Common;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use App\Enums\PermissionType;
 use Encore\Admin\Facades\Admin;
