@@ -332,7 +332,6 @@
                                 <i class="fa fa-eye"></i> {{ __('go to the preview') }}
                             </button>
                         </li>
-                    @endif
                 @endif
 
                 @if(session('preview_superadmin') || session('preview_area_manager') )
