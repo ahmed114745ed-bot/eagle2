@@ -25,6 +25,7 @@ class ChatRoomPusherV2Resource extends JsonResource
         \Log::info('Total unread messages: ', ['total_undread_message' => $total_undread_message]);
 
         return [
+            'id'             => $this->id,
             'user_id'        => $user2->id,
             'name'           => $user2->name,
             'img'            => @$user2->profile->avatar,
