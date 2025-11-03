@@ -106,7 +106,8 @@ class LuckyGiftService
 
 
 
-        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+//        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
 
@@ -465,23 +466,38 @@ class LuckyGiftService
 
     private function getResponseData($gift, $roomMics, $user, $receiversIds, $receiverName)
     {
-//        $positions = [];
-//        $userInMic = [];
-//        $mics      = explode(',', $roomMics);
-//
-//        foreach ($mics as $key => $value) {
-//            $founded = in_array($value, $receiversIds);
-//
-//            if ($founded) {
-//                $userInMic[] = $value;
-//                $positions[] = $key;
-//            }
-//        }
-//
-//        if (count(array_diff($receiversIds, $userInMic)) > 0) {
-//            $positions[] = -1;
-//        }
 
+        $positions = [];
+        $userInMic = [];
+        $mics      = explode(',', $roomMics);
+
+        foreach ($mics as $key => $value) {
+            $founded = in_array($value, $receiversIds);
+
+            if ($founded) {
+                $userInMic[] = $value;
+                $positions[] = $key;
+            }
+        }
+
+        if (count(array_diff($receiversIds, $userInMic)) > 0) {
+            $positions[] = -1;
+        }
+
+        return [
+            'gift_image'      => $gift->img,
+            'receiver_name'   => $receiverName,
+            'receivers_ids'   => $receiversIds,
+            'sender_id'       => $user->id ?? 0,
+            'sender_name'     => $user->name ?? '',
+            'sender_img'      => $user->profile->avatar ?? '',
+            'position'        => $positions,
+            'combo' => [],
+        ];
+    }
+
+    private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
+    {
         $microphones = $room->microphones ?? collect();
 
         $positions = $microphones
