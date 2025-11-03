@@ -612,91 +612,91 @@ use Modules\Vip\Entities\Vip;
             </form>
         </div>
         <div id="landPageSettings" class="settings-section">
-    <h3 class="mb-4">{{ __('Landing Page Settings') }}</h3>
+            <h3 class="mb-4">{{ __('Landing Page Settings') }}</h3>
 
-    <div class="settings-container">
-        <!-- Sidebar Tabs -->
-        <div class="tabs-sidebar" role="tablist" aria-orientation="vertical">
-            <button class="tab-btn active" data-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
-                {{ __('General Settings') }}
-            </button>
-            <button class="tab-btn" data-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">
-                {{ __('Statistics Settings') }}
-            </button>
-            <button class="tab-btn" data-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
-                {{ __('Social Media Settings') }}
-            </button>
+            <div class="settings-container">
+                <!-- Sidebar Tabs -->
+                <div class="tabs-sidebar" role="tablist" aria-orientation="vertical">
+                    <button class="tab-btn active" data-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
+                        {{ __('General Settings') }}
+                    </button>
+                    <button class="tab-btn" data-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">
+                        {{ __('Statistics Settings') }}
+                    </button>
+                    <button class="tab-btn" data-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
+                        {{ __('Social Media Settings') }}
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="landingSettingsForm">
+                        @csrf
+
+                        <!-- General Settings -->
+                        <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                            <h5>{{ __('General Settings') }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>{{ __('About Us Link') }}</label>
+                                    <input type="url" name="about_us_link" value="{{ $settings['about_us_link'] ?? '' }}" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>{{ __('Gallery App Link') }}</label>
+                                    <input type="url" name="gallery_app_link" value="{{ $settings['gallery_app_link'] ?? '' }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Settings -->
+                        <div class="tab-pane" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                            <h5>{{ __('Statistics Settings') }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>{{ __('Number of Users') }}</label>
+                                    <input type="number" name="landing_users_count" value="{{ $settings['landing_users_count'] ?? '' }}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Number of Countries') }}</label>
+                                    <input type="number" name="landing_countries_count" value="{{ $settings['landing_countries_count'] ?? '' }}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Number of Live Streams') }}</label>
+                                    <input type="number" name="landing_live_count" value="{{ $settings['landing_live_count'] ?? '' }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Media Settings -->
+                        <div class="tab-pane" id="social" role="tabpanel" aria-labelledby="social-tab">
+                            <h5>{{ __('Social Media Settings') }}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>{{ __('Facebook Link') }}</label>
+                                    <input type="url" name="facebook_link" value="{{ $settings['facebook_link'] ?? '' }}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Twitter Link') }}</label>
+                                    <input type="url" name="twitter_link" value="{{ $settings['twitter_link'] ?? '' }}" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('WhatsApp Link') }}</label>
+                                    <input type="url" name="whatsapp_link" value="{{ $settings['whatsapp_link'] ?? '' }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="landingSettingsForm">
-                @csrf
-
-                <!-- General Settings -->
-                <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                    <h5>{{ __('General Settings') }}</h5>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>{{ __('About Us Link') }}</label>
-                            <input type="url" name="about_us_link" value="{{ $settings['about_us_link'] ?? '' }}" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label>{{ __('Gallery App Link') }}</label>
-                            <input type="url" name="gallery_app_link" value="{{ $settings['gallery_app_link'] ?? '' }}" class="form-control">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Statistics Settings -->
-                <div class="tab-pane" id="stats" role="tabpanel" aria-labelledby="stats-tab">
-                    <h5>{{ __('Statistics Settings') }}</h5>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>{{ __('Number of Users') }}</label>
-                            <input type="number" name="landing_users_count" value="{{ $settings['landing_users_count'] ?? '' }}" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label>{{ __('Number of Countries') }}</label>
-                            <input type="number" name="landing_countries_count" value="{{ $settings['landing_countries_count'] ?? '' }}" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label>{{ __('Number of Live Streams') }}</label>
-                            <input type="number" name="landing_live_count" value="{{ $settings['landing_live_count'] ?? '' }}" class="form-control">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Media Settings -->
-                <div class="tab-pane" id="social" role="tabpanel" aria-labelledby="social-tab">
-                    <h5>{{ __('Social Media Settings') }}</h5>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label>{{ __('Facebook Link') }}</label>
-                            <input type="url" name="facebook_link" value="{{ $settings['facebook_link'] ?? '' }}" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label>{{ __('Twitter Link') }}</label>
-                            <input type="url" name="twitter_link" value="{{ $settings['twitter_link'] ?? '' }}" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label>{{ __('WhatsApp Link') }}</label>
-                            <input type="url" name="whatsapp_link" value="{{ $settings['whatsapp_link'] ?? '' }}" class="form-control">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Save Button -->
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 
@@ -4343,6 +4343,7 @@ use Modules\Vip\Entities\Vip;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     color: #222;
+    background: white;
 }
 
 /* layout */
@@ -4358,25 +4359,28 @@ use Modules\Vip\Entities\Vip;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    border-right: 1px solid #eee;
-    padding-right: 12px;
+    border-left: 1px solid #eee; /* move border to left side */
+    padding-left: 12px; /* spacing on left side */
+    border-right: none;
+    direction: rtl; /* aligns text and elements right-to-left */
 }
+
 .tab-btn {
-    /* background: #f7f7f7; */
-    border: 1px solid #e6e6e6;
-    padding: 10px 12px;
-    border-radius: 6px;
-    text-align: left;
+    background-color: var(--secondary-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: right; /* align text to the right */
     cursor: pointer;
-    transition: all .18s ease;
-    font-weight: 600;
-    color: #333;
+    transition: all 0.3s ease;
 }
+
+
 .tab-btn:hover {
     transform: translateY(-1px);
 }
 .tab-btn.active {
-    background: #0d6efd; /* bootstrap primary */
+    background: var(--primary-color); /* bootstrap primary */
     color: #fff;
     border-color: rgba(13,110,253,0.9);
 }
@@ -4411,13 +4415,14 @@ use Modules\Vip\Entities\Vip;
     .settings-container {
         flex-direction: column;
     }
-    .tabs-sidebar {
+.tabs-sidebar {
         order: 0;
         border-right: none;
         border-bottom: 1px solid #eee;
         padding-right: 0;
         padding-bottom: 10px;
-        flex-direction: row;
+        flex-direction: row; /* horizontal layout */
+        justify-content: flex-start;
         gap: 10px;
         overflow-x: auto;
     }
@@ -4449,65 +4454,86 @@ use Modules\Vip\Entities\Vip;
 </style>
 
 <script>
-(function(){
-    // Tab logic (vanilla JS)
+(function () {
     const tabButtons = document.querySelectorAll('#landPageSettings .tab-btn');
     const panes = document.querySelectorAll('#landPageSettings .tab-pane');
 
     function activateTab(btn) {
-        // deactivate buttons
+        // deactivate all buttons
         tabButtons.forEach(b => {
             b.classList.remove('active');
             b.setAttribute('aria-selected', 'false');
         });
-        // hide panes
+
+        // hide all panes
         panes.forEach(p => {
-            p.classList.remove('show','active');
+            p.classList.remove('show', 'active');
             p.setAttribute('aria-hidden', 'true');
         });
 
-        // activate clicked
+        // activate the clicked button
         btn.classList.add('active');
         btn.setAttribute('aria-selected', 'true');
+
         const target = btn.getAttribute('data-target');
         if (!target) return;
+
         const pane = document.querySelector(target);
         if (pane) {
-            pane.classList.add('show','active');
+            pane.classList.add('show', 'active');
             pane.setAttribute('aria-hidden', 'false');
-            // focus first input in pane for accessibility
+
+            // optional: focus the first input element inside the tab
             const firstInput = pane.querySelector('input, select, textarea, button');
-            if (firstInput) firstInput.focus({preventScroll:true});
+            if (firstInput) {
+                firstInput.focus({ preventScroll: true });
+            }
         }
     }
 
-    // attach listeners
+    // attach click listeners to tab buttons
     tabButtons.forEach(btn => {
-        btn.addEventListener('click', function(e){
+        btn.addEventListener('click', e => {
             e.preventDefault();
-            activateTab(this);
-            // smooth scroll to top of content on small screens
+            activateTab(btn);
+
+            // smooth scroll to the tab content on mobile
             if (window.innerWidth < 768) {
-                document.querySelector('#landPageSettings .tab-content').scrollIntoView({behavior:'smooth'});
+                const tabContent = document.querySelector('#landPageSettings .tab-content');
+                if (tabContent) {
+                    tabContent.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            // update URL hash for history navigation
+            const target = btn.getAttribute('data-target');
+            if (target) {
+                history.replaceState(null, null, target);
             }
         });
     });
 
-    // set initial active (first one) if none active
+    // set the first tab active by default if none active
     const initiallyActive = document.querySelector('#landPageSettings .tab-btn.active') || tabButtons[0];
-    if (initiallyActive) activateTab(initiallyActive);
+    if (initiallyActive) {
+        activateTab(initiallyActive);
+    }
 
-    // Optional: allow switching tabs by hash (e.g., #stats)
+    // allow switching tabs by URL hash (e.g., #stats)
     function checkHash() {
         if (location.hash) {
-            const btn = document.querySelector('#landPageSettings .tab-btn[data-target="'+location.hash+'"]');
-            if (btn) activateTab(btn);
+            const btn = document.querySelector('#landPageSettings .tab-btn[data-target="' + location.hash + '"]');
+            if (btn) {
+                activateTab(btn);
+            }
         }
     }
+
     window.addEventListener('hashchange', checkHash);
     checkHash();
 })();
 </script>
+
 
 <script>
     function toggleBackgroundInput() {

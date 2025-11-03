@@ -10,4 +10,10 @@ class RoomMicrophone extends Model
     use HasFactory;
 
     protected $fillable = ['room_id', 'user_id', 'position', 'status'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

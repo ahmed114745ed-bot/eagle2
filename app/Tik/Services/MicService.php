@@ -146,14 +146,10 @@ class MicService
 //        $base_mic = explode(',', $room->microphone_only_users);
 
         $position = (int) $data['position'];
-        $maxPositions = 8;
 
-        if ($position < 0 || $position >= $maxPositions) {
-            throw new Exception(__('This seat is out of the designated range'));
-        }
-
-        if ($position == 0 && $room->uid != auth()->id()) {
-            throw new Exception(__('This seat is for owner'));
+        $maxPositions = $room->mode == 0 ? 9 : 17;
+        if ($position < 0 || $position > $maxPositions) {
+            throw new Exception(__('api_responses.position_error'));
         }
 
 //        $current = $mic_arr[$position] ?? '0';
@@ -202,10 +198,11 @@ class MicService
                 ->orWhere("user_two_id", $user->id)
                 ->delete();
 
-            $existingMic->update([
-                'user_id' => null,
-                'status'  => $existingMic->status,
-            ]);
+            $existingMic->delete();
+//            $existingMic->update([
+//                'user_id' => null,
+//                'status'  => $existingMic->status,
+//            ]);
         }
 
 //        $base_mic[$position] = $user->id . '#' . $old_status;
@@ -538,10 +535,11 @@ class MicService
 //        $position = array_search($user->id, $microphone);
 //        if ($position === false) return 0;
 
-        $micSeat->update([
-            'user_id' => null,
-            'status'  => 0,
-        ]);
+        $micSeat->delete();
+//        $micSeat->update([
+//            'user_id' => null,
+//            'status'  => 0,
+//        ]);
 
         // Remove user
 //        $microphone[$position] = "0";
@@ -562,14 +560,6 @@ class MicService
 //                $final[] = '0';
 //            }
 //        }
-
-        $mainSeat = $room->mainMicrophones()
-            ->where('position', $micSeat->position)
-            ->first();
-
-        if ($mainSeat && $mainSeat->user_id == $user->id) {
-            $mainSeat->update(['user_id' => null]);
-        }
 
         $micString = $room->microphones()
             ->orderBy('position')
