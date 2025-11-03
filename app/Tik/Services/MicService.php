@@ -198,10 +198,11 @@ class MicService
                 ->orWhere("user_two_id", $user->id)
                 ->delete();
 
-            $existingMic->update([
-                'user_id' => null,
-                'status'  => $existingMic->status,
-            ]);
+            $existingMic->delete();
+//            $existingMic->update([
+//                'user_id' => null,
+//                'status'  => $existingMic->status,
+//            ]);
         }
 
 //        $base_mic[$position] = $user->id . '#' . $old_status;
@@ -534,10 +535,11 @@ class MicService
 //        $position = array_search($user->id, $microphone);
 //        if ($position === false) return 0;
 
-        $micSeat->update([
-            'user_id' => null,
-            'status'  => 0,
-        ]);
+        $micSeat->delete();
+//        $micSeat->update([
+//            'user_id' => null,
+//            'status'  => 0,
+//        ]);
 
         // Remove user
 //        $microphone[$position] = "0";
