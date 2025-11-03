@@ -127,6 +127,7 @@ class ChatMessagesController extends Controller
         }
 
         \Log::info('room_resource ', ['room_resource' => $response['room_resource']]);
+        \Log::info('room_resource ', ['room_resource' => $response['room_resource'] , 'room req' => $response['message_resource']->toResponse(request())->getData()->data]);
 
         try {
             // return $user2;
