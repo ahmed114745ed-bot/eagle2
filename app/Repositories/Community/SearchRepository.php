@@ -79,29 +79,29 @@ class SearchRepository implements SearchRepositoryInterface
             'owner',
             'owner.packs'
         ])
-        ->whereHas('owner', function ($query) {
-            $query->where('status', 1);
-        })
-        ->where(function ($query) use ($keywords, $blockedUserIds) {
-            $query->where('uid', 'like', $keywords . '%')
-                  ->whereNotIn('uid', $blockedUserIds);
-        })
-        ->where(function ($query) {
-            $query->where('type', '!=', 'live')
-                  ->orWhere(function ($subQuery) {
-                      $subQuery->where('type', 'live')
-                               ->where('room_status', 1)
-                               ->where('is_live', 1);
-                  });
-        })
-        ->orderBy('hot', 'desc')
-        ->take(2);
-    
-    
+            ->whereHas('owner', function ($query) {
+                $query->where('status', 1);
+            })
+            ->where(function ($query) use ($keywords, $blockedUserIds) {
+                $query->where('uid', 'like', $keywords . '%')
+                    ->whereNotIn('uid', $blockedUserIds);
+            })
+            ->where(function ($query) {
+                $query->where('type', '!=', 'live')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'live')
+                            ->where('room_status', 1)
+                            ->where('is_live', 1);
+                    });
+            })
+            ->orderBy('hot', 'desc')
+            ->take(2);
+
+
         $rooms = $query->get();
 
         // \Log::info('Room Results:', $rooms->toArray());
-        
+
         return $rooms;
     }
 
@@ -134,24 +134,23 @@ class SearchRepository implements SearchRepositoryInterface
             'owner',
             'owner.packs'
         ])
-        ->whereHas('owner', function ($query) {
-            $query->where('status', 1);
-        })
-        ->where(function ($query) use ($keywords, $blockedUserIds) {
-            $query->where('uid', 'like', $keywords . '%')
-                  ->whereNotIn('uid', $blockedUserIds);
-        })
-        ->where(function ($query) {
-            $query->where('type', '!=', 'live') 
-                  ->orWhere(function ($subQuery) {
-                      $subQuery->where('type', 'live') 
-                               ->where('room_status', 1); 
-                  });
-        })
-        ->orderBy('hot', 'desc')
-        ->take(2)
-        ->get();
-    
+            ->whereHas('owner', function ($query) {
+                $query->where('status', 1);
+            })
+            ->where(function ($query) use ($keywords, $blockedUserIds) {
+                $query->where('uid', 'like', $keywords . '%')
+                    ->whereNotIn('uid', $blockedUserIds);
+            })
+            ->where(function ($query) {
+                $query->where('type', '!=', 'live')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'live')
+                            ->where('room_status', 1);
+                    });
+            })
+            ->orderBy('hot', 'desc')
+            ->take(2)
+            ->get();
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
@@ -319,8 +318,13 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
 
         $official = OfficialMessage::query()
-            ->whereHas('userOfficialMessages', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
+            ->where(function ($query) use ($userId) {
+                $query->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                });
+            })
+            ->orWhere(function ($query) use ($userId) {
+                $query->WhereIn('user_id', [0, $userId])->whereDoesntHave('userOfficialMessages');
             })
             ->where('type', 2)
             ->orderBy('created_at', 'desc')
