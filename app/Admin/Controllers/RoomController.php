@@ -630,73 +630,94 @@ class RoomController extends MainController
 
 
         $grid->column(__('microphone'))->display(function () {
+            $mics = $this->microphones()
+                ->with('user.profile')
+                ->orderBy('position')
+                ->get();
 
-            $usersForRow = $this->microphone_users ?? collect();
-            if ($usersForRow->isEmpty()) {
-                return '';
-            }
-            $ids = array_filter(explode(',', $this->microphone ?? ''));
-            if (empty($ids)) {
+            if ($mics->isEmpty()) {
                 return '';
             }
 
             $html = '<div class="image-container">';
-            foreach ($usersForRow as $user) {
 
-                if (!$user) continue;
+            foreach ($mics as $mic) {
+                $user = $mic->user;
 
-                $url = $user->profile->avatar
+                if (!$user) {
+                    $statusLabel = match ((string)$mic->status) {
+                        '-1' => '🔒',
+                        '-2' => '🔇',
+                        default => '➕',
+                    };
+                    $statusColor = match ((string)$mic->status) {
+                        '-1' => '#e74c3c',
+                        '-2' => '#f1c40f',
+                        default => '#bdc3c7',
+                    };
+
+                    $html .= <<<HTML
+                <div class="image-wrapper" title="{$statusLabel}"
+                    style="width:40px;height:40px;border-radius:50%;
+                           background-color:{$statusColor};
+                           display:flex;align-items:center;justify-content:center;
+                           color:white;font-size:16px;font-weight:bold;">
+                    {$statusLabel}
+                </div>
+            HTML;
+                    continue;
+                }
+
+                $url = $user->profile?->avatar
                     ? getImagePath($user->profile->avatar)
                     : asset("images/businessman-icon.jpg");
 
-                $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$user->id}'">
-                    <img src="{$url}" title="{$user->name}"
-                    style="width: 40px; height: 40px; border-radius: 50%;
-                                    object-fit: cover; border: 2px solid white;
-                                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                                    transition: transform 0.3s ease;"/>
-                </div>
-            HTML;
-            }
+                $name = e($user->name);
+                $userId = e($user->id);
 
+                $html .= <<<HTML
+            <div class="image-wrapper" onclick="window.location.href='/admin/users/{$userId}'" title="{$name}">
+                <img src="{$url}" alt="{$name}" />
+            </div>
+        HTML;
+            }
 
             $html .= '</div>';
 
             static $appended = false;
             if (!$appended) {
                 $html .= '
-                <style>
-                    .image-container {
-                        display: flex;
-                        justify-content: start;
-                        align-items: center;
-                        gap: -10px; /* Overlap the images slightly */
-                        padding: 8px 0;
-                        overflow-y: overlay;
-                        width: 218px;
-                        padding-right: 16px;
-                    }
-                    .image-wrapper {
-                        display: inline-block;
-                        position: relative;
-                        margin-right: -12px;
-                    }
-                    .image-wrapper img {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        object-fit: cover;
-                        border: 2px solid #fff;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                        transition: transform 0.3s ease, box-shadow 0.3s ease;
-                        cursor: pointer;
-                    }
-                    .image-wrapper img:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    }
-                </style>';
+        <style>
+            .image-container {
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                gap: -10px;
+                padding: 8px 0;
+                overflow-y: overlay;
+                width: 218px;
+                padding-right: 16px;
+            }
+            .image-wrapper {
+                display: inline-block;
+                position: relative;
+                margin-right: -12px;
+                cursor: pointer;
+            }
+            .image-wrapper img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #fff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .image-wrapper img:hover {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        </style>';
                 $appended = true;
             }
 
