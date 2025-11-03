@@ -18,7 +18,7 @@ class ChatRoomPusherV2Resource extends JsonResource
         \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'chat_room_id' => $this->id]);
     
         $total_undread_message = ChatMessage::where('chat_room_id', $this->id)
-            ->where('user_id', $user2->id)
+            ->where('user_id', '!=',$user2->id)
             ->whereRaw("LOWER(status) != 'seen'")
             ->count();
     
