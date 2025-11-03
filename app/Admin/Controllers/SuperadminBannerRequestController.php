@@ -7,7 +7,7 @@ use App\Enums\SuperAdminNotificationLink;
 use App\Enums\SuperAdminNotificationType;
 use App\Helpers\SuperAdminNotificationHelper;
 use App\Models\HomeCarouselDisplay;
-use App\Models\SuperadminBannerRequest;
+use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
