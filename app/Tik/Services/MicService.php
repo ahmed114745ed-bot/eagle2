@@ -146,14 +146,10 @@ class MicService
 //        $base_mic = explode(',', $room->microphone_only_users);
 
         $position = (int) $data['position'];
-        $maxPositions = 8;
 
-        if ($position < 0 || $position >= $maxPositions) {
-            throw new Exception(__('This seat is out of the designated range'));
-        }
-
-        if ($position == 0 && $room->uid != auth()->id()) {
-            throw new Exception(__('This seat is for owner'));
+        $maxPositions = $room->mode == 0 ? 9 : 17;
+        if ($position < 0 || $position > $maxPositions) {
+            throw new Exception(__('api_responses.position_error'));
         }
 
 //        $current = $mic_arr[$position] ?? '0';
