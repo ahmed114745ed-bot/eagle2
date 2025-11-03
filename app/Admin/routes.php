@@ -512,8 +512,8 @@ Route::group(
 //        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
-//        Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
-//        Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
+       Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
+       Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
 
         // Route::resource('ovip', 'OVipController');
