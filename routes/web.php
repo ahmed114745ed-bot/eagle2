@@ -329,7 +329,6 @@ Route::group(
     }
 );
 
-Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 Route::group(
     [
@@ -394,7 +393,6 @@ Route::get('/clear-admin-error', function () {
 
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
 Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
-Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
@@ -516,8 +514,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
-Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
-Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
+
 
 Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
@@ -652,11 +649,7 @@ Route::get('remove-new-country', function () {
     return 'done';
 });
 
-// Main page route
-Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
 
-// AJAX API route
-Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
 Route::get('/fix-agencies-bd', function () {
     Artisan::call('db:seed', [
         '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
