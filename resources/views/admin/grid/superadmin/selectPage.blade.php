@@ -1,6 +1,6 @@
 @php
-    $superAdmins = \App\Models\SuperAdmin::all();
-    $defaultSuperAdmin = \App\Models\SuperAdmin::where('default', 1)->first();
+    $superAdmins = \Modules\SuperAdmin\Entities\SuperAdmin::all();
+    $defaultSuperAdmin = \Modules\SuperAdmin\Entities\SuperAdmin::where('default', 1)->first();
 @endphp
 
 <style>
