@@ -465,21 +465,33 @@ class LuckyGiftService
 
     private function getResponseData($gift, $roomMics, $user, $receiversIds, $receiverName)
     {
+//        $positions = [];
+//        $userInMic = [];
+//        $mics      = explode(',', $roomMics);
+//
+//        foreach ($mics as $key => $value) {
+//            $founded = in_array($value, $receiversIds);
+//
+//            if ($founded) {
+//                $userInMic[] = $value;
+//                $positions[] = $key;
+//            }
+//        }
+//
+//        if (count(array_diff($receiversIds, $userInMic)) > 0) {
+//            $positions[] = -1;
+//        }
 
-        $positions = [];
-        $userInMic = [];
-        $mics      = explode(',', $roomMics);
+        $microphones = $room->microphones ?? collect();
 
-        foreach ($mics as $key => $value) {
-            $founded = in_array($value, $receiversIds);
+        $positions = $microphones
+            ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))
+            ->pluck('position')
+            ->values()
+            ->all();
 
-            if ($founded) {
-                $userInMic[] = $value;
-                $positions[] = $key;
-            }
-        }
-
-        if (count(array_diff($receiversIds, $userInMic)) > 0) {
+        $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
+        if (!empty($missingReceivers)) {
             $positions[] = -1;
         }
 
