@@ -3,12 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\SuperAdminChargeAction;
-use App\Models\SuperAdmin;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class SuperAdminChargeController extends MainController
 {

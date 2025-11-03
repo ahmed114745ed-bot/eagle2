@@ -12,7 +12,6 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Permission;
-use App\Models\SuperAdmin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use App\Enums\PermissionType;
@@ -20,7 +19,6 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\Rule;
-use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
@@ -30,6 +28,8 @@ use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
 use App\Admin\Actions\DeleteSuperAdminsAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 class SuperAdminController extends MainController
 {

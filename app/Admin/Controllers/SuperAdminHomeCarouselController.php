@@ -7,8 +7,7 @@ use App\Enums\AdminNotificationType;
 use App\helper\SuperAdminHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
-use App\Models\SuperAdmin;
-use App\Models\SuperadminBannerRequest;
+
 use App\Selectables\Countries;
 use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
@@ -25,6 +24,8 @@ use Illuminate\Validation\Rule;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Grid\Tools;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 class SuperAdminHomeCarouselController extends MainController
 {
     use HasResourceActions;

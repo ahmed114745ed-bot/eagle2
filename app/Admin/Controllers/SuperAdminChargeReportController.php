@@ -4,7 +4,6 @@ namespace App\Admin\Controllers;
 
 use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\UserCommon;
-use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Facades\Admin;
@@ -19,6 +18,7 @@ use Encore\Admin\Widgets\Box;
 
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class SuperAdminChargeReportController extends MainController
 {
