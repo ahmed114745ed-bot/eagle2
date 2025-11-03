@@ -12,7 +12,7 @@ use Encore\Admin\Facades\Admin;
 use App\helper\SuperAdminHelper;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
-use App\Models\SuperadminBannerRequest;
+use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 use App\Admin\Controllers\MainController;
 use App\Admin\Services\UserSuperAdminService;
 use Encore\Admin\Controllers\AdminController;

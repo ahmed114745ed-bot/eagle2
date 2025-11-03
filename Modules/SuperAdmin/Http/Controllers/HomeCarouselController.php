@@ -7,7 +7,7 @@ use App\Enums\AdminNotificationType;
 use App\helper\SuperAdminHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
-use App\Models\SuperadminBannerRequest;
+use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 use App\Selectables\Countries;
 use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
