@@ -181,7 +181,7 @@ class EnteranceRoomServices
         }
         $user->save();
         $room->save();
-       
+
 
 
 //        $count = RoomVisitor::query()->where('room_id', $room->id)->count();
@@ -192,6 +192,48 @@ class EnteranceRoomServices
 
         return response()->json(['status' => 'Webhook processed successfully']);
     }
+
+    public function updateRoomCountFromZego2(Request $request)
+    {
+        $event = $request->event;
+        $roomId = $request->room_id;
+        $userId = $request->user_account;
+
+        /** @var Room $room */
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
+        $user = User::find($userId);
+
+        if (!$room || !$user) {
+            return response()->json(['status' => 'Webhook received but room or user not found']);
+        }
+
+        $visitors = $this->updateRoomVisitorsBasedOnEvent2($event, $room, $user->id);
+
+        if ($event == 'room_login'){
+            $this->addUserToVisitors($room->id, $user->id);
+            $user->now_room_uid = $room->uid;
+        }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
+            $user->now_room_uid = 0;
+        }
+        if ($event == 'room_logout' ){
+
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+            }
+            $this->removeUserToVisitors($room->id, $user->id);
+            $this->handleLeaveCp($user, $room);
+
+        }
+
+        if ($event == 'room_logout' && $room->charizma_status) {
+            $this->handleCharismaStatusOnLogout2($room, $user, $request->owner_id);
+        }
+        $user->save();
+        $room->save();
+
+        return response()->json(['status' => 'Webhook processed successfully']);
+    }
+
     public function updateRoomCountFromAgora(Request $request)
     {
 
@@ -368,11 +410,46 @@ class EnteranceRoomServices
         return array_values(array_unique($visitors));
     }
 
+    private function updateRoomVisitorsBasedOnEvent2($event, $room, $userId)
+    {
+
+        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
+
+        if ($event == 'room_login' && !in_array($userId, $visitors)) {
+
+            $visitors[] = $userId;
+        } elseif ($event == 'room_logout') {
+
+            UserHandling::calcTime($userId);
+            $this->updateMicrophone2($room->uid, $userId);
+            $visitors = array_diff($visitors, [$userId]);
+        }
+
+        return array_values(array_unique($visitors));
+    }
+
     private function handleCharismaStatusOnLogout($room, $user, $ownerId)
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
         $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
+
+        $ms = [
+            'messageContent' => [
+                "message" => "updateCharisma",
+                'data' => $userDataWithCharisma
+            ]
+        ];
+        $json = json_encode($ms);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+    }
+
+    private function handleCharismaStatusOnLogout2($room, $user, $ownerId)
+    {
+        $userCharismaService = new UserCharismaService();
+        $userCharismaService->resetUserCharisma($user->id, $room->id);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
         $ms = [
             'messageContent' => [
@@ -400,6 +477,20 @@ class EnteranceRoomServices
         }
     }
 
+    private function updateMicrophone2($room_uid, $user_id)
+    {
+        $user = User::query()->find($user_id);
+        if (!$user) return;
+        $result  = Common::go_microphone_hand_2($room_uid, $user_id);
+
+        $room = Room::query()->where('uid', $room_uid)->first();
+
+        if (!$room) return;
+        if ($result) {
+
+            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+        }
+    }
     ///////////////////////////////
 
 
@@ -438,7 +529,7 @@ class EnteranceRoomServices
                     $remainingTime = ['remaining_time' => "$h:$m:$s"];
 
                     return Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
-                 
+
                 }
 
                 if ($sjc >= $arr[2]) {
@@ -466,7 +557,7 @@ class EnteranceRoomServices
         $room_info = (new EnterRoomCollection($room,$user->id));
 
         $room_info = $room_info->toArray($request);
-  
+
 
         $this->updateRoom($user->id, $owner_id, $room);
         $this->enterTheRoomCreateOrUpdate($user->id, $owner_id, $room->id);

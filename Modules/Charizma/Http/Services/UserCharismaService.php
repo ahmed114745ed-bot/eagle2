@@ -146,6 +146,12 @@ class UserCharismaService
         return collect($users);
     }
 
+    public function getUserIdWithPosition2($room)
+    {
+        return $room->microphones()->get(['user_id', 'position']);
+    }
+
+
     public function removeRoomCharisma(int $roomId)
     {
         ExtraDataInRoom::query()->where('room_id', $roomId)->delete();
@@ -159,6 +165,20 @@ class UserCharismaService
     public function getUserResetData($microphones, array $userIds)
     {
         $users       = $this->getUserIdWithPosition($microphones);
+        $allDataChanges = [];
+        foreach ($userIds as $userId) {
+            $user = $users->where('user_id', $userId)->first();
+            if ($user){
+                $user['total'] =  0;
+                $allDataChanges[] = $user;
+            }
+        }
+        return $allDataChanges;
+    }
+
+    public function getUserResetData2($room, array $userIds)
+    {
+        $users       = $this->getUserIdWithPosition2($room);
         $allDataChanges = [];
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();
