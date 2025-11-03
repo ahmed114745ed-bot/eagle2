@@ -1439,6 +1439,7 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
+        \Log::info('start sendToZego3');
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
