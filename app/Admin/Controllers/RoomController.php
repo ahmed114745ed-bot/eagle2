@@ -63,7 +63,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory'])
+        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -95,14 +95,13 @@ class RoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-//        $microphones = $room->microphones()
-//            ->whereNotNull('user_id')
-//            ->where('user_id', '>', 0)
-//            ->orderBy('position')
-//            ->get(['user_id', 'position']);
-//        foreach ($microphones as $mic) {
-//            $micPositions[$mic->user_id] = $mic->position + 1;
-//        }
+        $microphones = $room->microphones
+            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->sortBy('position')
+            ->values();
+        foreach ($microphones as $mic) {
+            $micPositions[$mic->user_id] = $mic->position + 1;
+        }
 
 
         // Blacklist
