@@ -2,6 +2,7 @@
 
 namespace Modules\SuperAdmin\Entities;
 
+use App\Models\HomeCarousel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

@@ -2,6 +2,9 @@
 
 namespace Modules\SuperAdmin\Entities;
 
+use App\Models\Agency;
+use App\Models\Country;
+use App\Models\User;
 use DB;
 use Exception;
 use App\Traits\TimestampsWithTimezone;

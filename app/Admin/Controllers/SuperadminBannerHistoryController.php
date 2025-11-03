@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\SuperAdmin;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -11,8 +10,9 @@ use Encore\Admin\Grid\Tools;
 use Encore\Admin\Facades\Admin;
 use App\helper\SuperAdminHelper;
 use Encore\Admin\Layout\Content;
-use App\Models\SuperadminBannerRequest;
 use App\Admin\Services\UserSuperAdminService;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 
 
 

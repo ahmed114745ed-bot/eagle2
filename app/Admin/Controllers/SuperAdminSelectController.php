@@ -2,10 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\Box;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class SuperAdminSelectController extends MainController
 {

@@ -3,6 +3,7 @@
 namespace Modules\SuperAdmin\Entities;
 
 use App\Helpers\Common;
+use App\Models\Ware;
 use Modules\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
 use Modules\Badge\Entities\Badge;
