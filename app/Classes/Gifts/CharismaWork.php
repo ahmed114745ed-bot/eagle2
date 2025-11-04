@@ -46,12 +46,17 @@ class CharismaWork implements RoomJobInterface
             foreach ($item as $key => $userData) {
 
                 if ($key === 'room_id') continue;
-                if (is_array($userData) && count($userData) === 1 && is_array(reset($userData))) {
-                    $userData = reset($userData);
+                foreach ($userData as $inner) {
+                    $userData = $inner;
+                    break;
                 }
-                if (!is_array($userData) || !isset($userData['user_id'])) continue;
+
+                if (!isset($userData['user_id'])) continue;
 
                 $user_id = $userData['user_id'];
+                $total   = $userData['total'] ?? 0;
+                info('Processed user', compact('user_id', 'total'));
+
                 if (!isset($result[$room_id])) {
                     $result[$room_id] = [
                         'room_id' => $room_id,
