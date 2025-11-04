@@ -406,40 +406,8 @@ class AllStatisticController extends MainController
                         });
 
                         $row->column(6, function ($column) use ($countryID) {
-                            $currMonth = now()->month;
-                            $prevMonth = now()->subMonth()->month;
 
-                            $signups = User::when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            })
-                                ->selectRaw("
-                                YEAR(created_at) as year,
-                                MONTH(created_at) as month,
-                                FLOOR((DAY(created_at)-1)/7)+1 as week_of_month,
-                                COUNT(*) as total
-                            ")
-                                ->whereIn(DB::raw('MONTH(created_at)'), [$currMonth, $prevMonth])
-                                ->groupBy('year', 'month', 'week_of_month')
-                                ->orderBy('year')
-                                ->orderBy('month')
-                                ->orderBy('week_of_month')
-                                ->get();
-
-                            $labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-
-                            $dataCurrent = [];
-                            $dataPrevious = [];
-
-                            foreach (range(1, 4) as $week) {
-                                $dataCurrent[]  = $signups->where('month', $currMonth)->where('week_of_month', $week)->sum('total');
-                                $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
-                            }
-
-                            $view = view('admin.dashboard.widgets.signups_weekly_chart', [
-                                'labels'       => $labels,
-                                'dataCurrent'  => $dataCurrent,
-                                'dataPrevious' => $dataPrevious,
-                            ])->render();
+                            $view = view('admin.dashboard.widgets.signups_weekly_chart')->render();
 
                             $column->row($view);
                         });
@@ -919,6 +887,46 @@ class AllStatisticController extends MainController
         return response()->json([
             'labels' => $topUsers->pluck('name'),
             'data'   => $topUsers->pluck('total_hours')
+        ]);
+    }
+
+
+    protected function comparisonUserSignUp()
+    {
+        $currMonth = now()->month;
+        $prevMonth = now()->subMonth()->month;
+        $countryID = request('country_id', null);
+
+        $signups = User::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })
+            ->selectRaw("
+                                YEAR(created_at) as year,
+                                MONTH(created_at) as month,
+                                FLOOR((DAY(created_at)-1)/7)+1 as week_of_month,
+                                COUNT(*) as total
+                            ")
+            ->whereIn(DB::raw('MONTH(created_at)'), [$currMonth, $prevMonth])
+            ->groupBy('year', 'month', 'week_of_month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->orderBy('week_of_month')
+            ->get();
+
+        $labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+
+        $dataCurrent = [];
+        $dataPrevious = [];
+
+        foreach (range(1, 4) as $week) {
+            $dataCurrent[]  = $signups->where('month', $currMonth)->where('week_of_month', $week)->sum('total');
+            $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
+        }
+
+        return response()->json([
+            'labels'       => $labels,
+            'dataCurrent'  => $dataCurrent,
+            'dataPrevious' => $dataPrevious,
         ]);
     }
 }
