@@ -1,5 +1,8 @@
 name: Merge Test to Production
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -16,7 +19,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest #[self-hosted]
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -29,7 +32,7 @@ jobs:
 
   merge:
     needs: prepare
-    runs-on: ubuntu-latest #[self-hosted]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # Continue other jobs even if one fails
       matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
