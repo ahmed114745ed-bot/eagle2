@@ -20,7 +20,7 @@ class PKWork implements RoomJobInterface
         $earnedCoinsPerUser = $roomJob->coins;
         $lastPk =
             Pk::query()->where('room_id', $room->id)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();
-        $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk,$userIds, $earnedCoinsPerUser, $room->microphone);
+        $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk,$userIds, $earnedCoinsPerUser, $room);
         return ['room_id'=> $room->id, ...$data];
     }
 
