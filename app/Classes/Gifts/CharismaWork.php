@@ -46,7 +46,9 @@ class CharismaWork implements RoomJobInterface
             foreach ($item as $key => $userData) {
                 info('userData', [$userData]);
                 if (is_array($userData)) { // Ensure we're working with the user data arrays
-                    $user_id = $userData['user_id'];
+//                    $user_id = $userData['user_id'];
+                    $user_id = $userData[array_key_first($userData)]['user_id'] ?? null;
+                    $total   = $userData[array_key_first($userData)]['total'] ?? 0;
                     if (!isset($result[$room_id])) {
                         $result[$room_id] = [
                             'room_id' => $room_id,
@@ -62,7 +64,7 @@ class CharismaWork implements RoomJobInterface
                         $result[$room_id]['data'][$user_id] = $userData;
                     }
                     // Always add to the room's total
-                    $result[$room_id]['total'] += $userData['total'];
+                    $result[$room_id]['total'] += $total;
                 }
             }
         }
