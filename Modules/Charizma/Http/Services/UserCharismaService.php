@@ -26,7 +26,7 @@ class UserCharismaService
         }
 
         $microphones = $room->microphone;
-        $users       = $this->getUserIdWithPosition($microphones);
+        $users       = $this->getUserIdWithPosition2($room);
         $user_ids = $users->pluck('user_id')->toArray();
 
         $charisma = ExtraDataInRoom::whereIn('user_id', $user_ids)->where('room_id', $room->id)->get()->map(function ($item) use ($users) {
@@ -69,7 +69,7 @@ class UserCharismaService
         }
 
 
-        $users = $this->getUserIdWithPosition($room->microphone);
+        $users = $this->getUserIdWithPosition2($room);
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
@@ -102,9 +102,7 @@ class UserCharismaService
             return false;
         }
 
-        $users = $room->microphones()
-            ->whereIn('user_id', $userIds)
-            ->get(['user_id', 'position']);
+        $users = $this->getUserIdWithPosition2($room);
 
         $allDataChanges = [];
 

@@ -1438,7 +1438,7 @@ class Common
     }
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
-    {           
+    {
          Log::info('start sendToZego3');
 
         try {
@@ -1801,7 +1801,7 @@ class Common
                     UserHandling::calcTime($userId);
                 }
             }
-            self::quit_hand($room->uid, $userId);
+            self::quit_hand_2($room->uid, $userId);
         }
 
         $room->update(['is_live' => false]);
@@ -1816,7 +1816,7 @@ class Common
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
         $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, $users);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, $users);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, $users);
 
         $ms = [
             'messageContent' => [

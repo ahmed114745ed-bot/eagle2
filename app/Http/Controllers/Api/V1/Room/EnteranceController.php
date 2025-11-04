@@ -162,7 +162,7 @@ class EnteranceController extends Controller
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
         $message = [
             'messageContent' => [
