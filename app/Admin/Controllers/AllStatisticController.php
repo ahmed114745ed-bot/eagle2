@@ -36,100 +36,108 @@ class AllStatisticController extends MainController
     }
     public function index(Content $content)
     {
+
         $countryID = $this->countryId();
-        $date = request("date");
-        $currentDate = $date ? Carbon::createFromFormat('Y-m', $date) : now();
+        // $balance = GameWallet::query();
+        // $balanceDollar = GameChargeHistory::query();
+        // if (request("date") != null) {
+        //     $date = request("date");
+        //     $year = substr($date, 0, 4);
+        //     $month = substr($date, 5, 2);
+        //     $balance = $balance->whereMonth("created_at", $month)->whereYear("created_at", $year);
+        //     $balanceDollar = $balanceDollar->whereMonth("created_at", $month)->whereYear("created_at", $year);
+        // } else {
+        //     $balance = $balance->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+        //     $balanceDollar = $balanceDollar->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+        // }
+        // $balance = $balance->first();
+        // $balanceDollar = $balanceDollar->sum("value");
+        // $allBalance = $balance->balance ?? 0;
+        // $availableBalance = $balance ? $balance->balance - $balance->used : 0;
+        // $data = [$balance->used ?? 0, $availableBalance ?? 0];
+        // $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
+        
+        
+        $user = Auth::user();
+        $usersCount = User::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->count();
 
-        // 1. تحسين استعلامات الرصيد
-        $balanceQuery = GameWallet::whereMonth("created_at", $currentDate->month)
-            ->whereYear("created_at", $currentDate->year);
-
-        $balanceDollar = GameChargeHistory::whereMonth("created_at", $currentDate->month)
-            ->whereYear("created_at", $currentDate->year)
-            ->sum("value");
-
-        $balance = $balanceQuery->first();
-        $allBalance = $balance->balance ?? 0;
-        $availableBalance = $balance ? $balance->balance - $balance->used : 0;
-        $data = [$balance->used ?? 0, $availableBalance ?? 0];
-        $usePercentage = ($allBalance > 0) ? (($balance->used ?? 0 / $allBalance) * 100) : 0;
-
-        // 2. تجميع استعلامات المستخدمين
-        $userBaseQuery = User::when($countryID, fn($q) => $q->where('country_id', $countryID));
-
-        $usersCount = $userBaseQuery->count();
-
-        // استعلام واحد للحصول على إحصائيات المستخدمين
-        $userStats = $userBaseQuery
-            ->selectRaw('
-                COUNT(*) as total,
-                SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as today_count,
-                SUM(CASE WHEN created_at BETWEEN ? AND ? THEN 1 ELSE 0 END) as week_count,
-                SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as month_count,
-                SUM(online) as online_count
-            ', [
-                now()->startOfWeek(),
-                now()->endOfWeek(),
-                now()->month,
-                now()->year
-            ])
-            ->first();
-
-        $newSignUpsToday = $userStats->today_count;
-        $newSignUpsThisWeek = $userStats->week_count;
-        $newSignUpsThisMonth = $userStats->month_count;
-        $onlineUser = $userStats->online_count;
-
-        // 3. تحسين استعلام المستخدمين الأكثر متابعة
-        $topUsersByFollowers = User::with(['packs', 'profile'])
-            ->withCount('followers')
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        //users
+        $newSignUpsToday = User::whereDate('created_at', today())->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->count();
+        $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->count();
+        $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->count();
+        $onlineUser = User::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->where('online', 1)->count();
+        $topUsersByFollowers = User::withCount('followers')
+            ->with('packs', 'profile')
+            ->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            })
             ->orderByDesc('followers_count')
             ->take(10)
             ->get();
-
-        // 4. تحسين استعلامات المحادثات
-        $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
-            $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
-        });
-
-        // استعلام واحد لإحصائيات المحادثات
-        $chatStats = $chatMessageQuery
-            ->selectRaw('
-                COUNT(*) as total_messages,
-                COUNT(DISTINCT user_id) as unique_senders,
-                COUNT(DISTINCT CASE WHEN DATE(created_at) = CURDATE() THEN chat_room_id END) as today_conversations,
-                SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as today_messages,
-                SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as month_messages
-            ', [now()->month, now()->year])
-            ->first();
-
-        $messagesToday = $chatStats->today_messages;
-        $messagesThisMonth = $chatStats->month_messages;
-        $usersWhoSend = $chatStats->unique_senders;
-        $openConversationsToday = $chatStats->today_conversations;
-
-        $usersWhoNeverSend = $usersCount - $usersWhoSend;
-
-        // 5. تحسين استعلام مدة المحادثات
-        $avgConversationDuration = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
-            })
-            ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
-            ->groupBy('chat_room_id')
-            ->havingRaw('duration IS NOT NULL')
-            ->get()
-            ->avg('duration') ?? 0;
-
-        // 6. تحسين استبحث ساعات الذروة
         $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-                $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
-            })
-            ->whereDate('created_at', today())
-            ->selectRaw("HOUR(FROM_UNIXTIME(start_time)) as hour, COUNT(*) as total_sessions")
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
+            ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
             ->groupBy('hour')
             ->orderByDesc('total_sessions')
+            ->limit(1)
             ->first();
+        $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->whereDate('created_at', today())
+            ->count();
+        $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->distinct('user_id')
+            ->count('user_id');
+        $totalUsers = User::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })->count();
+        $usersWhoNeverSend = $totalUsers - $usersWhoSend;
+        $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->whereDate('created_at', today())
+            ->distinct('chat_room_id')
+            ->count('chat_room_id');
+        $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+            ->groupBy('chat_room_id')
+            ->pluck('duration')
+            ->avg() ?? 0;
 
 
         // $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
@@ -147,9 +155,9 @@ class AllStatisticController extends MainController
         return parent::index($content
             ->title(__('Home'))
             ->description(__('General Statistics'))
-            ->row(function (Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
+            ->row(function (Row $row) use ($user) {
                 if ($user->isRole('admin') || $user->isRole('developer')) {
-                    $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
+                    $row->column(12, view('admin.dashboard.chart'));
                 }
             })
             ->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,  $topUsersByFollowers) {
@@ -860,5 +868,56 @@ class AllStatisticController extends MainController
             'totalBDCut' => round($totalBDCut),
             'averageAgenciesPerBD' => round($averageAgenciesPerBD, 2),
         ]);
+    }
+
+    public function getBalanceData(Request $request)
+    {
+        try {
+            $date = $request->get("date");
+            
+            $balanceQuery = GameWallet::query();
+            $balanceDollarQuery = GameChargeHistory::query();
+            
+            if ($date != null) {
+                $year = substr($date, 0, 4);
+                $month = substr($date, 5, 2);
+                $balanceQuery->whereMonth("created_at", $month)->whereYear("created_at", $year);
+                $balanceDollarQuery->whereMonth("created_at", $month)->whereYear("created_at", $year);
+            } else {
+                $balanceQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+                $balanceDollarQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+            }
+            
+            $balance = $balanceQuery->first();
+            $balanceDollar = $balanceDollarQuery->sum("value");
+            $allBalance = $balance->balance ?? 0;
+            $availableBalance = $balance ? $balance->balance - $balance->used : 0;
+            
+            // تأكد من أن البيانات صالحة للـ Chart
+            $used = $balance->used ?? 0;
+            $available = $availableBalance ?? 0;
+            
+            $chartData = [$used, $available];
+            $usePercentage = ($allBalance > 0) ? (($used / $allBalance) * 100) : 0;
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'allBalance' => $allBalance,
+                    'availableBalance' => $available,
+                    'balanceDollar' => $balanceDollar,
+                    'used' => $used,
+                    'usePercentage' => $usePercentage,
+                    'chartData' => $chartData,
+                    'showPaymentAlert' => $usePercentage <= 90
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching balance data'
+            ], 500);
+        }
     }
 }
