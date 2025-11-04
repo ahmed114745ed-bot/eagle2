@@ -407,6 +407,8 @@ Route::group(
             Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
             Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
             Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
+            Route::get('balance-data', [AllStatisticController::class, 'getBalanceData']);
+            Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
