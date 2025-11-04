@@ -70,7 +70,15 @@ class UserCharismaService
         }
 
 
-        $users = $this->getUserIdWithPosition2($room);
+//        $users = $this->getUserIdWithPosition2($room);
+        $users = $room->microphones()
+            ->get(['user_id', 'position'])
+            ->map(fn($m) => [
+                'user_id'  => (int)$m->user_id,
+                'position' => (int)$m->position,
+            ])
+            ->values();
+
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {

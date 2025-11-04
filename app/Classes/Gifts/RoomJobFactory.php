@@ -30,9 +30,7 @@ class RoomJobFactory
 
     public function sendToZego(array $data)
     {
-        info('data before', $data);
         $data = $this->roomJob->prepareDataToZego($data);
-        info('data after', $data);
         dispatch(new TestTestCharizma($data, $this->roomJob))->onQueue($this->type . '-job');
     }
 }
