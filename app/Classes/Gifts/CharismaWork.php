@@ -44,6 +44,7 @@ class CharismaWork implements RoomJobInterface
             $room_id = $item["room_id"]; // Assuming the first entry of each item contains the room_id and user data
             info('item', $item);
             foreach ($item as $key => $userData) {
+                info('userData', $userData);
                 if (is_array($userData)) { // Ensure we're working with the user data arrays
                     $user_id = $userData['user_id'];
                     if (!isset($result[$room_id])) {
