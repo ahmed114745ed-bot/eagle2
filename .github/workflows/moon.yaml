@@ -1,0 +1,87 @@
+name: SSh-moonlight-pipline
+on:
+  push:
+    branches: ["moon"]
+jobs:
+  run_moonlight_hub:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out moonlight-hub
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.13.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/moonlight
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+ 
+  run_moonlight_app:
+    runs-on: ubuntu-latest
+    needs: run_moonlight_hub
+    steps:
+    - name: print out moonlight-app
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.13.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/moonlight
+          pwd
+          docker build -t moonlight:${{ github.sha }} .
+          docker service update --image moonlight:${{ github.sha }} moonlight-app
+          
+          # Get first container ID of the service
+          CONTAINER_ID=$(docker ps --filter "name=moonlight-app.1" --format "{{.ID}}" | head -n 1)
+          # Run artisan command inside that container
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
+          else
+            echo "No running container found for moonlight-app service"
+            exit 1
+          fi
+
+          
+          # check again
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+ 
+  run_moonlight_job:
+    runs-on: ubuntu-latest
+    needs: run_moonlight_hub
+    steps:
+    - name: print out moonlight-job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.13.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: | 
+          cd /var/www/moonlight
+          pwd
+          docker build -t moonlight-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image moonlight-job:${{ github.sha }} moonlight-job
