@@ -36,9 +36,9 @@
                         <h3 class=" font-bold text-gray-900 mb-2">
                             {{ $template->title }}
                         </h3>
-                        <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
+                        <!-- <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
                             {{ $template->description }}
-                        </p>
+                        </p> -->
                     </div>
                     <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $template->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                         {{ $template->is_active ? __('Active') : __('Inactive') }}

@@ -89,6 +89,7 @@
                 </div>
             @endforeach
         </div>
+        
     </div>
 </div>
 
@@ -315,6 +316,9 @@ function addField(sectionId, data = null) {
     // Build widget selector options
     const widgetOptionsHtml = availableWidgets.map(widget => {
         const widgetName = widget.widget_name.en || widget.widget_type;
+        console.log( data);
+        console.log( widget.id);
+        
         const isSelected = data && data.widget_id === widget.id ? 'selected' : '';
         return `<option value="${widget.id}" ${isSelected}>${widgetName}</option>`;
     }).join('');
@@ -382,21 +386,22 @@ function addField(sectionId, data = null) {
                     </div>
                 </div>
 
-                <!-- Custom Widget Selector (shown only when field type is 'custom') -->
-                <div class="mb-4 widget-selector-container" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
-                    <label class="block text-lg font-semibold mb-1">
-                        <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>
-                        ${'{{ __('Select Custom Widget') }}'} *
-                    </label>
-                    <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
-                            class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
-                        <option value="">-- ${'{{ __('Choose a widget') }}'} --</option>
-                        ${widgetOptionsHtml}
-                    </select>
-                    <p class="text-lg text-gray-500 mt-1">
-                        <i class="fas fa-info-circle"></i> ${'{{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}'}
-                    </p>
-                </div>
+                     <!-- Custom Field Options (Custom/Predefined) -->
+                    <div  class=" widget-selector-container custom-options-wrapper mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
+                        <!-- Widget Selector -->
+                        <div class="mb-3">
+                            <label class="block text-lg font-semibold mb-1">
+                                <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>{{ __('Select Custom Widget') }} *
+                            </label>
+                            <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
+                                    class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
+                                <option value="">-- {{ __('Choose a widget') }} --</option>
+                                ${widgetOptionsHtml}
+                            </select>
+                            <p class="text-gray-500 mt-1">
+                                <i class="fas fa-info-circle"></i> {{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}
+                            </p>
+                        </div>
 
                 <div class="mb-4 placeholder-container" style="display: ${data && data.field_type === 'custom' ? 'none' : 'block'};">
                     <h5 class="text-lg font-semibold mb-2">${'{{ __('Placeholder Text') }}'}</h5>
@@ -439,17 +444,22 @@ function addField(sectionId, data = null) {
                         </div>
                     </div>
 
-                    <!-- Custom Options Editor -->
-                    <div class="custom-options-editor" style="display: ${!data || !data.data_source ? 'block' : 'none'};">
-                        <textarea name="sections[${sectionId}][fields][${fieldId}][custom_options]" 
-                                  rows="4" 
-                                  class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg font-mono"
-                                  placeholder="${'{{ __('Enter one option per line or JSON format') }}'}\nOption 1\nOption 2\nOption 3">${data && data.options ? (typeof data.options === 'object' ? JSON.stringify(data.options, null, 2) : data.options) : ''}</textarea>
-                        <p class="text-lg text-gray-500 mt-1">
-                            <i class="fas fa-info-circle"></i> 
-                            ${'{{ __('Enter one option per line, or use JSON format for translations: {"en":"Option 1","ar":"خيار 1"}') }}'}
-                        </p>
-                    </div>
+                     <!-- Custom Field Options (Custom/Predefined) -->
+                    <div class=" widget-selector-container custom-options-wrapper mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
+                        <!-- Widget Selector -->
+                        <div class="mb-3">
+                            <label class="block text-lg font-semibold mb-1">
+                                <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>{{ __('Select Custom Widget') }} *
+                            </label>
+                            <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
+                                    class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
+                                <option value="">-- {{ __('Choose a widget') }} --</option>
+                                ${widgetOptionsHtml}
+                            </select>
+                            <p class="text-gray-500 mt-1">
+                                <i class="fas fa-info-circle"></i> {{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}
+                            </p>
+                        </div>
 
                     <!-- Pre-defined Data Selector -->
                     <div class="predefined-options-selector" style="display: ${data && data.data_source ? 'block' : 'none'};">

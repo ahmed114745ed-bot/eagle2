@@ -4295,8 +4295,23 @@
   "General Settings": "الإعدادات العامة",
   "Statistics Settings": "إعدادات الإحصائيات",
   "Social Media Settings": "إعدادات وسائل التواصل الاجتماعي",
-  "Save": "حفظ"
+  "Save": "حفظ",
+  "Search for Certified Agency Manager": "🔎 ابحث عن مدير وكالة معتمد",
+  "Enter name or ID": "أدخل الاسم أو المعرف",
+  "Search": "بحث",
+  "No results found": "لا توجد نتائج مطابقة",
+  "ID": "المعرف",
+  "Country": "الدولة",
+  "Title": "الوظيفة",
+  "Experience": "الخبرة",
+  "years": "سنة",
+  "Top 3 Agencies": "أفضل 3 وكالات",
+  "Agency": "وكالة",
+  "Hosts": "مضيف"
 
+
+
+  
 
 
 

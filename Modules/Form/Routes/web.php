@@ -12,13 +12,16 @@ use Modules\Form\Http\Controllers\FormTemplateController;
 * #########################   use
 *
 **/
+Route::get('/host-agency/search', [FormTemplateController::class, 'search'])
+    ->name('host_agency.search');
+
 Route::get('/forms', [FormTemplateController::class, 'showByType'])
 ->name('forms.showByType');
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])
         ->name('form.submit');
     Route::get('/form-translations', [FormTemplateController::class, 'getTranslations']);
-});
+// });
 
  Route::group(
     [
@@ -29,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . 'routes',
+        'as' => config('admin.route.prefix'), 
     ],
     function () {
  

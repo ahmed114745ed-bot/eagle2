@@ -11,18 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('form_fields', function (Blueprint $table) {
-            $table->boolean(column: 'can_not_delete')->default(false);
+        Schema::table('form_templates', function (Blueprint $table) {
+            $table->json('note_text')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
-        Schema::table('form_fields', function (Blueprint $table) {
-            $table->dropColumn('can_not_delete');
+        Schema::table('form_templates', function (Blueprint $table) {
+            $table->dropColumn('note_text');
         });
     }
+
 };

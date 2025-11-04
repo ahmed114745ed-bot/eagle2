@@ -4,6 +4,8 @@ namespace  Modules\Form\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +97,7 @@ class FormTemplateController extends Controller
                                 $dataSource = $fieldData['data_source'];
                             }
                         }
-                        
+                     
                         FormField::create([
                             'section_id' => $section->id,
                             'field_label' => $fieldData['label'],
@@ -138,82 +140,97 @@ class FormTemplateController extends Controller
     }
 
     public function update(Request $request, FormTemplate $formTemplate)
-    {
-        $validated = $request->validate([
-            'title' => 'required|array',
-            'title.*' => 'required|string',
-            'form_type' => 'required|string',
-            'description' => 'nullable|array',
-            'sections' => 'required|array',
-        ]);
+{
+    $validated = $request->validate([
+        'title' => 'required|array',
+        'title.*' => 'required|string',
+        'form_type' => 'required|string',
+        'description' => 'nullable|array',
+        'sections' => 'required|array',
+    ]);
+    $formTemplate->update([
+        'title' => $request->title,
+        'form_type' => $request->form_type,
+        'description' => $request->description,
+    ]);
 
-        // Update template
-        $formTemplate->update([
-            'title' => $request->title,
-            'form_type' => $request->form_type,
-            'description' => $request->description,
-        ]);
+    $formTemplate->sections()->delete();
 
-        // Delete existing sections and fields
-        $formTemplate->sections()->delete();
+    if ($request->has('sections')) {
+        foreach ($request->sections as $sectionData) {
+            $section = FormSection::create([
+                'form_template_id' => $formTemplate->id,
+                'title' => $sectionData['title'],
+                'section_order' => $sectionData['order'],
+                'is_visible' => true,
+            ]);
 
-        // Recreate sections and fields
-        if ($request->has('sections')) {
-            foreach ($request->sections as $sectionData) {
-                $section = FormSection::create([
-                    'form_template_id' => $formTemplate->id,
-                    'title' => $sectionData['title'],
-                    'section_order' => $sectionData['order'],
-                    'is_visible' => true,
-                ]);
+            if (isset($sectionData['fields'])) {
+                foreach ($sectionData['fields'] as $fieldData) {
 
-                if (isset($sectionData['fields'])) {
-                    foreach ($sectionData['fields'] as $fieldData) {
-                        // Handle options based on type
-                        $options = null;
-                        $dataSource = null;
-                        
-                        if (isset($fieldData['options_type'])) {
-                            if ($fieldData['options_type'] === 'custom' && isset($fieldData['custom_options'])) {
-                                // Parse custom options (either JSON or line-separated)
-                                $customOptions = $fieldData['custom_options'];
-                                if (is_string($customOptions)) {
-                                    // Try to parse as JSON first
-                                    $decoded = json_decode($customOptions, true);
-                                    if (json_last_error() === JSON_ERROR_NONE) {
-                                        $options = $decoded;
-                                    } else {
-                                        // Parse as line-separated values
-                                        $lines = array_filter(array_map('trim', explode("\n", $customOptions)));
-                                        $options = array_combine($lines, $lines);
-                                    }
+                    $options = null;
+                    $dataSource = null;
+
+                    if (isset($fieldData['options_type'])) {
+                        if ($fieldData['options_type'] === 'custom' && isset($fieldData['custom_options'])) {
+                            $customOptions = $fieldData['custom_options'];
+                            if (is_string($customOptions)) {
+                                $decoded = json_decode($customOptions, true);
+                                if (json_last_error() === JSON_ERROR_NONE) {
+                                    $options = $decoded;
+                                } else {
+                                    $lines = array_filter(array_map('trim', explode("\n", $customOptions)));
+                                    $options = array_combine($lines, $lines);
                                 }
-                            } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
-                                $dataSource = $fieldData['data_source'];
+                            }
+                        } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
+                            $dataSource = $fieldData['data_source'];
+                        }
+                    }
+
+                    $widgetConfig = null;
+                    if (isset($fieldData['type']) && $fieldData['type'] === 'custom' && isset($fieldData['widget_id'])) {
+                        $widget = \Modules\Form\Entities\CustomFieldWidget::find($fieldData['widget_id']);
+                        if ($widget) {
+                            $widgetConfig = $widget->default_config;
+
+                            if (isset($fieldData['custom_options']) && $fieldData['custom_options']) {
+                                $customOptions = json_decode($fieldData['custom_options'], true);
+                                if ($customOptions && is_array($customOptions)) {
+                                    $widgetConfig['fields'] = $customOptions['fields'] ?? $widgetConfig['fields'] ?? [];
+                                    $widgetConfig['allow_add_more'] = $customOptions['allow_add_more'] ?? $widgetConfig['allow_add_more'] ?? true;
+                                    $widgetConfig['min_items'] = $customOptions['min_items'] ?? $widgetConfig['min_items'] ?? 0;
+                                    $widgetConfig['max_items'] = $customOptions['max_items'] ?? $widgetConfig['max_items'] ?? 10;
+                                }
                             }
                         }
-                        
-                        FormField::create([
-                            'section_id' => $section->id,
-                            'field_label' => $fieldData['label'],
-                            'field_name' => $fieldData['name'],
-                            'field_type' => $fieldData['type'],
-                            'widget_id' => $fieldData['widget_id'] ?? null,
-                            'widget_config' => isset($fieldData['widget_config']) ? json_decode($fieldData['widget_config'], true) : null,
-                            'placeholder' => $fieldData['placeholder'] ?? null,
-                            'options' => $options,
-                            'data_source' => $dataSource,
-                            'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
-                            'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
-                            'field_order' => $fieldData['order'],
-                        ]);
+                    } else {
+                        $widgetConfig = isset($fieldData['widget_config']) ? json_decode($fieldData['widget_config'], true) : null;
                     }
+                    $fieldType = $fieldData['type'] ?? 'text';
+                    FormField::create([
+                        'section_id' => $section->id,
+                        'field_label' => $fieldData['label'],
+                        'field_name' => $fieldData['name'],
+                        'field_type' => $fieldType,
+                        'widget_id' => $fieldData['widget_id'] ?? null,
+                        'widget_config' => $widgetConfig,
+                        'placeholder' => $fieldData['placeholder'] ?? null,
+                        'options' => $options,
+                        'data_source' => $dataSource,
+                        'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
+                        'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
+                        'field_order' => $fieldData['order'],
+                    ]);
                 }
             }
         }
-        admin_success(__('Form template updated successfully!'));
-        return redirect(admin_url('form-templates'));
     }
+
+    admin_success(__('Form template updated successfully!'));
+    return redirect(admin_url('form-templates'));
+}
+
 
     public function destroy(FormTemplate $formTemplate)
     {
@@ -234,11 +251,11 @@ class FormTemplateController extends Controller
                 'message' => 'Access denied. Please login or use a valid token.',
             ], 403);
         }
-        if (  !$user && $linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
-            return response()->view('Form::forms.invalid', [
-                    'message' => 'Invalid or expired token.',
-                ], 403);
-        }
+        // if (  !$user && $linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
+        //     return response()->view('Form::forms.invalid', [
+        //             'message' => 'Invalid or expired token.',
+        //         ], 403);
+        // }
 
         $locale = $request->header('Accept-Language', app()->getLocale());
         $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : app()->getLocale();
@@ -255,24 +272,43 @@ class FormTemplateController extends Controller
     public function storeSubmission(Request $request, string $type)
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
-
+    
+        $data = $request->except('_token');
+        foreach ($request->files as $key => $fileInput) {
+            if (is_array($fileInput)) {
+                $storedFiles = [];
+                foreach ($fileInput as $file) {
+                    if ($file && $file->isValid()) {
+                        $file->storeAs('data', $file->getClientOriginalName());
+                        $storedFiles[] = $file->getClientOriginalName();
+                    }
+                }
+                $data[$key] = $storedFiles;
+            }
+            elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
+                $fileInput->storeAs('data', $fileInput->getClientOriginalName());
+                $data[$key] = $fileInput->getClientOriginalName();
+            }
+        }
+    
         FormRequest::create([
             'form_template_id' => $template->id,
-            'submitted_by'=> Auth::user()->id  ,
+            'submitted_by'=> Auth::user()->id ,
             'bd_id' => $request->bd_id,
             'name' => $request->agency_name ?? $request->bd_name,
             'whatsapp_number' => $request->whatsapp_number,
             'form_template_type' => $template->form_type,
-            'data' => json_encode($request->except('_token')),
+            'data' => json_encode($data),
             'created_at' => now(),
-         
         ]);
+    
+   
         return response()->json([
             'success' => true,
             'message' => __('Form submitted successfully!'),
         ], 200);
     }
-
+    
     public function getTranslations( Request $request)
     {
         $locale = $request->get('locale', 'en');
@@ -306,6 +342,37 @@ class FormTemplateController extends Controller
                 ];
             })
         ]);
+    }
+
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+
+        $bds = Bd::where('name', 'like', "%{$query}%")
+            ->orWhere('id', 'like', "%{$query}%")
+            ->limit(10)
+            ->get();
+
+        $results = $bds->map(function ($bd) {
+            $topAgencies = Agency::where('bd_id', $bd->id)
+                ->withCount('members')
+                ->orderByDesc('members_count')
+                ->limit(3)
+                ->get(['name', 'members_count']);
+            return [
+                'id' => $bd->id,
+                'name' => $bd->name,
+                'phone' => $bd->phone,
+                'country' => $bd->country,
+                'title' => $bd->title,
+                'bio' => $bd->bio,
+                'years' => $bd->years_of_experience,
+                'top_agencies' => $topAgencies,
+            ];
+        });
+
+        return response()->json(['data' => $results]);
     }
 
 }
