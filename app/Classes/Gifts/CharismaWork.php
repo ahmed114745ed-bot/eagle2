@@ -66,7 +66,9 @@ class CharismaWork implements RoomJobInterface
         }
 
         $finalResult = [];
+        info('result', $result);
         foreach ($result as $room_id => $info) {
+            info('info', $info);
             // Extract user data as array values to discard the user_id keys used for summing duplicates
             $users_data = array_values($info['data']);
             $finalResult[] = [
