@@ -6,6 +6,7 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Selectables\Badges;
+use Modules\SuperAdmin\Actions\Admin\DedicateSuperAdminRewardAction;
 use Modules\Vip\Entities\OVip;
 use App\Selectables\SuperAdmins;
 use App\Selectables\WaresByType;
@@ -95,7 +96,7 @@ class SuperAdminRewardController extends MainController
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
                 $type = request('type');
-                return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
+                return (new DedicateSuperAdminRewardAction($this->id, $type))->render();
             });
         }
 

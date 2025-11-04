@@ -40,12 +40,11 @@ Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
-        'namespace' => config('admin.route.namespace'),
+        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers\\Admin',
         'middleware' => [
             'web',
             'admin',
             'adminIp',
-            //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => config('admin.route.prefix') . '.',
@@ -165,7 +164,7 @@ Route::group(
 Route::group(
     [
         'prefix' => 'superadmin',
-        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers',
+        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers\\SuperAdmin',
         'middleware' => [
             'web',
             'admin.auth',

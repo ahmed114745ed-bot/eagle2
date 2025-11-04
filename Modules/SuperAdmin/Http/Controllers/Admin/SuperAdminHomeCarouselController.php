@@ -4,7 +4,6 @@ namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
 use App\Enums\AdminNotificationLink;
 use App\Enums\AdminNotificationType;
-use App\helper\SuperAdminHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Models\Country;
 
@@ -26,6 +25,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Grid\Tools;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
+use Modules\SuperAdmin\Helper\SuperAdminHelper;
 class SuperAdminHomeCarouselController extends MainController
 {
     use HasResourceActions;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Notification;
+namespace Modules\SuperAdmin\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

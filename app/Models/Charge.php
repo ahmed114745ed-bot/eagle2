@@ -6,6 +6,7 @@ use App\Models\Scopes\HostAgencyScope;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\SuperAdmin\Entities\SubAdmin;
 
 class Charge extends Model
 {

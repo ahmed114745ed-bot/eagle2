@@ -14,7 +14,6 @@ use Modules\RoleRewards\Actions\DeleteUser;
 use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
-use Modules\SuperAdmin\Http\Controllers\EncorUsersController;
 
 
 class AdminUserController extends EncorUsersController

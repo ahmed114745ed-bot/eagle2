@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Services;
+namespace Modules\SuperAdmin\Services;
 
 
 

@@ -7,7 +7,7 @@ use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Setting;
-use App\Models\SubAdmin;
+use Modules\SuperAdmin\Entities\SubAdmin;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;

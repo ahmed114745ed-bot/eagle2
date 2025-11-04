@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Helpers;
+namespace Modules\SuperAdmin\Helper;
 
-use App\Events\SuperAdminNotificationCreated;
 use App\Jobs\SendFirebaseNotificationsToAdmins;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use App\Enums\SuperAdminNotificationType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\Admin;
@@ -14,6 +12,8 @@ use Kreait\Firebase\Messaging\CloudMessage;
 use Google_Client;
 use Illuminate\Support\Str;
 use Modules\SuperAdmin\Entities\SuperAdminNotification;
+use Modules\SuperAdmin\Enums\SuperAdminNotificationLink;
+use Modules\SuperAdmin\Enums\SuperAdminNotificationType;
 class SuperAdminNotificationHelper
 {
     public static function notify(
@@ -48,13 +48,13 @@ class SuperAdminNotificationHelper
         $url = '';
         $previewUrlValue = $data['preview_url'] ?? null;
         if ($previewUrlValue) {
-            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrlValue->value);
+            $enum = SuperAdminNotificationLink::tryFrom($previewUrlValue->value);
             if ($enum) {
                 $url = $enum->url($data);
             }
         }
     
-        broadcast(new SuperAdminNotificationCreated(
+        broadcast(new \Modules\SuperAdmin\Events\SuperAdminNotificationCreated(
             notification: $notification,
             translatedTitle: $translatedTitle,
             translatedMessage: $translatedMessage,

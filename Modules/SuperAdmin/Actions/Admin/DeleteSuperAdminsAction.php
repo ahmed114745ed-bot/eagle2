@@ -4,7 +4,7 @@ namespace Modules\SuperAdmin\Actions\Admin;
 
 use App\Models\Bd;
 use App\Models\User;
-use App\Models\SubAdmin;
+use Modules\SuperAdmin\Entities\SubAdmin;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;

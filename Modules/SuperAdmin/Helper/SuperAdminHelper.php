@@ -1,6 +1,6 @@
 <?php
 
-namespace App\helper;
+namespace Modules\SuperAdmin\Helper;
 
 use App\Models\HomeCarousel;
 use App\Models\Setting;

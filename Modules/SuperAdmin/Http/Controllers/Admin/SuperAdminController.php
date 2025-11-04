@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
-use App\Admin\Actions\DeleteSuperAdminsAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 
