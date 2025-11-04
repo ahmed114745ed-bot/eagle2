@@ -18,7 +18,6 @@ class CharismaWork implements RoomJobInterface
         $earnedCoinsPerUser = $roomJob->coins;
 
         $data =(new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $userIds, $earnedCoinsPerUser);
-        info('dataaa', ...$data);
         return ['room_id'=> $room->id, ...$data];
     }
 
@@ -38,49 +37,35 @@ class CharismaWork implements RoomJobInterface
 
     public function prepareDataToZego($data) : array
     {
-        info('prepareDataToZego');
         $result = [];
 
         foreach ($data['charisma'] as $item) {
             $room_id = $item["room_id"]; // Assuming the first entry of each item contains the room_id and user data
-            info('item', $item);
-            foreach ($item as $key => $userData) {
-
-                if ($key == 'room_id') continue;
-                foreach ($userData as $inner) {
-                    $userData = $inner;
-                    break;
+            foreach ($item as $userData) {
+                if (is_array($userData)) { // Ensure we're working with the user data arrays
+                    $user_id = $userData['user_id'];
+                    if (!isset($result[$room_id])) {
+                        $result[$room_id] = [
+                            'room_id' => $room_id,
+                            'data' => [],
+                            'total' => 0,
+                        ];
+                    }
+                    if (isset($result[$room_id]['data'][$user_id])) {
+                        // If user exists, sum their totals
+                        $result[$room_id]['data'][$user_id]['total'] = max($result[$room_id]['data'][$user_id]['total'], $userData['total']);
+                    } else {
+                        // If user does not exist, add them to the data
+                        $result[$room_id]['data'][$user_id] = $userData;
+                    }
+                    // Always add to the room's total
+                    $result[$room_id]['total'] += $userData['total'];
                 }
-
-                if (!isset($userData['user_id'])) continue;
-
-                $user_id = $userData['user_id'];
-                $total   = $userData['total'] ?? 0;
-                info('Processed user', compact('user_id', 'total'));
-
-                if (!isset($result[$room_id])) {
-                    $result[$room_id] = [
-                        'room_id' => $room_id,
-                        'data' => [],
-                        'total' => 0,
-                    ];
-                }
-                if (isset($result[$room_id]['data'][$user_id])) {
-                    // If user exists, sum their totals
-                    $result[$room_id]['data'][$user_id]['total'] = max($result[$room_id]['data'][$user_id]['total'], $userData['total']);
-                } else {
-                    // If user does not exist, add them to the data
-                    $result[$room_id]['data'][$user_id] = $userData;
-                }
-                // Always add to the room's total
-                $result[$room_id]['total'] += $userData['total'];
             }
         }
 
         $finalResult = [];
-        info('result', $result);
         foreach ($result as $room_id => $info) {
-            info('info', $info);
             // Extract user data as array values to discard the user_id keys used for summing duplicates
             $users_data = array_values($info['data']);
             $finalResult[] = [
