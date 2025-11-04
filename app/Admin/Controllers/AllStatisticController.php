@@ -397,8 +397,8 @@ class AllStatisticController extends MainController
                     });
                 });
 
-                $row->column(12, function ($column) use ($countryID, $topUsersByFollowers) {
-                    $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
+                $row->column(12, function ($column) use ( $topUsersByFollowers) {
+                    $column->row(function (Row $row) use ( $topUsersByFollowers) {
                         $row->column(6, function ($col) use ($topUsersByFollowers) {
                             $top5 = $topUsersByFollowers
                                 ->filter(fn($user) => $user->followers_count > 0)
@@ -411,7 +411,7 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col) use ($countryID) {
+                        $row->column(6, function ($col)  {
                             $view = view('admin.dashboard.widgets.users_online_chart')->render();
                             $col->row($view);
                         });

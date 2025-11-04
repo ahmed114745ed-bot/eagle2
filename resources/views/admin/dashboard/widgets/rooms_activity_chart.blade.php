@@ -14,7 +14,7 @@
 
 @php
   
-        $fetchUrl = admin_url('admin/rooms-activity');
+        $fetchUrl = admin_url('rooms-activity');
  
 @endphp
 
