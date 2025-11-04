@@ -315,8 +315,6 @@ class SendGiftService
             }
         }
 
-        info($pk->t1_score);
-        info($pk->t2_score);
         $pk->team_1 = implode(',', $team1);
         $pk->team_2 = implode(',', $team2);
         $pk->save();
@@ -416,8 +414,8 @@ class SendGiftService
             ->get()
             ->keyBy('position');
 
-        $team1Positions = [2, 3, 6, 7];
-        $team2Positions = [4, 5, 8, 9];
+        $team1Positions = [1, 2, 5, 6];
+        $team2Positions = [3, 4, 7, 8];
 
         $team1 = collect($team1Positions)
             ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
