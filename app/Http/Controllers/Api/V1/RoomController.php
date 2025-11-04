@@ -349,6 +349,40 @@ class RoomController extends Controller
         }
     }
 
+    public function quit_room_2(Request $request)
+    {
+        if (!$request->owner_id && !$request->room_id) {
+
+            return Common::apiResponse(false, __('missing parameter'), null, 422);
+        }
+        try {
+            $user = $request->user();
+            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom2($request->owner_id, $user, $request->room_id);
+            if ($isToZegoCharisma && isset($userDataWithCharisma)) {
+                $ms = [
+                    'messageContent' => [
+                        "message" => "updateCharisma",
+                        'data' => $userDataWithCharisma
+                    ]
+                ];
+                $json = json_encode($ms);
+
+                Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
+            }
+            $this->handleLeaveCp($user, $roomId);
+            $room = Room::find($roomId);
+            if ($user->id === $room->uid) {
+                $room->is_afk = 0;
+                $room->save();
+            }
+            $this->updateMicrophone2($room->uid, $user->id);
+            return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function handleLeaveCp($user, $roomId)
     {
         $userId = $user->id;
@@ -1948,6 +1982,21 @@ class RoomController extends Controller
         $user = User::query()->find($user_id);
         if (!$user) return;
         $result  = Common::go_microphone_hand($room_uid, $user_id);
+
+        $room = Room::query()->where('uid', $room_uid)->first();
+
+        if (!$room) return;
+        if ($result) {
+
+            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+        }
+    }
+
+    private function updateMicrophone2($room_uid, $user_id)
+    {
+        $user = User::query()->find($user_id);
+        if (!$user) return;
+        $result  = Common::go_microphone_hand_2($room_uid, $user_id);
 
         $room = Room::query()->where('uid', $room_uid)->first();
 

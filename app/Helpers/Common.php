@@ -1472,8 +1472,11 @@ class Common
     }
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
-    {
+    {           
+         Log::info('start sendToZego3');
+
         try {
+
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
             $AppId            = self::zegoData('zego_app_id');
@@ -1503,6 +1506,8 @@ class Common
             }
             return $promises;
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
         }
     }
 

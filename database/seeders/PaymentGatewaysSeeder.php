@@ -68,11 +68,11 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         $fawry_id = PaymentCoin::firstOrCreate([
-            'title' => 'fawry',
+            'type' => 'fawry',
         ], [
+            'title' => 'fawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'type' => 'fawry',
             'package_type' => 'user'
         ]);
         $fawry_fields = [
@@ -117,11 +117,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //utd fawry
         $utd_fawry_id = PaymentCoin::firstOrCreate([
-            'title' => 'utdFawry',
+            'type' => 'utd_fawry',
         ], [
+            'title' => 'utdFawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'type' => 'utd_fawry',
             'package_type' => 'user'
         ]);
         $utd_fawry_fields = [
@@ -166,11 +166,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         // sky pay
          $pay_sky_id = PaymentCoin::firstOrCreate([
-            'title' => 'skyPay',
-        ], [
-            'photo' => 'images/paysky.png',
-            'status' => 1,
              'type' => 'sky_pay',
+        ], [
+             'title' => 'skyPay',
+             'photo' => 'images/paysky.png',
+             'status' => 1,
              'package_type' => 'user'
          ]);
 
@@ -216,11 +216,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //stripe
         $strip_id = PaymentCoin::firstOrCreate([
-            'title' => 'strip',
+            'type' => 'strip',
         ], [
+            'title' => 'strip',
             'photo' => 'images/stripe.png',
             'status' => 1,
-            'type' => 'strip',
             'package_type' => 'user'
         ]);
 
@@ -271,11 +271,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //opay
         $opay_id = PaymentCoin::firstOrCreate([
-            'title' => 'opay',
+            'type' => 'opay',
         ], [
+            'title' => 'opay',
             'photo' => 'images/opay.png',
             'status' => 1,
-            'type' => 'opay',
             'package_type' => 'user'
         ]);
 
@@ -331,11 +331,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //cashfree
         $cashfree_id = PaymentCoin::firstOrCreate([
-            'title' => 'cashfree',
+            'type' => 'cash_free',
         ], [
+            'title' => 'cashfree',
             'photo' => 'images/cashfree.jpg',
             'status' => 1,
-            'type' => 'cash_free',
             'package_type' => 'user'
         ]);
 
@@ -381,11 +381,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //applepay
         $applepay_id = PaymentCoin::firstOrCreate([
-            'title' => 'applepay',
+            'type' => 'apple_pay',
         ], [
+            'title' => 'applepay',
             'photo' => 'images/applepay.png',
             'status' => 1,
-            'type' => 'apple_pay',
             'package_type' => 'user'
         ]);
 
@@ -528,11 +528,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //paypal
         $paypal_id = PaymentCoin::firstOrCreate([
-            'title' => 'paypal',
+            'type' => 'paypal',
         ], [
+            'title' => 'paypal',
             'photo' => 'images/paypal.png',
             'status' => 1,
-            'type' => 'paypal',
             'package_type' => 'user'
         ]);
 
@@ -638,11 +638,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //paytabs
         $paytabs_id = PaymentCoin::firstOrCreate([
-            'title' => 'paytabs',
+            'type' => 'paytabs',
         ], [
+            'title' => 'paytabs',
             'photo' => 'images/paytabs.webp',
             'status' => 1,
-            'type' => 'paytabs',
             'package_type' => 'user'
         ]);
 
@@ -1057,11 +1057,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         // Google Pay
         $google_pay_id = PaymentCoin::firstOrCreate([
-            'title' => 'google_pay',
+            'type' => 'google_pay',
         ], [
+            'title' => 'google_pay',
             'photo' => 'images/googlepay.png',
             'status' => 1,
-            'type' => 'google_pay',
             'package_type' => 'user'
         ]);
 
@@ -1096,11 +1096,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         //codapay
         $codapay_id = PaymentCoin::firstOrCreate([
-            'title' => 'codapay',
+            'type' => 'codapay',
         ], [
+            'title' => 'codapay',
             'photo' => 'images/codapay.webp',
             'status' => 1,
-            'type' => 'codapay',
             'package_type' => 'user'
         ]);
 

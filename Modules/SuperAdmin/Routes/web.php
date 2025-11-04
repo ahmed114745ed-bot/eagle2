@@ -1,39 +1,131 @@
 <?php
 
-use Modules\SuperAdmin\Http\Controllers\AdminUserController;
-use Modules\SuperAdmin\Http\Controllers\AgencyController;
-use Modules\SuperAdmin\Http\Controllers\AgencyUserController;
-use Modules\SuperAdmin\Http\Controllers\AppearChargerAgencyController;
-use Modules\SuperAdmin\Http\Controllers\AuthController;
-use Modules\SuperAdmin\Http\Controllers\BdController;
-use Modules\SuperAdmin\Http\Controllers\BdSalariesController;
-use Modules\SuperAdmin\Http\Controllers\ChargeController;
-use Modules\SuperAdmin\Http\Controllers\HomeCarouselController;
-use Modules\SuperAdmin\Http\Controllers\HomeController;
-use Modules\SuperAdmin\Http\Controllers\LiveRoomController;
-use Modules\SuperAdmin\Http\Controllers\MultiLanguageController;
-use Modules\SuperAdmin\Http\Controllers\NotificationController;
-use Modules\SuperAdmin\Http\Controllers\OfficialMessengerSuperAdminController;
-use Modules\SuperAdmin\Http\Controllers\ProfessionalBdController;
-use Modules\SuperAdmin\Http\Controllers\RequestAgencyController;
-use Modules\SuperAdmin\Http\Controllers\RoleController;
-use Modules\SuperAdmin\Http\Controllers\RoomController;
-use Modules\SuperAdmin\Http\Controllers\SuperadminBannerHistoryController;
-use Modules\SuperAdmin\Http\Controllers\SuperAdminRewardController;
-use Modules\SuperAdmin\Http\Controllers\UserController;
-use Modules\SuperAdmin\Http\Controllers\WalletController;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperadminBannerHistoryController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminStatisticController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminHomeCarouselController;
+use Modules\SuperAdmin\Http\Controllers\Admin\RestoreSuperAdminController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminSelectController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminRewardControllerHistory;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperadminBannerRequestController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeReportController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdminCountryController;
+
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| admin Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+*/
+
+
+Route::get('/admin/superadmin-logout', [App\Admin\Controllers\AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
+Route::get('/admin/superadmin-logout', [App\Admin\Controllers\AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
+Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
+Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
+// Main page route
+Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
+
+// AJAX API route
+Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
+
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers\\Admin',
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function () {
+
+        Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
+            Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
+            Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('peak-hours', [SuperAdminStatisticController::class, 'peakHours'])->name('admin.peak-hours');
+            Route::get('rooms-activity', [SuperAdminStatisticController::class, 'roomsActivity'])->name('admin.rooms-activity');
+            Route::get('users-online-stats', [SuperAdminStatisticController::class, 'onlineStats'])->name('users.online.stats');
+            Route::get('profile', [SuperAdminController::class, 'showPreview']);
+            Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('superadmin.home-carousel.history');
+            Route::resource('home-carousel', SuperAdminHomeCarouselController::class);
+            Route::post('home-carousel/resend-banner-request/{banner}', [SuperAdminHomeCarouselController::class, 'resendBannerRequest'])
+                ->name('superadmin.banner.resend');
+        });
+
+        Route::resource('superadmin-users', SuperAdminController::class);
+        Route::resource('restore-super-admins', RestoreSuperAdminController::class);
+        Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
+
+        Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
+        Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
+
+        Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
+        Route::resource('super-admin-rewards', Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminRewardController::class);
+        
+        
+        Route::post('/set-preview-superadmin', function () {
+            session(['preview_superadmin' => true]);
+        });
+
+        Route::post('/unset-preview-superadmin', function () {
+            session()->forget('preview_superadmin');
+        });
+    
+        Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
+        Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
+        Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
+
+        Route::get('superadmin-charges', [SuperAdminChargeController::class, 'index']);
+        Route::group(['prefix' => 'superadmin-charges-report'], function () {
+            Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
+        });
+    });
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| superadmin Routes
+|--------------------------------------------------------------------------
 |
 */
+
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AdminUserController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyUserController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AppearChargerAgencyController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdSalariesController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\ChargeController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeCarouselController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\LiveRoomController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\MultiLanguageController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\NotificationController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\OfficialMessengerSuperAdminController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\ProfessionalBdController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\RequestAgencyController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\RoleController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\RoomController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\SuperadminBannerHistoryController as SuperadminBannerHistory;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\SuperAdminRewardController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\UserController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\WalletController;
 
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
@@ -72,15 +164,13 @@ Route::group(
 Route::group(
     [
         'prefix' => 'superadmin',
-        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers',
+        'namespace' => 'Modules\\SuperAdmin\\Http\\Controllers\\SuperAdmin',
         'middleware' => [
             'web',
             'admin.auth',
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
-            // 'adminIp',
-            //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => 'superadmin.',
@@ -121,7 +211,7 @@ Route::group(
         ]);
 
         Route::resource('rooms', RoomController::class);
-        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
+        Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
 
         Route::resource('home-carousel', HomeCarouselController::class);
 

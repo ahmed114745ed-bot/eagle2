@@ -210,7 +210,29 @@ trait RoomTrait
         return $new_visitor;
     }
 
-
+    public static function quit_hand_2($uid,$user_id){
+        $Visitor=DB::table('rooms')->where(['uid'=>$uid])->value('room_visitor');
+        $room_visitor=explode(',', $Visitor);
+        $room = Room::query ()->where('uid',$uid)->first ();
+        if($uid == $user_id){
+            if ($room){
+                $room->update (['is_afk'=>0]);
+            }
+            Room::query ()->where('uid',$uid)->update(['is_afk'=>0]);
+        }
+        if( $uid != $user_id && !in_array($user_id, $room_visitor)){
+            return $Visitor;
+        }
+        foreach ($room_visitor as $k => &$v) {
+            if($user_id == $v){
+                unset($room_visitor[$k]);
+            }
+        }
+        $new_visitor=trim(implode(',', $room_visitor),',');
+        self::go_microphone_hand_2($uid,$user_id);
+        self::delMicHand($user_id);
+        return $new_visitor;
+    }
     //Down the wheat - execute the operation
     public static function go_microphone_hand($uid,$user_id){
         $room      = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
@@ -236,7 +258,7 @@ trait RoomTrait
         if ($microphone[$position] > 0){
             $baseMic[$position] = $mainMicrophone[$position];
         }
-        
+
 
         $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>implode(',', $baseMic)]);
         $room = Room::query ()->where ('uid',$uid)->first ();
@@ -257,6 +279,70 @@ trait RoomTrait
         $json = json_encode ($ms);
         Common::sendToZego ('SendCustomCommand',$room->id,$user_id,$json);*/
         return $result;
+    }
+
+    public static function go_microphone_hand_2($uid,$user_id){
+        $room = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+
+        if (!$room) {
+            return 0;
+        }
+
+//        $microphone = $room->microphone;
+//        $mainMicrophone = $room->main_microphone;
+//        $baseMic = $room->all_microphone;
+//
+//
+//        $microphone = explode(',', $microphone);
+//        $mainMicrophone = explode(',', $mainMicrophone);
+//        $baseMic = explode(',', $baseMic);
+//        if(!$microphone || !in_array($user_id, $microphone)){
+//            return 0;
+//        }
+
+        $micSeat = $room->microphones()
+            ->where('user_id', $user_id)
+            ->first();
+
+        if (!$micSeat) {
+            return 0;
+        }
+
+//        $position = 0;
+//        for ($i=0; $i < count($microphone); $i++) {
+//            if($microphone[$i] == $user_id){
+//                $position = $i;
+//                break;
+//            }
+//        }
+//        if ($microphone[$position] > 0){
+//            $baseMic[$position] = $mainMicrophone[$position];
+//        }
+
+        $micSeat->update([
+            'user_id' => null,
+            'status'  => 0,
+        ]);
+
+        $micString = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($mic) {
+                $userId = $mic->user_id ?? 0;
+                $status = $mic->status ?? 0;
+
+                return $userId > 0 ? "{$userId}#{$status}" : (string)$status;
+            })
+            ->implode(',');
+
+        $pk = Pk::query ()->where ('room_id',$room->id)->where ('status',1)->first ();
+        if ($pk){
+            $pk->mics = $micString;
+            $pk->save ();
+        }
+        Db::table('time_logs')->where(['uid'=>$uid,'user_id'=>$user_id])->delete();
+
+        return 1;
     }
 
     //Remove mic discharge operation

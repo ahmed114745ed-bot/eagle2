@@ -73,7 +73,7 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $grid = new Grid(new HomeCarousel);
-        $grid ->model()->with('displays');
+        $grid->model()->with('displays');
 
         $grid->id(__('ID'));
 
@@ -85,25 +85,25 @@ class HomeCarouselController extends MainController
                     </div>";
         });
 
-            $types = [
-                'displayDiscover' => 'Discover',
-                'displayHomeTop'  => 'Home Top',
-                'displayHomeMiddle'=> 'Home Middle',
-                'displayLive'     => 'Live',
-                'displayCountry'  => 'Country',
-                'displayRoom'  => 'Room',
-            ];
+        $types = [
+            'displayDiscover' => 'Discover',
+            'displayHomeTop'  => 'Home Top',
+            'displayHomeMiddle' => 'Home Middle',
+            'displayLive'     => 'Live',
+            'displayCountry'  => 'Country',
+            'displayRoom'  => 'Room',
+        ];
 
-            foreach ($types as $attr => $label) {
-                $grid->column($attr, __($label))
-                    ->display(function () use ($attr) {
-                        return $this->{$attr} ? 1 : 0;
-                    })
-                    ->switch([
-                        'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
-                        'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
-                    ]);
-            }
+        foreach ($types as $attr => $label) {
+            $grid->column($attr, __($label))
+                ->display(function () use ($attr) {
+                    return $this->{$attr} ? 1 : 0;
+                })
+                ->switch([
+                    'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
+                ]);
+        }
 
 
 
@@ -165,35 +165,37 @@ class HomeCarouselController extends MainController
      * @return Form
      */
 
-     protected function form()
-     {
-         $form = new Form(new HomeCarousel);
+    protected function form()
+    {
+        $form = new Form(new HomeCarousel);
 
-         $this->disableFormTools($form);
-         $this->addBasicFields($form);
-         $this->addTimeSettings($form);
-         $this->addContentType($form);
-         $this->addDisplayLocations($form);
+        $this->disableFormTools($form);
+        $this->addBasicFields($form);
+        $this->addTimeSettings($form);
+        $this->addContentType($form);
+        $this->addDisplayLocations($form);
 
-         $this->syncDisplaysBeforeSave($form);
-         $this->syncCountriesAfterSave($form);
-
-
-         return $form;
-     }
+        $this->syncDisplaysBeforeSave($form);
+        $this->syncCountriesAfterSave($form);
 
 
-     protected function addBasicFields(Form $form)
-     {
-         $form->display(__('admin.ID'));
-         $form->number('sort', __('sort'));
-         $form->image('img', trans('img'))->setResolution(80)->required();
-         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
-     }
+        return $form;
+    }
 
 
-     protected function addTimeSettings(Form $form)
-     {
+    protected function addBasicFields(Form $form)
+    {
+        $form->display(__('admin.ID'));
+        $form->number('sort', __('sort'));
+        $form->image('img', trans('img'));
+        /**->setResolution(80)*/
+        // ->required();
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
+    }
+
+
+    protected function addTimeSettings(Form $form)
+    {
         $form->select('form', trans('time view type'))->options([
             0 => __(''),
             1 => __('hours'),
@@ -202,67 +204,63 @@ class HomeCarouselController extends MainController
         ])->when('1', function (Form $form) {
 
             $form->text('input', trans('input'))
-            ->rules('required|regex:/^\d+$/');
-
+                ->rules('required|regex:/^\d+$/');
         })->when('2', function (Form $form) {
             $form->text('input', trans('input'))
-            ->rules('required|regex:/^\d+$/');
-
+                ->rules('required|regex:/^\d+$/');
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
-            ->rules('required|regex:/^\d+$/');
-
+                ->rules('required|regex:/^\d+$/');
         });
-
-     }
-
-
-     protected function addContentType(Form $form)
-     {
-         $form->select('type', trans('type'))->options([
-             'room'   => __('Room'),
-             'normal' => __('Normal'),
-             'link'   => __('URL'),
-             'event'  => __('Events')
-         ])->when('room', function (Form $form) {
-             $form->select('owner_id', __('Owner'))
-                 ->options('/api/search/users2')
-                 ->ajax('/api/search/users2', 'id', 'name');
-         })->when('link', function (Form $form) {
-             $form->url('url', trans('url'))->rules('nullable|url');
-         })->when('event', function (Form $form) {
-             $form->select('event_type', trans('events'))->options([
-                 'event'        => __('events'),
-                 'pk_event'     => __('pk_event'),
-                 'weekly_star'  => __('weekly_star'),
-                 'charge_event' => __('charge_event'),
-                 'event_period' => __('event_period'),
-                 'weekly_cp'    => __('weekly_cp'),
-             ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
-         });
-     }
+    }
 
 
-     protected function addDisplayLocations(Form $form)
-     {
+    protected function addContentType(Form $form)
+    {
+        $form->select('type', trans('type'))->options([
+            'room'   => __('Room'),
+            'normal' => __('Normal'),
+            'link'   => __('URL'),
+            'event'  => __('Events')
+        ])->when('room', function (Form $form) {
+            $form->select('owner_id', __('Owner'))
+                ->options('/api/search/users2')
+                ->ajax('/api/search/users2', 'id', 'name');
+        })->when('link', function (Form $form) {
+            $form->url('url', trans('url'))->rules('nullable|url');
+        })->when('event', function (Form $form) {
+            $form->select('event_type', trans('events'))->options([
+                'event'        => __('events'),
+                'pk_event'     => __('pk_event'),
+                'weekly_star'  => __('weekly_star'),
+                'charge_event' => __('charge_event'),
+                'event_period' => __('event_period'),
+                'weekly_cp'    => __('weekly_cp'),
+            ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
+        });
+    }
+
+
+    protected function addDisplayLocations(Form $form)
+    {
         $form->multipleSelect('display_at', __('Display At'))
-        ->options([
-            'discover'    => __('Discover'),
-            'home_top'    => __('Home Top'),
-            'home_middle' => __('Home Middle'),
-            'live'        => __('Live'),
-            'country'     => __('Country'),
-            'room'     => __('Room'),
-        ])
-        ->rules(['array'])
-        ->attribute('id', 'display_at_select');
+            ->options([
+                'discover'    => __('Discover'),
+                'home_top'    => __('Home Top'),
+                'home_middle' => __('Home Middle'),
+                'live'        => __('Live'),
+                'country'     => __('Country'),
+                'room'     => __('Room'),
+            ])
+            ->rules(['array'])
+            ->attribute('id', 'display_at_select');
 
 
-         $form->belongsToMany('countries', Countries::class, trans('Country'));
+        $form->belongsToMany('countries', Countries::class, trans('Country'));
 
-         $form->html('<style>#countries_select { display:none; }</style>');
+        $form->html('<style>#countries_select { display:none; }</style>');
 
-         Admin::script("
+        Admin::script("
              function toggleCountriesField() {
                  var displayAt = document.getElementById('display_at_select');
                  var countriesField = document.querySelector('#countries_select').closest('.form-group');
@@ -275,24 +273,26 @@ class HomeCarouselController extends MainController
                  toggleCountriesField();
              });
          ");
-     }
+    }
 
 
-     protected function syncDisplaysBeforeSave(Form $form)
-     {
+    protected function syncDisplaysBeforeSave(Form $form)
+    {
         $form->ignore(['duration']);
 
 
         // dd($form->display_at , $form->model()->display_at ,request('display_at'));
 
 
-     }
+    }
 
 
 
-     protected function syncCountriesAfterSave(Form $form)
-     {
+    protected function syncCountriesAfterSave(Form $form)
+    {
         $form->saved(function (Form $form) {
+
+
             $types = [
                 'displayDiscover'   => 'discover',
                 'displayHomeTop'    => 'home_top',
@@ -304,14 +304,15 @@ class HomeCarouselController extends MainController
             ];
             $reqKeys = array_keys($types);
 
-            $foundKeys = array_filter($reqKeys, function($key) {
+            $foundKeys = array_filter($reqKeys, function ($key) {
                 return request()->has($key);
             });
 
             $existing = $form->model()->displays()->pluck('display_type')->toArray();
-            $formInput = request('input') ?? $form->model()->input ?? 0;
-            $formForm  = request('form') ?? $form->model()->form ?? 1;
-            $displaysOrg =$form->display_at ?? $form->model()->display_at;
+            $formInput = request('input') ?? ($form->model()->input ?? 0);
+            $formForm  = request('form') ?? ($form->model()->form ?? 1);
+
+            $displaysOrg = $form->display_at ?? $form->model()->display_at;
 
 
             if (is_array($displaysOrg)) {
@@ -327,46 +328,50 @@ class HomeCarouselController extends MainController
                 $displays = [];
             }
 
-
+            $displays = array_filter($displays, fn($v) => !is_null($v) && $v !== '');
+            // dd( $displays);
             if (is_array($displays) && !empty($displays) && empty($foundKeys)) {
+
                 $toDelete = array_diff($existing, $displays);
+
                 if ($toDelete) {
                     $form->model()->displays()->whereIn('display_type', $toDelete)->delete();
                 }
 
-                $toAdd = array_diff($displays, $existing);
+                // $toAdd = array_diff($displays, $existing);
+                // $toAdd = array_filter($toAdd);
+                //  $toAdd = array_filter($toAdd, fn($v) => $v !== null && $v !== '');
 
-                $toAdd = array_filter($toAdd);
-                foreach ($toAdd as $type) {
+                foreach ($displays as $type) {
+
                     $display = $form->model()->displays()->where('display_type', $type)->first();
+                    switch ($formForm) {
+                        case 1:
+                            $duration_unit = 'hours';
+                            break;
+                        case 2:
+                            $duration_unit = 'days';
+                            break;
+                        case 3:
+                            $duration_unit = 'months';
+                            break;
+                        default:
+                            $duration_unit = 'hours';
+                    }
 
                     if ($display) {
                         $display->update([
                             'duration'      => $formInput,
-                            'duration_unit' => match($formForm) {
-                                1 => 'hours',
-                                2 => 'days',
-                                3 => 'months',
-                                default => 'hours',
-                            }
+                            'duration_unit' => $duration_unit,
                         ]);
                     } else {
                         $form->model()->displays()->create([
                             'display_type'  => $type,
                             'duration'      => $formInput,
-                            'duration_unit' => match($formForm) {
-                                1 => 'hours',
-                                2 => 'days',
-                                3 => 'months',
-                                default => 'hours',
-                            }
+                            'duration_unit' => $duration_unit,
                         ]);
                     }
                 }
-
-
-
-
             } else {
 
                 foreach ($types as $key => $type) {
@@ -379,7 +384,7 @@ class HomeCarouselController extends MainController
                             if ($display) {
                                 $display->update([
                                     'duration'      => $formInput,
-                                    'duration_unit' => match($formForm) {
+                                    'duration_unit' => match ($formForm) {
                                         1 => 'hours',
                                         2 => 'days',
                                         3 => 'months',
@@ -390,7 +395,7 @@ class HomeCarouselController extends MainController
                                 $form->model()->displays()->create([
                                     'display_type'  => $type,
                                     'duration'      => $formInput,
-                                    'duration_unit' => match($formForm) {
+                                    'duration_unit' => match ($formForm) {
                                         1 => 'hours',
                                         2 => 'days',
                                         3 => 'months',
@@ -410,9 +415,6 @@ class HomeCarouselController extends MainController
                                 $form->model()->display_at = $existingDisplayAt; // ← احفظ كمصفوفة مباشرة
                                 $form->model()->save();
                             }
-
-
-
                         } else {
                             if ($display) {
                                 $display->delete();
@@ -429,8 +431,6 @@ class HomeCarouselController extends MainController
                         }
                     }
                 }
-
-
             }
 
             if (in_array('country', $displays ?? []) && $foundKeys == []) {
@@ -445,12 +445,11 @@ class HomeCarouselController extends MainController
                     $form->model()->countries()->detach();
                 }
             }
-
         });
-     }
+    }
 
 
-     public function homeCarouselSettings(Content $content)
+    public function homeCarouselSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'banner-setting');

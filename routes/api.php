@@ -235,7 +235,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
                 Route::post('remove_pass', [RoomController::class, 'removeRoomPass']);
                 Route::post('room_background_list', [BackgroundController::class, 'roomBackground']);
-                Route::post('quit_room', [RoomController::class, 'quit_room']);
+                Route::post('quit_room', [RoomController::class, 'quit_room_2']);
+//                Route::post('quit_room_2', [RoomController::class, 'quit_room_2']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
                 Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
@@ -278,7 +279,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone2']);
 //                Route::post('unlock_microphone_place2', [MicrophoneController::class, 'open_microphone2']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-                // Invite user to room
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);

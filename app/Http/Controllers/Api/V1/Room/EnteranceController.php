@@ -91,7 +91,7 @@ class EnteranceController extends Controller
                 'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
-            'is_auto_preview' => $is_auto_preview == 1 ? true : false, 
+            'is_auto_preview' => $is_auto_preview == 1 ? true : false,
 
 
         ];
@@ -267,6 +267,7 @@ class EnteranceController extends Controller
         }
 
         $room = $this->findRoom($roomId);
+        $room->load('microphones.user.profile');
         if (!$room) {
             return $this->errorResponse(__('Room not found.'), 404);
         }

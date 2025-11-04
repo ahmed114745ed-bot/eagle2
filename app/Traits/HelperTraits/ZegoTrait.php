@@ -57,6 +57,7 @@ Trait ZegoTrait
         return null;
     }
     public static function sendToZego($Action,$RoomId,$FromUserId,$MessageContent,$IsTest = 'false'){
+        Log::info('start sendToZego');
         $url = 'https://rtc-api.zego.im';
         $AppId = self::zegoData ('zego_app_id');
         $SignatureNonce = self::getSignatureNonce ();

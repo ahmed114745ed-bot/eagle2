@@ -8,7 +8,7 @@ use App\Http\Middleware\AuthenticateWeb;
 use App\Http\Middleware\CheckLoginAdmin;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
-use App\Http\Middleware\PreviewSuperAdmin;
+use Modules\SuperAdmin\Http\Middleware\PreviewSuperAdmin;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
