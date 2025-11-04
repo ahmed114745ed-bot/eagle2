@@ -62,7 +62,7 @@
 $(function() {
     function updateBdStats() {
         $.ajax({
-            url: '{{ url("admin/bd-stats") }}',
+            url: '{{ url("admin/statistics/bd-stats") }}',
             type: 'GET',
             beforeSend: function() {
                 $('#refreshBdStats').html('<i class="fa fa-spinner fa-spin"></i> {{ __("Loading...") }}');
