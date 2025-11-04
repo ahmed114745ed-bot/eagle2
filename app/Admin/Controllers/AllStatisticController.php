@@ -160,37 +160,7 @@ class AllStatisticController extends MainController
             ->selectRaw("type, COUNT(*) as total")
             ->groupBy('type')
             ->pluck('total', 'type');
-        $totalRoomsJoined = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->withCount('roomVisitors')
-            ->get()
-            ->sum('room_visitors_count');
-        $totalRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })->count();
-        $longestActiveRoom = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        }))
-            ->with(['roomVisitors' => function ($q) {
-                $q->select('id', 'room_id', 'created_at');
-            }])
-            ->get()
-            ->map(function ($room) {
-                $min = $room->roomVisitors->min('created_at');
-                $max = $room->roomVisitors->max('created_at');
 
-                if (!$min || !$max) {
-                    return 0;
-                }
-
-                return Carbon::parse($max)->diffInDays(Carbon::parse($min));
-            })
-            ->max() ?? 0;
         $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
                 return $query->where('country_id', $countryID);
@@ -203,39 +173,6 @@ class AllStatisticController extends MainController
 
         $liveRoomsTrue = $liveRooms[1] ?? 0;
         $liveRoomsFalse = $liveRooms[0] ?? 0;
-        $mostVisitedRoom = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->withCount('roomVisitors')
-            ->orderByDesc('room_visitors_count')
-            ->first();
-        $mostVisitedRoomCount = $mostVisitedRoom?->room_visitors_count ?? 0;
-        $avgVisitorsPerRoom = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->withCount('roomVisitors')
-            ->get()
-            ->avg('room_visitors_count');
-
-        $avgMicPerRoom = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        }))
-            ->pluck('microphone')
-            ->filter()
-            ->map(fn($mics) => count(array_filter(explode(',', $mics))))
-            ->avg();
-
-        $roomsWithMic = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        }))
-            ->whereNotNull('microphone')
-            ->where('microphone', '!=', '')
-            ->count();
-        $percentageWithMic = $totalRooms > 0 ? ($roomsWithMic / $totalRooms) * 100 : 0;
 
         //agencies
         $agencyCount = Agency::when($countryID, function ($query, $countryID) {
@@ -273,12 +210,7 @@ class AllStatisticController extends MainController
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
-        $topAgencies = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->orderByDesc('coins')
-            ->take(10)
-            ->get(['id', 'name', 'coins']);
+
         $avgAgencyWallet = Agency::when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
         })->avg('coins');
@@ -333,11 +265,11 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                 }
             })
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $roomCounts, $agency_salaries, $user_salaries, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
-                $row->column(12, function ($column) use ($usersCount, $onlineUser, $countryID, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration, $topUsersByFollowers) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $roomCounts, $agency_salaries, $user_salaries, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
+                $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
-                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $totalRoomsJoined, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours,  $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                         $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
                         $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users?online=1', $onlineUser));
                         if ($peakHours) {
@@ -412,10 +344,10 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($countryID, $roomCounts, $totalRoomsJoined, $liveRooms, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic, $liveRoomsTrue, $liveRoomsFalse,) {
+                $row->column(12, function ($column) use ($roomCounts,  $liveRoomsTrue, $liveRoomsFalse) {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
-                    $column->row(function (Row $row) use ($roomCounts, $totalRoomsJoined, $liveRoomsTrue, $liveRoomsFalse, $mostVisitedRoomCount, $avgVisitorsPerRoom, $longestActiveRoom, $avgMicPerRoom, $roomsWithMic, $percentageWithMic) {
+                    $column->row(function (Row $row) use ($roomCounts, $liveRoomsTrue, $liveRoomsFalse,) {
                         $row->column(3, new InfoBox(__('Audio Rooms'), 'headphones', 'blue', 'superadmin/rooms?online=1', $roomCounts['audio'] ?? 0));
                         $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'green', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
                         $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'purple', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
@@ -423,7 +355,7 @@ class AllStatisticController extends MainController
                         $row->column(3, new InfoBox(__('Live Rooms (Inactive)'), 'microphone-slash', 'red', 'superadmin/live-rooms?is_live=0', $liveRoomsFalse));
                     });
 
-                    $column->row(function (Row $row) use ($countryID) {
+                    $column->row(function (Row $row) {
                         //chart 1
                         $row->column(6, function ($column) {
 
@@ -438,7 +370,7 @@ class AllStatisticController extends MainController
                         });
 
                         //chart 3
-                        $row->column(6, function ($column) use ($countryID) {
+                        $row->column(6, function ($column) {
 
 
                             $view = view('admin.dashboard.widgets.top_gifted_rooms_chart')->render();
@@ -454,10 +386,10 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($countryID, $agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
+                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth,  $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $topAgencies, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
+                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
                         $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
                         $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies', round($agency_salaries)));
                         $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', round($user_salaries)));
