@@ -140,16 +140,16 @@ class AllStatisticController extends MainController
             ->avg() ?? 0;
 
 
-        $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })->selectRaw("
-            SUM(total_played) as total_played,
-            SUM(total_loss) as total_loss,
-            SUM(total_win) as total_win,
-            SUM(total_loss - total_win) as app_profit
-        ")->first();
+        // $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })->selectRaw("
+        //     SUM(total_played) as total_played,
+        //     SUM(total_loss) as total_loss,
+        //     SUM(total_win) as total_win,
+        //     SUM(total_loss - total_win) as app_profit
+        // ")->first();
 
 
         return parent::index($content
@@ -322,13 +322,13 @@ class AllStatisticController extends MainController
                     });
                 });
 
-                $row->column(12, function ($column) use ($game) {
-                    $column->row("<h3 style='margin:10px 0;'>💼 " . __('game') . "</h3>");
+                // $row->column(12, function ($column) use ($game) {
+                //     $column->row("<h3 style='margin:10px 0;'>💼 " . __('game') . "</h3>");
 
-                    $column->row(function (Row $row) use ($game) {
-                        $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue', "", number_format($game->total_played ?? 0, 2)));
-                    });
-                });
+                //     $column->row(function (Row $row) use ($game) {
+                //         $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue', "", number_format($game->total_played ?? 0, 2)));
+                //     });
+                // });
             }));
     }
 
