@@ -5,7 +5,7 @@
         <div class="info-box bg-aqua">
             <span class="info-box-icon"><i class="fa fa-briefcase"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">{{ __('BD Count') }}</span>
+                <span class="info-box-text">{{ __('Bd Count') }}</span>
                 <span class="info-box-number" data-bdstat="bdCount">0</span>
                 <a href="{{ admin_url('usersBD') }}" class="info-box-more text-white">
                     <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
