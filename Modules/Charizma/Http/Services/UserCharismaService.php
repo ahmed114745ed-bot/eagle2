@@ -25,7 +25,7 @@ class UserCharismaService
             return [];
         }
 
-        $microphones = $room->microphone;
+//        $microphones = $room->microphone;
         $users       = $this->getUserIdWithPosition2($room);
         $user_ids = $users->pluck('user_id')->toArray();
 

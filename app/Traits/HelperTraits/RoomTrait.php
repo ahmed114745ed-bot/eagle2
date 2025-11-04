@@ -101,10 +101,8 @@ trait RoomTrait
 //            if($v == 0 || $v == -1 || $v == $owner_id)   unset($mic_arr[$k]);
 //        }
 
-        $mic_arr=$room->microphone ? explode(',', $room->microphone) : [];
-        foreach ($mic_arr as $k => &$v) {
-            if($v == 0 || $v == -1 || $v == $owner_id)   unset($mic_arr[$k]);
-        }
+        $mic_arr = $room->microphones->whereNotIn('user_id', [0, -1, $owner_id])->pluck('user_id')->filter()->values()->all();
+
 
         $vis_arr=$room->room_visitor ? explode(',', $room->room_visitor) : [];
         if($user_id && !in_array($user_id,$vis_arr))    return __('User is not in this room');
