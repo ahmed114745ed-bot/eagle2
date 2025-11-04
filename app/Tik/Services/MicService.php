@@ -270,9 +270,14 @@ class MicService
 
 
 
-        $micSeats = array_map(function ($v) {
-            return is_numeric($v) ? (int)$v : null;
-        }, explode(',', $room->microphone));
+//        $micSeats = array_map(function ($v) {
+//            return is_numeric($v) ? (int)$v : null;
+//        }, explode(',', $room->microphone));
+
+        $micSeats = $room->microphones()
+            ->orderBy('position')
+            ->pluck('user_id', 'position')
+            ->toArray();
 
         foreach ($userSeats as $neighborPosition) {
 
