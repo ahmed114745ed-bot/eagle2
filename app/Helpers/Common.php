@@ -1793,14 +1793,24 @@ class Common
 
         //leave mic
 
-        foreach ($usersIdInRooms as $userId) {
-            if (isset($room->microphone)) {
+//        foreach ($usersIdInRooms as $userId) {
+//            if (isset($room->microphone)) {
+//
+//                $microphones = explode(',', $room->microphone);
+//                if (in_array($userId, $microphones)) {
+//                    UserHandling::calcTime($userId);
+//                }
+//            }
+//            self::quit_hand_2($room->uid, $userId);
+//        }
 
-                $microphones = explode(',', $room->microphone);
-                if (in_array($userId, $microphones)) {
-                    UserHandling::calcTime($userId);
-                }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+
+        foreach ($usersIdInRooms as $userId) {
+            if (in_array($userId, $micUserIds, true)) {
+                UserHandling::calcTime($userId);
             }
+
             self::quit_hand_2($room->uid, $userId);
         }
 

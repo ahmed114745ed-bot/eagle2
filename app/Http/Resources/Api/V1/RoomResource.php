@@ -108,7 +108,7 @@ class RoomResource extends JsonResource
                 ->implode(',');
 
             $data = array_merge($data, [
-                'room_users' => Common::get_room_users($this->owner()?->id, $request->user()->id),
+                'room_users' => Common::get_room_users_2($this->owner()?->id, $request->user()->id),
                 'background' => $this->final_room_image ?: $this->room_background,
 //                'mics' => $this->microphone ? explode(',', $this->microphone) : [],
                 'mics' => $micString ? explode(',', $micString) : [],

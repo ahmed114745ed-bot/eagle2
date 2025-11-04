@@ -316,12 +316,17 @@ class RoomRepoService
             $isToZegoCharisma = true;
         }
 
-        if (isset($room->microphone)) {
+//        if (isset($room->microphone)) {
+//
+//            $microphones = explode(',', $room->microphone);
+//            if (in_array($user->id, $microphones)) {
+//                UserHandling::calcTime($user->id);
+//            }
+//        }
 
-            $microphones = explode(',', $room->microphone);
-            if (in_array($user->id, $microphones)) {
-                UserHandling::calcTime($user->id);
-            }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+        if (in_array($user->id, $micUserIds, true)) {
+            UserHandling::calcTime($user->id);
         }
 
         $res = Common::quit_hand_2($ownerId, $user->id);
