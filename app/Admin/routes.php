@@ -1,13 +1,5 @@
 <?php
 
-use App\Admin\Controllers\AdminNotification;
-use App\Admin\Controllers\AllStatisticController;
-use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\SuperadminBannerHistoryController;
-use App\Admin\Controllers\SuperadminBannerRequestController;
-use App\Admin\Controllers\SuperAdminHomeCarouselController;
-use App\Admin\Controllers\SuperAdminStatisticController;
-use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +23,7 @@ use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\TargetController;
+use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
@@ -73,8 +66,10 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ZegoFeatureController;
+use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\HomeCarouselController;
+use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -108,6 +103,7 @@ use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\RestoreSuperAdminController;
 use App\Admin\Controllers\UserChargeHistoryController;
 use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
@@ -120,17 +116,22 @@ use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
+use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
+use App\Admin\Controllers\SuperAdminHomeCarouselController;
+use App\Admin\Controllers\SuperadminBannerHistoryController;
+use App\Admin\Controllers\SuperadminBannerRequestController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
+use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 
 Route::group(
     [
@@ -281,7 +282,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
-         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
+        Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -332,8 +333,8 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
-         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+        Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
@@ -392,6 +393,21 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
+            Route::get('comparison-user-signup', [AllStatisticController::class, 'comparisonUserSignUp']);
+            Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
+            Route::get('top-sender', [AllStatisticController::class, 'topSender']);
+            Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [AllStatisticController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
+            Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
+            Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
+        });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
             Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
@@ -489,7 +505,8 @@ Route::group(
         Route::resource('usersBd', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::resource('superadmin-users', SuperAdminController::class)->except('delete');
+        Route::resource('superadmin-users', SuperAdminController::class);
+        Route::resource('restore-super-admins', RestoreSuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
@@ -665,9 +682,9 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
-         Route::resource('helper-links', LinkViewController::class);
+            ->except(['update'])
+            ->names('admin.settings');
+        Route::resource('helper-links', LinkViewController::class);
 
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
@@ -741,10 +758,10 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
-            Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
-            Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
-            Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
         });
+        Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
+        Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
+        Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
 
         Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
         Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
@@ -753,7 +770,7 @@ Route::group(
 
 
 
-   
+
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);

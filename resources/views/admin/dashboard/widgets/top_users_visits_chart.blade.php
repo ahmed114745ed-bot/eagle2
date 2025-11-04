@@ -6,7 +6,7 @@
 </div>
 
 @php
-        $fetchUrl = admin_url('admin/top-users-visits');
+        $fetchUrl = admin_url('top-users-visits');
  
 @endphp
 

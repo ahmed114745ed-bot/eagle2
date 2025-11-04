@@ -221,7 +221,7 @@ class AppearChargerAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile','country')

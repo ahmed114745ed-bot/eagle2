@@ -11,6 +11,8 @@ use Modules\Form\Entities\CustomFieldWidget;
 
 class CustomWidgetController extends Controller
 {
+
+ 
     /**
      * Get available widgets
      */

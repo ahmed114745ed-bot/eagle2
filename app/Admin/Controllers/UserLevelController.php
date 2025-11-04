@@ -58,7 +58,7 @@ class UserLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
         $grid->quickSearch();

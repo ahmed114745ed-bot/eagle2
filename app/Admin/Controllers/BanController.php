@@ -91,7 +91,7 @@ class BanController extends MainController
     {
         $now = now();
         $grid = new Grid(new Ban);
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->disableRowSelector();
 
         $reason = app()->getLocale() == 'ar' ? 'description_ar' : 'description_en';
