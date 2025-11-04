@@ -369,28 +369,6 @@ class AllStatisticController extends MainController
                     $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
                         // Right: chart view (Top Salaries)
                         $row->column(6, function ($column) use ($countryID) {
-                            //                            $topUsersByLiveTime = LiveTime::query()
-                            //                                ->whereHas('user', function ($q) use ($countryID) {
-                            //                                    $q->when($countryID, function ($query, $countryID) {
-                            //                                    return $query->where('country_id', $countryID);
-                            //                                });
-                            //                                })
-                            //                                ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
-                            //                                ->groupBy('uid')
-                            //                                ->havingRaw('SUM(hours) >= 1')
-                            //                                ->orderByDesc('total_hours')
-                            //                                ->take(10)
-                            //                                ->get();
-
-                            //                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->when($countryID, function ($query, $countryID) {
-                            //                                    return $query->where('country_id', $countryID);
-                            //                                })->pluck('name');
-                            //                            $data   = $topUsersByLiveTime->pluck('total_hours');
-
-                            //                            $view = view('admin.dashboard.widgets.users_chart', [
-                            //                                'labels' => $labels,
-                            //                                'data'   => $data,
-                            //                            ])->render();
 
                             $view = view('admin.dashboard.widgets.users_chart')->render();
 
@@ -398,14 +376,14 @@ class AllStatisticController extends MainController
                         });
 
                         // Left: top 10 salaries
-                        $row->column(6, function ($column) use ($countryID, $topUsersByFollowers) {
+                        $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.top_users_visits_chart')->render();
 
                             $column->row($view);
                         });
 
-                        $row->column(6, function ($column) use ($countryID) {
+                        $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.signups_weekly_chart')->render();
 
@@ -452,49 +430,9 @@ class AllStatisticController extends MainController
 
                     $column->row(function (Row $row) use ($countryID) {
                         //chart 1
-                        $row->column(6, function ($column) use ($countryID) {
-                            $roomsWithPk = Room::whereHas('owner', function ($q) use ($countryID) {
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                });
-                            })
-                                ->has('lastPk')
-                                ->count();
-
-                            $audioRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                });
-                            })
-                                ->where('type', 'audio')
-                                ->count();
-
-                            $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                });
-                            })
-                                ->where('type', 'live')
-                                ->count();
-
-                            $inactiveRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            }))
-                                ->whereDoesntHave('roomVisitors')
-                                ->count();
-
-                            $roomStats = [
-                                __('Rooms with PK')  => $roomsWithPk,
-                                __('Audio Rooms')    => $audioRooms,
-                                __('Live Rooms')     => $liveRooms,
-                                __('Inactive Rooms') => $inactiveRooms,
-                            ];
-
-                            $view = view('admin.dashboard.widgets.rooms_distribution_chart', [
-                                'labels' => array_keys($roomStats),
-                                'data'   => array_values($roomStats),
-                            ])->render();
-
+                        $row->column(6, function ($column)  {
+                            
+                            $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
                             $column->row($view);
                         });
 
@@ -927,6 +865,52 @@ class AllStatisticController extends MainController
             'labels'       => $labels,
             'dataCurrent'  => $dataCurrent,
             'dataPrevious' => $dataPrevious,
+        ]);
+    }
+
+    protected function distributionRooms()
+    {
+        $countryID = request('country_id', null);
+        $roomsWithPk = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->has('lastPk')
+            ->count();
+
+        $audioRooms = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->where('type', 'audio')
+            ->count();
+
+        $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->where('type', 'live')
+            ->count();
+
+        $inactiveRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        }))
+            ->whereDoesntHave('roomVisitors')
+            ->count();
+
+        $roomStats = [
+            __('Rooms with PK')  => $roomsWithPk,
+            __('Audio Rooms')    => $audioRooms,
+            __('Live Rooms')     => $liveRooms,
+            __('Inactive Rooms') => $inactiveRooms,
+        ];
+
+        return response()->json([
+            'labels' => array_keys($roomStats),
+            'data'   => array_values($roomStats),
         ]);
     }
 }
