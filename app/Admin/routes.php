@@ -400,6 +400,7 @@ Route::group(
             Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
             Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
             Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {

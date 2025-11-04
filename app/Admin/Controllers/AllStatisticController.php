@@ -478,26 +478,9 @@ class AllStatisticController extends MainController
 
                     $column->row(function (Row $row) use ($countryID) {
                         //chart 1
-                        $row->column(6, function ($column) use ($countryID) {
-                            $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            }))
-                                ->where('agency_obtain', '>', 0)
-                                ->selectRaw('agency_id, COUNT(*) as total_achieved')
-                                ->groupBy('agency_id')
-                                ->orderByDesc('total_achieved')
-                                ->with('agency:id,name')
-                                ->take(10)
-                                ->get();
+                        $row->column(6, function ($column) {
 
-                            $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
-                            $data   = $topAgenciesByTargets->pluck('total_achieved');
-
-                            $view = view('admin.dashboard.widgets.agencies_targets_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
-
+                            $view = view('admin.dashboard.widgets.agencies_targets_chart')->render();
                             $column->row($view);
                         });
 
@@ -920,6 +903,28 @@ class AllStatisticController extends MainController
 
         $labels = $avgSessionRooms->pluck('room_name');
         $data   = $avgSessionRooms->pluck('avg_duration');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function agencyTarget()
+    {
+        $countryID = request('country_id', null);
+        $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        }))
+            ->where('agency_obtain', '>', 0)
+            ->selectRaw('agency_id, COUNT(*) as total_achieved')
+            ->groupBy('agency_id')
+            ->orderByDesc('total_achieved')
+            ->with('agency:id,name')
+            ->take(10)
+            ->get();
+
+        $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
+        $data   = $topAgenciesByTargets->pluck('total_achieved');
         return response()->json([
             'labels' => $labels,
             'data'   => $data,
