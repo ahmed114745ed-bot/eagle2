@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
@@ -225,6 +226,20 @@ class FormTemplateController extends Controller
     public function showByType(Request $request)
     {
         $type =request('type');
+        $linkToken = $request->query('token');
+        $user = $request->user();
+
+        if (!$user && empty($linkToken)) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'Access denied. Please login or use a valid token.',
+            ], 403);
+        }
+        if ($linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
+            return response()->view('Form::forms.invalid', [
+                    'message' => 'Invalid or expired token.',
+                ], 403);
+        }
+
         $locale = $request->header('Accept-Language', app()->getLocale());
         $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : app()->getLocale();
         app()->setLocale($locale);
