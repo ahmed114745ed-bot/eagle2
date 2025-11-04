@@ -25,7 +25,7 @@ class UserCharismaService
             return [];
         }
 
-        $microphones = $room->microphone;
+//        $microphones = $room->microphone;
         $users       = $this->getUserIdWithPosition2($room);
         $user_ids = $users->pluck('user_id')->toArray();
 
@@ -62,6 +62,7 @@ class UserCharismaService
     public function addTotalEarnedCoinsInUserRoom(Room $room, array $userIds, $earnedCoins = null): false|array
     {
 
+        info('addTotalEarnedCoinsInUserRoom');
         $roomId = $room->id;
 
         if ( !$room) {
@@ -69,7 +70,15 @@ class UserCharismaService
         }
 
 
-        $users = $this->getUserIdWithPosition2($room);
+//        $users = $this->getUserIdWithPosition2($room);
+        $users = $room->microphones()
+            ->get(['user_id', 'position'])
+            ->map(fn($m) => [
+                'user_id'  => (int)$m->user_id,
+                'position' => (int)$m->position,
+            ])
+            ->values();
+
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {

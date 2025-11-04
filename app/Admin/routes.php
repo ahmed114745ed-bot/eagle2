@@ -402,7 +402,11 @@ Route::group(
             Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
             Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
             Route::get('top-sender', [AllStatisticController::class, 'topSender']);
-             Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
+            Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [AllStatisticController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
+            Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
+            Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
