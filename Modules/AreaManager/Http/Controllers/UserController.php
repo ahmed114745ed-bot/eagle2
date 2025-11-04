@@ -2,12 +2,7 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\ChangeAgencyAction;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
-use App\Admin\Actions\KickOfAgencyAction;
-use App\Admin\Actions\KickOfFamilyAction;
+
 use App\Admin\Controllers\MainController;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
