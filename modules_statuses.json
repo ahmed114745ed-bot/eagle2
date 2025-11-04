@@ -29,5 +29,6 @@
     "Badge": true,
     "RoleRewards": true,
     "Milestones": true,
-    "RoomCup": true
+    "RoomCup": true,
+    "AreaManager": true
 }
