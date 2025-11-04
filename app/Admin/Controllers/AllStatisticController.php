@@ -179,7 +179,7 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                 }
             })
-            ->row(function (Row $row) use ( $usersCount, $bdCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
+            ->row(function (Row $row) use ( $usersCount, $bdCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,  $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
                 $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
