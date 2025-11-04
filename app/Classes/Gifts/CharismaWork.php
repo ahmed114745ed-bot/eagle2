@@ -37,6 +37,7 @@ class CharismaWork implements RoomJobInterface
 
     public function prepareDataToZego($data) : array
     {
+        info('prepareDataToZego');
         $result = [];
 
         foreach ($data['charisma'] as $item) {
