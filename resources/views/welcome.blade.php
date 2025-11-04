@@ -1654,7 +1654,7 @@
                 <p data-translate="stats1.desc">Active Users</p>
             </div>
             <div class="stat-item">
-                <h2>{{numToStringNew( (int)($settings['landing_countries_count'] )?? 0) }}<span>+</span></h2>
+                <h2>{{numToStringNew( (int)(@$settings['landing_countries_count'] )?? 0) }}<span>+</span></h2>
                 <p data-translate="stats2.desc">Countries</p>
             </div>
             <div class="stat-item">
