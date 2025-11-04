@@ -151,72 +151,8 @@ class AllStatisticController extends MainController
             SUM(total_loss - total_win) as app_profit
         ")->first();
 
-       
-        //agencies
-        $agencyCount = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-        $user_salaries = UserSallary::query()
-            ->whereHas('user', function ($q) use ($countryID) {
-                $q->where('agency_id', '!=', 0)
-                    ->when($countryID, function ($query, $countryID) {
-                        return $query->where('country_id', $countryID);
-                    })
-                    ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
-                        return $query->where('country_id', $countryID);
-                    }));
-            })
-            ->sum(DB::raw('sallary - cut_amount'));
-        $agency_salaries = AgencySallary::query()->whereHas('agency', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })->sum(DB::raw('sallary - cut_amount'));
-
-        $activeAgencies = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->whereHas('agencySalaries', fn($q) => $q->where('month', now()->month)
-                ->where('year', now()->year))
-            ->count();
-        $newAgenciesToday = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->whereDate('created_at', today())->count();
-        $newAgenciesMonth = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-
-        $avgAgencyWallet = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->avg('coins');
-        $totalMembers = User::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->where('agency_id', '!=', 0)
-            ->whereHas('agency', function ($q) use ($countryID) {
-                $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
-                });
-            })
-            ->count();
-        $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
-        $pendingJoins = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->whereHas('joinRequests', fn($q) => $q->where('status', 1))
-            ->count();
-        $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        }))
-            ->whereHas('agency', function ($q) use ($countryID) {
-                $q->when($countryID, function ($query, $countryID) {
-                    return $query->where('country_id', $countryID);
-                });
-            })
-            ->sum('achieved_diamond');
+        
+        // bd
 
         $bdCount = Bd::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
@@ -243,13 +179,13 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                 }
             })
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser,  $agency_salaries, $user_salaries, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
+            ->row(function (Row $row) use ( $usersCount, $bdCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
                 $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
                     $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours,  $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
-                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'superadmin/users', $usersCount));
-                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'superadmin/users?online=1', $onlineUser));
+                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'admin/users', $usersCount));
+                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'admin/users?online=1', $onlineUser));
                         if ($peakHours) {
                             $time = Carbon::createFromTime($peakHours->hour);
                             $time->locale(app()->getLocale());
@@ -259,16 +195,16 @@ class AllStatisticController extends MainController
                         } else {
                             $value = 0;
                         }
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'superadmin/users', $value));
-                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'superadmin/users?signups=today', $newSignUpsToday));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'superadmin/users?signups=week', $newSignUpsThisWeek));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'superadmin/users?signups=month', $newSignUpsThisMonth));
-                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', 'superadmin/users?messages=today', $messagesToday));
-                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', 'superadmin/users?messages=month', $messagesThisMonth));
-                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', 'superadmin/users?sent_messages=1', $usersWhoSend));
-                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', 'superadmin/users?never_send=1', $usersWhoNeverSend));
-                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', 'superadmin/users', $openConversationsToday));
-                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration)));
+                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'admin/users', $value));
+                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'admin/users?signups=today', $newSignUpsToday));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'admin/users?signups=week', $newSignUpsThisWeek));
+                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'admin/users?signups=month', $newSignUpsThisMonth));
+                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', 'admin/users?messages=today', $messagesToday));
+                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', 'admin/users?messages=month', $messagesThisMonth));
+                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', 'admin/users?sent_messages=1', $usersWhoSend));
+                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', 'admin/users?never_send=1', $usersWhoNeverSend));
+                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', 'admin/users', $openConversationsToday));
+                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'admin/users', round($avgConversationDuration)));
                     });
 
                     $column->row(function (Row $row) {
@@ -322,7 +258,7 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column)  {
+                $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
                     $column->row(function ($row) {
@@ -361,23 +297,13 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth,  $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
+                $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                    $column->row(function (Row $row) use ($agencyCount, $agency_salaries, $user_salaries, $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved) {
-                        $row->column(3, new InfoBox(__('Agencies Count'), 'building', 'olive', 'superadmin/agencies', $agencyCount));
-                        $row->column(3, new InfoBox(__('total agency salary'), 'building', 'lime', 'superadmin/agencies', round($agency_salaries)));
-                        $row->column(3, new InfoBox(__('Total Users Salary'), 'money', 'gray', 'superadmin/ag/users', round($user_salaries)));
-                        $row->column(3, new InfoBox(__('Active Agencies'), 'building', 'red', 'superadmin/agencies?active=true', $activeAgencies));
-                        $row->column(3, new InfoBox(__('New Agencies Today'), 'plus', 'teal', 'superadmin/agencies?created=today', $newAgenciesToday));
-                        $row->column(3, new InfoBox(__('New Agencies This Month'), 'calendar', 'orange', 'superadmin/agencies?created=month', $newAgenciesMonth));
-                        $row->column(3, new InfoBox(__('Average Agency Wallet'), 'money', 'aqua', 'superadmin/agencies', round($avgAgencyWallet)));
-                        $row->column(3, new InfoBox(__('Total Members in Agencies'), 'users', 'maroon', 'superadmin/users?agencyMembers=1', $totalMembers));
-                        $row->column(3, new InfoBox(__('Avg Members Per Agency'), 'user', 'lime', 'superadmin/agencies', round($avgMembersPerAgency)));
-                        $row->column(3, new InfoBox(__('Pending Join Requests'), 'hourglass', 'purple', 'superadmin/agencies?pending=1', $pendingJoins));
-                        $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
+                     $column->row(function ($row) {
+                        $view = view('admin.dashboard.widgets.agency_tab')->render();
+                        $row->column(12, $view);
                     });
-
                     $column->row(function (Row $row) {
                         //chart 1
                         $row->column(6, function ($column) {
@@ -410,10 +336,10 @@ class AllStatisticController extends MainController
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
                     $column->row(function (Row $row) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'superadmin/usersBD', $bdCount));
-                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'superadmin/bd-salaries', number_format($totalBDSalary)));
-                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'superadmin/bd-salaries', number_format($totalBDCut)));
-                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'superadmin/usersBD', number_format($averageAgenciesPerBD)));
+                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'admin/usersBD', $bdCount));
+                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'admin/bd-salaries', number_format($totalBDSalary)));
+                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'admin/bd-salaries', number_format($totalBDCut)));
+                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'admin/usersBD', number_format($averageAgenciesPerBD)));
                     });
                 });
 
@@ -846,8 +772,7 @@ class AllStatisticController extends MainController
 
     public function roomStats()
     {
-        $countryID = request('country_id', Auth::user()->country_id);
-
+        $countryID = $this->countryId();
         $roomCounts = Room::whereHas('owner.country', fn($q) => $q->where('id', $countryID))
             ->whereHas('roomVisitors')
             ->selectRaw("type, COUNT(*) as total")
@@ -872,6 +797,69 @@ class AllStatisticController extends MainController
             'live'          => $roomCounts['live'] ?? 0,
             'active'        => $liveRoomsTrue,
             'inactive'      =>  $liveRoomsFalse,
+        ]);
+    }
+
+    public function getStats()
+    {
+        $countryID = $this->countryId();
+
+        $agencyCount = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))->count();
+
+        $user_salaries = UserSallary::whereHas('user', function ($q) use ($countryID) {
+            $q->where('agency_id', '!=', 0)
+                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+                ->whereHas('agency', fn($a) => $a->when($countryID, fn($q) => $q->where('country_id', $countryID)));
+        })->sum(DB::raw('sallary - cut_amount'));
+
+        $agency_salaries = AgencySallary::whereHas(
+            'agency',
+            fn($q) =>
+            $q->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        )->sum(DB::raw('sallary - cut_amount'));
+
+        $activeAgencies = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->whereHas('agencySalaries', fn($q) => $q->where('month', now()->month)->where('year', now()->year))
+            ->count();
+
+        $newAgenciesToday = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->whereDate('created_at', today())
+            ->count();
+
+        $newAgenciesMonth = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $avgAgencyWallet = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))->avg('coins');
+
+        $totalMembers = User::when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->where('agency_id', '!=', 0)
+            ->whereHas('agency', fn($q) => $q->when($countryID, fn($q) => $q->where('country_id', $countryID)))
+            ->count();
+
+        $avgMembersPerAgency = $agencyCount > 0 ? round($totalMembers / $agencyCount) : 0;
+
+        $pendingJoins = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->whereHas('joinRequests', fn($q) => $q->where('status', 1))
+            ->count();
+
+        $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->when($countryID, fn($q) => $q->where('country_id', $countryID)))
+            ->whereHas('agency', fn($q) => $q->when($countryID, fn($q) => $q->where('country_id', $countryID)))
+            ->sum('achieved_diamond');
+
+        return response()->json([
+            'agencyCount' => $agencyCount,
+            'user_salaries' => round($user_salaries),
+            'agency_salaries' => round($agency_salaries),
+            'activeAgencies' => $activeAgencies,
+            'newAgenciesToday' => $newAgenciesToday,
+            'newAgenciesMonth' => $newAgenciesMonth,
+            'avgAgencyWallet' => round($avgAgencyWallet),
+            'totalMembers' => $totalMembers,
+            'avgMembersPerAgency' => $avgMembersPerAgency,
+            'pendingJoins' => $pendingJoins,
+            'diamondsAchieved' => $diamondsAchieved,
         ]);
     }
 }

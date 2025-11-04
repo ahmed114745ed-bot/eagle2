@@ -405,6 +405,7 @@ Route::group(
             Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
             Route::get('comparison-agencies-target', [AllStatisticController::class, 'comparisonAgencyTarget']);
             Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
+            Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
