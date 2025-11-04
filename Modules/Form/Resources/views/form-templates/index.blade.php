@@ -60,7 +60,7 @@
             <div class="p-6 bg-gray-50">
                 {{-- Copy Form Link Button --}}
                 <div class="mb-3">
-                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type]) }}', this)"
+                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type , 'token' => (auth()->user()?->api_token ?? '')]) }}', this)"
                             class="w-full bg-green-600 text-white text-center px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
                         <i class="fas fa-link {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
                         <span class="button-text">{{ __('Copy') }}</span>
