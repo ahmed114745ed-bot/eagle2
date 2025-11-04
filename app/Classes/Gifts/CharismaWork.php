@@ -49,6 +49,8 @@ class CharismaWork implements RoomJobInterface
 //                    $user_id = $userData['user_id'];
                     $user_id = $userData[array_key_first($userData)]['user_id'] ?? null;
                     $total   = $userData[array_key_first($userData)]['total'] ?? 0;
+                    info('$user_id', $user_id);
+                    info('total', $total);
                     if (!isset($result[$room_id])) {
                         $result[$room_id] = [
                             'room_id' => $room_id,
