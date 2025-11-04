@@ -14,7 +14,7 @@ use Modules\Vip\Http\Controllers\Api\VipController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan' ,'update.last.seen'])->group(
     function () {
         
         Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {

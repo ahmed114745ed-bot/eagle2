@@ -8,6 +8,7 @@ use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\LogUserCumulativeCoinProfit;
+use App\Models\AllGame;
 use App\Models\Room;
 use DB;
 use App\Models\User;
@@ -86,9 +87,13 @@ class BaishunGameController extends Controller
 
                 $userDi += (int) $request->currency_diff;
 
-                // Insert into coin_game_users after all checks
                 $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
-
+                $game = AllGame::where('custom_id', $request->game_id)->first();
+                
+                if (empty($gameId) && $game) {
+                    $gameId = $game->id;
+                }
+                
                 DB::table('coin_game_users')->insert([
                     'user_id' => $id,
                     'coins' => abs($request->currency_diff),

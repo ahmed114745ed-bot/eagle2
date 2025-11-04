@@ -63,7 +63,7 @@ class BdSalariesController extends AdminController
         });
     }
 
-    
+
 
     /**
      * Make a grid builder.
@@ -72,34 +72,34 @@ class BdSalariesController extends AdminController
      */
     protected function grid()
     {
-       
-       
+
+
     $grid = new Grid(new BdAgencyHostSallary());
     $appID = Auth::user()->id;
 
- 
+
 
     $grid->model()
         ->where('bd_id', $appID)
         ->with('agency')
         ->selectRaw('
-            agency_id, 
+            agency_id,
             month,
             year,
-            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary,
             COUNT(*) as count,
             (
-                SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
-                FROM user_sallaries 
-                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                    AND month = bd_agency_host_sallaries.month 
+                SELECT SUM(CAST(sallary AS DECIMAL(15,4)))
+                FROM user_sallaries
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id
+                    AND month = bd_agency_host_sallaries.month
                     AND year = bd_agency_host_sallaries.year
             ) as total_user_sallary,
             (
-                SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
-                FROM user_sallaries 
-                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                    AND month = bd_agency_host_sallaries.month 
+                SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4)))
+                FROM user_sallaries
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id
+                    AND month = bd_agency_host_sallaries.month
                     AND year = bd_agency_host_sallaries.year
             ) as total_agency_sallary
         ')
@@ -107,7 +107,7 @@ class BdSalariesController extends AdminController
         ->orderBy('year', 'desc')
         ->orderBy('month', 'desc');
 
-            
+
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->filter(function (Grid\Filter $filter) {
@@ -127,7 +127,7 @@ class BdSalariesController extends AdminController
                 11 => __('November'),
                 12 => __('December'),
             ]);
-        
+
             $currentYear = now()->year;
             $years = [];
             for ($i = $currentYear; $i >= $currentYear - 10; $i--) {
@@ -139,7 +139,7 @@ class BdSalariesController extends AdminController
                 \App\Models\Agency::where('bd_id',Auth::id())->pluck('name', 'id')->toArray()
             );
         });
-        
+
         $grid->column('agency.name', trans('agency'))->display(function () {
             $agency = $this->agency;
             if (request()->filled('_export_')) {
@@ -148,22 +148,22 @@ class BdSalariesController extends AdminController
             if (!$agency) {
                 return "<span style='color:red;'>No agency</span>";
             }
-    
+
             $cacheKey = "agency_image_{$agency->id}";
             $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
                 $path = @$agency->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-    
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
-    
+
                 return handleShowImageWithTypes($agency->id, $url, 40, 40);
             });
-    
+
             $profileUrl = route('bd.agency.profile', ['id' => $agency->id]);
-    
+
             return "
                 <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
@@ -176,18 +176,18 @@ class BdSalariesController extends AdminController
                 </a>
             ";
         });
-    
+
         $grid->column('total_bd_sallary', trans('totalBd'))->display(function ($value) {
-          
+
             return truncateAndTrim($value , 2);
         });
-        
+
         $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
 
             return truncateAndTrim($value, 2);
         });
-        
-        
+
+
         $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
             return truncateAndTrim($value , 2);
         });
@@ -205,7 +205,7 @@ class BdSalariesController extends AdminController
         // });
         return $grid;
     }
-    
+
     /**
      * Make a show builder.
      *

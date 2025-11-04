@@ -54,6 +54,8 @@ class ResetUserMonthlyDiamond extends Command
 
                 $this->calculateUserSalary();
             }
+         
+            $this->info('users:ResetUserMonthlyDiamond Command Run Successfully !');
 
 
         }catch (\Exception $exception){

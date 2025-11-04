@@ -25,4 +25,4 @@ Route::group([
 });
 
 Route::post('agencies/rewards/{id}/send', [TribeController::class, 'sendUserRewards'])
-    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']);
+    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization'  ,'update.last.seen']);

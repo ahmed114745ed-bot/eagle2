@@ -62,7 +62,11 @@ class ChargeAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new EntitiesChargeAgency());
-        $grid->model()->whereHas('agency');
+        $countryID =session('filter_country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
+            ->whereHas('agency');
 
         $grid->id(__('ID'));
         $grid->column('agency.name', __('Agency'))->display(function ($name) {

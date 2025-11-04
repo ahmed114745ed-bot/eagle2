@@ -43,7 +43,7 @@ class ProfileService
             $data['email'] = $request->email;
         }
         if ($request->uuid) {
-            // $data['firebase_uuid'] = $request->uuid;
+            $data['firebase_uuid'] = $request->uuid;
         }
         $user = $this->profileRepo->updateUser($request->user(), $data);
 

@@ -57,9 +57,10 @@ class MilestonesSeeder extends Seeder
         ];
 
         foreach ($milestones as $milestone) {
-            Milestone::create($milestone);
+            Milestone::firstOrCreate(
+                ['slug' => $milestone['slug']], // check by slug
+                $milestone                      // create if not exist
+            );
         }
-
-    
     }
 }

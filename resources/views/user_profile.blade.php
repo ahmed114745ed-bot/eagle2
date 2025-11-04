@@ -1117,7 +1117,13 @@
                 <div class="meta-item">
                     <span class="meta-label">{{__("Phone")}}:</span>
                     <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
+                    <span class="meta-label">{{ __("country") }}:</span>
+                 <img src="{{ getImagePath(@$user->country->flag) }}"
+                     class="flag-image"
+                     alt="flag Image"
+                     title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
                 </div>
+               
 
             </div>
             <div class="agency-stats">
@@ -1217,7 +1223,7 @@
 
         <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('vips') }}</a>
 
-        @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+        @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))

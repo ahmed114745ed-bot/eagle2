@@ -258,33 +258,65 @@ class SendGiftService
         return json_encode($ms);
     }
 
-    public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $microphone)
+    public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $room)
     {
         if (!($pk instanceof Pk)) return;
 
-        $m      = explode(',', $microphone);
-        $mic_1  = @$m[1] ?? 0;
-        $mic_2  = @$m[2] ?? 0;
-        $mic_3  = @$m[3] ?? 0;
-        $mic_4  = @$m[4] ?? 0;
-        $mic_5  = @$m[5] ?? 0;
-        $mic_6  = @$m[6] ?? 0;
-        $mic_7  = @$m[7] ?? 0;
-        $mic_8  = @$m[8] ?? 0;
-        $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
-        $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
-        $t1     = implode(',', $team_1);
-        $t2     = implode(',', $team_2);
+//        $m      = explode(',', $microphone);
+//        $mic_1  = @$m[1] ?? 0;
+//        $mic_2  = @$m[2] ?? 0;
+//        $mic_3  = @$m[3] ?? 0;
+//        $mic_4  = @$m[4] ?? 0;
+//        $mic_5  = @$m[5] ?? 0;
+//        $mic_6  = @$m[6] ?? 0;
+//        $mic_7  = @$m[7] ?? 0;
+//        $mic_8  = @$m[8] ?? 0;
+//        $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
+//        $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
+//        $t1     = implode(',', $team_1);
+//        $t2     = implode(',', $team_2);
+//
+//        foreach ($receivedIds as $toUid) {
+//            if (in_array($toUid, $team_1)) {
+//                $pk->t1_score += $giftPrice;
+//            } elseif (in_array($toUid, $team_2)) {
+//                $pk->t2_score += $giftPrice;
+//            }
+//        }
+//        $pk->team_1 = $t1;
+//        $pk->team_2 = $t2;
+//        $pk->save();
+
+        $microphones = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->keyBy('position');
+
+        $team1Positions = [1, 2, 5, 6];
+        $team2Positions = [3, 4, 7, 8];
+
+        $team1 = collect($team1Positions)
+            ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $team2 = collect($team2Positions)
+            ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
+            ->filter()
+            ->values()
+            ->toArray();
 
         foreach ($receivedIds as $toUid) {
-            if (in_array($toUid, $team_1)) {
+            if (in_array($toUid, $team1)) {
                 $pk->t1_score += $giftPrice;
-            } elseif (in_array($toUid, $team_2)) {
+            } elseif (in_array($toUid, $team2)) {
                 $pk->t2_score += $giftPrice;
             }
         }
-        $pk->team_1 = $t1;
-        $pk->team_2 = $t2;
+
+        $pk->team_1 = implode(',', $team1);
+        $pk->team_2 = implode(',', $team2);
         $pk->save();
 
         $ms   = [
@@ -347,35 +379,68 @@ class SendGiftService
         return $info;
     }
 
-    public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $microphone) :  array
+    public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room) :  array
     {
         if(!($pk instanceof Pk)) return [];
 
-        $m = explode (',',$microphone);
-        $mic_1 = isset($m[0])?$m[0]:0;
-        $mic_2 = isset($m[1])?$m[1]:0;
-        $mic_3 = isset($m[2])?$m[2]:0;
-        $mic_4 = isset($m[3])?$m[3]:0;
-        $mic_5 = isset($m[4])?$m[4]:0;
-        $mic_6 = isset($m[5])?$m[5]:0;
-        $mic_7 = isset($m[6])?$m[6]:0;
-        $mic_8 = isset($m[7])?$m[7]:0;
-        $mic_9 = isset($m[8])?$m[8]:0;
-        $team_1 = [$mic_2,$mic_3,$mic_6,$mic_7];
-        $team_2 = [$mic_4,$mic_5,$mic_8,$mic_9];
-        $t1 = implode (',',$team_1);
-        $t2 = implode (',',$team_2);
+//        $m = explode (',',$microphone);
+//        $mic_1 = isset($m[0])?$m[0]:0;
+//        $mic_2 = isset($m[1])?$m[1]:0;
+//        $mic_3 = isset($m[2])?$m[2]:0;
+//        $mic_4 = isset($m[3])?$m[3]:0;
+//        $mic_5 = isset($m[4])?$m[4]:0;
+//        $mic_6 = isset($m[5])?$m[5]:0;
+//        $mic_7 = isset($m[6])?$m[6]:0;
+//        $mic_8 = isset($m[7])?$m[7]:0;
+//        $mic_9 = isset($m[8])?$m[8]:0;
+//        $team_1 = [$mic_2,$mic_3,$mic_6,$mic_7];
+//        $team_2 = [$mic_4,$mic_5,$mic_8,$mic_9];
+//        $t1 = implode (',',$team_1);
+//        $t2 = implode (',',$team_2);
+//
+//        foreach ($receivedIds as $toUid) {
+//            if (in_array($toUid, $team_1)) {
+//                $pk->t1_score += $giftPrice;
+//            } elseif (in_array($toUid, $team_2)) {
+//                $pk->t2_score += $giftPrice;
+//            }
+//        }
+//        $pk->team_1 = $t1;
+//        $pk->team_2 = $t2;
+//        $pk->save();
+
+        $microphones = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->keyBy('position');
+
+        $team1Positions = [1, 2, 5, 6];
+        $team2Positions = [3, 4, 7, 8];
+
+        $team1 = collect($team1Positions)
+            ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $team2 = collect($team2Positions)
+            ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
+            ->filter()
+            ->values()
+            ->toArray();
 
         foreach ($receivedIds as $toUid) {
-            if (in_array($toUid, $team_1)) {
+            if (in_array($toUid, $team1)) {
                 $pk->t1_score += $giftPrice;
-            } elseif (in_array($toUid, $team_2)) {
+            } elseif (in_array($toUid, $team2)) {
                 $pk->t2_score += $giftPrice;
             }
         }
-        $pk->team_1 = $t1;
-        $pk->team_2 = $t2;
-        $pk->save();
+
+        $pk->update([
+            'team_1' => implode(',', $team1),
+            'team_2' => implode(',', $team2),
+        ]);
 
         return ["end_at" => $pk->end_at, 't1_score' => $pk->t1_score, 't2_score' => $pk->t2_score];
     }

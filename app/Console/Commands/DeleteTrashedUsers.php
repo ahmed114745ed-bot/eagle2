@@ -35,6 +35,6 @@ class DeleteTrashedUsers extends Command
            $item->forceDelete() ;
         });
 
-//        $this->info("Permanently deleted {$trashedUsers} user(s).");
+       $this->info("Permanently deleted {$trashedUsers} user(s).");
     }
 }

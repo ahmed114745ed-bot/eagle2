@@ -150,8 +150,9 @@
     }
 
     .rtl .small-box .icon{
-        width: 96%;
+        width: 100%;
         text-align: left;
+        right: -2px !important;
     }
 
     .skin-black-light .main-header > .navbar {
@@ -724,6 +725,12 @@
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     color: var(--inverse-box-color) !important;
 }
+.flag-image {
+    height: 30px;  /* adjust size */
+    width: auto;
+    margin-top: 10px;
+    border-radius: 4px; /* optional */
+}
 
 /* RTL override */
 html.rtl .dropdown-menu {
@@ -756,11 +763,11 @@ html.ltr .dropdown-menu {
         right: 0;
     }
 
-    
+
     .rtl  .column-reward .rtlSvga {
             direction: ltr !important;
         }
-  
+
     select>option{
         background-color: var(--box-background-color) !important;
         color: var(--inverse-box-color) !important;
@@ -886,7 +893,7 @@ html.ltr .dropdown-menu {
                 position: absolute;
             } */
             .rtl .sidebar-toggle {
-                            direction: rtl !important;
+                direction: rtl !important;
                 float: right !important;
             }
 
@@ -1081,7 +1088,7 @@ html.ltr .dropdown-menu {
     }
 
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-left,
-    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,
+    /*.rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,*/
     .rtl .sidebar-menu .treeview.active > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,
@@ -1260,4 +1267,47 @@ html.ltr .dropdown-menu {
         margin-left: 50px;
     }
 
+    @media (max-width: 768px) {
+        .col-md-3,
+        .col-sm-6 {
+            flex: 0 0 100%;
+            width: 50%;
+        }
+    }
+
+    .small-box h3{
+        font-size: x-large !important;
+    }
+
+    .small-box:hover .icon{
+        font-size: 80px;
+        transform: translateY(-37px);
+        transition: all 0.3s ease;
+    }
+
+    .small-box .icon{
+        font-size: 50px;
+        top: 25px;
+        right: 2px;
+    }
+
+    .preview-superadmin-btn,
+    .exit-preview-btn{
+        border: none;
+        border-radius: 4px;
+        padding: 4px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .select-country .select2-container{
+        margin-top: 12px;
+    }
+
+    #go-superadmin i {
+        font-size: 15px;
+    }
 </style>

@@ -79,10 +79,7 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        Log::info('Stripe Webhook received', [
-            'payload' => $request->getContent(),
-            'all'     => $request->all(),
-        ]);
+
 
         $apiKey         = Setting::where('key', 'stripe_test_secret_key')->value('value');
         $endpointSecret = Setting::where('key', 'stripe_webhook_secret')->value('value');
@@ -165,7 +162,6 @@ class StripeController extends Controller
                 break;
 
             default:
-                Log::info("Unhandled Stripe event type", ['event' => $event->type]);
         }
 
         return [$orderId, $trxId, $status];
@@ -217,7 +213,6 @@ class StripeController extends Controller
     private function isAlreadyProcessed(CoinLog $coinLog): bool
     {
         if ($coinLog->status == 1) {
-            Log::info("Stripe Webhook: CoinLog {$coinLog->id} already processed");
             return true;
         }
         return false;
@@ -231,7 +226,6 @@ class StripeController extends Controller
             'status' => true,
         ]);
     
-        Log::info("Stripe Webhook: CoinLog {$coinLog->id} marked as paid");
     }
     
  
@@ -264,13 +258,11 @@ class StripeController extends Controller
     
         (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
     
-        Log::info("Stripe Webhook: User {$user->id} credited with {$coinLog->obtained_coins} coins");
     }
 
     private function processAgencyPayment(ShippingAgency $agency, CoinLog $coinLog): void
     {
         $agency->increment('coins', $coinLog->obtained_coins);
-        Log::info("Stripe Webhook: User {$agency->id} credited with {$coinLog->obtained_coins} coins");
     }
     
     private function finalizeResponse(CoinLog $coinLog)

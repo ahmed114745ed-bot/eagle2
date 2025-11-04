@@ -68,8 +68,9 @@ class TicketController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Ticket);
+        $countryID =session('filter_country_id');
 
-//        $grid->model ()->where ('status',1);
+        $grid->model()->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 
 
         $grid->id(__ ('ID_tiket'));
@@ -191,7 +192,7 @@ class TicketController extends MainController
     {
         $form = new Form(new Ticket);
         $this->disableFormTools($form);
-        
+
         $form->display('ID');
 //        $form->text('user_id', 'user_id');
         $form->text('contact_num', __('contact'));

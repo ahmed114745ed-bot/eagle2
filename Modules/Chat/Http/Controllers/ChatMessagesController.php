@@ -72,11 +72,10 @@ class ChatMessagesController extends Controller
             ], 404);
         }
 
-        //get user 2
-        if ($chatRoom->user_id == $user->id) {
-            $user2 = User::withoutAppends()->find($chatRoom->user_id2);
-        } else {
+        if ($chatRoom->user_id != $user->id) {
             $user2 = User::withoutAppends()->find($chatRoom->user_id);
+        } else {
+            $user2 = User::withoutAppends()->find($chatRoom->user_id2);
         }
 
         //Files Validations
@@ -126,6 +125,9 @@ class ChatMessagesController extends Controller
         if ($totalDistinctUsers >= 2) {
             $chatRoom->type = 'friend';
         }
+
+        \Log::info('room_resource ', ['room_resource' => $response['room_resource']]);
+        \Log::info('room_resource ', ['room_resource' => $response['room_resource'] , 'room req' => $response['message_resource']->toResponse(request())->getData()->data]);
 
         try {
             // return $user2;

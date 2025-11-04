@@ -25,7 +25,7 @@ class WhatsappOtp
         if ($data?->count >= 10) {
             throw new \Exception(__('you spend all chances'));
         } else if (Carbon::createFromTimeString($data?->created_at ?? now()->copy()->subDay()->toDateTimeString())->addMinutes(2) > now()) {
-            throw new Exception(__('whatsapp.wait-2-minutes'));
+            throw new Exception(__('wait-2-minutes'));
         }
 
 

@@ -51,17 +51,17 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
     public function handle()
     {
   
-        \Log::info('🚀 AllOpeningRoomsZegoRequest started', [
-            'roomID'   => $this->roomID,
-            'senderId' => $this->senderId,
-        ]);
+        // \Log::info('🚀 AllOpeningRoomsZegoRequest started', [
+        //     'roomID'   => $this->roomID,
+        //     'senderId' => $this->senderId,
+        // ]);
         
-        $useZego = Config::where('name', 'use_zego')->value('value');
+        // $useZego = Config::where('name', 'use_zego')->value('value');
 
-        if (!$useZego){
-            event(new BannerEvent(json_decode($this->json, true)));
-            return;
-        }
+        // if (!$useZego){
+        //     event(new BannerEvent(json_decode($this->json, true)));
+        //     return;
+        // }
 
         $rooms = Cache::remember('allRooms', 60, function (){
             return Room::withoutAppends()->where('room_status', 1)->where(function ($q) {

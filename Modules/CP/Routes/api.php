@@ -17,7 +17,7 @@ use Modules\CP\Http\Controllers\Api\CpRelationController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'localization'])->group(function () {
+Route::middleware(['auth:sanctum', 'localization' ,'update.last.seen'])->group(function () {
     Route::get('/cp-relations', [CpRelationController::class, 'index']);
     Route::post('/make-cp-request', [CpController::class, 'makeRequestCp']);
     Route::get('/get-cp-request', [CpController::class, 'getRequestCp']);
