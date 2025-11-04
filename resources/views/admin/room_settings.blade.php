@@ -327,7 +327,7 @@
                         <input class="form-control" type="number" name="special_bar_coin"
                                value="{{ $settings['special_bar_coin'] ?? '' }}">
 
-                        <div class="feature-toggle-container">
+                        {{-- <div class="feature-toggle-container">
                             <span class="toggle-label">{{ __('Use Zego') }}</span>
                             <!-- Hidden Fallback -->
                             <input type="hidden" name="use_zego" value="0">
@@ -337,7 +337,7 @@
                                     {{ isset($settings['use_zego']) && $settings['use_zego'] == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
                             </label>
-                        </div>
+                        </div> --}}
 
                         <button type="submit">{{ __('save') }}</button>
                     </div>

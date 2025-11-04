@@ -1,8 +1,6 @@
 <?php
 
-use App\Admin\Controllers\AuthController;
 use App\Models\Bd;
-use App\Models\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -11,6 +9,7 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Models\Country;
 use App\Models\BDSallary;
+use App\Models\SuperAdmin;
 use  App\helper\TimeHelper;
 use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
@@ -29,17 +28,20 @@ use App\Admin\Controllers\BdController;
 use App\Jobs\UpdateUserFollowCountsJob;
 use Illuminate\Support\Facades\Artisan;
 use App\Helpers\AdminNotificationHelper;
+use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\UserController;
 use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\SettingsController;
 use App\Helpers\SuperAdminNotificationHelper;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -201,6 +203,7 @@ Route::get('/clear_clear', function () {
 
     return "Cleared!";
 });
+Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 
 Route::get('/seed', function () {
 
@@ -257,9 +260,8 @@ Route::get('delete-account', function () {
     return view('deleteAccount', compact("data"));
 });
 
-Route::get('/', function () {
-    return response()->json();
-});
+Route::get('/', [WelcomeController::class, 'index']);
+
 
 Route::group(
     [

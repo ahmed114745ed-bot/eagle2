@@ -51,7 +51,7 @@ class ParentUsersController extends MainController
     protected function parents()
     {
         $grid = new Grid(new User());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->where('country_id', $countryID);

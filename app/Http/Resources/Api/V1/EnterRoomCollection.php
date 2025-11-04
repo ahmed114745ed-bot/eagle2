@@ -53,7 +53,8 @@ class EnterRoomCollection extends JsonResource
             "admins"              => explode(',', $this->room_admin ?? ''), // room admins
             "pk"                  => (@$pks[0]) && $pks[0]->end_at >= now() ? new PkCollection($pks[0]) : new \stdClass(), // all pk data
             "room_intro"          => $this->room_intro, // room intro
-            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
+//            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
+            "microphones"         => $this->getMicrophones2(), // seat states
             "cp_indexs"           => $indices, // cp
             "charisma_status"     => ($this->charizma_status) ? true : false, // isCharisma
             "is_comment_closed"   => $this->is_comment_closed ,
@@ -249,6 +250,49 @@ class EnterRoomCollection extends JsonResource
         }
         return $microphones;
     }
+
+    private function getMicrophones2()
+    {
+        $microphones = $this->microphones
+            ->sortBy('position')
+            ->values();
+
+        $maxPosition = $microphones->max('position') ?? 0;
+
+        $micsByPosition = $microphones->keyBy('position');
+
+        $result = [];
+        for ($i = 0; $i <= $maxPosition; $i++) {
+            if (!isset($micsByPosition[$i])) {
+                $result[] = 'empty';
+                continue;
+            }
+
+            $mic = $micsByPosition[$i];
+            $status = (string) $mic->status;
+
+            $seatCondition = match ($status) {
+                '0'  => 'empty',
+                '-1' => 'locked',
+                '-2' => 'muted',
+                default => 'empty'
+            };
+
+            if (!$mic->user) {
+                $result[] = $seatCondition;
+            } else {
+                $result[] = [
+                    'id'   => $mic->user->id,
+                    'name' => $mic->user->name,
+                    'img'  => $mic->user->profile?->avatar ?? '',
+                    'seat_condition' => $seatCondition,
+                ];
+            }
+        }
+
+        return $result;
+    }
+
 
     private function getUserType($roomAdmin, $roomJudge)
     {

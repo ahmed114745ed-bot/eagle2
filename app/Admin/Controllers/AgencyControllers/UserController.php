@@ -111,7 +111,7 @@ class UserController extends MainController
     protected function gridProfessional()
     {
         $grid = new Grid(new User());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $haveCoins = (request()->have_coins == 1);
         $grid->model()
             ->ofAgency()
@@ -465,7 +465,7 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);

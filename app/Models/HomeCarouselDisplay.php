@@ -115,12 +115,12 @@ class HomeCarouselDisplay extends Model
             $model->end_at = $endAt;
          });
  
-         self::updating(function ($model) {
+         self::updating(function ($model) {      
              if ($model->isDirty(['duration', 'duration_unit'])) {
                  $startAt = $model->created_at ?? Carbon::now();
                  $endAt = clone $startAt;
- 
-                 switch ($model->duration_unit) {
+
+                 switch ($model->duration_unit) { 
                      case 'hours':
                          $endAt->addHours($model->duration);
                          break;
