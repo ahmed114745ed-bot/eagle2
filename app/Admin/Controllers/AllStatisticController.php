@@ -151,29 +151,7 @@ class AllStatisticController extends MainController
             SUM(total_loss - total_win) as app_profit
         ")->first();
 
-
-        //rooms
-        $roomCounts = Room::whereHas('owner.country', function ($q) use ($countryID) {
-            $q->where('id', $countryID);
-        })
-            ->whereHas('roomVisitors')
-            ->selectRaw("type, COUNT(*) as total")
-            ->groupBy('type')
-            ->pluck('total', 'type');
-
-        $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->where('type', 'live')
-            ->selectRaw('is_live, COUNT(*) as total')
-            ->groupBy('is_live')
-            ->pluck('total', 'is_live');
-
-        $liveRoomsTrue = $liveRooms[1] ?? 0;
-        $liveRoomsFalse = $liveRooms[0] ?? 0;
-
+       
         //agencies
         $agencyCount = Agency::when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
@@ -265,7 +243,7 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                 }
             })
-            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser, $roomCounts, $agency_salaries, $user_salaries, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $liveRoomsTrue, $liveRoomsFalse, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
+            ->row(function (Row $row) use ($agencyCount, $usersCount, $bdCount, $onlineUser,  $agency_salaries, $user_salaries, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,   $activeAgencies, $newAgenciesToday, $newAgenciesMonth, $avgAgencyWallet, $totalMembers, $avgMembersPerAgency, $pendingJoins, $diamondsAchieved, $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
                 $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
@@ -344,15 +322,12 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($roomCounts,  $liveRoomsTrue, $liveRoomsFalse) {
+                $row->column(12, function ($column)  {
                     $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
 
-                    $column->row(function (Row $row) use ($roomCounts, $liveRoomsTrue, $liveRoomsFalse,) {
-                        $row->column(3, new InfoBox(__('Audio Rooms'), 'headphones', 'blue', 'superadmin/rooms?online=1', $roomCounts['audio'] ?? 0));
-                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'green', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
-                        $row->column(3, new InfoBox(__('Live Rooms'), 'microphone', 'purple', 'superadmin/live-rooms?online=1', $roomCounts['live'] ?? 0));
-                        $row->column(3, new InfoBox(__('Live Rooms (Active)'), 'microphone', 'green', 'superadmin/live-rooms?is_live=1', $liveRoomsTrue));
-                        $row->column(3, new InfoBox(__('Live Rooms (Inactive)'), 'microphone-slash', 'red', 'superadmin/live-rooms?is_live=0', $liveRoomsFalse));
+                    $column->row(function ($row) {
+                        $view = view('admin.dashboard.widgets.room_tab')->render();
+                        $row->column(12, $view);
                     });
 
                     $column->row(function (Row $row) {
@@ -866,6 +841,37 @@ class AllStatisticController extends MainController
         return response()->json([
             'achieved'    => $achievedAgencies,
             'notAchieved' => $notAchievedAgencies,
+        ]);
+    }
+
+    public function roomStats()
+    {
+        $countryID = request('country_id', Auth::user()->country_id);
+
+        $roomCounts = Room::whereHas('owner.country', fn($q) => $q->where('id', $countryID))
+            ->whereHas('roomVisitors')
+            ->selectRaw("type, COUNT(*) as total")
+            ->groupBy('type')
+            ->pluck('total', 'type');
+
+
+        $liveRooms = Room::whereHas('owner', function ($q) use ($countryID) {
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            });
+        })
+            ->where('type', 'live')
+            ->selectRaw('is_live, COUNT(*) as total')
+            ->groupBy('is_live')
+            ->pluck('total', 'is_live');
+
+        $liveRoomsTrue = $liveRooms[1] ?? 0;
+        $liveRoomsFalse = $liveRooms[0] ?? 0;
+        return response()->json([
+            'audio'         => $roomCounts['audio'] ?? 0,
+            'live'          => $roomCounts['live'] ?? 0,
+            'active'        => $liveRoomsTrue,
+            'inactive'      =>  $liveRoomsFalse,
         ]);
     }
 }
