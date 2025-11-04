@@ -133,7 +133,7 @@ class GiftLogService
                 }else{
                     $to    = __('live');
                 }
-               
+
             } else {
                 $to_id = $receiversIds[0];
                 $to    = @$receivedUsers->first()->name;
@@ -159,7 +159,7 @@ class GiftLogService
 
             if ($room->lastPk != null) {
 
-                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))
+                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
                     ->afterCommit()
                     ->onQueue('updatePk');
             }
@@ -217,9 +217,9 @@ class GiftLogService
             // (new RoomAchievementTargetService)->roomTarget($room);
 
             // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
-            
 
-            
+
+
                 $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
 
 
