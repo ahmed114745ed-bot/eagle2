@@ -1105,7 +1105,7 @@ class RoomController extends Controller
 
         if ($result) {
             //exit the room
-            Common::quit_hand($uid, $black_id);
+            Common::quit_hand_2($uid, $black_id);
             $user = User::find($black_id);
             if ($user) {
                 $user->now_room_uid = 0;

@@ -111,7 +111,7 @@ class EnteranceRoomServices
 
             $userCharismaService = new UserCharismaService();
             $userCharismaService->resetUserCharisma($userId, $room->id);
-            $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$userId]);
+            $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$userId]);
 
             $ms = [
                 'messageContent' => [
@@ -432,7 +432,7 @@ class EnteranceRoomServices
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
         $ms = [
             'messageContent' => [
