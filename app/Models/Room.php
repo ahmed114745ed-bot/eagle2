@@ -159,15 +159,33 @@ class Room extends Model
         return numToString($this->session);
     }
 
+//    public function getMicrophoneAttribute()
+//    {
+//        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
+//        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
+//        $array = array_map(function ($id) {
+//            return explode('#', $id)[0];
+//        }, $microphoneWithOldSeat);
+//
+//        return implode(',', $array);
+//    }
+
     public function getMicrophoneAttribute()
     {
-        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
-        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
-        $array = array_map(function ($id) {
-            return explode('#', $id)[0];
-        }, $microphoneWithOldSeat);
+        return $this->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($mic) {
+                $userId = $mic->user_id ?? 0;
+                $status = $mic->status ?? 0;
 
-        return implode(',', $array);
+                if ($userId > 0) {
+                    return "{$userId}#{$status}";
+                } else {
+                    return (string)$status;
+                }
+            })
+            ->implode(',');
     }
 
     public function getMicrophoneOnlyUsersAttribute()
