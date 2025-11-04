@@ -6,9 +6,13 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Selectables\Agencies;
+use App\Selectables\Families;
+use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Models\OfficialMessageAdmin;
+use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
 
@@ -69,7 +73,12 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $grid->model()->where('type', 2)->orderByDesc('id');
+        $countryID =session('filter_country_id');
+
+        $grid->model()->whereNull('admin_id')
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->where('type', 2)->orderByDesc('id');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -103,6 +112,7 @@ class OfficialMessageController extends MainController
 
 
         $grid->content(__('content'));
+        $grid->feature(__('type'));
         $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
@@ -149,6 +159,9 @@ class OfficialMessageController extends MainController
         $grid->disableExport();
 
         $this->extendGrid($grid);
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
         return $grid;
     }
 
@@ -199,23 +212,89 @@ class OfficialMessageController extends MainController
     {
         $form = new Form(new OfficialMessageAdmin);
         $this->disableFormTools($form);
-
         $form->display('ID');
-        $form->text('title', __('title'))->rules('nullable|max:255');;
+        $form->text('title', __('title'))->rules('required|max:255');
+        $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
-        $form->select('user_id', __('user'))->options(function ($search) {
-            $ops = [0 => __('all')];
-            return $ops;
-        })->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name', 'uuid');
-        $form->text('content', __('content'));
-        $form->select('type', __('type'))->options(
-            [
-                2 => trans(__('official message'))
-            ]
-        )->default(2);
         $form->text('url', __('url'));
+        $form->select('language', __('language'))
+            ->options('/api/search/language')
+            ->ajax('/api/search/language', 'code', 'name')->rules('required');
+
+
+        $this->selectFeature($form);
+
+        $form->hidden('type', __('type'))->default(2);
 
 
         return $form;
+    }
+
+    protected function selectFeature(Form $form)
+    {
+        $form->select('feature', trans('feature'))->options([
+            'agency'   => __('agency'),
+            'family' => __('family'),
+            'users'   => __('users'),
+            'bds'  => __('BDs'),
+            'shipping_agency'  => __('shipping agency')
+        ])->when('agency', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all'   => __('all agencies'),
+                'country' => __('All Agencies in Country'),
+                'ids'   => __('Specific Agency by ID'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            })->when('ids', function (Form $form) {
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
+                $form->select('member_title', trans('member'))->options([
+                    'owner'   => __('owner'),
+                    'admin' => __('admins'),
+                    'members'   => __('members'),
+                ]);
+            })->default('owner');
+        })->when('family', function (Form $form) {
+            $form->belongsToMany('family_ids', Families::class, trans('families'));
+            $form->select('member_title', trans('member'))->options([
+                'owner'   => __('owner'),
+                'admin' => __('admins'),
+                'members'   => __('members'),
+            ])->default('owner');
+        })->when('users', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'country' => __('Users in Specific Country'),
+                'logout'   => __('Logged Out Users'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        })->when('bds', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all' => __('All BDS'),
+                'country' => __('Bds in Specific Country'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        })->when('shipping_agency', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all' => __('All Shipping Agencies'),
+                'country' => __('Shipping Agencies in Specific Country'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        });
+
+        $form->saved(function (Form $form) {
+            $model = $form->model();
+            $data = request()->except(['img']);
+            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
+        });
     }
 }

@@ -300,6 +300,56 @@ class RoomRepoService
         return [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $room->id];
     }
 
+    public function quiteRoom2($ownerId = null, User $user, $roomId = null)
+    {
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
+        if (!$room)  throw new \Exception(__("Room not found for this owner."));
+        $isToZegoCharisma = false;
+        $userDataWithCharisma = [];
+        //reset user charisma
+        if (isset($room->charizma_status)) {
+            $userCharismaService = new UserCharismaService();
+            $userCharismaService->resetUserCharisma($user->id, $room->id);
+            $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom2($room, [$user->id]);
+            $isToZegoCharisma = true;
+        }
+
+//        if (isset($room->microphone)) {
+//
+//            $microphones = explode(',', $room->microphone);
+//            if (in_array($user->id, $microphones)) {
+//                UserHandling::calcTime($user->id);
+//            }
+//        }
+
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+        if (in_array($user->id, $micUserIds, true)) {
+            UserHandling::calcTime($user->id);
+        }
+
+        $res = Common::quit_hand_2($ownerId, $user->id);
+        $visitorIdsList = explode(',', $res);
+
+        $user->now_room_uid = 0;
+        $user->save();
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
+
+            $room->update(['is_live' => false]);
+        }
+
+        if ($room->is_afk == null && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+
+        if ($user->id == $ownerId && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+        $this->repository->updateRoomUser($room);
+
+        return [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $room->id];
+    }
 
     public function roomUsers($request,)
     {
@@ -393,12 +443,13 @@ class RoomRepoService
 
     public function changeMode($request, $currentMode)
     {
+        \Log::info('start changeMode');
         $user = request()->user();
         $roomId = $request->room_id;
         $room = $roomId
             ? $this->repository->findById($roomId)
             : $this->repository->findRoomUserEnableAudio($request->owner_id);
-        \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
+        // \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
@@ -447,13 +498,13 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-        \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
+        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
             Utils::unwrap($promises);
         } catch (\Throwable $e) {
-            \Log::error("changeMode: Zego send failed - " . $e->getMessage());
+            // \Log::error("changeMode: Zego send failed - " . $e->getMessage());
         }
         \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 

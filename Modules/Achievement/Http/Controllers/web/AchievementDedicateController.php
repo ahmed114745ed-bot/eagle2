@@ -42,6 +42,7 @@ class AchievementDedicateController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserAchievementLevel());
+        $countryID =session('filter_country_id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -64,6 +65,7 @@ class AchievementDedicateController extends MainController
             });
         });
         $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->when(
                 request('from_date') && request('to_date'),
                 function ($q) {

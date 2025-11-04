@@ -1,0 +1,153 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use KevinSoft\MultiLanguage\MultiLanguage;
+use App\SuperAdmin\Controllers\BdController;
+use App\SuperAdmin\Controllers\AuthController;
+use App\SuperAdmin\Controllers\HomeController;
+use App\SuperAdmin\Controllers\RoleController;
+use App\SuperAdmin\Controllers\RoomController;
+use App\SuperAdmin\Controllers\UserController;
+use App\SuperAdmin\Controllers\AgencyController;
+use App\SuperAdmin\Controllers\ChargeController;
+use App\SuperAdmin\Controllers\WalletController;
+use App\SuperAdmin\Controllers\LiveRoomController;
+use App\SuperAdmin\Controllers\AdminUserController;
+use App\SuperAdmin\Controllers\AgencyUserController;
+use App\SuperAdmin\Controllers\BdSalariesController;
+use App\SuperAdmin\Controllers\HomeCarouselController;
+use App\SuperAdmin\Controllers\MultiLanguageController;
+use App\SuperAdmin\Controllers\RequestAgencyController;
+use App\SuperAdmin\Controllers\ProfessionalBdController;
+use App\SuperAdmin\Controllers\SuperAdminRewardController;
+use App\SuperAdmin\Controllers\AppearChargerAgencyController;
+use App\SuperAdmin\Controllers\SuperadminBannerHistoryController;
+use App\SuperAdmin\Controllers\OfficialMessengerSuperAdminController;
+
+Route::prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+
+Route::group(
+    [
+        'prefix' => 'superadmin',
+        'namespace' => '',
+        'middleware' => [
+            'web',
+            'multiLanguage',
+        ],
+        'as' => 'superadmin.',
+    ],
+    function () {
+        if (MultiLanguage::config("show-login-page", true)) {
+            Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+        }
+        Route::post('login', [AuthController::class, 'postLogin']);
+        Route::get('logout', [AuthController::class, 'logout']);
+        Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);
+        Route::get('change-password-view', [AuthController::class, 'changePasswordView']);
+        Route::get('verify-whatsapp-code', [AuthController::class, 'verifyWhatsappCode'])
+            ->name('verify-whatsapp-code');
+
+        Route::post('change-password', [AuthController::class, 'changePassword'])->name('superadmin.change-password');
+
+        Route::post('send-whatsapp-code-preview', [AuthController::class, 'send_whatsapp_code_preview'])
+            ->name('superadmin.send-whatsapp-code-preview');
+    }
+);
+
+Route::group(
+    [
+        'prefix' => 'superadmin',
+        'namespace' => 'App\\SuperAdmin\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            // 'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => 'superadmin.',
+    ],
+    function () {
+        Route::get('setting', [AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [AuthController::class, 'getSetting']);
+        Route::put('update-setting', [AuthController::class, 'putSetting']);
+
+        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::resource('/salaries', BdSalariesController::class);
+        Route::resource('/charges', ChargeController::class);
+        // Route::resource('/wallet', 'WalletController');
+        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        Route::post('/locale', MultiLanguageController::class . '@locale');
+
+        Route::resource('usersBd', BdController::class);
+
+        //agencies
+        Route::resource('/agencies', AgencyController::class);
+        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+        Route::resource('/request-agencies', RequestAgencyController::class);
+        Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
+            Route::resource('users', AgencyUserController::class);
+            Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
+        });
+        Route::resource('live-rooms', LiveRoomController::class);
+        Route::resource('official-message', OfficialMessengerSuperAdminController::class);
+
+        //users
+        Route::resource('users', 'UserController', [
+            'names' => [
+                'index' => 'users',
+                'show' => 'users.show'
+            ]
+        ]);
+
+        Route::resource('rooms', RoomController::class);
+        Route::get('home-carousel/history', [SuperadminBannerHistoryController::class, 'index'])->name('home-carousel.history');
+
+        Route::resource('home-carousel', HomeCarouselController::class);
+
+        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
+        Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
+
+        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::get('/sub-admins', [ChargeController::class, 'getSubAdmins'])->name('sub.admins');
+
+        Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
+        Route::resource('professional-bd', ProfessionalBdController::class);
+
+        // ajax
+        Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('admin.peak-hours');
+        Route::get('users-online-stats', [HomeController::class, 'onlineStats'])
+            ->name('users.online.stats');
+        Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+        Route::resource('super-admin-rewards', SuperAdminRewardController::class);
+        Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
+        Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
+        ->name('banner.resend');
+
+        Route::prefix('notifications')->group(function () {
+            Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
+            Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
+            Route::get('grid', [ App\SuperAdmin\Controllers\NotificationController::class, 'index'])->name('notifications.grid');
+        });
+
+        Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
+            $user = auth()->user();
+            $user->fcm_token = $request->token;
+            $user->save();
+            return response()->json(['status' => 'success']);
+        });
+        Route::resource('roles', RoleController::class);
+        Route::resource('auth-users', AdminUserController::class);
+    }
+);

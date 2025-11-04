@@ -74,10 +74,12 @@ class ChargeCountryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChargeCountry());
+        $countryID =session('filter_country_id');
+
+        $grid->model()->when($countryID, fn($q) => $q->whereHas('country', fn($q) => $q->where('id', $countryID)));
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
@@ -166,7 +168,7 @@ class ChargeCountryController extends MainController
                         ->get();
 
                     foreach ($ps as $p) {
-                        $ops[$p->id] = $p->name;
+                        $ops[$p->id] = app()->getLocale() === 'ar' ? $p->name : $p->e_name;
                     }
 
                     return $ops;

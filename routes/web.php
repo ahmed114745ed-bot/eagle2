@@ -1,38 +1,52 @@
 <?php
 
-use App\Models\Country;
+use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\CoinLog;
+use App\Models\Country;
+use App\Models\BDSallary;
+use App\Models\SuperAdmin;
 use  App\helper\TimeHelper;
 use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
+use App\Models\UserSallary;
 use App\Exports\AgencyCharge;
+use App\Models\AgencySallary;
 use App\Models\DeleteAccount;
 use App\Models\CoinGameUserAll;
+use App\Models\AdminNotification;
 use App\Facades\CustomNotification;
+use App\Enums\AdminNotificationType;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Modules\Vip\Entities\VipPrivilege;
 use App\Admin\Controllers\BdController;
 use App\Jobs\UpdateUserFollowCountsJob;
+use Illuminate\Support\Facades\Artisan;
+use App\Helpers\AdminNotificationHelper;
+use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\UserController;
+use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\SettingsController;
+use App\Helpers\SuperAdminNotificationHelper;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -165,7 +179,21 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
+Route::get('/run-seeders', function () {
 
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
+    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 Route::get('/clear_clear', function () {
 
     Artisan::call('cache:clear');
@@ -175,6 +203,7 @@ Route::get('/clear_clear', function () {
 
     return "Cleared!";
 });
+Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 
 Route::get('/seed', function () {
 
@@ -231,9 +260,8 @@ Route::get('delete-account', function () {
     return view('deleteAccount', compact("data"));
 });
 
-Route::get('/', function () {
-    return response()->json();
-});
+Route::get('/', [WelcomeController::class, 'index']);
+
 
 Route::group(
     [
@@ -273,11 +301,56 @@ Route::group(
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
-         Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
+        Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
+        Route::resource('auth/users', 'AdminUserController')->names([
+            'index' => 'auth.users.index',
+            'create' => 'auth.users.create',
+            'store' => 'auth.users.store',
+            'show' => 'auth.users.show',
+            'edit' => 'auth.users.edit',
+            'update' => 'auth.users.update',
+            'destroy' => 'auth.users.destroy',
+        ]);
+
+        Route::get('/firebase-config', function () {
+            return response()->json([
+                'apiKey' => config('firebase.apiKey'),
+                'authDomain' => config('firebase.authDomain'),
+                'projectId' => config('firebase.projectId'),
+                'storageBucket' => config('firebase.storageBucket'),
+                'messagingSenderId' => config('firebase.messagingSenderId'),
+                'appId' => config('firebase.appId'),
+                'vapidKey' => config('firebase.vapid_key'),
+            ]);
+        });
+
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
+    }
+);
+
+Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
+
+Route::group(
+    [
+        'prefix' => 'superadmin',
+        'namespace' => 'App\\SuperAdmin\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            // 'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => 'superadmin.',
+    ],
+    function () {
+        Route::get('auth/setting', [\App\SuperAdmin\Controllers\AuthController::class, 'getSetting']);
     }
 );
 
@@ -321,6 +394,9 @@ Route::get('/clear-admin-error', function () {
     return 'Session cleared!';
 });
 
+Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
+Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
+Route::get('/admin/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.superadmin.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
@@ -445,11 +521,11 @@ Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class
 Route::get('/countries/{id}', [SuperAdminCountryController::class, 'index'])->name('countries.preview')->middleware('multiLanguage');
 Route::post('/locale', [SuperAdminCountryController::class, 'locale'])->name('locale');
 
-Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
+Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
-//    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
-//    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
+    //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
+    //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
 
@@ -457,14 +533,14 @@ Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle
 
 Route::get('/test-games', function () {
 
-    $fromDate= request()->get('fromDate');
-    $toDate= request()->get('toDate');
-    $userId= request()->get('userId');
+    $fromDate = request()->get('fromDate');
+    $toDate = request()->get('toDate');
+    $userId = request()->get('userId');
 
     $records = CoinGameUserAll::where('user_id', $userId)
-    ->whereBetween('created_at', [$fromDate, $toDate])
-    ->orderBy('created_at', 'desc')
-    ->get();
+        ->whereBetween('created_at', [$fromDate, $toDate])
+        ->orderBy('created_at', 'desc')
+        ->get();
 
     return $records;
 })->name('test-games');
@@ -506,7 +582,7 @@ Route::get('/archive-old-coin-games', function () {
 
 Route::get('/update-user-follow-counts', function () {
     UpdateUserFollowCountsJob::dispatch()
-    ->onQueue('follow_counts');
+        ->onQueue('follow_counts');
     return response()->json([
         'success' => true,
         'message' => 'done'
@@ -563,16 +639,304 @@ Route::get('/week-zone', function () {
 
 
 Route::get('update-country-id', function () {
-     Artisan::call('db:seed', [
+    Artisan::call('db:seed', [
         '--class' => 'CleanUpDuplicateCountriesSeeder',
     ]);
 
     return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
 });
 
+Route::get('remove-new-country', function () {
+    User::where('country_id', 488)->update(['country_id' => null]);
+
+    Country::where('id', 488)->delete();
+
+    return 'done';
+});
 
 // Main page route
 Route::get('/country/{id}', [SuperAdminCountryController::class, 'index2'])->name('country.show');
 
 // AJAX API route
 Route::get('country/{id}/stats', [SuperAdminCountryController::class, 'getStats'])->name('country.stats');
+Route::get('/fix-agencies-bd', function () {
+    Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
+    ]);
+
+    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
+});
+
+Route::get('assign-super-admin-bd', function () {
+    $bds = Bd::whereNull('parent_id')->get();
+
+    foreach ($bds as $bd) {
+        if (!$bd->country_id) {
+            continue;
+        }
+
+        $superAdmin = SuperAdmin::where('country_id', $bd->country_id)
+            ->where('type', 'superadmin')
+            ->first();
+
+        if ($superAdmin) {
+            $bd->parent_id = $superAdmin->id;
+            $bd->save();
+        }
+    }
+
+    return "Parent IDs updated successfully.";
+});
+
+Route::get('/migrate-home-carousel', function () {
+
+    $carousels = DB::table('home_carousels')->get();
+
+    foreach ($carousels as $carousel) {
+
+        $displayTypes = [];
+        if ($carousel->display_home_top)     $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle)  $displayTypes[] = 'home_middle';
+        if ($carousel->display_live)         $displayTypes[] = 'live';
+        if ($carousel->display_country)      $displayTypes[] = 'country';
+        if ($carousel->display_discover)     $displayTypes[] = 'discover';
+
+
+        $unitMap = [
+            0 => null,
+            1 => 'hours',
+            2 => 'days',
+            3 => 'months',
+        ];
+
+        $unit = $unitMap[$carousel->form ?? 2] ?? 'days';
+
+        $endAt = null;
+        if (!empty($carousel->input) && $carousel->input > 0) {
+            $endAt = match ($unit) {
+                'hours'  => Carbon::parse($carousel->created_at)->addHours($carousel->input),
+                'days'   => Carbon::parse($carousel->created_at)->addDays($carousel->input),
+                'months' => Carbon::parse($carousel->created_at)->addMonths($carousel->input),
+                default  => null,
+            };
+        }
+
+        foreach ($displayTypes as $type) {
+            DB::table('home_carousel_displays')->updateOrInsert(
+                [
+                    'home_carousel_id' => $carousel->id,
+                    'display_type'     => $type,
+                ],
+                [
+                    'end_at'        => $endAt,
+                    'duration'      => $carousel->input ?? 0,
+                    'duration_unit' => $unit,
+                    'created_at'    => $carousel->created_at,
+                    'updated_at'    => $carousel->updated_at,
+                ]
+            );
+        }
+    }
+
+    return "✅ Migration completed successfully!";
+});
+
+
+Route::get('notifications/test', function () {
+    AdminNotificationHelper::notify(
+        AdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        null
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+
+
+Route::get('notifications/test2', function () {
+    SuperAdminNotificationHelper::notify(
+        SuperAdminNotificationType::SYSTEM,
+        'إشعار تجريبي 🎉',
+        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
+        null,
+
+
+        ['created_at' => Carbon::now()->toDateTimeString()],
+        95,
+
+    );
+
+    return 'تم إرسال الإشعار ✉️';
+});
+
+Route::get('/codapay/create-payment', function () {
+    $trxId  = rand(1000, 9999);
+    $amount = 1.00;
+    $userId = 123;
+
+    $payload = [
+        'initRequest' => [
+            'country'    => "784",    // ✅ UAE (الإمارات)
+            'currency'   => 840,      // ✅ USD (دولار أمريكي)
+            'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
+            'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
+            'orderId'    => (string) $trxId,
+            'returnUrl'  => url('/codapay/success'),
+            'failUrl'    => url('/codapay/fail'),
+            'items'      => [
+                [
+                    'code'  => '1',
+                    'price' => (float) $amount,
+                    'name'  => "Order #{$trxId}"
+                ]
+            ],
+            'profile' => [
+                'entry' => [
+                    ['key' => 'user_id', 'value' => (string) $userId],
+                ],
+            ],
+        ],
+    ];
+
+    $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
+
+    try {
+        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
+
+        $response = Http::timeout(15)
+            ->withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, $payload);
+
+        if ($response->failed()) {
+            Log::error("❌ Codapay Connection Failed", [
+                'status'  => $response->status(),
+                'body'    => $response->body(),
+                'headers' => $response->headers(),
+            ]);
+
+            return response()->json([
+                'error'   => 'Failed to connect Codapay',
+                'status'  => $response->status(),
+                'details' => $response->body(),
+                'url'     => $url,
+                'payload' => $payload,
+            ], 500);
+        }
+
+        $result = $response->json();
+
+        // Log::info("✅ Codapay Response Received", ['result' => $result]);
+
+        // ✅ تحقق من النجاح
+        if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
+            $txnId = $result['initResult']['txnId'];
+            $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment link generated successfully.',
+                'paymentUrl' => $paymentUrl,
+                'txnId' => $txnId,
+                'result' => $result,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create payment',
+            'error_code' => $result['initResult']['resultCode'] ?? null,
+            'error_desc' => $result['initResult']['resultDesc'] ?? null,
+            'result'  => $result,
+        ]);
+    } catch (\Throwable $e) {
+        Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
+
+        return response()->json([
+            'error'   => 'Exception while connecting Codapay',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+});
+
+Route::view('/codapay-complete-landing', 'landing', ['title' => 'Complete Landing Page']);
+Route::view('/codapay-atm-pending', 'landing', ['title' => 'ATM Pending Landing Page']);
+Route::view('/codapay-pending-otc', 'landing', ['title' => 'Pending OTC Landing Page']);
+Route::view('/codapay-subscription-notification', 'landing', ['title' => 'Subscription Notification Page']);
+
+Route::get('remove-minus', function () {
+    try {
+        $currentMonth = date("m");
+        $currentYear = date("Y");
+
+        // DB::table('user_sallaries')
+        //     ->select('user_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+        //     ->groupBy('user_id')
+        //     ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+        //     ->orderBy('user_id')
+        //     ->chunk(100, function ($users) use ($currentMonth, $currentYear) {
+        //         $insertData = [];
+        //         foreach ($users as $user) {
+        //             $insertData[] = [
+        //                 'user_id' => $user->user_id,
+        //                 'cut_amount' => ($user->total_sallary - $user->total_cut_amount),
+        //                 'month' => $currentMonth,
+        //                 'year' => $currentYear,
+        //                 'sallary' => 0,
+        //                 'created_at' => now(),
+        //                 'updated_at' => now(),
+        //             ];
+        //         }
+        //         DB::table('user_sallaries')->insert($insertData);
+        //     });
+
+        DB::table('bd_sallaries')
+            ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('bd_id', 'agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('bd_id')
+            ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($bds as $bd) {
+                    $insertData[] = [
+                        'bd_id' => $bd->bd_id,
+                        'agency_id' => $bd->agency_id,
+                        'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('bd_sallaries')->insert($insertData);
+            });
+
+        DB::table('agency_sallaries')
+            ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+            ->groupBy('agency_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->orderBy('agency_id')
+            ->chunk(100, function ($agencies) use ($currentMonth, $currentYear) {
+                $insertData = [];
+                foreach ($agencies as $agency) {
+                    $insertData[] = [
+                        'agency_id' => $agency->agency_id,
+                        'cut_amount' => ($agency->total_sallary - $agency->total_cut_amount),
+                        'month' => $currentMonth,
+                        'year' => $currentYear,
+                        'sallary' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                DB::table('agency_sallaries')->insert($insertData);
+            });
+
+        return 'تم بنجاح';
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});

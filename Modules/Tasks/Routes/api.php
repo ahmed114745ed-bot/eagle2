@@ -21,7 +21,7 @@ use Modules\Tasks\Http\Controllers\TaskProgressController;
 Route::middleware('auth:api')->get('/tasks', function (Request $request) {
     return $request->user();
 });
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum' ,'update.last.seen'])->group(function () {
     Route::get('days', [TaskProgressController::class, 'getDays']);
     Route::post('tasks/{taskId}/collect', [TaskCompleteController::class, 'collectTaskPoints']);
     Route::post('day/tasks/{taskId}', [DayTasksController::class, 'getDayTasks']);

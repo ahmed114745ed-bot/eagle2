@@ -14,7 +14,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Services\AchievementLevelsService;
 
-Route::middleware(['auth:sanctum','appFeatureEnable:achievement'])->group(function () {
+Route::middleware(['auth:sanctum','appFeatureEnable:achievement' ,'update.last.seen'])->group(function () {
     Route::get('/test/achievement', function () {
         (new AchievementLevelsService())->setUserAchievementLevel(true);
         return response()->json('Success');

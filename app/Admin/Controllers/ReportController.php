@@ -57,8 +57,11 @@ class ReportController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
+        $countryID =session('filter_country_id');
+
         $grid->disableRowSelector();
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->where('agency_id', '!=', 0)
             ->where('agency_id', '!=', '')
             ->where('agency_id', '!=', null);
@@ -244,9 +247,12 @@ class ReportController extends MainController
     protected function agencies(): Grid
     {
         $grid = new Grid(new Agency());
+        $countryID =session('filter_country_id');
+
         $grid->disableRowSelector();
 
         $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->withCount(['users'])
             ->with(['owner.profile']);
 
@@ -366,8 +372,11 @@ class ReportController extends MainController
     protected function agencies_manger()
     {
         $grid = new Grid(new AdminUser());
+        $countryID =session('filter_country_id');
+
         $grid->disableRowSelector();
         $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->where('app_id', '!=', 0);
 
         $grid->column('user.id', __('Id'));

@@ -38,7 +38,11 @@ class TrashedUserAccountController extends  MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $grid->model()->onlyTrashed()->orderByDesc('deleted_at');
+        $countryID =session('filter_country_id');
+
+        $grid->model()
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->onlyTrashed()->orderByDesc('deleted_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

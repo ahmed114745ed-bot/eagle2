@@ -1,53 +1,48 @@
 <?php
+
 namespace App\Admin\Controllers;
-use App\Admin\Extensions\AgencyExporter;
-use App\Admin\Extensions\UserExporter;
-use App\Helpers\Common;
-use App\Models\Charge;
-use App\Models\CoinLog;
+
 use App\Models\User;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Request;
 
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-
-class ParentUsersController extends MainController {
+class ParentUsersController extends MainController
+{
     public $permission_name = 'user-parent';
 
-    public function index ( Content $content )
+    public function index(Content $content)
     {
         if (request("name") != null) {
             if (request("name") == 'users') {
-                $user=User::select("id","name")->find(request("ids"));
-                $title='المستخدمين التابعين لل مستخدم : '.$user?->name;
-            }elseif (request("name") == 'operations') {
-                $user=User::select("id","name")->find(request("useer_operation_id"));
-                $title='العمليات التابعه لل مستخدم : '.$user?->name;
+                $user = User::select("id", "name")->find(request("ids"));
+                $title = 'المستخدمين التابعين لل مستخدم : ' . $user?->name;
+            } elseif (request("name") == 'operations') {
+                $user = User::select("id", "name")->find(request("useer_operation_id"));
+                $title = 'العمليات التابعه لل مستخدم : ' . $user?->name;
             }
         }
         return parent::index($content
             ->title(__('Invitation code'))
-            ->row(function($row) {
+            ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
     }
 
-    protected function grid(){
-        $name= "parents";
+    protected function grid()
+    {
+        $name = "parents";
         if (request("name") != null) {
-            $name= request("name");
+            $name = request("name");
         }
 
         $grid = $name;
         $grid = $this->{$grid}();
         $grid->disableexport();
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
-        $grid->disableColumnSelector ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        $grid->disableColumnSelector();
         return $grid;
     }
 
@@ -56,38 +51,42 @@ class ParentUsersController extends MainController {
     protected function parents()
     {
         $grid = new Grid(new User());
-        $grid->model ()->orderByDesc('created_at')
+        $countryID =session('filter_country_id');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            });
+        })->orderByDesc('created_at')
             ->has('codeInvitations');
 
 
 
-            $grid->filter(function (Grid\Filter $filter) {
-                $filter->expand();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
 
 
 
-                    $filter->column('1/2', function ($filter) {
-                        $filter->where(function ($query) {
-                            $input = $this->input;
-                            $query->where('uuid', $input);
-                        }, __('User'))->placeholder(__('Search by  UUID '));
-                    });
-
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->where('uuid', $input);
+                }, __('User'))->placeholder(__('Search by  UUID '));
             });
-        $grid->column ('name',__ ('name'))->display (function ($recever){
+        });
+        $grid->column('name', __('name'))->display(function ($recever) {
             $name =  $this->name ?? '';
-             $uid = @$this->uuid ?? 0;
-             $path = @$this->profile?->avatar;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
+            $uid = @$this->uuid ?? 0;
+            $path = @$this->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-             return "
+            return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
                  <div>
@@ -96,18 +95,17 @@ class ParentUsersController extends MainController {
                  </div>
              </div>
          ";
-
-         });
-        $grid->column ('user_count',__("user_count"))->display (function (){
+        });
+        $grid->column('user_count', __("user_count"))->display(function () {
             return count($this->codeInvitations);
         });
-        $grid->column ('earn',__("user_earn"))->display (function (){
+        $grid->column('earn', __("user_earn"))->display(function () {
             return $this->codeInvitationsEarn->sum("parent_percentage");
         });
 
         $grid->column('created_at', __('created'))->sortable()->diffForHumans();
-        $grid->column('action', __('action'))->display (function (){
-            return '<a href="?name=users&ids='.$this->id.'" class="btn btn-xs btn-primary">'.__("users").'</a>';
+        $grid->column('action', __('action'))->display(function () {
+            return '<a href="?name=users&ids=' . $this->id . '" class="btn btn-xs btn-primary">' . __("users") . '</a>';
         });
 
 
@@ -117,37 +115,36 @@ class ParentUsersController extends MainController {
 
     protected function users()
     {
-        $userId=request("ids");
+        $userId = request("ids");
 
         $grid = new Grid(new UserCodeInvitation());
-        $grid->model ()->orderByDesc('created_at')
-            ->where("user_id",$userId);
+        $grid->model()->orderByDesc('created_at')
+            ->where("user_id", $userId);
 
-        $grid->column ('id',__ ('ID'));
-        $grid->column ('invited.name',__("name"));
-        $grid->column ('user_percentage',__("user_earn"));
+        $grid->column('id', __('ID'));
+        $grid->column('invited.name', __("name"));
+        $grid->column('user_percentage', __("user_earn"));
 
         $grid->column('created_at', __('created'))->sortable()->diffForHumans();
-        $grid->column('action', __('action'))->display (function (){
-            return '<a href="?name=operations&useer_operation_id='.$this->invited_id.'" class="btn btn-xs btn-primary">'.__("Operation log").'</a>';
+        $grid->column('action', __('action'))->display(function () {
+            return '<a href="?name=operations&useer_operation_id=' . $this->invited_id . '" class="btn btn-xs btn-primary">' . __("Operation log") . '</a>';
         });
         return $grid;
     }
 
     protected function operations()
     {
-        $userId=request("useer_operation_id");
+        $userId = request("useer_operation_id");
 
         $grid = new Grid(new UserEarnInvitation());
-        $grid->model ()->orderByDesc('created_at')
-            ->where("user_id",$userId);
+        $grid->model()->orderByDesc('created_at')
+            ->where("user_id", $userId);
 
-        $grid->column ('id',__ ('ID'));
-        $grid->column ('user_charge',__("user_charge"));
-        $grid->column ('parent_percentage',__("parent_earn"));
+        $grid->column('id', __('ID'));
+        $grid->column('user_charge', __("user_charge"));
+        $grid->column('parent_percentage', __("parent_earn"));
 
         $grid->column('created_at', __('created'))->sortable()->diffForHumans();
         return $grid;
     }
-
 }

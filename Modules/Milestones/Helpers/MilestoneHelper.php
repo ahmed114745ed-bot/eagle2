@@ -26,9 +26,7 @@ class MilestoneHelper
 
     public static function grantMilestoneToUser(User|int $user, string $slug): void
     {
-        Log::info("Granting milestone '{$slug}' to user", [
-            'user' => $user instanceof User ? $user->id : $user,
-        ]);
+      
 
         if (! $user instanceof User) {
             $user = User::find($user);
@@ -53,7 +51,6 @@ class MilestoneHelper
             self::giveRewardToUser($user, $mr);
         }
 
-        Log::info("Finished granting milestone '{$slug}' to user {$user->id}");
     }
 
 
@@ -146,10 +143,11 @@ class MilestoneHelper
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->get();
-
-        foreach ($rewards as $r) {
-            self::removeRewardEffect($user, $r);
-            $r->delete();
+        if ($rewards) {
+            foreach ($rewards as $r) {
+                self::removeRewardEffect($user, $r);
+                $r->delete();
+            }
         }
     }
 
@@ -193,11 +191,7 @@ class MilestoneHelper
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
         if ($milestone && $milestone->rewards && $milestone->rewards->count()) {
             foreach ($milestone->rewards as $reward) {
-                Log::info('Revoking reward from user', [
-                    'user_id' => $user->id,
-                    'milestone_slug' => $slug,
-                    'reward_id' => $reward->id,
-                ]);
+          
     
                 self::revokeRewardFromUser($user, $reward);
             }

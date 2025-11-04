@@ -17,6 +17,8 @@ return [
     'list'                  => 'List',
     'percent_total_error' => '❌ The total percentages must be exactly 100%. Current: :total%',
     'new'                   => 'New',
+    'lifetime_help' => '💡 If you enter <strong>0</strong>, this means the item will never expire (lifetime).',
+    'not_in_same_country' => 'Not in the same country',
     "apple_team_id" => 'Team ID',
     "apple_client_id" => 'Client ID',
     'apple_redirect_uri' => 'Redirect url',
@@ -423,6 +425,7 @@ return [
     'mada'          => 'Mada',
     'liqpay'        => 'LiqPay',
     'paypal'        => 'PayPal',
+    'codapay'        => 'CodaPay',
     'paytm'         => 'Paytm',
     'paytabs'       => 'PayTabs',
     'bkash'         => 'bKash',
@@ -436,7 +439,9 @@ return [
     'huawei_pay'    => 'Huawei Pay',
     "webhook_url" => "Webhook Url",
     "webhook_id" => "Webhook Id",
-
+    'project_id'   => 'Project ID',
+    'country'      => 'Country',
+    'pay_type'     => 'Payment Type',
     "target_no" => 'Target Number',
     "diamonds" => 'Diamonds',
     "usd" => 'Host Salary',
@@ -452,4 +457,6 @@ return [
     'creator' => 'admin',
     'custom_img_image' => 'The file must be an image.',
     'custom_img_mimes' => 'Only jpeg, png, jpg images are allowed.',
+    'is_preview' => 'Live Preview',
+
 ];

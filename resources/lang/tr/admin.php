@@ -14,6 +14,8 @@ return [
     'remember_me'           => 'Beni Hatırla',
     'user_setting'          => 'Kullanıcı Ayarları',
     "total" => "toplam",
+    'lifetime_help' => '💡 Eğer <strong>0</strong> girerseniz, bu öğenin asla süresinin dolmayacağı (ömür boyu) anlamına gelir.',
+
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',
     'new'                   => 'Yeni',
@@ -404,6 +406,7 @@ return [
     'mada'          => 'mada',
     'liqpay'        => 'liqpay',
     'paypal'        => 'paypal',
+    'codapay'        => 'CodaPay',
     'paytm'         => 'paytm',
     'paytabs'       => 'paytabs',
     'bkash'         => 'bkash',
@@ -417,7 +420,9 @@ return [
     'huawei_pay' => 'Huawei Pay',
     "webhook_url" => "Webhook URL'si",
     'webhook_id' => 'Webhook Kimliği',
-
+    'project_id'   => 'Proje Kimliği',
+    'country'      => 'Ülke',
+    'pay_type'     => 'Ödeme Türü',
     "target_no" => 'Hedef Numarası',
     "diamonds" => 'Elmas Hedefi',
     "usd" => 'Dolar',
