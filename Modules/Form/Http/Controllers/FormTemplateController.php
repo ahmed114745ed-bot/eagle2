@@ -234,7 +234,7 @@ class FormTemplateController extends Controller
                 'message' => 'Access denied. Please login or use a valid token.',
             ], 403);
         }
-        if ($linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
+        if (  !$user && $linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
             return response()->view('Form::forms.invalid', [
                     'message' => 'Invalid or expired token.',
                 ], 403);
