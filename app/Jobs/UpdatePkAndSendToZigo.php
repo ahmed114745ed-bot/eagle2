@@ -22,7 +22,7 @@ class UpdatePkAndSendToZigo implements ShouldQueue
     private $receivedIds;
     private $totalPrice;
     private $roomId;
-    private string $room;
+    private $room;
 
 
     /**
@@ -31,7 +31,7 @@ class UpdatePkAndSendToZigo implements ShouldQueue
      * @param string $room
      * @param $userId
      */
-    public function __construct($userId, $roomId, array $receivedIds, float $totalPrice, string $room)
+    public function __construct($userId, $roomId, array $receivedIds, float $totalPrice, $room)
     {
 
         $this->receivedIds = $receivedIds;
