@@ -18,6 +18,7 @@ class CharismaWork implements RoomJobInterface
         $earnedCoinsPerUser = $roomJob->coins;
 
         $data =(new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $userIds, $earnedCoinsPerUser);
+        info('dataaa', ...$data);
         return ['room_id'=> $room->id, ...$data];
     }
 
@@ -45,7 +46,7 @@ class CharismaWork implements RoomJobInterface
             info('item', $item);
             foreach ($item as $key => $userData) {
 
-                if ($key === 'room_id') continue;
+                if ($key == 'room_id') continue;
                 foreach ($userData as $inner) {
                     $userData = $inner;
                     break;
