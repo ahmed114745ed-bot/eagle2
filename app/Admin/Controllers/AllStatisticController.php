@@ -59,23 +59,23 @@ class AllStatisticController extends MainController
         
         
         $user = Auth::user();
-        $usersCount = User::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
+        // $usersCount = User::when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->count();
 
-        //users
-        $newSignUpsToday = User::whereDate('created_at', today())->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-        $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-        $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-        $onlineUser = User::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->where('online', 1)->count();
+        // //users
+        // $newSignUpsToday = User::whereDate('created_at', today())->when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->count();
+        // $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->count();
+        // $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->count();
+        // $onlineUser = User::when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->where('online', 1)->count();
         $topUsersByFollowers = User::withCount('followers')
             ->with('packs', 'profile')
             ->when($countryID, function ($query, $countryID) {
@@ -84,60 +84,60 @@ class AllStatisticController extends MainController
             ->orderByDesc('followers_count')
             ->take(10)
             ->get();
-        $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
-            ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
-            ->groupBy('hour')
-            ->orderByDesc('total_sessions')
-            ->limit(1)
-            ->first();
-        $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->whereDate('created_at', today())
-            ->count();
-        $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-        $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->distinct('user_id')
-            ->count('user_id');
-        $totalUsers = User::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-        $usersWhoNeverSend = $totalUsers - $usersWhoSend;
-        $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->whereDate('created_at', today())
-            ->distinct('chat_room_id')
-            ->count('chat_room_id');
-        $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            });
-        })
-            ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
-            ->groupBy('chat_room_id')
-            ->pluck('duration')
-            ->avg() ?? 0;
+        // $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
+        //     ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+        //     ->groupBy('hour')
+        //     ->orderByDesc('total_sessions')
+        //     ->limit(1)
+        //     ->first();
+        // $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->whereDate('created_at', today())
+        //     ->count();
+        // $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->whereMonth('created_at', now()->month)
+        //     ->whereYear('created_at', now()->year)
+        //     ->count();
+        // $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->distinct('user_id')
+        //     ->count('user_id');
+        // $totalUsers = User::when($countryID, function ($query, $countryID) {
+        //     return $query->where('country_id', $countryID);
+        // })->count();
+        // $usersWhoNeverSend = $totalUsers - $usersWhoSend;
+        // $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->whereDate('created_at', today())
+        //     ->distinct('chat_room_id')
+        //     ->count('chat_room_id');
+        // $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+        //     $q->when($countryID, function ($query, $countryID) {
+        //         return $query->where('country_id', $countryID);
+        //     });
+        // })
+        //     ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+        //     ->groupBy('chat_room_id')
+        //     ->pluck('duration')
+        //     ->avg() ?? 0;
 
 
         // $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
@@ -160,32 +160,12 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart'));
                 }
             })
-            ->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,  $topUsersByFollowers) {
-                $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
+            ->row(function (Row $row) use (  $topUsersByFollowers) {
+                $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
-                    $column->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours,  $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
-                        $row->column(3, new InfoBox(__('Users Count'), 'users', 'aqua', 'admin/users', $usersCount));
-                        $row->column(3, new InfoBox(__('Online Users Count'), 'user', 'blue', 'admin/users?online=1', $onlineUser));
-                        if ($peakHours) {
-                            $time = Carbon::createFromTime($peakHours->hour);
-                            $time->locale(app()->getLocale());
-                            $peakHour = $time->isoFormat('h A');
-                            $peakHourCount = $peakHours->total_sessions;
-                            $value = $peakHour . ' • ' . $peakHourCount . ' ' . __('Users');
-                        } else {
-                            $value = 0;
-                        }
-                        $row->column(3, new InfoBox(__('Peak Hour'), 'clock-o', 'green', 'admin/users', $value));
-                        $row->column(3, new InfoBox(__('New Sign Ups Today'), 'user-plus', 'yellow', 'admin/users?signups=today', $newSignUpsToday));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Week'), 'users', 'red', 'admin/users?signups=week', $newSignUpsThisWeek));
-                        $row->column(3, new InfoBox(__('New Sign Ups This Month'), 'user', 'purple', 'admin/users?signups=month', $newSignUpsThisMonth));
-                        $row->column(3, new InfoBox(__('Messages Today'), 'envelope', 'maroon', 'admin/users?messages=today', $messagesToday));
-                        $row->column(3, new InfoBox(__('Messages This Month'), 'comments', 'teal', 'admin/users?messages=month', $messagesThisMonth));
-                        $row->column(3, new InfoBox(__('Users Who Send Messages'), 'user', 'gray', 'admin/users?sent_messages=1', $usersWhoSend));
-                        $row->column(3, new InfoBox(__('Users Who Never Send'), 'user-times', 'orange', 'admin/users?never_send=1', $usersWhoNeverSend));
-                        $row->column(3, new InfoBox(__('Open Conversations Today'), 'comments-o', 'lime', 'admin/users', $openConversationsToday));
-                        $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'admin/users', round($avgConversationDuration)));
+                    $column->row(function (Row $row) {
+                        $row->column(12, view('admin.dashboard.stats'));
                     });
 
                     $column->row(function (Row $row) {
@@ -917,6 +897,77 @@ class AllStatisticController extends MainController
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching balance data'
+            ], 500);
+        }
+    }
+
+   public function getStatsData(Request $request)
+    {
+        try {
+            $countryID = $this->countryId();
+            
+            // تجميع جميع الاستعلامات في مرة واحدة
+            $userBaseQuery = User::when($countryID, fn($q) => $q->where('country_id', $countryID));
+            
+            $stats = [
+                'usersCount' => $userBaseQuery->count(),
+                'newSignUpsToday' => $userBaseQuery->whereDate('created_at', today())->count(),
+                'newSignUpsThisWeek' => $userBaseQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'newSignUpsThisMonth' => $userBaseQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+                'onlineUser' => $userBaseQuery->where('online', 1)->count(),
+            ];
+
+            // Peak Hours
+            $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
+                    $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
+                })
+                ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions")
+                ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+                ->groupBy('hour')
+                ->orderByDesc('total_sessions')
+                ->first();
+
+            if ($peakHours) {
+                $time = Carbon::createFromTime($peakHours->hour);
+                $time->locale(app()->getLocale());
+                $stats['peakHour'] = $time->isoFormat('h A') . ' • ' . $peakHours->total_sessions . ' ' . __('Users');
+            } else {
+                $stats['peakHour'] = '0';
+            }
+
+            // Chat Statistics
+            $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
+                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+            });
+
+            $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
+            $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)->count();
+            
+            $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
+            $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
+            
+            $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
+                ->distinct('chat_room_id')->count('chat_room_id');
+            
+            $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
+                    $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+                })
+                ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+                ->groupBy('chat_room_id')
+                ->pluck('duration')
+                ->avg() ?? 0;
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error fetching stats data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching statistics data'
             ], 500);
         }
     }
