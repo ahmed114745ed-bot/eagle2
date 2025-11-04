@@ -273,7 +273,7 @@ class SuperAdminController extends MainController
 
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'super-admin')->first();
-                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('Acquisitions');
 
                 $customButtonHTML = <<<HTML
