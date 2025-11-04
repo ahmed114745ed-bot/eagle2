@@ -3,21 +3,15 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
-use App\Models\Charge;
-use App\Helpers\Common;
-use App\Models\CoinLog;
 use App\Models\GameWallet;
-use App\Models\UsdTransfer;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
-use App\Models\RequestTakeSalary;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use App\Models\MonthlyDiamondReceive;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Room;
@@ -27,22 +21,23 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
-use App\Models\AgencyJoinRequest;
-use App\Enums\Charges\UserTypeEnum;
-use App\Admin\Widgets\CustomInfoBox;
-use App\Http\Controllers\Controller;
+
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
-use Encore\Admin\Facades\Admin;
+
 
 class AllStatisticController extends MainController
 {
     public $permission_name = 'dashboard';
 
+    protected function countryId()
+    {
+        return session('filter_country_id');
+    }
     public function index(Content $content)
     {
 
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
         $balance = GameWallet::query();
         $balanceDollar = GameChargeHistory::query();
         if (request("date") != null) {
@@ -366,9 +361,9 @@ class AllStatisticController extends MainController
                         $row->column(3, new InfoBox(__('Avg Conversation Duration (min)'), 'clock-o', 'olive', 'superadmin/users', round($avgConversationDuration)));
                     });
 
-                    $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
+                    $column->row(function (Row $row) {
                         // Right: chart view (Top Salaries)
-                        $row->column(6, function ($column) use ($countryID) {
+                        $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.users_chart')->render();
 
@@ -476,7 +471,7 @@ class AllStatisticController extends MainController
                         $row->column(3, new InfoBox(__('Diamonds Achieved by Hosts'), 'diamond', 'green', 'superadmin/ag/users', $diamondsAchieved));
                     });
 
-                    $column->row(function (Row $row) use ($countryID) {
+                    $column->row(function (Row $row) {
                         //chart 1
                         $row->column(6, function ($column) {
 
@@ -485,64 +480,20 @@ class AllStatisticController extends MainController
                         });
 
                         //chart 2
-                        $row->column(6, function ($column) use ($countryID) {
+                        $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.top_senders_chart')->render();
                             $column->row($view);
                         });
 
                         //chart 3
-                        $row->column(6, function ($column) use ($countryID) {
-                            $topReceivers = GiftLog::whereHas(
-                                'receiver',
-                                fn($q) =>
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                })
-                                    ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
-                                        return $query->where('country_id', $countryID);
-                                    }))
-                            )
-                                ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
-                                ->groupBy('receiver_id')
-                                ->orderByDesc('total_received')
-                                ->take(10)
-                                ->with('receiver:id,name')
-                                ->get()
-                                ->filter(fn($s) => $s->total_received > 0);
-
-                            $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
-                            $data   = $topReceivers->pluck('total_received');
-
-                            $view = view('admin.dashboard.widgets.top_receivers_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
-
+                        $row->column(6, function ($column) {
+                            $view = view('admin.dashboard.widgets.top_receivers_chart')->render();
                             $column->row($view);
                         });
 
                         //chart 4
-                        $row->column(6, function ($column) use ($countryID) {
-                            $achievedAgencies = Agency::when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            })
-                                ->whereHas('userTarget', function ($q) {
-                                    $q
-                                        //                                        ->where('add_month', now()->month)
-                                        //                                        ->where('add_year', now()->year)
-                                        ->where('agency_obtain', '>', 0);
-                                })
-                                ->count();
-
-                            $notAchievedAgencies = Agency::when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            })
-                                ->count() - $achievedAgencies;
-
-                            $view = view('admin.dashboard.widgets.agencies_compare_chart', [
-                                'achieved'    => $achievedAgencies,
-                                'notAchieved' => $notAchievedAgencies,
-                            ])->render();
+                        $row->column(6, function ($column) {
+                            $view = view('admin.dashboard.widgets.agencies_compare_chart')->render();
 
                             $column->row($view);
                         });
@@ -708,7 +659,7 @@ class AllStatisticController extends MainController
 
     public function topUsersData(Request $request)
     {
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
 
         $topUsers = LiveTime::query()
             ->whereHas('user', function ($q) use ($countryID) {
@@ -791,7 +742,7 @@ class AllStatisticController extends MainController
 
     protected function distributionRooms()
     {
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
         $roomsWithPk = Room::whereHas('owner', function ($q) use ($countryID) {
             $q->when($countryID, function ($query, $countryID) {
                 return $query->where('country_id', $countryID);
@@ -837,7 +788,7 @@ class AllStatisticController extends MainController
 
     protected function topRoomGifts()
     {
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
         $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
         }))
@@ -886,7 +837,7 @@ class AllStatisticController extends MainController
 
     protected function agencyTarget()
     {
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
         $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
         }))
@@ -908,7 +859,7 @@ class AllStatisticController extends MainController
 
     protected function topSender()
     {
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
         $topSenders = GiftLog::whereHas(
             'sender',
             fn($q) =>
@@ -932,6 +883,57 @@ class AllStatisticController extends MainController
         return response()->json([
             'labels' => $labels,
             'data'   => $data,
+        ]);
+    }
+
+    protected function topReceiver()
+    {
+        $countryID = $this->countryId();
+        $topReceivers = GiftLog::whereHas(
+            'receiver',
+            fn($q) =>
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            })
+                ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
+                    return $query->where('country_id', $countryID);
+                }))
+        )
+            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+            ->groupBy('receiver_id')
+            ->orderByDesc('total_received')
+            ->take(10)
+            ->with('receiver:id,name')
+            ->get()
+            ->filter(fn($s) => $s->total_received > 0);
+
+        $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
+        $data   = $topReceivers->pluck('total_received');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function comparisonAgencyTarget()
+    {
+        $countryID = $this->countryId();
+        $achievedAgencies = Agency::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })
+            ->whereHas('userTarget', function ($q) {
+                $q->where('agency_obtain', '>', 0);
+            })
+            ->count();
+
+        $notAchievedAgencies = Agency::when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        })
+            ->count() - $achievedAgencies;
+
+        return response()->json([
+            'achieved'    => $achievedAgencies,
+            'notAchieved' => $notAchievedAgencies,
         ]);
     }
 }
