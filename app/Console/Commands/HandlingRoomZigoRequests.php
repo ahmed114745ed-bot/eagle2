@@ -79,6 +79,7 @@ class HandlingRoomZigoRequests extends Command
 
         try {
             foreach ($allData as $key => $allDatum) {
+                info('handling-room-zigo-requests');
                 $roomFactory->setType($key)->sendToZego($allData);
                 echo 'Done zego  ' . $key . ' to room ' . PHP_EOL;
             }
