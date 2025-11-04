@@ -315,6 +315,8 @@ class SendGiftService
             }
         }
 
+        info($pk->t1_score);
+        info($pk->t2_score);
         $pk->team_1 = implode(',', $team1);
         $pk->team_2 = implode(',', $team2);
         $pk->save();
