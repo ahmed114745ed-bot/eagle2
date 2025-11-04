@@ -397,8 +397,8 @@ class AllStatisticController extends MainController
                     });
                 });
 
-                $row->column(12, function ($column) use ( $topUsersByFollowers) {
-                    $column->row(function (Row $row) use ( $topUsersByFollowers) {
+                $row->column(12, function ($column) use ($topUsersByFollowers) {
+                    $column->row(function (Row $row) use ($topUsersByFollowers) {
                         $row->column(6, function ($col) use ($topUsersByFollowers) {
                             $top5 = $topUsersByFollowers
                                 ->filter(fn($user) => $user->followers_count > 0)
@@ -411,7 +411,7 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col)  {
+                        $row->column(6, function ($col) {
                             $view = view('admin.dashboard.widgets.users_online_chart')->render();
                             $col->row($view);
                         });
@@ -430,8 +430,8 @@ class AllStatisticController extends MainController
 
                     $column->row(function (Row $row) use ($countryID) {
                         //chart 1
-                        $row->column(6, function ($column)  {
-                            
+                        $row->column(6, function ($column) {
+
                             $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
                             $column->row($view);
                         });
@@ -444,23 +444,9 @@ class AllStatisticController extends MainController
 
                         //chart 3
                         $row->column(6, function ($column) use ($countryID) {
-                            $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            }))
-                                ->with('owner')
-                                ->withSum('gifts', 'giftPrice')
-                                ->orderByDesc('gifts_sum_gift_price')
-                                ->take(10)
-                                ->get()
-                                ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
+                        
 
-                            $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
-                            $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
-
-                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
+                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart')->render();
 
                             $column->row($view);
                         });
@@ -911,6 +897,27 @@ class AllStatisticController extends MainController
         return response()->json([
             'labels' => array_keys($roomStats),
             'data'   => array_values($roomStats),
+        ]);
+    }
+
+    protected function topRoomGifts()
+    {
+        $countryID = request('country_id', null);
+        $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        }))
+            ->with('owner')
+            ->withSum('gifts', 'giftPrice')
+            ->orderByDesc('gifts_sum_gift_price')
+            ->take(10)
+            ->get()
+            ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
+
+        $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
+        $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
         ]);
     }
 }

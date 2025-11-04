@@ -398,6 +398,7 @@ Route::group(
             Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
             Route::get('comparison-user-signup', [AllStatisticController::class, 'comparisonUserSignUp']);
             Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
