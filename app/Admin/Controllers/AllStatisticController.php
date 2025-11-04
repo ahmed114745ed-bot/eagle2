@@ -486,32 +486,7 @@ class AllStatisticController extends MainController
 
                         //chart 2
                         $row->column(6, function ($column) use ($countryID) {
-                            $topSenders = GiftLog::whereHas(
-                                'sender',
-                                fn($q) =>
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                })
-                                    ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
-                                        return $query->where('country_id', $countryID);
-                                    }))
-                            )
-                                ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-                                ->groupBy('sender_id')
-                                ->orderByDesc('total_sent')
-                                ->take(10)
-                                ->with('sender:id,name')
-                                ->get()
-                                ->filter(fn($s) => $s->total_sent > 0);
-
-                            $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
-                            $data   = $topSenders->pluck('total_sent');
-
-                            $view = view('admin.dashboard.widgets.top_senders_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
-
+                            $view = view('admin.dashboard.widgets.top_senders_chart')->render();
                             $column->row($view);
                         });
 
@@ -925,6 +900,35 @@ class AllStatisticController extends MainController
 
         $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
         $data   = $topAgenciesByTargets->pluck('total_achieved');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function topSender()
+    {
+        $countryID = request('country_id', null);
+        $topSenders = GiftLog::whereHas(
+            'sender',
+            fn($q) =>
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            })
+                ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
+                    return $query->where('country_id', $countryID);
+                }))
+        )
+            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+            ->groupBy('sender_id')
+            ->orderByDesc('total_sent')
+            ->take(10)
+            ->with('sender:id,name')
+            ->get()
+            ->filter(fn($s) => $s->total_sent > 0);
+
+        $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
+        $data   = $topSenders->pluck('total_sent');
         return response()->json([
             'labels' => $labels,
             'data'   => $data,
