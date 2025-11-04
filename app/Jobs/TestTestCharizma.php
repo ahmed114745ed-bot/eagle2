@@ -40,6 +40,7 @@ class TestTestCharizma implements ShouldQueue
     public function handle()
     {
         $promises = [];
+        info('TestTestCharizma before for');
         foreach ($this->data as $key => $value){
             [$data, $roomId, $userId] = $this->roomJob->getVariables($value);
             $josns[] =  $this->roomJob->sendToZego($data, $roomId, $userId ?? 0);
