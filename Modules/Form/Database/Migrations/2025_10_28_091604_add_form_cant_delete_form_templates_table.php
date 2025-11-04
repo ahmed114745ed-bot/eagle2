@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('form_fields', function (Blueprint $table) {
-            $table->boolean('can_not_delete')->default(false);
+            $table->boolean(column: 'can_not_delete')->default(false);
         });
     }
 

@@ -67,7 +67,7 @@ class LiveRoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory'])
+        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -99,13 +99,12 @@ class LiveRoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-        if ($room->microphone) {
-            $positions = explode(',', $room->microphone);
-            foreach ($positions as $index => $userId) {
-                if ($userId != '0') {
-                    $micPositions[$userId] = $index + 1;
-                }
-            }
+        $microphones = $room->microphones
+            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->sortBy('position')
+            ->values();
+        foreach ($microphones as $mic) {
+            $micPositions[$mic->user_id] = $mic->position + 1;
         }
 
         // Blacklist
@@ -327,7 +326,7 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
@@ -548,32 +547,32 @@ class LiveRoomController extends MainController
     {
         $grid->disableRowSelector();
 
-        $grid->model()->collection(function (Collection $collection) {
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
-
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                ->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
-
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn ($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
-
-            return $collection; // IMPORTANT: return the collection
-        });
+//        $grid->model()->collection(function (Collection $collection) {
+//            $allIds = $collection->flatMap(function ($row) {
+//                return array_filter(explode(',', (string) $row->microphone));
+//            })->unique()->values()->all();
+//
+//            // fetch all needed users once
+//            $users = collect();
+//            if (!empty($allIds)) {
+//                $users = User::select(['id', 'name'])
+//                ->with('profile:id,user_id,avatar')
+//                    ->whereIn('id', $allIds)
+//                    ->get()
+//                    ->keyBy('id');
+//            }
+//
+//            // attach a ready-to-use collection on each row
+//            $collection->each(function ($row) use ($users) {
+//                $ids = array_filter(explode(',', (string) $row->microphone));
+//                $row->microphone_users = collect($ids)
+//                    ->map(fn ($id) => $users->get($id))
+//                    ->filter()
+//                    ->values();
+//            });
+//
+//            return $collection; // IMPORTANT: return the collection
+//        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1

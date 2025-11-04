@@ -1439,7 +1439,10 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
+         Log::info('start sendToZego3');
+
         try {
+
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
             $AppId            = self::getConf('zego_app_id');
@@ -1469,6 +1472,8 @@ class Common
             }
             return $promises;
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
         }
     }
 
@@ -1788,15 +1793,25 @@ class Common
 
         //leave mic
 
-        foreach ($usersIdInRooms as $userId) {
-            if (isset($room->microphone)) {
+//        foreach ($usersIdInRooms as $userId) {
+//            if (isset($room->microphone)) {
+//
+//                $microphones = explode(',', $room->microphone);
+//                if (in_array($userId, $microphones)) {
+//                    UserHandling::calcTime($userId);
+//                }
+//            }
+//            self::quit_hand_2($room->uid, $userId);
+//        }
 
-                $microphones = explode(',', $room->microphone);
-                if (in_array($userId, $microphones)) {
-                    UserHandling::calcTime($userId);
-                }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+
+        foreach ($usersIdInRooms as $userId) {
+            if (in_array($userId, $micUserIds, true)) {
+                UserHandling::calcTime($userId);
             }
-            self::quit_hand($room->uid, $userId);
+
+            self::quit_hand_2($room->uid, $userId);
         }
 
         $room->update(['is_live' => false]);
@@ -1811,7 +1826,7 @@ class Common
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
         $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, $users);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, $users);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, $users);
 
         $ms = [
             'messageContent' => [

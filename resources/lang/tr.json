@@ -23,9 +23,15 @@
     "Top 3 Recharge Agencies": "En Büyük 3 Yükleme Ajansı",
     "Host Agency Owner": "Ev Sahibi Acente Sahibi",
     "Charge Agency Owner": "Yükleme Acente Sahibi",
+    "can not delete default super admin": "Varsayılan süper yönetici silinemez",
     "Family Owner": "Aile Sahibi",
     "Area Manager": "Bölge Müdürü",
     "Acquisitions": "Edinimler",
+    "more": "Daha fazla",
+"More": "Daha fazla",
+    "restore super admin": "Süper yöneticiyi geri yükle",
+"can not restore this super admin": "Bu süper yönetici geri yüklenemez",
+"can not restore this super admin user taken": "Bu süper yönetici geri yüklenemez çünkü kullanıcı zaten alınmış",
     "user joined agency before": "Kullanıcı daha önce ajansa katıldı",
     "You cannot delete the default BD for this country.": "Bu ülkenin varsayılan BD'sini silemezsiniz.",
     "Top 3 Most Active BD": "En Aktif 3 BD",
@@ -3767,7 +3773,24 @@
     "Custom Options": "Özel Seçenekler",
     "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Her satıra bir seçenek girin veya çeviriler için JSON formatını kullanın: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
     ,  "Field":"Alan",
-    "Field Type":"Alan Gönder"
+    "Field Type":"Alan Gönder",
+    "land settings": "Açılış Sayfası Ayarları",
+    "Number of Users": "Kullanıcı Sayısı",
+    "Number of Countries": "Ülke Sayısı",
+    "Number of Live Streams": "Canlı Yayın Sayısı",
+    "Google Play Link": "Google Play Bağlantısı",
+    "Apple Store Link": "Apple Store Bağlantısı",
+    "Gallery App Link": "Galeri Uygulama Bağlantısı",
+    "Facebook Link": "Facebook Bağlantısı",
+    "Twitter Link": "Twitter Bağlantısı",
+    "WhatsApp Link": "WhatsApp Bağlantısı",
+    "About Us Link": "Hakkımızda Bağlantısı",
+    "Landing Page Settings": "Açılış Sayfası Ayarları",
+    "General Settings": "Genel Ayarlar",
+    "Statistics Settings": "İstatistik Ayarları",
+    "Social Media Settings": "Sosyal Medya Ayarları",
+    "Save": "Kaydet"
+
 
 
 

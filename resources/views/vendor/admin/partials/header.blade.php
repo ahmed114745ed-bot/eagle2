@@ -223,7 +223,7 @@
             $lang = app()->getLocale();
             $country   = \App\Models\Country::find(Admin::user()->country_id);
             $countries = \App\Models\Country::select(['id', 'name','e_name', 'flag'])->get();
-            $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
+            $selectedCountryId = session('filter_country_id') ?? request('country_id') ?? Admin::user()->country_id;
             $selectedCountry   = $countries->firstWhere('id', (int) $selectedCountryId);
         @endphp
 
@@ -317,7 +317,7 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('country_id'))
+                @if(!session('preview_superadmin') && session('filter_country_id'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
@@ -362,9 +362,9 @@
                 const url = new URL(window.location.href);
 
                 if (countryId && countryId !== 'null') {
-                    url.searchParams.set('country_id', countryId);
+                    url.searchParams.set('filter_country_id', countryId);
                 } else {
-                    url.searchParams.set('country_id', 'null');
+                    url.searchParams.set('filter_country_id', 'null');
                 }
 
                 window.location.href = url.toString();
@@ -375,7 +375,7 @@
                 e.stopPropagation();
 
                 const url = new URL(window.location.href);
-                url.searchParams.set('country_id', 'null');
+                url.searchParams.set('filter_country_id', 'null');
                 window.location.href = url.toString();
             });
         }

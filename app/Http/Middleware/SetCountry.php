@@ -15,13 +15,13 @@ class SetCountry
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $countryId = $request->get('country_id');
+        $countryId = $request->get('filter_country_id');
 
-        if ($request->has('country_id')) {
+        if ($request->has('filter_country_id')) {
             if ($countryId === null || $countryId === '' || $countryId === 'null') {
-                session()->forget('country_id');
+                session()->forget('filter_country_id');
             } else {
-                session(['country_id' => $countryId]);
+                session(['filter_country_id' => $countryId]);
             }
         }
 

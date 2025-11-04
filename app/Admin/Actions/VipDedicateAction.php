@@ -28,7 +28,7 @@ class VipDedicateAction extends Action
     public function handle(Request $request)
     {
         try {
-            $countryID = session('country_id');
+            $countryID = session('filter_country_id');
 
             // Validate user
             $user = User::query()

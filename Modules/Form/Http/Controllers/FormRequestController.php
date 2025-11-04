@@ -26,7 +26,7 @@ class FormRequestController extends AdminController
         $this->title = __('requests_title');
     }
 
-   
+ 
     public function index(Content $content)
     {
         $type = request()->get('type', 'host_agency');
@@ -116,10 +116,12 @@ class FormRequestController extends AdminController
             'rejected' => 'danger'
         ]);
 
+        
         $grid->column('actions', __('Actions'))->display(function () {
             $approveUrl = admin_url("requests/{$this->id}/approve");
             $rejectUrl  = admin_url("requests/{$this->id}/reject");
-        
+            $showUrl = admin_url('form-requests', $this->id);
+
             if ($this->status === 'rejected') {
                 return '<span class="text-danger">' . __('Rejected') . '</span>';
             }
@@ -130,8 +132,12 @@ class FormRequestController extends AdminController
         
             $approveText = __('Approved');
             $rejectText  = __('Reject');
-        
+            $viewText    = __('View');
+
             return <<<HTML
+                   <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
+                        <i class="fa fa-eye"></i> {$viewText}
+                    </a>
                 <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
                 <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
             HTML;
@@ -238,7 +244,7 @@ class FormRequestController extends AdminController
     
         
     
-        $grid->disableActions();
+        // $grid->disableActions();
         $grid->disableCreateButton();
 
         return $grid;
@@ -247,27 +253,44 @@ class FormRequestController extends AdminController
     protected function detail($id)
     {
         $show = new Show(FormRequest::findOrFail($id));
-
-        $show->field('user.name', __('name'));
-        $show->field('bd_id', __('bd_id'));
-        $show->field('agency_name', __('agency_name'));
-        $show->field('whatsapp_number', __('whatsapp_number'));
-        $show->field('country', __('country'));
-        $show->field('form_template_type', __('form_template_type'));
-        $show->field('status', __('status'));
-        $show->field('data', __('additional_info'))->as(function ($data) {
+    
+        $show->field('user.name', __('Name'));
+        $show->field('bd_id', __('BD ID'));
+        $show->field('agency_name', __('Agency Name'));
+        $show->field('whatsapp_number', __('WhatsApp Number'));
+        $show->field('country', __('Country'));
+        $show->field('form_template_type', __('Form Type'));
+        $show->field('status', __('Status'));
+    
+        $show->field('data', __('Additional Info'))->as(function ($data) {
             $array = json_decode($data, true);
-            $html = '';
-            if ($array && is_array($array)) {
-                foreach ($array as $key => $value) {
-                    $html .= "<b>{$key}:</b> {$value}<br/>";
+        
+            $renderValue = function ($value) use (&$renderValue) {
+                if (is_array($value)) {
+                    $html = '<ul style="padding-left: 15px;">';
+                    foreach ($value as $k => $v) {
+                        $html .= "<li><b>{$k}:</b> " . $renderValue($v) . "</li>";
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                } 
+                elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
+                    $url = asset('storage/' . $value); 
+                    return "<img src='{$url}' style='max-width:200px;max-height:200px;'/>";
+                } 
+                else {
+                    return htmlspecialchars($value);
                 }
-            }
-            return $html;
+            };
+        
+            return $array ? $renderValue($array) : '';
         })->unescape();
-
+        
+    
         return $show;
     }
+    
+    
     protected function form()
     {
         $form = new Form(new FormRequest());
@@ -445,4 +468,21 @@ class FormRequestController extends AdminController
         return redirect()->back();
     }
     
+
+       /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('appear-charger-agency'))
+            // ->body($this->detail($id))
+            )
+            ;
+    }
+
 }
