@@ -1,4 +1,4 @@
-<div class="box box-info">
+{{-- <div class="box box-info">
     <div class="box-header with-border">
         <h3 class="box-title">🎁 {{ __('Top 10 Rooms by Gifts Sent') }}</h3>
     </div>
@@ -36,4 +36,58 @@
             }
         }
     });
+</script> --}}
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">🎁 {{ __('Top 10 Rooms by Gifts Sent') }}</h3>
+    </div>
+    <div class="box-body">
+        <canvas id="giftedRoomsChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $.ajax({
+        url: "{{ url('admin/statistics/top-room-gifts') }}", // 👈 your endpoint
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+            const ctxGift = document.getElementById('giftedRoomsChart').getContext('2d');
+
+            new Chart(ctxGift, {
+                type: 'bar',
+                data: {
+                    labels: response.labels,
+                    datasets: [{
+                        label: '{{ __("Total Gifts") }}',
+                        data: response.data,
+                        backgroundColor: [
+                            '#f87171','#60a5fa','#34d399','#fbbf24',
+                            '#a78bfa','#f472b6','#38bdf8','#facc15',
+                            '#ef4444','#10b981'
+                        ]
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // horizontal bars ✅
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading chart data:", error);
+        }
+    });
+});
 </script>

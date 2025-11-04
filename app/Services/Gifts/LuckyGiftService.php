@@ -106,7 +106,8 @@ class LuckyGiftService
 
 
 
-        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+//        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
 
@@ -480,6 +481,33 @@ class LuckyGiftService
         }
 
         if (count(array_diff($receiversIds, $userInMic)) > 0) {
+            $positions[] = -1;
+        }
+
+        return [
+            'gift_image'      => $gift->img,
+            'receiver_name'   => $receiverName,
+            'receivers_ids'   => $receiversIds,
+            'sender_id'       => $user->id ?? 0,
+            'sender_name'     => $user->name ?? '',
+            'sender_img'      => $user->profile->avatar ?? '',
+            'position'        => $positions,
+            'combo' => [],
+        ];
+    }
+
+    private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
+    {
+        $microphones = $room->microphones ?? collect();
+
+        $positions = $microphones
+            ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))
+            ->pluck('position')
+            ->values()
+            ->all();
+
+        $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
+        if (!empty($missingReceivers)) {
             $positions[] = -1;
         }
 

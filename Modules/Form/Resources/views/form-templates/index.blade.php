@@ -36,9 +36,9 @@
                         <h3 class=" font-bold text-gray-900 mb-2">
                             {{ $template->title }}
                         </h3>
-                        <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
+                        <!-- <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
                             {{ $template->description }}
-                        </p>
+                        </p> -->
                     </div>
                     <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $template->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                         {{ $template->is_active ? __('Active') : __('Inactive') }}
@@ -60,7 +60,7 @@
             <div class="p-6 bg-gray-50">
                 {{-- Copy Form Link Button --}}
                 <div class="mb-3">
-                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type]) }}', this)"
+                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type , 'token' => (auth()->user()?->api_token ?? '')]) }}', this)"
                             class="w-full bg-green-600 text-white text-center px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
                         <i class="fas fa-link {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
                         <span class="button-text">{{ __('Copy') }}</span>

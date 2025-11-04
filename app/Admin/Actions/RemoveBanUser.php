@@ -27,7 +27,7 @@ class RemoveBanUser extends Action
 
     public function handle(Request $request)
     {
-        $countryID = session('country_id');
+        $countryID = session('filter_country_id');
 
         if (!Admin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);

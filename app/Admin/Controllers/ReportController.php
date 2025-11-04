@@ -57,7 +57,7 @@ class ReportController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()
@@ -247,7 +247,7 @@ class ReportController extends MainController
     protected function agencies(): Grid
     {
         $grid = new Grid(new Agency());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
 
@@ -372,7 +372,7 @@ class ReportController extends MainController
     protected function agencies_manger()
     {
         $grid = new Grid(new AdminUser());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()

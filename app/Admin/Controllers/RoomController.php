@@ -63,7 +63,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory'])
+        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -95,14 +95,14 @@ class RoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-        if ($room->microphone) {
-            $positions = explode(',', $room->microphone);
-            foreach ($positions as $index => $userId) {
-                if ($userId != '0') {
-                    $micPositions[$userId] = $index + 1;
-                }
-            }
+        $microphones = $room->microphones
+            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->sortBy('position')
+            ->values();
+        foreach ($microphones as $mic) {
+            $micPositions[$mic->user_id] = $mic->position + 1;
         }
+
 
         // Blacklist
         $blackList = [];
@@ -255,6 +255,7 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
+        $grid->model()->with(['microphones.user.profile']);
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
@@ -321,7 +322,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()
             ->audio()
@@ -631,72 +632,75 @@ class RoomController extends MainController
 
         $grid->column(__('microphone'))->display(function () {
 
-            $usersForRow = $this->microphone_users ?? collect();
-            if ($usersForRow->isEmpty()) {
-                return '';
-            }
-            $ids = array_filter(explode(',', $this->microphone ?? ''));
-            if (empty($ids)) {
+            $microphones = $this->microphones->sortBy('position');
+
+
+            if ($microphones->isEmpty()) {
                 return '';
             }
 
             $html = '<div class="image-container">';
-            foreach ($usersForRow as $user) {
+
+            foreach ($microphones as $mic) {
+                $user = $mic->user;
 
                 if (!$user) continue;
 
-                $url = $user->profile->avatar
+                $url = $user->profile?->avatar
                     ? getImagePath($user->profile->avatar)
                     : asset("images/businessman-icon.jpg");
 
-                $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$user->id}'">
-                    <img src="{$url}" title="{$user->name}"
-                    style="width: 40px; height: 40px; border-radius: 50%;
-                                    object-fit: cover; border: 2px solid white;
-                                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                                    transition: transform 0.3s ease;"/>
-                </div>
-            HTML;
-            }
+                $name = e($user->name);
+                $id   = e($user->id);
 
+                $html .= <<<HTML
+            <div class="image-wrapper" onclick="window.location.href='{$id}'">
+                <img src="{$url}" title="{$name}"
+                style="width: 40px; height: 40px; border-radius: 50%;
+                        object-fit: cover; border: 2px solid white;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                        transition: transform 0.3s ease;"/>
+            </div>
+        HTML;
+            }
 
             $html .= '</div>';
 
+            // Add the same CSS block only once
             static $appended = false;
             if (!$appended) {
                 $html .= '
-                <style>
-                    .image-container {
-                        display: flex;
-                        justify-content: start;
-                        align-items: center;
-                        gap: -10px; /* Overlap the images slightly */
-                        padding: 8px 0;
-                        overflow-y: overlay;
-                        width: 218px;
-                        padding-right: 16px;
-                    }
-                    .image-wrapper {
-                        display: inline-block;
-                        position: relative;
-                        margin-right: -12px;
-                    }
-                    .image-wrapper img {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        object-fit: cover;
-                        border: 2px solid #fff;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                        transition: transform 0.3s ease, box-shadow 0.3s ease;
-                        cursor: pointer;
-                    }
-                    .image-wrapper img:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    }
-                </style>';
+        <style>
+            .image-container {
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                gap: -10px; /* Overlap the images slightly */
+                padding: 8px 0;
+                overflow-y: overlay;
+                width: 218px;
+                padding-right: 16px;
+            }
+            .image-wrapper {
+                display: inline-block;
+                position: relative;
+                margin-right: -12px;
+            }
+            .image-wrapper img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #fff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+            .image-wrapper img:hover {
+                transform: scale(1.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        </style>';
                 $appended = true;
             }
 

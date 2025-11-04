@@ -80,10 +80,10 @@ class GiftLogService
 
             // Get Room Data
             if (isset($ownerId)){
-                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,	room_name,room_cover,play_num,hot,room_pass,session,microphone,charizma_status,type');
 
             }else{
-                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,room_cover,	room_name,hot,room_pass,session,microphone,charizma_status,type');
                 $ownerId = $room?->uid;
             }
 
@@ -133,7 +133,7 @@ class GiftLogService
                 }else{
                     $to    = __('live');
                 }
-               
+
             } else {
                 $to_id = $receiversIds[0];
                 $to    = @$receivedUsers->first()->name;
@@ -159,7 +159,7 @@ class GiftLogService
 
             if ($room->lastPk != null) {
 
-                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))
+                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
                     ->afterCommit()
                     ->onQueue('updatePk');
             }
@@ -217,9 +217,9 @@ class GiftLogService
             // (new RoomAchievementTargetService)->roomTarget($room);
 
             // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
-            
 
-            
+
+
                 $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
 
 
@@ -492,7 +492,6 @@ class GiftLogService
     {
 
         $receiverGiftDTO = (count($receiversIds) > 1)? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromUser($receivedUser);
-
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
             'gift_img'          => $gift->img,

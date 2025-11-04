@@ -1119,6 +1119,15 @@ class PermissionTypeSeeder extends Seeder
                         ],
                     ],
                     [
+                        'key' => 'restore-super-admin',
+                        'except' => ['show', 'create', 'edit', 'delete'],
+                        'additional' => ['restore-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
+
+                        ],
+                    ],
+                    [
                         'key' => 'superadmin-settings',
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => [],

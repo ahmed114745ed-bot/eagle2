@@ -53,7 +53,7 @@ class SuperadminBannerRequestController extends AdminController
             $query->where('id', $itemNotification);
         });
         $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('superAdmin', fn($q) => $q->where('country_id', $countryID)))
             ->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();

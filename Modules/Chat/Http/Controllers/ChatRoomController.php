@@ -153,7 +153,8 @@ class ChatRoomController extends Controller
 
         $user->current_room_chat = $checkRoom->id;
         $user->update();
-        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request);
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request,$user);
+     //   dd( $messages->toArray());
 
         $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
 

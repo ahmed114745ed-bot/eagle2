@@ -68,7 +68,7 @@ class TicketController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Ticket);
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 

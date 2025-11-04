@@ -92,7 +92,7 @@ class ChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()
@@ -434,7 +434,7 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
 
@@ -615,7 +615,7 @@ class ChargeReportController extends MainController
     {
 
         $grid = new Grid(new CoinLog());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()
@@ -718,7 +718,7 @@ class ChargeReportController extends MainController
     protected function exchange()
     {
         $grid = new Grid(new ExchangeLog());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()

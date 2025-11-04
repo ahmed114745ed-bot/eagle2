@@ -12,6 +12,7 @@ use Encore\Admin\Show;
 use App\Models\Country;
 use App\Models\Permission;
 use App\Models\SuperAdmin;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use App\Admin\Actions\DeleteSuperAdminsAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class SuperAdminController extends MainController
@@ -243,29 +245,29 @@ class SuperAdminController extends MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
-            //            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-            //                $actions->add(new DeleteSuperAdminAction());
-            //            }
+            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteSuperAdminsAction());
+            }
         });
 
-//        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-//            $grid->tools(function (Grid\Tools $tools) {
-//                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-//                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-//                $milestone = __('milestone');   // Translates 'milestone' via your language files
-//
-//                $customButtonHTML = <<<HTML
-//                <div style="display: contents; align-items: center;">
-//                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-//                         {$milestone}
-//                    </a>
-//                </div>
-//            HTML;
-//
-//                // Append the custom HTML button to the grid's toolbar
-//                $tools->append($customButtonHTML);
-//            });
-//        }
+        //        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+        //            $grid->tools(function (Grid\Tools $tools) {
+        //                $milestoneId = Milestone::where('slug', 'super-admin')->first();
+        //                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+        //                $milestone = __('milestone');   // Translates 'milestone' via your language files
+        //
+        //                $customButtonHTML = <<<HTML
+        //                <div style="display: contents; align-items: center;">
+        //                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+        //                         {$milestone}
+        //                    </a>
+        //                </div>
+        //            HTML;
+        //
+        //                // Append the custom HTML button to the grid's toolbar
+        //                $tools->append($customButtonHTML);
+        //            });
+        //        }
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
 
@@ -381,8 +383,8 @@ class SuperAdminController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-superadmin', 'id', 'name')->rules('required');
 
-//            $form->switch('default', __('set_superadmin_as_default'))
-//                ->help(__('make_super_admin_default'));
+            //            $form->switch('default', __('set_superadmin_as_default'))
+            //                ->help(__('make_super_admin_default'));
         }
         $this->addPhoneFields($form, 'sometimes');
 
@@ -502,7 +504,11 @@ class SuperAdminController extends MainController
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-
+                $defaultBd =  Bd::where('country_id', $superAdmin->country_id)->where('default', 1)->first();
+                if ($defaultBd) {
+                    $defaultBd->password   = Hash::make(Str::random(10));
+                    $defaultBd->save();
+                }
                 Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
 
                 Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
@@ -626,7 +632,7 @@ class SuperAdminController extends MainController
         }
 
         $tab = request()->query('tab', 'agencies');
-        $countryID = session('country_id');
+        $countryID = session('filter_country_id');
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();

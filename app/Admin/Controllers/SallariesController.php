@@ -47,7 +47,7 @@ class SallariesController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->disableRowSelector();
 
@@ -147,7 +147,7 @@ class SallariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
 
         $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID));
 
