@@ -42,7 +42,7 @@ class AllStatisticController extends MainController
     public function index(Content $content)
     {
 
-        $countryID =request('country_id' ,null) ;
+        $countryID = request('country_id' ,null) ;
         $balance = GameWallet::query();
         $balanceDollar = GameChargeHistory::query();
         if (request("date") != null) {
@@ -369,28 +369,30 @@ class AllStatisticController extends MainController
                     $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
                         // Right: chart view (Top Salaries)
                         $row->column(6, function ($column) use ($countryID) {
-                            $topUsersByLiveTime = LiveTime::query()
-                                ->whereHas('user', function ($q) use ($countryID) {
-                                    $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                });
-                                })
-                                ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
-                                ->groupBy('uid')
-                                ->havingRaw('SUM(hours) >= 1')
-                                ->orderByDesc('total_hours')
-                                ->take(10)
-                                ->get();
+//                            $topUsersByLiveTime = LiveTime::query()
+//                                ->whereHas('user', function ($q) use ($countryID) {
+//                                    $q->when($countryID, function ($query, $countryID) {
+//                                    return $query->where('country_id', $countryID);
+//                                });
+//                                })
+//                                ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
+//                                ->groupBy('uid')
+//                                ->havingRaw('SUM(hours) >= 1')
+//                                ->orderByDesc('total_hours')
+//                                ->take(10)
+//                                ->get();
 
-                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                })->pluck('name');
-                            $data   = $topUsersByLiveTime->pluck('total_hours');
+//                            $labels = User::whereIn('id', $topUsersByLiveTime->pluck('uid'))->when($countryID, function ($query, $countryID) {
+//                                    return $query->where('country_id', $countryID);
+//                                })->pluck('name');
+//                            $data   = $topUsersByLiveTime->pluck('total_hours');
 
-                            $view = view('admin.dashboard.widgets.users_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
+//                            $view = view('admin.dashboard.widgets.users_chart', [
+//                                'labels' => $labels,
+//                                'data'   => $data,
+//                            ])->render();
+
+                            $view = view('admin.dashboard.widgets.users_chart')->render();
 
                             $column->row($view);
                         });
@@ -880,6 +882,31 @@ class AllStatisticController extends MainController
         ]);
     }
 
+    public function topUsersData(Request $request)
+    {
+        $countryID = request('country_id' ,null) ;
+
+        $topUsers = LiveTime::query()
+            ->whereHas('user', function ($q) use ($countryID) {
+                $q->when($countryID, fn($q) => $q->where('country_id', $countryID));
+            })
+            ->selectRaw('uid, SUM(hours) as total_hours')
+            ->groupBy('uid')
+            ->havingRaw('SUM(hours) >= 1')
+            ->orderByDesc('total_hours')
+            ->take(10)
+            ->get();
+
+        $labels = User::whereIn('id', $topUsers->pluck('uid'))
+            ->pluck('name');
+
+        $data = $topUsers->pluck('total_hours');
+
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data
+        ]);
+    }
 
     public function topUsersVisits(Request $request)
     {

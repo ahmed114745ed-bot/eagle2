@@ -394,6 +394,10 @@ Route::group(
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
 
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
+        });
+
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
             Route::get('/statistics', [SuperAdminStatisticController::class, 'index'])->name('statistic');
             Route::get('top-users-visits', [SuperAdminStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
@@ -755,7 +759,7 @@ Route::group(
 
 
 
-   
+
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);
