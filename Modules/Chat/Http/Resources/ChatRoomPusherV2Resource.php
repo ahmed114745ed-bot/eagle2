@@ -15,9 +15,9 @@ class ChatRoomPusherV2Resource extends JsonResource
         $authUser = $request->user();
     
         if ($authUser && $this->user_id == $authUser->id) {
-            $user2 = User::find($this->user_id2);
-        } else {
             $user2 = User::find($this->user_id);
+        } else {
+            $user2 = User::find($this->user_id2);
         }
     
         $total_unread_message = ChatMessage::where('chat_room_id', $this->id)
