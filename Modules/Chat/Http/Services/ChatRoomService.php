@@ -234,14 +234,14 @@ class ChatRoomService
         // Get chat requests (guest)
         $guestChats = ChatRoom::WhereHas('messages')
             ->select('chat_rooms.*')
-            ->where(function($q) use($user){
+            ->where(function ($q) use ($user) {
                 $q->where('chat_rooms.user_id2', $user->id)
-                ->orWhere('chat_rooms.user_id', $user->id);
+                    ->orWhere('chat_rooms.user_id', $user->id);
             })
             ->where('chat_rooms.type', 'guest')
             ->has('messages')
             ->withCount([
-                'messages as distinct_users_count' => function($query) {
+                'messages as distinct_users_count' => function ($query) {
                     $query->select(DB::raw("COUNT(DISTINCT user_id)"));
                 }
             ])
@@ -305,14 +305,38 @@ class ChatRoomService
         return $chatRoom;
     }
 
-    public function getChatMessages($chatRoomId, $request = null)
+    public function getChatMessages($chatRoomId, $request = null, $user)
     {
         // Get messages with reacts and albums for the chat room
+        // $query = ChatMessage::where('chat_room_id', $chatRoomId)
+        //     ->with('reacts', 'albums')
+        //     ->orderBy('id', 'desc');
+
         $query = ChatMessage::where('chat_room_id', $chatRoomId)
             ->with('reacts', 'albums')
-            ->orderBy('id', 'desc');
+            ->orderBy('id', 'desc')
+            ->where(function ($q) use ($user) {
+                $q->where(function ($sub) use ($user) {
+                    // If current user is sender (user_1)
+                    $sub->where('user_id', $user->id)
+                        ->where(function ($inner) {
+                            $inner->whereNull('user_1_deleted');
+                        });
+                })
+                    ->orWhere(function ($sub) use ($user) {
+                        // If current user is receiver (user_2)
+                        $sub->where('user_id', '!=', $user->id)
+                            ->where(function ($inner) {
+                                $inner->whereNull('user_2_deleted');
+                            });
+                    })
+                    ->orWhere(function ($sub) use ($user) {
+                        // If current user is receiver (user_2)
+                        $sub->whereNotNull('user_1_deleted')->whereNotNull('user_2_deleted');
+                    });
+            });
 
-        if ($request && $request->type && $request->message_id){
+        if ($request && $request->type && $request->message_id) {
             if ($request->type == 'new') {
                 return $query->where('id', '>', $request->message_id)->get();
             } elseif ($request->type == 'old') {
@@ -345,7 +369,7 @@ class ChatRoomService
         // Dispatch the event to open the chat room
         try {
             $roomResource = new ChatRoomResourcePusher($checkRoom);
-            event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ??$user , $checkRoom));
+            event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ?? $user, $checkRoom));
         } catch (\Throwable $th) {
 
             throw $th;
