@@ -62,6 +62,7 @@ class UserCharismaService
     public function addTotalEarnedCoinsInUserRoom(Room $room, array $userIds, $earnedCoins = null): false|array
     {
 
+        info('addTotalEarnedCoinsInUserRoom');
         $roomId = $room->id;
 
         if ( !$room) {
