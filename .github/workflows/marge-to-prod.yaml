@@ -1,5 +1,8 @@
 name: Merge Test to Production
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -9,14 +12,14 @@ on:
         default: 'test'
         type: string
       target_branches:
-        description: 'Target branches (comma-separated: tempoApp,uv-live,moonlight,5live,vibe,dang,zion)'
+        description: 'Target branches (comma-separated: tempoAppLive,uv-live,moon,5live,vibe,dang,zion)'
         required: true
         type: string
-        default: 'tempoApp,uv-live,moonlight,5live,vibe,dang,zion'
+        default: 'tempoAppLive,uv-live,moon,5live,vibe,dang,zion'
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest #[self-hosted]
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -29,7 +32,7 @@ jobs:
 
   merge:
     needs: prepare
-    runs-on: ubuntu-latest #[self-hosted]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false  # Continue other jobs even if one fails
       matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
@@ -41,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
       
       - name: Configure Git
         run: |
