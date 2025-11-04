@@ -12,7 +12,6 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-// دالة تحميل الإحصائيات
 function loadStatsData() {
     $.ajax({
         url: '{{ url("admin/statistics/stats-data") }}',
@@ -34,16 +33,14 @@ function loadStatsData() {
     });
 }
 
-// دالة عرض الإحصائيات بنفس شكل InfoBoxes
 function renderStatsWithInfoBoxes(data) {
     const statsContent = $('#stats-content');
     
     const infoBoxesHtml = `
         <div class="row">
-            <!-- Users Count -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}'">
-                    <span class="info-box-icon bg-aqua">
+                <div class="info-box bg-light-blue" onclick="window.location.href='{{ admin_url('users') }}'">
+                    <span class="info-box-icon">
                         <i class="fa fa-users"></i>
                     </span>
                     <div class="info-box-content">
@@ -53,10 +50,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Online Users Count -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?online=1'">
-                    <span class="info-box-icon bg-blue">
+                <div class="info-box bg-green" onclick="window.location.href='{{ admin_url('users') }}?online=1'">
+                    <span class="info-box-icon">
                         <i class="fa fa-user"></i>
                     </span>
                     <div class="info-box-content">
@@ -66,10 +62,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Peak Hour -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}'">
-                    <span class="info-box-icon bg-green">
+                <div class="info-box bg-gray" onclick="window.location.href='{{ admin_url('users') }}'">
+                    <span class="info-box-icon">
                         <i class="fa fa-clock-o"></i>
                     </span>
                     <div class="info-box-content">
@@ -79,10 +74,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- New Sign Ups Today -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?signups=today'">
-                    <span class="info-box-icon bg-yellow">
+                <div class="info-box bg-purple" onclick="window.location.href='{{ admin_url('users') }}?signups=today'">
+                    <span class="info-box-icon">
                         <i class="fa fa-user-plus"></i>
                     </span>
                     <div class="info-box-content">
@@ -92,10 +86,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- New Sign Ups This Week -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?signups=week'">
-                    <span class="info-box-icon bg-red">
+                <div class="info-box bg-yellow" onclick="window.location.href='{{ admin_url('users') }}?signups=week'">
+                    <span class="info-box-icon">
                         <i class="fa fa-users"></i>
                     </span>
                     <div class="info-box-content">
@@ -105,10 +98,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- New Sign Ups This Month -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?signups=month'">
-                    <span class="info-box-icon bg-purple">
+                <div class="info-box bg-purple" onclick="window.location.href='{{ admin_url('users') }}?signups=month'">
+                    <span class="info-box-icon">
                         <i class="fa fa-user"></i>
                     </span>
                     <div class="info-box-content">
@@ -118,10 +110,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Messages Today -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?messages=today'">
-                    <span class="info-box-icon bg-maroon">
+                <div class="info-box bg-red" onclick="window.location.href='{{ admin_url('users') }}?messages=today'">
+                    <span class="info-box-icon">
                         <i class="fa fa-envelope"></i>
                     </span>
                     <div class="info-box-content">
@@ -131,10 +122,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Messages This Month -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?messages=month'">
-                    <span class="info-box-icon bg-teal">
+                <div class="info-box bg-red" onclick="window.location.href='{{ admin_url('users') }}?messages=month'">
+                    <span class="info-box-icon">
                         <i class="fa fa-comments"></i>
                     </span>
                     <div class="info-box-content">
@@ -144,10 +134,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Users Who Send Messages -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?sent_messages=1'">
-                    <span class="info-box-icon bg-gray">
+                <div class="info-box bg-blue" onclick="window.location.href='{{ admin_url('users') }}?sent_messages=1'">
+                    <span class="info-box-icon">
                         <i class="fa fa-user"></i>
                     </span>
                     <div class="info-box-content">
@@ -157,10 +146,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Users Who Never Send -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}?never_send=1'">
-                    <span class="info-box-icon bg-orange">
+                <div class="info-box bg-gray" onclick="window.location.href='{{ admin_url('users') }}?never_send=1'">
+                    <span class="info-box-icon">
                         <i class="fa fa-user-times"></i>
                     </span>
                     <div class="info-box-content">
@@ -170,10 +158,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Open Conversations Today -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}'">
-                    <span class="info-box-icon bg-lime">
+                <div class="info-box bg-green" onclick="window.location.href='{{ admin_url('users') }}'">
+                    <span class="info-box-icon">
                         <i class="fa fa-comments-o"></i>
                     </span>
                     <div class="info-box-content">
@@ -183,10 +170,9 @@ function renderStatsWithInfoBoxes(data) {
                 </div>
             </div>
 
-            <!-- Avg Conversation Duration -->
             <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="info-box" onclick="window.location.href='{{ admin_url('users') }}'">
-                    <span class="info-box-icon bg-olive">
+                <div class="info-box bg-yellow" onclick="window.location.href='{{ admin_url('users') }}'">
+                    <span class="info-box-icon">
                         <i class="fa fa-clock-o"></i>
                     </span>
                     <div class="info-box-content">
@@ -201,33 +187,29 @@ function renderStatsWithInfoBoxes(data) {
     statsContent.html(infoBoxesHtml);
 }
 
-// تحديث الإحصائيات تلقائياً كل دقيقتين
 function startAutoRefresh() {
-    setInterval(loadStatsData, 120000); // 2 دقيقة
+    setInterval(loadStatsData, 120000);
 }
 
-// تحميل البيانات عند فتح الصفحة
 $(document).ready(function() {
     loadStatsData();
     startAutoRefresh();
     
-    // إضافة زر تحديث يدوي إذا أردت
     $(document).on('click', '#refresh-stats-btn', function() {
         loadStatsData();
     });
 });
 
-// إضافة تأثير hover على الـ InfoBoxes
 $(document).on('mouseenter', '.info-box', function() {
     $(this).css('cursor', 'pointer');
-    $(this).css('transform', 'translateY(-2px)');
+    $(this).css('transform', 'translateY(-3px)');
     $(this).css('transition', 'all 0.3s ease');
-    $(this).css('box-shadow', '0 4px 8px rgba(0,0,0,0.2)');
+    $(this).css('box-shadow', '0 6px 12px rgba(0,0,0,0.3)');
 });
 
 $(document).on('mouseleave', '.info-box', function() {
     $(this).css('transform', 'translateY(0)');
-    $(this).css('box-shadow', 'none');
+    $(this).css('box-shadow', '0 2px 4px rgba(0,0,0,0.1)');
 });
 </script>
 
@@ -236,31 +218,130 @@ $(document).on('mouseleave', '.info-box', function() {
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 15px;
+    border-radius: 5px;
+    display: block;
+    min-height: 100px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    color: white !important;
+    padding: 0;
+    overflow: hidden;
 }
 
 .info-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3) !important;
 }
 
-/* ألوان الـ InfoBoxes */
-.bg-aqua { background-color: #00c0ef !important; }
-.bg-blue { background-color: #0073b7 !important; }
-.bg-green { background-color: #00a65a !important; }
-.bg-yellow { background-color: #f39c12 !important; }
-.bg-red { background-color: #dd4b39 !important; }
-.bg-purple { background-color: #605ca8 !important; }
-.bg-maroon { background-color: #d81b60 !important; }
-.bg-teal { background-color: #39cccc !important; }
-.bg-gray { background-color: #d2d6de !important; color: #333 !important; }
-.bg-orange { background-color: #ff851b !important; }
-.bg-lime { background-color: #01ff70 !important; color: #333 !important; }
-.bg-olive { background-color: #3d9970 !important; }
+.info-box-icon {
+    display: block;
+    float: left;
+    height: 100px;
+    width: 100px;
+    text-align: center;
+    font-size: 50px;
+    line-height: 100px;
+    background: rgba(255,255,255,0.2);
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
 
-/* تحسين التصميم للشاشات الصغيرة */
+.info-box-content {
+    padding: 15px 20px;
+    margin-left: 100px;
+    color: white;
+}
+
+.info-box-text {
+    display: block;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+    opacity: 0.9;
+}
+
+.info-box-number {
+    display: block;
+    font-weight: bold;
+    font-size: 24px;
+    opacity: 1;
+}
+
+.bg-light-blue { 
+    background: linear-gradient(135deg, #3c8dbc 0%, #367fa9 100%) !important; 
+    border-left: 4px solid #2d7ca7;
+}
+
+.bg-blue { 
+    background: linear-gradient(135deg, #0073b7 0%, #0065a3 100%) !important;
+    border-left: 4px solid #005c8f;
+}
+
+.bg-green { 
+    background: linear-gradient(135deg, #00a65a 0%, #008d4c 100%) !important;
+    border-left: 4px solid #007d41;
+}
+
+.bg-yellow { 
+    background: linear-gradient(135deg, #f39c12 0%, #e08e0b 100%) !important;
+    border-left: 4px solid #d17e09;
+}
+
+.bg-orange { 
+    background: linear-gradient(135deg, #ff851b 0%, #ff7701 100%) !important;
+    border-left: 4px solid #e66900;
+}
+
+.bg-red { 
+    background: linear-gradient(135deg, #dd4b39 0%, #d73925 100%) !important;
+    border-left: 4px solid #c23321;
+}
+
+.bg-purple { 
+    background: linear-gradient(135deg, #605ca8 0%, #555299 100%) !important;
+    border-left: 4px solid #4a4786;
+}
+
+.bg-gray { 
+    background: linear-gradient(135deg, #d2d6de 0%, #b5bbc9 100%) !important;
+    border-left: 4px solid #a8afbf;
+    color: #333 !important;
+}
+
+.bg-gray .info-box-content {
+    color: #333 !important;
+}
+
+.bg-gray .info-box-text {
+    color: #555 !important;
+}
+
+.bg-gray .info-box-number {
+    color: #222 !important;
+}
+
 @media (max-width: 768px) {
     .col-md-3 {
         margin-bottom: 10px;
+    }
+    
+    .info-box {
+        min-height: 80px;
+    }
+    
+    .info-box-icon {
+        width: 80px;
+        height: 80px;
+        line-height: 80px;
+        font-size: 40px;
+    }
+    
+    .info-box-content {
+        margin-left: 80px;
+        padding: 10px 15px;
     }
     
     .info-box-content .info-box-number {
@@ -268,7 +349,33 @@ $(document).on('mouseleave', '.info-box', function() {
     }
     
     .info-box-content .info-box-text {
-        font-size: 13px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-box {
+        min-height: 70px;
+    }
+    
+    .info-box-icon {
+        width: 70px;
+        height: 70px;
+        line-height: 70px;
+        font-size: 35px;
+    }
+    
+    .info-box-content {
+        margin-left: 70px;
+        padding: 8px 12px;
+    }
+    
+    .info-box-content .info-box-number {
+        font-size: 18px;
+    }
+    
+    .info-box-content .info-box-text {
+        font-size: 11px;
     }
 }
 </style>
