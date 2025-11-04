@@ -140,6 +140,7 @@ class ChatMessageResource extends JsonResource
             'reacts' => $reacts->count() > 0 ? ChatReactResource::collection($reacts) : null,
             'albums' => $albums->count() > 0 ?  $album_array : null,
             'created_at' => $this->create_at($timeZone),
+            "date_time" => $this->created_at,
         ];
     }
 }
