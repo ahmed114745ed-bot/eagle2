@@ -151,25 +151,6 @@ class AllStatisticController extends MainController
             SUM(total_loss - total_win) as app_profit
         ")->first();
 
-        
-        // bd
-
-        $bdCount = Bd::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })->count();
-
-
-        $totalSalaries = Bd::where('parent_id', auth()->id())->when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->withSum('salaries', 'salary')
-            ->withSum('salaries', 'cut_amount')
-            ->withCount('agencies')
-            ->get();
-
-        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
-        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
-        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
         return parent::index($content
             ->title(__('Home'))
@@ -179,7 +160,7 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                 }
             })
-            ->row(function (Row $row) use ( $usersCount, $bdCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,  $topUsersByFollowers, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD, $game) {
+            ->row(function (Row $row) use ($usersCount, $onlineUser, $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration,  $topUsersByFollowers, $game) {
                 $row->column(12, function ($column) use ($usersCount, $onlineUser,  $peakHours, $newSignUpsToday, $newSignUpsThisWeek, $newSignUpsThisMonth, $messagesToday, $messagesThisMonth, $usersWhoSend, $usersWhoNeverSend, $openConversationsToday, $avgConversationDuration) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
@@ -300,7 +281,7 @@ class AllStatisticController extends MainController
                 $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
 
-                     $column->row(function ($row) {
+                    $column->row(function ($row) {
                         $view = view('admin.dashboard.widgets.agency_tab')->render();
                         $row->column(12, $view);
                     });
@@ -332,14 +313,12 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                $row->column(12, function ($column)  {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
-                    $column->row(function (Row $row) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'admin/usersBD', $bdCount));
-                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'admin/bd-salaries', number_format($totalBDSalary)));
-                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'admin/bd-salaries', number_format($totalBDCut)));
-                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'admin/usersBD', number_format($averageAgenciesPerBD)));
+                    $column->row(function ($row) {
+                        $view = view('admin.dashboard.widgets.bd_tab')->render();
+                        $row->column(12, $view);
                     });
                 });
 
@@ -860,6 +839,34 @@ class AllStatisticController extends MainController
             'avgMembersPerAgency' => $avgMembersPerAgency,
             'pendingJoins' => $pendingJoins,
             'diamondsAchieved' => $diamondsAchieved,
+        ]);
+    }
+
+
+    public function getBdStats()
+    {
+        $countryID = $this->countryId();
+
+        $bdCount = Bd::where('parent_id', auth()->id())
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->count();
+
+        $totalSalaries = Bd::where('parent_id', auth()->id())
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->withSum('salaries', 'salary')
+            ->withSum('salaries', 'cut_amount')
+            ->withCount('agencies')
+            ->get();
+
+        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
+        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
+        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
+
+        return response()->json([
+            'bdCount' => $bdCount,
+            'totalBDSalary' => round($totalBDSalary),
+            'totalBDCut' => round($totalBDCut),
+            'averageAgenciesPerBD' => round($averageAgenciesPerBD, 2),
         ]);
     }
 }
