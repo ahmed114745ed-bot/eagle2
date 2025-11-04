@@ -282,7 +282,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
-         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
+        Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -333,8 +333,8 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
-         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+        Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
@@ -398,6 +398,10 @@ Route::group(
             Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
             Route::get('comparison-user-signup', [AllStatisticController::class, 'comparisonUserSignUp']);
             Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
+            Route::get('top-sender', [AllStatisticController::class, 'topSender']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
@@ -673,9 +677,9 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
-         Route::resource('helper-links', LinkViewController::class);
+            ->except(['update'])
+            ->names('admin.settings');
+        Route::resource('helper-links', LinkViewController::class);
 
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);

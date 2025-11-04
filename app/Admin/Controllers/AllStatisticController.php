@@ -397,8 +397,8 @@ class AllStatisticController extends MainController
                     });
                 });
 
-                $row->column(12, function ($column) use ($countryID, $topUsersByFollowers) {
-                    $column->row(function (Row $row) use ($countryID, $topUsersByFollowers) {
+                $row->column(12, function ($column) use ($topUsersByFollowers) {
+                    $column->row(function (Row $row) use ($topUsersByFollowers) {
                         $row->column(6, function ($col) use ($topUsersByFollowers) {
                             $top5 = $topUsersByFollowers
                                 ->filter(fn($user) => $user->followers_count > 0)
@@ -411,7 +411,7 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col) use ($countryID) {
+                        $row->column(6, function ($col) {
                             $view = view('admin.dashboard.widgets.users_online_chart')->render();
                             $col->row($view);
                         });
@@ -430,8 +430,8 @@ class AllStatisticController extends MainController
 
                     $column->row(function (Row $row) use ($countryID) {
                         //chart 1
-                        $row->column(6, function ($column)  {
-                            
+                        $row->column(6, function ($column) {
+
                             $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
                             $column->row($view);
                         });
@@ -444,53 +444,16 @@ class AllStatisticController extends MainController
 
                         //chart 3
                         $row->column(6, function ($column) use ($countryID) {
-                            $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            }))
-                                ->with('owner')
-                                ->withSum('gifts', 'giftPrice')
-                                ->orderByDesc('gifts_sum_gift_price')
-                                ->take(10)
-                                ->get()
-                                ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
 
-                            $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
-                            $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
 
-                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
+                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart')->render();
 
                             $column->row($view);
                         });
 
                         //chart4
-                        $row->column(6, function ($column) use ($countryID) {
-                            $avgSessionRooms = \DB::table('rooms')
-                                ->join('users', 'rooms.uid', '=', 'users.id')
-                                ->join('live_times', 'users.id', '=', 'live_times.uid')
-                                ->where('users.country_id', Auth::user()->country_id)
-                                ->select(
-                                    'rooms.id',
-                                    'users.name as room_name',
-                                    \DB::raw('AVG(
-                                        COALESCE(live_times.hours,
-                                            TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(live_times.start_time), FROM_UNIXTIME(live_times.end_time)) / 3600
-                                        )
-                                    ) as avg_duration')
-                                )
-                                ->groupBy('rooms.id', 'users.name')
-                                ->orderByDesc('avg_duration')
-                                ->limit(10)
-                                ->get();
-
-                            $labels = $avgSessionRooms->pluck('room_name');
-                            $data   = $avgSessionRooms->pluck('avg_duration');
-                            $view = view('admin.dashboard.widgets.avg_session_duration_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
+                        $row->column(6, function ($column) {
+                            $view = view('admin.dashboard.widgets.avg_session_duration_chart')->render();
 
                             $column->row($view);
                         });
@@ -515,57 +478,15 @@ class AllStatisticController extends MainController
 
                     $column->row(function (Row $row) use ($countryID) {
                         //chart 1
-                        $row->column(6, function ($column) use ($countryID) {
-                            $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->when($countryID, function ($query, $countryID) {
-                                return $query->where('country_id', $countryID);
-                            }))
-                                ->where('agency_obtain', '>', 0)
-                                ->selectRaw('agency_id, COUNT(*) as total_achieved')
-                                ->groupBy('agency_id')
-                                ->orderByDesc('total_achieved')
-                                ->with('agency:id,name')
-                                ->take(10)
-                                ->get();
+                        $row->column(6, function ($column) {
 
-                            $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
-                            $data   = $topAgenciesByTargets->pluck('total_achieved');
-
-                            $view = view('admin.dashboard.widgets.agencies_targets_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
-
+                            $view = view('admin.dashboard.widgets.agencies_targets_chart')->render();
                             $column->row($view);
                         });
 
                         //chart 2
                         $row->column(6, function ($column) use ($countryID) {
-                            $topSenders = GiftLog::whereHas(
-                                'sender',
-                                fn($q) =>
-                                $q->when($countryID, function ($query, $countryID) {
-                                    return $query->where('country_id', $countryID);
-                                })
-                                    ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
-                                        return $query->where('country_id', $countryID);
-                                    }))
-                            )
-                                ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-                                ->groupBy('sender_id')
-                                ->orderByDesc('total_sent')
-                                ->take(10)
-                                ->with('sender:id,name')
-                                ->get()
-                                ->filter(fn($s) => $s->total_sent > 0);
-
-                            $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
-                            $data   = $topSenders->pluck('total_sent');
-
-                            $view = view('admin.dashboard.widgets.top_senders_chart', [
-                                'labels' => $labels,
-                                'data'   => $data,
-                            ])->render();
-
+                            $view = view('admin.dashboard.widgets.top_senders_chart')->render();
                             $column->row($view);
                         });
 
@@ -911,6 +832,106 @@ class AllStatisticController extends MainController
         return response()->json([
             'labels' => array_keys($roomStats),
             'data'   => array_values($roomStats),
+        ]);
+    }
+
+    protected function topRoomGifts()
+    {
+        $countryID = request('country_id', null);
+        $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        }))
+            ->with('owner')
+            ->withSum('gifts', 'giftPrice')
+            ->orderByDesc('gifts_sum_gift_price')
+            ->take(10)
+            ->get()
+            ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
+
+        $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
+        $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function averageActiveRooms()
+    {
+        $avgSessionRooms = \DB::table('rooms')
+            ->join('users', 'rooms.uid', '=', 'users.id')
+            ->join('live_times', 'users.id', '=', 'live_times.uid')
+            ->where('users.country_id', Auth::user()->country_id)
+            ->select(
+                'rooms.id',
+                'users.name as room_name',
+                \DB::raw('AVG(
+                                        COALESCE(live_times.hours,
+                                            TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(live_times.start_time), FROM_UNIXTIME(live_times.end_time)) / 3600
+                                        )
+                                    ) as avg_duration')
+            )
+            ->groupBy('rooms.id', 'users.name')
+            ->orderByDesc('avg_duration')
+            ->limit(10)
+            ->get();
+
+        $labels = $avgSessionRooms->pluck('room_name');
+        $data   = $avgSessionRooms->pluck('avg_duration');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function agencyTarget()
+    {
+        $countryID = request('country_id', null);
+        $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->when($countryID, function ($query, $countryID) {
+            return $query->where('country_id', $countryID);
+        }))
+            ->where('agency_obtain', '>', 0)
+            ->selectRaw('agency_id, COUNT(*) as total_achieved')
+            ->groupBy('agency_id')
+            ->orderByDesc('total_achieved')
+            ->with('agency:id,name')
+            ->take(10)
+            ->get();
+
+        $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
+        $data   = $topAgenciesByTargets->pluck('total_achieved');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function topSender()
+    {
+        $countryID = request('country_id', null);
+        $topSenders = GiftLog::whereHas(
+            'sender',
+            fn($q) =>
+            $q->when($countryID, function ($query, $countryID) {
+                return $query->where('country_id', $countryID);
+            })
+                ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
+                    return $query->where('country_id', $countryID);
+                }))
+        )
+            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+            ->groupBy('sender_id')
+            ->orderByDesc('total_sent')
+            ->take(10)
+            ->with('sender:id,name')
+            ->get()
+            ->filter(fn($s) => $s->total_sent > 0);
+
+        $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
+        $data   = $topSenders->pluck('total_sent');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
         ]);
     }
 }
