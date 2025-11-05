@@ -233,7 +233,7 @@ function addSection(data = null) {
                         ${titlesHtml}
                     </div>
                 </div>
-
+                <input type="hidden" name="sections[${sectionCount}][can_not_delete]" value="${data.can_not_delete}">
                 <input type="hidden" name="sections[${sectionCount}][order]" value="${sectionCount}">
 
                 <div class="mb-4">
@@ -467,6 +467,8 @@ function addField(sectionId, data = null) {
                         </p>
                     </div>
                 </div>
+
+                <input type="hidden" name="sections[${sectionId}][fields][${fieldId}][can_not_delete]" value="${data && data.can_not_delete ? data.can_not_delete : 0}">
 
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center text-lg">
