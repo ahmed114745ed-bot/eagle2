@@ -8,18 +8,16 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Models\Follow;
 use App\Models\SuperAdmin;
-use App\Models\AreaManager;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
-use App\Models\SubAreaManager;
+
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
-use function Laravel\Prompts\select;
-use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Modules\AreaManager\Entities\AreaManager;
+use Modules\AreaManager\Entities\SubAreaManager;
 use App\Http\Resources\Api\V1\UserDataRoomResource;
 use App\Tik\Repositories\UserRepository as Repository;
 
