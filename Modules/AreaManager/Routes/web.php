@@ -35,12 +35,7 @@ use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController
 |
 */
 
-Route::prefix('areaManager')->name('areaManager.')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-});
-
-
-
+/*============================= DASHBOARD ROUTE THAT SPECIAL owner DASH ==============================*/
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -63,7 +58,7 @@ Route::group(
         });
     }
 );
-
+/*============================= DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
 Route::group(
     [
         'prefix' => 'areaManager',
@@ -155,3 +150,10 @@ Route::group(
         Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
     }
 );
+
+Route::prefix('areaManager')->name('areaManager.')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+/*============================= End DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
+
