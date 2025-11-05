@@ -91,7 +91,7 @@ class AgencyJoinRequestController extends MainController
     {
 
         $grid = new Grid(new AgencyJoinRequest);
-        $countryID = session('country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
             ->when($countryID, fn($q) =>

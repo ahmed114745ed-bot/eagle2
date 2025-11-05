@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubAdmin extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
 
     protected $attributes = [
-        'type' => 'superadmin',
+        'type' => 'sub_super_admin',
     ];
+    protected $dates = ['deleted_at'];
 
     public function appUser()
     {
@@ -34,6 +36,11 @@ class SubAdmin extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function superAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SuperAdmin::class, 'parent_id');
+    }
+
     protected static function booted(): void
     {
 
@@ -41,22 +48,15 @@ class SubAdmin extends Model
             $builder->where('type', 'sub_super_admin');
         });
 
-        self::deleting(function (SuperAdmin $superAdmin) {
-        });
+        self::deleting(function (SuperAdmin $superAdmin) {});
     }
 
     protected static function boot()
     {
         parent::boot();
 
-        self::creating(function ($model) {
-          
-        });
+        self::creating(function ($model) {});
 
-        self::updating(function ($model) {
-            
-        });
+        self::updating(function ($model) {});
     }
-
-
 }

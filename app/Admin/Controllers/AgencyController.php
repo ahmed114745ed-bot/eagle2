@@ -579,7 +579,7 @@ class AgencyController extends MainController
 
     protected function grid()
     {
-        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
+        $countryID = session('filter_country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()

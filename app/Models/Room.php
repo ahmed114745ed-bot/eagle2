@@ -85,6 +85,11 @@ class Room extends Model
         return $this->belongsTo(AllGame::class, 'game_id');
     }
 
+    public function microphones(): HasMany
+    {
+        return $this->hasMany(RoomMicrophone::class);
+    }
+
     public function getLangAttribute()
     {
         if (self::$withoutAppends) {
@@ -154,15 +159,33 @@ class Room extends Model
         return numToString($this->session);
     }
 
+//    public function getMicrophoneAttribute()
+//    {
+//        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
+//        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
+//        $array = array_map(function ($id) {
+//            return explode('#', $id)[0];
+//        }, $microphoneWithOldSeat);
+//
+//        return implode(',', $array);
+//    }
+
     public function getMicrophoneAttribute()
     {
-        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
-        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
-        $array = array_map(function ($id) {
-            return explode('#', $id)[0];
-        }, $microphoneWithOldSeat);
+        return $this->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($mic) {
+                $userId = $mic->user_id ?? 0;
+                $status = $mic->status ?? 0;
 
-        return implode(',', $array);
+                if ($userId > 0) {
+                    return "{$userId}#{$status}";
+                } else {
+                    return (string)$status;
+                }
+            })
+            ->implode(',');
     }
 
     public function getMicrophoneOnlyUsersAttribute()
@@ -271,7 +294,7 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
-    
+
 
     public function getVisitorsImages()
     {
@@ -375,4 +398,10 @@ class Room extends Model
         return User::whereIn('id', explode(',', $this->room_admin ?? ''))
                 ->get();
     }
+
+    public function getTotalAdminsAttribute(): int
+    {
+        return (int) $this->max_admin + (int) $this->additional_admin;
+    }
+
 }

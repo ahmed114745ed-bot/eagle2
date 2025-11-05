@@ -165,7 +165,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     // all route with auth
-    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
+    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan' ,'update.last.seen'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
@@ -235,7 +235,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
                 Route::post('remove_pass', [RoomController::class, 'removeRoomPass']);
                 Route::post('room_background_list', [BackgroundController::class, 'roomBackground']);
-                Route::post('quit_room', [RoomController::class, 'quit_room']);
+                Route::post('quit_room', [RoomController::class, 'quit_room_2']);
+//                Route::post('quit_room_2', [RoomController::class, 'quit_room_2']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
                 Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
@@ -264,15 +265,20 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
-                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
-                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
+                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone2']);
+//                Route::post('up-microphone2', [MicrophoneController::class, 'upMicrophone2']);
+                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone2']);
+//                Route::post('leave-microphone2', [MicrophoneController::class, 'goMicrophone2']);
                 Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
-                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone']);
-                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
-                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
-                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
+                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone2']);
+//                Route::post('mute_microphone2', [MicrophoneController::class, 'mute_microphone2']);
+                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone2']);
+//                Route::post('unmute_microphone2', [MicrophoneController::class, 'unmute_microphone2']);
+                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone2']);
+//                Route::post('lock_microphone_place2', [MicrophoneController::class, 'shut_microphone2']);
+                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone2']);
+//                Route::post('unlock_microphone_place2', [MicrophoneController::class, 'open_microphone2']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-                // Invite user to room
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);

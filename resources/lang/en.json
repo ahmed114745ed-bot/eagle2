@@ -22,6 +22,8 @@
     "Add switch charge to superadmin":" add charge",
     "History switch charge to superadmin":"history charges",
     "not_in_same_country":"not in same country",
+    "Make every minute in :app LIFE an authentic celebration!": "Make every minute in :app LIFE an authentic celebration!",
+    ":app LIFE Legends": ":app LIFE Legends",
     "Browse coin recharge" : "Browse charges",
     "Add switch coin recharge" : "Add charge",
     "Coin Recharge" : "charges",
@@ -29,7 +31,7 @@
     "Reward Center": "Gift Rewards",
     "Browse reward center": "Browse Gift Rewards",
     "Dedicate switch reward center": "Dedicate Gift Rewards",
-    
+
 
     "Price for 1 day": "Price for one hour!",
     "Browse Ticket": "View Complaints",
@@ -1328,6 +1330,81 @@
 "Banner approved successfully": "Banner approved successfully",
 "Banner rejected successfully": "Banner rejected successfully",
 "sub admin" : "Sup Admin",
-"Acquisitions":"Acquisitions"
+"requests_title": "Requests",
+"name": "Name",
+"bd_id": "BD ID",
+"agency_name": "Agency Name",
+"whatsapp_number": "WhatsApp Number",
+"country": "Country",
+"form_template_type": "Form Type",
+"status": "Status",
+"additional_info": "Additional Information",
+"approve": "Approve",
+"reject": "Reject",
+"approved_message": "Request approved successfully!",
+"rejected_message": "Request rejected successfully!",
+"Host Agency": "Host Agency",
+"BD Form": "BD Form",
+"Shaping Agency": "Shaping Agency",
+"user_not_found": "User not found.",
+"user_already_has_agency": "This user already owns an agency.",
+"user_already_has_bd": "This user already has a BD account.",
+"user_already_has_shipping_agency": "This user already owns a shipping agency.",
+"approved_successfully": "Approved successfully.",
+"Preview":"Preview",
+"Form-templates":"Form-templates",
+"Edit Form Template":"Edit Form Template",    "Template Information": "Template Information",
+"Form Title": "Form Title",
+"Form Type": "Form Type",
+"Description": "Description",
+"Form Description": "Form Description",
+"Add Section": "Add Section",
+"Cancel": "Cancel",
+"Create Template": "Create Template",
+"Requests": "Requests",
+"Placeholder Text": "Placeholder Text",
+"Field Label": "Field Label",
+"Field Name": "Field Name",
+"Required": "Required",
+"Enabled": "Enabled",
+"BD Registration Form": "BD Registration Form",
+"Main Section": "Main Section",
+"Submit Form": "Submit Form",
+"Section Title": "Section Title",
+"Form Requests": "Form Requests",
+"Form-requests": "Form Requests",
+"form-requests": "Form Requests",
+"Select Options Configuration": "Select Options Configuration",
+"Pre-defined Data": "Pre-defined Data",
+"Options Type": "Options Type",
+"Custom Options": "Custom Options",
+"Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}": "Enter one option per line, or use JSON format for translations: {\"en\":\"Option 1\",\"ar\":\"خيار 1\"}"
+,  "Field":"Field",
+"Field Type":"Field Type",
+"land settings": "Landing Page Settings",
+"Number of Users": "Number of Users",
+"Number of Countries": "Number of Countries",
+"Number of Live Streams": "Number of Live Streams",
+"Google Play Link": "Google Play Link",
+"Apple Store Link": "Apple Store Link",
+"Gallery App Link": "Gallery App Link",
+"Facebook Link": "Facebook Link",
+"Twitter Link": "Twitter Link",
+"WhatsApp Link": "WhatsApp Link",
+"About Us Link": "About Us Link",
+"Landing Page Settings": "Landing Page Settings",
+"General Settings": "General Settings",
+"Statistics Settings": "Statistics Settings",
+"Social Media Settings": "Social Media Settings",
+"Save": "Save"
+
+
+
+
+
+
+
+
+
 
 }

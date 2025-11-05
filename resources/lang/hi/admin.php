@@ -435,4 +435,6 @@ return [
     "CDN" => "CDN",
     "L3" => "L3",
     "charge_level" => "चार्ज स्तर",
+    'is_preview' => 'लाइव पूर्वावलोकन',
+
 ];

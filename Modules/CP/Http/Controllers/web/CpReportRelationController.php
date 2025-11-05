@@ -38,7 +38,7 @@ class CpReportRelationController extends MainController
     protected function relations()
     {
         $grid = new Grid(new Cp());
-        $countryID = session('country_id');
+        $countryID =session('filter_country_id');
         $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('fromUser', function ($subQuery) use ($countryID) {

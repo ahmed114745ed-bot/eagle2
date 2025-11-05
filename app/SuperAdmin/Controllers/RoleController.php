@@ -85,7 +85,8 @@ class RoleController extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('admin_id', auth()->id());
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $grid->model()->where('admin_id', $authId);
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 
@@ -215,7 +216,7 @@ class RoleController extends MainController
             $form->model()->admin_id = Auth::id();
             $form->model()->type = PermissionType::SUPER_ADMIN->value;
             // Automatically generate slug from name *before saving*
-            $form->model()->slug = Str::slug($form->name. '-' . PermissionType::SUPER_ADMIN->value);
+            $form->model()->slug = Str::slug($form->name . '-' . PermissionType::SUPER_ADMIN->value);
         });
         $form->saving(function (Form $form) {
             $form->ignore('permissions'); // handled manually

@@ -355,7 +355,7 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('country_id') && !session('area_manager_id'))
+                @if(!session('preview_superadmin') && session('filter_country_id'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
@@ -474,11 +474,9 @@
                 const url = new URL(window.location.href);
 
                 if (countryId && countryId !== 'null') {
-                    url.searchParams.set('country_id', countryId);
-                    url.searchParams.delete('clear_country');
+                    url.searchParams.set('filter_country_id', countryId);
                 } else {
-                    url.searchParams.set('clear_country', 1);
-                    url.searchParams.delete('country_id');
+                    url.searchParams.set('filter_country_id', 'null');
                 }
 
                 if ($.pjax) {

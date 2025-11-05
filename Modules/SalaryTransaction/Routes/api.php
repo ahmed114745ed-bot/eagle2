@@ -16,7 +16,7 @@ use Modules\SalaryTransaction\Http\Controllers\Api\SalaryTransactionController;
     | is assigned the "api" middleware group. Enjoy building your API!
     |
 */
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group (
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan' ,'update.last.seen'])->group (
     function (){
         Route::prefix('salary-transaction')->group(function () {
             Route::post('add-request', [SalaryTransactionController::class, 'add_request_salary']);

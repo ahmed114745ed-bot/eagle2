@@ -102,11 +102,16 @@
                 @endforeach
                 @endif
 
-                 @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
+
+
+
+
+     
+            @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
                         ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
                         ,
                         [
@@ -192,7 +197,7 @@
                     @if(isset($link['children']))
 
                         @if(hasVisibleChildren($link['children']))
-
+                      
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa {{ $link['icon'] }}"></i>

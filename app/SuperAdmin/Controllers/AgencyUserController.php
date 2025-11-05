@@ -54,14 +54,14 @@ class AgencyUserController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(__($this->title))
             ->body($this->detail($id)));
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(__($this->title))
             ->body($this->form()->edit($id)));
     }
@@ -245,11 +245,11 @@ class AgencyUserController extends MainController
         ");
 
         $grid->disableCreateButton();
-        $grid->actions(
-            function ($actions) {
-                $actions->disableEdit();
-            }
-        );
+        $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->disableEdit();
+        });
 
         return $grid;
     }
@@ -296,15 +296,15 @@ class AgencyUserController extends MainController
         $grid->column('id', __('Id'));
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
+                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
             ";
-        });
+            });
         }
 
         $grid->column('name', __('Name'))
@@ -425,11 +425,7 @@ class AgencyUserController extends MainController
         $grid->disableActions();
 
         $grid->disableCreateButton();
-        $grid->actions(
-            function ($actions) {
-                $actions->disableEdit();
-            }
-        );
+        $grid->disableExport();
 
         return $grid;
     }

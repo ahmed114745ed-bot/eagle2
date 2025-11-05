@@ -53,6 +53,21 @@ class MicrophoneController extends Controller
     }
     //leave mic
 
+    public function upMicrophone2(Request $request)
+    {
+        $data = $request;
+        $user_id = $request->user_id;
+        if ((!$data['owner_id'] && !$request->room_id) || !$user_id) return Common::apiResponse(0, __('api_responses.Missing_data'), null, 422);
+        try {
+            [$user, $room] = $this->microphoneService->upMic2($data);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+
+        // (new CpServices())->sendZegoMap($user, $room);
+        return Common::apiResponse(1, __('api_responses.Success_on_the_mic'));
+    }
+
     public function goMicrophone(Request $request)
     {
         $data = $request;
@@ -71,6 +86,23 @@ class MicrophoneController extends Controller
         }
     }
 
+    public function goMicrophone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->goMic2($data);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+
+        if ($room) {
+            UserHandling::calcTime($data['user_id']);
+            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($data['user_id'], $room->id);
+            return Common::apiResponse(1, __('api_responses.success'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.failed'), null, 400);
+        }
+    }
 
     //mute mic place
     public function mute_microphone(Request $request)
@@ -78,6 +110,30 @@ class MicrophoneController extends Controller
         $data = $request;
         try {
             $room = $this->microphoneService->mic($data, 'mute');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if (true) {
+            $ms = [
+                'messageContent' => [
+                    'message' => 'muteMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_locked_the_microphone_position'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_lock_microphone'), null, 400);
+        }
+    }
+
+    public function mute_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic2($data, 'mute');
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
@@ -128,6 +184,31 @@ class MicrophoneController extends Controller
         }
     }
 
+    public function unmute_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic2($data, 'unmute');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if (true) {
+
+            $ms = [
+                'messageContent' => [
+                    'message' => 'unmuteMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_unlocked_the_microphone'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_unlock_microphone'), null, 400);
+        }
+    }
+
     //lock mic place
     public function shut_microphone(Request $request)
     {
@@ -153,6 +234,29 @@ class MicrophoneController extends Controller
         }
     }
 
+    public function shut_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic2($data, 'shut');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if ($room) {
+            $ms = [
+                'messageContent' => [
+                    'message' => 'lockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_unlocked_the_microphone'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_unlock_microphone'), null, 400);
+        }
+    }
 
     //open mic place
     public function open_microphone(Request $request)
@@ -180,7 +284,30 @@ class MicrophoneController extends Controller
         }
     }
 
-
+    public function open_microphone2(Request $request)
+    {
+        $data = $request;
+        try {
+            $room = $this->microphoneService->mic2($data, 'open');
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        if (true) {
+            $room = Room::query()->where('uid', $data['owner_id'])->first();
+            $ms = [
+                'messageContent' => [
+                    'message' => 'unLockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
+                ]
+            ];
+            $json = json_encode($ms);
+            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+            return Common::apiResponse(1, __('api_responses.Successfully_unlocked_the_microphone'));
+        } else {
+            return Common::apiResponse(0, __('api_responses.Failed_to_unlock_microphone'), null, 400);
+        }
+    }
 
     public function calcTime($uid)
     {

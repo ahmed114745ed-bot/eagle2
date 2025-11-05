@@ -67,12 +67,12 @@ class PaymentGatewaysSeeder extends Seeder
             });
         }
 
-        $fawry_id = PaymentCoin::updateOrCreate([
-            'title' => 'fawry',
+        $fawry_id = PaymentCoin::firstOrCreate([
+            'type' => 'fawry',
         ], [
+            'title' => 'fawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'type' => 'fawry',
             'package_type' => 'user'
         ]);
         $fawry_fields = [
@@ -106,7 +106,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($fawry_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $fawry_id->id,
                 'type' => 'payment'
@@ -116,12 +116,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //utd fawry
-        $utd_fawry_id = PaymentCoin::updateOrCreate([
-            'title' => 'utdFawry',
+        $utd_fawry_id = PaymentCoin::firstOrCreate([
+            'type' => 'utd_fawry',
         ], [
+            'title' => 'utdFawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'type' => 'utd_fawry',
             'package_type' => 'user'
         ]);
         $utd_fawry_fields = [
@@ -155,7 +155,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($utd_fawry_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $utd_fawry_id->id,
                 'type' => 'payment'
@@ -165,12 +165,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         // sky pay
-         $pay_sky_id = PaymentCoin::updateOrCreate([
-            'title' => 'skyPay',
-        ], [
-            'photo' => 'images/paysky.png',
-            'status' => 1,
+         $pay_sky_id = PaymentCoin::firstOrCreate([
              'type' => 'sky_pay',
+        ], [
+             'title' => 'skyPay',
+             'photo' => 'images/paysky.png',
+             'status' => 1,
              'package_type' => 'user'
          ]);
 
@@ -204,7 +204,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($pay_sky_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $pay_sky_id->id,
                 'type' => 'payment'
@@ -215,12 +215,12 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //stripe
-        $strip_id = PaymentCoin::updateOrCreate([
-            'title' => 'strip',
+        $strip_id = PaymentCoin::firstOrCreate([
+            'type' => 'strip',
         ], [
+            'title' => 'strip',
             'photo' => 'images/stripe.png',
             'status' => 1,
-            'type' => 'strip',
             'package_type' => 'user'
         ]);
 
@@ -260,7 +260,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($strip_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $strip_id->id,
                 'type' => 'payment'
@@ -270,12 +270,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //opay
-        $opay_id = PaymentCoin::updateOrCreate([
-            'title' => 'opay',
+        $opay_id = PaymentCoin::firstOrCreate([
+            'type' => 'opay',
         ], [
+            'title' => 'opay',
             'photo' => 'images/opay.png',
             'status' => 1,
-            'type' => 'opay',
             'package_type' => 'user'
         ]);
 
@@ -320,7 +320,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($opay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $opay_id->id,
                 'type' => 'payment'
@@ -330,12 +330,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //cashfree
-        $cashfree_id = PaymentCoin::updateOrCreate([
-            'title' => 'cashfree',
+        $cashfree_id = PaymentCoin::firstOrCreate([
+            'type' => 'cash_free',
         ], [
+            'title' => 'cashfree',
             'photo' => 'images/cashfree.jpg',
             'status' => 1,
-            'type' => 'cash_free',
             'package_type' => 'user'
         ]);
 
@@ -370,7 +370,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($cashfree_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $cashfree_id->id,
                 'type' => 'payment'
@@ -380,12 +380,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //applepay
-        $applepay_id = PaymentCoin::updateOrCreate([
-            'title' => 'applepay',
+        $applepay_id = PaymentCoin::firstOrCreate([
+            'type' => 'apple_pay',
         ], [
+            'title' => 'applepay',
             'photo' => 'images/applepay.png',
             'status' => 1,
-            'type' => 'apple_pay',
             'package_type' => 'user'
         ]);
 
@@ -425,7 +425,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($applepay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $applepay_id->id,
                 'type' => 'payment'
@@ -437,7 +437,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //mada
-//        $mada_id = PaymentCoin::updateOrCreate([
+//        $mada_id = PaymentCoin::firstOrCreate([
 //            'title' => 'mada',
 //        ], [
 //            'photo' => 'images/mada.png',
@@ -471,7 +471,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
 //        foreach ($mada_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $mada_id->id,
 //                'type' => 'payment'
@@ -483,7 +483,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
 //        //liqpay
-//        $liqpay_id = PaymentCoin::updateOrCreate([
+//        $liqpay_id = PaymentCoin::firstOrCreate([
 //            'title' => 'liqpay',
 //        ], [
 //            'photo' => 'images/liqpay.png',
@@ -517,7 +517,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($liqpay_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $liqpay_id->id,
 //                'type' => 'payment'
@@ -527,12 +527,12 @@ class PaymentGatewaysSeeder extends Seeder
 //        }
 
         //paypal
-        $paypal_id = PaymentCoin::updateOrCreate([
-            'title' => 'paypal',
+        $paypal_id = PaymentCoin::firstOrCreate([
+            'type' => 'paypal',
         ], [
+            'title' => 'paypal',
             'photo' => 'images/paypal.png',
             'status' => 1,
-            'type' => 'paypal',
             'package_type' => 'user'
         ]);
 
@@ -573,7 +573,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($paypal_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $paypal_id->id,
                 'type' => 'payment'
@@ -586,7 +586,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        //paytm
-//        $paytm_id = PaymentCoin::updateOrCreate([
+//        $paytm_id = PaymentCoin::firstOrCreate([
 //            'title' => 'paytm',
 //        ], [
 //            'photo' => 'images/paytm.png',
@@ -625,7 +625,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($paytm_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $paytm_id->id,
 //                'type' => 'payment'
@@ -637,12 +637,12 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //paytabs
-        $paytabs_id = PaymentCoin::updateOrCreate([
-            'title' => 'paytabs',
+        $paytabs_id = PaymentCoin::firstOrCreate([
+            'type' => 'paytabs',
         ], [
+            'title' => 'paytabs',
             'photo' => 'images/paytabs.webp',
             'status' => 1,
-            'type' => 'paytabs',
             'package_type' => 'user'
         ]);
 
@@ -677,7 +677,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($paytabs_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $paytabs_id->id,
                 'type' => 'payment'
@@ -690,7 +690,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //BKash
-//        $bkash_id = PaymentCoin::updateOrCreate([
+//        $bkash_id = PaymentCoin::firstOrCreate([
 //            'title' => 'bkash',
 //        ], [
 //            'photo' => 'images/bkash.png',
@@ -734,7 +734,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($bkash_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $bkash_id->id,
 //                'type' => 'payment'
@@ -745,7 +745,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //razorpay
-//        $razorpay_id = PaymentCoin::updateOrCreate([
+//        $razorpay_id = PaymentCoin::firstOrCreate([
 //            'title' => 'razorpay',
 //        ], [
 //            'photo' => 'images/razorpay.webp',
@@ -779,7 +779,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($razorpay_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $razorpay_id->id,
 //                'type' => 'payment'
@@ -791,7 +791,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //senangpay
-//        $senangpay_id = PaymentCoin::updateOrCreate([
+//        $senangpay_id = PaymentCoin::firstOrCreate([
 //            'title' => 'senangpay',
 //        ], [
 //            'photo' => 'images/senangpay.png',
@@ -830,7 +830,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($senangpay_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $senangpay_id->id,
 //                'type' => 'payment'
@@ -843,7 +843,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //paymob_accept
-//        $paymob_accept_id = PaymentCoin::updateOrCreate([
+//        $paymob_accept_id = PaymentCoin::firstOrCreate([
 //            'title' => 'paymob_accept',
 //        ], [
 //            'photo' => 'images/paymob.png',
@@ -892,7 +892,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($paymob_accept_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $paymob_accept_id->id,
 //                'type' => 'payment'
@@ -904,7 +904,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //flutterwave
-//        $flutterwave_id = PaymentCoin::updateOrCreate([
+//        $flutterwave_id = PaymentCoin::firstOrCreate([
 //            'title' => 'flutterwave',
 //        ], [
 //            'photo' => 'images/flutterwave.jpg',
@@ -943,7 +943,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($flutterwave_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $flutterwave_id->id,
 //                'type' => 'payment'
@@ -956,7 +956,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //paystack
-//        $paystack_id = PaymentCoin::updateOrCreate([
+//        $paystack_id = PaymentCoin::firstOrCreate([
 //            'title' => 'paystack',
 //        ], [
 //            'photo' => 'images/paystack.png',
@@ -1000,7 +1000,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($paystack_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $paystack_id->id,
 //                'type' => 'payment'
@@ -1012,7 +1012,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //sslcommerz
-//        $sslcommerz_id = PaymentCoin::updateOrCreate([
+//        $sslcommerz_id = PaymentCoin::firstOrCreate([
 //            'title' => 'sslcommerz',
 //        ], [
 //            'photo' => 'images/sslcommerz.png',
@@ -1046,7 +1046,7 @@ class PaymentGatewaysSeeder extends Seeder
 //
 //
 //        foreach ($sslcommerz_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $sslcommerz_id->id,
 //                'type' => 'payment'
@@ -1056,12 +1056,12 @@ class PaymentGatewaysSeeder extends Seeder
 //        }
 
         // Google Pay
-        $google_pay_id = PaymentCoin::updateOrCreate([
-            'title' => 'google_pay',
+        $google_pay_id = PaymentCoin::firstOrCreate([
+            'type' => 'google_pay',
         ], [
+            'title' => 'google_pay',
             'photo' => 'images/googlepay.png',
             'status' => 1,
-            'type' => 'google_pay',
             'package_type' => 'user'
         ]);
 
@@ -1076,15 +1076,15 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => "test"
             ],
-            'new_3' => [
-                "name" => "google_pay_webhook_url",
-                "type" => "input",
-                "value" => "test"
-            ],
+//            'new_3' => [
+//                "name" => "google_pay_webhook_url",
+//                "type" => "input",
+//                "value" => "test"
+//            ],
         ];
 
         foreach ($google_pay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $google_pay_id->id,
                 'type' => 'payment'
@@ -1095,12 +1095,12 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //codapay
-        $codapay_id = PaymentCoin::updateOrCreate([
-            'title' => 'codapay',
+        $codapay_id = PaymentCoin::firstOrCreate([
+            'type' => 'codapay',
         ], [
+            'title' => 'codapay',
             'photo' => 'images/codapay.webp',
             'status' => 1,
-            'type' => 'codapay',
             'package_type' => 'user'
         ]);
 
@@ -1121,11 +1121,6 @@ class PaymentGatewaysSeeder extends Seeder
                 "value" => 289
             ],
             'new_4' => [
-                "name" => "codapay_country",
-                "type" => "input",
-                "value" => 818
-            ],
-            'new_5' => [
                 "name" => "codapay_webhook_url",
                 "type" => "input",
                 "value" => "test"
@@ -1133,7 +1128,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($codapay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $codapay_id->id,
                 'type' => 'payment'
@@ -1144,7 +1139,7 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //huawei pay
-//        $huawei_pay_id = PaymentCoin::updateOrCreate([
+//        $huawei_pay_id = PaymentCoin::firstOrCreate([
 //            'title' => 'huawei_pay',
 //        ], [
 //            'photo' => 'images/huaweipay.png',
@@ -1166,7 +1161,7 @@ class PaymentGatewaysSeeder extends Seeder
 //        ];
 //
 //        foreach ($huawei_pay_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $huawei_pay_id->id,
 //                'type' => 'payment'
@@ -1177,7 +1172,7 @@ class PaymentGatewaysSeeder extends Seeder
 //        }
 
         //zinipay
-//        $zinipay_id = PaymentCoin::updateOrCreate([
+//        $zinipay_id = PaymentCoin::firstOrCreate([
 //            'title' => 'zinipay',
 //        ], [
 //            'photo' => 'images/zinipay.jpg',
@@ -1204,7 +1199,7 @@ class PaymentGatewaysSeeder extends Seeder
 //        ];
 //
 //        foreach ($zinipay_fields as $key => $value) {
-//            Setting::updateOrCreate([
+//            Setting::firstOrCreate([
 //                'key' => $value['name'],
 //                'item_id' => $zinipay_id->id,
 //                'type' => 'payment'

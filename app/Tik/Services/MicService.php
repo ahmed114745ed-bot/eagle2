@@ -127,9 +127,127 @@ class MicService
         return [$user, $room];
     }
 
+    public function upMic2($data)
+    {
+        $user = $this->userRepository->findById($data['user_id']);
+
+        if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
+
+        if (!$room)  throw new Exception(__('room does not exist'));
+        $data['owner_id'] = $room->uid;
+        //
+//        $position = $data['position']; // mic index
+//        $mic_arr = explode(',', $room->microphone);
+//        $main_mic = explode(',', $room->main_microphone);
+//        $base_mic = explode(',', $room->microphone_only_users);
+
+        $position = (int) $data['position'];
+
+        $maxPositions = $room->mode == 0 ? 9 : 17;
+        if ($position < 0 || $position > $maxPositions) {
+            throw new Exception(__('api_responses.position_error'));
+        }
+
+//        $current = $mic_arr[$position] ?? '0';
+//        $old_status = '0';
+//        $old_user = '0';
+//
+//        if (str_contains($current, '#')) {
+//            [$old_user, $old_status] = explode('#', $current);
+//        } elseif (is_numeric($current) && (int)$current > 0) {
+//            $old_user = $current;
+//            $old_status = '0'; // Assume occupied but no explicit status
+//        } else {
+//            $old_user = '0';
+//            $old_status = $current;
+//        }
+
+        $micSeat = $room->microphones()->where('position', $position)->first();
+
+        if (!$micSeat) {
+            $micSeat = $room->microphones()->create([
+                'position' => $position,
+                'status'   => 1,
+                'user_id'  => null,
+            ]);
+        }
+
+        $old_user   = $micSeat?->user_id ?? 0;
+        $old_status = $micSeat?->status ?? '0';
+
+        if ($micSeat->status == -1 && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $room->uid)) {
+            throw new Exception(__('This microphone is closed and cannot be accessed'));
+        }
+
+//        if (in_array($user->id, $mic_arr)) {
+//            CpRoomHistory::where("user_one_id", $user->id)
+//                ->orWhere("user_two_id", $user->id)->delete();
+//
+//            $key = array_search($user->id, $mic_arr);
+//            $old = $main_mic[$key] ?? '0';
+//            $base_mic[$key] = $old;
+//        }
+
+        $existingMic = $room->microphones()->where('user_id', $user->id)->first();
+        if ($existingMic) {
+            CpRoomHistory::where("user_one_id", $user->id)
+                ->orWhere("user_two_id", $user->id)
+                ->delete();
+
+            $existingMic->delete();
+//            $existingMic->update([
+//                'user_id' => null,
+//                'status'  => $existingMic->status,
+//            ]);
+        }
+
+//        $base_mic[$position] = $user->id . '#' . $old_status;
+//        $mic = implode(',', $base_mic);
+//
+        $micSeat->update([
+            'user_id' => $user->id,
+            'status'  => $old_status,
+        ]);
+
+        $micString = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($mic) {
+                $userId = $mic->user_id ?? 0;
+                $status = $mic->status ?? 0;
+
+                if ($userId > 0) {
+                    return "{$userId}#{$status}";
+                } else {
+                    return (string)$status;
+                }
+            })
+            ->implode(',');
+
+        $this->updatePK($room, $micString);
+        //Remove mic sequence
+        Common::delMicHand($user->id);
+
+        $t = $this->liveTimeRepository->getActiveByUserId($user->id);
+        if (!$t) {
+            $data = [
+                'uid' => $user->id,
+                'start_time' => time()
+            ];
+            $this->liveTimeRepository->create($data);
+        }
+        $this->handleCpLovely($user, $room, $position);
+
+        return [$user, $room];
+    }
+
     public function handleCpLovely($user, $room, $position)
     {
-    
+
 
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
@@ -152,9 +270,14 @@ class MicService
 
 
 
-        $micSeats = array_map(function ($v) {
-            return is_numeric($v) ? (int)$v : null;
-        }, explode(',', $room->microphone));
+//        $micSeats = array_map(function ($v) {
+//            return is_numeric($v) ? (int)$v : null;
+//        }, explode(',', $room->microphone));
+
+        $micSeats = $room->microphones()
+            ->orderBy('position')
+            ->pluck('user_id', 'position')
+            ->toArray();
 
         foreach ($userSeats as $neighborPosition) {
 
@@ -164,7 +287,7 @@ class MicService
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-            
+
                 $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
 
@@ -303,6 +426,22 @@ class MicService
         return $room;
     }
 
+    public function goMic2($data)
+    {
+        $user = $this->userRepository->findById($data->user_id);
+
+        if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
+
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
+        if (!$room) throw new Exception(__('api_responses.room_not_found'));
+
+        $this->goMicrophoneHand2($user, $room);
+        return $room;
+    }
+
     //Down the wheat - execute the operation
     // public  function goMicrophoneHand($user, $room)
     // {
@@ -381,7 +520,74 @@ class MicService
         return true;
     }
 
+    public function goMicrophoneHand2($user, $room)
+    {
+//        $microphone = explode(',', $room->microphone);
+//        $mainMicrophone = explode(',', $room->main_microphone);
+//        $original = explode(',', $room->getOriginal('microphone'));
+//        if (!$microphone || !in_array($user->id, $microphone)) {
+//            return 0;
+//        }
 
+        $micSeat = $room->microphones()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$micSeat) {
+            return 0;
+        }
+
+//        $position = array_search($user->id, $microphone);
+//        if ($position === false) return 0;
+
+        $micSeat->delete();
+//        $micSeat->update([
+//            'user_id' => null,
+//            'status'  => 0,
+//        ]);
+
+        // Remove user
+//        $microphone[$position] = "0";
+//
+//        $final = [];
+//
+//        for ($i = 0; $i < count($microphone); $i++) {
+//            $mic = $microphone[$i] ?? '0';
+//            $main = $mainMicrophone[$i] ?? '0';
+//
+//            if ($mic != '0' && $main != '0' && $mic != $main) {
+//                $final[] = $mic . '#' . $main;
+//            } elseif ($mic != '0') {
+//                $final[] = $mic;
+//            } elseif ($main != '0') {
+//                $final[] = $main;
+//            } else {
+//                $final[] = '0';
+//            }
+//        }
+
+        $micString = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($m) {
+                $userId = $m->user_id ?? 0;
+                $status = $m->status ?? 0;
+                return "{$userId}#{$status}";
+            })
+            ->implode(',');
+
+        // Save to DB
+//        $result = implode(',', $final);
+//        $this->updateMicAndPK($room, $result);
+
+        $this->updatePK($room, $micString);
+
+        // Clear mic timer and leave CP
+        $this->timeLogRepository->deleteAth($room->uid, $user->id);
+        $this->handleLeaveCp($user, $room);
+
+        return true;
+    }
 
     public function handleLeaveCp($user, $room)
     {
@@ -432,6 +638,87 @@ class MicService
         return $room;
     }
 
+    public function mic2($data, $type)
+    {
+        $user = request()->user();
+        $position = $data['position'];
+        $roomId = $data->room_id;
+        $room = $roomId
+            ? $this->roomRepository->findById($roomId)
+            : $this->roomRepository->findRoomUserEnableAudio($data['owner_id']);
+        if (!$room) throw new Exception(__('room fot found'));
+//        if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
+//            throw new Exception(__('you do not have permission'));
+//        }
+//        $data['owner_id'] = $room->uid;
+//
+//        if ($room['mode'] == 0) {
+//            if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
+//        } else {
+//            if ($position < 0 || $position > 17) throw new Exception(__('api_responses.position_error'));
+//        }
+//        $admins = $room->room_admin;
+//        $admins = explode(',', $admins);
+//
+//        if ($data->user()->id != $data['owner_id'] && !in_array($data->user()->id, $admins)) {
+//            return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
+//        }
+
+        $admins = $room->room_admin ? explode(',', $room->room_admin) : [];
+
+        if ($user->id != $room->uid && !in_array($user->id, $admins)) {
+            throw new Exception(__('you do not have permission'));
+        }
+
+        $data['owner_id'] = $room->uid;
+
+        // position validation based on room mode
+        $maxPositions = $room->mode == 0 ? 9 : 17;
+        if ($position < 0 || $position > $maxPositions) {
+            throw new Exception(__('api_responses.position_error'));
+        }
+
+        // $microphone = $room->getOriginal('microphone');
+//        $microphone = $room->all_microphone;
+        //        logger('microphone:', [$microphone]);
+
+//        $microphone = $this->micType($type, $microphone, $position);
+        //        logger(' end microphone:', [$microphone]);
+
+        $micSeat = $room->microphones()->where('position', $position)->first();
+
+        if (!$micSeat) {
+            $micSeat = $room->microphones()->create([
+                'position' => $position,
+                'user_id'  => null,
+                'status'   => 0,
+            ]);
+        }
+
+        $this->micType2($type, $micSeat);
+
+        return $room;
+    }
+
+    public function micType2(string $type, $micSeat)
+    {
+        $userId = $micSeat->user_id ?? 0;
+        $status = $micSeat->status ?? 0;
+
+        if ($type === 'mute') {
+            $status = -2;
+        } elseif ($type === 'unmute' || $type === 'open') {
+            $status = 0;
+        } elseif ($type === 'shut') {
+            $status = -1;
+        }
+
+        $micSeat->update([
+            'status' => $status,
+        ]);
+
+        return $micSeat;
+    }
 
     public function kickMicrophone($data)
     {
@@ -513,6 +800,15 @@ class MicService
         $pk = $this->pkRepository->getPk($room->id);
         if ($pk) {
             $pk->mics = $room->microphone;
+            $pk->save();
+        }
+    }
+
+    public function updatePK($room, $mic)
+    {
+        $pk = $this->pkRepository->getPk($room->id);
+        if ($pk) {
+            $pk->mics = $mic;
             $pk->save();
         }
     }

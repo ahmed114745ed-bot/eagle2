@@ -50,8 +50,9 @@ class OfficialMessengerSuperAdminController extends MainController
 
 
         $grid = new Grid(new OfficialMessage);
-        $countryID = session('country_id');
-        $grid->model()->where('admin_type', PermissionType::SUPER_ADMIN->value)->where('type', 2)->orderByDesc('id');
+        $countryID =session('filter_country_id');
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $grid->model()->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -157,7 +158,8 @@ class OfficialMessengerSuperAdminController extends MainController
         $form->hidden('admin_type', __('type'))->default(PermissionType::SUPER_ADMIN->value);
         $form->hidden('type', __('type'))->default(2);
         $this->selectFeature($form);
-        $form->hidden('admin_id', __('type'))->default(Auth::user()->id);
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $form->hidden('admin_id', __('type'))->default($authId);
 
         return $form;
     }
@@ -214,7 +216,7 @@ class OfficialMessengerSuperAdminController extends MainController
                 ])->default('owner');
             });;
         });
-        
+
 
         $form->saved(function (Form $form) {
             $model = $form->model();

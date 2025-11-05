@@ -2,22 +2,24 @@
 
 namespace App\SuperAdmin\Controllers;
 
-use App\Enums\Charges\UserTypeEnum;
-use App\Enums\PermissionType;
-use App\Helpers\Common;
 use App\Models\Agency;
 use App\Models\Charge;
-use App\Models\ShippingAgency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\SubAdmin;
+use App\Models\SuperAdmin;
+use Encore\Admin\Layout\Row;
+use Illuminate\Http\Request;
+use App\Enums\PermissionType;
+use App\Models\ShippingAgency;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ChargeController extends MainController
 {
@@ -70,17 +72,24 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge());
-
+        $auth = auth()->user();
+        $ids = auth()->user()->type == 'superadmin' ? SuperAdmin::with('subSuperAdmins:id,parent_id')
+            ->find($auth->id)
+            ->subSuperAdmins
+            ->pluck('id')
+            ->prepend($auth->id) // add superadmin id to the beginning
+            ->toArray() : SubAdmin::where('parent_id', $auth->parent_id)
+            ->pluck('id')
+            ->prepend($auth->parent_id) // add superadmin id
+            ->toArray();
         $grid->model()
-                ->when(auth('admin')->user()->type === 'superadmin', function ($query) {
-                    $query->where('charger_type', UserTypeEnum::SUPER_ADMIN);
-                })
-                ->when(auth('admin')->user()->type === 'sub_super_admin', function ($query) {
-                    $query->where('charger_type', UserTypeEnum::SUB_ADMIN);
-                })
-                ->with('receiverSubAdmin', 'receiveragency')
-                ->where('charger_id', Auth::user()->id)
-                ->orderBy('id', 'desc');
+            ->where(function ($query) {
+                $query->where('charger_type', UserTypeEnum::SUPER_ADMIN)
+                    ->orWhere('charger_type', UserTypeEnum::SUB_ADMIN);
+            })
+            ->with('receiverSubAdmin', 'receiveragency')
+            ->whereIn('charger_id', $ids)
+            ->orderBy('id', 'desc');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -121,7 +130,8 @@ class ChargeController extends MainController
                 });
                 $profileUrl = '';
                 if (!empty($info['uuid'])) {
-                    $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
+                    // dd($info['uuid']);
+                    $profileUrl = url('superadmin/shipping-agencies/profile/' . $info['uuid']);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -181,6 +191,7 @@ class ChargeController extends MainController
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableActions();
+        $grid->disableExport();
         return $grid;
     }
 
@@ -237,32 +248,33 @@ class ChargeController extends MainController
     }
 
 
-    public function getSubAdmins(Request $request){
+    public function getSubAdmins(Request $request)
+    {
         $key = $request->q;
         $page = $request->get('page', 1);
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
-        
+
         $query = DB::table('admin_users')
             ->where('type', PermissionType::SUB_SUPER_ADMIN->value)
             ->where('is_preview', 0)
             ->where('parent_id', auth('admin')->id());
-         
-            
+
+
         if ($key) {
-                $query->where(function ($q) use ($key) {
-                    $q->where('name', 'like', "%{$key}%")
+            $query->where(function ($q) use ($key) {
+                $q->where('name', 'like', "%{$key}%")
                     ->orWhere('username', 'like', "%{$key}%")
                     ->orWhere('id', $key);
-                });
-            }
-            
-            $total = $query->count();
-            
-            $users = $query->select('id', 'name', 'username')
+            });
+        }
+
+        $total = $query->count();
+
+        $users = $query->select('id', 'name', 'username')
             ->paginate($perPage, ['*'], 'page', $page);
 
-            
-            return response()->json([$users]);
+
+        return response()->json([$users]);
     }
 }

@@ -2,19 +2,23 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\AreaManager\Entities\AreaManager;
 
 class SuperAdmin extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
     protected $guarded = [];
+
+    protected $dates = ['deleted_at'];
 
     protected $attributes = [
         'type' => 'superadmin',
@@ -46,28 +50,40 @@ class SuperAdmin extends Model
 //            ->where('user_charger_type', 'bd');
 //    }
 
-//    public function getAgenciesCountAttribute()
-//    {
-//        return $this->agencies()->count();
-//    }
+    public function subSuperAdmins()
+    {
+        return $this->hasMany(SubAdmin::class, 'parent_id', 'id');
+    }
+
+    //
+    //    public function transactions()
+    //    {
+    //        return $this->hasMany(Charge::class, 'charger_id', 'id')
+    //            ->where('user_charger_type', 'bd');
+    //    }
+
+    //    public function getAgenciesCountAttribute()
+    //    {
+    //        return $this->agencies()->count();
+    //    }
 
 
-//    public function getTotalSalaryAttribute()
-//    {
-//        return $this->bdSalaries()->sum('salary');
-//    }
-//    public function getTotalCutAttribute()
-//    {
-//        return $this->bdSalaries()->sum('cut_amount');
-//    }
-//
-//    public function getNetSallaryAttribute()
-//    {
-//        $userSallary = $this->bdSalaries()
-//        ->sum(DB::raw('salary - cut_amount'));
-//
-//       return floor($userSallary);
-//    }
+    //    public function getTotalSalaryAttribute()
+    //    {
+    //        return $this->bdSalaries()->sum('salary');
+    //    }
+    //    public function getTotalCutAttribute()
+    //    {
+    //        return $this->bdSalaries()->sum('cut_amount');
+    //    }
+    //
+    //    public function getNetSallaryAttribute()
+    //    {
+    //        $userSallary = $this->bdSalaries()
+    //        ->sum(DB::raw('salary - cut_amount'));
+    //
+    //       return floor($userSallary);
+    //    }
 
     protected static function booted(): void
     {
@@ -77,6 +93,10 @@ class SuperAdmin extends Model
         });
 
         self::deleting(function (SuperAdmin $superAdmin) {
+
+            if ($superAdmin->default == 1) {
+                throw new Exception(__('can not delete default super admin'));
+            }
             $defaultSuperAdmin = self::where('default', 1)
                 ->where('id', '!=', $superAdmin->id)
                 ->first();
@@ -85,6 +105,7 @@ class SuperAdmin extends Model
                 Bd::where('parent_id', $superAdmin->id)
                     ->update(['parent_id' => $defaultSuperAdmin->id]);
             } else {
+
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
             $userApp = User::find($superAdmin->app_id);
@@ -131,34 +152,33 @@ class SuperAdmin extends Model
                     $userApp->save();
                 }
             }
-
         });
     }
 
 
-//    public function incrementCutAmountInBdSallary(int $amount)
-//    {
-//        $lastBdSalary = $this->bdSalaries()->latest()->first();
-//
-//        if ($lastBdSalary) {
-//            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
-//            $lastBdSalary->update(['cut_amount' => $newAmount]);
-//
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//    public function bdSalaries()
-//    {
-//        return $this->hasMany(BdSalary::class,  'bd_id', 'id');
-//    }
-//    public function getBdSalaryAttribute()
-//    {
-//        $userSallary = $this->bdSalaries()
-//            ->sum(DB::raw('salary - cut_amount'));
-//
-//        return floor($userSallary);
-//    }
+    //    public function incrementCutAmountInBdSallary(int $amount)
+    //    {
+    //        $lastBdSalary = $this->bdSalaries()->latest()->first();
+    //
+    //        if ($lastBdSalary) {
+    //            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
+    //            $lastBdSalary->update(['cut_amount' => $newAmount]);
+    //
+    //            return true;
+    //        }
+    //
+    //        return false;
+    //    }
+    //
+    //    public function bdSalaries()
+    //    {
+    //        return $this->hasMany(BdSalary::class,  'bd_id', 'id');
+    //    }
+    //    public function getBdSalaryAttribute()
+    //    {
+    //        $userSallary = $this->bdSalaries()
+    //            ->sum(DB::raw('salary - cut_amount'));
+    //
+    //        return floor($userSallary);
+    //    }
 }

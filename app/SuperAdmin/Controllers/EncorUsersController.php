@@ -173,12 +173,13 @@ class EncorUsersController extends AdminController
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
 
-        $grid->model()->where(function ($q) {
-            $q->where('type', PermissionType::SUB_SUPER_ADMIN->value);
+        $grid->model()->where(function ($q) use ($authId) {
+            $q->where('parent_id', $authId);
         })
             ->where('is_preview', 0)
-            ->where('parent_id', auth('admin')->id())
+            ->where('country_id', auth()->user()->country_id)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
             });
@@ -279,7 +280,8 @@ class EncorUsersController extends AdminController
                 $tools->disableDelete();
             });
         }
-        $form->hidden('parent_id')->default(auth('admin')->id());
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $form->hidden('parent_id')->default($authId);
 
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');
@@ -314,6 +316,7 @@ class EncorUsersController extends AdminController
 
         $form->ignore(['password_confirmation']);
         $form->hidden('type', __('Type'))->value(PermissionType::SUB_SUPER_ADMIN->value);
+        $form->hidden('country_id', __('country'))->value(auth()->user()->country_id);
 
         $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('type', PermissionType::SUPER_ADMIN->value)->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
