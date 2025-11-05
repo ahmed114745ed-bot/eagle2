@@ -661,7 +661,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
     @endif
 
 
-        <input type="hidden" name="bd_id" id="selected-bd-id">
 
         <div class="text-center">
             <button type="submit" class="btn btn-primary">
