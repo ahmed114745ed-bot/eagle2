@@ -3789,7 +3789,14 @@
     "General Settings": "Genel Ayarlar",
     "Statistics Settings": "İstatistik Ayarları",
     "Social Media Settings": "Sosyal Medya Ayarları",
-    "Save": "Kaydet"
+    "Save": "Kaydet",
+    "Textarea": "Metin Alanı",
+    "Checkbox": "Onay Kutusu",
+    "Radio": "Radyo Düğmesi",
+    "Custom Widget": "Özel Bileşen",
+    "Select Custom Widget": "Özel Bileşen Seç",
+    "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "Özel bileşenler özel kullanıcı arayüzü sağlar (BD Seçici, Kullanıcı Seçici, vb.)",
+    "form_bd_bio":"Hoş geldiniz! Benimle, canlı yayın dünyasında başarı sırlarını öğreneceksiniz. Başarılı ajansları eğitme konusunda geniş deneyime sahibim. Sizi zirveye ulaşana kadar günlük takip ve sınırsız destekle destekleyeceğim!"
 
 
 

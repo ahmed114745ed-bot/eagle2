@@ -352,7 +352,9 @@ class FormTemplateController extends Controller
     public function search(Request $request)
     {
         $query = $request->get('query');
-
+        $lang = $request->get('lang') ?? app()->getLocale();
+    
+        app()->setLocale($lang);
         $bds = Bd::where('name', 'like', "%{$query}%")
             ->orWhere('id', 'like', "%{$query}%")
             ->limit(6)
@@ -368,9 +370,9 @@ class FormTemplateController extends Controller
                 'id' => $bd->id,
                 'name' => $bd->name,
                 'phone' => $bd->phone,
-                'country' => $bd->country,
-                'title' => $bd->title,
-                'bio' => $bd->bio,
+                'country' => $bd->country?->name,
+                // 'title' => $bd->title,
+                'bio' =>__('form_bd_bio'),
                 'years' => $bd->years_of_experience,
                 'top_agencies' => $topAgencies,
             ];

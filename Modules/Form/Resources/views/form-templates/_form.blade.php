@@ -373,12 +373,12 @@ function addField(sectionId, data = null) {
                                 onchange="handleFieldTypeChange(${sectionId}, ${fieldId}, this)">
                             <option value="text" ${data && data.field_type === 'text' ? 'selected' : ''}>${'{{ __('Text') }}'}</option>
                             <option value="email" ${data && data.field_type === 'email' ? 'selected' : ''}>${'{{ __('Email') }}'}</option>
-                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${'{{ __('Number') }}'}</option>
+                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${'{{ __('integer') }}'}</option>
                             <option value="tel" ${data && data.field_type === 'tel' ? 'selected' : ''}>${'{{ __('Phone') }}'}</option>
                             <option value="date" ${data && data.field_type === 'date' ? 'selected' : ''}>${'{{ __('Date') }}'}</option>
                             <option value="textarea" ${data && data.field_type === 'textarea' ? 'selected' : ''}>${'{{ __('Textarea') }}'}</option>
-                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${'{{ __('File') }}'}</option>
-                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${'{{ __('Select') }}'}</option>
+                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${'{{ __('file') }}'}</option>
+                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${'{{ __('select') }}'}</option>
                             <option value="checkbox" ${data && data.field_type === 'checkbox' ? 'selected' : ''}>${'{{ __('Checkbox') }}'}</option>
                             <option value="radio" ${data && data.field_type === 'radio' ? 'selected' : ''}>${'{{ __('Radio') }}'}</option>
                             <option value="custom" ${data && data.field_type === 'custom' ? 'selected' : ''}>${'{{ __('Custom Widget') }}'}</option>
@@ -459,6 +459,15 @@ function addField(sectionId, data = null) {
                             <p class="text-gray-500 mt-1">
                                 <i class="fas fa-info-circle"></i> {{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}
                             </p>
+                        </div>
+
+                        <div class="options-container" style="display: none;">
+                            <div class="custom-options-editor" style="display: block;"> 
+                                <textarea name="..."></textarea>
+                            </div>
+                            <div class="predefined-options-selector" style="display: none;"> 
+                                <select name="..."></select>
+                            </div>
                         </div>
 
                     <!-- Pre-defined Data Selector -->
@@ -545,32 +554,32 @@ function handleFieldTypeChange(sectionId, fieldId, selectElement) {
     if (placeholderContainer) placeholderContainer.style.display = 'block';
     if (fieldNameContainer) fieldNameContainer.style.display = 'block';
 
+   
     if (selectElement.value === 'custom') {
-        // Show widget selector
-        widgetContainer.style.display = 'block';
-        widgetSelect.required = true;
+    widgetContainer.style.display = 'block';
+    widgetSelect.required = true;
 
-        // Hide placeholder and field name
-        if (placeholderContainer) placeholderContainer.style.display = 'none';
-        if (fieldNameContainer) fieldNameContainer.style.display = 'none';
-        fieldNameInput.required = false;
+    if (placeholderContainer) placeholderContainer.style.display = 'none';
+    if (fieldNameContainer) fieldNameContainer.style.display = 'none';
+    fieldNameInput.required = false;
 
-        // Auto-generate field name from widget selection
-        widgetSelect.addEventListener('change', function() {
-            if (this.value) {
-                const selectedWidget = availableWidgets.find(w => w.id == this.value);
-                if (selectedWidget) {
-                    // Generate field name from widget type
-                    const autoName = selectedWidget.widget_type + '_' + sectionId + '_' + fieldId;
-                    fieldNameInput.value = autoName;
-                }
+    const newWidgetSelect = widgetSelect.cloneNode(true);
+    widgetSelect.parentNode.replaceChild(newWidgetSelect, widgetSelect);
+
+    newWidgetSelect.addEventListener('change', function() {
+        if (this.value) {
+            const selectedWidget = availableWidgets.find(w => w.id == this.value);
+            if (selectedWidget) {
+                fieldNameInput.value = selectedWidget.widget_type + '_' + sectionId + '_' + fieldId;
             }
-        });
-    } else if (selectElement.value === 'select' || selectElement.value === 'checkbox' || selectElement.value === 'radio') {
+        }
+    });
+} else if (selectElement.value === 'select' || selectElement.value === 'checkbox' || selectElement.value === 'radio') {
         // Show options configuration for select/checkbox/radio
         if (optionsContainer) optionsContainer.style.display = 'block';
         fieldNameInput.required = true;
         widgetSelect.required = false;
+
     } else {
         // Show standard fields
         widgetSelect.required = false;
@@ -585,12 +594,14 @@ function toggleOptionsType(sectionId, fieldId, type) {
     const customEditor = fieldContainer.querySelector('.custom-options-editor');
     const predefinedSelector = fieldContainer.querySelector('.predefined-options-selector');
 
-    if (type === 'custom') {
-        customEditor.style.display = 'block';
-        predefinedSelector.style.display = 'none';
-    } else {
-        customEditor.style.display = 'none';
-        predefinedSelector.style.display = 'block';
+    if (customEditor && predefinedSelector) {
+        if (type === 'custom') {
+            customEditor.style.display = 'block';
+            predefinedSelector.style.display = 'none';
+        } else {
+            customEditor.style.display = 'none';
+            predefinedSelector.style.display = 'block';
+        }
     }
 }
 

@@ -551,10 +551,14 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
                 <div id="search-results" class="d-flex flex-wrap gap-4" style="display: flex;"></div>
             </div>
+            @php
+                $currentLocale = request()->query('lang') ?? app()->getLocale();
+            @endphp
 
             <script>
                 let selectedCard = null;
                 let searchTimeout = null;
+                let lang = "{{ $currentLocale }}"; 
 
                 const searchInput = document.getElementById('search-query');
                 const resultsContainer = document.getElementById('search-results');
@@ -572,7 +576,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
                 });
 
                 function performSearch(query) {
-                    fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}`)
+                    fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}&lang=${lang}`)
                         .then(res => res.json())
                         .then(res => {
                             resultsContainer.innerHTML = '';
@@ -603,7 +607,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                         </div>
                                         <div class="agency-info">
                                             <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country}</p>
-                                            <p><i class="fa fa-user-tie text-primary me-2"></i> <strong>{{ __('Title') }}:</strong> ${bd.title}</p>
                                             <p><i class="fa fa-briefcase text-primary me-2"></i> <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}</p>
                                             <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone}</p>
                                         </div>
