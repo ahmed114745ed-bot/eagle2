@@ -2,43 +2,16 @@
     $userService = app(\App\Admin\Services\UserSuperAdminService::class);
 @endphp
 
-<style>
-    #top-followers-box {
-        height: 430px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    #top-followers-table-wrapper {
-        flex: 1;
-        overflow-y: auto;
-    }
-
-    #top-followers-table-wrapper thead th {
-        position: sticky;
-        top: 0;
-        background: #f8f9fa;
-        z-index: 1;
-    }
-
-    .avatar-cell img {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        margin-right: 8px;
-    }
-</style>
-
-<div class="box box-success shadow-sm border-0" id="top-followers-box">
+<div class="box box-success shadow-sm border-0">
     <div class="box-header with-border text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="fa fa-users me-2"></i> {{ __('Top Followers') }}</h4>
     </div>
 
     <div class="box-body p-0">
-        {{-- <div id="top-followers-loading" class="text-center py-3">
-            <i class="fa fa-spinner fa-spin fa-2x"></i>
-            <p>{{ __('Loading...') }}</p>
-        </div> --}}
+{{--        <div id="top-followers-loading" class="text-center py-3">--}}
+{{--            <i class="fa fa-spinner fa-spin fa-2x"></i>--}}
+{{--            <p>{{ __('Loading...') }}</p>--}}
+{{--        </div>--}}
 
         <div class="table-responsive d-none" id="top-followers-table-wrapper">
             <table class="table table-hover align-middle mb-0">
@@ -46,7 +19,7 @@
                 <tr>
                     <th class="text-center" style="width: 60px;">#</th>
                     <th class="text-center">{{ __('User') }}</th>
-                    <th class="text-center">{{ __('Followers Count') }}</th>
+                    <th class="text-center th">{{ __('Followers Count') }}</th>
                 </tr>
                 </thead>
                 <tbody id="top-followers-body"></tbody>
@@ -62,28 +35,29 @@
             .then(data => {
                 const tbody = document.getElementById('top-followers-body');
                 const tableWrapper = document.getElementById('top-followers-table-wrapper');
+                const loading = document.getElementById('top-followers-loading');
                 tbody.innerHTML = '';
 
                 data.forEach((user, index) => {
                     tbody.innerHTML += `
-                    <tr>
-                        <td class="text-center fw-bold">${index + 1}</td>
-                        <td class="avatar-cell d-flex align-items-center justify-content-center">
-                            <img src="${user.profile?.avatar ?? '/default-avatar.png'}" alt="avatar">
-                            <span>${user.name}</span>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-success fs-6">${Number(user.followers_count).toLocaleString()}</span>
-                        </td>
-                    </tr>
-                `;
+                        <tr>
+                            <td class="text-center fw-bold">${index + 1}</td>
+                            <td class="avatar-cell">
+                                <img src="${user.profile?.avatar ?? '/default-avatar.png'}" alt="avatar">
+                                <span>${user.name}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success fs-6">${Number(user.followers_count).toLocaleString()}</span>
+                            </td>
+                        </tr>
+                    `;
                 });
 
+                loading.classList.add('d-none');
                 tableWrapper.classList.remove('d-none');
             })
             .catch(() => {
-                document.getElementById('top-followers-body').innerHTML =
-                    `<tr><td colspan="3" class="text-center text-danger">{{ __('Failed to load data') }}</td></tr>`;
+                document.getElementById('top-followers-loading').innerHTML = `<p class="text-danger">{{ __('Failed to load data') }}</p>`;
             });
     });
 </script>
