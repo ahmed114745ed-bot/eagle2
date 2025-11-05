@@ -2,6 +2,7 @@
 
 namespace  Modules\Form\Http\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Bd;
 
 use App\Models\Agency;
@@ -326,6 +327,7 @@ class FormTemplateController extends Controller
         foreach ($request->files as $key => $fileInput) {
             info($fileInput);
             if (is_array($fileInput)) {
+                info('array');
                 $storedFiles = [];
                 foreach ($fileInput as $file) {
                     if ($file && $file->isValid()) {
@@ -335,9 +337,9 @@ class FormTemplateController extends Controller
                 }
                 $data[$key] = $storedFiles;
             } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
-                $fileInput->storeAs('data', $fileInput->getClientOriginalName());
-                info($fileInput->getClientOriginalName());
-                $data[$key] = $fileInput->getClientOriginalName();
+                info('uploaded file');
+                $path = Common::upload('data', $fileInput);
+                $data[$key] = $path;
             }
         }
 
