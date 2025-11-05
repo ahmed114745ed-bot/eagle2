@@ -61,7 +61,7 @@
 <script>
 $(function() {
     function updateBdStats() {
-        $.ajax({
+        addToAjaxQueue({
             url: '{{ url("admin/statistics/bd-stats") }}',
             type: 'GET',
             beforeSend: function() {

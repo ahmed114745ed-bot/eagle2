@@ -44,7 +44,7 @@
 
 <script>
 $(document).ready(function() {
-    $.ajax({
+    addToAjaxQueue({
         url: "{{ url('admin/statistics/top-sender') }}", // 👈 endpoint
         type: "GET",
         dataType: "json",

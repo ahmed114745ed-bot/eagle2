@@ -188,7 +188,7 @@
 <script>
 $(function() {
     function updateStats() {
-        $.ajax({
+        addToAjaxQueue({
             url: '{{ url("admin/statistics/agency-stats") }}', // ✅ matches your route
             type: 'GET',
             beforeSend: function() {
