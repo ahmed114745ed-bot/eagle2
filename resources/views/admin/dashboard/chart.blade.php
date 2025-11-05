@@ -82,6 +82,56 @@ ul.list-unstyled {
     </div>
 </div>
 
+<div class="col-md-12">
+    @include('admin.dashboard.stats')
+</div>
+
+<div class="stats-container" id="stats-container">
+    <div id="stats-content">
+
+        {{-- ================= USERS SECTION ================= --}}
+{{--        <div class="col-md-12">@include('admin.dashboard.stats')</div>--}}
+
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.users_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_users_visits_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.signups_weekly_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.peak_hours_card')</div>
+        </div>
+        {{--        <div class="row">--}}
+        {{--            <div class="col-md-6">@include('admin.dashboard.widgets.top_followers_table')</div>--}}
+        {{--        </div>--}}
+
+        {{-- ================= ROOMS SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.room_tab')</div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.rooms_activity_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
+        </div>
+
+        {{-- ================= AGENCIES SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.agency_tab')</div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.agencies_targets_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_senders_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_receivers_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.agencies_compare_chart')</div>
+        </div>
+
+        {{-- ================= BD SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.bd_tab')</div>
+
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -92,12 +142,12 @@ var myChart = null;
 // دالة لإنشاء أو تحديث الـ Chart
 function createOrUpdateChart(chartData, usePercentage) {
     var ctx = document.getElementById('myChart').getContext('2d');
-    
+
     // إذا كان الـ Chart موجود بالفعل، قم بتدميره أولاً
     if (myChart !== null) {
         myChart.destroy();
     }
-    
+
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -162,10 +212,10 @@ function loadBalanceData(date = null) {
                 $('#available-balance').text(response.data.availableBalance.toLocaleString());
                 $('#balance-dollar').text(response.data.balanceDollar.toLocaleString());
                 $('#used-balance').text(response.data.used.toLocaleString());
-                
+
                 // تحديث الـ Chart
                 createOrUpdateChart(response.data.chartData, response.data.usePercentage);
-                
+
                 // معالجة التنبيه
                 handlePaymentAlert(response.data.showPaymentAlert, response.data.usePercentage);
             }
@@ -185,9 +235,9 @@ function loadBalanceData(date = null) {
 // دالة للتعامل مع تنبيه الدفع
 function handlePaymentAlert(showAlert, usePercentage) {
     const alertContainer = $('#payment-alert-container');
-    
+
     alertContainer.empty();
-    
+
     if (showAlert) {
         const alertHtml = `
             <div class="row">
@@ -201,7 +251,7 @@ function handlePaymentAlert(showAlert, usePercentage) {
             </div>
         `;
         alertContainer.html(alertHtml);
-        
+
         // إضافة تأثير لو أردت
         alertContainer.hide().fadeIn(500);
     }
@@ -211,15 +261,15 @@ function handlePaymentAlert(showAlert, usePercentage) {
 $(document).ready(function() {
     // إنشاء الـ Chart الأولي بالبيانات الافتراضية
     createOrUpdateChart([0, 0], 0);
-    
+
     // تحميل البيانات الفعلية
     loadBalanceData();
-    
+
     // إضافة event listener لحقل التاريخ
     $('#date-filter').on('change', function() {
         loadBalanceData($(this).val());
     });
-    
+
     // منع إعادة تحميل الصفحة عند الضغط على الفلتر
     $('form').on('submit', function(e) {
         e.preventDefault();

@@ -39,7 +39,7 @@ class AllStatisticController extends MainController
             ->title(__('Home'))
             ->description(__('General Statistics'))
             ->row(function (Row $row) {
-                    $row->column(12, view('admin.dashboard.stats'));
+                    $row->column(12, view('admin.dashboard.chart'));
             })
         );
         $countryID = $this->countryId();
