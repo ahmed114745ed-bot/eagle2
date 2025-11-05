@@ -162,7 +162,6 @@ class FormTemplateController extends Controller
             'description' => 'nullable|array',
             'sections' => 'required|array',
         ]);
-
         // Update form template basic info
         $formTemplate->update([
             'title' => $request->title,
@@ -182,6 +181,7 @@ class FormTemplateController extends Controller
                     'title' => $sectionData['title'],
                     'section_order' => $sectionData['order'],
                     'is_visible' => true,
+                    'can_not_delete' =>$sectionData['can_not_delete']
                 ]);
 
                 // Create fields for this section
@@ -256,6 +256,7 @@ class FormTemplateController extends Controller
                             'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
                             'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
                             'field_order' => $fieldData['order'],
+                            'can_not_delete' =>  $fieldData['can_not_delete']
                         ]);
                     }
                 }
@@ -319,6 +320,7 @@ class FormTemplateController extends Controller
 
     public function storeSubmission(Request $request, string $type)
     {
+
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
         $data = $request->except('_token');
         foreach ($request->files as $key => $fileInput) {

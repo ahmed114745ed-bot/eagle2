@@ -233,7 +233,7 @@ function addSection(data = null) {
                         ${titlesHtml}
                     </div>
                 </div>
-                <input type="hidden" name="sections[${sectionCount}][can_not_delete]" value="${data.can_not_delete}">
+                <input type="hidden" name="sections[${sectionCount}][can_not_delete]" value="${data && data.can_not_delete ? data.can_not_delete : 0}">
                 <input type="hidden" name="sections[${sectionCount}][order]" value="${sectionCount}">
 
                 <div class="mb-4">
@@ -250,6 +250,7 @@ function addSection(data = null) {
     `;
 
     document.getElementById('sections').insertAdjacentHTML('beforeend', sectionHtml);
+    document.querySelector(`[data-section="${sectionCount}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     new Sortable(document.getElementById(`section-${sectionCount}-fields`), {
         animation: 150,
