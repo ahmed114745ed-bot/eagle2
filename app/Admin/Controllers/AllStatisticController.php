@@ -35,6 +35,13 @@ class AllStatisticController extends MainController
     public function index(Content $content)
     {
 
+        return parent::index($content
+            ->title(__('Home'))
+            ->description(__('General Statistics'))
+            ->row(function (Row $row) {
+                    $row->column(12, view('admin.dashboard.stats'));
+            })
+        );
         $countryID = $this->countryId();
 
         $user = Auth::user();
