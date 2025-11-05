@@ -2,43 +2,53 @@
 
 namespace  Modules\Form\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Bd;
 
 use App\Models\Agency;
-use App\Models\Bd;
 use App\Models\FormRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
-use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
 
 class FormTemplateController extends Controller
 {
-
+    public $permission_name = 'templates-form';
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
+        }
+
         $templates = FormTemplate::with('sections.fields')->latest()->get();
         return $content
             ->title(__(''))
             ->description(__(''))
             ->row(function ($row) use ($templates) {
-                $row->column(12,view('Form::form-templates.index', compact('templates')));
+                $row->column(12, view('Form::form-templates.index', compact('templates')));
             });
     }
 
-    public function show($id,Content $content)
+    public function show($id, Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('show-' . $this->permission_name);
+        }
         $template = FormTemplate::with(['sections.fields'])->findOrFail($id);
         return $content
-        ->title(__('Preview'))
-        ->body(view('Form::form-templates.show', compact('template')));
+            ->title(__('Preview'))
+            ->body(view('Form::form-templates.show', compact('template')));
     }
 
     public function create()
     {
+        
         $template = new FormTemplate();
         return view('Form::form-templates.create', compact('template'));
     }
@@ -77,7 +87,7 @@ class FormTemplateController extends Controller
                         // Handle options based on type
                         $options = null;
                         $dataSource = null;
-                        
+
                         if (isset($fieldData['options_type'])) {
                             if ($fieldData['options_type'] === 'custom' && isset($fieldData['custom_options'])) {
                                 // Parse custom options (either JSON or line-separated)
@@ -97,7 +107,7 @@ class FormTemplateController extends Controller
                                 $dataSource = $fieldData['data_source'];
                             }
                         }
-                     
+
                         FormField::create([
                             'section_id' => $section->id,
                             'field_label' => $fieldData['label'],
@@ -122,9 +132,12 @@ class FormTemplateController extends Controller
 
     public function edit($id, Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
+        }
         try {
             $template = FormTemplate::with(['sections.fields.widget'])->findOrFail($id);
-    
+
             return $content
                 ->title(__('Edit Form Template'))
                 ->body(view('Form::form-templates.edit', compact('template')));
@@ -133,7 +146,7 @@ class FormTemplateController extends Controller
             return redirect()->back();
         } catch (\Exception $e) {
             \Log::error('Form Template Edit Error: ' . $e->getMessage(), ['id' => $id]);
-    
+
             admin_error(__('Unexpected Error'), __('Something went wrong while loading the form template.'));
             return redirect()->back();
         }
@@ -221,6 +234,8 @@ class FormTemplateController extends Controller
                                         $dataSource = $fieldData['data_source'];
                                     }
                                 }
+                            } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
+                                $dataSource = $fieldData['data_source'];
                             }
                         }
     
@@ -277,25 +292,25 @@ class FormTemplateController extends Controller
                 ], 403);
             }
         }
-    
+
         $locale = $request->header('Accept-Language', $defaultLang);
         $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defaultLang;
         app()->setLocale($locale);
-    
+
         $template = FormTemplate::with(['sections.fields'])
             ->where('form_type', $type)
             ->where('is_active', true)
             ->firstOrFail();
-    
+
         return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken'));
     }
-    
-    
+
+
 
     public function storeSubmission(Request $request, string $type)
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
-    
+
         $data = $request->except('_token');
         foreach ($request->files as $key => $fileInput) {
             if (is_array($fileInput)) {
@@ -307,16 +322,15 @@ class FormTemplateController extends Controller
                     }
                 }
                 $data[$key] = $storedFiles;
-            }
-            elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
+            } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
                 $fileInput->storeAs('data', $fileInput->getClientOriginalName());
                 $data[$key] = $fileInput->getClientOriginalName();
             }
         }
-    
+
         FormRequest::create([
             'form_template_id' => $template->id,
-            'submitted_by'=> Auth::user()->id ,
+            'submitted_by' => Auth::user()->id,
             'bd_id' => $request->bd_id,
             'name' => $request->agency_name ?? $request->bd_name,
             'whatsapp_number' => $request->whatsapp_number,
@@ -324,21 +338,21 @@ class FormTemplateController extends Controller
             'data' => json_encode($data),
             'created_at' => now(),
         ]);
-    
-   
+
+
         return response()->json([
             'success' => true,
             'message' => __('Form submitted successfully!'),
         ], 200);
     }
-    
-    public function getTranslations( Request $request)
+
+    public function getTranslations(Request $request)
     {
         $locale = $request->get('locale', 'en');
         $templateId = $request->get('id', 'en');
-        
+
         $template = FormTemplate::with('sections.fields')->findOrFail($templateId);
-        
+
         return response()->json([
             'title' => $template->getTranslation('title', $locale),
             'sections' => $template->sections->map(function ($section) use ($locale) {
@@ -355,7 +369,7 @@ class FormTemplateController extends Controller
                                 return $value;
                             })->toArray();
                         }
-                        
+
                         return [
                             'label' => $field->getTranslation('field_label', $locale),
                             'placeholder' => $field->getTranslation('placeholder', $locale),
@@ -399,5 +413,4 @@ class FormTemplateController extends Controller
 
         return response()->json(['data' => $results]);
     }
-
 }

@@ -12,7 +12,7 @@
 
 <script>
 $(document).ready(function () {
-    $.ajax({
+    addToAjaxQueue({
         url: "{{ url('admin/statistics/agency-target') }}", // 👈 endpoint
         type: "GET",
         dataType: "json",
@@ -47,12 +47,12 @@ $(document).ready(function () {
                         }
                     },
                     scales: {
-                        x: { 
+                        x: {
                             beginAtZero: true,
                             ticks: { stepSize: 1 },
                             title: { display: true, text: '{{ __("Targets") }}' }
                         },
-                        y: { 
+                        y: {
                             title: { display: true, text: '{{ __("Agencies") }}' }
                         }
                     }
