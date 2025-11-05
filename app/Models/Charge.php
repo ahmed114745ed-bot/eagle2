@@ -4,9 +4,10 @@ namespace App\Models;
 
 use App\Models\Scopes\HostAgencyScope;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Charge extends Model
 {
