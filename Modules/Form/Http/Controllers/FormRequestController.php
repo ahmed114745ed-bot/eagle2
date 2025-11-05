@@ -939,7 +939,9 @@ class FormRequestController extends MainController
         foreach ($files as $file) {
             if (!$file) continue;
 
-            $url = asset('storage/' . $file);
+            $url = getImagePath($file);
+
+//            $url = asset('storage/' . $file);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
 
             if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
@@ -1098,7 +1100,8 @@ class FormRequestController extends MainController
             if (is_array($value)) {
                 $html .= '<pre style="background: white; padding: 10px; border-radius: 4px; margin-top: 8px; border: 1px solid #ddd; overflow-x: auto;">' . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
             } elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
-                $url = asset('storage/' . $value);
+//                $url = asset('storage/' . $value);
+                $url = getImagePath($value);
                 $html .= '<br><img src="' . $url . '" style="max-width: 200px; max-height: 200px; border-radius: 6px; margin-top: 8px; border: 2px solid #ddd;"/>';
             } else {
                 $html .= '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
