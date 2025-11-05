@@ -816,7 +816,8 @@ class FormRequestController extends MainController
         foreach ($files as $file) {
             if (!$file) continue;
 
-            $url = asset('storage/' . $file);
+            $url = getImagePath($file);
+
             $extension = pathinfo($file, PATHINFO_EXTENSION);
 
             if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
