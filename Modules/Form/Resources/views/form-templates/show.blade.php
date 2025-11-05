@@ -229,42 +229,122 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 
                                         {{-- Custom Widget --}}
                                         @case('custom')
-                                            @php
-                                                $widget = \Modules\Form\Entities\CustomFieldWidget::find($field->widget_id);
-                                                $widgetName = $widget ? ($widget->widget_name[$currentLocale] ?? $widget->widget_name['en'] ?? $widget->widget_type) : 'Custom Widget';
-                                            @endphp
-                                            <div class="custom-widget-preview">
-                                                <div class="alert alert-warning border-0 mb-0">
-                                                    <div class="d-flex align-items-start">
-                                                        <i class="fa fa-puzzle-piece fa-2x me-3 text-warning"></i>
-                                                        <div class="flex-grow-1">
-                                                            <h6 class="alert-heading mb-2">
-                                                                {{ __('Custom Widget') }}: {{ $widgetName }}
-                                                            </h6>
-                                                            @if($widget && $widget->description)
-                                                                <p class="mb-2 small">
-                                                                    {{ $widget->description[$currentLocale] ?? $widget->description['en'] ?? '' }}
-                                                                </p>
-                                                            @endif
-                                                            <div class="widget-example-items">
-                                                                <div class="list-group list-group-flush">
-                                                                    <div class="list-group-item d-flex justify-content-between align-items-center bg-white">
-                                                                        <span><i class="fa fa-check-circle text-success me-2"></i>{{ __('Example Item') }} 1</span>
-                                                                        <span class="badge bg-secondary">{{ __('Sample') }}</span>
-                                                                    </div>
-                                                                    <div class="list-group-item d-flex justify-content-between align-items-center bg-white">
-                                                                        <span><i class="fa fa-check-circle text-success me-2"></i>{{ __('Example Item') }} 2</span>
-                                                                        <span class="badge bg-secondary">{{ __('Sample') }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <button class="btn btn-sm btn-outline-warning mt-2" disabled>
-                                                                    <i class="fa fa-plus me-1"></i>{{ __('Add More') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+    @php
+        $widget = \Modules\Form\Entities\CustomFieldWidget::find($field->widget_id);
+        $widgetName = $widget ? ($widget->widget_name[$currentLocale] ?? $widget->widget_name['en'] ?? $widget->widget_type) : 'Custom Widget';
+        
+        // Get widget config with fallback to widget default_config
+        $widgetConfig = $field->widget_config ?? ($widget ? $widget->default_config : []);
+        $fields = $widgetConfig['fields'] ?? [];
+        $allowAddMore = $widgetConfig['allow_add_more'] ?? true;
+        $minItems = $widgetConfig['min_items'] ?? 0;
+        $maxItems = $widgetConfig['max_items'] ?? 10;
+        
+        // Fallback fields if empty (for preview purposes)
+        if (empty($fields)) {
+            $fields = [
+                [
+                    'name' => 'field_1',
+                    'type' => 'text',
+                    'placeholder' => [
+                        'en' => 'Field 1',
+                        'ar' => 'حقل 1'
+                    ]
+                ],
+                [
+                    'name' => 'field_2',
+                    'type' => 'text',
+                    'placeholder' => [
+                        'en' => 'Field 2',
+                        'ar' => 'حقل 2'
+                    ]
+                ]
+            ];
+        }
+    @endphp
+    
+    <div class="custom-widget-container">
+        {{-- Widget Info Header --}}
+        <div class="alert alert-info border-0 mb-3 py-2 px-3">
+            <div class="d-flex align-items-center">
+                <i class="fa fa-puzzle-piece me-2 text-info"></i>
+                <div>
+                    <strong>{{ $widgetName }}</strong>
+                    @if($widget && isset($widget->description))
+                        <small class="d-block text-muted">
+                            {{ is_array($widget->description) ? ($widget->description[$currentLocale] ?? $widget->description['en'] ?? '') : $widget->description }}
+                        </small>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Custom Fields List --}}
+        <div class="custom-field-list d-flex flex-wrap gap-2 align-items-start" 
+             id="custom-list-{{ $section->id }}-{{ $field->id }}"
+             data-widget-fields="{{ htmlspecialchars(json_encode($fields), ENT_QUOTES, 'UTF-8') }}"
+             data-section-id="{{ $section->id }}"
+             data-field-id="{{ $field->id }}">
+            
+            {{-- Example Items (2 examples for preview) --}}
+            @for($i = 0; $i < 2; $i++)
+                <div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" 
+                     style="width: 100%; min-width: 250px;">
+                    @foreach($fields as $fieldConfig)
+
+                        @php
+
+                            $placeholder = '';
+                            if (isset($fieldConfig['placeholder'])) {
+                                if (is_array($fieldConfig['placeholder'])) {
+                                    $placeholder = $fieldConfig['label'][$currentLocale] 
+                                        ?? $fieldConfig['label']['en'] 
+                                        ?? $fieldConfig['name'];
+                                } else {
+                                    $placeholder = $fieldConfig['label'][$currentLocale];
+                                }
+                            } else {
+                                $placeholder = $fieldConfig['label'][$currentLocale]  ?? 'Field';
+                            }
+                        @endphp
+                        <div class="flex-grow-1" style="min-width: 41%;">
+                            <input 
+                                type="{{ $fieldConfig['type'] ?? 'text' }}" 
+                                class="form-control form-control-sm mb-1"
+                                placeholder="{{ $placeholder }}"
+                                disabled>
+                        </div>
+                    @endforeach
+            
+                </div>
+            @endfor
+        </div>
+
+        {{-- Add Button (if allowed) --}}
+        @if($allowAddMore)
+            <button type="button"
+                    class="btn btn-sm btn-primary mt-3"
+                    onclick="addCustomFieldPreview({{ $section->id }}, {{ $field->id }})"
+                    style="background: #8b8be1; border-color: #8b8be1;">
+                <i class="fa fa-plus me-1"></i>
+                {{ __('Add') }}
+            </button>
+        @endif
+
+        {{-- Widget Config Info --}}
+        <div class="mt-2">
+            <small class="text-muted d-block">
+                <i class="fa fa-info-circle me-1"></i>
+                @if($allowAddMore)
+                    @if($maxItems > 0)
+                        ({{ __('Max') }}: {{ $maxItems }})
+                    @endif
+                @else
+                    {{ __('Single item only') }}
+                @endif
+            </small>
+        </div>
+    </div>
                                             @break
 
                                         {{-- Default/Unknown Type --}}
@@ -300,7 +380,116 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     </div>
 
 </div>
+<script>
+// Custom Field Dynamic Addition for Preview
+window.addCustomFieldPreview = function(sectionId, fieldId) {
+    const list = document.getElementById(`custom-list-${sectionId}-${fieldId}`);
+    
+    if (!list) {
+        console.error('Custom field list not found');
+        return;
+    }
+    
+    // Get widget fields configuration from data attribute
+    const fieldsDataRaw = list.getAttribute('data-widget-fields');
+    
+    if (!fieldsDataRaw) {
+        console.error('No fields configuration found in data attribute');
+        return;
+    }
+    
+    let fields = [];
+    try {
+        fields = JSON.parse(fieldsDataRaw);
+    } catch (e) {
+        console.error('Error parsing fields data:', e);
+        return;
+    }
+    
+    if (!fields || fields.length === 0) {
+        console.error('Fields array is empty');
+        return;
+    }
 
+    const index = list.children.length;
+    const currentLocale = document.querySelector('.form-preview-container')?.getAttribute('data-current-locale') || 'en';
+
+    let html = `<div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="width: 100%; min-width: 250px;">`;
+
+    fields.forEach(field => {
+        let placeholder = '';
+        
+        if (field.placeholder) {
+            if (typeof field.placeholder === 'object') {
+                placeholder = field.placeholder[currentLocale] || field.placeholder['en'] || field.name || 'Field';
+            } else {
+                placeholder = field.placeholder;
+            }
+        } else {
+            placeholder = field.name || 'Field';
+        }
+        
+        const fieldType = field.type || 'text';
+        
+        html += `
+            <div class="flex-grow-1" style="min-width: 41%;">
+                <input type="${fieldType}" 
+                    class="form-control form-control-sm mb-1"
+                    placeholder="${escapeHtml(placeholder)}"
+                    disabled>
+            </div>
+        `;
+    });
+
+    html += `
+        <button type="button" 
+                class="btn btn-sm btn-danger" 
+                onclick="this.closest('.custom-item').remove()">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>`;
+
+    list.insertAdjacentHTML('beforeend', html);
+
+    // Add animation
+    const newItem = list.lastElementChild;
+    if (newItem) {
+        newItem.style.opacity = '0';
+        newItem.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            newItem.style.transition = 'all 0.3s ease';
+            newItem.style.opacity = '1';
+            newItem.style.transform = 'translateY(0)';
+        }, 10);
+    }
+};
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Debug function (remove after testing)
+window.debugCustomWidget = function(sectionId, fieldId) {
+    const list = document.getElementById(`custom-list-${sectionId}-${fieldId}`);
+    console.log('List element:', list);
+    console.log('Fields data attribute:', list?.getAttribute('data-widget-fields'));
+    
+    try {
+        const fields = JSON.parse(list?.getAttribute('data-widget-fields'));
+        console.log('Parsed fields:', fields);
+    } catch (e) {
+        console.error('Parse error:', e);
+    }
+};
+</script>
 <style>
 
 .form-header {
