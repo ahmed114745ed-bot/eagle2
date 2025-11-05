@@ -239,36 +239,39 @@ class FormTemplateController extends Controller
             ->with('success', __('Form template deleted successfully!'));
     }
 
-
     public function showByType(Request $request)
     {
-        $type =request('type');
+        $type = $request->query('type');
         $linkToken = $request->query('token');
-        $defultLang = $request->query('lang') ?? app()->getLocale();
+        $defaultLang = $request->query('lang') ?? app()->getLocale();
         $user = $request->user();
-
-        if (!$user && empty($linkToken)) {
-            return response()->view('Form::forms.invalid', [
-                'message' => 'Access denied. Please login or use a valid token.',
-            ], 403);
+        if (!$user) {
+            if (empty($linkToken)) {
+                return response()->view('Form::forms.invalid', [
+                    'message' => 'Access denied. Please login or use a valid token.',
+                ], 403);
+            }
+            $tokenRecord = DB::table('personal_access_tokens')->where('token', $linkToken)->first();
+            if (!$tokenRecord) {
+                return response()->view('Form::forms.invalid', [
+                    'message' => 'Invalid or expired token.',
+                ], 403);
+            }
         }
-        // if (  !$user && $linkToken && !DB::table('personal_access_tokens')->where('token', $linkToken)->exists()) {
-        //     return response()->view('Form::forms.invalid', [
-        //             'message' => 'Invalid or expired token.',
-        //         ], 403);
-        // }
-
-        $locale = $request->header('Accept-Language',$defultLang );
-        $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defultLang;
+    
+        $locale = $request->header('Accept-Language', $defaultLang);
+        $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defaultLang;
         app()->setLocale($locale);
-
+    
         $template = FormTemplate::with(['sections.fields'])
             ->where('form_type', $type)
             ->where('is_active', true)
             ->firstOrFail();
-
-        return view('Form::web-view.dynamic-form', compact('template','locale'));
+    
+        return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken'));
     }
+    
+    
 
     public function storeSubmission(Request $request, string $type)
     {

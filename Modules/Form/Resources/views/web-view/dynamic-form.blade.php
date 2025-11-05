@@ -377,6 +377,9 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @if (!empty($linkToken))
+        <input type="hidden" name="token" value="{{ request()->query('token') ?? '' }}">
+        @endif
 
         @if($template->getTranslation('description', $currentLocale))
         <div class="card mb-5 border-info shadow-sm">
