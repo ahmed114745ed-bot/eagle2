@@ -325,7 +325,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
     margin: 10px 0;
 }
 .agency-list {
-    text-align: left;
+    text-align: right;
     font-size: 0.9rem;
 }
 .card-selected {
