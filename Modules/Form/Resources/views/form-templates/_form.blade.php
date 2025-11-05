@@ -250,6 +250,7 @@ function addSection(data = null) {
     `;
 
     document.getElementById('sections').insertAdjacentHTML('beforeend', sectionHtml);
+    document.querySelector(`[data-section="${sectionCount}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     new Sortable(document.getElementById(`section-${sectionCount}-fields`), {
         animation: 150,
