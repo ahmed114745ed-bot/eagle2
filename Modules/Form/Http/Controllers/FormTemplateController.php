@@ -244,6 +244,7 @@ class FormTemplateController extends Controller
     {
         $type =request('type');
         $linkToken = $request->query('token');
+        $defultLang = $request->query('lang') ?? app()->getLocale();
         $user = $request->user();
 
         if (!$user && empty($linkToken)) {
@@ -257,8 +258,8 @@ class FormTemplateController extends Controller
         //         ], 403);
         // }
 
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : app()->getLocale();
+        $locale = $request->header('Accept-Language',$defultLang );
+        $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defultLang;
         app()->setLocale($locale);
 
         $template = FormTemplate::with(['sections.fields'])
@@ -351,7 +352,7 @@ class FormTemplateController extends Controller
 
         $bds = Bd::where('name', 'like', "%{$query}%")
             ->orWhere('id', 'like', "%{$query}%")
-            ->limit(10)
+            ->limit(6)
             ->get();
 
         $results = $bds->map(function ($bd) {
