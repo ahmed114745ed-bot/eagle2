@@ -10,6 +10,54 @@
     <div id="stats-content" style="display: none;"></div>
 </div>
 
+{{--@section('content')--}}
+{{-- admin/dashboard/stats.blade.php --}}
+<div class="stats-container" id="stats-container">
+    <div id="stats-content">
+
+        {{-- ================= USERS SECTION ================= --}}
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.users_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_users_visits_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.signups_weekly_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.peak_hours_card')</div>
+        </div>
+        {{--        <div class="row">--}}
+        {{--            <div class="col-md-6">@include('admin.dashboard.widgets.top_followers_table')</div>--}}
+        {{--        </div>--}}
+
+        {{-- ================= ROOMS SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.room_tab')</div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.rooms_activity_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
+        </div>
+
+        {{-- ================= AGENCIES SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.agency_tab')</div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.agencies_targets_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_senders_chart')</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_receivers_chart')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.agencies_compare_chart')</div>
+        </div>
+
+        {{-- ================= BD SECTION ================= --}}
+        <div class="col-md-12">@include('admin.dashboard.widgets.bd_tab')</div>
+
+    </div>
+</div>
+
+{{--@endsection--}}
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 function loadStatsData() {
