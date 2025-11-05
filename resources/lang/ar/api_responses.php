@@ -14,7 +14,6 @@ return [
     'type_not_found'                                            => 'هذا النوع غير موجود',
     'unusable_item'                                             => 'هذا العنصر لا يمكن استخدامه',
     'cant_follow_your_self'                                     => 'لا يمكن ان تتابع نفسك!',
-    'rejected_success' => 'تم الرفض بنجاح ✅',
     'this_user_not_found'                                       => 'هذا المستخدم غير موجود',
     'follow_done'                                               => 'تم متابعة هذا المستخدم بنجاح',
     'unfollow_done'                                             => 'تم الغاء متابعة هذا المستخدم بنجاح',
