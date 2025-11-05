@@ -8,6 +8,7 @@ use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bd;
@@ -197,6 +198,19 @@ class AllStatisticController extends MainController
             }));
     }
 
+    public function getTopFollowers(Request $request): JsonResponse
+    {
+        $countryID = $this->countryId();
+
+        $topUsersByFollowers = User::withCount('followers')
+            ->with('profile')
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->orderByDesc('followers_count')
+            ->take(10)
+            ->get();
+
+        return response()->json($topUsersByFollowers);
+    }
 
     public function peakHours(Request $request)
     {
@@ -783,6 +797,31 @@ class AllStatisticController extends MainController
             ], 500);
         }
     }
+
+    public function gameSummary(Request $request): JsonResponse
+    {
+        $countryID = $request->get('country_id');
+
+        $game = CoinGameUserDailyAggregated::query()
+            ->whereHas('user', function ($q) use ($countryID) {
+                $q->when($countryID, fn($query, $countryID) => $query->where('country_id', $countryID));
+            })
+            ->selectRaw("
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(total_loss - total_win) as app_profit
+        ")
+            ->first();
+
+        return response()->json([
+            'total_played' => $game->total_played ?? 0,
+            'total_loss' => $game->total_loss ?? 0,
+            'total_win' => $game->total_win ?? 0,
+            'app_profit' => $game->app_profit ?? 0,
+        ]);
+    }
+
 
    public function getStatsData(Request $request)
     {

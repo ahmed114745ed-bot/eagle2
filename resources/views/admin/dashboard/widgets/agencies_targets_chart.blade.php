@@ -12,7 +12,7 @@
 
 <script>
 $(document).ready(function () {
-    addToAjaxQueue({
+    $.ajax({
         url: "{{ url('admin/statistics/agency-target') }}", // 👈 endpoint
         type: "GET",
         dataType: "json",

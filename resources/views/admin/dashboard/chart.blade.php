@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <div style="margin-bottom: 15px;">
     <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
         <input type="month" name="date" id="date-filter" value="{{ request('date') }}" style="padding: 5px;">
@@ -82,15 +84,13 @@ ul.list-unstyled {
     </div>
 </div>
 
+<h3 style="margin:10px 0;">👤 {{ __('Users') }}</h3>
 <div class="col-md-12">
     @include('admin.dashboard.stats')
 </div>
 
 <div class="stats-container" id="stats-container">
     <div id="stats-content">
-
-        {{-- ================= USERS SECTION ================= --}}
-{{--        <div class="col-md-12">@include('admin.dashboard.stats')</div>--}}
 
         <div class="row">
             <div class="col-md-6">@include('admin.dashboard.widgets.users_chart')</div>
@@ -100,11 +100,12 @@ ul.list-unstyled {
             <div class="col-md-6">@include('admin.dashboard.widgets.signups_weekly_chart')</div>
             <div class="col-md-6">@include('admin.dashboard.widgets.peak_hours_card')</div>
         </div>
-        {{--        <div class="row">--}}
-        {{--            <div class="col-md-6">@include('admin.dashboard.widgets.top_followers_table')</div>--}}
-        {{--        </div>--}}
+        <div class="row">
+            <div class="col-md-6">@include('admin.dashboard.widgets.top_followers_table')</div>
+            <div class="col-md-6">@include('admin.dashboard.widgets.users_online_chart')</div>
+        </div>
 
-        {{-- ================= ROOMS SECTION ================= --}}
+        <h3 style="margin:10px 0;">🏠 {{ __('Rooms') }}</h3>
         <div class="col-md-12">@include('admin.dashboard.widgets.room_tab')</div>
         <div class="row">
             <div class="col-md-6">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
@@ -115,7 +116,7 @@ ul.list-unstyled {
             <div class="col-md-6">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
         </div>
 
-        {{-- ================= AGENCIES SECTION ================= --}}
+        <h3 style="margin:10px 0;">🏢 {{ __('Agencies') }}</h3>
         <div class="col-md-12">@include('admin.dashboard.widgets.agency_tab')</div>
         <div class="row">
             <div class="col-md-6">@include('admin.dashboard.widgets.agencies_targets_chart')</div>
@@ -126,9 +127,11 @@ ul.list-unstyled {
             <div class="col-md-6">@include('admin.dashboard.widgets.agencies_compare_chart')</div>
         </div>
 
-        {{-- ================= BD SECTION ================= --}}
+        <h3 style="margin:10px 0;">💼 {{ __('BD') }}</h3>
         <div class="col-md-12">@include('admin.dashboard.widgets.bd_tab')</div>
 
+        <h3 style="margin:10px 0;">🎮 {{ __('Game') }}</h3>
+        <div class="col-md-12">@include('admin.dashboard.widgets.game_tab')</div>
     </div>
 </div>
 
@@ -276,4 +279,26 @@ $(document).ready(function() {
         loadBalanceData($('#date-filter').val());
     });
 });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const charts = document.querySelectorAll('canvas');
+
+        const io = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const url = entry.target.dataset.url;
+                    if (url) fetch(url)
+                        .then(r => r.json())
+                        .then(data => {
+                            const ctx = entry.target.getContext('2d');
+                            new Chart(ctx, { type: 'bar', data: { labels: data.labels, datasets: [{ data: data.data }] } });
+                        });
+                    obs.unobserve(entry.target);
+                }
+            });
+        });
+        charts.forEach(c => io.observe(c));
+    });
 </script>
