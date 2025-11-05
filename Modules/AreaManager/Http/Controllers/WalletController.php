@@ -2,26 +2,26 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Enums\Charges\UserTypeEnum;
-use App\Helpers\ShippingAgencyHelper;
-use App\Models\AreaManager;
-use App\Models\Setting;
-use App\Models\SubAreaManager;
-use App\Models\SuperAdmin;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Setting;
 use App\Models\BDSallary;
+use App\Models\SuperAdmin;
 use App\Models\UserWallet;
 use Illuminate\Http\Request;
 use App\Models\ShippingAgency;
 use App\Services\WalletService;
 use Encore\Admin\Layout\Content;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\ShippingAgencyHelper;
 use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\AreaManager;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 class WalletController extends MainController
 {

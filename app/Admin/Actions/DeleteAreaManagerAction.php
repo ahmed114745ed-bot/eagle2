@@ -2,15 +2,15 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\AreaManager;
-use App\Models\Country;
-use App\Models\SubAreaManager;
+
 use App\Models\User;
 use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 class DeleteAreaManagerAction extends RowAction
 {

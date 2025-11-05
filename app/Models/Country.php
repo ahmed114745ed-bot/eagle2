@@ -4,9 +4,10 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Country extends Model
 {

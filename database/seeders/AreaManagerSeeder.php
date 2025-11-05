@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\AreaManager;
 use App\Models\Country;
+
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
+use Modules\AreaManager\Entities\AreaManager;
 
 class AreaManagerSeeder extends Seeder
 {
