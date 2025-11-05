@@ -17,11 +17,11 @@ Route::get('/host-agency/search', [FormTemplateController::class, 'search'])
 
 Route::get('/forms', [FormTemplateController::class, 'showByType'])
 ->name('forms.showByType');
-// Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])
         ->name('form.submit');
     Route::get('/form-translations', [FormTemplateController::class, 'getTranslations']);
-// });
+});
 
  Route::group(
     [

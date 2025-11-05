@@ -111,7 +111,7 @@ class AgencyAndBdFormsSeeder extends Seeder
         ],
         'section_order' => 1,
         'is_visible' => true,
-        'can_not_delete' => true
+        'can_not_delete' => false
     ]);
 
     $personalFields = [
@@ -258,7 +258,7 @@ class AgencyAndBdFormsSeeder extends Seeder
         ],
         'section_order' => 3,
         'is_visible' => true,
-        'can_not_delete' => true
+        'can_not_delete' => false
         ]);
         
         FormField::create([
