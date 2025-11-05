@@ -9,12 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\AreaManager\Entities\AreaManager;
 
 class SuperAdmin extends Model
 {
     use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'admin_users';
+    protected $guarded = [];
 
     protected $dates = ['deleted_at'];
 
@@ -36,6 +38,17 @@ class SuperAdmin extends Model
     {
         return $this->belongsTo(Country::class);
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(AreaManager::class, 'parent_id');
+    }
+//
+//    public function transactions()
+//    {
+//        return $this->hasMany(Charge::class, 'charger_id', 'id')
+//            ->where('user_charger_type', 'bd');
+//    }
 
     public function subSuperAdmins()
     {

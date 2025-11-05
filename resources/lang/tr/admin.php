@@ -15,7 +15,8 @@ return [
     'user_setting'          => 'Kullanıcı Ayarları',
     "total" => "toplam",
     'lifetime_help' => '💡 Eğer <strong>0</strong> girerseniz, bu öğenin asla süresinin dolmayacağı (ömür boyu) anlamına gelir.',
-
+    "password_incorrect" => 'Şifre yanlış',
+    "username_not_found" => 'Kullanıcı adı bulunamadı',
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',
     'new'                   => 'Yeni',
@@ -432,8 +433,8 @@ return [
     "days" => 'Günler',
     "reals" => 'reels',
     "moments" => 'anlar',
-    "RTC"=> "RTC",
-    "CDN"=> "CDN",
-    "L3"=> "L3",
+    "RTC" => "RTC",
+    "CDN" => "CDN",
+    "L3" => "L3",
     "charge_level" => "şarj seviyesi",
 ];

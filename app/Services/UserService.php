@@ -115,7 +115,7 @@ class UserService
         return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
     }
 
-    
+
 
     public function user_bd($key, $page)
     {
@@ -129,16 +129,29 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
+    public function userBdByCountries($areaManagerId,$key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->userBdByCountries($areaManagerId,$key, $page, $perPage);
+    }
+
     public function superAdminUsers($key, $page)
     {
         $perPage = 10;
         return $this->userRepository->superAdminUsers($key, $page, $perPage);
     }
 
+
     public function subSuperAdminUsers($key, $page)
     {
         $perPage = 10;
         return $this->userRepository->supSuperAdminUsers($key, $page, $perPage);
+    }
+
+    public function subAreaManager($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->subAreaManager($key, $page, $perPage);
     }
 
     public function superAdminUsers2($key, $page)
@@ -147,11 +160,25 @@ class UserService
         return $this->userRepository->superAdminUsers2($key, $page, $perPage);
     }
 
+
+    public function usersAreaManager($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->usersAreaManager($key, $page, $perPage);
+    }
+
     public function usersByCountry($superAdminId, $key, $page)
     {
         $perPage = 10;
 
         return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
+    }
+
+     public function usersByCountries($areaManager, $key, $page)
+    {
+        $perPage = 10;
+
+        return $this->userRepository->usersByCountries($areaManager, $key, $page, $perPage);
     }
 
     public function searchInAgency($key, $page)

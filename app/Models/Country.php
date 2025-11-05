@@ -51,6 +51,34 @@ class Country extends Model
 
     public function superAdmin()
     {
-        return $this->hasMany( SuperAdmin::class,'country_id');
+        return $this->hasMany(SuperAdmin::class,'country_id');
+    }
+    public function areaManager()
+    {
+        return $this->belongsTo(AreaManager::class, 'area_manager_id');
+    }
+
+    public function scopeNonDefaultOrUnassigned($query)
+    {
+        return $query->where(function($q) {
+            $q->whereNull('area_manager_id')
+              ->orWhereHas('areaManager', function($q2) {
+                 $q2->where('default', 0);
+              });
+        });
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($country) {
+            if (empty($country->area_manager_id)) {
+                $defaultManager = AreaManager::where('default', 1)->first();
+                if ($defaultManager) {
+                    $country->area_manager_id = $defaultManager->id;
+                }
+            }
+        });
     }
 }

@@ -143,6 +143,9 @@ return [
     */
 
     'custom' => [
+        'username' => [
+            'unique' => 'custom-message',
+        ],
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],

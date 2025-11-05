@@ -22,13 +22,14 @@ class AuthenticateWeb
         $uri = $request->path();
 
         $user = Admin::user();
-       // dd( $user);
+        // dd( $user);
         $userType = $user?->type ?? 'admin';
         //  dd($userType);
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
         $superadminLogin = 'superadmin/login';
+        $areaManagerLogin = 'areaManager/login';
 
         if ($user) {
             if (Str::is($uri, $adminLogin) && $userType === 'admin') {
@@ -43,10 +44,18 @@ class AuthenticateWeb
             ) {
                 return redirect('/superadmin');
             }
+           // dd($uri, $areaManagerLogin);
+            if (
+                Str::is($uri, $areaManagerLogin)
+                && in_array($userType, ['area-manager', 'sub_area_manager'], true)
+            ) {
+                return redirect('/areaManager');
+            }
 
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
-                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin' && $userType !== 'sub_super_admin') ||
+                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
+                (Str::startsWith($uri, 'areaManager') && $userType !== 'area-manager' && $userType !== 'sub_area_manager') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
                 Admin::guard()->logout();
@@ -57,6 +66,10 @@ class AuthenticateWeb
                     return redirect('/bd/login')->withErrors(['error' => 'Please login through BD portal.']);
                 } elseif ($userType === 'superadmin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
+                } elseif ($userType === 'area-manager') {
+                    return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
+                } elseif ($userType === 'sub_area_manager') {
+                    return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
                 } elseif ($userType === 'sub_super_admin') {
                     return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin 1111 portal.']);
                 } else {
@@ -73,6 +86,9 @@ class AuthenticateWeb
         }
         if (Str::contains($uri, 'superadmin')) {
             $redirectTo = '/superadmin/login';
+        }
+        if (Str::contains($uri, 'areaManager')) {
+            $redirectTo = '/areaManager/login';
         }
 
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {

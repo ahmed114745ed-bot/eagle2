@@ -583,7 +583,7 @@ class AgencyController extends MainController
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins','country_id','img', 'is_frozen'])
             ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
@@ -1015,6 +1015,9 @@ class AgencyController extends MainController
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
+            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            $form->country_id = $bd->country_id;
+
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;

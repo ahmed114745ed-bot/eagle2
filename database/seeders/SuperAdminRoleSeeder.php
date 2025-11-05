@@ -45,5 +45,44 @@ class SuperAdminRoleSeeder extends Seeder
             $role->permissions()->sync($permissions);
             echo "ℹ️ ";
         }
+
+
+
+
+        $this->createOrUpdateRole('area-manager', [
+            'desc_en' => 'Regional management access role',
+            'desc_ar' => 'صلاحيات إدارة المناطق',
+        ]);
+    }
+
+    /**
+     * Create or update a role and sync its permissions by type
+     */
+    protected function createOrUpdateRole(string $slug, array $descriptions)
+    {
+        $role = Role::firstOrCreate(
+            ['slug' => $slug],
+            [
+                'name' => $slug,
+                'desc_en' => $descriptions['desc_en'] ?? null,
+                'desc_ar' => $descriptions['desc_ar'] ?? null,
+                'image' => null,
+                'admin_id' => 1,
+                'type' => 'system',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]
+        );
+
+        // Match permissions by type (same as slug)
+        $permissions = Permission::whereHas('permissionTypes', function ($q) use ($slug) {
+            $q->where('type', $slug);
+        })->pluck('id')->toArray();
+
+        $role->permissions()->sync($permissions);
+
+        echo $role->wasRecentlyCreated
+            ? "✅ Created role: {$slug}\n"
+            : "ℹ️ Updated role: {$slug}\n";
     }
 }

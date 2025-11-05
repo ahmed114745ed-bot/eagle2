@@ -15,6 +15,8 @@ return [
     'user_setting'          => 'User setting',
     'avatar'                => 'Avatar',
     'list'                  => 'List',
+    "password_incorrect" => 'password incorrect',
+    "username_not_found" => 'username not found',
     'percent_total_error' => '❌ The total percentages must be exactly 100%. Current: :total%',
     'new'                   => 'New',
     'lifetime_help' => '💡 If you enter <strong>0</strong>, this means the item will never expire (lifetime).',
