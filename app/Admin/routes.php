@@ -475,14 +475,6 @@ Route::group(
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
-        // Route::resource('area-manager-users', AreaManagerController::class);
-         Route::get('area-manager-users/profile', [SuperAdminController::class, 'showPreview']);
-
-        // Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
-        // Route::group(['prefix' => 'area-manager-charges-report'], function () {
-        //     Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
-        // });
-
         Route::resource('usersBd', BdController::class);
          Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);

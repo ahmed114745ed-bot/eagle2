@@ -522,7 +522,7 @@ class AreaManagerController extends MainController
 
     public function profilePreview()
     {
-        if (!session('preview_superadmin') || !session('country_id')) {
+        if (!session('preview_area_manager') || !session('country_id')) {
             abort(404, __('not found'));
         }
 
@@ -614,6 +614,8 @@ class AreaManagerController extends MainController
 
         Admin::script($this->mapJs());
     }
+
+   
 
     protected function mapJs0()
     {
@@ -833,4 +835,6 @@ class AreaManagerController extends MainController
         });
     JS;
     }
+
+    
 }
