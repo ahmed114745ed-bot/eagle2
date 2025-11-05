@@ -374,11 +374,11 @@ input[type="file"]::-webkit-file-upload-button:hover {
     $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 <div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}">
-    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4" style=" text-align: center; font-size: 25px;">
         <h2 class="text-primary mb-0">
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
-    </div> -->
+    </div>
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
