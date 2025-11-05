@@ -1,31 +1,27 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\AreaManager\Http\Controllers\Admin; 
 
-use App\Models\Bd;
 use App\Models\User;
-use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Country;
 use App\Models\SuperAdmin;
-use App\Models\AreaManager;
 use Encore\Admin\Layout\Row;
-use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\Rule;
-use App\Models\SuperAdminReward;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
-use App\Admin\Actions\DeleteSuperAdminAction;
+use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 

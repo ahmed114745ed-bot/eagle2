@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\AreaManager\Http\Controllers\Admin;
 
-use App\Admin\Actions\AreaManagerChargeAction;
-use App\Models\AreaManager;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
+
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\AreaManager;
+use App\Admin\Actions\AreaManagerChargeAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class AreaManagerChargeController extends MainController

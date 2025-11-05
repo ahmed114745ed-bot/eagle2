@@ -1,23 +1,21 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\AreaManager\Http\Controllers\Admin;
 
-use App\Helpers\UserCommon;
-use App\Models\AreaManager;
-use App\Models\User;
 use App\Models\Charge;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
-use App\Models\ChargeInvoice;
-use Encore\Admin\Widgets\Table;
+use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
+use App\Models\ChargeInvoice;
 use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
 
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\AreaManager;
 
 class AreaManagerChargeReportController extends MainController
 {
