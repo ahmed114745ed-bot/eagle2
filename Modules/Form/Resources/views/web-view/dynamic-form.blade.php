@@ -596,8 +596,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 bd.top_agencies.forEach(agency => {
                                     topAgencies += `
                                         <div class="mb-1">
-                                            <strong>{{ __('Agency') }}:</strong> ${agency.name}
-                                            <span class="badge bg-info text-dark ms-2">${agency.members_count} {{ __('Members') }}</span>
+                                            <strong>{{ __('Agency') }}:</strong> ${agency.name ?? ''}
+                                            <span class="badge bg-info text-dark ms-2">${agency.members_count ?? ''} {{ __('Members') }}</span>
                                         </div>
                                     `;
                                 });
@@ -607,13 +607,12 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 card.innerHTML = `
                                     <div class="agency-card-inner">
                                         <div class="agency-header">
-                                            <h5 class="agency-name">${bd.name}</h5>
-                                            <span class="agency-id">#${bd.id}</span>
+                                            <h5 class="agency-name">${bd.name ?? ''}</h5>
+                                            <span class="agency-id">#${bd.id ?? ''}</span>
                                         </div>
                                         <div class="agency-info">
-                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country}</p>
-                                            <p><i class="fa fa-briefcase text-primary me-2"></i> <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}</p>
-                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone}</p>
+                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country ?? ''}</p>
+                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone ?? ''}</p>
                                         </div>
                                         <p class="agency-bio">${bd.bio}</p>
                                         <div class="agency-divider"></div>
