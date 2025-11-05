@@ -325,8 +325,13 @@ input[type="file"]::-webkit-file-upload-button:hover {
     margin: 10px 0;
 }
 .agency-list {
-    text-align: left;
+    text-align: right;
     font-size: 0.9rem;
+    background: darkkhaki;
+    border: 1px solid;
+    border-radius: 9%;
+    padding: 12px;
+
 }
 .card-selected {
     border: 3px solid #0d6efd;
@@ -369,16 +374,16 @@ input[type="file"]::-webkit-file-upload-button:hover {
     $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 <div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}">
-    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4" style=" text-align: center; font-size: 25px;">
         <h2 class="text-primary mb-0">
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
-    </div> -->
+    </div>
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @if (!empty($linkToken))
-        <input type="hidden" name="token" value="{{ request()->query('token') ?? '' }}">
+        @if (!empty($user))
+        <input type="hidden" name="user_id" value="{{  $user->id}}">
         @endif
 
         @if($template->getTranslation('description', $currentLocale))
@@ -444,6 +449,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                             $options = is_array($field->options) 
                                                 ? $field->options 
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
+                                               
+
                                         @endphp
                                         <select 
                                             name="{{ $field->field_name }}"
@@ -451,10 +458,13 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                             @required($field->is_required)>
                                             <option value="">-- {{ __('Select') }} --</option>
                                             @foreach ($options as $key => $value)
+
                                                 @php
-                                                    $displayValue = is_array($value) 
-                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key) 
-                                                        : $value;
+                                                
+                                              
+                                                $displayValue = is_array($value) 
+                                                            ? ($value['label'][$currentLocale] ?? $value['label']['en'] ?? $value['value'] ?? $key)
+                                                            : $value;
                                                 @endphp
                                                 <option value="{{ $key }}">{{ $displayValue }}</option>
                                             @endforeach
@@ -525,9 +535,10 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                         {{-- إذا كان allow_add_more = true في config --}}
                                         @if(optional($field->config)['allow_add_more'] ?? true)
                                             <button type="button"
+                                                     style=" background: #8b8be1;"
                                                     class="btn btn-sm btn-outline-primary mt-2"
                                                     onclick="addCustomField({{ $section->id }}, {{ $field->id }})">
-                                                <i class="fa fa-plus"></i> {{ __('Add More') }}
+                                                <i class="fa fa-plus"></i> {{ __('Add') }}
                                             </button>
                                         @endif
                                     @endif
@@ -591,8 +602,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 bd.top_agencies.forEach(agency => {
                                     topAgencies += `
                                         <div class="mb-1">
-                                            <strong>{{ __('Agency') }}:</strong> ${agency.name}
-                                            <span class="badge bg-info text-dark ms-2">${agency.members_count} {{ __('Members') }}</span>
+                                            <strong>{{ __('Agency') }}:</strong> ${agency.name ?? ''}
+                                            <span class="badge bg-info text-dark ms-2">${agency.members_count ?? ''} {{ __('Members') }}</span>
                                         </div>
                                     `;
                                 });
@@ -602,13 +613,12 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 card.innerHTML = `
                                     <div class="agency-card-inner">
                                         <div class="agency-header">
-                                            <h5 class="agency-name">${bd.name}</h5>
-                                            <span class="agency-id">#${bd.id}</span>
+                                            <h5 class="agency-name">${bd.name ?? ''}</h5>
+                                            <span class="agency-id">#${bd.id ?? ''}</span>
                                         </div>
                                         <div class="agency-info">
-                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country}</p>
-                                            <p><i class="fa fa-briefcase text-primary me-2"></i> <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}</p>
-                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone}</p>
+                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country ?? ''}</p>
+                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone ?? ''}</p>
                                         </div>
                                         <p class="agency-bio">${bd.bio}</p>
                                         <div class="agency-divider"></div>
@@ -656,7 +666,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
     @endif
 
 
-        <input type="hidden" name="bd_id" id="selected-bd-id">
 
         <div class="text-center">
             <button type="submit" class="btn btn-primary">
