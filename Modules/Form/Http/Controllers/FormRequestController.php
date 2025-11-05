@@ -587,7 +587,10 @@ class FormRequestController extends MainController
         $request = FormRequest::findOrFail($id);
         $request->status = 'rejected';
         $request->save();
-
+      return response()->json([
+            'success' => true,
+            'message' => __('done'),
+        ]);
         admin_toastr(__('rejected_message'), 'error');
         return redirect()->back();
     }
