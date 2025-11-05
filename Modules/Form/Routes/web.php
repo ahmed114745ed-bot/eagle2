@@ -15,14 +15,10 @@ use Modules\Form\Http\Controllers\FormTemplateController;
 Route::get('/host-agency/search', [FormTemplateController::class, 'search'])
     ->name('host_agency.search');
 
-Route::get('/forms', [FormTemplateController::class, 'showByType'])
-->name('forms.showByType');
-Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])
-->name('form.submit')->middleware('optional.sanctum');
-Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('/forms', [FormTemplateController::class, 'showByType'])->name('forms.showByType');
+    Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])->name('form.submit');
     Route::get('/form-translations', [FormTemplateController::class, 'getTranslations']);
-});
 
  Route::group(
     [

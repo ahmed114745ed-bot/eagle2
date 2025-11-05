@@ -41,7 +41,7 @@
 
 <script>
 $(document).ready(function() {
-    addToAjaxQueue({
+    $.ajax({
         url: "{{ url('admin/statistics/active-rooms') }}", // 👈 endpoint for data
         type: "GET",
         dataType: "json",
