@@ -2,9 +2,7 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\SubAreaManager;
 use DB;
-use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -19,7 +17,8 @@ use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
+use Modules\AreaManager\Entities\SubAreaManager;
+
 
 class ChargeController extends MainController
 {

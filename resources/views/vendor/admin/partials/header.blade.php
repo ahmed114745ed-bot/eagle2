@@ -220,7 +220,7 @@
         </a>
 
         @php
-            $areaManagers = \App\Models\AreaManager::select(['id','name','username','avatar'])->get();
+            $areaManagers = \Modules\AreaManager\Entities\AreaManager::select(['id','name','username','avatar'])->get();
             $selectAreaManagerId = session('area_manager_id') ?? request('area_manager_id');
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);

@@ -9,7 +9,8 @@ use App\Models\Agency;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
-use App\AreaManager\Controllers\EncorUsersController;
+use Modules\AreaManager\Http\Controllers\EncorUsersController;
+
 
 
 class AdminUserController extends EncorUsersController

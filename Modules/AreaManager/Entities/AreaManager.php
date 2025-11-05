@@ -1,8 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Modules\AreaManager\Entities;
 
 use Exception;
+use App\Models\User;
+use App\Models\Agency;
+use App\Models\Country;
+use App\Models\AreaPolygon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -1,7 +1,6 @@
 <?php
 
-namespace Modules\AreaManager\Http\Controllers;
-
+use Modules\AreaManager\Http\Controllers;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
@@ -24,8 +23,8 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\DeleteSuperAdminAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+
 
 class SuperAdminController extends MainController
 {

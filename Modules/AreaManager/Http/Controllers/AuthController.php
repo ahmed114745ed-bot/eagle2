@@ -3,7 +3,7 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\AreaManager;
+
 use Exception;
 use App\Models\Agent;
 use Encore\Admin\Form;
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use Modules\AreaManager\Entities\AreaManager;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 
@@ -88,18 +89,7 @@ class AuthController extends BaseAuthController
     {
 
         $userName = $request->username;
-       // $type = $request->type;
-        // $auth = \App\Models\Admin::where('username', $request->username)->first();
-        // if (!$auth) {
-        //     return back()->withErrors(['username' => __('User not found')]);
-        // }
-        // $whatsappOtpService = new WhatsappOtp();
-        // $phone              = $auth->phone_code . $auth->phone;
-        // $isValid            = $whatsappOtpService->isValidate($phone, $request->code);
-        // if (!$isValid) {
-        //     return back()->withErrors(['code' => __('api_responses.invalid_code')])->withInput();
-        // }
-        // $whatsappOtpService->resetCodes($phone);
+ 
         $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
@@ -164,23 +154,7 @@ class AuthController extends BaseAuthController
     }
 
 
-    // public function postLogin(Request $request)
-    // {
-    //     $url = $request->url;
-
-    //     $this->loginValidator($request->all())->validate();
-
-    //     $credentials = $request->only([$this->username(), 'password']);
-    //     $remember = $request->get('remember', false);
-
-    //     if ($this->guard()->attempt($credentials, $remember)) {
-    //         return $this->sendLoginResponse($request);
-    //     }
-
-    //     return back()->withInput()->withErrors([
-    //         $this->username() => $this->getFailedLoginMessage(),
-    //     ]);
-    // }
+    
 
     public function postLogin(Request $request)
     {

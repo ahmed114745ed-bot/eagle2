@@ -11,10 +11,8 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Models\GiftLog;
-use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Models\AgencySallary;
-use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -24,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteShippingAgencyAction;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
+
 
 class AppearChargerAgencyController extends MainController
 {

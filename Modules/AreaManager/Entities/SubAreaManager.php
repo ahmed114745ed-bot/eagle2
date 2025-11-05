@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace Modules\AreaManager\Entities;
 
-use DB;
-use Exception;
+
+use App\Models\User;
+use App\Models\Agency;
+use App\Models\Country;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,7 +52,7 @@ class SubAreaManager extends Model
             $builder->where('type', 'sub_area_manager');
         });
 
-        self::deleting(function (SuperAdmin $superAdmin) {});
+        self::deleting(function (SubAreaManager $subAreaManager) {});
     }
 
     protected static function boot()
