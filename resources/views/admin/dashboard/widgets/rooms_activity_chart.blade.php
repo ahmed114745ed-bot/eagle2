@@ -13,9 +13,9 @@
 </div>
 
 @php
-  
+
         $fetchUrl = admin_url('rooms-activity');
- 
+
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

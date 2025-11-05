@@ -120,7 +120,7 @@ class ChatRoomController extends Controller
         $user->current_room_chat = $checkRoom->id;
         $user->update();
         // Retrieve and paginate chat messages
-        $messages = $this->chatRoomService->getChatMessages($checkRoom->id);
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request, $user);
 
         // Mark unread messages as seen
         $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
