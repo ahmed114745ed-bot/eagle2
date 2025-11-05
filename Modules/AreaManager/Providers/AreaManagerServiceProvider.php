@@ -28,6 +28,8 @@ class AreaManagerServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->loadViewsFrom(module_path('areaManager', 'Resources/views'), 'areaManager');
+        $this->loadRoutesFrom(module_path('areaManager', 'Routes/web.php'));
     }
 
     /**
