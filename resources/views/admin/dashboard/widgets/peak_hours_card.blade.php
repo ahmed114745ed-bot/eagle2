@@ -7,7 +7,7 @@
             <option value="month">{{ __('This Month') }}</option>
         </select>
     </div>
-    <div class="box-body" style="height:245px;">
+    <div class="box-body" style="height:367px;">
         <canvas id="peakChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>

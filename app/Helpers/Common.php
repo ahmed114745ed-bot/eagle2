@@ -510,11 +510,12 @@ class Common
         return $confs ?: null;
     }
 
-    public static function upload($folder, $file)
+    public static function upload($folder, $file, $disk = null)
     {
+        $config = $disk ?: config('filesystems.default');
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
