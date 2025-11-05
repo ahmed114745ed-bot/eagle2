@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AreaManager\Actions;
+namespace Modules\AreaManager\Actions;
 
 use App\Enums\Charges\UserTypeEnum;
 use App\Enums\UserCoinLogType;
