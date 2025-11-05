@@ -484,7 +484,7 @@ class FormRequestController extends MainController
         return parent::show(
             $id,
             $content
-                ->title(trans('appear-charger-agency'))
+                ->title(trans(''))
             ->body($this->detail($id))
         );
     }
@@ -494,18 +494,10 @@ class FormRequestController extends MainController
         $show = new Show(FormRequest::findOrFail($id));
         $formRequest = FormRequest::findOrFail($id);
     
-        $show->field('user.name', __('Name'));
-        $show->field('bd_id', __('BD ID'));
-        $show->field('agency_name', __('Agency Name'));
-        $show->field('whatsapp_number', __('WhatsApp Number'));
-        $show->field('country', __('Country'));
-        $show->field('form_template_type', __('Form Type'));
-        $show->field('status', __('Status'));
-    
         // استخدم $this داخل closure
         $controller = $this;
         
-        $show->field('data', __('Form Data'))->as(function ($data) use ($formRequest, $controller) {
+        $show->field('data', __('Form Details'))->as(function ($data) use ($formRequest, $controller) {
             $formData = json_decode($data, true);
             if (!$formData || !is_array($formData)) {
                 return '<p class="text-muted">No data available</p>';
@@ -522,7 +514,15 @@ class FormRequestController extends MainController
     
             // Build fields map with their configurations
             $fieldsMap = [];
+            $sectionFieldsMap = []; // To organize fields by sections
+            
             foreach ($template->sections as $section) {
+                $sectionKey = $section->section_order;
+                $sectionFieldsMap[$sectionKey] = [
+                    'title' => $section->title,
+                    'fields' => []
+                ];
+                
                 foreach ($section->fields as $field) {
                     $fieldsMap[$field->field_name] = [
                         'label' => $field->field_label,
@@ -530,48 +530,74 @@ class FormRequestController extends MainController
                         'options' => $field->options,
                         'data_source' => $field->data_source,
                         'widget_id' => $field->widget_id,
-                        'section_title' => $section->title,
+                        'section_order' => $section->section_order,
+                        'field_order' => $field->field_order,
                     ];
-                }
-            }
-    
-            $html = '<div class="form-data-display">';
-            
-            // Group data by sections
-            $currentSection = null;
-            foreach ($formData as $fieldName => $value) {
-                if (!isset($fieldsMap[$fieldName])) {
-                    continue; // Skip unknown fields
-                }
-    
-                $fieldConfig = $fieldsMap[$fieldName];
-                $sectionTitle = $fieldConfig['section_title'];
-                $currentLocale = app()->getLocale();
-    
-                // Display section header
-                if ($currentSection !== $sectionTitle) {
-                    if ($currentSection !== null) {
-                        $html .= '</div>'; // Close previous section
+                    
+                    // Add field to section if exists in formData
+                    if (array_key_exists($field->field_name, $formData)) {
+                        $sectionFieldsMap[$sectionKey]['fields'][$field->field_name] = $fieldsMap[$field->field_name];
                     }
-                    $currentSection = $sectionTitle;
-                    $sectionName = is_array($sectionTitle) ? ($sectionTitle[$currentLocale] ?? $sectionTitle['en'] ?? '') : $sectionTitle;
-                    $html .= '<div class="section-group" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">';
-                    $html .= '<h4 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 8px;">' . htmlspecialchars($sectionName) . '</h4>';
                 }
-    
-                // Get field label
-                $label = $fieldConfig['label'];
-                $labelText = is_array($label) ? ($label[$currentLocale] ?? $label['en'] ?? $fieldName) : $label;
-    
-                // Render field based on type
-                $html .= '<div class="field-row" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 4px;">';
-                $html .= '<strong style="color: #34495e; display: inline-block; min-width: 200px;">' . htmlspecialchars($labelText) . ':</strong> ';
-                $html .= $controller->renderFieldValue($value, $fieldConfig);
-                $html .= '</div>';
             }
     
-            if ($currentSection !== null) {
-                $html .= '</div>'; // Close last section
+            $currentLocale = app()->getLocale();
+            $html = '<div class="form-data-display" style="max-width: 100%;">';
+            
+            // Display data organized by sections
+            foreach ($sectionFieldsMap as $sectionData) {
+                // Skip empty sections
+                if (empty($sectionData['fields'])) {
+                    continue;
+                }
+                
+                // Section header
+                $sectionTitle = $sectionData['title'];
+                $sectionName = is_array($sectionTitle) ? ($sectionTitle[$currentLocale] ?? $sectionTitle['en'] ?? '') : $sectionTitle;
+                
+                $html .= '<div class="section-group" style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">';
+                $html .= '<h3 style="color: #2c3e50; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #3498db; font-size: 18px;">';
+                $html .= '<i class="fa fa-folder-open" style="margin-right: 8px;"></i>' . htmlspecialchars($sectionName);
+                $html .= '</h3>';
+                
+                // Display fields in this section
+                foreach ($sectionData['fields'] as $fieldName => $fieldConfig) {
+                    $value = $formData[$fieldName];
+                    
+                    // Get field label
+                    $label = $fieldConfig['label'];
+                    $labelText = is_array($label) ? ($label[$currentLocale] ?? $label['en'] ?? $fieldName) : $label;
+                    
+                    // Render field
+                    $html .= '<div class="field-row" style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+                    $html .= '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+                    $html .= '<strong style="color: #34495e; min-width: 200px; flex: 0 0 auto;">' . htmlspecialchars($labelText) . ':</strong> ';
+                    $html .= '<div style="flex: 1; min-width: 0;">' . $controller->renderFieldValue($value, $fieldConfig) . '</div>';
+                    $html .= '</div>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>'; // Close section
+            }
+            
+            // Display fields that exist in data but not in template (orphaned fields)
+            $orphanedFields = array_diff_key($formData, $fieldsMap);
+            if (!empty($orphanedFields)) {
+                $html .= '<div class="section-group" style="margin-bottom: 25px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">';
+                $html .= '<h3 style="color: #856404; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #ffc107; font-size: 18px;">';
+                $html .= '<i class="fa fa-exclamation-triangle" style="margin-right: 8px;"></i>' . __('Additional Fields');
+                $html .= '</h3>';
+                
+                foreach ($orphanedFields as $fieldName => $value) {
+                    $html .= '<div class="field-row" style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+                    $html .= '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+                    $html .= '<strong style="color: #34495e; min-width: 200px; flex: 0 0 auto;">' . htmlspecialchars(str_replace('_', ' ', ucfirst($fieldName))) . ':</strong> ';
+                    $html .= '<div style="flex: 1; min-width: 0;">' . $controller->renderUnknownField($value) . '</div>';
+                    $html .= '</div>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
             }
     
             $html .= '</div>';
@@ -592,7 +618,7 @@ class FormRequestController extends MainController
     
         // Handle empty values
         if ($value === null || $value === '' || (is_array($value) && empty($value))) {
-            return '<span class="text-muted" style="color: #95a5a6;">—</span>';
+            return '<span class="text-muted" style="color: #95a5a6; font-style: italic;">—</span>';
         }
     
         switch ($type) {
@@ -622,11 +648,34 @@ class FormRequestController extends MainController
                 return $this->renderCustomWidget($value, $fieldConfig);
     
             case 'number':
-                return '<span style="font-weight: 500;">' . number_format($value) . '</span>';
+                return '<span style="font-weight: 500; color: #2c3e50;">' . number_format($value) . '</span>';
     
             default: // text and others
-                return '<span>' . htmlspecialchars($value) . '</span>';
+                return '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
         }
+    }
+    
+    /**
+     * Render unknown field (for orphaned fields)
+     */
+    public function renderUnknownField($value)
+    {
+        if ($value === null || $value === '') {
+            return '<span class="text-muted" style="color: #95a5a6; font-style: italic;">—</span>';
+        }
+        
+        if (is_array($value)) {
+            return '<pre style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin: 0; font-size: 13px; overflow-x: auto;">' . 
+                   json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . 
+                   '</pre>';
+        }
+        
+        // Check if it's a file path
+        if (preg_match('/\.(jpg|jpeg|png|gif|webp|pdf|doc|docx)$/i', $value)) {
+            return $this->renderFileField($value);
+        }
+        
+        return '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
     }
     
     /**
@@ -637,9 +686,11 @@ class FormRequestController extends MainController
         if (!$value) return '<span class="text-muted">—</span>';
     
         $files = is_array($value) ? $value : [$value];
-        $html = '<div class="file-preview" style="display: flex; flex-wrap: wrap; gap: 10px;">';
+        $html = '<div class="file-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">';
     
         foreach ($files as $file) {
+            if (!$file) continue;
+            
             $url = asset('storage/' . $file);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
     
@@ -647,14 +698,15 @@ class FormRequestController extends MainController
                 // Image preview
                 $html .= '<div style="position: relative;">';
                 $html .= '<a href="' . $url . '" target="_blank">';
-                $html .= '<img src="' . $url . '" style="max-width: 150px; max-height: 150px; border-radius: 4px; border: 1px solid #ddd;"/>';
+                $html .= '<img src="' . $url . '" style="max-width: 150px; max-height: 150px; border-radius: 6px; border: 2px solid #ddd; transition: transform 0.2s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'"/>';
                 $html .= '</a>';
                 $html .= '</div>';
             } else {
                 // Document link
                 $icon = $this->getFileIcon($extension);
-                $html .= '<a href="' . $url . '" target="_blank" style="padding: 8px 12px; background: #ecf0f1; border-radius: 4px; text-decoration: none; color: #2c3e50;">';
-                $html .= '<i class="fa fa-' . $icon . '"></i> ' . basename($file);
+                $html .= '<a href="' . $url . '" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 15px; background: #ecf0f1; border-radius: 6px; text-decoration: none; color: #2c3e50; transition: background 0.2s;" onmouseover="this.style.background=\'#d5dbdb\'" onmouseout="this.style.background=\'#ecf0f1\'">';
+                $html .= '<i class="fa fa-' . $icon . '" style="font-size: 20px;"></i> ';
+                $html .= '<span>' . basename($file) . '</span>';
                 $html .= '</a>';
             }
         }
@@ -672,7 +724,7 @@ class FormRequestController extends MainController
     
         // Check if using predefined data source
         if (!empty($fieldConfig['data_source'])) {
-            return '<span style="padding: 4px 10px; background: #3498db; color: white; border-radius: 3px;">' . htmlspecialchars($value) . '</span>';
+            return '<span style="display: inline-block; padding: 6px 12px; background: #3498db; color: white; border-radius: 4px; font-size: 14px;">' . htmlspecialchars($value) . '</span>';
         }
     
         // Check custom options
@@ -681,12 +733,12 @@ class FormRequestController extends MainController
                 if (isset($option['value']) && $option['value'] == $value) {
                     $label = $option['label'];
                     $labelText = is_array($label) ? ($label[$locale] ?? $label['en'] ?? $value) : $label;
-                    return '<span style="padding: 4px 10px; background: #3498db; color: white; border-radius: 3px;">' . htmlspecialchars($labelText) . '</span>';
+                    return '<span style="display: inline-block; padding: 6px 12px; background: #3498db; color: white; border-radius: 4px; font-size: 14px;">' . htmlspecialchars($labelText) . '</span>';
                 }
             }
         }
     
-        return '<span style="padding: 4px 10px; background: #3498db; color: white; border-radius: 3px;">' . htmlspecialchars($value) . '</span>';
+        return '<span style="display: inline-block; padding: 6px 12px; background: #3498db; color: white; border-radius: 4px; font-size: 14px;">' . htmlspecialchars($value) . '</span>';
     }
     
     /**
@@ -697,7 +749,7 @@ class FormRequestController extends MainController
         $values = is_array($value) ? $value : [$value];
         if (empty($values)) return '<span class="text-muted">—</span>';
     
-        $html = '<div style="display: flex; flex-wrap: wrap; gap: 6px;">';
+        $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">';
     
         foreach ($values as $val) {
             if (!empty($fieldConfig['options']) && is_array($fieldConfig['options'])) {
@@ -705,12 +757,12 @@ class FormRequestController extends MainController
                     if (isset($option['value']) && $option['value'] == $val) {
                         $label = $option['label'];
                         $labelText = is_array($label) ? ($label[$locale] ?? $label['en'] ?? $val) : $label;
-                        $html .= '<span style="padding: 4px 10px; background: #2ecc71; color: white; border-radius: 3px; font-size: 13px;">' . htmlspecialchars($labelText) . '</span>';
+                        $html .= '<span style="display: inline-block; padding: 6px 12px; background: #2ecc71; color: white; border-radius: 4px; font-size: 13px;">' . htmlspecialchars($labelText) . '</span>';
                         continue 2;
                     }
                 }
             }
-            $html .= '<span style="padding: 4px 10px; background: #2ecc71; color: white; border-radius: 3px; font-size: 13px;">' . htmlspecialchars($val) . '</span>';
+            $html .= '<span style="display: inline-block; padding: 6px 12px; background: #2ecc71; color: white; border-radius: 4px; font-size: 13px;">' . htmlspecialchars($val) . '</span>';
         }
     
         $html .= '</div>';
@@ -724,7 +776,7 @@ class FormRequestController extends MainController
     {
         try {
             $date = \Carbon\Carbon::parse($value);
-            return '<span style="color: #16a085;"><i class="fa fa-calendar"></i> ' . $date->format('Y-m-d') . '</span>';
+            return '<span style="color: #16a085; font-weight: 500;"><i class="fa fa-calendar" style="margin-right: 6px;"></i>' . $date->format('Y-m-d') . '</span>';
         } catch (\Exception $e) {
             return '<span>' . htmlspecialchars($value) . '</span>';
         }
@@ -735,7 +787,7 @@ class FormRequestController extends MainController
      */
     public function renderTextareaField($value)
     {
-        return '<div style="padding: 10px; background: #f8f9fa; border-left: 3px solid #3498db; border-radius: 4px; white-space: pre-wrap;">' . htmlspecialchars($value) . '</div>';
+        return '<div style="padding: 12px; background: #f8f9fa; border-left: 4px solid #3498db; border-radius: 4px; white-space: pre-wrap; line-height: 1.6; color: #2c3e50;">' . htmlspecialchars($value) . '</div>';
     }
     
     /**
@@ -743,7 +795,7 @@ class FormRequestController extends MainController
      */
     public function renderEmailField($value)
     {
-        return '<a href="mailto:' . htmlspecialchars($value) . '" style="color: #3498db;"><i class="fa fa-envelope"></i> ' . htmlspecialchars($value) . '</a>';
+        return '<a href="mailto:' . htmlspecialchars($value) . '" style="color: #3498db; text-decoration: none; font-weight: 500;"><i class="fa fa-envelope" style="margin-right: 6px;"></i>' . htmlspecialchars($value) . '</a>';
     }
     
     /**
@@ -751,7 +803,7 @@ class FormRequestController extends MainController
      */
     public function renderPhoneField($value)
     {
-        return '<a href="tel:' . htmlspecialchars($value) . '" style="color: #27ae60;"><i class="fa fa-phone"></i> ' . htmlspecialchars($value) . '</a>';
+        return '<a href="tel:' . htmlspecialchars($value) . '" style="color: #27ae60; text-decoration: none; font-weight: 500;"><i class="fa fa-phone" style="margin-right: 6px;"></i>' . htmlspecialchars($value) . '</a>';
     }
     
     /**
@@ -763,19 +815,20 @@ class FormRequestController extends MainController
             return '<span>' . htmlspecialchars($value) . '</span>';
         }
     
-        $html = '<div style="padding: 10px; background: #fff3cd; border-left: 3px solid #ffc107; border-radius: 4px;">';
+        $html = '<div style="padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; margin-top: 5px;">';
         $html .= '<ul style="list-style: none; padding: 0; margin: 0;">';
         
         foreach ($value as $key => $val) {
             if (is_array($val)) {
-                $html .= '<li style="margin-bottom: 8px;"><strong>' . htmlspecialchars($key) . ':</strong>';
-                $html .= '<ul style="padding-left: 20px;">';
+                $html .= '<li style="margin-bottom: 10px;"><strong style="color: #856404;">' . htmlspecialchars($key) . ':</strong>';
+                $html .= '<ul style="padding-left: 20px; margin-top: 5px;">';
                 foreach ($val as $k => $v) {
-                    $html .= '<li>' . htmlspecialchars($k) . ': ' . htmlspecialchars($v) . '</li>';
+                    $displayValue = is_array($v) ? json_encode($v, JSON_UNESCAPED_UNICODE) : $v;
+                    $html .= '<li style="margin-bottom: 3px; color: #856404;">' . htmlspecialchars($k) . ': <span style="color: #2c3e50;">' . htmlspecialchars($displayValue) . '</span></li>';
                 }
                 $html .= '</ul></li>';
             } else {
-                $html .= '<li style="margin-bottom: 4px;"><strong>' . htmlspecialchars($key) . ':</strong> ' . htmlspecialchars($val) . '</li>';
+                $html .= '<li style="margin-bottom: 5px;"><strong style="color: #856404;">' . htmlspecialchars($key) . ':</strong> <span style="color: #2c3e50;">' . htmlspecialchars($val) . '</span></li>';
             }
         }
         
@@ -788,19 +841,19 @@ class FormRequestController extends MainController
      */
     public function renderSimpleData($data)
     {
-        $html = '<div class="simple-data-display">';
+        $html = '<div class="simple-data-display" style="padding: 20px;">';
         
         foreach ($data as $key => $value) {
-            $html .= '<div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">';
-            $html .= '<strong>' . htmlspecialchars(str_replace('_', ' ', ucfirst($key))) . ':</strong> ';
+            $html .= '<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+            $html .= '<strong style="color: #2c3e50;">' . htmlspecialchars(str_replace('_', ' ', ucwords($key))) . ':</strong> ';
             
             if (is_array($value)) {
-                $html .= '<pre style="background: white; padding: 8px; border-radius: 4px; margin-top: 5px;">' . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
+                $html .= '<pre style="background: white; padding: 10px; border-radius: 4px; margin-top: 8px; border: 1px solid #ddd; overflow-x: auto;">' . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
             } elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
                 $url = asset('storage/' . $value);
-                $html .= '<br><img src="' . $url . '" style="max-width: 200px; max-height: 200px; border-radius: 4px; margin-top: 5px;"/>';
+                $html .= '<br><img src="' . $url . '" style="max-width: 200px; max-height: 200px; border-radius: 6px; margin-top: 8px; border: 2px solid #ddd;"/>';
             } else {
-                $html .= '<span>' . htmlspecialchars($value) . '</span>';
+                $html .= '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
             }
             
             $html .= '</div>';
