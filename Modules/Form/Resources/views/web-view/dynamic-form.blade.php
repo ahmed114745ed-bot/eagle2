@@ -325,8 +325,13 @@ input[type="file"]::-webkit-file-upload-button:hover {
     margin: 10px 0;
 }
 .agency-list {
-    text-align: left;
+    text-align: right;
     font-size: 0.9rem;
+    background: darkkhaki;
+    border: 1px solid;
+    border-radius: 9%;
+    padding: 12px;
+
 }
 .card-selected {
     border: 3px solid #0d6efd;
@@ -369,14 +374,17 @@ input[type="file"]::-webkit-file-upload-button:hover {
     $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 <div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}">
-    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4" style=" text-align: center; font-size: 25px;">
         <h2 class="text-primary mb-0">
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
-    </div> -->
+    </div>
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @if (!empty($user))
+        <input type="hidden" name="user_id" value="{{  $user->id}}">
+        @endif
 
         @if($template->getTranslation('description', $currentLocale))
         <div class="card mb-5 border-info shadow-sm">
@@ -438,26 +446,57 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                     {{-- Select --}}
                                     @elseif ($field->field_type === 'select')
                                         @php
-                                            $options = is_array($field->options) 
-                                                ? $field->options 
+                                            $options = is_array($field->options)
+                                                ? $field->options
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
+
+                                            $data = [];
+
+                                            if (!empty($field->data_source)) {
+                                                switch ($field->data_source) {
+                                                    case 'countries':
+                                                        $data = \App\Models\Country::select('id', 'name')->get();
+                                                        break;
+                                                    case 'cities':
+                                                        $data = \App\Models\City::select('id', 'name')->get();
+                                                        break;
+                                                    case 'languages':
+                                                        $data = \App\Models\Language::select('id', 'name')->get();
+                                                        break;
+                                                    case 'currencies':
+                                                        $data = \App\Models\Currency::select('id', 'name')->get();
+                                                        break;
+                                                }
+                                            }
                                         @endphp
+
                                         <select 
                                             name="{{ $field->field_name }}"
                                             class="form-select"
                                             @required($field->is_required)>
                                             <option value="">-- {{ __('Select') }} --</option>
-                                            @foreach ($options as $key => $value)
-                                                @php
-                                                    $displayValue = is_array($value) 
-                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key) 
-                                                        : $value;
-                                                @endphp
-                                                <option value="{{ $key }}">{{ $displayValue }}</option>
-                                            @endforeach
+
+                                            @if (!empty($options))
+                                                @foreach ($options as $key => $value)
+                                                    @php
+                                                        $displayValue = is_array($value)
+                                                            ? ($value['label'][$currentLocale] ?? $value['label']['en'] ?? $value['value'] ?? $key)
+                                                            : $value;
+                                                    @endphp
+                                                    <option value="{{ $key }}">{{ $displayValue }}</option>
+                                                @endforeach
+                                            @endif
+
+                                            @if (!empty($data))
+                                                @foreach ($data as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
 
                                     {{-- Radio --}}
+                                  
+                                  
                                     @elseif ($field->field_type === 'radio')
                                         @php
                                             $options = is_array($field->options) 
@@ -522,9 +561,10 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                         {{-- إذا كان allow_add_more = true في config --}}
                                         @if(optional($field->config)['allow_add_more'] ?? true)
                                             <button type="button"
+                                                     style=" background: #8b8be1;"
                                                     class="btn btn-sm btn-outline-primary mt-2"
                                                     onclick="addCustomField({{ $section->id }}, {{ $field->id }})">
-                                                <i class="fa fa-plus"></i> {{ __('Add More') }}
+                                                <i class="fa fa-plus"></i> {{ __('Add') }}
                                             </button>
                                         @endif
                                     @endif
@@ -548,10 +588,14 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
                 <div id="search-results" class="d-flex flex-wrap gap-4" style="display: flex;"></div>
             </div>
+            @php
+                $currentLocale = request()->query('lang') ?? app()->getLocale();
+            @endphp
 
             <script>
                 let selectedCard = null;
                 let searchTimeout = null;
+                let lang = "{{ $currentLocale }}"; 
 
                 const searchInput = document.getElementById('search-query');
                 const resultsContainer = document.getElementById('search-results');
@@ -569,7 +613,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
                 });
 
                 function performSearch(query) {
-                    fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}`)
+                    fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}&lang=${lang}`)
                         .then(res => res.json())
                         .then(res => {
                             resultsContainer.innerHTML = '';
@@ -584,8 +628,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 bd.top_agencies.forEach(agency => {
                                     topAgencies += `
                                         <div class="mb-1">
-                                            <strong>{{ __('Agency') }}:</strong> ${agency.name}
-                                            <span class="badge bg-info text-dark ms-2">${agency.members_count} {{ __('Members') }}</span>
+                                            <strong>{{ __('Agency') }}:</strong> ${agency.name ?? ''}
+                                            <span class="badge bg-info text-dark ms-2">${agency.members_count ?? ''} {{ __('Members') }}</span>
                                         </div>
                                     `;
                                 });
@@ -595,14 +639,12 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 card.innerHTML = `
                                     <div class="agency-card-inner">
                                         <div class="agency-header">
-                                            <h5 class="agency-name">${bd.name}</h5>
-                                            <span class="agency-id">#${bd.id}</span>
+                                            <h5 class="agency-name">${bd.name ?? ''}</h5>
+                                            <span class="agency-id">#${bd.id ?? ''}</span>
                                         </div>
                                         <div class="agency-info">
-                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country}</p>
-                                            <p><i class="fa fa-user-tie text-primary me-2"></i> <strong>{{ __('Title') }}:</strong> ${bd.title}</p>
-                                            <p><i class="fa fa-briefcase text-primary me-2"></i> <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}</p>
-                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone}</p>
+                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country ?? ''}</p>
+                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone ?? ''}</p>
                                         </div>
                                         <p class="agency-bio">${bd.bio}</p>
                                         <div class="agency-divider"></div>
@@ -650,7 +692,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
     @endif
 
 
-        <input type="hidden" name="bd_id" id="selected-bd-id">
 
         <div class="text-center">
             <button type="submit" class="btn btn-primary">
@@ -685,11 +726,11 @@ document.addEventListener('DOMContentLoaded', function () {
             { name: 'work_duration', type: 'number', placeholder: "{{ __('Work Duration (months)') }}" }
         ];
 
-        let html = `<div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
+        let html = `<div style="width: 100%;" class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
 
         fields.forEach(field => {
             html += `
-                <div class="flex-grow-1">
+                <div class="flex-grow-1" style="width: 41%;">
                     <input type="${field.type}" 
                         name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
                         class="form-control form-control-sm mb-1"

@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_microphones', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('room_id');
-            $table->bigInteger('user_id')->nullable();
-            $table->integer('position')->default(0);
-            $table->string('status')->default('0');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('room_microphones')) {
+            Schema::create('room_microphones', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('room_id');
+                $table->bigInteger('user_id')->nullable();
+                $table->integer('position')->default(0);
+                $table->string('status')->default('0');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

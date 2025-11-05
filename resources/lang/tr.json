@@ -16,6 +16,77 @@
     "Receiving Level": "Alma Seviyesi",
     "Recharge Level": "Yeniden Yükleme Seviyesi",
     "Active Users": "Aktif Kullanıcılar",
+    "Form Details": "Form Detayları",
+    "Additional Fields": "Ek Alanlar",
+    "Form Request": "Form Talebi",
+    "Browse form request": "Form taleplerini görüntüle",
+    "Type switch form request": "Form talebi türünü değiştir",
+    "Approve switch form request": "Form talebini onayla",
+    "Reject switch form request": "Form talebini reddet",
+    "Show form request": "Form talebini göster",
+    "Browse badges": "Rozetleri görüntüle",
+    "Create badges": "Rozet oluştur",
+    "Delete badges": "Rozet sil",
+    "Edit badges": "Rozeti düzenle",
+    "Show badges": "Rozeti göster",
+
+    "Dedicate Badges": "Rozetleri tahsis et",
+    "Browse dedicate badges": "Tahsis edilmiş rozetleri görüntüle",
+    "Dedicate switch dedicate badges": "Rozet tahsis et veya değiştir",
+
+    "Roles Reward": "Rol Ödülü",
+    "Browse roles reward": "Rol ödüllerini görüntüle",
+    "Create roles reward": "Rol ödülü oluştur",
+    "Delete roles reward": "Rol ödülünü sil",
+    "Edit roles reward": "Rol ödülünü düzenle",
+
+    "Pusher Statistics": "Pusher İstatistikleri",
+    "Browse pusher statistics": "Pusher istatistiklerini görüntüle",
+
+    "Browse milestone": "Dönüm noktalarını görüntüle",
+    "Dedicate switch milestone": "Dönüm noktası tahsis et veya değiştir",
+
+    "Superadmin Banners": "Süper Yönetici Afişleri",
+    "User Reward": "Kullanıcı Ödülü",
+    "Browse user reward": "Kullanıcı ödüllerini görüntüle",
+    "reward": "ödül",
+    "Templates Form": "Şablon Formu",
+"Browse templates form": "Şablon formlarını görüntüle",
+"Edit templates form": "Şablon formunu düzenle",
+"Show templates form": "Şablon formunu göster",
+
+    "Superadmin": "Süper Yönetici",
+    "Browse superadmin": "Süper yöneticileri görüntüle",
+    "SuperAdmin": "Süper Yönetici",
+    "Create superadmin": "Süper yönetici oluştur",
+    "Edit superadmin": "Süper yöneticiyi düzenle",
+    "Delete superadmin": "Süper yöneticiyi sil",
+
+    "Superadmin Settings": "Süper Yönetici Ayarları",
+    "Browse superadmin settings": "Süper yönetici ayarlarını görüntüle",
+
+    "Restore Super Admin": "Süper yöneticiyi geri yükle",
+    "Browse restore super admin": "Süper yönetici geri yüklemelerini görüntüle",
+
+    "SuperAdmin Charge": "Süper Yönetici Yüklemesi",
+    "Charge To Superadmin": "Süper yöneticiye bakiye yükle",
+    "Browse charge to superadmin": "Süper yönetici yüklemelerini görüntüle",
+    "Add switch charge to superadmin": "Süper yöneticiye yükleme ekle",
+    "History switch charge to superadmin": "Süper yönetici yükleme geçmişi",
+
+    "SuperAdmin Banners": "Süper Yönetici Afişleri",
+    "Browse superadmin banners": "Süper yönetici afişlerini görüntüle",
+    "Add switch superadmin banners": "Süper yönetici afişi ekle",
+    "History switch superadmin banners": "Süper yönetici afiş geçmişi",
+
+    "Browse super admin reward": "Süper yönetici ödüllerini görüntüle",
+    "Dedicate switch super admin reward": "Süper yöneticiye ödül tahsis et",
+    "History switch super admin reward": "Süper yönetici ödül geçmişi",
+    "Browse super admin reward history": "Süper yönetici ödül geçmişini görüntüle",
+
+    "SuperAdmin Rewards": "Süper Yönetici Ödülleri",
+
+
     "Top 3 Entertainment Rooms": "En Popüler 3 Eğlence Odası",
     "Top 3 Generous Supporters": "En Cömert 3 Destekçi",
     "Top 3 Star Hosts": "En İyi 3 Yıldız Sunucu",
@@ -3789,7 +3860,16 @@
     "General Settings": "Genel Ayarlar",
     "Statistics Settings": "İstatistik Ayarları",
     "Social Media Settings": "Sosyal Medya Ayarları",
-    "Save": "Kaydet"
+    "Save": "Kaydet",
+    "Textarea": "Metin Alanı",
+    "Checkbox": "Onay Kutusu",
+    "Radio": "Radyo Düğmesi",
+    "Custom Widget": "Özel Bileşen",
+    "Select Custom Widget": "Özel Bileşen Seç",
+    "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "Özel bileşenler özel kullanıcı arayüzü sağlar (BD Seçici, Kullanıcı Seçici, vb.)",
+    "form_bd_bio":"Hoş geldiniz! Benimle, canlı yayın dünyasında başarı sırlarını öğreneceksiniz. Başarılı ajansları eğitme konusunda geniş deneyime sahibim. Sizi zirveye ulaşana kadar günlük takip ve sınırsız destekle destekleyeceğim!"
+,  "Application Name": "Uygulama Adı",
+    "Work Duration (months)": "Çalışma Süresi (ay)"
 
 
 

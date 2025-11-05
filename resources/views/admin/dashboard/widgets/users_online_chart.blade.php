@@ -9,7 +9,7 @@
 
 @php
         $fetchUrl = admin_url('users-online-stats');
- 
+
 @endphp
 
 @if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin'))
