@@ -327,6 +327,11 @@ input[type="file"]::-webkit-file-upload-button:hover {
 .agency-list {
     text-align: right;
     font-size: 0.9rem;
+    background: darkkhaki;
+    border: 1px solid;
+    border-radius: 9%;
+    padding: 12px;
+
 }
 .card-selected {
     border: 3px solid #0d6efd;
