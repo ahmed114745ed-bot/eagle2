@@ -17,51 +17,51 @@
 <script>
     let weeklySignupsChart;
 
-    document.addEventListener("DOMContentLoaded", function () {
-        addToAjaxQueue(() => {
-            return fetch("{{ $fetchUrl }}", {
-                headers: { 'Accept': 'application/json' }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const ctx = document.getElementById('weeklySignupsChart').getContext('2d');
+    function loadWeeklySignups() {
+        fetch("{{ $fetchUrl }}", {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const ctx = document.getElementById('weeklySignupsChart').getContext('2d');
 
-                    if (weeklySignupsChart) {
-                        weeklySignupsChart.destroy();
-                    }
+            if (weeklySignupsChart) {
+                weeklySignupsChart.destroy();
+            }
 
-                    weeklySignupsChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: data.labels,
-                            datasets: [
-                                {
-                                    label: data.currentMonth,
-                                    data: data.dataCurrent,
-                                    backgroundColor: 'rgba(75, 192, 192, 0.7)'
-                                },
-                                {
-                                    label: data.previousMonth,
-                                    data: data.dataPrevious,
-                                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                                }
-                            ]
+            weeklySignupsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: data.currentMonth,
+                            data: data.dataCurrent,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)'
                         },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: { position: 'top' }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: { stepSize: 1 }
-                                }
-                            }
+                        {
+                            label: data.previousMonth,
+                            data: data.dataPrevious,
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
                         }
-                    });
-                })
-                .catch(err => console.error("Fetch Error:", err));
-        });
-    });
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(err => console.error("Fetch Error:", err));
+    }
+
+    document.addEventListener("DOMContentLoaded", loadWeeklySignups);
 </script>

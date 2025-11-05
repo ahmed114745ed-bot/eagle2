@@ -7,46 +7,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        addToAjaxQueue(() => {
-            const ctx = document.getElementById('salaryChart').getContext('2d');
-            const salaryChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: '{{ __("Live Hours") }}',
-                        data: [],
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
+    (function () {
+        var ctx = document.getElementById('salaryChart').getContext('2d');
+        var salaryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '{{ __("Live Hours") }}',
+                    data: [],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
                             }
                         }
                     }
                 }
-            });
-
-            return fetch('/admin/statistics/top-users-data')
-                .then(response => response.json())
-                .then(data => {
-                    salaryChart.data.labels = data.labels;
-                    salaryChart.data.datasets[0].data = data.data;
-                    salaryChart.update();
-                })
-                .catch(err => console.error('Error loading chart data:', err));
+            }
         });
-    });
+        fetch('/admin/statistics/top-users-data')
+            .then(response => response.json())
+            .then(data => {
+                salaryChart.data.labels = data.labels;
+                salaryChart.data.datasets[0].data = data.data;
+                salaryChart.update();
+            })
+            .catch(err => console.error('Error loading chart data:', err));
+    })();
 </script>
-

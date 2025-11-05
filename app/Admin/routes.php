@@ -409,6 +409,8 @@ Route::group(
             Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
             Route::get('balance-data', [AllStatisticController::class, 'getBalanceData']);
             Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
+            Route::get('top-followers', [AllStatisticController::class, 'getTopFollowers']);
+            Route::get('game-summary', [AllStatisticController::class, 'gameSummary']);
         });
 
         Route::prefix('superadmin')->name('superadmin.')->middleware('preview.superadmin')->group(function () {
