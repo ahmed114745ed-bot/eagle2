@@ -321,28 +321,26 @@ class FormTemplateController extends Controller
 
     public function storeSubmission(Request $request, string $type)
     {
-
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
         $data = $request->except('_token');
-        foreach ($request->files as $key => $fileInput) {
-            info($fileInput);
+        foreach ($request->file() as $key => $fileInput) {
             if (is_array($fileInput)) {
-                info('array');
                 $storedFiles = [];
                 foreach ($fileInput as $file) {
                     if ($file && $file->isValid()) {
-                        $file->storeAs('data', $file->getClientOriginalName());
-                        $storedFiles[] = $file->getClientOriginalName();
+                        $storedFiles[] = Common::upload('data', $file);
                     }
                 }
                 $data[$key] = $storedFiles;
             } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
-                info('uploaded file');
                 $path = Common::upload('data', $fileInput);
                 $data[$key] = $path;
+            } else {
+                info("Unexpected file input type for {$key}");
+                info('Type: ' . gettype($fileInput));
+                info('Class: ' . (is_object($fileInput) ? get_class($fileInput) : 'not object'));
             }
         }
-
         FormRequest::create([
             'form_template_id' => $template->id,
             'submitted_by' => $request->user_id,
