@@ -114,6 +114,8 @@ class Kernel extends HttpKernel
         'local' => \App\Http\Middleware\LocalOnly::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
+        'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
+
 
     ];
 }
