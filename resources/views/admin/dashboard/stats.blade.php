@@ -1,10 +1,10 @@
 {{-- admin/dashboard/stats.blade.php --}}
 <div class="stats-container" id="stats-container">
     <!-- Loading Indicator -->
-    <div id="stats-loading" class="text-center py-4">
-        <i class="fa fa-spinner fa-spin fa-2x"></i>
-        <p>{{ __('admin.loading_statistics') }}</p>
-    </div>
+{{--    <div id="stats-loading" class="text-center py-4">--}}
+{{--        <i class="fa fa-spinner fa-spin fa-2x"></i>--}}
+{{--        <p>{{ __('admin.loading_statistics') }}</p>--}}
+{{--    </div>--}}
 
     <!-- Stats will be loaded here -->
     <div id="stats-content" style="display: none;"></div>
@@ -35,7 +35,7 @@ function loadStatsData() {
 
 function renderStatsWithInfoBoxes(data) {
     const statsContent = $('#stats-content');
-    
+
     const infoBoxesHtml = `
         <div class="row">
             <div class="col-md-3 col-sm-6 col-xs-12">
@@ -183,7 +183,7 @@ function renderStatsWithInfoBoxes(data) {
             </div>
         </div>
     `;
-    
+
     statsContent.html(infoBoxesHtml);
 }
 
@@ -194,7 +194,7 @@ function startAutoRefresh() {
 $(document).ready(function() {
     loadStatsData();
     startAutoRefresh();
-    
+
     $(document).on('click', '#refresh-stats-btn', function() {
         loadStatsData();
     });
@@ -211,6 +211,28 @@ $(document).on('mouseleave', '.info-box', function() {
     $(this).css('transform', 'translateY(0)');
     $(this).css('box-shadow', '0 2px 4px rgba(0,0,0,0.1)');
 });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const charts = document.querySelectorAll('canvas');
+
+        const io = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const url = entry.target.dataset.url;
+                    if (url) fetch(url)
+                        .then(r => r.json())
+                        .then(data => {
+                            const ctx = entry.target.getContext('2d');
+                            new Chart(ctx, { type: 'bar', data: { labels: data.labels, datasets: [{ data: data.data }] } });
+                        });
+                    obs.unobserve(entry.target);
+                }
+            });
+        });
+        charts.forEach(c => io.observe(c));
+    });
 </script>
 
 <style>
@@ -270,42 +292,42 @@ $(document).on('mouseleave', '.info-box', function() {
     opacity: 1;
 }
 
-.bg-light-blue { 
-    background: linear-gradient(135deg, #3c8dbc 0%, #367fa9 100%) !important; 
+.bg-light-blue {
+    background: linear-gradient(135deg, #3c8dbc 0%, #367fa9 100%) !important;
     border-left: 4px solid #2d7ca7;
 }
 
-.bg-blue { 
+.bg-blue {
     background: linear-gradient(135deg, #0073b7 0%, #0065a3 100%) !important;
     border-left: 4px solid #005c8f;
 }
 
-.bg-green { 
+.bg-green {
     background: linear-gradient(135deg, #00a65a 0%, #008d4c 100%) !important;
     border-left: 4px solid #007d41;
 }
 
-.bg-yellow { 
+.bg-yellow {
     background: linear-gradient(135deg, #f39c12 0%, #e08e0b 100%) !important;
     border-left: 4px solid #d17e09;
 }
 
-.bg-orange { 
+.bg-orange {
     background: linear-gradient(135deg, #ff851b 0%, #ff7701 100%) !important;
     border-left: 4px solid #e66900;
 }
 
-.bg-red { 
+.bg-red {
     background: linear-gradient(135deg, #dd4b39 0%, #d73925 100%) !important;
     border-left: 4px solid #c23321;
 }
 
-.bg-purple { 
+.bg-purple {
     background: linear-gradient(135deg, #605ca8 0%, #555299 100%) !important;
     border-left: 4px solid #4a4786;
 }
 
-.bg-gray { 
+.bg-gray {
     background: linear-gradient(135deg, #d2d6de 0%, #b5bbc9 100%) !important;
     border-left: 4px solid #a8afbf;
     color: #333 !important;
@@ -327,27 +349,27 @@ $(document).on('mouseleave', '.info-box', function() {
     .col-md-3 {
         margin-bottom: 10px;
     }
-    
+
     .info-box {
         min-height: 80px;
     }
-    
+
     .info-box-icon {
         width: 80px;
         height: 80px;
         line-height: 80px;
         font-size: 40px;
     }
-    
+
     .info-box-content {
         margin-left: 80px;
         padding: 10px 15px;
     }
-    
+
     .info-box-content .info-box-number {
         font-size: 20px;
     }
-    
+
     .info-box-content .info-box-text {
         font-size: 12px;
     }
@@ -357,23 +379,23 @@ $(document).on('mouseleave', '.info-box', function() {
     .info-box {
         min-height: 70px;
     }
-    
+
     .info-box-icon {
         width: 70px;
         height: 70px;
         line-height: 70px;
         font-size: 35px;
     }
-    
+
     .info-box-content {
         margin-left: 70px;
         padding: 8px 12px;
     }
-    
+
     .info-box-content .info-box-number {
         font-size: 18px;
     }
-    
+
     .info-box-content .info-box-text {
         font-size: 11px;
     }
