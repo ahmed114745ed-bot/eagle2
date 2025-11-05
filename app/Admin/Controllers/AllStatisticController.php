@@ -8,10 +8,8 @@ use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
-use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Admin\Controllers\MainController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Room;
@@ -38,44 +36,9 @@ class AllStatisticController extends MainController
     {
 
         $countryID = $this->countryId();
-        // $balance = GameWallet::query();
-        // $balanceDollar = GameChargeHistory::query();
-        // if (request("date") != null) {
-        //     $date = request("date");
-        //     $year = substr($date, 0, 4);
-        //     $month = substr($date, 5, 2);
-        //     $balance = $balance->whereMonth("created_at", $month)->whereYear("created_at", $year);
-        //     $balanceDollar = $balanceDollar->whereMonth("created_at", $month)->whereYear("created_at", $year);
-        // } else {
-        //     $balance = $balance->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
-        //     $balanceDollar = $balanceDollar->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
-        // }
-        // $balance = $balance->first();
-        // $balanceDollar = $balanceDollar->sum("value");
-        // $allBalance = $balance->balance ?? 0;
-        // $availableBalance = $balance ? $balance->balance - $balance->used : 0;
-        // $data = [$balance->used ?? 0, $availableBalance ?? 0];
-        // $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
-        
-        
-        $user = Auth::user();
-        // $usersCount = User::when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->count();
 
-        // //users
-        // $newSignUpsToday = User::whereDate('created_at', today())->when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->count();
-        // $newSignUpsThisWeek = User::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->count();
-        // $newSignUpsThisMonth = User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->count();
-        // $onlineUser = User::when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->where('online', 1)->count();
+        $user = Auth::user();
+
         $topUsersByFollowers = User::withCount('followers')
             ->with('packs', 'profile')
             ->when($countryID, function ($query, $countryID) {
@@ -84,73 +47,6 @@ class AllStatisticController extends MainController
             ->orderByDesc('followers_count')
             ->take(10)
             ->get();
-        // $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
-        //     ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
-        //     ->groupBy('hour')
-        //     ->orderByDesc('total_sessions')
-        //     ->limit(1)
-        //     ->first();
-        // $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->whereDate('created_at', today())
-        //     ->count();
-        // $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->whereMonth('created_at', now()->month)
-        //     ->whereYear('created_at', now()->year)
-        //     ->count();
-        // $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->distinct('user_id')
-        //     ->count('user_id');
-        // $totalUsers = User::when($countryID, function ($query, $countryID) {
-        //     return $query->where('country_id', $countryID);
-        // })->count();
-        // $usersWhoNeverSend = $totalUsers - $usersWhoSend;
-        // $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->whereDate('created_at', today())
-        //     ->distinct('chat_room_id')
-        //     ->count('chat_room_id');
-        // $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })
-        //     ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
-        //     ->groupBy('chat_room_id')
-        //     ->pluck('duration')
-        //     ->avg() ?? 0;
-
-
-        // $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countryID) {
-        //     $q->when($countryID, function ($query, $countryID) {
-        //         return $query->where('country_id', $countryID);
-        //     });
-        // })->selectRaw("
-        //     SUM(total_played) as total_played,
-        //     SUM(total_loss) as total_loss,
-        //     SUM(total_win) as total_win,
-        //     SUM(total_loss - total_win) as app_profit
-        // ")->first();
-
 
         return parent::index($content
             ->title(__('Home'))
@@ -169,7 +65,6 @@ class AllStatisticController extends MainController
                     });
 
                     $column->row(function (Row $row) {
-                        // Right: chart view (Top Salaries)
                         $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.users_chart')->render();
@@ -177,7 +72,6 @@ class AllStatisticController extends MainController
                             $column->row($view);
                         });
 
-                        // Left: top 10 salaries
                         $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.top_users_visits_chart')->render();
@@ -213,10 +107,10 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col) {
-                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
-                            $col->row($view);
-                        });
+//                        $row->column(6, function ($col) {
+//                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
+//                            $col->row($view);
+//                        });
                     });
                 });
                 $row->column(12, function ($column) {
@@ -228,20 +122,17 @@ class AllStatisticController extends MainController
                     });
 
                     $column->row(function (Row $row) {
-                        //chart 1
                         $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
                             $column->row($view);
                         });
 
-                        //chart2
                         $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.rooms_activity_chart')->render();
                             $column->row($view);
                         });
 
-                        //chart 3
                         $row->column(6, function ($column) {
 
 
@@ -250,7 +141,6 @@ class AllStatisticController extends MainController
                             $column->row($view);
                         });
 
-                        //chart4
                         $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.avg_session_duration_chart')->render();
 
@@ -266,26 +156,22 @@ class AllStatisticController extends MainController
                         $row->column(12, $view);
                     });
                     $column->row(function (Row $row) {
-                        //chart 1
                         $row->column(6, function ($column) {
 
                             $view = view('admin.dashboard.widgets.agencies_targets_chart')->render();
                             $column->row($view);
                         });
 
-                        //chart 2
                         $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.top_senders_chart')->render();
                             $column->row($view);
                         });
 
-                        //chart 3
                         $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.top_receivers_chart')->render();
                             $column->row($view);
                         });
 
-                        //chart 4
                         $row->column(6, function ($column) {
                             $view = view('admin.dashboard.widgets.agencies_compare_chart')->render();
 
@@ -301,26 +187,16 @@ class AllStatisticController extends MainController
                         $row->column(12, $view);
                     });
                 });
-
-                // $row->column(12, function ($column) use ($game) {
-                //     $column->row("<h3 style='margin:10px 0;'>💼 " . __('game') . "</h3>");
-
-                //     $column->row(function (Row $row) use ($game) {
-                //         $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue', "", number_format($game->total_played ?? 0, 2)));
-                //     });
-                // });
             }));
     }
 
 
     public function peakHours(Request $request)
     {
-        // $countryID = Auth::user()->country_id;
         $period = $request->get('period', 'day');
 
         $query = DB::table('live_times')
             ->join('users', 'live_times.uid', '=', 'users.id');
-        // ->where('users.country_id', $countryID);
 
         if ($period === 'day') {
             $query->selectRaw("FROM_UNIXTIME(live_times.start_time, '%H') as label, COUNT(*) as total")
@@ -854,10 +730,10 @@ class AllStatisticController extends MainController
     {
         try {
             $date = $request->get("date");
-            
+
             $balanceQuery = GameWallet::query();
             $balanceDollarQuery = GameChargeHistory::query();
-            
+
             if ($date != null) {
                 $year = substr($date, 0, 4);
                 $month = substr($date, 5, 2);
@@ -867,16 +743,16 @@ class AllStatisticController extends MainController
                 $balanceQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
                 $balanceDollarQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
             }
-            
+
             $balance = $balanceQuery->first();
             $balanceDollar = $balanceDollarQuery->sum("value");
             $allBalance = $balance->balance ?? 0;
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
-            
+
             // تأكد من أن البيانات صالحة للـ Chart
             $used = $balance->used ?? 0;
             $available = $availableBalance ?? 0;
-            
+
             $chartData = [$used, $available];
             $usePercentage = ($allBalance > 0) ? (($used / $allBalance) * 100) : 0;
 
@@ -892,7 +768,7 @@ class AllStatisticController extends MainController
                     'showPaymentAlert' => $usePercentage <= 90
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -905,10 +781,10 @@ class AllStatisticController extends MainController
     {
         try {
             $countryID = $this->countryId();
-            
+
             // تجميع جميع الاستعلامات في مرة واحدة
             $userBaseQuery = User::when($countryID, fn($q) => $q->where('country_id', $countryID));
-            
+
             $stats = [
                 'usersCount' => $userBaseQuery->count(),
                 'newSignUpsToday' => $userBaseQuery->whereDate('created_at', today())->count(),
@@ -943,13 +819,13 @@ class AllStatisticController extends MainController
             $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
             $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)->count();
-            
+
             $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
             $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
-            
+
             $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
                 ->distinct('chat_room_id')->count('chat_room_id');
-            
+
             $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
                     $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
                 })
