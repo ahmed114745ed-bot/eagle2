@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\PersonalAccessToken;
 use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
@@ -275,34 +276,43 @@ class FormTemplateController extends Controller
 
     public function showByType(Request $request)
     {
+
         $type = $request->query('type');
         $linkToken = $request->query('token');
         $defaultLang = $request->query('lang') ?? app()->getLocale();
-        $user = $request->user();
-        if (!$user) {
-            if (empty($linkToken)) {
-                return response()->view('Form::forms.invalid', [
-                    'message' => 'Access denied. Please login or use a valid token.',
-                ], 403);
-            }
-            $tokenRecord = DB::table('personal_access_tokens')->where('token', $linkToken)->first();
-            if (!$tokenRecord) {
-                return response()->view('Form::forms.invalid', [
-                    'message' => 'Invalid or expired token.',
-                ], 403);
-            }
+    
+        if (empty($linkToken)) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'Access denied. Please provide a valid token.',
+            ], 403);
         }
-
+    
+        $token = PersonalAccessToken::findToken($linkToken);
+        if (!$token) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'Invalid or expired token.',
+            ], 403);
+        }
+    
+        $user = $token->tokenable;
+      
+        if (!$user) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'User not found for this token.',
+            ], 403);
+        }
+    
         $locale = $request->header('Accept-Language', $defaultLang);
         $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defaultLang;
         app()->setLocale($locale);
-
+    
         $template = FormTemplate::with(['sections.fields'])
             ->where('form_type', $type)
             ->where('is_active', true)
             ->firstOrFail();
-
-        return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken'));
+    
+        return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken', 'user'));
+    
     }
 
 
@@ -310,7 +320,6 @@ class FormTemplateController extends Controller
     public function storeSubmission(Request $request, string $type)
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
-
         $data = $request->except('_token');
         foreach ($request->files as $key => $fileInput) {
             if (is_array($fileInput)) {
@@ -330,7 +339,7 @@ class FormTemplateController extends Controller
 
         FormRequest::create([
             'form_template_id' => $template->id,
-            'submitted_by' => Auth::user()->id,
+            'submitted_by' => $request->user_id,
             'bd_id' => $request->bd_id,
             'name' => $request->agency_name ?? $request->bd_name,
             'whatsapp_number' => $request->whatsapp_number,
