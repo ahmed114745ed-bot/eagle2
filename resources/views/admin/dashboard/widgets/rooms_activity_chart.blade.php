@@ -69,7 +69,7 @@
     }
 
     function loadRoomsActivity(period = 'day') {
-        addToAjaxQueue({
+        $.ajax({
             url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function(res) {

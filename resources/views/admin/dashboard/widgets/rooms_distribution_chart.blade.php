@@ -70,7 +70,7 @@
 <script>
     $(document).ready(function() {
         // Fetch data from your Laravel endpoint
-        addToAjaxQueue({
+        $.ajax({
             url: "{{ url('admin/statistics/distribution-rooms') }}",
             type: "GET",
             dataType: "json",

@@ -535,9 +535,10 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                         {{-- إذا كان allow_add_more = true في config --}}
                                         @if(optional($field->config)['allow_add_more'] ?? true)
                                             <button type="button"
+                                                     style=" background: #8b8be1;"
                                                     class="btn btn-sm btn-outline-primary mt-2"
                                                     onclick="addCustomField({{ $section->id }}, {{ $field->id }})">
-                                                <i class="fa fa-plus"></i> {{ __('Add More') }}
+                                                <i class="fa fa-plus"></i> {{ __('Add') }}
                                             </button>
                                         @endif
                                     @endif
