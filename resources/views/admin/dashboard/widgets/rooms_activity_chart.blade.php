@@ -13,9 +13,9 @@
 </div>
 
 @php
-  
+
         $fetchUrl = admin_url('rooms-activity');
- 
+
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -69,7 +69,7 @@
     }
 
     function loadRoomsActivity(period = 'day') {
-        $.ajax({
+        addToAjaxQueue({
             url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function(res) {

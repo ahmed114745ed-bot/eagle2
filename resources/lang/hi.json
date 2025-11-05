@@ -17,6 +17,75 @@
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
     "Luck gift Settings": "लक गिफ्ट सेटिंग्स",
+    "Form Request": "फॉर्म अनुरोध",
+    "Browse form request": "फॉर्म अनुरोध देखें",
+    "Type switch form request": "फॉर्म अनुरोध का प्रकार बदलें",
+    "Approve switch form request": "फॉर्म अनुरोध स्वीकृत करें",
+    "Reject switch form request": "फॉर्म अनुरोध अस्वीकार करें",
+    "Show form request": "फॉर्म अनुरोध दिखाएँ",
+
+    "User Reward": "उपयोगकर्ता इनाम",
+    "Browse user reward": "उपयोगकर्ता इनाम देखें",
+    "reward": "इनाम",
+"Browse badges": "बैज देखें",
+    "Create badges": "बैज बनाएं",
+    "Delete badges": "बैज हटाएं",
+    "Edit badges": "बैज संपादित करें",
+    "Show badges": "बैज दिखाएं",
+
+    "Dedicate Badges": "बैज समर्पित करें",
+    "Browse dedicate badges": "समर्पित बैज देखें",
+    "Dedicate switch dedicate badges": "बैज समर्पित या बदलें",
+
+    "Roles Reward": "भूमिकाओं का इनाम",
+    "Browse roles reward": "भूमिकाओं के इनाम देखें",
+    "Create roles reward": "भूमिकाओं का इनाम बनाएं",
+    "Delete roles reward": "भूमिकाओं का इनाम हटाएं",
+    "Edit roles reward": "भूमिकाओं का इनाम संपादित करें",
+
+    "Pusher Statistics": "पुशर सांख्यिकी",
+    "Browse pusher statistics": "पुशर सांख्यिकी देखें",
+    "Templates Form": "टेम्पलेट फ़ॉर्म",
+"Browse templates form": "टेम्पलेट फ़ॉर्म देखें",
+"Edit templates form": "टेम्पलेट फ़ॉर्म संपादित करें",
+"Show templates form": "टेम्पलेट फ़ॉर्म दिखाएं",
+
+    "Browse milestone": "उपलब्धियाँ देखें",
+    "Dedicate switch milestone": "उपलब्धि समर्पित या बदलें",
+
+    "Superadmin Banners": "सुपर एडमिन बैनर",
+    "Superadmin": "सुपर एडमिन",
+    "Browse superadmin": "सुपर एडमिन देखें",
+    "SuperAdmin": "सुपर एडमिन",
+    "Create superadmin": "सुपर एडमिन बनाएँ",
+    "Edit superadmin": "सुपर एडमिन संपादित करें",
+    "Delete superadmin": "सुपर एडमिन हटाएँ",
+
+    "Superadmin Settings": "सुपर एडमिन सेटिंग्स",
+    "Browse superadmin settings": "सुपर एडमिन सेटिंग्स देखें",
+
+    "Restore Super Admin": "सुपर एडमिन पुनर्स्थापित करें",
+    "Browse restore super admin": "सुपर एडमिन पुनर्स्थापन देखें",
+
+    "SuperAdmin Charge": "सुपर एडमिन चार्ज",
+    "Charge To Superadmin": "सुपर एडमिन को चार्ज करें",
+    "Browse charge to superadmin": "सुपर एडमिन चार्ज देखें",
+    "Add switch charge to superadmin": "सुपर एडमिन में चार्ज जोड़ें",
+    "History switch charge to superadmin": "सुपर एडमिन चार्ज इतिहास",
+
+    "SuperAdmin Banners": "सुपर एडमिन बैनर",
+    "Browse superadmin banners": "सुपर एडमिन बैनर देखें",
+    "Add switch superadmin banners": "सुपर एडमिन बैनर जोड़ें",
+    "History switch superadmin banners": "सुपर एडमिन बैनर इतिहास",
+
+    "Browse super admin reward": "सुपर एडमिन इनाम देखें",
+    "Dedicate switch super admin reward": "सुपर एडमिन को इनाम दें",
+    "History switch super admin reward": "सुपर एडमिन इनाम इतिहास",
+    "Browse super admin reward history": "सुपर एडमिन इनाम इतिहास देखें",
+
+    "SuperAdmin Rewards": "सुपर एडमिन इनाम"
+
+
     "audio": "आवाज़",
     "more": "और देखें",
 "More": "और देखें",
@@ -3392,7 +3461,17 @@
   "General Settings": "सामान्य सेटिंग्स",
   "Statistics Settings": "आंकड़ों की सेटिंग्स",
   "Social Media Settings": "सोशल मीडिया सेटिंग्स",
-  "Save": "सहेजें"
+  "Save": "सहेजें",
+  "Textarea": "पाठ क्षेत्र",
+  "Checkbox": "चेक बॉक्स",
+  "Radio": "रेडियो बटन",
+  "Custom Widget": "कस्टम विजेट",
+  "Select Custom Widget": "कस्टम विजेट चुनें",
+  "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "कस्टम विजेट विशेष UI प्रदान करते हैं (BD चयनकर्ता, उपयोगकर्ता चयनकर्ता, आदि)",
+  "Choose a widget": "एक विजेट चुनें",
+  "Choose a widget": "स्वागत है! मेरे साथ, आप लाइव स्ट्रीमिंग की दुनिया में सफलता के रहस्य सीखेंगे। मेरे पास सफल एजेंसियों को प्रशिक्षित करने का व्यापक अनुभव है। मैं आपको रोज़ाना फॉलो-अप और असीमित समर्थन का वादा करता हूँ जब तक आप शीर्ष पर नहीं पहुँच जाते!"
+
+
 
 
 

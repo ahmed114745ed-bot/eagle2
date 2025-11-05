@@ -14,7 +14,7 @@
                 <span class="info-box-number" id="audioRooms">--</span>
             </div>
 
-            <a href="{{ admin_url('rooms?online=1') }}" 
+            <a href="{{ admin_url('rooms?online=1') }}"
            class="info-box-more text-white"
            style="
                 position: absolute;
@@ -31,7 +31,7 @@
                 text-align: center;
                 color: #fff;
                 transition: background 0.2s ease;">
-           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i> 
+           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i>
         </a>
         </div>
     </div>
@@ -45,7 +45,7 @@
         </div>
 
         <!-- More Button -->
-        <a href="{{ admin_url('live-rooms?online=1') }}" 
+        <a href="{{ admin_url('live-rooms?online=1') }}"
            class="info-box-more text-white"
            style="
                 position: absolute;
@@ -62,7 +62,7 @@
                 text-align: center;
                 color: #fff;
                 transition: background 0.2s ease;">
-           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i> 
+           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i>
         </a>
     </div>
 </div>
@@ -74,7 +74,7 @@
                 <span class="info-box-text">{{ __('Live Rooms (Active)') }}</span>
                 <span class="info-box-number" id="activeRooms">--</span>
             </div>
-            <a href="{{ admin_url('live-rooms?is_live=1') }}" 
+            <a href="{{ admin_url('live-rooms?is_live=1') }}"
            class="info-box-more text-white"
            style="
                 position: absolute;
@@ -91,8 +91,8 @@
                 text-align: center;
                 color: #fff;
                 transition: background 0.2s ease;">
-                
-           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i> 
+
+           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i>
         </a>
         </div>
     </div>
@@ -104,7 +104,7 @@
                 <span class="info-box-text">{{ __('Live Rooms (Inactive)') }}</span>
                 <span class="info-box-number" id="inactiveRooms">--</span>
             </div>
-            <a href="{{ admin_url('live-rooms?is_live=0') }}" 
+            <a href="{{ admin_url('live-rooms?is_live=0') }}"
            class="info-box-more text-white"
            style="
                 position: absolute;
@@ -121,22 +121,25 @@
                 text-align: center;
                 color: #fff;
                 transition: background 0.2s ease;">
-           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i> 
+           {{ __('more') }} <i class="fa fa-arrow-circle-right me-1"></i>
         </a>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    fetch('{{ admin_url('statistics/room-stats') }}')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('audioRooms').innerText = data.audio;
-            document.getElementById('liveRooms').innerText = data.live;
-            document.getElementById('activeRooms').innerText = data.active;
-            document.getElementById('inactiveRooms').innerText = data.inactive;
-        })
-        .catch(err => console.error('Error loading room stats:', err));
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        addToAjaxQueue(() => {
+            return fetch(`{{ admin_url('statistics/room-stats') }}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('audioRooms').innerText = data.audio;
+                    document.getElementById('liveRooms').innerText = data.live;
+                    document.getElementById('activeRooms').innerText = data.active;
+                    document.getElementById('inactiveRooms').innerText = data.inactive;
+                })
+                .catch(err => console.error('Error loading room stats:', err));
+        });
+    });
 </script>
+

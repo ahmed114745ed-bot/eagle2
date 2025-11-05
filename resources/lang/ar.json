@@ -4149,6 +4149,76 @@
     "Agencies Achieved Targets": "الوكالات التي حققت الأهداف",
     "Diamonds Achieved by Hosts": "الألماس الذي حققه المضيفون",
     "User Signups Comparison (Weeks)": "مقارنة تسجيلات المستخدمين (أسابيع)",
+  
+    "Form Request": "طلب النموذج",
+    "Browse form request": "تصفح طلبات النماذج",
+    "Type switch form request": "تبديل نوع طلب النموذج",
+    "Approve switch form request": "الموافقة على طلب النموذج",
+    "Reject switch form request": "رفض طلب النموذج",
+    "Show form request": "عرض طلب النموذج",
+
+    "User Reward": "مكافأة المستخدم",
+    "Browse user reward": "تصفح مكافآت المستخدمين",
+    "reward": "مكافأة",
+
+    "Superadmin": "المشرف الأعلى",
+    "Browse superadmin": "تصفح المشرفين الأعلى",
+    "SuperAdmin": "المشرف الأعلى",
+    "Create superadmin": "إنشاء مشرف أعلى",
+    "Edit superadmin": "تعديل المشرف الأعلى",
+    "Delete superadmin": "حذف المشرف الأعلى",
+
+    "Superadmin Settings": "إعدادات المشرف الأعلى",
+    "Browse superadmin settings": "تصفح إعدادات المشرف الأعلى",
+
+    "Restore Super Admin": "استعادة المشرف الأعلى",
+    "Browse restore super admin": "تصفح استعادة المشرف الأعلى",
+
+    "SuperAdmin Charge": "شحن المشرف الأعلى",
+    "Charge To Superadmin": "شحن إلى المشرف الأعلى",
+    "Browse charge to superadmin": "تصفح عمليات الشحن للمشرف الأعلى",
+    "Add switch charge to superadmin": "إضافة عملية شحن إلى المشرف الأعلى",
+    "History switch charge to superadmin": "سجل عمليات الشحن للمشرف الأعلى",
+
+    "SuperAdmin Banners": "لافتات المشرف الأعلى",
+    "Browse superadmin banners": "تصفح لافتات المشرف الأعلى",
+    "Add switch superadmin banners": "إضافة لافتة للمشرف الأعلى",
+    "History switch superadmin banners": "سجل لافتات المشرف الأعلى",
+
+    "Browse super admin reward": "تصفح مكافآت المشرف الأعلى",
+    "Dedicate switch super admin reward": "تخصيص مكافأة للمشرف الأعلى",
+    "History switch super admin reward": "سجل مكافآت المشرف الأعلى",
+    "Browse super admin reward history": "تصفح سجل مكافآت المشرف الأعلى",
+
+    "SuperAdmin Rewards": "مكافآت المشرف الأعلى",
+
+    "Browse badges": "تصفح الشارات",
+    "Create badges": "إنشاء شارات",
+    "Delete badges": "حذف الشارات",
+    "Edit badges": "تعديل الشارات",
+    "Show badges": "عرض الشارات",
+
+    "Dedicate Badges": "تخصيص الشارات",
+    "Browse dedicate badges": "تصفح الشارات المخصصة",
+    "Dedicate switch dedicate badges": "تخصيص أو تبديل الشارات",
+
+    "Roles Reward": "مكافأة الأدوار",
+    "Browse roles reward": "تصفح مكافآت الأدوار",
+    "Create roles reward": "إنشاء مكافأة للأدوار",
+    "Delete roles reward": "حذف مكافأة الأدوار",
+    "Edit roles reward": "تعديل مكافأة الأدوار",
+
+    "Pusher Statistics": "إحصائيات المرسل",
+    "Browse pusher statistics": "تصفح إحصائيات المرسل",
+
+    "Browse milestone": "تصفح الإنجازات",
+    "Dedicate switch milestone": "تخصيص أو تبديل الإنجاز",
+
+    "Superadmin Banners": "لافتات المشرف الأعلى",
+    "Templates Form": "نماذج القوالب",
+"Browse templates form": "تصفح نماذج القوالب",
+"Edit templates form": "تعديل نماذج القوالب",
+"Show templates form": "عرض نماذج القوالب",
 
     "Live Rooms (Active)": "الغرف المباشرة (نشطة)",
     "Live Rooms (Inactive)": "الغرف المباشرة (غير نشطة)",
@@ -4309,7 +4379,15 @@
   "years": "سنة",
   "Top 3 Agencies": "أفضل 3 وكالات",
   "Agency": "وكالة",
-  "Hosts": "مضيف"
+  "Hosts": "مضيف",
+  "Textarea": "حقل نصي",
+  "Checkbox": "مربع اختيار",
+  "Radio": "زر اختيار",
+  "Custom Widget": "عنصر مخصص",
+  "Select Custom Widget": "اختر عنصر مخصص",
+  "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "العناصر المخصصة توفر واجهة مستخدم متخصصة (محدد مدير الأعمال، محدد المستخدم، إلخ)",
+  "Choose a widget": "اختر عنصراً",
+  "form_bd_bio":"أهلاً وسهلاً! معي ستتعلم أسرار النجاح في عالم البث المباشر. لدي خبرة واسعة في تدريب الوكالات الناجحة. أعدك بمتابعة يومية ودعم لا محدود حتى تصل للقمة!"
 
 
 
