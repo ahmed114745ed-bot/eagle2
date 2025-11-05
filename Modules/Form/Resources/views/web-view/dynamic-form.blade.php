@@ -726,11 +726,11 @@ document.addEventListener('DOMContentLoaded', function () {
             { name: 'work_duration', type: 'number', placeholder: "{{ __('Work Duration (months)') }}" }
         ];
 
-        let html = `<div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
+        let html = `<div style="width: 100%;" class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
 
         fields.forEach(field => {
             html += `
-                <div class="flex-grow-1">
+                <div class="flex-grow-1" style="width: 41%;">
                     <input type="${field.type}" 
                         name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
                         class="form-control form-control-sm mb-1"
