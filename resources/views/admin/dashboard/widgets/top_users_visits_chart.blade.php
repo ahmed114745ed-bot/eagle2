@@ -7,7 +7,7 @@
 
 @php
         $fetchUrl = admin_url('top-users-visits');
- 
+
 @endphp
 
 

@@ -22,6 +22,8 @@ class AgencyAndBdFormsSeeder extends Seeder
             'type' => 'text',
             'placeholder' => ['en' => 'Enter Agency Name', 'ar' => 'أدخل اسم الوكالة', 'hi' => 'एजेंसी नाम दर्ज करें', 'tr' => 'Ajans Adı girin'],
             'order' => 1,
+            'data_source' => null,
+
         ],
         [
             'label' => ['en' => 'WhatsApp Number', 'ar' => 'رقم الواتساب', 'hi' => 'व्हाट्सएप नंबर', 'tr' => 'WhatsApp Numarası'],
@@ -29,6 +31,8 @@ class AgencyAndBdFormsSeeder extends Seeder
             'type' => 'text',
             'placeholder' => ['en' => 'Enter WhatsApp number', 'ar' => 'أدخل رقم الواتساب', 'hi' => 'व्हाट्सएप नंबर दर्ज करें', 'tr' => 'WhatsApp Numarası girin'],
             'order' => 2,
+            'data_source' => null,
+
         ],
     ];
     
@@ -54,18 +58,15 @@ class AgencyAndBdFormsSeeder extends Seeder
                 'type' => 'text',
                 'placeholder' => ['en' => 'Enter BD name', 'ar' => 'أدخل اسم BD', 'hi' => 'BD नाम दर्ज करें', 'tr' => 'BD Adı girin'],
                 'order' => 1,
+                'data_source' => null,
+
             ],
             [
                 'label' => ['en' => 'Country', 'ar' => 'الدولة', 'hi' => 'देश', 'tr' => 'Ülke'],
                 'name' => 'country',
                 'type' => 'select',
+                'data_source' => 'countries',
                 'placeholder' => ['en' => 'Select country', 'ar' => 'اختر الدولة', 'hi' => 'देश चुनें', 'tr' => 'Ülke seçin'],
-                'options' => [
-                    'Egypt' => ['en' => 'Egypt', 'ar' => 'مصر', 'hi' => 'मिस्र', 'tr' => 'Mısır'],
-                    'Saudi Arabia' => ['en' => 'Saudi Arabia', 'ar' => 'السعودية', 'hi' => 'सऊदी अरब', 'tr' => 'Suudi Arabistan'],
-                    'UAE' => ['en' => 'UAE', 'ar' => 'الإمارات', 'hi' => 'संयुक्त अरब अमीरात', 'tr' => 'BAE'],
-                    'Other' => ['en' => 'Other', 'ar' => 'أخرى', 'hi' => 'अन्य', 'tr' => 'Diğer']
-                ],
                 'order' => 2,
             ],
         ]
@@ -326,6 +327,7 @@ class AgencyAndBdFormsSeeder extends Seeder
             'is_enabled' => true,
             'can_not_delete' => true,
             'field_order' => $field['order'],
+            'data_source'=>$field['data_source']
         ]);
     }
             

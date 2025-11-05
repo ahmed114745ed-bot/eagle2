@@ -96,9 +96,16 @@ class ChatService
             }
 
             $chatRoomId = $message->chat_room_id;
+            $message->user_1_deleted = now();
+
+            $message->user_2_deleted = now();
+            $message->save();
         }
 
-        $this->chatRepository->deleteMessages($ids);
+        // $this->chatRepository->deleteMessages($ids);
+
+
+
 
         $chatRoom = ChatRoom::find($chatRoomId);
         $otherUser = $chatRoom->user_id === $user->id
