@@ -288,10 +288,121 @@ class FormRequestController extends MainController
         //     });
         // ");
 
+        //         Admin::script("
+        //     function initFormRequestActions() {
+
+        //         // 🔹 Function to send POST requests
+        //         function sendRequest(url) {
+        //             return fetch(url, {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'X-CSRF-TOKEN': LA.token,
+        //                     'Accept': 'application/json',
+        //                 },
+        //             }).then(res => res.json());
+        //         }
+
+        //         // 🔹 Handle Approve/Reject buttons
+        //         function handleAction(button, actionType) {
+        //             button.addEventListener('click', function(e) {
+        //                 e.preventDefault();
+
+        //                 const messages = {
+        //                     approve: {
+        //                         title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#28a745'
+        //                     },
+        //                     reject: {
+        //                         title: 'هل أنت متأكد من رفض هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#dc3545'
+        //                     },
+        //                     success: {
+        //                         en: 'Action completed successfully!',
+        //                         ar: 'تمت العملية بنجاح!',
+        //                         hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+        //                         tr: 'İşlem başarıyla tamamlandı!'
+        //                     },
+        //                     error: {
+        //                         en: 'An error occurred!',
+        //                         ar: 'حدث خطأ أثناء العملية',
+        //                         hi: 'एक त्रुटि हुई!',
+        //                         tr: 'İşlem sırasında hata oluştu!'
+        //                     }
+        //                 };
+
+        //                 const locale = document.documentElement.lang || 'ar';
+
+        //                 Swal.fire({
+        //                     title: messages[actionType].title,
+        //                     icon: 'question',
+        //                     showCancelButton: true,
+        //                     confirmButtonText: messages[actionType].confirm,
+        //                     cancelButtonText: messages[actionType].cancel,
+        //                     confirmButtonColor: messages[actionType].color,
+        //                     cancelButtonColor: '#6c757d',
+        //                 }).then((result) => {
+        //                     if (result.value) {
+        //                         const url = button.dataset.url;
+
+        //                         Swal.fire({
+        //                             title: 'جاري التنفيذ...',
+        //                             allowOutsideClick: false,
+        //                             didOpen: () => Swal.showLoading()
+        //                         });
+
+        //                         sendRequest(url)
+        //                             .then(res => {
+        //                                 Swal.close();
+
+        //                                 console.group('Form Request Action Response');
+        //                                 console.log('Request URL:', url);
+        //                                 console.log('Response:', res);
+        //                                 console.groupEnd();
+
+        //                                 if (res.success) {
+        //                                     Swal.fire({
+        //                                         title: res.message || messages.success[locale],
+        //                                         icon: 'success',
+        //                                         timer: 2000,
+        //                                         showConfirmButton: false
+        //                                     });
+
+        //                                     // 🔹 Reload the grid without full page refresh
+        //                                     $.pjax.reload('#pjax-container');
+        //                                 } else {
+        //                                     Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+        //                                 }
+        //                             })
+        //                             .catch((err) => {
+        //                                 console.error('Fetch error:', err);
+        //                                 Swal.fire('خطأ', messages.error[locale], 'error');
+        //                             });
+        //                     }
+        //                 });
+        //             });
+        //         }
+
+        //         // 🔹 Initialize Approve & Reject Buttons
+        //         document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+        //         document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+        //     }
+
+        //     // ✅ Run on page load
+        //     initFormRequestActions();
+
+        //     // ✅ Re-run after PJAX reload
+        //     $(document).off('pjax:end').on('pjax:end', function() {
+        //         initFormRequestActions();
+        //     });
+        // ");
         Admin::script("
     function initFormRequestActions() {
 
-        // 🔹 Function to send POST requests
+        // Send POST request
         function sendRequest(url) {
             return fetch(url, {
                 method: 'POST',
@@ -302,7 +413,7 @@ class FormRequestController extends MainController
             }).then(res => res.json());
         }
 
-        // 🔹 Handle Approve/Reject buttons
+        // Handle Approve/Reject buttons
         function handleAction(button, actionType) {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -358,43 +469,54 @@ class FormRequestController extends MainController
                             .then(res => {
                                 Swal.close();
 
-                                console.group('Form Request Action Response');
-                                console.log('Request URL:', url);
-                                console.log('Response:', res);
-                                console.groupEnd();
-
                                 if (res.success) {
+                                    // 🔹 Modern SweetAlert with centered icon & message
                                     Swal.fire({
-                                        title: res.message || messages.success[locale],
-                                        icon: 'success',
+                                        html: `
+                                            <div style='text-align:center;'>
+                                                <div style='font-size:60px; color:${res . icon === 'success' ? '#28a745' : '#dc3545'};'>
+                                                    <i class='fa ${res . icon === 'success' ? 'fa-check-circle' : 'fa-times-circle'}'></i>
+                                                </div>
+                                                <h3 style='margin-top:15px; font-weight:600;'>${res . message || messages . success[locale]}</h3>
+                                            </div>
+                                        `,
+                                        showConfirmButton: false,
                                         timer: 2000,
-                                        showConfirmButton: false
+                                        background: '#fff',
+                                        width: 400,
+                                        padding: '2em',
+                                        backdrop: `rgba(0,0,0,0.4)`,
                                     });
 
-                                    // 🔹 Reload the grid without full page refresh
+                                    // Reload data grid
                                     $.pjax.reload('#pjax-container');
                                 } else {
-                                    Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'خطأ',
+                                        text: res.message || messages.error[locale],
+                                    });
                                 }
                             })
                             .catch((err) => {
-                                console.error('Fetch error:', err);
-                                Swal.fire('خطأ', messages.error[locale], 'error');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: messages.error[locale],
+                                });
                             });
                     }
                 });
             });
         }
 
-        // 🔹 Initialize Approve & Reject Buttons
+        // Initialize
         document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
         document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
     }
 
-    // ✅ Run on page load
     initFormRequestActions();
 
-    // ✅ Re-run after PJAX reload
     $(document).off('pjax:end').on('pjax:end', function() {
         initFormRequestActions();
     });
@@ -591,6 +713,7 @@ class FormRequestController extends MainController
         return response()->json([
             'success' => true,
             'message' => __('done'),
+            'icon' => 'success',
         ]);
         admin_toastr(__('rejected_message'), 'error');
         return redirect()->back();
