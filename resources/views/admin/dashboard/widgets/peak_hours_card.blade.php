@@ -59,7 +59,7 @@
     }
 
     function loadPeakData(period = 'day') {
-        $.ajax({
+        addToAjaxQueue({
             url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function (res) {

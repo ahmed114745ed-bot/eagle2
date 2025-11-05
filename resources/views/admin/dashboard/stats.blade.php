@@ -235,6 +235,43 @@ $(document).on('mouseleave', '.info-box', function() {
     });
 </script>
 
+<script>
+    const ajaxQueue = [];
+
+    function addToAjaxQueue(task) {
+        ajaxQueue.push(task);
+        if (ajaxQueue.length === 1) {
+            runNextAjax();
+        }
+    }
+
+    function runNextAjax() {
+        if (ajaxQueue.length === 0) return;
+
+        const current = ajaxQueue[0];
+        let promise;
+
+        if (typeof current === 'object' && current.url) {
+            promise = $.ajax(current);
+        }
+        else if (typeof current === 'function') {
+            promise = current();
+        }
+        else {
+            console.error("❌ Invalid AJAX/fetch task in queue", current);
+            ajaxQueue.shift();
+            runNextAjax();
+            return;
+        }
+
+        Promise.resolve(promise).finally(() => {
+            ajaxQueue.shift();
+            runNextAjax();
+        });
+    }
+
+</script>
+
 <style>
 .info-box {
     cursor: pointer;
