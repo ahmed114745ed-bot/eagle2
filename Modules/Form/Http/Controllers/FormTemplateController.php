@@ -328,12 +328,12 @@ class FormTemplateController extends Controller
                 $storedFiles = [];
                 foreach ($fileInput as $file) {
                     if ($file && $file->isValid()) {
-                        $storedFiles[] = Common::upload('data', $file, 'public');
+                        $storedFiles[] = Common::upload('data', $file);
                     }
                 }
                 $data[$key] = $storedFiles;
             } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
-                $path = Common::upload('data', $fileInput, 'public');
+                $path = Common::upload('data', $fileInput);
                 $data[$key] = $path;
             } else {
                 info("Unexpected file input type for {$key}");
