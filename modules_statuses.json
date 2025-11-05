@@ -31,5 +31,6 @@
     "Milestones": true,
     "RoomCup": true,
     "AreaManager": true,
-    "Form": true
+    "Form": true,
+    "SuperAdmin": true
 }
