@@ -371,7 +371,7 @@ class FormRequestController extends MainController
                                         showConfirmButton: false
                                     });
 
-                                    // 🔹 Reload the grid (without full page refresh)
+                                    // 🔹 Reload the grid without full page refresh
                                     $.pjax.reload('#pjax-container');
                                 } else {
                                     Swal.fire('خطأ', res.message || messages.error[locale], 'error');
@@ -386,7 +386,7 @@ class FormRequestController extends MainController
             });
         }
 
-        // 🔹 Initialize buttons
+        // 🔹 Initialize Approve & Reject Buttons
         document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
         document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
     }
@@ -394,11 +394,12 @@ class FormRequestController extends MainController
     // ✅ Run on page load
     initFormRequestActions();
 
-    // ✅ Re-run after each PJAX reload
+    // ✅ Re-run after PJAX reload
     $(document).off('pjax:end').on('pjax:end', function() {
         initFormRequestActions();
     });
 ");
+
 
 
 
@@ -587,7 +588,7 @@ class FormRequestController extends MainController
         $request = FormRequest::findOrFail($id);
         $request->status = 'rejected';
         $request->save();
-      return response()->json([
+        return response()->json([
             'success' => true,
             'message' => __('done'),
         ]);
