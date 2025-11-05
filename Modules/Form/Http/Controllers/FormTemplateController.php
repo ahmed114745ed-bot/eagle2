@@ -140,96 +140,115 @@ class FormTemplateController extends Controller
     }
 
     public function update(Request $request, FormTemplate $formTemplate)
-{
-    $validated = $request->validate([
-        'title' => 'required|array',
-        'title.*' => 'required|string',
-        'form_type' => 'required|string',
-        'description' => 'nullable|array',
-        'sections' => 'required|array',
-    ]);
-    $formTemplate->update([
-        'title' => $request->title,
-        'form_type' => $request->form_type,
-        'description' => $request->description,
-    ]);
-
-    $formTemplate->sections()->delete();
-
-    if ($request->has('sections')) {
-        foreach ($request->sections as $sectionData) {
-            $section = FormSection::create([
-                'form_template_id' => $formTemplate->id,
-                'title' => $sectionData['title'],
-                'section_order' => $sectionData['order'],
-                'is_visible' => true,
-            ]);
-
-            if (isset($sectionData['fields'])) {
-                foreach ($sectionData['fields'] as $fieldData) {
-
-                    $options = null;
-                    $dataSource = null;
-
-                    if (isset($fieldData['options_type'])) {
-                        if ($fieldData['options_type'] === 'custom' && isset($fieldData['custom_options'])) {
-                            $customOptions = $fieldData['custom_options'];
-                            if (is_string($customOptions)) {
-                                $decoded = json_decode($customOptions, true);
-                                if (json_last_error() === JSON_ERROR_NONE) {
-                                    $options = $decoded;
-                                } else {
-                                    $lines = array_filter(array_map('trim', explode("\n", $customOptions)));
-                                    $options = array_combine($lines, $lines);
-                                }
-                            }
-                        } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
-                            $dataSource = $fieldData['data_source'];
-                        }
-                    }
-
-                    $widgetConfig = null;
-                    if (isset($fieldData['type']) && $fieldData['type'] === 'custom' && isset($fieldData['widget_id'])) {
-                        $widget = \Modules\Form\Entities\CustomFieldWidget::find($fieldData['widget_id']);
-                        if ($widget) {
-                            $widgetConfig = $widget->default_config;
-
-                            if (isset($fieldData['custom_options']) && $fieldData['custom_options']) {
-                                $customOptions = json_decode($fieldData['custom_options'], true);
-                                if ($customOptions && is_array($customOptions)) {
-                                    $widgetConfig['fields'] = $customOptions['fields'] ?? $widgetConfig['fields'] ?? [];
-                                    $widgetConfig['allow_add_more'] = $customOptions['allow_add_more'] ?? $widgetConfig['allow_add_more'] ?? true;
-                                    $widgetConfig['min_items'] = $customOptions['min_items'] ?? $widgetConfig['min_items'] ?? 0;
-                                    $widgetConfig['max_items'] = $customOptions['max_items'] ?? $widgetConfig['max_items'] ?? 10;
-                                }
+    {
+        $validated = $request->validate([
+            'title' => 'required|array',
+            'title.*' => 'required|string',
+            'form_type' => 'required|string',
+            'description' => 'nullable|array',
+            'sections' => 'required|array',
+        ]);
+        
+        // Update form template basic info
+        $formTemplate->update([
+            'title' => $request->title,
+            'form_type' => $request->form_type,
+            'description' => $request->description,
+        ]);
+    
+        // Delete old sections and fields (cascade will handle fields)
+        $formTemplate->sections()->delete();
+    
+        // Create new sections and fields
+        if ($request->has('sections')) {
+            foreach ($request->sections as $sectionData) {
+                // Create section
+                $section = FormSection::create([
+                    'form_template_id' => $formTemplate->id,
+                    'title' => $sectionData['title'],
+                    'section_order' => $sectionData['order'],
+                    'is_visible' => true,
+                ]);
+    
+                // Create fields for this section
+                if (isset($sectionData['fields'])) {
+                    foreach ($sectionData['fields'] as $fieldData) {
+                        $fieldType = $fieldData['type'] ?? 'text';
+                        $options = null;
+                        $dataSource = null;
+                        $widgetId = null;
+                        $widgetConfig = null;
+    
+                        // ============================================
+                        // Handle Custom Widget Fields
+                        // ============================================
+                        if ($fieldType === 'custom' && isset($fieldData['widget_id'])) {
+                            $widgetId = $fieldData['widget_id'];
+                            $widget = \Modules\Form\Entities\CustomFieldWidget::find($widgetId);
+                            if ($widget) {
+                                $widgetConfig = $widget->default_config;
                             }
                         }
-                    } else {
-                        $widgetConfig = isset($fieldData['widget_config']) ? json_decode($fieldData['widget_config'], true) : null;
+                        // ============================================
+                        // Handle Select/Checkbox/Radio Fields
+                        // ============================================
+                        elseif (in_array($fieldType, ['select', 'checkbox', 'radio'])) {
+                            // Check if options_type is provided
+                            if (isset($fieldData['options_type'])) {
+                                
+                                // Custom Options
+                                if ($fieldData['options_type'] === 'custom') {
+                                    // Process custom options from the form
+                                    // Format: sections[X][fields][Y][options][Z][label][locale] & [value]
+                                    if (isset($fieldData['options']) && is_array($fieldData['options'])) {
+                                        $processedOptions = [];
+                                        
+                                        foreach ($fieldData['options'] as $optionData) {
+                                            if (isset($optionData['value']) && !empty($optionData['value'])) {
+                                                $processedOptions[] = [
+                                                    'label' => $optionData['label'] ?? [],  // Multi-language labels
+                                                    'value' => $optionData['value']
+                                                ];
+                                            }
+                                        }
+                                        
+                                        $options = !empty($processedOptions) ? $processedOptions : null;
+                                    }
+                                }
+                                // Predefined Data Source
+                                elseif ($fieldData['options_type'] === 'predefined') {
+                                    if (isset($fieldData['data_source']) && !empty($fieldData['data_source'])) {
+                                        $dataSource = $fieldData['data_source'];
+                                    }
+                                }
+                            }
+                        }
+    
+                        // ============================================
+                        // Create Field Record
+                        // ============================================
+                        FormField::create([
+                            'section_id' => $section->id,
+                            'field_label' => $fieldData['label'],
+                            'field_name' => $fieldData['name'],
+                            'field_type' => $fieldType,
+                            'widget_id' => $widgetId,
+                            'widget_config' => $widgetConfig,
+                            'placeholder' => $fieldData['placeholder'] ?? null,
+                            'options' => $options,
+                            'data_source' => $dataSource,
+                            'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
+                            'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
+                            'field_order' => $fieldData['order'],
+                        ]);
                     }
-                    $fieldType = $fieldData['type'] ?? 'text';
-                    FormField::create([
-                        'section_id' => $section->id,
-                        'field_label' => $fieldData['label'],
-                        'field_name' => $fieldData['name'],
-                        'field_type' => $fieldType,
-                        'widget_id' => $fieldData['widget_id'] ?? null,
-                        'widget_config' => $widgetConfig,
-                        'placeholder' => $fieldData['placeholder'] ?? null,
-                        'options' => $options,
-                        'data_source' => $dataSource,
-                        'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
-                        'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
-                        'field_order' => $fieldData['order'],
-                    ]);
                 }
             }
         }
+    
+        admin_success(__('Form template updated successfully!'));
+        return redirect(admin_url('form-templates'));
     }
-
-    admin_success(__('Form template updated successfully!'));
-    return redirect(admin_url('form-templates'));
-}
 
 
     public function destroy(FormTemplate $formTemplate)

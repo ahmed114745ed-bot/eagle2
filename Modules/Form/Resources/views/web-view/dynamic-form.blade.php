@@ -444,6 +444,8 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                             $options = is_array($field->options) 
                                                 ? $field->options 
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
+                                               
+
                                         @endphp
                                         <select 
                                             name="{{ $field->field_name }}"
@@ -451,10 +453,13 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                             @required($field->is_required)>
                                             <option value="">-- {{ __('Select') }} --</option>
                                             @foreach ($options as $key => $value)
+
                                                 @php
-                                                    $displayValue = is_array($value) 
-                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key) 
-                                                        : $value;
+                                                
+                                              
+                                                $displayValue = is_array($value) 
+                                                            ? ($value['label'][$currentLocale] ?? $value['label']['en'] ?? $value['value'] ?? $key)
+                                                            : $value;
                                                 @endphp
                                                 <option value="{{ $key }}">{{ $displayValue }}</option>
                                             @endforeach
