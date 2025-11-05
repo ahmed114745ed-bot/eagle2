@@ -2,6 +2,32 @@
 
 @section('content')
 <style>
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 900px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.5s 
+    ease-out;
+    }
     .form-container {
         max-width: 950px;
         margin: 0 auto;
@@ -119,7 +145,7 @@
 
     /* ======== Container & Layout ======== */
 .form-container {
-    max-width: 1200px;
+    /* max-width: 1200px; */
     margin: auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -239,6 +265,103 @@ input[type="file"]::-webkit-file-upload-button:hover {
         max-width: 100%;
     }
 }
+
+.agency-card {
+    background: #fff;
+    border-radius: 15px;
+    border: 1px solid #dce3f0;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 252px;
+    /* flex: 1 1 280px; */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.agency-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.agency-card-inner {
+    padding: 1.2rem;
+}
+.agency-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f3f6fb;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.agency-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #0d6efd;
+    margin: 0;
+}
+.agency-id {
+    background: #e9efff;
+    color: #0d6efd;
+    font-size: 0.9rem;
+    padding: 3px 8px;
+    border-radius: 8px;
+}
+.agency-info p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: #444;
+}
+.agency-bio {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 10px;
+    text-align: center;
+    min-height: 40px;
+}
+.agency-divider {
+    border-bottom: 1px solid #e0e6ef;
+    margin: 10px 0;
+}
+.agency-list {
+    text-align: left;
+    font-size: 0.9rem;
+}
+.card-selected {
+    border: 3px solid #0d6efd;
+    box-shadow: 0 12px 30px rgba(13,110,253,0.2);
+}
+
+.custom-field-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.custom-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #f9fafc;
+    position: relative;
+}
+.custom-item input {
+    min-width: 130px;
+}
+.remove-btn {
+    margin-left: 6px;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+.remove-btn i {
+    pointer-events: none;
+}
 </style>
 
 @php
@@ -246,11 +369,11 @@ input[type="file"]::-webkit-file-upload-button:hover {
     $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 <div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary mb-0">
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
-    </div>
+    </div> -->
 
     <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -393,12 +516,19 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
                                     {{-- Custom --}}
                                     @elseif ($field->field_type === 'custom')
-                                        <div class="custom-field-list" id="custom-list-{{ $section->id }}-{{ $field->id }}"></div>
-                                        <button type="button" class="btn btn-sm btn-secondary mt-2 btn-style"
-                                            onclick="addCustomField({{ $section->id }}, {{ $field->id }})">
-                                            {{ __('Add More') }}
-                                        </button>
+                                        <div class="custom-field-list d-flex flex-wrap gap-2 align-items-start"
+                                            id="custom-list-{{ $section->id }}-{{ $field->id }}"></div>
+
+                                        {{-- إذا كان allow_add_more = true في config --}}
+                                        @if(optional($field->config)['allow_add_more'] ?? true)
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary mt-2"
+                                                    onclick="addCustomField({{ $section->id }}, {{ $field->id }})">
+                                                <i class="fa fa-plus"></i> {{ __('Add More') }}
+                                            </button>
+                                        @endif
                                     @endif
+
                                 </div>
                             </div>
                         @endforeach
@@ -406,6 +536,120 @@ input[type="file"]::-webkit-file-upload-button:hover {
                 </div>
             </div>
         @endforeach
+
+
+        @if($template->form_type === 'host_agency') <div class="card mb-5 border-primary shadow-sm p-4"> <h4 class="text-primary mb-4"> <i class="fa fa-search me-2"></i>{{ __('Search for Certified Agency Manager') }} </h4>
+
+                <div class="input-group mb-4">
+                    <input type="text" id="search-query" class="form-control" placeholder="{{ __('Enter name or ID') }}">
+                </div>
+
+                <input type="hidden" name="bd_id" id="selected-bd-id">
+
+                <div id="search-results" class="d-flex flex-wrap gap-4" style="display: flex;"></div>
+            </div>
+
+            <script>
+                let selectedCard = null;
+                let searchTimeout = null;
+
+                const searchInput = document.getElementById('search-query');
+                const resultsContainer = document.getElementById('search-results');
+
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value.trim();
+
+                    if (!query) {
+                        resultsContainer.innerHTML = '';
+                        return;
+                    }
+
+                    searchTimeout = setTimeout(() => performSearch(query), 400);
+                });
+
+                function performSearch(query) {
+                    fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(res => {
+                            resultsContainer.innerHTML = '';
+
+                            if (!res.data.length) {
+                                resultsContainer.innerHTML = `<div class="text-center text-muted w-100">{{ __('No results found') }}</div>`;
+                                return;
+                            }
+
+                            res.data.forEach(bd => {
+                                let topAgencies = '';
+                                bd.top_agencies.forEach(agency => {
+                                    topAgencies += `
+                                        <div class="mb-1">
+                                            <strong>{{ __('Agency') }}:</strong> ${agency.name}
+                                            <span class="badge bg-info text-dark ms-2">${agency.members_count} {{ __('Members') }}</span>
+                                        </div>
+                                    `;
+                                });
+
+                                const card = document.createElement('div');
+                                card.classList.add('agency-card', 'selectable-card');
+                                card.innerHTML = `
+                                    <div class="agency-card-inner">
+                                        <div class="agency-header">
+                                            <h5 class="agency-name">${bd.name}</h5>
+                                            <span class="agency-id">#${bd.id}</span>
+                                        </div>
+                                        <div class="agency-info">
+                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country}</p>
+                                            <p><i class="fa fa-user-tie text-primary me-2"></i> <strong>{{ __('Title') }}:</strong> ${bd.title}</p>
+                                            <p><i class="fa fa-briefcase text-primary me-2"></i> <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}</p>
+                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone}</p>
+                                        </div>
+                                        <p class="agency-bio">${bd.bio}</p>
+                                        <div class="agency-divider"></div>
+                                        <h6 class="text-success mb-2 text-center">⭐ {{ __('Top 3 Agencies') }}</h6>
+                                        <div class="agency-list">
+                                            ${topAgencies}
+                                        </div>
+                                    </div>
+                                `;
+
+
+                                card.addEventListener('click', function() {
+                                    if (selectedCard) selectedCard.classList.remove('card-selected');
+                                    card.classList.add('card-selected');
+                                    selectedCard = card;
+                                    document.getElementById('selected-bd-id').value = bd.id;
+                                });
+
+                                resultsContainer.appendChild(card);
+                            });
+                        })
+                        .catch(err => console.error(err));
+                }
+            </script>
+
+            <style>
+                #search-results {
+                    justify-content: flex-start;
+                }
+                .selectable-card {
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .selectable-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                }
+                .card-selected {
+                    border: 3px solid #0d6efd;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                }
+            </style>
+
+
+    @endif
+
+
         <input type="hidden" name="bd_id" id="selected-bd-id">
 
         <div class="text-center">
@@ -415,108 +659,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
         </div>
     </form>
 
-    @if($template->form_type === 'host_agency')
-    <div class="card mb-5 border-primary shadow-sm p-4">
-        <h4 class="text-primary mb-4"><i class="fa fa-search me-2"></i>{{ __('Search for Certified Agency Manager') }}</h4>
-        <div class="input-group mb-4">
-            <input type="text" id="search-query" class="form-control" placeholder="{{ __('Enter name or ID') }}">
-            <button class="btn btn-primary" id="search-btn">{{ __('Search') }}</button>
-        </div>
-
-        {{-- Hidden input for selected bd_id --}}
-        <input type="hidden" name="bd_id" id="selected-bd-id">
-
-        <div id="search-results" class="d-flex flex-wrap gap-4" style="display: flex;"></div>
-    
-    </div>
-
-    <script>
-        let selectedCard = null;
-
-        document.getElementById('search-btn').addEventListener('click', function() {
-            const query = document.getElementById('search-query').value.trim();
-            if (!query) return;
-
-            fetch(`{{ route('host_agency.search') }}?query=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(res => {
-                    const container = document.getElementById('search-results');
-                    container.innerHTML = '';
-                    if (!res.data.length) {
-                        container.innerHTML = `<div class="text-center text-muted w-100">{{ __('No results found') }}</div>`;
-                        return;
-                    }
-
-                    res.data.forEach(bd => {
-                        let topAgencies = '';
-                        bd.top_agencies.forEach(agency => {
-                            topAgencies += `
-                                <div class="mb-1">
-                                    <strong>{{ __('Agency') }}:</strong> ${agency.name}
-                                    <span class="badge bg-info text-dark ms-2">${agency.members_count} {{ __('Members') }}</span>
-                                </div>
-                            `;
-                        });
-
-                        const card = document.createElement('div');
-                        card.classList.add('card', 'flex-fill', 'shadow-sm', 'border-primary', 'selectable-card');
-                        card.style.minWidth = '300px';
-                        card.style.maxWidth = '350px';
-                        card.style.flex = '1 1 300px';
-                        card.style.textAlign = 'center';
-                        card.innerHTML = `
-                            <div class="card-body">
-                                <h5 class="card-title text-primary mb-2">${bd.name}</h5>
-                                <p class="card-text mb-2">
-                                    <strong>ID:</strong> ${bd.id}<br>
-                                    <strong>{{ __('Country') }}:</strong> ${bd.country}<br>
-                                    <strong>{{ __('Title') }}:</strong> ${bd.title}<br>
-                                    <strong>{{ __('Experience') }}:</strong> ${bd.years} {{ __('years') }}<br>
-                                    <strong>📞</strong> ${bd.phone}
-                                </p>
-                                <p class="text-muted mb-3">${bd.bio}</p>
-                                <hr>
-                                <h6 class="text-success mb-2">⭐ {{ __('Top 3 Agencies') }}</h6>
-                                ${topAgencies}
-                            </div>
-                        `;
-
-                        // Click event to select card
-                        card.addEventListener('click', function() {
-                            if (selectedCard) {
-                                selectedCard.classList.remove('card-selected');
-                            }
-                            card.classList.add('card-selected');
-                            selectedCard = card;
-                            document.getElementById('selected-bd-id').value = bd.id;
-                        });
-
-                        container.appendChild(card);
-                    });
-                })
-                .catch(err => console.error(err));
-        });
-    </script>
-
-    <style>
-        #search-results {
-            justify-content: flex-start; 
-        }
-        .selectable-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .selectable-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .card-selected {
-            border: 3px solid #0d6efd; /* اللون الأساسي عند التحديد */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-    </style>
-@endif
-
+   
 </div>
 
 <script>
@@ -533,19 +676,44 @@ document.addEventListener('DOMContentLoaded', function () {
     updateDirection(currentLang);
 
     // ---------------- Custom field dynamic addition ----------------
-    window.addCustomField = function(sectionId, fieldId) {
+        window.addCustomField = function(sectionId, fieldId) {
         const list = document.getElementById(`custom-list-${sectionId}-${fieldId}`);
         const index = list.children.length;
-        const html = `
-            <div class="custom-item mb-2 border p-2 rounded">
-                <input type="text" name="sections[${sectionId}][fields][${fieldId}][items][${index}][app_name]" 
-                       placeholder="{{ __('Application Name') }}" class="form-control mb-1">
-                <input type="number" name="sections[${sectionId}][fields][${fieldId}][items][${index}][work_duration]" 
-                       placeholder="{{ __('Work Duration (months)') }}" class="form-control">
-            </div>
-        `;
+
+        const fields = [
+            { name: 'app_name', type: 'text', placeholder: "{{ __('Application Name') }}" },
+            { name: 'work_duration', type: 'number', placeholder: "{{ __('Work Duration (months)') }}" }
+        ];
+
+        let html = `<div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
+
+        fields.forEach(field => {
+            html += `
+                <div class="flex-grow-1">
+                    <input type="${field.type}" 
+                        name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
+                        class="form-control form-control-sm mb-1"
+                        placeholder="${field.placeholder}">
+                </div>
+            `;
+        });
+
+        html += `
+            <button type="button" class="btn btn-sm btn-danger remove-btn" 
+                onclick="this.closest('.custom-item').remove()">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>`;
+
         list.insertAdjacentHTML('beforeend', html);
-    }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.custom-field-list').forEach(list => {
+            const [sectionId, fieldId] = list.id.replace('custom-list-', '').split('-');
+            addCustomField(sectionId, fieldId);
+        });
+    });
 
     // ---------------- Language toggle example ----------------
     const toggleBtn = document.getElementById('toggle-lang');
