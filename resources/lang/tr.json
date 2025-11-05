@@ -16,7 +16,8 @@
     "Receiving Level": "Alma Seviyesi",
     "Recharge Level": "Yeniden Yükleme Seviyesi",
     "Active Users": "Aktif Kullanıcılar",
-    
+    "Form Details": "Form Detayları",
+    "Additional Fields": "Ek Alanlar",
     "Form Request": "Form Talebi",
     "Browse form request": "Form taleplerini görüntüle",
     "Type switch form request": "Form talebi türünü değiştir",
@@ -3867,6 +3868,8 @@
     "Select Custom Widget": "Özel Bileşen Seç",
     "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "Özel bileşenler özel kullanıcı arayüzü sağlar (BD Seçici, Kullanıcı Seçici, vb.)",
     "form_bd_bio":"Hoş geldiniz! Benimle, canlı yayın dünyasında başarı sırlarını öğreneceksiniz. Başarılı ajansları eğitme konusunda geniş deneyime sahibim. Sizi zirveye ulaşana kadar günlük takip ve sınırsız destekle destekleyeceğim!"
+,  "Application Name": "Uygulama Adı",
+    "Work Duration (months)": "Çalışma Süresi (ay)"
 
 
 

@@ -182,111 +182,225 @@ class FormRequestController extends MainController
             return $html;
         });
 
+        //     Admin::script("
+        //     function initFormRequestActions() {
+
+        //         function sendRequest(url) {
+        //             return fetch(url, {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'X-CSRF-TOKEN': LA.token,
+        //                     'Accept': 'application/json',
+        //                 },
+        //             }).then(res => res.json());
+        //         }
+
+        //         function handleAction(button, actionType) {
+        //             button.addEventListener('click', function(e){
+        //                 e.preventDefault();
+
+        //                 const messages = {
+        //                     approve: {
+        //                         title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#28a745'
+        //                     },
+        //                     reject: {
+        //                         title: 'هل أنت متأكد من رفض هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#dc3545'
+        //                     },
+        //                     success: {
+        //                         en: 'Action completed successfully!',
+        //                         ar: 'تمت العملية بنجاح!',
+        //                         hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+        //                         tr: 'İşlem başarıyla tamamlandı!'
+        //                     },
+        //                     error: {
+        //                         en: 'An error occurred!',
+        //                         ar: 'حدث خطأ أثناء العملية',
+        //                         hi: 'एक त्रुटि हुई!',
+        //                         tr: 'İşlem sırasında hata oluştu!'
+        //                     }
+        //                 };
+
+        //                 const locale = document.documentElement.lang || 'ar';
+
+        //                 Swal.fire({
+        //                     title: messages[actionType].title,
+        //                     type: 'question',
+        //                     showCancelButton: true,
+        //                     confirmButtonText: messages[actionType].confirm,
+        //                     cancelButtonText: messages[actionType].cancel,
+        //                     confirmButtonColor: messages[actionType].color,
+        //                     cancelButtonColor: '#6c757d',
+        //                 }).then((result) => {
+        //                     if (result.value) {
+        //                         const url = button.dataset.url;
+        //                          Swal.fire({
+        //                             title: 'جاري التنفيذ...',
+        //                             allowOutsideClick: false,
+        //                             didOpen: () => {
+        //                                 Swal.showLoading()
+        //                             }
+        //                         });
+        //                         sendRequest(url).then(res => {
+        //                              Swal.close();
+        //                             console.group('Form Request Action Response');
+        //                             console.log('Request URL:', url);
+        //                             console.log('Response:', res);
+        //                             console.groupEnd();
+
+        //                             if (res.success) {
+        //                                 Swal.fire({
+        //                                     title: res.message || messages.success[locale],
+        //                                     type: 'success',
+        //                                     timer: 2000,
+        //                                     showConfirmButton: false
+        //                                 });
+
+        //                                 // إعادة تحميل محتوى الـ grid بدون refresh
+        //                                 $.pjax.reload('#pjax-container');
+        //                             } else {
+        //                                 Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+        //                             }
+        //                         }).catch((err) => {
+        //                             console.error('Fetch error:', err);
+        //                             Swal.fire('خطأ', messages.error[locale], 'error');
+        //                         });
+        //                     }
+        //                 });
+        //             });
+        //         }
+
+        //         document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+        //         document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+        //     }
+
+        //     // يعمل أول مرة عند تحميل الصفحة
+        //     initFormRequestActions();
+
+        //     // يعمل بعد كل تحديث PJAX (reload)
+        //     $(document).off('pjax:end').on('pjax:end', function() {
+        //         initFormRequestActions();
+        //     });
+        // ");
+
         Admin::script("
-        function initFormRequestActions() {
-    
-            function sendRequest(url) {
-                return fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': LA.token,
-                        'Accept': 'application/json',
+    function initFormRequestActions() {
+
+        // 🔹 Function to send POST requests
+        function sendRequest(url) {
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': LA.token,
+                    'Accept': 'application/json',
+                },
+            }).then(res => res.json());
+        }
+
+        // 🔹 Handle Approve/Reject buttons
+        function handleAction(button, actionType) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const messages = {
+                    approve: {
+                        title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                        confirm: 'نعم',
+                        cancel: 'إلغاء',
+                        color: '#28a745'
                     },
-                }).then(res => res.json());
-            }
-    
-            function handleAction(button, actionType) {
-                button.addEventListener('click', function(e){
-                    e.preventDefault();
-    
-                    const messages = {
-                        approve: {
-                            title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                            confirm: 'نعم',
-                            cancel: 'إلغاء',
-                            color: '#28a745'
-                        },
-                        reject: {
-                            title: 'هل أنت متأكد من رفض هذا الطلب؟',
-                            confirm: 'نعم',
-                            cancel: 'إلغاء',
-                            color: '#dc3545'
-                        },
-                        success: {
-                            en: 'Action completed successfully!',
-                            ar: 'تمت العملية بنجاح!',
-                            hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                            tr: 'İşlem başarıyla tamamlandı!'
-                        },
-                        error: {
-                            en: 'An error occurred!',
-                            ar: 'حدث خطأ أثناء العملية',
-                            hi: 'एक त्रुटि हुई!',
-                            tr: 'İşlem sırasında hata oluştu!'
-                        }
-                    };
-    
-                    const locale = document.documentElement.lang || 'ar';
-    
-                    Swal.fire({
-                        title: messages[actionType].title,
-                        type: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: messages[actionType].confirm,
-                        cancelButtonText: messages[actionType].cancel,
-                        confirmButtonColor: messages[actionType].color,
-                        cancelButtonColor: '#6c757d',
-                    }).then((result) => {
-                        if (result.value) {
-                            const url = button.dataset.url;
-                             Swal.fire({
-                                title: 'جاري التنفيذ...',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            });
-                            sendRequest(url).then(res => {
-                                 Swal.close();
+                    reject: {
+                        title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                        confirm: 'نعم',
+                        cancel: 'إلغاء',
+                        color: '#dc3545'
+                    },
+                    success: {
+                        en: 'Action completed successfully!',
+                        ar: 'تمت العملية بنجاح!',
+                        hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                        tr: 'İşlem başarıyla tamamlandı!'
+                    },
+                    error: {
+                        en: 'An error occurred!',
+                        ar: 'حدث خطأ أثناء العملية',
+                        hi: 'एक त्रुटि हुई!',
+                        tr: 'İşlem sırasında hata oluştu!'
+                    }
+                };
+
+                const locale = document.documentElement.lang || 'ar';
+
+                Swal.fire({
+                    title: messages[actionType].title,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: messages[actionType].confirm,
+                    cancelButtonText: messages[actionType].cancel,
+                    confirmButtonColor: messages[actionType].color,
+                    cancelButtonColor: '#6c757d',
+                }).then((result) => {
+                    if (result.value) {
+                        const url = button.dataset.url;
+
+                        Swal.fire({
+                            title: 'جاري التنفيذ...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        sendRequest(url)
+                            .then(res => {
+                                Swal.close();
+
                                 console.group('Form Request Action Response');
                                 console.log('Request URL:', url);
                                 console.log('Response:', res);
                                 console.groupEnd();
-    
+
                                 if (res.success) {
                                     Swal.fire({
                                         title: res.message || messages.success[locale],
-                                        type: 'success',
+                                        icon: 'success',
                                         timer: 2000,
                                         showConfirmButton: false
                                     });
-    
-                                    // إعادة تحميل محتوى الـ grid بدون refresh
+
+                                    // 🔹 Reload the grid without full page refresh
                                     $.pjax.reload('#pjax-container');
                                 } else {
                                     Swal.fire('خطأ', res.message || messages.error[locale], 'error');
                                 }
-                            }).catch((err) => {
+                            })
+                            .catch((err) => {
                                 console.error('Fetch error:', err);
                                 Swal.fire('خطأ', messages.error[locale], 'error');
                             });
-                        }
-                    });
+                    }
                 });
-            }
-    
-            document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-            document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+            });
         }
-    
-        // يعمل أول مرة عند تحميل الصفحة
+
+        // 🔹 Initialize Approve & Reject Buttons
+        document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+        document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+    }
+
+    // ✅ Run on page load
+    initFormRequestActions();
+
+    // ✅ Re-run after PJAX reload
+    $(document).off('pjax:end').on('pjax:end', function() {
         initFormRequestActions();
-    
-        // يعمل بعد كل تحديث PJAX (reload)
-        $(document).off('pjax:end').on('pjax:end', function() {
-            initFormRequestActions();
-        });
-    ");
+    });
+");
+
+
 
 
 
@@ -296,7 +410,7 @@ class FormRequestController extends MainController
         return $grid;
     }
 
- 
+
 
 
     protected function form()
@@ -364,7 +478,11 @@ class FormRequestController extends MainController
         ]);
         $request->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        return response()->json([
+            'success' => true,
+            'message' => __('تمت الموافقة بنجاح'),
+        ]);
     }
 
     protected function approveBdForm($request)
@@ -400,7 +518,11 @@ class FormRequestController extends MainController
 
         $request->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        //  return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        return response()->json([
+            'success' => true,
+            'message' => __('تمت الموافقة بنجاح'),
+        ]);
     }
 
     protected function approveShapingAgency($request)
@@ -466,7 +588,10 @@ class FormRequestController extends MainController
         $request = FormRequest::findOrFail($id);
         $request->status = 'rejected';
         $request->save();
-
+        return response()->json([
+            'success' => true,
+            'message' => __('done'),
+        ]);
         admin_toastr(__('rejected_message'), 'error');
         return redirect()->back();
     }
@@ -485,7 +610,7 @@ class FormRequestController extends MainController
             $id,
             $content
                 ->title(trans(''))
-            ->body($this->detail($id))
+                ->body($this->detail($id))
         );
     }
 
@@ -493,36 +618,36 @@ class FormRequestController extends MainController
     {
         $show = new Show(FormRequest::findOrFail($id));
         $formRequest = FormRequest::findOrFail($id);
-    
+
         // استخدم $this داخل closure
         $controller = $this;
-        
+
         $show->field('data', __('Form Details'))->as(function ($data) use ($formRequest, $controller) {
             $formData = json_decode($data, true);
             if (!$formData || !is_array($formData)) {
                 return '<p class="text-muted">No data available</p>';
             }
-    
+
             // Get the form template with all fields
             $template = \Modules\Form\Entities\FormTemplate::where('form_type', $formRequest->form_template_type)
                 ->with(['sections.fields'])
                 ->first();
-    
+
             if (!$template) {
                 return $controller->renderSimpleData($formData);
             }
-    
+
             // Build fields map with their configurations
             $fieldsMap = [];
             $sectionFieldsMap = []; // To organize fields by sections
-            
+
             foreach ($template->sections as $section) {
                 $sectionKey = $section->section_order;
                 $sectionFieldsMap[$sectionKey] = [
                     'title' => $section->title,
                     'fields' => []
                 ];
-                
+
                 foreach ($section->fields as $field) {
                     $fieldsMap[$field->field_name] = [
                         'label' => $field->field_label,
@@ -533,41 +658,41 @@ class FormRequestController extends MainController
                         'section_order' => $section->section_order,
                         'field_order' => $field->field_order,
                     ];
-                    
+
                     // Add field to section if exists in formData
                     if (array_key_exists($field->field_name, $formData)) {
                         $sectionFieldsMap[$sectionKey]['fields'][$field->field_name] = $fieldsMap[$field->field_name];
                     }
                 }
             }
-    
+
             $currentLocale = app()->getLocale();
             $html = '<div class="form-data-display" style="max-width: 100%;">';
-            
+
             // Display data organized by sections
             foreach ($sectionFieldsMap as $sectionData) {
                 // Skip empty sections
                 if (empty($sectionData['fields'])) {
                     continue;
                 }
-                
+
                 // Section header
                 $sectionTitle = $sectionData['title'];
                 $sectionName = is_array($sectionTitle) ? ($sectionTitle[$currentLocale] ?? $sectionTitle['en'] ?? '') : $sectionTitle;
-                
+
                 $html .= '<div class="section-group" style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">';
                 $html .= '<h3 style="color: #2c3e50; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #3498db; font-size: 18px;">';
                 $html .= '<i class="fa fa-folder-open" style="margin-right: 8px;"></i>' . htmlspecialchars($sectionName);
                 $html .= '</h3>';
-                
+
                 // Display fields in this section
                 foreach ($sectionData['fields'] as $fieldName => $fieldConfig) {
                     $value = $formData[$fieldName];
-                    
+
                     // Get field label
                     $label = $fieldConfig['label'];
                     $labelText = is_array($label) ? ($label[$currentLocale] ?? $label['en'] ?? $fieldName) : $label;
-                    
+
                     // Render field
                     $html .= '<div class="field-row" style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
                     $html .= '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
@@ -576,10 +701,10 @@ class FormRequestController extends MainController
                     $html .= '</div>';
                     $html .= '</div>';
                 }
-                
+
                 $html .= '</div>'; // Close section
             }
-            
+
             // Display fields that exist in data but not in template (orphaned fields)
             $orphanedFields = array_diff_key($formData, $fieldsMap);
             if (!empty($orphanedFields)) {
@@ -587,7 +712,7 @@ class FormRequestController extends MainController
                 $html .= '<h3 style="color: #856404; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 2px solid #ffc107; font-size: 18px;">';
                 $html .= '<i class="fa fa-exclamation-triangle" style="margin-right: 8px;"></i>' . __('Additional Fields');
                 $html .= '</h3>';
-                
+
                 foreach ($orphanedFields as $fieldName => $value) {
                     $html .= '<div class="field-row" style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
                     $html .= '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
@@ -596,18 +721,18 @@ class FormRequestController extends MainController
                     $html .= '</div>';
                     $html .= '</div>';
                 }
-                
+
                 $html .= '</div>';
             }
-    
+
             $html .= '</div>';
-    
+
             return $html;
         })->unescape();
-    
+
         return $show;
     }
-    
+
     /**
      * Render field value based on field type
      */
@@ -615,46 +740,46 @@ class FormRequestController extends MainController
     {
         $type = $fieldConfig['type'];
         $currentLocale = app()->getLocale();
-    
+
         // Handle empty values
         if ($value === null || $value === '' || (is_array($value) && empty($value))) {
             return '<span class="text-muted" style="color: #95a5a6; font-style: italic;">—</span>';
         }
-    
+
         switch ($type) {
             case 'file':
                 return $this->renderFileField($value);
-    
+
             case 'select':
             case 'radio':
                 return $this->renderSelectField($value, $fieldConfig, $currentLocale);
-    
+
             case 'checkbox':
                 return $this->renderCheckboxField($value, $fieldConfig, $currentLocale);
-    
+
             case 'date':
                 return $this->renderDateField($value);
-    
+
             case 'textarea':
                 return $this->renderTextareaField($value);
-    
+
             case 'email':
                 return $this->renderEmailField($value);
-    
+
             case 'tel':
                 return $this->renderPhoneField($value);
-    
+
             case 'custom':
                 return $this->renderCustomWidget($value, $fieldConfig);
-    
+
             case 'number':
                 return '<span style="font-weight: 500; color: #2c3e50;">' . number_format($value) . '</span>';
-    
+
             default: // text and others
                 return '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
         }
     }
-    
+
     /**
      * Render unknown field (for orphaned fields)
      */
@@ -663,37 +788,39 @@ class FormRequestController extends MainController
         if ($value === null || $value === '') {
             return '<span class="text-muted" style="color: #95a5a6; font-style: italic;">—</span>';
         }
-        
+
         if (is_array($value)) {
-            return '<pre style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin: 0; font-size: 13px; overflow-x: auto;">' . 
-                   json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . 
-                   '</pre>';
+            return '<pre style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin: 0; font-size: 13px; overflow-x: auto;">' .
+                json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                '</pre>';
         }
-        
+
         // Check if it's a file path
         if (preg_match('/\.(jpg|jpeg|png|gif|webp|pdf|doc|docx)$/i', $value)) {
             return $this->renderFileField($value);
         }
-        
+
         return '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
     }
-    
+
     /**
      * Render file field (images and documents)
      */
     public function renderFileField($value)
     {
         if (!$value) return '<span class="text-muted">—</span>';
-    
+
         $files = is_array($value) ? $value : [$value];
         $html = '<div class="file-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">';
-    
+
         foreach ($files as $file) {
             if (!$file) continue;
-            
-            $url = asset('storage/' . $file);
+
+            $url = getImagePath($file);
+
+//            $url = asset('storage/' . $file);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
-    
+
             if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
                 // Image preview
                 $html .= '<div style="position: relative;">';
@@ -710,23 +837,23 @@ class FormRequestController extends MainController
                 $html .= '</a>';
             }
         }
-    
+
         $html .= '</div>';
         return $html;
     }
-    
+
     /**
      * Render select/radio field with option label
      */
     public function renderSelectField($value, $fieldConfig, $locale)
     {
         if (!$value) return '<span class="text-muted">—</span>';
-    
+
         // Check if using predefined data source
         if (!empty($fieldConfig['data_source'])) {
             return '<span style="display: inline-block; padding: 6px 12px; background: #3498db; color: white; border-radius: 4px; font-size: 14px;">' . htmlspecialchars($value) . '</span>';
         }
-    
+
         // Check custom options
         if (!empty($fieldConfig['options']) && is_array($fieldConfig['options'])) {
             foreach ($fieldConfig['options'] as $option) {
@@ -737,10 +864,10 @@ class FormRequestController extends MainController
                 }
             }
         }
-    
+
         return '<span style="display: inline-block; padding: 6px 12px; background: #3498db; color: white; border-radius: 4px; font-size: 14px;">' . htmlspecialchars($value) . '</span>';
     }
-    
+
     /**
      * Render checkbox field (multiple values)
      */
@@ -748,9 +875,9 @@ class FormRequestController extends MainController
     {
         $values = is_array($value) ? $value : [$value];
         if (empty($values)) return '<span class="text-muted">—</span>';
-    
+
         $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">';
-    
+
         foreach ($values as $val) {
             if (!empty($fieldConfig['options']) && is_array($fieldConfig['options'])) {
                 foreach ($fieldConfig['options'] as $option) {
@@ -764,11 +891,11 @@ class FormRequestController extends MainController
             }
             $html .= '<span style="display: inline-block; padding: 6px 12px; background: #2ecc71; color: white; border-radius: 4px; font-size: 13px;">' . htmlspecialchars($val) . '</span>';
         }
-    
+
         $html .= '</div>';
         return $html;
     }
-    
+
     /**
      * Render date field
      */
@@ -781,7 +908,7 @@ class FormRequestController extends MainController
             return '<span>' . htmlspecialchars($value) . '</span>';
         }
     }
-    
+
     /**
      * Render textarea field
      */
@@ -789,7 +916,7 @@ class FormRequestController extends MainController
     {
         return '<div style="padding: 12px; background: #f8f9fa; border-left: 4px solid #3498db; border-radius: 4px; white-space: pre-wrap; line-height: 1.6; color: #2c3e50;">' . htmlspecialchars($value) . '</div>';
     }
-    
+
     /**
      * Render email field
      */
@@ -797,7 +924,7 @@ class FormRequestController extends MainController
     {
         return '<a href="mailto:' . htmlspecialchars($value) . '" style="color: #3498db; text-decoration: none; font-weight: 500;"><i class="fa fa-envelope" style="margin-right: 6px;"></i>' . htmlspecialchars($value) . '</a>';
     }
-    
+
     /**
      * Render phone field
      */
@@ -805,7 +932,7 @@ class FormRequestController extends MainController
     {
         return '<a href="tel:' . htmlspecialchars($value) . '" style="color: #27ae60; text-decoration: none; font-weight: 500;"><i class="fa fa-phone" style="margin-right: 6px;"></i>' . htmlspecialchars($value) . '</a>';
     }
-    
+
     /**
      * Render custom widget field
      */
@@ -814,10 +941,10 @@ class FormRequestController extends MainController
         if (!is_array($value)) {
             return '<span>' . htmlspecialchars($value) . '</span>';
         }
-    
+
         $html = '<div style="padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; margin-top: 5px;">';
         $html .= '<ul style="list-style: none; padding: 0; margin: 0;">';
-        
+
         foreach ($value as $key => $val) {
             if (is_array($val)) {
                 $html .= '<li style="margin-bottom: 10px;"><strong style="color: #856404;">' . htmlspecialchars($key) . ':</strong>';
@@ -831,38 +958,39 @@ class FormRequestController extends MainController
                 $html .= '<li style="margin-bottom: 5px;"><strong style="color: #856404;">' . htmlspecialchars($key) . ':</strong> <span style="color: #2c3e50;">' . htmlspecialchars($val) . '</span></li>';
             }
         }
-        
+
         $html .= '</ul></div>';
         return $html;
     }
-    
+
     /**
      * Fallback: Render simple data for unknown templates
      */
     public function renderSimpleData($data)
     {
         $html = '<div class="simple-data-display" style="padding: 20px;">';
-        
+
         foreach ($data as $key => $value) {
             $html .= '<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
             $html .= '<strong style="color: #2c3e50;">' . htmlspecialchars(str_replace('_', ' ', ucwords($key))) . ':</strong> ';
-            
+
             if (is_array($value)) {
                 $html .= '<pre style="background: white; padding: 10px; border-radius: 4px; margin-top: 8px; border: 1px solid #ddd; overflow-x: auto;">' . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
             } elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
-                $url = asset('storage/' . $value);
+//                $url = asset('storage/' . $value);
+                $url = getImagePath($value);
                 $html .= '<br><img src="' . $url . '" style="max-width: 200px; max-height: 200px; border-radius: 6px; margin-top: 8px; border: 2px solid #ddd;"/>';
             } else {
                 $html .= '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
             }
-            
+
             $html .= '</div>';
         }
-        
+
         $html .= '</div>';
         return $html;
     }
-    
+
     /**
      * Get icon for file type
      */
@@ -880,7 +1008,7 @@ class FormRequestController extends MainController
             'rar' => 'file-archive',
             'txt' => 'file-text',
         ];
-    
+
         return $icons[$extension] ?? 'file';
     }
 }

@@ -2,6 +2,7 @@
 
 namespace  Modules\Form\Http\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Bd;
 
 use App\Models\Agency;
@@ -49,7 +50,7 @@ class FormTemplateController extends Controller
 
     public function create()
     {
-        
+
         $template = new FormTemplate();
         return view('Form::form-templates.create', compact('template'));
     }
@@ -162,17 +163,16 @@ class FormTemplateController extends Controller
             'description' => 'nullable|array',
             'sections' => 'required|array',
         ]);
-        
         // Update form template basic info
         $formTemplate->update([
             'title' => $request->title,
             'form_type' => $request->form_type,
             'description' => $request->description,
         ]);
-    
+
         // Delete old sections and fields (cascade will handle fields)
         $formTemplate->sections()->delete();
-    
+
         // Create new sections and fields
         if ($request->has('sections')) {
             foreach ($request->sections as $sectionData) {
@@ -182,8 +182,9 @@ class FormTemplateController extends Controller
                     'title' => $sectionData['title'],
                     'section_order' => $sectionData['order'],
                     'is_visible' => true,
+                    'can_not_delete' =>$sectionData['can_not_delete']
                 ]);
-    
+
                 // Create fields for this section
                 if (isset($sectionData['fields'])) {
                     foreach ($sectionData['fields'] as $fieldData) {
@@ -192,7 +193,7 @@ class FormTemplateController extends Controller
                         $dataSource = null;
                         $widgetId = null;
                         $widgetConfig = null;
-    
+
                         // ============================================
                         // Handle Custom Widget Fields
                         // ============================================
@@ -209,14 +210,14 @@ class FormTemplateController extends Controller
                         elseif (in_array($fieldType, ['select', 'checkbox', 'radio'])) {
                             // Check if options_type is provided
                             if (isset($fieldData['options_type'])) {
-                                
+
                                 // Custom Options
                                 if ($fieldData['options_type'] === 'custom') {
                                     // Process custom options from the form
                                     // Format: sections[X][fields][Y][options][Z][label][locale] & [value]
                                     if (isset($fieldData['options']) && is_array($fieldData['options'])) {
                                         $processedOptions = [];
-                                        
+
                                         foreach ($fieldData['options'] as $optionData) {
                                             if (isset($optionData['value']) && !empty($optionData['value'])) {
                                                 $processedOptions[] = [
@@ -225,7 +226,7 @@ class FormTemplateController extends Controller
                                                 ];
                                             }
                                         }
-                                        
+
                                         $options = !empty($processedOptions) ? $processedOptions : null;
                                     }
                                 }
@@ -239,7 +240,7 @@ class FormTemplateController extends Controller
                                 $dataSource = $fieldData['data_source'];
                             }
                         }
-    
+
                         // ============================================
                         // Create Field Record
                         // ============================================
@@ -256,12 +257,13 @@ class FormTemplateController extends Controller
                             'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
                             'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
                             'field_order' => $fieldData['order'],
+                            'can_not_delete' =>  $fieldData['can_not_delete']
                         ]);
                     }
                 }
             }
         }
-    
+
         admin_success(__('Form template updated successfully!'));
         return redirect(admin_url('form-templates'));
     }
@@ -280,39 +282,39 @@ class FormTemplateController extends Controller
         $type = $request->query('type');
         $linkToken = $request->query('token');
         $defaultLang = $request->query('lang') ?? app()->getLocale();
-    
+
         if (empty($linkToken)) {
             return response()->view('Form::forms.invalid', [
                 'message' => 'Access denied. Please provide a valid token.',
             ], 403);
         }
-    
+
         $token = PersonalAccessToken::findToken($linkToken);
         if (!$token) {
             return response()->view('Form::forms.invalid', [
                 'message' => 'Invalid or expired token.',
             ], 403);
         }
-    
+
         $user = $token->tokenable;
-      
+
         if (!$user) {
             return response()->view('Form::forms.invalid', [
                 'message' => 'User not found for this token.',
             ], 403);
         }
-    
+
         $locale = $request->header('Accept-Language', $defaultLang);
         $locale = in_array($locale, ['ar', 'en', 'tr', 'hi']) ? $locale : $defaultLang;
         app()->setLocale($locale);
-    
+
         $template = FormTemplate::with(['sections.fields'])
             ->where('form_type', $type)
             ->where('is_active', true)
             ->firstOrFail();
-    
+
         return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken', 'user'));
-    
+
     }
 
 
@@ -321,22 +323,24 @@ class FormTemplateController extends Controller
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
         $data = $request->except('_token');
-        foreach ($request->files as $key => $fileInput) {
+        foreach ($request->file() as $key => $fileInput) {
             if (is_array($fileInput)) {
                 $storedFiles = [];
                 foreach ($fileInput as $file) {
                     if ($file && $file->isValid()) {
-                        $file->storeAs('data', $file->getClientOriginalName());
-                        $storedFiles[] = $file->getClientOriginalName();
+                        $storedFiles[] = Common::upload('data', $file);
                     }
                 }
                 $data[$key] = $storedFiles;
             } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
-                $fileInput->storeAs('data', $fileInput->getClientOriginalName());
-                $data[$key] = $fileInput->getClientOriginalName();
+                $path = Common::upload('data', $fileInput);
+                $data[$key] = $path;
+            } else {
+                info("Unexpected file input type for {$key}");
+                info('Type: ' . gettype($fileInput));
+                info('Class: ' . (is_object($fileInput) ? get_class($fileInput) : 'not object'));
             }
         }
-
         FormRequest::create([
             'form_template_id' => $template->id,
             'submitted_by' => $request->user_id,
@@ -395,7 +399,7 @@ class FormTemplateController extends Controller
     {
         $query = $request->get('query');
         $lang = $request->get('lang') ?? app()->getLocale();
-    
+
         app()->setLocale($lang);
         $bds = Bd::where('name', 'like', "%{$query}%")
             ->orWhere('id', 'like', "%{$query}%")

@@ -446,31 +446,57 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                     {{-- Select --}}
                                     @elseif ($field->field_type === 'select')
                                         @php
-                                            $options = is_array($field->options) 
-                                                ? $field->options 
+                                            $options = is_array($field->options)
+                                                ? $field->options
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
-                                               
 
+                                            $data = [];
+
+                                            if (!empty($field->data_source)) {
+                                                switch ($field->data_source) {
+                                                    case 'countries':
+                                                        $data = \App\Models\Country::select('id', 'name')->get();
+                                                        break;
+                                                    case 'cities':
+                                                        $data = \App\Models\City::select('id', 'name')->get();
+                                                        break;
+                                                    case 'languages':
+                                                        $data = \App\Models\Language::select('id', 'name')->get();
+                                                        break;
+                                                    case 'currencies':
+                                                        $data = \App\Models\Currency::select('id', 'name')->get();
+                                                        break;
+                                                }
+                                            }
                                         @endphp
+
                                         <select 
                                             name="{{ $field->field_name }}"
                                             class="form-select"
                                             @required($field->is_required)>
                                             <option value="">-- {{ __('Select') }} --</option>
-                                            @foreach ($options as $key => $value)
 
-                                                @php
-                                                
-                                              
-                                                $displayValue = is_array($value) 
+                                            @if (!empty($options))
+                                                @foreach ($options as $key => $value)
+                                                    @php
+                                                        $displayValue = is_array($value)
                                                             ? ($value['label'][$currentLocale] ?? $value['label']['en'] ?? $value['value'] ?? $key)
                                                             : $value;
-                                                @endphp
-                                                <option value="{{ $key }}">{{ $displayValue }}</option>
-                                            @endforeach
+                                                    @endphp
+                                                    <option value="{{ $key }}">{{ $displayValue }}</option>
+                                                @endforeach
+                                            @endif
+
+                                            @if (!empty($data))
+                                                @foreach ($data as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
 
                                     {{-- Radio --}}
+                                  
+                                  
                                     @elseif ($field->field_type === 'radio')
                                         @php
                                             $options = is_array($field->options) 
@@ -700,11 +726,11 @@ document.addEventListener('DOMContentLoaded', function () {
             { name: 'work_duration', type: 'number', placeholder: "{{ __('Work Duration (months)') }}" }
         ];
 
-        let html = `<div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
+        let html = `<div style="width: 100%;" class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" style="min-width:250px">`;
 
         fields.forEach(field => {
             html += `
-                <div class="flex-grow-1">
+                <div class="flex-grow-1" style="width: 41%;">
                     <input type="${field.type}" 
                         name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
                         class="form-control form-control-sm mb-1"

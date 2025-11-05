@@ -16,6 +16,8 @@
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
     "App": "التطبيق",
+    "Form Details": "تفاصيل النموذج",
+    "Additional Fields": "حقول إضافية",
    "Dedicated successfully": "تم الإهداء بنجاح",
 "Something went wrong": "حدث خطأ ما",
 "professional BD": "خبير العلاقات العامة",
@@ -4149,7 +4151,7 @@
     "Agencies Achieved Targets": "الوكالات التي حققت الأهداف",
     "Diamonds Achieved by Hosts": "الألماس الذي حققه المضيفون",
     "User Signups Comparison (Weeks)": "مقارنة تسجيلات المستخدمين (أسابيع)",
-  
+
     "Form Request": "طلب النموذج",
     "Browse form request": "تصفح طلبات النماذج",
     "Type switch form request": "تبديل نوع طلب النموذج",
@@ -4388,10 +4390,11 @@
   "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "العناصر المخصصة توفر واجهة مستخدم متخصصة (محدد مدير الأعمال، محدد المستخدم، إلخ)",
   "Choose a widget": "اختر عنصراً",
   "form_bd_bio":"أهلاً وسهلاً! معي ستتعلم أسرار النجاح في عالم البث المباشر. لدي خبرة واسعة في تدريب الوكالات الناجحة. أعدك بمتابعة يومية ودعم لا محدود حتى تصل للقمة!"
+,    "Application Name": "اسم التطبيق",
+    "Work Duration (months)": "مدة العمل (بالأشهر)"
 
 
 
-  
 
 
 
