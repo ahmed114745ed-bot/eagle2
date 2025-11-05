@@ -3,406 +3,639 @@ $currentLocale = $locale ?? app()->getLocale();
 $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @endphp
 
-<div class="container py-5 form-container" data-current-locale="{{ $currentLocale }}" dir="{{ $direction }}">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary mb-0">
-            {{ $template->getTranslation('title', $currentLocale) }}
+<div class="form-preview-container" data-current-locale="{{ $currentLocale }}" dir="{{ $direction }}">
+    
+    {{-- Form Header --}}
+@php
+    $isRtl = in_array(app()->getLocale(), ['ar', 'he', 'ur']);
+@endphp
+
+<div class="form-header mb-5" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+
+        {{-- عنوان النموذج --}}
+        <h2 class="form-title mb-0 d-flex align-items-center text-primary fw-bold">
+            <i class="fa fa-file-text {{ $isRtl ? 'ms-2' : 'me-2' }}"></i>
+            {{ $template->getTranslation('title', app()->getLocale()) }}
         </h2>
 
+        {{-- زر تعديل --}}
+        <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
+           class="btn btn-primary d-flex align-items-center mt-2 mt-md-0">
+            <i class="fa fa-edit {{ $isRtl ? 'ms-2' : 'me-2' }}"></i>
+            {{ __('Edit Form') }}
+        </a>
+    </div>
+
+    <hr class="border-2 border-primary opacity-75">
 </div>
 
-@if($template->getTranslation('description', $currentLocale))
-    <div class="card mb-5 border-info shadow-sm">
-        <div class="card-body bg-light">
-            <h5 class="card-title text-primary mb-3">
-                <i class="fa fa-info-circle me-2"></i>{{ __('Form Description') }}
-            </h5>
-            <p class="card-text fs-5 text-muted" style="white-space: pre-line;">
-                {{ $template->getTranslation('description', $currentLocale) }}
-            </p>
-        </div>
+        @if($template->getTranslation('description', $currentLocale))
+            <div class="alert  border-0 shadow-sm">
+                <div class="d-flex align-items-start">
+                    <i class="fa fa-info-circle fa-lg me-3 mt-1 text-info"></i>
+                    <div>
+                        <h5 class="alert-heading mb-2">{{ __('Form Description') }}</h5>
+                        <p class="mb-0" style="white-space: pre-line;">
+                            {{ $template->getTranslation('description', $currentLocale) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
-@endif
 
-@foreach ($template->sections as $section)
-    <div class="card mb-5 shadow-sm">
-        <div class="card-header bg-primary text-white">
-            {{ $section->getTranslation('title', $currentLocale) }}
-        </div>
-        <div class="card-body">
-            @if($section->description)
-                <p class="text-muted mb-3">{{ $section->getTranslation('description', $currentLocale) }}</p>
-            @endif
+    {{-- Form Sections --}}
+    @foreach ($template->sections as $section)
+        <div class="section-card mb-4">
+            <div class="section-header">
+                <i class="fa fa-folder-open me-2"></i>
+                {{ $section->getTranslation('title', $currentLocale) }}
+            </div>
+            
+            <div class="section-body">
+                @if($section->description)
+                    <p class="section-description">
+                        {{ $section->getTranslation('description', $currentLocale) }}
+                    </p>
+                @endif
 
-            <div class="row">
-                @foreach ($section->fields as $field)
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label fw-bold">
-                            {{ $field->getTranslation('field_label', $currentLocale) }}
-                            @if($field->is_required)
-                                <span class="text-danger">*</span>
-                            @endif
-                        </label>
+                <div class="row g-4">
+                    @foreach ($section->fields as $field)
+                        @if($field->is_enabled)
+                            <div class="col-md-6">
+                                <div class="field-group">
+                                    <label class="field-label">
+                                        {{ $field->getTranslation('field_label', $currentLocale) }}
+                                        @if($field->is_required)
+                                            <span class="text-danger ms-1">*</span>
+                                        @endif
+                                    </label>
 
-                        @php
-                            $options = is_array($field->options) 
-                                ? $field->options 
-                                : (is_string($field->options) ? json_decode($field->options, true) : []);
-                        @endphp
+                                    @php
+                                        $placeholder = $field->getTranslation('placeholder', $currentLocale);
+                                        $helpText = $field->help_text ? $field->getTranslation('help_text', $currentLocale) : null;
+                                    @endphp
 
-                        {{-- Preview mode for each field type --}}
-                        @switch($field->field_type)
-                            @case('textarea')
-                                <textarea class="form-control" rows="3" placeholder="{{ $field->getTranslation('placeholder', $currentLocale) }}" disabled></textarea>
-                                @break
+                                    {{-- Render Field Based on Type --}}
+                                    @switch($field->field_type)
+                                        
+                                        {{-- Text Input --}}
+                                        @case('text')
+                                        @case('email')
+                                        @case('number')
+                                        @case('tel')
+                                            <input 
+                                                type="{{ $field->field_type }}"
+                                                class="form-control preview-field"
+                                                placeholder="{{ $placeholder }}"
+                                                disabled>
+                                            @break
 
-                            @case('select')
-                                <select class="form-select" disabled>
-                                    <option value="">-- {{ __('Select') }} --</option>
-                                    @foreach ($options as $key => $value)
-                                        @php
-                                            $displayValue = is_array($value) ? ($value[$currentLocale] ?? $value['en'] ?? $key) : $value;
-                                        @endphp
-                                        <option value="{{ $key }}">{{ $displayValue }}</option>
-                                    @endforeach
-                                </select>
-                                @break
+                                        {{-- Date Input --}}
+                                        @case('date')
+                                            <input 
+                                                type="date"
+                                                class="form-control preview-field"
+                                                disabled>
+                                            @break
 
-                            @case('checkbox')
-                                <div class="checkbox-group">
-                                    @foreach ($options as $key => $value)
-                                        @php
-                                            $displayValue = is_array($value) ? ($value[$currentLocale] ?? $value['en'] ?? $key) : $value;
-                                        @endphp
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" disabled>
-                                            <label class="form-check-label">{{ $displayValue }}</label>
+                                        {{-- Textarea --}}
+                                        @case('textarea')
+                                            <textarea 
+                                                class="form-control preview-field" 
+                                                rows="4" 
+                                                placeholder="{{ $placeholder }}"
+                                                disabled></textarea>
+                                            @break
+
+                                        {{-- File Upload --}}
+                                        @case('file')
+                                            <div class="file-upload-preview">
+                                                <input type="file" class="form-control" disabled>
+                                                <small class="text-muted mt-1 d-block">
+                                                    <i class="fa fa-upload me-1"></i>
+                                                    {{ __('Click to upload file') }}
+                                                </small>
+                                            </div>
+                                            @break
+
+                                        {{-- Select Dropdown --}}
+                                        @case('select')
+                                            @if(!empty($field->data_source))
+                                                {{-- Predefined Data Source --}}
+                                                <select class="form-select preview-field" disabled>
+                                                    <option value="">-- {{ __('Select') }} --</option>
+                                                    <option disabled>{{ __('Loading from') }}: {{ ucfirst($field->data_source) }}</option>
+                                                </select>
+                                                <small class="text-muted mt-1 d-block">
+                                                    <i class="fa fa-database me-1"></i>
+                                                    {{ __('Data Source') }}: <strong>{{ ucfirst($field->data_source) }}</strong>
+                                                </small>
+                                            @elseif(!empty($field->options))
+                                                {{-- Custom Options --}}
+                                                <select class="form-select preview-field" disabled>
+                                                    <option value="">-- {{ __('Select') }} --</option>
+                                                    @foreach ($field->options as $option)
+                                                        @php
+                                                            $label = $option['label'] ?? [];
+                                                            $value = $option['value'] ?? '';
+                                                            $displayLabel = is_array($label) 
+                                                                ? ($label[$currentLocale] ?? $label['en'] ?? $value)
+                                                                : $label;
+                                                        @endphp
+                                                        <option value="{{ $value }}">{{ $displayLabel }}</option>
+                                                    @endforeach
+                                                </select>
+                                            @else
+                                                <select class="form-select preview-field" disabled>
+                                                    <option value="">-- {{ __('No options available') }} --</option>
+                                                </select>
+                                            @endif
+                                            @break
+
+                                        {{-- Radio Buttons --}}
+                                        @case('radio')
+                                            <div class="radio-group">
+                                                @if(!empty($field->data_source))
+                                                    {{-- Predefined Data Source --}}
+                                                    <div class="alert alert-secondary py-2 px-3 mb-0">
+                                                        <i class="fa fa-database me-2"></i>
+                                                        {{ __('Options loaded from') }}: <strong>{{ ucfirst($field->data_source) }}</strong>
+                                                    </div>
+                                                @elseif(!empty($field->options))
+                                                    {{-- Custom Options --}}
+                                                    @foreach ($field->options as $option)
+                                                        @php
+                                                            $label = $option['label'] ?? [];
+                                                            $value = $option['value'] ?? '';
+                                                            $displayLabel = is_array($label) 
+                                                                ? ($label[$currentLocale] ?? $label['en'] ?? $value)
+                                                                : $label;
+                                                        @endphp
+                                                        <div class="form-check">
+                                                            <input 
+                                                                type="radio" 
+                                                                class="form-check-input" 
+                                                                name="radio_{{ $field->id }}"
+                                                                id="radio_{{ $field->id }}_{{ $loop->index }}"
+                                                                disabled>
+                                                            <label class="form-check-label" for="radio_{{ $field->id }}_{{ $loop->index }}">
+                                                                {{ $displayLabel }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <p class="text-muted mb-0">{{ __('No options available') }}</p>
+                                                @endif
+                                            </div>
+                                            @break
+
+                                        {{-- Checkboxes --}}
+                                        @case('checkbox')
+                                            <div class="checkbox-group">
+                                                @if(!empty($field->data_source))
+                                                    {{-- Predefined Data Source --}}
+                                                    <div class="alert alert-secondary py-2 px-3 mb-0">
+                                                        <i class="fa fa-database me-2"></i>
+                                                        {{ __('Options loaded from') }}: <strong>{{ ucfirst($field->data_source) }}</strong>
+                                                    </div>
+                                                @elseif(!empty($field->options))
+                                                    {{-- Custom Options --}}
+                                                    @foreach ($field->options as $option)
+                                                        @php
+                                                            $label = $option['label'] ?? [];
+                                                            $value = $option['value'] ?? '';
+                                                            $displayLabel = is_array($label) 
+                                                                ? ($label[$currentLocale] ?? $label['en'] ?? $value)
+                                                                : $label;
+                                                        @endphp
+                                                        <div class="form-check">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                class="form-check-input"
+                                                                id="checkbox_{{ $field->id }}_{{ $loop->index }}"
+                                                                disabled>
+                                                            <label class="form-check-label" for="checkbox_{{ $field->id }}_{{ $loop->index }}">
+                                                                {{ $displayLabel }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <p class="text-muted mb-0">{{ __('No options available') }}</p>
+                                                @endif
+                                            </div>
+                                            @break
+
+                                        {{-- Custom Widget --}}
+                                        @case('custom')
+                                            @php
+                                                $widget = \Modules\Form\Entities\CustomFieldWidget::find($field->widget_id);
+                                                $widgetName = $widget ? ($widget->widget_name[$currentLocale] ?? $widget->widget_name['en'] ?? $widget->widget_type) : 'Custom Widget';
+                                            @endphp
+                                            <div class="custom-widget-preview">
+                                                <div class="alert alert-warning border-0 mb-0">
+                                                    <div class="d-flex align-items-start">
+                                                        <i class="fa fa-puzzle-piece fa-2x me-3 text-warning"></i>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="alert-heading mb-2">
+                                                                {{ __('Custom Widget') }}: {{ $widgetName }}
+                                                            </h6>
+                                                            @if($widget && $widget->description)
+                                                                <p class="mb-2 small">
+                                                                    {{ $widget->description[$currentLocale] ?? $widget->description['en'] ?? '' }}
+                                                                </p>
+                                                            @endif
+                                                            <div class="widget-example-items">
+                                                                <div class="list-group list-group-flush">
+                                                                    <div class="list-group-item d-flex justify-content-between align-items-center bg-white">
+                                                                        <span><i class="fa fa-check-circle text-success me-2"></i>{{ __('Example Item') }} 1</span>
+                                                                        <span class="badge bg-secondary">{{ __('Sample') }}</span>
+                                                                    </div>
+                                                                    <div class="list-group-item d-flex justify-content-between align-items-center bg-white">
+                                                                        <span><i class="fa fa-check-circle text-success me-2"></i>{{ __('Example Item') }} 2</span>
+                                                                        <span class="badge bg-secondary">{{ __('Sample') }}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <button class="btn btn-sm btn-outline-warning mt-2" disabled>
+                                                                    <i class="fa fa-plus me-1"></i>{{ __('Add More') }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @break
+
+                                        {{-- Default/Unknown Type --}}
+                                        @default
+                                            <input 
+                                                type="text"
+                                                class="form-control preview-field"
+                                                placeholder="{{ $placeholder }}"
+                                                disabled>
+                                    @endswitch
+
+                                    {{-- Help Text --}}
+                                    @if($helpText)
+                                        <div class="field-help-text">
+                                            <i class="fa fa-question-circle me-1"></i>
+                                            {{ $helpText }}
                                         </div>
-                                    @endforeach
+                                    @endif
                                 </div>
-                                @break
-
-                            @case('radio')
-                                <div class="radio-group">
-                                    @foreach ($options as $key => $value)
-                                        @php
-                                            $displayValue = is_array($value) ? ($value[$currentLocale] ?? $value['en'] ?? $key) : $value;
-                                        @endphp
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" disabled>
-                                            <label class="form-check-label">{{ $displayValue }}</label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                @break
-
-                            @case('file')
-                                <input type="file" class="form-control" disabled>
-                                @break
-
-                            @case('custom')
-                                <div class="border rounded p-3 bg-light">
-                                    <p class="text-muted mb-2">
-                                        <i class="fa fa-plus-circle me-2 text-secondary"></i>
-                                        {{ __('Custom Field List (Example)') }}
-                                    </p>
-                                    <ul class="list-group" id="custom-list-{{ $section->id }}-{{ $field->id }}">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>{{ __('Custom Item 1') }}</span>
-                                            <span class="badge bg-secondary">{{ __('Example') }}</span>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>{{ __('Custom Item 2') }}</span>
-                                            <span class="badge bg-secondary">{{ __('Example') }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                @break
-
-                            @default
-                                <input 
-                                    type="{{ $field->field_type }}"
-                                    class="form-control"
-                                    placeholder="{{ $field->getTranslation('placeholder', $currentLocale) }}"
-                                    disabled>
-                        @endswitch
-
-                        @if($field->help_text)
-                            <div class="form-text text-muted mt-1">
-                                <i class="fa fa-question-circle me-1"></i>
-                                {{ $field->getTranslation('help_text', $currentLocale) }}
                             </div>
                         @endif
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
+    @endforeach
+
+    {{-- Preview Notice --}}
+    <div class="alert alert-light border shadow-sm mt-4">
+        <div class="d-flex align-items-center">
+            
+        </div>
     </div>
-@endforeach
-
-
-
 
 </div>
+
 <style>
-    .form-container {
-        max-width: 950px;
-        margin: 0 auto;
-    }
 
-    .card {
-        border-radius: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: none;
-        overflow: hidden;
-    }
+.form-header {
+    /* background: #f8fafc; */
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 2px solid #cce0ff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
 
-    .card-header {
-        font-size: 1.2rem;
-        font-weight: 600;
-        background: linear-gradient(90deg, #f8f9fa 0%, #eef2f7 100%);
-        color: #333;
-        border-bottom: 2px solid #dee2e6;
-        padding: 1rem 1.25rem;
-    }
+.form-title {
+    font-size: 1.6rem;
+    color: #004085;
+}
 
-    .card-body {
-        background-color: #fff;
-        padding: 1.5rem;
-    }
+.btn-primary {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+}
 
-    .form-label {
-        display: block;
-        font-weight: 600;
-        color: #222;
-        margin-bottom: 6px;
-        font-size: 0.95rem;
-    }
+.btn-primary i {
+    font-size: 1.1rem;
+}
 
-    .form-control, .form-select, textarea {
-        border-radius: 10px;
-        padding: 10px 14px;
-        border: 1px solid #ced4da;
-        transition: all 0.25s ease;
-        width: 100%;
-    }
+.btn-primary:hover {
+    background-color: #0056b3 !important;
+}
 
-    .form-control:focus, .form-select:focus, textarea:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
-    }
-
-    .field-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.25rem;
-    }
-
-    .field-col {
-        flex: 1 1 calc(50% - 1.25rem);
-        min-width: 260px;
-    }
-
-    @media (max-width: 767px) {
-        .field-col {
-            flex: 1 1 100%;
-        }
-    }
-
-    button[type="submit"] {
-        border-radius: 10px;
-        padding: 12px 30px;
-        font-weight: 600;
-        font-size: 1.05rem;
-        background-color: #0d6efd;
-        border: none;
-        transition: all 0.25s ease;
-    }
-
-    button[type="submit"]:hover {
-        background-color: #0b5ed7;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(13,110,253,0.3);
-    }
-
-    h2.text-primary {
-        font-weight: 700;
-        color: #0d6efd !important;
-        letter-spacing: 0.5px;
-    }
-
-    /* زر اللغة */
-    .lang-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 6px 14px;
-        background-color: #f8f9fa;
-        cursor: pointer;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-
-    .lang-toggle:hover {
-        background-color: #e9ecef;
-    }
-
-    .lang-toggle i {
-        color: #0d6efd;
-    }
-    .btn-style {
-        border: 2px solid blue;
-        border-radius: 10px;
-        background: blue;
-        width: 17%;
-        color: white;
-    }
-
-    /* ======== Container & Layout ======== */
-.form-container {
+============================================ */
+.back-btn{
+    position: relative;
+    right: 90%;
+    margin: 10px;
+}
+/* ============================================
+   Form Preview Container
+============================================ */
+.form-preview-container {
     max-width: 1200px;
-    margin: auto;
+    margin: 0 auto;
+    padding: 2rem 1rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ======== Cards ======== */
-.card {
-    border-radius: 10px;
-    transition: all 0.3s ease;
+/* ============================================
+   Form Header
+============================================ */
+.form-header .form-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 2rem;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.card-header {
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-/* ======== Form Fields ======== */
-.form-control {
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
-}
-
-/* Textareas */
-textarea.form-control {
-    resize: vertical;
-}
-
-/* ======== Selects ======== */
-.form-select {
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-}
-
-/* ======== Buttons ======== */
-.btn {
-    border-radius: 8px;
-    padding: 0.6rem 1.2rem;
-    font-size: 1rem;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* ======== Labels ======== */
-.form-label {
-    font-weight: 500;
-    margin-bottom: 0.4rem;
-}
-
-/* ======== Search Results Cards ======== */
-#search-results .card {
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-#search-results .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
-
-#search-results .card-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-/* ======== Badges ======== */
-.badge {
+.form-header .alert-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
     border-radius: 12px;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.85rem;
 }
 
-/* ======== Images in Fields ======== */
-input[type="file"] {
-    padding: 0.5rem;
+.form-header .alert-heading {
+    color: #1976d2;
+    font-weight: 600;
 }
 
-input[type="file"]::-webkit-file-upload-button {
+/* ============================================
+   Section Cards
+============================================ */
+.section-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    padding: 1.25rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-body {
+    padding: 2rem 1.5rem;
+}
+
+.section-description {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+    border-radius: 6px;
+}
+
+/* ============================================
+   Field Groups
+============================================ */
+.field-group {
+    margin-bottom: 0;
+}
+
+.field-label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.field-help-text {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: flex;
+    align-items: start;
+}
+
+.field-help-text i {
+    margin-top: 2px;
+}
+
+/* ============================================
+   Form Controls (Preview Mode)
+============================================ */
+.preview-field,
+.form-control:disabled,
+.form-select:disabled {
+    /* background-color: #f8f9fa; */
+    border: 2px solid #e9ecef;
+    color: #495057;
+    cursor: not-allowed;
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+}
+
+.preview-field:focus,
+.form-control:disabled:focus {
+    border-color: #dee2e6;
+    box-shadow: none;
+}
+
+textarea.preview-field {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ============================================
+   Radio & Checkbox Groups
+============================================ */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-check {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.form-check:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    cursor: not-allowed;
+}
+
+.form-check-input:disabled {
+    opacity: 0.6;
+}
+
+.form-check-label {
+    font-size: 0.95rem;
+    color: #495057;
+    cursor: not-allowed;
+    margin-left: 0.5rem;
+}
+
+/* ============================================
+   Custom Widget Preview
+============================================ */
+.custom-widget-preview .alert {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.custom-widget-preview .list-group-item {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.custom-widget-preview .widget-example-items {
+    margin-top: 1rem;
+}
+
+/* ============================================
+   File Upload Preview
+============================================ */
+.file-upload-preview input[type="file"] {
+    cursor: not-allowed;
+}
+
+.file-upload-preview input[type="file"]::-webkit-file-upload-button {
+    background: #6c757d;
+    color: white;
     border: none;
-    background-color: #0d6efd;
-    color: #fff;
     padding: 0.5rem 1rem;
     border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
-input[type="file"]::-webkit-file-upload-button:hover {
-    background-color: #0b5ed7;
-    transform: translateY(-1px);
+/* ============================================
+   Badges & Alerts
+============================================ */
+.badge {
+    padding: 0.4rem 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
 }
 
-/* ======== Responsive Adjustments ======== */
+.alert {
+    border-radius: 10px;
+}
+
+.alert-secondary {
+    /* background-color: #f8f9fa; */
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+}
+
+/* ============================================
+   Responsive Design
+============================================ */
 @media (max-width: 768px) {
-    .form-container {
-        padding: 0 1rem;
+    .form-preview-container {
+        padding: 1rem 0.5rem;
     }
-    #search-results .col-md-6, #search-results .col-lg-4 {
+
+    .form-header .form-title {
+        font-size: 1.5rem;
+    }
+
+    .section-header {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .section-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .col-md-6 {
         flex: 0 0 100%;
         max-width: 100%;
     }
 }
-</style>
-<style>
 
+/* ============================================
+   RTL Support
+============================================ */
+[dir="rtl"] .form-preview-container {
+    text-align: right;
+}
 
-@media (min-width: 1200px) {
-    .container {
-        width: 100% !important;
+[dir="rtl"] .field-help-text i {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+[dir="rtl"] .form-check-label {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+/* ============================================
+   Print Styles
+============================================ */
+@media print {
+    .form-preview-container {
+        max-width: 100%;
+    }
+
+    .section-card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+        page-break-inside: avoid;
+    }
+
+    .badge,
+    .alert:last-child {
+        display: none;
     }
 }
-    /* .form-container {
-        background: #f9fafb;
-        border-radius: 12px;
+
+/* ============================================
+   Animation
+============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
     }
-    .form-label {
-        color: #0d6efd;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .form-control:disabled, .form-select:disabled {
-        background: #f3f3f3;
-        cursor: not-allowed;
-    }
-    .card-header {
-        font-weight: bold;
-    } */
+}
+
+.section-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.section-card:nth-child(1) { animation-delay: 0.1s; }
+.section-card:nth-child(2) { animation-delay: 0.2s; }
+.section-card:nth-child(3) { animation-delay: 0.3s; }
+.section-card:nth-child(4) { animation-delay: 0.4s; }
 </style>
