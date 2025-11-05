@@ -1,6 +1,7 @@
 <?php
 
 use KevinSoft\MultiLanguage\MultiLanguage;
+
 use Modules\AreaManager\Http\Controllers\BdController;
 use Modules\AreaManager\Http\Controllers\AuthController;
 use Modules\AreaManager\Http\Controllers\HomeController;
@@ -13,6 +14,7 @@ use Modules\AreaManager\Http\Controllers\WalletController;
 use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
+
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
@@ -66,7 +68,7 @@ Route::group(
 Route::group(
     [
         'prefix' => 'areaManager',
-        'namespace' => 'App\\AreaManager\\Controllers',
+        'namespace' => 'Modules\\AreaManager\\Http\\Controllers',
         'middleware' => [
             'web',
             'admin.auth',

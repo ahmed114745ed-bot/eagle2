@@ -1,6 +1,6 @@
 <?php
 
-use Modules\AreaManager\Http\Controllers;
+namespace Modules\AreaManager\Http\Controllers;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
