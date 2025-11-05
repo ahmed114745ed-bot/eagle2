@@ -19,7 +19,10 @@ use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
+use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
 use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
+use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
+use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +39,30 @@ Route::prefix('areaManager')->name('areaManager.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
+
+
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'Modules\\AreaManager\\Http\\Controllers\\Admin',
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function () {
+        Route::resource('area-manager-users', AdminAreaManagerController::class);
+       
+
+        Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
+        Route::group(['prefix' => 'area-manager-charges-report'], function () {
+            Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
+        });
+    }
+);
 
 Route::group(
     [
@@ -126,7 +153,5 @@ Route::group(
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
-
-        
     }
 );
