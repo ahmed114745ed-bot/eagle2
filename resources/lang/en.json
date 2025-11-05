@@ -1396,7 +1396,16 @@
 "General Settings": "General Settings",
 "Statistics Settings": "Statistics Settings",
 "Social Media Settings": "Social Media Settings",
-"Save": "Save"
+"Save": "Save",
+"Textarea": "Textarea",
+"Checkbox": "Checkbox",
+"Radio": "Radio",
+"Custom Widget": "Custom Widget",
+"Select Custom Widget": "Select Custom Widget",
+"Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)",
+"Choose a widget": "Choose a widget",
+"form_bd_bio":"Welcome! With me, you'll learn the secrets of success in live streaming. I have extensive experience training successful agencies. I promise daily follow-up and unlimited support until you reach the top!"
+
 
 
 

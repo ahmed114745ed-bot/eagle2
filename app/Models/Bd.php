@@ -109,16 +109,13 @@ class Bd extends Model
     {
         parent::boot();
     
-        // عند الإنشاء
         self::creating(function (Bd $model) {
             $model->type = 'bd';
     
             if ($model->default) {
-                // نخلي باقي BDs لنفس السوبر = 0
                 static::where('parent_id', $model->parent_id)
                     ->update(['default' => 0]);
     
-                // نربط الوكالات اللي مالهاش BD بالافتراضي الجديد
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
@@ -126,7 +123,6 @@ class Bd extends Model
             }
         });
     
-        // عند التحديث
         self::updating(function (Bd $model) {
             if ($model->default) {
                 // نخلي الافتراضي واحد بس لنفس السوبر

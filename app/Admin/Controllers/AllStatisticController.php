@@ -107,10 +107,10 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col) {
-                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
-                            $col->row($view);
-                        });
+//                        $row->column(6, function ($col) {
+//                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
+//                            $col->row($view);
+//                        });
                     });
                 });
                 $row->column(12, function ($column) {

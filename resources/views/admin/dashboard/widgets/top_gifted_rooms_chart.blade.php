@@ -51,7 +51,7 @@
 
 <script>
 $(document).ready(function() {
-    $.ajax({
+    addToAjaxQueue({
         url: "{{ url('admin/statistics/top-room-gifts') }}", // 👈 your endpoint
         type: "GET",
         dataType: "json",

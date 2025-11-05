@@ -69,16 +69,20 @@
 
                 {{-- Action Buttons --}}
                 <div class="flex space-x-2">
-                    <a href="{{ admin_url('form-templates/' . $template->id) }}"
-                       class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition form-templates-btn">
-                        <i class="fas fa-eye {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                        {{ __('Preview') }}
-                    </a>
-                    <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
-                       class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition form-templates-btn">
-                        <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                        {{ __('Edit') }}
-                    </a>
+                     @if (\Encore\Admin\Facades\Admin::user()->can('show-templates-form') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                        <a href="{{ admin_url('form-templates/' . $template->id) }}"
+                            class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition form-templates-btn">
+                                <i class="fas fa-eye {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                {{ __('Preview') }}
+                        </a>
+                     @endif
+                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-templates-form') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                        <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
+                            class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition form-templates-btn">
+                                <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                {{ __('Edit') }}
+                        </a>
+                    @endif
                     <!-- <form action="{{ admin_url('form-templates/' . $template->id) }} method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}');" class="flex-1">
                         @csrf
                         @method('DELETE')
