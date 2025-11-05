@@ -9,11 +9,6 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
             {{ $template->getTranslation('title', $currentLocale) }}
         </h2>
 
-
-    <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}" 
-       class="btn btn-primary">
-        <i class="fa fa-edit me-2"></i> {{ __('Edit Form') }}
-    </a>
 </div>
 
 @if($template->getTranslation('description', $currentLocale))
