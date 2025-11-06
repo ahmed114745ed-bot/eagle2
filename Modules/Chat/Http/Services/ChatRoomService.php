@@ -456,12 +456,11 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
+            $column = $checkRoom->user_id == $user->id ? 'user_1_deleted' : 'user_2_deleted';
+
             ChatMessage::where('chat_room_id', $checkRoom->id)
-                ->update([
-                    $checkRoom->user_id == $user->id
-                        ? 'user_1_deleted'
-                        : 'user_2_deleted' => now()
-                ]);
+                ->update([$column => now()]);
+
         }
 
         return [
