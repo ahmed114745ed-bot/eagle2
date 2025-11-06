@@ -14,5 +14,15 @@ trait ChatUserTrait {
     {
         return $this->hasMany(ChatMessage::class);
     }
+
+    public function chatRoomsAsUser(): HasMany
+    {
+        return $this->hasMany(ChatRoom::class, 'user_id');
+    }
+
+    public function chatRoomsAsUser2(): HasMany
+    {
+        return $this->hasMany(ChatRoom::class, 'user_id2');
+    }
 }
 
