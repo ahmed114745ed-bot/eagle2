@@ -20,7 +20,6 @@ class ChatRepository
             $chatRoom->update(['user_2_deleted' => null]);
         }
 
-
         return $chatRoom;
     }
 
