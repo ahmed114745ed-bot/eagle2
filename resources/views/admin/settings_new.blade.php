@@ -4414,6 +4414,7 @@ use Modules\Vip\Entities\Vip;
         flex-direction: column;
     }
 .tabs-sidebar {
+       width: 100%;
         order: 0;
         border-right: none;
         border-bottom: 1px solid #eee;
@@ -4448,6 +4449,9 @@ use Modules\Vip\Entities\Vip;
 
 @media (max-width: 767px) {
     .col-md-6, .col-md-4 { flex: 1 1 100%; min-width: 0; }
+    .settings-content {
+    width: 100% !important;
+}
 }
 </style>
 

@@ -10,7 +10,18 @@ class ChatRepository
 {
     public function findChatRoomBetweenUsers($userId, $userId2)
     {
-        return ChatRoom::BetweenUsers($userId, $userId2)->first();
+        $chatRoom = ChatRoom::BetweenUsers($userId, $userId2)->first();
+
+        if ($chatRoom->user_1_deleted) {
+            $chatRoom->update(['user_1_deleted' => null]);
+        }
+
+        if ($chatRoom->user_2_deleted) {
+            $chatRoom->update(['user_2_deleted' => null]);
+        }
+
+
+        return $chatRoom;
     }
 
     public function getUserChatRooms(int $userId): array
