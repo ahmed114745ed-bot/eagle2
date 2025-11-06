@@ -18,6 +18,7 @@ use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
 use Encore\Admin\Auth\Permission;
+use Carbon\Carbon;
 
 class FormTemplateController extends Controller
 {
@@ -407,19 +408,58 @@ class FormTemplateController extends Controller
             ->get();
 
         $results = $bds->map(function ($bd) {
-            $topAgencies = Agency::where('bd_id', $bd->id)
-                ->withCount('members')
-                ->orderByDesc('members_count')
-                ->limit(3)
-                ->get(['name', 'members_count']);
+            
+        $topAgencies = Agency::where('bd_id', $bd->id)
+            ->withCount('members')
+            ->orderByDesc('members_count')
+            ->limit(3)
+            ->get(['img','name', 'members_count'])
+            ->map(function ($agency) {
+                $defaultAgencyImage = asset("images/agency-placeholder.jpg");
+                $agencyImage = getImagePath($agency->img) ?? $defaultAgencyImage;
+        
+                if (!isImageExists($agencyImage)) {
+                    $agencyImage = $defaultAgencyImage;
+                }
+        
+                return [
+                    'name' => $agency->name,
+                    'members_count' => $agency->members_count,
+                    'image' => $agencyImage,
+                ];
+            });
+        
+        
+        $createdAt = Carbon::parse($bd->created_at);
+        $now = now();
+        $diffInYears = $createdAt->diffInYears($now);
+        $diffInMonths = $createdAt->diffInMonths($now);
+        $diffInDays = $createdAt->diffInDays($now);
+    
+        if ($diffInYears >= 1) {
+            $since = __('Works since :value years', ['value' => $diffInYears]);
+        } elseif ($diffInMonths >= 1) {
+            $since = __('Works since :value months', ['value' => $diffInMonths]);
+        } else {
+            $since = __('Works since :value days', ['value' => $diffInDays]);
+        }
+        
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $bdAvatar = getImagePath( $bd->avatar) ?? $defaultImage;
+
+            if (!isImageExists($bdAvatar)) {
+                $bdAvatar = $defaultImage;
+            }
+        
             return [
                 'id' => $bd->id,
-                'name' => $bd->name,
-                'phone' => $bd->phone,
+                'name' => $bd->username,
+                'phone' => $bd->phone_code . $bd->phone,
+                'image' => $bdAvatar,
                 'country' => $bd->country?->name,
-                // 'title' => $bd->title,
+                'is_default' => $bd->default,
                 'bio' =>__('form_bd_bio'),
-                'years' => $bd->years_of_experience,
+                'years' => $since,
                 'top_agencies' => $topAgencies,
             ];
         });

@@ -97,7 +97,7 @@ class UserRepository extends Repository
     {
 
         return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
-        ->where('country_id',$country_id)    
+        ->where('country_id',$country_id)
         ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
@@ -121,7 +121,7 @@ class UserRepository extends Repository
     }
 
 
-    
+
     public function user_bd($key, $page, $perPage)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
@@ -490,6 +490,8 @@ class UserRepository extends Repository
 
     public function users($userId, $latitude = null, $longitude = null)
     {
+        $authUserId = auth()->id();
+
         $builder = User::query()
             ->with('profile')
             ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
@@ -505,7 +507,25 @@ class UserRepository extends Repository
                     * sin(radians(users.lat)))) AS distance")
             )->whereNotNull('lat')->whereNotNull('long');
         }
-        return     $builder->inRandomOrder()->paginate(10);
+
+        $builder->with([
+            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+        ]);
+
+        return $builder->inRandomOrder()->paginate(request('per_page'));
     }
 
 
