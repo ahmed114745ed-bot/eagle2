@@ -266,26 +266,6 @@ input[type="file"]::-webkit-file-upload-button:hover {
     }
 }
 
-.agency-card {
-    background: #fff;
-    border-radius: 15px;
-    border: 1px solid #dce3f0;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    width: 252px;
-    /* flex: 1 1 280px; */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.agency-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-.agency-card-inner {
-    padding: 1.2rem;
-}
 .agency-header {
     display: flex;
     justify-content: space-between;
@@ -348,7 +328,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
     align-items: center;
     gap: 6px;
     flex-wrap: nowrap;
-    border: 1px solid #dee2e6;
+    border: none !important;
     border-radius: 8px;
     padding: 8px 12px;
     background: #f9fafc;
@@ -367,6 +347,254 @@ input[type="file"]::-webkit-file-upload-button:hover {
 .remove-btn i {
     pointer-events: none;
 }
+.input, select, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+}
+.file-upload {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    width: 100%;
+}
+.file-upload input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+.file-upload-label {
+    display: block;
+    padding: 12px 15px;
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    text-align: center;
+    color: #667eea;
+    transition: all 0.3s 
+ease;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+
+/* ===== BD Card Style ===== */
+.bd-card {
+    background: #fff;
+    border-radius: 15px;
+    border: 1px solid #dce3f0;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 1.2rem;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    direction: rtl;
+    width: 48%;
+}
+
+.bd-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.bd-card.selected {
+    border: 2px solid #667eea;
+    box-shadow: 0 0 15px rgba(102,126,234,0.4);
+}
+
+/* === الشارة العلوية (موصى به) === */
+.default-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* === رقم الـ BD === */
+.bd-id {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #666;
+    font-size: 13px;
+}
+
+/* === البروفايل === */
+.bd-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.bd-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+}
+
+.bd-info {
+    flex: 1;
+}
+
+.bd-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.bd-title {
+    font-size: 14px;
+    color: #777;
+    margin-top: 3px;
+}
+
+.bd-duration {
+    font-size: 13px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.bd-phone {
+    font-size: 13px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* === الرسالة === */
+.bd-message {
+    background: #f8f9fc;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-top: 15px;
+    color: #444;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* === أفضل الوكالات === */
+.top-agencies {
+    margin-top: 20px;
+    border-top: 1px solid #e4e9f2;
+    padding-top: 15px;
+}
+
+.top-agencies-title {
+    text-align: center;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.agencies-grid {
+    display: flex;
+    justify-content: space-between;
+    /* flex-wrap: wrap; */
+    gap: 10px;
+}
+
+
+.bd-id {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.agency-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.agency-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.agency-hosts {
+    font-size: 12px;
+    color: #666;
+}
+
+.agency-card {
+    width: 32%;
+    text-align: center;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1));
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    transition: all 0.3s 
+ease;
+}
+.agency-logo {
+    width: 91px;
+    height: 56px;
+    border-radius: 44px;
+    margin-bottom: 8px;
+    object-fit: cover;
+    border: 2px solid #ffd700;
+}
+.agency-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 3px;
+}
+.agency-hosts {
+    font-size: 11px;
+    color: #666;
+}
+.bd-duration {
+    background: #4CAF50;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.bd-phone {
+    background: #2196F3;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+/* === التجاوب مع الشاشات الصغيرة === */
+@media (max-width: 768px) {
+    .bd-card {
+        width: 100%;
+    }
+    .agencies-grid {
+        flex-direction: column;
+    }
+  
+}
+
 </style>
 
 @php
@@ -437,11 +665,45 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
                                     {{-- File --}}
                                     @elseif ($field->field_type === 'file')
+                                    <div class="file-upload" style="position: relative; display: inline-block;">
                                         <input 
-                                            type="file"
-                                            name="{{ $field->field_name }}"
-                                            class="form-control"
-                                            @required($field->is_required)>
+                                            type="file" 
+                                            id="idBack" 
+                                            name="{{ $field->field_name ?? 'idBack' }}" 
+                                            accept="image/*" 
+                                            class="file-input" 
+                                            @required($field->is_required)
+                                            onchange="handleFileUpload(this, 'idBackLabel')"
+                                            style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; cursor: pointer;"
+                                        >
+                                        <label for="idBack" 
+                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column" 
+                                            id="idBackLabel" 
+                                            style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
+                                            📷 اضغط لرفع صورة ظهر البطاقة
+                                        </label>
+                                    </div>
+
+                                    <script>
+                                    function handleFileUpload(input, labelId) {
+                                        const label = document.getElementById(labelId);
+                                        if (!input.files || !input.files[0]) return;
+
+                                        const file = input.files[0];
+                                        const reader = new FileReader();
+
+                                        reader.onload = function(e) {
+                                            label.innerHTML = `
+                                                <img src="${e.target.result}" alt="Uploaded Image" 
+                                                    style="max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 8px;">
+                                                <div style="font-size: 12px; color: #555;">${file.name}</div>
+                                            `;
+                                        };
+
+                                        reader.readAsDataURL(file);
+                                    }
+                                    </script>
+
 
                                     {{-- Select --}}
                                     @elseif ($field->field_type === 'select')
@@ -627,33 +889,50 @@ input[type="file"]::-webkit-file-upload-button:hover {
                                 let topAgencies = '';
                                 bd.top_agencies.forEach(agency => {
                                     topAgencies += `
-                                        <div class="mb-1">
-                                            <strong>{{ __('Agency') }}:</strong> ${agency.name ?? ''}
-                                            <span class="badge bg-info text-dark ms-2">${agency.members_count ?? ''} {{ __('Members') }}</span>
+                                        <div class="agency-card" bis_skin_checked="1">
+                                            <img src="${agency.image ?? ''}" alt="Agency" class="agency-logo">
+                                            <div class="agency-name" bis_skin_checked="1"> ${agency.name ?? ''} </div>
+                                            <div class="agency-hosts" bis_skin_checked="1">${agency.members_count ?? ''} {{ __('Members') }}</div>
                                         </div>
                                     `;
                                 });
 
                                 const card = document.createElement('div');
-                                card.classList.add('agency-card', 'selectable-card');
+                                card.classList.add('bd-card');
+                                card.setAttribute('onclick', `selectBD(this, '${bd.id}')`);
+                                card.setAttribute('data-bd-id', bd.id ?? '');
+                                card.setAttribute('data-bd-name', bd.name ?? '');
+
                                 card.innerHTML = `
-                                    <div class="agency-card-inner">
-                                        <div class="agency-header">
-                                            <h5 class="agency-name">${bd.name ?? ''}</h5>
-                                            <span class="agency-id">#${bd.id ?? ''}</span>
+                                    <span class="default-badge">${bd.is_default ? "{{ __('Recommended') }}" : ''}</span>
+                                    <span class="bd-id">ID: ${bd.id ?? ''}</span>
+                                    <input type="radio" name="bd" value="${bd.id ?? ''}" ${bd.is_default ? 'checked' : ''} style="display: none;">
+                                    
+                                    <div class="bd-profile">
+                                        <img src="${bd.image ?? 'https://via.placeholder.com/80/667eea/ffffff?text=BD'}" 
+                                            alt="${bd.name ?? 'BD'}" 
+                                            class="bd-avatar">
+                                        <div class="bd-info">
+                                            <div class="bd-name">${bd.name ?? ''}</div>
+                                            <div class="bd-title">${bd.title ?? "{{ __('Agency Manager') }}"}</div>
+                                            <div class="bd-duration">{{ __('Works since') }}: ${bd.since ?? '—'}</div>
+                                            <div class="bd-phone">📞 ${bd.phone ?? ''}</div>
                                         </div>
-                                        <div class="agency-info">
-                                            <p><i class="fa fa-globe text-primary me-2"></i> <strong>{{ __('Country') }}:</strong> ${bd.country ?? ''}</p>
-                                            <p><i class="fa fa-phone text-primary me-2"></i> ${bd.phone ?? ''}</p>
-                                        </div>
-                                        <p class="agency-bio">${bd.bio}</p>
-                                        <div class="agency-divider"></div>
-                                        <h6 class="text-success mb-2 text-center">⭐ {{ __('Top 3 Agencies') }}</h6>
-                                        <div class="agency-list">
+                                    </div>
+
+                                    <div class="bd-message">
+                                        ${bd.bio ?? "{{ __('Welcome message') }}"}
+                                    </div>
+
+                                    <div class="top-agencies">
+                                        <div class="top-agencies-title">⭐ {{ __('Top 3 Agencies') }}</div>
+                                        <div class="agencies-grid">
                                             ${topAgencies}
                                         </div>
                                     </div>
                                 `;
+
+
 
 
                                 card.addEventListener('click', function() {
@@ -702,7 +981,16 @@ input[type="file"]::-webkit-file-upload-button:hover {
 
    
 </div>
-
+<script>
+    const translations = {
+        members: "{{ __('Members') }}",
+        recommended: "{{ __('موصى به') }}",
+        working_since: "{{ __('يعمل هنا منذ:') }}",
+        manager: "{{ __('مدير وكالات') }}",
+        welcome_message: "{{ __('مرحباً بك في عائلتنا! أنا هنا لأدعمك في كل خطوة نحو النجاح.') }}",
+        top_agencies: "{{ __('⭐ أفضل 3 وكالات') }}"
+    };
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('.form-container');
@@ -730,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fields.forEach(field => {
             html += `
-                <div class="flex-grow-1" style="width: 41%;">
+                <div class="flex-grow-1" style="width: 46%;">
                     <input type="${field.type}" 
                         name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
                         class="form-control form-control-sm mb-1"
