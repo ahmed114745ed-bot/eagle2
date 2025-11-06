@@ -4391,7 +4391,14 @@
   "Choose a widget": "اختر عنصراً",
   "form_bd_bio":"أهلاً وسهلاً! معي ستتعلم أسرار النجاح في عالم البث المباشر. لدي خبرة واسعة في تدريب الوكالات الناجحة. أعدك بمتابعة يومية ودعم لا محدود حتى تصل للقمة!"
 ,    "Application Name": "اسم التطبيق",
-    "Work Duration (months)": "مدة العمل (بالأشهر)"
+    "Work Duration (months)": "مدة العمل (بالأشهر)",
+    "Members": "الأعضاء",
+    "Top 3 Agencies": "أفضل 3 وكالات",
+    "Recommended": "موصى به",
+    "Works since :value years": "منذ :value سنة",
+    "Works since :value months": "منذ :value شهر",
+    "Works since :value days": "منذ :value يوم",
+    "Welcome message": "مرحباً بك في عائلتنا! أنا هنا لأدعمك في كل خطوة نحو النجاح."
 
 
 
