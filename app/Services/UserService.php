@@ -666,7 +666,7 @@ class UserService
         $room_uid = $request->input('room_uid');
         $limit    = $request->input('is_home') ? 3 : 30;
         $user_id  = $request->user()->id;
-        $query = GiftLog::query()->where('roomowner_id', $room_uid);
+        $query = GiftLog::query()->where('room_id', $room_uid);
 
         if ($type == 1) {
             $query = $query->whereBetween('created_at', [
