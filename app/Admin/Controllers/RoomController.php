@@ -265,7 +265,6 @@ class RoomController extends MainController
         $this->applyFilterType($grid, $filterType, $user);
         $this->setupFilters($grid);
         $this->defineGridColumns($grid);
-        $grid->disableRowSelector();
         $grid->disableCreateButton();
         $grid->disableExport();
 
