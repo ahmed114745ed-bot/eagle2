@@ -4448,6 +4448,9 @@ use Modules\Vip\Entities\Vip;
 
 @media (max-width: 767px) {
     .col-md-6, .col-md-4 { flex: 1 1 100%; min-width: 0; }
+    .settings-content {
+    width: 100% !important;
+}
 }
 </style>
 
