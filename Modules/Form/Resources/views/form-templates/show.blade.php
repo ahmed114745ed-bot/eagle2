@@ -21,7 +21,7 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     padding: 20px;
     position: relative;
     overflow-x: hidden;
-    border-radius: 151px;
+    border-radius: 8px;
 }
 .contenten {
     width: 78%;
@@ -34,7 +34,32 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     border-radius: 32px;
 }
 
-;
+.custom-widget-container{
+   width: 200%;
+
+}
+
+.custom-item {
+   width: 200%;
+
+}
+
+.custom-item input {
+    width: 46%;
+    margin: 10px 0px;
+}
+
+@media (max-width: 768px) {
+    .custom-widget-container{
+    width: 100% ;
+
+    }
+    .custom-item {
+        min-width: 0px !important;;
+
+    }
+  
+}
 
 </style>
  <div class=" body">
@@ -592,6 +617,7 @@ window.debugCustomWidget = function(sectionId, fieldId) {
    Section Cards
 ============================================ */
 .section-card {
+    margin: 20px 0px;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
