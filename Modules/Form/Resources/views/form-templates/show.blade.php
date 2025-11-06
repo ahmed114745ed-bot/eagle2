@@ -427,12 +427,7 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
         </div>
     @endforeach
 
-    {{-- Preview Notice --}}
-    <div class="alert alert-light border shadow-sm mt-4">
-        <div class="d-flex align-items-center">
-            
-        </div>
-    </div>
+ 
 
 </div>
 </div>
