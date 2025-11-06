@@ -545,8 +545,32 @@ class UserRepository extends AbstractRepository
 
     public function online()
     {
-        return $this->model->where('online', 1)->inRandomOrder()->paginate(10);
+        $authUserId = auth()->id();
+
+        $onlineUsers = $this->model
+            ->where('online', 1)
+            ->inRandomOrder()
+            ->with([
+                'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                    $q->where('user_id2', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
+                'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                    $q->where('user_id', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
+            ])
+            ->paginate(request('per_page', 10));
+
+        return $onlineUsers;
     }
+
 
     public function agencyUsers($agencyId, $month, $year, $perPage, $page)
     {
