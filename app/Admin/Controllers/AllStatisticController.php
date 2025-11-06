@@ -786,7 +786,7 @@ class AllStatisticController extends MainController
                     'used' => $used,
                     'usePercentage' => $usePercentage,
                     'chartData' => $chartData,
-                    'showPaymentAlert' => $usePercentage <= 90
+                    'showPaymentAlert' => $used > 0 && $usePercentage <= 90 
                 ]
             ]);
 
