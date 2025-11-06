@@ -456,10 +456,18 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
-            $column = $checkRoom->user_id == $user->id ? 'user_1_deleted' : 'user_2_deleted';
-
             ChatMessage::where('chat_room_id', $checkRoom->id)
-                ->update([$column => now()]);
+                ->chunk(200, function ($messages) use ($user) {
+                    foreach ($messages as $msg) {
+                        if ($msg->user_id == $user->id) {
+                            $msg->user_2_deleted = now();
+                            $msg->save();
+                        } else {
+                            $msg->user_1_deleted = now();
+                            $msg->save();
+                        }
+                    }
+                });
 
         }
 
