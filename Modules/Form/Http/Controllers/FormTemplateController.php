@@ -428,11 +428,18 @@ class FormTemplateController extends Controller
             $since = __('Works since :value days', ['value' => $diffInDays]);
         }
         
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $bdAvatar = getImagePath( $bd->avatar) ?? $defaultImage;
+
+            if (!isImageExists($bdAvatar)) {
+                $bdAvatar = $defaultImage;
+            }
+        
             return [
                 'id' => $bd->id,
                 'name' => $bd->username,
                 'phone' => $bd->phone_code . $bd->phone,
-                'image' => $bd->avatar,
+                'image' => $bdAvatar,
                 'country' => $bd->country?->name,
                 'is_default' => $bd->default,
                 'bio' =>__('form_bd_bio'),
