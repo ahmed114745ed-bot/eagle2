@@ -726,7 +726,7 @@ $(document).off('pjax:end').on('pjax:end', function() {
         // استخدم $this داخل closure
         $controller = $this;
 
-        $show->field('data')->as(function ($data) use ($formRequest, $controller) {
+        $show->field('')->as(function ($data) use ($formRequest, $controller) {
             $formData = json_decode($data, true);
             if (!$formData || !is_array($formData)) {
                 return '<p class="text-muted">No data available</p>';
