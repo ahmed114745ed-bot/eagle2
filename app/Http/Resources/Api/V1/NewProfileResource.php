@@ -14,7 +14,7 @@ class NewProfileResource extends JsonResource
         $vip_level_img  = Common::ovip_center_rank_img(@$this->id);
         $total_received_level_img = Common::getImageTotalReceiverOrSender($this->total_received_level);
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($this->total_sender_level);
-
+        $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
 
         $userId = $request->user()->id;
 //        $is_licked = $this->likes?->where("likeable_id",$userId)->exist();
@@ -36,7 +36,8 @@ class NewProfileResource extends JsonResource
             'age'       => @Carbon::parse ($this->profile?->birthday)->age ?? 0,
             'vip' => Common::ovip_center($this),
             'is_friend'            => $this->isFriends(),
-
+            'chat_id' => $chatRoom->id ?? null,
+            'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
     }
 }
