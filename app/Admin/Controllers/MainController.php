@@ -77,7 +77,7 @@ class MainController extends AdminController
 
     public function extendGrid($grid)
     {
-        $grid->disableRowSelector();
+        if(!request()->is('admin/rooms')) $grid->disableRowSelector();
         $permission_name = $this->permission_name;
 
         if (!Admin::user()->can('*')) {

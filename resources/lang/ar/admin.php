@@ -20,7 +20,7 @@ return [
     'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
     'is_preview' => 'عرض مباشر',
-
+    'rejected_success' => 'تم الرفض بنجاح ✅',
     'lifetime_help' => '💡 إذا أدخلت <strong>0</strong>، فهذا يعني أن العنصر لن تنتهي صلاحيته أبدًا (مدى الحياة).',
 
     'percent_total_error' => '❌ يجب أن يكون مجموع النسب 100٪ بالضبط. الحالي: :total٪',
