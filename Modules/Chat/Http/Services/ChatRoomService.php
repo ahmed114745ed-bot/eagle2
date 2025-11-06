@@ -288,7 +288,6 @@ class ChatRoomService
         })->first();
 
         if (!$chatRoom) {
-
             $user2 = User::find($userId2);
             $type = 'guest';
             if ($user->followBack($user2)) {
@@ -300,6 +299,16 @@ class ChatRoomService
                 'user_id2' => $userId2,
                 'type' => $type,
             ]);
+        }
+
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
+
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
         }
 
         return $chatRoom;
