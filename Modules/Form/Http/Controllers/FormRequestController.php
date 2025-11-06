@@ -720,12 +720,13 @@ $(document).off('pjax:end').on('pjax:end', function() {
     protected function detail($id)
     {
         $show = new Show(FormRequest::findOrFail($id));
+        $this->extendShow ($show);
         $formRequest = FormRequest::findOrFail($id);
 
         // استخدم $this داخل closure
         $controller = $this;
 
-        $show->field('data', __('Form Details'))->as(function ($data) use ($formRequest, $controller) {
+        $show->field('data')->as(function ($data) use ($formRequest, $controller) {
             $formData = json_decode($data, true);
             if (!$formData || !is_array($formData)) {
                 return '<p class="text-muted">No data available</p>';
