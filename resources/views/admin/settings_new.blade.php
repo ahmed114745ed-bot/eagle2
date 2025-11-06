@@ -4414,6 +4414,7 @@ use Modules\Vip\Entities\Vip;
         flex-direction: column;
     }
 .tabs-sidebar {
+       width: 100%;
         order: 0;
         border-right: none;
         border-bottom: 1px solid #eee;
