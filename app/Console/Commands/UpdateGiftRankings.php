@@ -36,14 +36,26 @@ class UpdateGiftRankings extends Command
             $this->updateRanking($type, 'receiver', 'receiver_id', $startDate);
             $this->updateRanking($type, 'roomOwner', 'roomowner_id', $startDate);
             $this->updateRanking($type, 'agency', 'agency_id', $startDate);
+            $this->updateRanking($type, 'roomId', 'room_id', $startDate);
         }
     }
 
 
     private function updateRanking(string $type, string $role, string $column, $startDate): void
     {
-        $rankerType = $role != 'agency' ? \App\Models\User::class : \App\Models\Agency::class;
 
+        switch ($role) {
+            case 'agency':
+                $rankerType = \App\Models\Agency::class;
+                break;
+
+            case 'roomId':
+                $rankerType = \App\Models\Room::class;
+                break;
+            default:
+                $rankerType = \App\Models\User::class;
+                break;
+        }
         DB::transaction(function () use ($type, $role, $column, $startDate, $rankerType) {
             // 1. Delete all old rankings of this type
             DB::table('gift_rankings')
