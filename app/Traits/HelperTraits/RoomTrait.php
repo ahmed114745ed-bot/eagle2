@@ -363,6 +363,7 @@ trait RoomTrait
 
     public static function go_microphone_hand_2($uid,$user_id){
         $room = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+        Log::info('Room object:', ['room' => $room]);
 
         if (!$room) {
             Log::warning("Room not found for UID: {$uid}");
@@ -372,7 +373,10 @@ trait RoomTrait
         $micSeat = $room->microphones()
             ->where('user_id', $user_id)
             ->first();
-    
+
+            $micSeat2 = $room->microphones();
+            Log::info('micSeat2  object:', ['$micSeat2 ' => $micSeat2 ]);
+
         if (!$micSeat) {
             Log::warning("User ID {$user_id} is not on microphone in Room UID: {$uid}");
             return 0;
