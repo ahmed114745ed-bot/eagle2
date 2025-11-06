@@ -109,35 +109,81 @@
 
 @push('scripts')
 <script>
+{{--function copyFormLink(url, button) {--}}
+{{--    // Copy to clipboard--}}
+{{--    navigator.clipboard.writeText(url).then(function() {--}}
+{{--        // Change button appearance--}}
+{{--        const buttonText = button.querySelector('.button-text');--}}
+{{--        const icon = button.querySelector('i');--}}
+{{--        const originalText = buttonText.textContent;--}}
+{{--        const originalIconClass = icon.className;--}}
+
+{{--        // Update to success state--}}
+{{--        buttonText.textContent = '{{ __("Link Copied!") }}';--}}
+{{--        icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';--}}
+{{--        button.classList.remove('bg-green-600', 'hover:bg-green-700');--}}
+{{--        button.classList.add('bg-green-800');--}}
+
+{{--        // Reset after 2 seconds--}}
+{{--        setTimeout(function() {--}}
+{{--            buttonText.textContent = originalText;--}}
+{{--            icon.className = originalIconClass;--}}
+{{--            button.classList.remove('bg-green-800');--}}
+{{--            button.classList.add('bg-green-600', 'hover:bg-green-700');--}}
+{{--        }, 2000);--}}
+
+{{--        // Show toast notification--}}
+{{--        showToast('{{ __("Form link copied to clipboard!") }}', 'success');--}}
+{{--    }).catch(function(err) {--}}
+{{--        console.error('Failed to copy: ', err);--}}
+{{--        showToast('{{ __("Failed to copy link") }}', 'error');--}}
+{{--    });--}}
+{{--}--}}
+
 function copyFormLink(url, button) {
-    // Copy to clipboard
-    navigator.clipboard.writeText(url).then(function() {
-        // Change button appearance
-        const buttonText = button.querySelector('.button-text');
-        const icon = button.querySelector('i');
-        const originalText = buttonText.textContent;
-        const originalIconClass = icon.className;
-        
-        // Update to success state
-        buttonText.textContent = '{{ __("Link Copied!") }}';
-        icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';
-        button.classList.remove('bg-green-600', 'hover:bg-green-700');
-        button.classList.add('bg-green-800');
-        
-        // Reset after 2 seconds
-        setTimeout(function() {
-            buttonText.textContent = originalText;
-            icon.className = originalIconClass;
-            button.classList.remove('bg-green-800');
-            button.classList.add('bg-green-600', 'hover:bg-green-700');
-        }, 2000);
-        
-        // Show toast notification
-        showToast('{{ __("Form link copied to clipboard!") }}', 'success');
-    }).catch(function(err) {
-        console.error('Failed to copy: ', err);
-        showToast('{{ __("Failed to copy link") }}', 'error');
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            handleCopySuccess(button);
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            showToast('{{ __("Failed to copy link") }}', 'error');
+        });
+    } else {
+        // Fallback method
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            handleCopySuccess(button);
+        } catch (err) {
+            console.error('Fallback: Copy failed', err);
+            showToast('{{ __("Failed to copy link") }}', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+}
+
+function handleCopySuccess(button) {
+    const buttonText = button.querySelector('.button-text');
+    const icon = button.querySelector('i');
+    const originalText = buttonText.textContent;
+    const originalIconClass = icon.className;
+
+    buttonText.textContent = '{{ __("Link Copied!") }}';
+    icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';
+    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+    button.classList.add('bg-green-800');
+
+    setTimeout(function() {
+        buttonText.textContent = originalText;
+        icon.className = originalIconClass;
+        button.classList.remove('bg-green-800');
+        button.classList.add('bg-green-600', 'hover:bg-green-700');
+    }, 2000);
+
+    showToast('{{ __("Form link copied to clipboard!") }}', 'success');
 }
 
 function showToast(message, type) {
@@ -152,10 +198,10 @@ function showToast(message, type) {
             <span>${message}</span>
         </div>
     `;
-    
+
     // Add to document
     document.body.appendChild(toast);
-    
+
     // Remove after 3 seconds
     setTimeout(function() {
         toast.style.opacity = '0';

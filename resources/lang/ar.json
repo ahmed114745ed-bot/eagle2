@@ -16,6 +16,8 @@
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
     "App": "التطبيق",
+    "Form Details": "تفاصيل النموذج",
+    "Additional Fields": "حقول إضافية",
    "Dedicated successfully": "تم الإهداء بنجاح",
 "Something went wrong": "حدث خطأ ما",
 "professional BD": "خبير العلاقات العامة",
@@ -4149,7 +4151,7 @@
     "Agencies Achieved Targets": "الوكالات التي حققت الأهداف",
     "Diamonds Achieved by Hosts": "الألماس الذي حققه المضيفون",
     "User Signups Comparison (Weeks)": "مقارنة تسجيلات المستخدمين (أسابيع)",
-  
+
     "Form Request": "طلب النموذج",
     "Browse form request": "تصفح طلبات النماذج",
     "Type switch form request": "تبديل نوع طلب النموذج",
@@ -4399,7 +4401,7 @@
     "Welcome message": "مرحباً بك في عائلتنا! أنا هنا لأدعمك في كل خطوة نحو النجاح."
 
 
-  
+
 
 
 

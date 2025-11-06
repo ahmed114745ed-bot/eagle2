@@ -288,117 +288,219 @@ class FormRequestController extends MainController
         //     });
         // ");
 
+        //         Admin::script("
+        //     function initFormRequestActions() {
+
+        //         // 🔹 Function to send POST requests
+        //         function sendRequest(url) {
+        //             return fetch(url, {
+        //                 method: 'POST',
+        //                 headers: {
+        //                     'X-CSRF-TOKEN': LA.token,
+        //                     'Accept': 'application/json',
+        //                 },
+        //             }).then(res => res.json());
+        //         }
+
+        //         // 🔹 Handle Approve/Reject buttons
+        //         function handleAction(button, actionType) {
+        //             button.addEventListener('click', function(e) {
+        //                 e.preventDefault();
+
+        //                 const messages = {
+        //                     approve: {
+        //                         title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#28a745'
+        //                     },
+        //                     reject: {
+        //                         title: 'هل أنت متأكد من رفض هذا الطلب؟',
+        //                         confirm: 'نعم',
+        //                         cancel: 'إلغاء',
+        //                         color: '#dc3545'
+        //                     },
+        //                     success: {
+        //                         en: 'Action completed successfully!',
+        //                         ar: 'تمت العملية بنجاح!',
+        //                         hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+        //                         tr: 'İşlem başarıyla tamamlandı!'
+        //                     },
+        //                     error: {
+        //                         en: 'An error occurred!',
+        //                         ar: 'حدث خطأ أثناء العملية',
+        //                         hi: 'एक त्रुटि हुई!',
+        //                         tr: 'İşlem sırasında hata oluştu!'
+        //                     }
+        //                 };
+
+        //                 const locale = document.documentElement.lang || 'ar';
+
+        //                 Swal.fire({
+        //                     title: messages[actionType].title,
+        //                     icon: 'question',
+        //                     showCancelButton: true,
+        //                     confirmButtonText: messages[actionType].confirm,
+        //                     cancelButtonText: messages[actionType].cancel,
+        //                     confirmButtonColor: messages[actionType].color,
+        //                     cancelButtonColor: '#6c757d',
+        //                 }).then((result) => {
+        //                     if (result.value) {
+        //                         const url = button.dataset.url;
+
+        //                         Swal.fire({
+        //                             title: 'جاري التنفيذ...',
+        //                             allowOutsideClick: false,
+        //                             didOpen: () => Swal.showLoading()
+        //                         });
+
+        //                         sendRequest(url)
+        //                             .then(res => {
+        //                                 Swal.close();
+
+        //                                 console.group('Form Request Action Response');
+        //                                 console.log('Request URL:', url);
+        //                                 console.log('Response:', res);
+        //                                 console.groupEnd();
+
+        //                                 if (res.success) {
+        //                                     Swal.fire({
+        //                                         title: res.message || messages.success[locale],
+        //                                         icon: 'success',
+        //                                         timer: 2000,
+        //                                         showConfirmButton: false
+        //                                     });
+
+        //                                     // 🔹 Reload the grid without full page refresh
+        //                                     $.pjax.reload('#pjax-container');
+        //                                 } else {
+        //                                     Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+        //                                 }
+        //                             })
+        //                             .catch((err) => {
+        //                                 console.error('Fetch error:', err);
+        //                                 Swal.fire('خطأ', messages.error[locale], 'error');
+        //                             });
+        //                     }
+        //                 });
+        //             });
+        //         }
+
+        //         // 🔹 Initialize Approve & Reject Buttons
+        //         document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+        //         document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+        //     }
+
+        //     // ✅ Run on page load
+        //     initFormRequestActions();
+
+        //     // ✅ Re-run after PJAX reload
+        //     $(document).off('pjax:end').on('pjax:end', function() {
+        //         initFormRequestActions();
+        //     });
+        // ");
         Admin::script("
-    function initFormRequestActions() {
+function initFormRequestActions() {
 
-        // 🔹 Function to send POST requests
-        function sendRequest(url) {
-            return fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': LA.token,
-                    'Accept': 'application/json',
-                },
-            }).then(res => res.json());
-        }
-
-        // 🔹 Handle Approve/Reject buttons
-        function handleAction(button, actionType) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                const messages = {
-                    approve: {
-                        title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                        confirm: 'نعم',
-                        cancel: 'إلغاء',
-                        color: '#28a745'
-                    },
-                    reject: {
-                        title: 'هل أنت متأكد من رفض هذا الطلب؟',
-                        confirm: 'نعم',
-                        cancel: 'إلغاء',
-                        color: '#dc3545'
-                    },
-                    success: {
-                        en: 'Action completed successfully!',
-                        ar: 'تمت العملية بنجاح!',
-                        hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                        tr: 'İşlem başarıyla tamamlandı!'
-                    },
-                    error: {
-                        en: 'An error occurred!',
-                        ar: 'حدث خطأ أثناء العملية',
-                        hi: 'एक त्रुटि हुई!',
-                        tr: 'İşlem sırasında hata oluştu!'
-                    }
-                };
-
-                const locale = document.documentElement.lang || 'ar';
-
-                Swal.fire({
-                    title: messages[actionType].title,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: messages[actionType].confirm,
-                    cancelButtonText: messages[actionType].cancel,
-                    confirmButtonColor: messages[actionType].color,
-                    cancelButtonColor: '#6c757d',
-                }).then((result) => {
-                    if (result.value) {
-                        const url = button.dataset.url;
-
-                        Swal.fire({
-                            title: 'جاري التنفيذ...',
-                            allowOutsideClick: false,
-                            didOpen: () => Swal.showLoading()
-                        });
-
-                        sendRequest(url)
-                            .then(res => {
-                                Swal.close();
-
-                                console.group('Form Request Action Response');
-                                console.log('Request URL:', url);
-                                console.log('Response:', res);
-                                console.groupEnd();
-
-                                if (res.success) {
-                                    Swal.fire({
-                                        title: res.message || messages.success[locale],
-                                        icon: 'success',
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    });
-
-                                    // 🔹 Reload the grid without full page refresh
-                                    $.pjax.reload('#pjax-container');
-                                } else {
-                                    Swal.fire('خطأ', res.message || messages.error[locale], 'error');
-                                }
-                            })
-                            .catch((err) => {
-                                console.error('Fetch error:', err);
-                                Swal.fire('خطأ', messages.error[locale], 'error');
-                            });
-                    }
-                });
-            });
-        }
-
-        // 🔹 Initialize Approve & Reject Buttons
-        document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-        document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+    function sendRequest(url) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': LA.token,
+                'Accept': 'application/json',
+            },
+        }).then(res => res.json());
     }
 
-    // ✅ Run on page load
-    initFormRequestActions();
+    function handleAction(button, actionType) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
 
-    // ✅ Re-run after PJAX reload
-    $(document).off('pjax:end').on('pjax:end', function() {
-        initFormRequestActions();
-    });
+            const messages = {
+                approve: {
+                    title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                    confirm: 'نعم',
+                    cancel: 'إلغاء',
+                    color: '#28a745'
+                },
+                reject: {
+                    title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                    confirm: 'نعم',
+                    cancel: 'إلغاء',
+                    color: '#dc3545'
+                },
+                success: {
+                    en: 'Action completed successfully!',
+                    ar: 'تمت العملية بنجاح!',
+                    hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                    tr: 'İşlem başarıyla tamamlandı!'
+                },
+                error: {
+                    en: 'An error occurred!',
+                    ar: 'حدث خطأ أثناء العملية',
+                    hi: 'एक त्रुटि हुई!',
+                    tr: 'İşlem sırasında hata oluştu!'
+                }
+            };
+
+            const locale = document.documentElement.lang || 'ar';
+
+            Swal.fire({
+                title: messages[actionType].title,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: messages[actionType].confirm,
+                cancelButtonText: messages[actionType].cancel,
+                confirmButtonColor: messages[actionType].color,
+                cancelButtonColor: '#6c757d',
+            }).then((result) => {
+                if (result.value) {
+                    const url = button.dataset.url;
+
+                    Swal.fire({
+                        title: 'جاري التنفيذ...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    sendRequest(url)
+                        .then(res => {
+                            Swal.close();
+
+                            if (res.success) {
+                                Swal.fire({
+                                    title: res.message || messages.success[locale],
+                                    icon: res.icon || 'success', // 💡 Use icon from backend
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                // Reload grid without full refresh
+                                $.pjax.reload('#pjax-container');
+                            } else {
+                                Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                            }
+                        })
+                        .catch((err) => {
+                            console.error('Fetch error:', err);
+                            Swal.fire('خطأ', messages.error[locale], 'error');
+                        });
+                }
+            });
+        });
+    }
+
+    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+}
+
+initFormRequestActions();
+
+$(document).off('pjax:end').on('pjax:end', function() {
+    initFormRequestActions();
+});
 ");
+
 
 
 
@@ -590,7 +692,8 @@ class FormRequestController extends MainController
         $request->save();
         return response()->json([
             'success' => true,
-            'message' => __('done'),
+            'message' =>  __('admin.rejected_success'),
+            'icon' => 'success',
         ]);
         admin_toastr(__('rejected_message'), 'error');
         return redirect()->back();
@@ -816,7 +919,9 @@ class FormRequestController extends MainController
         foreach ($files as $file) {
             if (!$file) continue;
 
-            $url = asset('storage/' . $file);
+            $url = getImagePath($file);
+
+            //            $url = asset('storage/' . $file);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
 
             if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
@@ -975,7 +1080,8 @@ class FormRequestController extends MainController
             if (is_array($value)) {
                 $html .= '<pre style="background: white; padding: 10px; border-radius: 4px; margin-top: 8px; border: 1px solid #ddd; overflow-x: auto;">' . json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
             } elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
-                $url = asset('storage/' . $value);
+                //                $url = asset('storage/' . $value);
+                $url = getImagePath($value);
                 $html .= '<br><img src="' . $url . '" style="max-width: 200px; max-height: 200px; border-radius: 6px; margin-top: 8px; border: 2px solid #ddd;"/>';
             } else {
                 $html .= '<span style="color: #2c3e50;">' . nl2br(htmlspecialchars($value)) . '</span>';
