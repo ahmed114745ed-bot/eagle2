@@ -882,8 +882,8 @@ class RankingService
         } elseif ($class == 2) {
             return ['sender_id', 'sender'];
         } elseif ($class == 3) {
-            // return ['roomowner_id', 'roomOwner'];
-            return ['room_id', 'roomId'];
+             return ['roomowner_id', 'roomOwner'];
+           // return ['room_id', 'roomId'];
         } elseif ($class == 5) {
             return ['agency_id', 'agency'];
         } else {

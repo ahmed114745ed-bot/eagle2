@@ -13,6 +13,7 @@ use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait RoomTrait
 {
@@ -361,70 +362,52 @@ trait RoomTrait
     }
 
     public static function go_microphone_hand_2($uid,$user_id){
-        \Log::info("Updated go_microphone_hand_2 string for Room UID {$uid}");
-
-       
-        $room = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+        $room = Room::withoutAppends()->where('type', 'audio')->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+        // Log::info('Room object:', ['room' => $room]);
 
         if (!$room) {
+            // Log::warning("Room not found for UID: {$uid}");
             return 0;
         }
-
-//        $microphone = $room->microphone;
-//        $mainMicrophone = $room->main_microphone;
-//        $baseMic = $room->all_microphone;
-//
-//
-//        $microphone = explode(',', $microphone);
-//        $mainMicrophone = explode(',', $mainMicrophone);
-//        $baseMic = explode(',', $baseMic);
-//        if(!$microphone || !in_array($user_id, $microphone)){
-//            return 0;
-//        }
-
+    
         $micSeat = $room->microphones()
             ->where('user_id', $user_id)
             ->first();
 
+            $micSeat2 = $room->microphones();
+            // Log::info('micSeat2  object:', ['$micSeat2 ' => $micSeat2 ]);
+
         if (!$micSeat) {
+            // Log::warning("User ID {$user_id} is not on microphone in Room UID: {$uid}");
             return 0;
         }
-
-//        $position = 0;
-//        for ($i=0; $i < count($microphone); $i++) {
-//            if($microphone[$i] == $user_id){
-//                $position = $i;
-//                break;
-//            }
-//        }
-//        if ($microphone[$position] > 0){
-//            $baseMic[$position] = $mainMicrophone[$position];
-//        }
-
+    
+        // Log::info("Deleting microphone seat for User ID {$user_id} in Room UID: {$uid}");
         $micSeat->delete();
-//        $micSeat->update([
-//            'user_id' => null,
-//            'status'  => 0,
-//        ]);
-
+    
         $micString = $room->microphones()
             ->orderBy('position')
             ->get()
             ->map(function ($mic) {
                 $userId = $mic->user_id ?? 0;
                 $status = $mic->status ?? 0;
-
+    
                 return $userId > 0 ? "{$userId}#{$status}" : (string)$status;
             })
             ->implode(',');
-
-        $pk = Pk::query ()->where ('room_id',$room->id)->where ('status',1)->first ();
-        if ($pk){
+    
+        // Log::info("Updated microphone string for Room UID {$uid}: {$micString}");
+    
+        $pk = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
+        if ($pk) {
             $pk->mics = $micString;
-            $pk->save ();
+            $pk->save();
+            // Log::info("Updated PK mics for Room ID {$room->id}");
         }
-        Db::table('time_logs')->where(['uid'=>$uid,'user_id'=>$user_id])->delete();
-
+    
+        DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $user_id])->delete();
+        // Log::info("Deleted time_logs for User ID {$user_id} in Room UID {$uid}");
+    
         return 1;
     }
 
