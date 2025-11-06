@@ -115,7 +115,7 @@ class UserService
         return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
     }
 
-    
+
 
     public function user_bd($key, $page)
     {
@@ -496,9 +496,23 @@ class UserService
             //            'country',
             'color_image',
             'followedByAuthUser',
-            'followerByAuthUser'
+            'followerByAuthUser',
             //            'eligiblePacks',
             //            'friends',
+            'chatRoomsAsUser' => function ($q) use ($userId) {
+                $q->where('user_id2', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
         ];
 
         if ($type == 1) {
