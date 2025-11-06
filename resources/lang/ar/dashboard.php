@@ -3,8 +3,8 @@
 return [
     'login.title'           => 'دخول لوحة التحكم',
     'login.titleBD'           => ' BD دخول لوحة التحكم',
-    'login.titleSuperAdmin'           => 'دخول لوحة تحكم السوبر ادمن',
     'login.titleAreaManager'           => 'دخول لوحة تحكم مدير المنطقة',
+    'login.titleSuperAdmin'           => 'دخول لوحة تحكم مدير دوله ',
     'login.remember'        => 'حفظ بيانات الدخول',
     'login.rights'          => '  ٢٠٢٣. جميع الحقوق محفوظة © ',
     'login.language.switch' => 'Switch to',

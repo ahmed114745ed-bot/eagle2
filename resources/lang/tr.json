@@ -3926,7 +3926,38 @@
     "Custom Widget": "Özel Bileşen",
     "Select Custom Widget": "Özel Bileşen Seç",
     "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "Özel bileşenler özel kullanıcı arayüzü sağlar (BD Seçici, Kullanıcı Seçici, vb.)",
-    "form_bd_bio":"Hoş geldiniz! Benimle, canlı yayın dünyasında başarı sırlarını öğreneceksiniz. Başarılı ajansları eğitme konusunda geniş deneyime sahibim. Sizi zirveye ulaşana kadar günlük takip ve sınırsız destekle destekleyeceğim!"
+    "form_bd_bio":"Hoş geldiniz! Benimle, canlı yayın dünyasında başarı sırlarını öğreneceksiniz. Başarılı ajansları eğitme konusunda geniş deneyime sahibim. Sizi zirveye ulaşana kadar günlük takip ve sınırsız destekle destekleyeceğim!",
+
+
+    "select super admin": "ülke yöneticisini seçin",
+    "Select Super Admins": "ülke yöneticilerini seçin",
+    "Super Admin Configuration": "ülke yöneticisi yapılandırması",
+    "Super Admin Details": "ülke yöneticisi detayları",
+    "Super Admin Profile": "ülke yöneticisi profili",
+    "can not delete default super admin": "varsayılan ülke yöneticisi silinemez",
+    "restore super admin": "ülke yöneticisini geri yükle",
+    "can not restore this super admin": "bu ülke yöneticisi geri yüklenemez",
+    "can not restore this super admin user taken": "bu ülke yöneticisi geri yüklenemez",
+    "Sub Super Admin": "ülke yöneticisi çalışanı",
+    "Super Admin": "ülke yöneticisi",
+    "Super Admin Coins": "ülke yöneticisi jetonları",
+    "Zones coins must be greater than super admin coins": "bölge jetonları ülke yöneticisi jetonlarından fazla olmalıdır",
+    "super admin coins must be greater than agancy coins": "ülke yöneticisi jetonları ajans jetonlarından fazla olmalıdır",
+    "Default Super Admin has been set successfully": "varsayılan ülke yöneticisi başarıyla ayarlandı",
+    "superadminDescription": "Sorunsuz operasyonlar sağlamak için, yönettiğiniz sanal bir ülke yöneticisi oluşturmanız önemlidir. Belirli bir ülke yöneticisine bağlı olmayan tüm ajanslar otomatik olarak bu sanal ülke yöneticisine atanır.\nBir ülke yöneticisi silindiğinde, ona bağlı ajanslar kesinti olmadan yönetimin devam etmesi için sanal ülke yöneticisine aktarılır. Eğer sanal bir ülke yöneticisi yoksa, kullanıcı bir ajans açmak istediğinde ülke yöneticisi kimliğini girmesi gerekir, ancak belirli bir ülke yöneticisi olmadan onu çalıştıramaz.\nBu nedenle, operasyonların sürekliliğini sağlamak için her zaman sanal bir ülke yöneticisi oluşturmanız ve yönetmeniz tavsiye edilir.",
+    "Super Admin Reward History": "ülke yöneticisi ödül geçmişi",
+    "default_superadmin_status": "varsayılan ülke yöneticisi",
+    "You cannot delete the default super admin.": "varsayılan ülke yöneticisini silemezsiniz.",
+    "You cannot delete a super admin created by the owner.": "sahip tarafından oluşturulan ülke yöneticisini silemezsiniz.",
+    "No default super admin found to transfer agencies to.": "ajansların aktarılacağı varsayılan ülke yöneticisi bulunamadı.",
+    "super admin deleted successfully.": "ülke yöneticisi başarıyla silindi.",
+    "superAdminRewardDescription": "Ülke yöneticisi ödül özelliği, bir ülke yöneticisi seçmenize ve bir son kullanma tarihi ile ödül sınırı belirlemenize olanak tanır. Seçilen ülke yöneticisi daha sonra aynı ülkedeki kullanıcılara belirlenen ödül sınırı içinde ödüller verebilir.",
+    "Super Admin Reward": "ülke yöneticisi ödülü",
+    "super admin": "ülke yöneticisi",
+    "Super admin": "ülke yöneticisi",
+    "superadmin": "ülke yöneticisi",
+    "super admin banner requests": "ülke yöneticisi afiş istekleri",
+    "superadmin rewards": "ülke yöneticisi ödülleri"
 
 
 
