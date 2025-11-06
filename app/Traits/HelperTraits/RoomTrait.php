@@ -362,7 +362,7 @@ trait RoomTrait
     }
 
     public static function go_microphone_hand_2($uid,$user_id){
-        $room = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+        $room = Room::withoutAppends()->where('type', 'audio')->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
         Log::info('Room object:', ['room' => $room]);
 
         if (!$room) {
