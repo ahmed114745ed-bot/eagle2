@@ -538,6 +538,7 @@ ease;
 
 .agency-card {
     width: 32%;
+    height: 148px;
     text-align: center;
     padding: 10px;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1));
