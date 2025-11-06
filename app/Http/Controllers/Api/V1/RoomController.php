@@ -375,6 +375,9 @@ class RoomController extends Controller
                 $room->is_afk = 0;
                 $room->save();
             }
+            \Log::info("Updated    Room room->uid {$room->uid}");
+            \Log::info("Updated    Room user->id {$user->id}");
+
             $this->updateMicrophone2($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
@@ -1994,6 +1997,8 @@ class RoomController extends Controller
 
     private function updateMicrophone2($room_uid, $user_id)
     {
+        \Log::info("Updated updateMicrophone2 string for Room room_uid {$room_uid}");
+
         $user = User::query()->find($user_id);
         if (!$user) return;
         $result  = Common::go_microphone_hand_2($room_uid, $user_id);
