@@ -408,11 +408,27 @@ class FormTemplateController extends Controller
             ->get();
 
         $results = $bds->map(function ($bd) {
-            $topAgencies = Agency::where('bd_id', $bd->id)
-                ->withCount('members')
-                ->orderByDesc('members_count')
-                ->limit(3)
-                ->get(['img','name', 'members_count']);
+            
+        $topAgencies = Agency::where('bd_id', $bd->id)
+            ->withCount('members')
+            ->orderByDesc('members_count')
+            ->limit(3)
+            ->get(['img','name', 'members_count'])
+            ->map(function ($agency) {
+                $defaultAgencyImage = asset("images/agency-placeholder.jpg");
+                $agencyImage = getImagePath($agency->img) ?? $defaultAgencyImage;
+        
+                if (!isImageExists($agencyImage)) {
+                    $agencyImage = $defaultAgencyImage;
+                }
+        
+                return [
+                    'name' => $agency->name,
+                    'members_count' => $agency->members_count,
+                    'image' => $agencyImage,
+                ];
+            });
+        
         
         $createdAt = Carbon::parse($bd->created_at);
         $now = now();
