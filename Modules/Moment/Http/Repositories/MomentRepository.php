@@ -51,13 +51,28 @@ class MomentRepository
 
     public function getUserMoments($userId, $page)
     {
-        return Moment::withUser()->where('user_id', $userId)
+        $authUserId = auth()->id();
+
+        return Moment::where('user_id', $userId)
             ->whereHas('user')->with('images')
             ->likeExists($userId)
             ->withCount(['likes', 'comments'])
             ->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+            }])
+            ->with(['user.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }, 'user.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
             }])
             ->orderBy('created_at', 'desc')
             // ->when($page == 1, function ($query) {
@@ -111,8 +126,23 @@ class MomentRepository
 
     public function getAllMoments($userId, $page)
     {
-        return Moment::withUser()->likeExists($userId)
+        $authUserId = auth()->id();
+
+        return Moment::likeExists($userId)
             ->whereHas('user')->with('images')
+            ->with(['user.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }, 'user.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }])
             ->withCount(['likes', 'comments'])
             ->with([ 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
@@ -128,7 +158,22 @@ class MomentRepository
 
     public function getNewMoments($userId)
     {
-        return Moment::withUser()->likeExists($userId)
+        $authUserId = auth()->id();
+
+        return Moment::likeExists($userId)
+            ->with(['user.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }, 'user.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }])
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
             ->with([ 'gifts' => function ($query) {
@@ -142,11 +187,26 @@ class MomentRepository
 
     public function momentUserFollow($userId)
     {
+        $authUserId = auth()->id();
         $followId = Follow::where('user_id', $userId)->pluck('followed_user_id');
+
         return Moment::likeExists($userId)->whereIn('user_id', $followId)
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with(['user', 'gifts' => function ($query) {
+            ->with(['user.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }, 'user.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            }])
+            ->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
