@@ -547,7 +547,6 @@ class RoomController extends MainController
 
     protected function defineGridColumns($grid)
     {
-        $grid->disableRowSelector();
         $maxRoomAdmin = Common::getConfig('max_room_admin');
 
         // Preload users for this page only
