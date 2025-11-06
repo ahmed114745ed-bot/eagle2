@@ -21,10 +21,10 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     padding: 20px;
     position: relative;
     overflow-x: hidden;
-    border-radius: 151px;
+    border-radius: 8px;
 }
 .contenten {
-    width: 78%;
+    width: 89%;
     min-height: 250px;
     padding: 15px;
     margin: auto;
@@ -34,7 +34,32 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     border-radius: 32px;
 }
 
-;
+.custom-widget-container{
+   width: 200%;
+
+}
+
+.custom-item {
+   width: 200%;
+
+}
+
+.custom-item input {
+    width: 95%;
+    margin: 10px 0px;
+}
+
+@media (max-width: 768px) {
+    .custom-widget-container{
+    width: 100% ;
+
+    }
+    .custom-item {
+        min-width: 0px !important;;
+
+    }
+  
+}
 
 </style>
  <div class=" body">
@@ -318,36 +343,37 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
             
             {{-- Example Items (2 examples for preview) --}}
             @for($i = 0; $i < 2; $i++)
-                <div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" 
-                     style="width: 100%; min-width: 250px;">
-                    @foreach($fields as $fieldConfig)
+    <div class="custom-item d-flex align-items-start gap-2 flex-wrap bg-light p-2 rounded border position-relative" 
+         style="width: 100%; min-width: 250px;     display: flex !important;">
+        
+        @foreach($fields as $fieldConfig)
+            @php
+                $placeholder = '';
+                if (isset($fieldConfig['placeholder'])) {
+                    if (is_array($fieldConfig['placeholder'])) {
+                        $placeholder = $fieldConfig['label'][$currentLocale] 
+                            ?? $fieldConfig['label']['en'] 
+                            ?? $fieldConfig['name'];
+                    } else {
+                        $placeholder = $fieldConfig['label'][$currentLocale];
+                    }
+                } else {
+                    $placeholder = $fieldConfig['label'][$currentLocale]  ?? 'Field';
+                }
+            @endphp
 
-                        @php
+            <div class="flex-shrink-0" style="flex: 0 0 48%;">
+                <input 
+                    type="{{ $fieldConfig['type'] ?? 'text' }}" 
+                    class="form-control form-control-sm mb-1"
+                    placeholder="{{ $placeholder }}"
+                    disabled>
+            </div>
+        @endforeach
 
-                            $placeholder = '';
-                            if (isset($fieldConfig['placeholder'])) {
-                                if (is_array($fieldConfig['placeholder'])) {
-                                    $placeholder = $fieldConfig['label'][$currentLocale] 
-                                        ?? $fieldConfig['label']['en'] 
-                                        ?? $fieldConfig['name'];
-                                } else {
-                                    $placeholder = $fieldConfig['label'][$currentLocale];
-                                }
-                            } else {
-                                $placeholder = $fieldConfig['label'][$currentLocale]  ?? 'Field';
-                            }
-                        @endphp
-                        <div class="flex-grow-1" style="min-width: 41%;">
-                            <input 
-                                type="{{ $fieldConfig['type'] ?? 'text' }}" 
-                                class="form-control form-control-sm mb-1"
-                                placeholder="{{ $placeholder }}"
-                                disabled>
-                        </div>
-                    @endforeach
-            
-                </div>
-            @endfor
+    </div>
+@endfor
+
         </div>
 
         {{-- Add Button (if allowed) --}}
@@ -402,12 +428,7 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
         </div>
     @endforeach
 
-    {{-- Preview Notice --}}
-    <div class="alert alert-light border shadow-sm mt-4">
-        <div class="d-flex align-items-center">
-            
-        </div>
-    </div>
+ 
 
 </div>
 </div>
@@ -592,6 +613,7 @@ window.debugCustomWidget = function(sectionId, fieldId) {
    Section Cards
 ============================================ */
 .section-card {
+    margin: 20px 0px;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
