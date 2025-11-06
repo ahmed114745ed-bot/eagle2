@@ -361,6 +361,9 @@ trait RoomTrait
     }
 
     public static function go_microphone_hand_2($uid,$user_id){
+        \Log::info("Updated go_microphone_hand_2 string for Room UID {$uid}");
+
+       
         $room = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
 
         if (!$room) {

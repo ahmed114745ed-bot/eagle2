@@ -2,31 +2,33 @@
 
 namespace App\Services;
 
-use App\helper\RankingHelper;
-use App\Http\Resources\RankingGameCollectionResource;
-use App\Http\Resources\RankingUserV2Resource;
-use App\Http\Resources\TopUserResource;
 use App\Models\Pk;;
-
 use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
+use App\helper\RankingHelper;
 
 use Illuminate\Log\LogManager;
 use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
-use Illuminate\Pagination\Paginator;
-use App\Repositories\RankingRepository;
 
+use Illuminate\Pagination\Paginator;
+use App\Http\Resources\TopUserResource;
+use App\Repositories\RankingRepository;
+use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\GameRankingResource;
+
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
+use App\Http\Resources\RankingUserV2Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\CP\Transformers\TopRankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Http\Resources\Api\V1\RoomRankingResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
+use App\Http\Resources\RankingGameCollectionResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -35,7 +37,7 @@ class RankingService
 {
     protected $rankingRepo, $cpRepository;
 
-    
+
     public function __construct(
         RankingRepository $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
@@ -112,13 +114,13 @@ class RankingService
         switch ($class) {
             case 4:
                 return $this->handleLuckyGiftRanking($type, $limit, $user, $class);
-    
+
             case 6:
                 return $this->handleGameCoinRanking($type, $limit, $user, $class);
-    
+
             case 5:
                 return $this->handleAgencyRanking($type, $limit);
-    
+
             default:
                 return $this->handleUserRanking($class, $type, $limit, $user);
         }
@@ -149,27 +151,28 @@ class RankingService
         return $this->rankingRepo->getAgencyRanking('agency', $types[$type], $limit);
     }
 
- 
+
 
     protected function handleUserRanking(int $class, int $type, int $limit, $user)
     {
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
-    
+
         $types = [
             1 => 'daily',
             2 => 'weekly',
             3 => 'monthly',
         ];
-    
+
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-    
+      
+      if($rel == 'roomId') return RoomRankingResource::collection($data);
         $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
-    
+
         $key = $types[$type] . '_' . $class;
-    
+
         $this->transformData3($data, $class, $keywords, $rel);
-    
-    
+
+
         $currentUser = new RankingUserV2Resource([
             'user'    => $user,
             'data'    => $data,
@@ -177,42 +180,42 @@ class RankingService
             'key'     => $key,
             'class'   => $class,
         ]);
-    
-        $topUsers = $data->take(3); 
+
+        $topUsers = $data->take(3);
         $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
-        
-       
-    $otherUsers = $data->slice(3);
 
-    $perPage = request('per_page', 10);
-    $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-    $currentItems = $otherUsers->forPage($currentPage, $perPage);
 
-    $paginatedOther = new LengthAwarePaginator(
-        $currentItems->values(),
-        $otherUsers->count(),
-        $perPage,
-        $currentPage,
-        ['path' => LengthAwarePaginator::resolveCurrentPath()]
-    );
+        $otherUsers = $data->slice(3);
 
-    $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+        $perPage = request('per_page', 10);
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+        $currentItems = $otherUsers->forPage($currentPage, $perPage);
 
-    return [
-        'user'  => $currentUser,
-        'top'   => $topResources,
-        'other' => $otherResources,
-        'others_pagination' => [
-            'total'        => $paginatedOther->total(),
-            'per_page'     => $paginatedOther->perPage(),
-            'current_page' => $paginatedOther->currentPage(),
-            'last_page'    => $paginatedOther->lastPage(),
-            'next_page'    => $paginatedOther->nextPageUrl(),
-            'prev_page'    => $paginatedOther->previousPageUrl(),
-        ]
-    ];
-}
-    
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems->values(),
+            $otherUsers->count(),
+            $perPage,
+            $currentPage,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+        $otherResources = collect($paginatedOther->items())->map(fn($item) => new TopUserResource($item));
+
+        return [
+            'user'  => $currentUser,
+            'top'   => $topResources,
+            'other' => $otherResources,
+            'others_pagination' => [
+                'total'        => $paginatedOther->total(),
+                'per_page'     => $paginatedOther->perPage(),
+                'current_page' => $paginatedOther->currentPage(),
+                'last_page'    => $paginatedOther->lastPage(),
+                'next_page'    => $paginatedOther->nextPageUrl(),
+                'prev_page'    => $paginatedOther->previousPageUrl(),
+            ]
+        ];
+    }
+
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $achievement_images = [];
@@ -303,7 +306,7 @@ class RankingService
             'next_page'    => $paginatedOther->nextPageUrl(),
             'prev_page'    => $paginatedOther->previousPageUrl(),
         ];
-//        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
+        //        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
 
         return $arr;
     }
@@ -334,7 +337,6 @@ class RankingService
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
         return new UsersRankingCollection($data, $user, $keywords);
-
     }
 
     protected function transformData3(&$data, $class, $key, $relation)
@@ -880,7 +882,8 @@ class RankingService
         } elseif ($class == 2) {
             return ['sender_id', 'sender'];
         } elseif ($class == 3) {
-            return ['roomowner_id', 'roomOwner'];
+            // return ['roomowner_id', 'roomOwner'];
+            return ['room_id', 'roomId'];
         } elseif ($class == 5) {
             return ['agency_id', 'agency'];
         } else {
