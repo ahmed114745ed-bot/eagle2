@@ -18,6 +18,11 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $chatRoom = null;
+
+        if ($this->relationLoaded('chatRoomsAsUser') || $this->relationLoaded('chatRoomsAsUser2')) {
+            $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
+        }
 
         return [
             'id'                 => @$this->id, // both
@@ -57,6 +62,8 @@ class UserResource extends JsonResource
             'image_color'          => @$this->color_image ?? '',
             'special_color'    => @$this->color_id ?? '',
             'user_types' => $this->user_types,
+            'chat_id' => $chatRoom->id ?? null,
+            'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
     }
 }
