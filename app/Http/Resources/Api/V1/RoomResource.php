@@ -29,6 +29,10 @@ class RoomResource extends JsonResource
         $have_luck_box = $this->boxUse->where("is_closed",0);
         $isHideCountry = $this?->owner?->getPackWithTypeV2(13);
 
+        if ($this->owner->relationLoaded('chatRoomsAsUser') || $this->owner->relationLoaded('chatRoomsAsUser2')) {
+            $chatRoom = $this->owner->chatRoomsAsUser->first() ?? $this->owner->chatRoomsAsUser2->first();
+        }
+
         /**@var Room $this*/
         $data = [
             'id' => $this->id,
@@ -41,6 +45,8 @@ class RoomResource extends JsonResource
             'room_id' => (string)($this->id ?: 0),
             'owner_special_id'          => $this->owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => $this->owner?->color_image,
+            'chat_id' => $chatRoom->id ?? null,
+            'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
             //            'visitors_count' => $this->count_room_socket,

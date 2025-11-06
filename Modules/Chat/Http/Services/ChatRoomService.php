@@ -288,7 +288,6 @@ class ChatRoomService
         })->first();
 
         if (!$chatRoom) {
-
             $user2 = User::find($userId2);
             $type = 'guest';
             if ($user->followBack($user2)) {
@@ -300,6 +299,16 @@ class ChatRoomService
                 'user_id2' => $userId2,
                 'type' => $type,
             ]);
+        }
+
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
+
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
         }
 
         return $chatRoom;
@@ -461,14 +470,17 @@ class ChatRoomService
                     foreach ($messages as $msg) {
                         if ($msg->user_id == $user->id) {
                             $msg->user_1_deleted = now();
-                            $msg->save();
                         } else {
                             $msg->user_2_deleted = now();
+                        }
+
+                        if ($msg->user_1_deleted && $msg->user_2_deleted) {
+                            $msg->delete();
+                        } else {
                             $msg->save();
                         }
                     }
                 });
-
         }
 
         return [

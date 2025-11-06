@@ -51,6 +51,11 @@ class UserRelationsResource extends JsonResource
             $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', @$this->total_sender_level)->first() : null;
         }
         $frameAbility = @$this->followPacks->where('type', 4)->first();
+
+        if ($this->relationLoaded('chatRoomsAsUser') || $this->relationLoaded('chatRoomsAsUser2')) {
+            $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
+        }
+
 //        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
@@ -106,6 +111,8 @@ class UserRelationsResource extends JsonResource
 //            ],
             'image_color'          => @$this->color_image,
             'color_name'   => common::wareUserVipColorV2($this, 18) ?? '',
+            'chat_id' => $chatRoom->id ?? null,
+            'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
 
         return $data;
