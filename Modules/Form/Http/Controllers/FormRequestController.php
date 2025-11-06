@@ -720,7 +720,14 @@ $(document).off('pjax:end').on('pjax:end', function() {
     protected function detail($id)
     {
         $show = new Show(FormRequest::findOrFail($id));
-        $this->extendShow ($show);
+        $show->panel()
+                ->tools(
+                    function ($tools) {
+                        $tools->disableEdit();
+                        $tools->disableList();
+                        $tools->disableDelete();
+                    }
+                );
         $formRequest = FormRequest::findOrFail($id);
 
         // استخدم $this داخل closure
