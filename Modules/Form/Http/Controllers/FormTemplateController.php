@@ -18,6 +18,7 @@ use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
 use Encore\Admin\Auth\Permission;
+use Carbon\Carbon;
 
 class FormTemplateController extends Controller
 {
@@ -411,15 +412,31 @@ class FormTemplateController extends Controller
                 ->withCount('members')
                 ->orderByDesc('members_count')
                 ->limit(3)
-                ->get(['name', 'members_count']);
+                ->get(['img','name', 'members_count']);
+        
+        $createdAt = Carbon::parse($bd->created_at);
+        $now = now();
+        $diffInYears = $createdAt->diffInYears($now);
+        $diffInMonths = $createdAt->diffInMonths($now);
+        $diffInDays = $createdAt->diffInDays($now);
+    
+        if ($diffInYears >= 1) {
+            $since = __('Works since :value years', ['value' => $diffInYears]);
+        } elseif ($diffInMonths >= 1) {
+            $since = __('Works since :value months', ['value' => $diffInMonths]);
+        } else {
+            $since = __('Works since :value days', ['value' => $diffInDays]);
+        }
+        
             return [
                 'id' => $bd->id,
-                'name' => $bd->name,
-                'phone' => $bd->phone,
+                'name' => $bd->username,
+                'phone' => $bd->phone_code . $bd->phone,
+                'image' => $bd->avatar,
                 'country' => $bd->country?->name,
-                // 'title' => $bd->title,
+                'is_default' => $bd->default,
                 'bio' =>__('form_bd_bio'),
-                'years' => $bd->years_of_experience,
+                'years' => $since,
                 'top_agencies' => $topAgencies,
             ];
         });

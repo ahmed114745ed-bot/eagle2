@@ -9,8 +9,38 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
 @php
     $isRtl = in_array(app()->getLocale(), ['ar', 'he', 'ur']);
 @endphp
+<style>
 
-<div class="form-header mb-5" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
+.body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* min-height: 100vh; */
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+    border-radius: 151px;
+}
+.contenten {
+    width: 78%;
+    min-height: 250px;
+    padding: 15px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 32px;
+}
+
+;
+
+</style>
+ <div class=" body">
+ <div class=" contenten">
+ <div class=" ">
+<div class=" form-header mb-5" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
 
         {{-- عنوان النموذج --}}
@@ -265,7 +295,7 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
     
     <div class="custom-widget-container">
         {{-- Widget Info Header --}}
-        <div class="alert alert-info border-0 mb-3 py-2 px-3">
+        <div class="alert border-0 mb-3 py-2 px-3">
             <div class="d-flex align-items-center">
                 <i class="fa fa-puzzle-piece me-2 text-info"></i>
                 <div>
@@ -379,6 +409,9 @@ $direction = $currentLocale === 'ar' ? 'rtl' : 'ltr';
         </div>
     </div>
 
+</div>
+</div>
+</div>
 </div>
 <script>
 // Custom Field Dynamic Addition for Preview
@@ -572,8 +605,8 @@ window.debugCustomWidget = function(sectionId, fieldId) {
 }
 
 .section-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #ffffff;
+    /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+    /* color: #ffffff; */
     padding: 1.25rem 1.5rem;
     font-size: 1.25rem;
     font-weight: 600;
