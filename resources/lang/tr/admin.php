@@ -15,7 +15,7 @@ return [
     'user_setting'          => 'Kullanıcı Ayarları',
     "total" => "toplam",
     'lifetime_help' => '💡 Eğer <strong>0</strong> girerseniz, bu öğenin asla süresinin dolmayacağı (ömür boyu) anlamına gelir.',
-
+    'rejected_success' => 'Reddetme başarıyla tamamlandı ✅',
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',
     'new'                   => 'Yeni',
