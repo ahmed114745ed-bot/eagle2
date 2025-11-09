@@ -100,7 +100,7 @@
     }
     .transferForm{
         height: 100%;
-        padding: 70px 9px 14px 16px;
+        padding: 25px 9px 14px 16px;
     }
     .transferForm .form-group{
         width: 70%;
@@ -300,11 +300,20 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     </div>
 
     <div id="target_fields" style="display: none;">
+
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
             <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
-
         </div>
+
+        <div class="form-group">
+            <label for="charge_type">{{ __('Charge by') }}</label>
+            <select id="charge_type" name="charge_type" class="form-control" required onchange="updateChargeInputLabel()">
+                <option value="dollar">{{ __('Dollar 💲') }}</option>
+                <option value="coins">{{ __('Coins 🪙') }}</option>
+            </select>
+        </div>
+
         @php
                 $rate = App\Helpers\Common::getCoinsValue('shipping_coins'); // e.g. 10 coins per dollar
             @endphp
@@ -352,17 +361,41 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
 <script>
 
-    
+
     const rate = {{ $rate ?? 1 }}; // fallback 1 if null
+
+    function updateChargeInputLabel() {
+        const type = document.getElementById('charge_type').value;
+        const label = document.getElementById('amountLabel');
+        const hint = document.getElementById('amountHint');
+        const output = document.getElementById('convertedAmount');
+        output.style.display = 'none'; // hide conversion text if switching type
+
+        if (type === 'dollar') {
+            label.textContent = "{{ __('enter_amount') }} 💲";
+            hint.textContent = "{{ __('Now charge by dollar') }}";
+        } else {
+            label.textContent = "{{ __('enter_amount') }} 🪙";
+            hint.textContent = "{{ __('Now charge by coins') }}";
+        }
+
+        document.getElementById('amount').value = '';
+    }
 
     function updateConvertedAmount() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const type = document.getElementById('charge_type').value;
         const result = amount * rate;
-
+        const invResult = amount / rate;
         const output = document.getElementById('convertedAmount');
+
         if (amount > 0) {
             output.style.display = 'block';
-            output.textContent = `= ${result.toFixed(2)}🪙`;
+            if (type === 'dollar') {
+                output.textContent = `= ${result.toFixed(2)} 🪙`;
+            } else {
+                output.textContent = `≈ ${invResult.toFixed(2)} 💲`;
+            }
         } else {
             output.style.display = 'none';
         }
@@ -438,8 +471,8 @@ function initSelect2(targetType = null) {
                 params.page = params.page || 1;
                 const items = Array.isArray(data)
                             ? (data[0]?.data || [])
-                            : (data.data || []);             
-                
+                            : (data.data || []);
+
                 return {
                     results: items.map(item => {
                         let displayName = targetType === 'user'
