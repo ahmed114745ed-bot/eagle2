@@ -173,6 +173,23 @@ class ChatRoomService
                         });
                 });
             })
+            ->where(function ($q) use ($user) {
+                $q->where(function ($sub) use ($user) {
+                    $sub->where('user_id', $user->id)
+                        ->where(function ($inner) {
+                            $inner->whereNull('user_1_deleted');
+                        });
+                })
+                    ->orWhere(function ($sub) use ($user) {
+                        $sub->where('user_id', '!=', $user->id)
+                            ->where(function ($inner) {
+                                $inner->whereNull('user_2_deleted');
+                            });
+                    })
+                    ->orWhere(function ($sub) use ($user) {
+                        $sub->whereNotNull('user_1_deleted')->whereNotNull('user_2_deleted');
+                    });
+            })
             ->groupBy([
                 'chat_rooms.id',
                 'chat_rooms.user_id',
