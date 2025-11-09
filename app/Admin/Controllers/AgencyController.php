@@ -366,7 +366,7 @@ class AgencyController extends MainController
      *
      * @return Grid
      */
-
+   
 
     protected function grid()
     {
@@ -375,15 +375,14 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->leftJoin('agency_sallaries', 'agency_sallaries.agency_id', '=', 'agencies.id')
-            ->selectRaw('agencies.id, agencies.name, agencies.app_owner_id, agencies.phone_code, agencies.phone, agencies.coins, agencies.country_id, agencies.img, agencies.is_frozen, COALESCE(SUM(agency_sallaries.sallary - agency_sallaries.cut_amount), 0) as salary')
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
+             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
+            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins','agencies.country_id','agencies.img', 'agencies.is_frozen'])
+            ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
                     ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
-            ->groupBy('agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen')
             ->orderByDesc('agencies.id');
 
         if (request("active") == true) {
@@ -421,19 +420,19 @@ class AgencyController extends MainController
 
                 return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
-            $flagHtml = '';
-            if (!empty($this->country?->flag)) {
-                $flagPath = getImagePath($this->country->flag);
-                $flagTitle = app()->getLocale() === 'ar'
-                    ? e($this->country->name)
-                    : e($this->country->e_name);
+           $flagHtml = '';
+                if (!empty($this->country?->flag)) {
+                    $flagPath = getImagePath($this->country->flag);
+                    $flagTitle = app()->getLocale() === 'ar'
+                        ? e($this->country->name)
+                        : e($this->country->e_name);
 
-                $flagHtml = "<img src='{$flagPath}' 
+                    $flagHtml = "<img src='{$flagPath}' 
                          class='flag-image' 
                          alt='flag Image' 
                          title='{$flagTitle}' 
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-            }
+                }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -449,7 +448,7 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-
+           
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -509,13 +508,13 @@ class AgencyController extends MainController
 
         // --- Salary column (using withSum preload) ---
         $grid->column('salary', __('Agency wallet'))->display(function () {
-            $coin = truncateAndTrim($this->salary ?? 0);
+            $coin = truncateAndTrim($this->current_salary ?? 0);
             $icon = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                 <span>{$coin}</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>";
-        })->sortable();
+        });
 
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
