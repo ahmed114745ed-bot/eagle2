@@ -169,7 +169,7 @@ Route::group(
         'namespace' => config('admin.route.namespace'),
         'middleware' => [
             'web',
-            'admin',
+            'admin.auth',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
