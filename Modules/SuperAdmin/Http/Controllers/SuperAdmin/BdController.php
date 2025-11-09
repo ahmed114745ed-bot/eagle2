@@ -94,19 +94,21 @@ class BdController extends MainController
     {
         $authSuperAdmin = auth()->user();
         $grid = new Grid(new Bd());
-        $grid->model()->where('parent_id', $authSuperAdmin->id)
-            ->where('country_id', $authSuperAdmin->country_id)
+        $grid->model()->where('admin_users.parent_id', $authSuperAdmin->id)
+            ->where('admin_users.country_id', $authSuperAdmin->country_id)
+            
+            ->where('admin_users.type', 'bd')
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
-            ->orderByDesc('id');
+            ->orderByDesc('admin_users.id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         $grid->column('username', __('Bd'))->display(function ($name) {
             if (request()->filled('_export_')) {
                 return $name;
@@ -136,7 +138,7 @@ class BdController extends MainController
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
 
 
         $grid->column('default', trans('default_status'))
@@ -144,35 +146,12 @@ class BdController extends MainController
         ->display(function ($enable) {
                 return $enable;
 
-        });
-        // $grid->column('default', __('default_status'))->display(function () {
-        //     if (request()->filled('_export_')) {
-        //         return $this->default;
-        //     }
+        })->sortable();
 
-        //     if ($this->default == 1) {
-        //         return <<<HTML
-        //             <span style="display: flex; align-items: center;">
-        //                 <span style="
-        //                     font-size: smaller;
-        //                     background: red;
-        //                     display: inline-block;
-        //                     border-radius: 50%;
-        //                     width: 10px;
-        //                     height: 10px;
-        //                     margin-left: 5px;
-        //                 " title=""></span>
-        //             </span>
-        //         HTML;
-        //     } else {
-        //         return '<span style="color: #999;"></span>';
-        //     }
-        // });
-
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
+        $grid->column('app_id', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
-                return $name;
+                return $user->name;
             }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
@@ -193,13 +172,13 @@ class BdController extends MainController
                     $image
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                         <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
                         </a>
                         <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
 
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
             return $this->total_agencies;
@@ -238,7 +217,7 @@ class BdController extends MainController
             $locale = App::getLocale();
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
-        });
+        })->sortable();
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {

@@ -185,11 +185,11 @@ class EncorUsersController extends AdminController
             });
 
         $grid->column('id', 'ID')->sortable();
-        $grid->column('username', trans('admin.username'));
-        $grid->column('name', trans('admin.name'));
+        $grid->column('username', trans('admin.username'))->sortable();
+        $grid->column('name', trans('admin.name'))->sortable();
         $grid->column('roles', trans('admin.roles'))->pluck('name')->label();
-        $grid->column('created_at', trans('admin.created_at'));
-        $grid->column('updated_at', trans('admin.updated_at'));
+        $grid->column('created_at', trans('admin.created_at'))->sortable();
+        $grid->column('updated_at', trans('admin.updated_at'))->sortable();
 
         $grid->actions(function (Grid\Displayers\Actions $actions) use ($permission_name) {
 

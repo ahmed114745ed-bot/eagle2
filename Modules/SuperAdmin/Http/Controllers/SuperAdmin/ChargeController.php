@@ -111,7 +111,7 @@ class ChargeController extends MainController
 
                 </div>
             ";
-        });
+        })->sortable();
 
         $grid->column('user_id', __('receiver'))->display(function () {
             $info = Common::getReceiverInfo($this);
@@ -171,12 +171,12 @@ class ChargeController extends MainController
             }
 
             return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
-        });
+        })->sortable();
 
 
         $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
-        });
+        })->sortable();
 
         $grid->column('usd', __('usd'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -187,7 +187,7 @@ class ChargeController extends MainController
 
                 </div>
             ";
-        });
+        })->sortable();
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableActions();

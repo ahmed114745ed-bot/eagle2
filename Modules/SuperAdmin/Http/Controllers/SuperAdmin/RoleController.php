@@ -88,9 +88,9 @@ class RoleController extends MainController
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
         $grid->model()->where('admin_id', $authId);
         $grid->column('id', 'ID')->sortable();
-        $grid->column('slug', trans('admin.slug'));
+        $grid->column('slug', trans('admin.slug'))->sortable();
 
-        $grid->column('name', trans('admin.name'));
+        $grid->column('name', trans('admin.name'))->sortable();
 
         // $grid->column('preview', trans('admin.preview'))->display(function () {
         //     $id = $this->id; // Assuming 'id' is the record ID field
@@ -111,8 +111,8 @@ class RoleController extends MainController
                 return __($name);
             });
         })->label();
-        $grid->column('created_at', trans('admin.created_at'));
-        $grid->column('updated_at', trans('admin.updated_at'));
+        $grid->column('created_at', trans('admin.created_at'))->sortable();
+        $grid->column('updated_at', trans('admin.updated_at'))->sortable();
 
 
 

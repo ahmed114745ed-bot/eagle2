@@ -216,7 +216,7 @@ class AppearChargerAgencyController extends MainController
         });
 
 
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
@@ -246,7 +246,7 @@ class AppearChargerAgencyController extends MainController
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         $grid->column('owner_id', __('Owner'))->display(function () {
             // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
@@ -277,7 +277,7 @@ class AppearChargerAgencyController extends MainController
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
         if (Admin::user()->can('switches-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('charge_agency', __("Charge-agency"))
                 ->display(function () {

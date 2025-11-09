@@ -59,7 +59,7 @@ class OfficialMessengerSuperAdminController extends MainController
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->id(__('ID'));
+        $grid->id(__('ID'))->sortable();
         $grid->column('user.name', trans('user id'))->display(function ($name) {
             $uid = @$this->user->uuid;
             $path = @$this->user?->profile?->avatar;
@@ -82,11 +82,11 @@ class OfficialMessengerSuperAdminController extends MainController
             </div>
         ";
         });
-        $grid->title(trans('title'));
+        $grid->title(trans('title'))->sortable();
 
 
-        $grid->content(__('content'));
-        $grid->feature(__('type'));
+        $grid->content(__('content'))->sortable();
+        $grid->feature(__('type'))->sortable();
         $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
@@ -128,8 +128,8 @@ class OfficialMessengerSuperAdminController extends MainController
         $grid->column('url', trans('url'))
             ->display(function ($value) {
                 return "<span style='color: #89CFF0;'>$value</span>";
-            });
-        $grid->created_at(trans('admin.created_at'));
+            })->sortable();
+        $grid->created_at(trans('admin.created_at'))->sortable();
         $grid->disableExport();
 
         $this->extendGrid($grid);

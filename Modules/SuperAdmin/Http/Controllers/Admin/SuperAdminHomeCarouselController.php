@@ -90,7 +90,7 @@ class SuperAdminHomeCarouselController extends MainController
             $q->where('countries.id', $countryID);
         });
 
-        $grid->id(__('ID'));
+        $grid->id(__('ID'))->sortable();
         $grid->column('img', __('Image'))->image('', 235, 77);
 
         $grid->column('actions', __('Actions'))->display(function () {

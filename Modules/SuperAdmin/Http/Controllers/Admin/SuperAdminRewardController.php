@@ -136,7 +136,7 @@ class SuperAdminRewardController extends MainController
         });
 
         $grid->model()->whereIn('type', [4, 5, 6, 28]);
-        $grid->column('name', __('name'));
+        $grid->column('name', __('name'))->sortable();
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
@@ -148,8 +148,8 @@ class SuperAdminRewardController extends MainController
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');
-        $grid->column('name', __('name'));
-        $grid->column('priority', __('Priority'));
+        $grid->column('name', __('name'))->sortable();
+        $grid->column('priority', __('Priority'))->sortable();
         $grid->column('image', __('image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
@@ -163,8 +163,8 @@ class SuperAdminRewardController extends MainController
 
     protected function vip($grid)
     {
-        $grid->column('level', __('level'));
-        $grid->column('name', __('name'));
+        $grid->column('level', __('level'))->sortable('o_vips.level');
+        $grid->column('name', __('name'))->sortable('o_vips.name');
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
             $defaultImage = asset("images/image.png");

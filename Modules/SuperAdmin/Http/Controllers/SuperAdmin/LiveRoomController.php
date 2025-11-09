@@ -569,9 +569,9 @@ class LiveRoomController extends MainController
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
-        });
+        })->sortable();
 
-        $grid->id(__('ID'));
+        $grid->id(__('ID'))->sortable();
 
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
@@ -598,20 +598,20 @@ class LiveRoomController extends MainController
                     </div>
                  </a>
             ";
-        });
+        })->sortable();
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('uid', __('room owner'))->display(function ($name) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
             }
 
             return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
-        });
+        })->sortable();
 
         $grid->column('session', __('Gifts'))->display(function () {
             return $this->session  ?? 0;
-        });
+        })->sortable();
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
