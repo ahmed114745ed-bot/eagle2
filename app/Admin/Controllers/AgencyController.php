@@ -375,6 +375,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins','agencies.country_id','agencies.img', 'agencies.is_frozen'])
             ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
@@ -513,7 +514,7 @@ class AgencyController extends MainController
                 <span>{$coin}</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>";
-        })->sortable();
+        });
 
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
