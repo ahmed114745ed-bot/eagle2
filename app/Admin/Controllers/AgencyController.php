@@ -507,13 +507,13 @@ class AgencyController extends MainController
 
         // --- Salary column (using withSum preload) ---
         $grid->column('salary', __('Agency wallet'))->display(function () {
-            $coin = truncateAndTrim($this->salary ?? 0);
+            $coin = truncateAndTrim($this->current_salary ?? 0);
             $icon = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                 <span>{$coin}</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>";
-        })->sortable();
+        });
 
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
