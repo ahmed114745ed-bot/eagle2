@@ -6,6 +6,7 @@ use App\Models\Scopes\HostAgencyScope;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Charge extends Model
 {
@@ -117,8 +118,11 @@ class Charge extends Model
         return $this->belongsTo(SubAdmin::class, 'user_id');
     }
 
+    public function receiverSubSuperAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SubAdmin::class, 'user_id');
+    }
 
-    
 
     /**
      * sender ############################

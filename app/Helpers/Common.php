@@ -1963,6 +1963,19 @@ class Common
                     'colored_name' =>  '',
 
                 ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiverSubSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+
+                ];
             case 'user':
                 return [
                     $hasColor = Common::hasInPack(@$resource->receiver?->id, 18, true),

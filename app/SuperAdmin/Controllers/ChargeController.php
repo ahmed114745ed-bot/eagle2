@@ -102,7 +102,7 @@ class ChargeController extends MainController
         $grid->column('user_id', __('receiver'))->display(function () {
             $info = Common::getReceiverInfo($this);
 
-            if ($info['type'] === 'agency') {
+            if ($info['type'] == 'agency') {
                 if (request()->filled('_export_')) {
                     return $info['name'];
                 }
@@ -132,7 +132,7 @@ class ChargeController extends MainController
                     ";
             }
 
-            if ($info['type'] === 'user') {
+            if ($info['type'] == 'sub_super_admin') {
                 if (request()->filled('_export_')) {
                     return $info['name'];
                 }
