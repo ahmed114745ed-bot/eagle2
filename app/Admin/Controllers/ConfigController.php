@@ -43,7 +43,7 @@ class ConfigController extends MainController
             ->title(trans('configs'))
             ->body($this->grid()));
     }
-    
+
     /**
      * Show interface.
      *
@@ -117,22 +117,22 @@ class ConfigController extends MainController
         $grid->column('desc', trans('description'))->display(function ($desc) {
             return Lang::has('dashboard.' . $desc) ? __('dashboard.' . $desc) : $desc;
         });
-        Admin::style('.dropdown-toggle {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ccc;
-        }
-        .dropdown-menu {
-            min-width: 200px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .dropdown-item {
-            color: #333;
-                padding: 0 5px;
-                display: block;
-        }');
+//        Admin::style('.dropdown-toggle {
+//            background-color: #f8f9fa;
+//            color: #333;
+//            border: 1px solid #ccc;
+//        }
+//        .dropdown-menu {
+//            min-width: 200px;
+//            background-color: #fff;
+//            border: 1px solid #ccc;
+//            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//        }
+//        .dropdown-item {
+//            color: #333;
+//                padding: 0 5px;
+//                display: block;
+//        }');
         Admin::js('https://cdn.bootcss.com/vue/2.6.10/vue.min.js');
 
 
