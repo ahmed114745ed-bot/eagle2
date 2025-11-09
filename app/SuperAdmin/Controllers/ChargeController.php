@@ -99,20 +99,6 @@ class ChargeController extends MainController
             );
         });
 
-        $grid->column('amount', __('Amount'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            if (request()->filled('_export_')) {
-                return $coin ?? 0;
-            }
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . truncateAndTrim($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
-        });
-
         $grid->column('user_id', __('receiver'))->display(function () {
             $info = Common::getReceiverInfo($this);
 
@@ -126,7 +112,7 @@ class ChargeController extends MainController
                     $defaultImage = asset("images/icon-agency.jpg");
                     $url = getImagePath($path) ?? $defaultImage;
                     if (!isImageExists($url)) $url = $defaultImage;
-                    return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                    return handleShowImageWithTypes($info['uuid'], $url, 40, 40, 0);
                 });
                 $profileUrl = '';
                 if (!empty($info['uuid'])) {
@@ -173,9 +159,33 @@ class ChargeController extends MainController
             return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
         });
 
+        $grid->column('user_type', __('User Type'))->display(function ($value) {
+            switch ($value) {
+                case UserTypeEnum::AGENCY:
+                    return "<span class='badge bg-primary'>" . __('Agency') . "</span>";
+                case UserTypeEnum::SUB_ADMIN:
+                    return "<span class='badge bg-success'>" . __('Sub Super Admin') . "</span>";
+                default:
+                    return "<span class='badge bg-secondary'>" . __('Unknown') . "</span>";
+            }
+        });
 
         $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
+        });
+
+        $grid->column('amount', __('Amount'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            if (request()->filled('_export_')) {
+                return $coin ?? 0;
+            }
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . truncateAndTrim($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
         });
 
         $grid->column('usd', __('usd'))->display(function ($coin) {
