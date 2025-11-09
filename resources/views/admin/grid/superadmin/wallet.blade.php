@@ -309,8 +309,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <div class="form-group">
             <label for="charge_type">{{ __('Charge by') }}</label>
             <select id="charge_type" name="charge_type" class="form-control" required onchange="updateChargeInputLabel()">
-                <option value="dollar">{{ __('Dollar 💲') }}</option>
-                <option value="coins">{{ __('Coins 🪙') }}</option>
+                <option value="dollar">{{ __('Dollar') }}💲</option>
+                <option value="coins">{{ __('Coins') }}🪙</option>
             </select>
         </div>
 
@@ -319,7 +319,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             @endphp
 
             <div class="form-group">
-                <label for="amount">{{ __('enter_amount') }} 💲</label>
+                <label for="amount">{{ __('enter_amount') }}</label>
                 <input type="number"
                     name="amount"
                     id="amount"
