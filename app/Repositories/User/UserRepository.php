@@ -56,6 +56,28 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function searchAudioOwnerWithPage($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')->whereDoesntHave('ownerAudioRoom')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function searchLiveOwnerWithPage($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')->whereDoesntHave('ownerLiveRoom')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function searchWithPageNew($key, $page, $perPage)
     {
 
@@ -93,12 +115,12 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function bdCountryUsers($key, $page, $perPage,$country_id)
+    public function bdCountryUsers($key, $page, $perPage, $country_id)
     {
 
         return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
-        ->where('country_id',$country_id)
-        ->where(function ($query) {
+            ->where('country_id', $country_id)
+            ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })
@@ -170,7 +192,7 @@ class UserRepository extends Repository
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
-     public function supSuperAdminUsers($key, $page, $perPage)
+    public function supSuperAdminUsers($key, $page, $perPage)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where('is_super_admin', 0)
@@ -276,7 +298,7 @@ class UserRepository extends Repository
 
     public function searchUserFamily($key, $page, $perPage)
     {
-        return User::select('id', 'name','uuid') // keep light select
+        return User::select('id', 'name', 'uuid') // keep light select
             ->where(function ($query) {
                 $query->where('family_id', 0)
                     ->orWhereNull('family_id');

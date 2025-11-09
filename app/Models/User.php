@@ -808,6 +808,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
     }
 
+    public function ownerLiveRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'live');
+    }
+
     public function familyType()
     {
         return $this->hasOne(FamilyUser::class, 'user_id', 'id');

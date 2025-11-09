@@ -319,7 +319,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             @endphp
 
             <div class="form-group">
-                <label for="amount">{{ __('enter_amount') }} 💲</label>
+                <label for="amount">{{ __('enter_amount') }}</label>
                 <input type="number"
                     name="amount"
                     id="amount"
