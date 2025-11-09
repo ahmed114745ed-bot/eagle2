@@ -82,7 +82,7 @@ class HomeCarouselController extends MainController
     protected function grid()
     {
         $itemNotification = request('itemNotification');
-       
+
         $grid = new Grid(new HomeCarousel);
         $grid->model()->when($itemNotification, function ($query, $itemNotification) {
             $query->where('id', $itemNotification);
@@ -97,7 +97,7 @@ class HomeCarouselController extends MainController
             $grid->column('actions', __('Actions'))->display(function () {
 
                 $types = [
-                    'display_discover' => __('Display Discover'),
+//                    'display_discover' => __('Display Discover'),
                     'display_home_top' => __('Display Home Top'),
                     'display_home_middle' => __('Display Home Middle'),
                     'display_live' => __('Display Live'),
@@ -107,7 +107,7 @@ class HomeCarouselController extends MainController
                 $buttons = '';
                 foreach ($types as $type => $label) {
                     $buttons .= '<button class="btn btn-sm btn-primary request-banner me-1 mb-1"
-                                data-id="' . $this->id . '" 
+                                data-id="' . $this->id . '"
                                 data-type="' . $type . '">
                                 <i class="fa fa-bullhorn"></i> ' . $label . '
                              </button>';
@@ -120,15 +120,18 @@ class HomeCarouselController extends MainController
         $grid->disableActions();
 
         $display_prices = [
-            'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
+//            'display_discover' => SuperAdminHelper::getHourlyBannerPrice('display_discover'),
             'display_home_top' => SuperAdminHelper::getHourlyBannerPrice('display_home_top'),
             'display_home_middle' => SuperAdminHelper::getHourlyBannerPrice('display_home_middle'),
             'display_live' => SuperAdminHelper::getHourlyBannerPrice('display_live'),
+            'display_room' => SuperAdminHelper::getHourlyBannerPrice('display_room'),
         ];
 
         $translations = [
             'confirm_deduction' => __('Confirm Deduction'),
             'deduct_text' => __('coins will be deducted to send the display request: '),
+            'coins_per_hour' => __('coins per hour'),
+            'hours_label' => __('Hours:'),
             'yes_deduct' => __('Yes, deduct and send request'),
             'cancel' => __('Cancel'),
             'done' => __('Done!'),
@@ -140,6 +143,7 @@ class HomeCarouselController extends MainController
                 'display_home_top' => __('Display Home Top'),
                 'display_home_middle' => __('Display Home Middle'),
                 'display_live' => __('Display Live'),
+                'display_room' => __('Display Rooms'),
             ],
         ];
         $translationsJson = json_encode($translations);
@@ -161,8 +165,8 @@ class HomeCarouselController extends MainController
                 }
                 Swal.fire({
                     title: translations.confirm_deduction,
-                    html: '<p id=\"deduct_message\">' + translations.deduct_text + ' ' + deductAmount + ' coins per hour</p>' +
-                        '<label>' + displayLabel + ' Hours:</label>' +
+                    html: '<p id=\"deduct_message\">' + translations.deduct_text + ' ' + deductAmount + ' ' + translations.coins_per_hour + '</p>' +
+                        '<label>' + displayLabel + ' ' + translations.hours_label + ':</label>' +
                         '<input type=\"number\" id=\"banner_hours\" class=\"swal2-input\" min=\"1\" value=\"1\">',
                     type: 'warning', // في الإصدارات الحديثة استعمل icon بدل type
                     showCancelButton: true,
@@ -196,8 +200,8 @@ class HomeCarouselController extends MainController
                         $.ajax({
                             url: '/superadmin/banner-request/' + bannerId,
                             type: 'POST',
-                            data: { 
-                                _token: LA.token, 
+                            data: {
+                                _token: LA.token,
                                 field: displayType,
                                 hours: hours,
                                 total: totalDeduct
@@ -465,7 +469,7 @@ class HomeCarouselController extends MainController
                 type: AdminNotificationType::NEW_ORDER,
                 title: 'banner_request_title',
                 message: __(
-                    'banner_request_message', 
+                    'banner_request_message',
                     [
                         'name' => auth()->user()->name,
                         'id' => auth()->user()->id,
@@ -485,7 +489,7 @@ class HomeCarouselController extends MainController
             );
          });
      }
-     
+
      protected function errorResponse($message)
      {
          return response()->json(['message' => $message], 422);
