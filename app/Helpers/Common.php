@@ -1950,8 +1950,6 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-
-
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
                     'uuid' => $resource->receiveragency->id ?? '',

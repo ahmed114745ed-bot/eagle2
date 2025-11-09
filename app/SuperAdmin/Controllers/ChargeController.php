@@ -94,9 +94,11 @@ class ChargeController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
-            $filter->equal('user_id', __('Agency'))->select(
-                ShippingAgency::where('country_id', Auth::user()->country_id)->pluck('name', 'id')->toArray()
-            );
+            $filter->equal('user_id', __('Agency'))
+                ->select(ShippingAgency::pluck('name', 'id')->toArray());
+
+            $filter->equal('user_id', __('Sub Super Admin'))
+                ->select(SubAdmin::pluck('name', 'id')->toArray());
         });
 
         $grid->column('user_id', __('receiver'))->display(function () {
