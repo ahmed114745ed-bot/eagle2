@@ -448,7 +448,7 @@ class AgencyController extends MainController
                     <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
-        })->sortable();
+        });
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
