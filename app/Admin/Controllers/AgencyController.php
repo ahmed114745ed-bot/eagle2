@@ -513,7 +513,7 @@ class AgencyController extends MainController
                 <span>{$coin}</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>";
-        })->sortable();
+        });
 
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
