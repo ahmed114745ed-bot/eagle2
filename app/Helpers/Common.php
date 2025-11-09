@@ -1969,12 +1969,11 @@ class Common
                     'image' => $resource->receiverSubSuperAdmin->img ?? '',
                     'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
                     'id' => $resource->receiverSubSuperAdmin->id ?? '',
-                    'type' => 'agency',
-                    'url' => $resource->receiverSubSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
                     'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
-
                 ];
             case 'user':
                 return [
