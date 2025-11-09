@@ -97,6 +97,19 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchWithPage($key, $page, $perPage);
     }
+
+    public function searchUsersAudioWithPage($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchAudioOwnerWithPage($key, $page, $perPage);
+    }
+
+    public function searchUsersLiveWithPage($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchLiveOwnerWithPage($key, $page, $perPage);
+    }
+
     public function searchUsersWithPageNew($key, $page)
     {
         $perPage = 10;
