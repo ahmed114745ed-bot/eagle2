@@ -127,8 +127,16 @@ class SuperPackageController extends MainController
                 $url = getImagePath($path);
                 Log::info("Resolved image URL: {$url}");
         
-                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
-              
+                $imageType = getFileExtension($url);
+
+                if (in_array($imageType, ['svga', 'zz'])) {
+                    $image = '<img src="' . asset('images/placeholder.png') . '" 
+                                  style="width:50px;height:50px;border-radius:50%;object-fit:cover;" 
+                                  alt="placeholder" />';
+                } else {
+                    $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                }
+                              
         
                 Log::info("Generated image HTML: {$image}");
         
