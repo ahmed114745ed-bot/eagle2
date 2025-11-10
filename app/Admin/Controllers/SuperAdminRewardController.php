@@ -7,16 +7,17 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Models\SuperAdmin;
 use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
-use App\Models\SuperAdminReward;
-use App\Selectables\SuperAdmins;
-use App\Selectables\WaresByType;
-use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use App\Models\SuperAdminReward;
+use App\Selectables\SuperAdmins;
+use Encore\Admin\Widgets\Table;
+use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Models\SuperPackageReward;
+use App\Admin\Controllers\MainController;
 
 class SuperAdminRewardController extends MainController
 {
@@ -53,7 +54,7 @@ class SuperAdminRewardController extends MainController
     {
         $content = new Row();
 
-        $types =  ['vip', 'ware', 'badge'];
+        $types =  ['vip', 'ware', 'badge', 'package'];
         $currentType = request()->get('type', 'vip');
 
         $box = new Box(content: view('admin.grid.Form.rewardTabs', [
@@ -89,17 +90,29 @@ class SuperAdminRewardController extends MainController
         } elseif ($type == 'ware') {
             $grid = new Grid(new Ware());
             $this->ware($grid);
+        } elseif ($type == 'package') {
+            $grid = new Grid(new SuperPackageReward());
+            $this->package($grid);
         } else {
             // Optional: handle invalid type
             $grid = new Grid(new OVip());
         }
+        if ($type != 'package') {
+            if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+                $grid->column('return', __('dedicate'))->display(function () {
+                    $type = request('type');
+                    return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
+                });
+            }
+        } else {
+            if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+                $grid->column('return', __('dedicate'))->display(function () {
 
-        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('dedicate'))->display(function () {
-                $type = request('type');
-                return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
-            });
+                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
+                });
+            }
         }
+
 
         $grid->disableRowSelector();
         $grid->disableExport();
@@ -145,7 +158,54 @@ class SuperAdminRewardController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
     }
+    protected function package($grid)
+    {
+        $grid->column('title', __('title'));
+        $grid->column('members', __('rewards'))->expand(function ($model) {
+            $mempers = $model->packageRewards()
+                ->get() // 👈 fetch the related records first
+                ->map(function ($memper) {
+                    $gifts = '';
+                    $path = '';
 
+                    if ($memper->type == "ware") {
+                        $gifts = @$memper->ware->name ?? '';
+                        $path = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+                    } elseif ($memper->type == "vip") {
+                        $gifts = @$memper->vip->name ?? '';
+                        $path = @$memper->vip->img ?? '';
+                    } elseif ($memper->type == "badge") {
+                        $gifts = @$memper->badge->name ?? '';
+                        $path = @$memper->badge->image ?? '';
+                    } elseif ($memper->type == "coins") {
+                        $gifts = @$memper->target;
+                        $path = 'coin.png';
+                    } elseif ($memper->type == "achievement") {
+                        $value = getDriverUrl() . '/' . @$memper->target;
+                        $gifts = "<img src='$value' width='80' height='80'>";
+                        $path = $memper->target;
+                    }
+
+                    $url = getImagePath($path);
+                    $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+
+                    return [
+                        'id'    => $memper->id,
+                        'type'  => $memper->type,
+                        'gift'  => $gifts,
+                        'image' => $image,
+                        'quantity' => $memper->expire,
+                        'expire'  => $memper->quantity,
+
+                    ];
+                });
+
+            return new Table(
+                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                $mempers->toArray()
+            );
+        });
+    }
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');
