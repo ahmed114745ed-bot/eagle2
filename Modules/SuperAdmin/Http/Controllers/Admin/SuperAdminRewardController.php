@@ -160,50 +160,149 @@ class SuperAdminRewardController extends MainController
     protected function package($grid)
     {
         $grid->column('title', __('package'));
-        $grid->column('members', __('rewards'))->expand(function ($model) {
-            $mempers = $model->packageRewards()
-                ->get() // 👈 fetch the related records first
-                ->map(function ($memper) {
-                    $gifts = '';
-                    $path = '';
+        // $grid->column('members', __('rewards'))->expand(function ($model) {
+        //     $mempers = $model->packageRewards()
+        //         ->get() // 👈 fetch the related records first
+        //         ->map(function ($memper) {
+        //             $gifts = '';
+        //             $path = '';
 
-                    if ($memper->type == "ware") {
+        //             if ($memper->type == "ware") {
+        //                 $gifts = @$memper->ware->name ?? '';
+        //                 $path = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+        //             } elseif ($memper->type == "vip") {
+        //                 $gifts = @$memper->vip->name ?? '';
+        //                 $path = @$memper->vip->img ?? '';
+        //             } elseif ($memper->type == "badge") {
+        //                 $gifts = @$memper->badge->name ?? '';
+        //                 $path = @$memper->badge->image ?? '';
+        //             } elseif ($memper->type == "coins") {
+        //                 $gifts = @$memper->target;
+        //                 $path = 'coin.png';
+        //             } elseif ($memper->type == "achievement") {
+        //                 $value = getDriverUrl() . '/' . @$memper->target;
+        //                 $gifts = "<img src='$value' width='80' height='80'>";
+        //                 $path = $memper->target;
+        //             }
+
+        //             $url = getImagePath($path);
+        //             $image = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+        //             return [
+        //                 'id'    => $memper->id,
+        //                 'type'  => $memper->type,
+        //                 'gift'  => $gifts,
+        //                 'image' => $image,
+        //                 'quantity' => $memper->expire,
+        //                 'expire'  => $memper->quantity,
+
+        //             ];
+        //         });
+
+        //     return new Table(
+        //         ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+        //         $mempers->toArray()
+        //     );
+        // });
+
+
+
+        $grid->column('members', __('Rewards'))->expand(function ($model) {
+
+            $members = $model->packageRewards()->get()->map(function ($memper) {
+                $gifts = '';
+                $path = '';
+                $url = '';
+
+                switch ($memper->type) {
+                    case 'ware':
                         $gifts = @$memper->ware->name ?? '';
-                        $path = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
-                    } elseif ($memper->type == "vip") {
+                        $path = @$memper->ware->img2 ?? @$memper->ware->show_img ?? '';
+                        break;
+
+                    case 'vip':
                         $gifts = @$memper->vip->name ?? '';
                         $path = @$memper->vip->img ?? '';
-                    } elseif ($memper->type == "badge") {
+                        break;
+
+                    case 'badge':
                         $gifts = @$memper->badge->name ?? '';
                         $path = @$memper->badge->image ?? '';
-                    } elseif ($memper->type == "coins") {
-                        $gifts = @$memper->target;
+                        break;
+
+                    case 'coins':
+                        $gifts = $memper->target ?? '';
                         $path = 'coin.png';
-                    } elseif ($memper->type == "achievement") {
-                        $value = getDriverUrl() . '/' . @$memper->target;
-                        $gifts = "<img src='$value' width='80' height='80'>";
+                        break;
+
+                    case 'achievement':
+                        $gifts = "<img src='" . getDriverUrl() . '/' . @$memper->target . "' width='80' height='80'>";
                         $path = $memper->target;
-                    }
+                        break;
+                }
 
-                    $url = getImagePath($path);
-                    $image = handleShowImageWithTypes($this->id, $url, 50, 50);
+                // Build the full URL
+                $url = getImagePath($path);
 
-                    return [
-                        'id'    => $memper->id,
-                        'type'  => $memper->type,
-                        'gift'  => $gifts,
-                        'image' => $image,
-                        'quantity' => $memper->expire,
-                        'expire'  => $memper->quantity,
+                // Handle different types
+                $imageType = getFileExtension($url);
+                if ($imageType === 'svga' || $imageType === 'zz') {
+                    // Generate unique div ID for each SVGA
+                    $divId = 'svga_' . $memper->id;
+                    $image = new HtmlString(
+                        "<div class='rtlSvga' id='{$divId}' data-url='{$url}' style='width:50px;height:50px;'></div>"
+                    );
+                } elseif ($imageType === 'mp4') {
+                    $image = new HtmlString(
+                        "<video width='50' height='50' controls autoplay muted loop>
+                    <source src='{$url}' type='video/mp4'>
+                    <source src='{$url}' type='video/webm'>
+                    Your browser does not support the video tag.
+                 </video>"
+                    );
+                } else {
+                    // Normal images
+                    $image = new HtmlString("<img src='{$url}' width='50' height='50' style='border-radius:50%; object-fit:cover;'/>");
+                }
 
-                    ];
-                });
+                return [
+                    'id'       => $memper->id,
+                    'type'     => $memper->type,
+                    'gift'     => $gifts,
+                    'image'    => $image,
+                    'quantity' => $memper->quantity ?? 0,
+                    'expire'   => $memper->expire ?? 0,
+                ];
+            });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $mempers->toArray()
+                ['ID', __('Type'), __('Gift'), __('Image'), __('Quantity'), __('Expire')],
+                $members->toArray()
             );
         });
+
+        Admin::script(<<<JS
+            function initSvgaPlayers() {
+                document.querySelectorAll('.rtlSvga').forEach(el => {
+                    const url = el.dataset.url;
+                    if (!url) return;
+
+                    const player = new SVGA.Player(el);
+                    const parser = new SVGA.Parser();
+                    parser.load(url, function(videoItem) {
+                        player.setVideoItem(videoItem);
+                        player.startAnimation();
+                    });
+                });
+            }
+
+            // Initial load
+            document.addEventListener('DOMContentLoaded', initSvgaPlayers);
+
+            // Re-run after PJAX updates (Laravel Admin tables)
+            $(document).on('pjax:success', initSvgaPlayers);
+            JS
+            );
     }
     protected function badge($grid)
     {
