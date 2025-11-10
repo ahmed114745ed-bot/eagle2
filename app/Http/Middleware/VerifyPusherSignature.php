@@ -15,6 +15,8 @@ class VerifyPusherSignature
      */
     public function handle(Request $request, Closure $next): Response
     {
+        info('VerifyPusherSignature');
+
         $signature = $request->header('X-Pusher-Signature');
         $expectedSignature = hash_hmac(
             'sha256',
