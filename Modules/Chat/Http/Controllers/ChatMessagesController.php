@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
 use App\Http\Controllers\Controller;
+use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
@@ -133,6 +134,7 @@ class ChatMessagesController extends Controller
             // return $user2;
             event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+            event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom));
         } catch (\Throwable $e) {
         }
 

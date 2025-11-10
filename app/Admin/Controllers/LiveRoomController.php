@@ -43,7 +43,7 @@ class LiveRoomController extends MainController
 
     public function index(Content $content)
     {
-        $content = $content->title(trans('Rooms'));
+        $content = $content->title(trans('live stream'));
 
         // if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
         //     $content = $content->row(function (Row $row) {
@@ -327,6 +327,7 @@ class LiveRoomController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->model()
+            ->where('is_live', 1)
             ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("
                 CASE room_status
                     WHEN 1 THEN 100
@@ -338,7 +339,6 @@ class LiveRoomController extends MainController
                  WHERE room_visitors.room_id = rooms.id) AS visitor_ids
             "))
             ->with([
-
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
@@ -580,7 +580,7 @@ class LiveRoomController extends MainController
 
         $grid->id(__('ID'));
 
-        $grid->column('room_name', __('room'))->display(function ($name) {
+        $grid->column('room_name', __('live stream'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
@@ -604,7 +604,7 @@ class LiveRoomController extends MainController
             ";
         });
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('owner_id', __('live stream owner'))->display(function ($name) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
@@ -854,7 +854,7 @@ class LiveRoomController extends MainController
             return $ops;
         };
     }
-    
+
     public function removeAdmin(Request $request, $roomId)
     {
         $room = Room::findOrFail($roomId);

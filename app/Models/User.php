@@ -1044,6 +1044,7 @@ class User extends Authenticatable
         return $this->belongsTo(Family::class, 'family_id');
     }
 
+
     public function followPacks()
     {
         return $this->hasMany(Pack::class, 'user_id', 'id')->whereIn('packs.type', [4, 18])->where(function ($q) {
@@ -1753,16 +1754,28 @@ class User extends Authenticatable
         return $this->shippingAgency()->exists();
     }
 
+
+
     public function hostAgency()
     {
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
 
+    
     public function hasHostAgency()
     {
-        return $this->shippingAgency()->exists();
+        return $this->hasOne(Agency::class, 'app_owner_id');
     }
-
+    
+    public function hasShippingAgencyV2()
+    {
+        return $this->hasOne(Agency::class, 'app_owner_id'); 
+    }
+    
+    public function hasFamily()
+    {
+        return $this->belongsTo(Family::class, 'family_id'); 
+    }
     public function bdSalaries()
     {
         return $this->hasMany(BDSallary::class, 'bd_id');
