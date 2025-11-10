@@ -896,7 +896,7 @@
   "make_super_admin_default":"When you enable this option, this country manager will become the default instead of the current default.",
 "vip_gift_message": "You have received a new VIP level as a gift",
 "default_current": "This BD will become the default owner for any agency when its BD is deleted",
-"default_current_superadmin": "This country manager will become the default owner for any agency when its country manager is deleted",
+"default_current_superadmin": "This country manager will become the default owner for any bd when its country manager is deleted",
 "no_default_set": "No default BD has been set yet",
 "select_default_bd": "Select BD to be default",
 "select_default_superadmin": "Select country manager to be default",
