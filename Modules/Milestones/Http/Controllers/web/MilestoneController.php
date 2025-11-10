@@ -76,10 +76,10 @@ class MilestoneController extends MainController
             });
         }
 
-        $grid->column('sync', __('Sync'))->display(function () {
+        $grid->column('sync', __('Rewards'))->display(function () {
             $url = admin_url("milestones/{$this->id}/sync"); 
             return "<a href='{$url}' class='btn btn-xs btn-success'>
-                        <i class='fa fa-sync'></i> " . __('Sync') . "
+                        <i class='fa fa-sync'></i> " . __('Reapply Rewards') ."
                     </a>";
         });
         
