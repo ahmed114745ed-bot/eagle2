@@ -24,6 +24,9 @@
         .col-sm-8 {
         width: 80.66666667%;
     }
+        .col-sm-2 {
+        width: 5.66666667%;
+    }
 
     .rtl label {
         margin: 0 !important;
