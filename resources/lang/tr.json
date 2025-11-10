@@ -3881,8 +3881,10 @@
     "Works since :value months": ":value aydır bizimle",
     "Works since :value days": ":value gündür bizimle",
     "owner room": "oda sahibi",
-    "Welcome message": "Ailemize hoş geldiniz! Başarınıza giden her adımda size destek olacağım."
-
+    "Welcome message": "Ailemize hoş geldiniz! Başarınıza giden her adımda size destek olacağım.",
+    "select super admin": "ülke yöneticisini seçin",
+  
+    "default_superadmin_status": "varsayılan ülke yöneticisi"
 
 
 
