@@ -88,42 +88,52 @@ class SuperPackageController extends MainController
 
         $grid->column('members', __('rewards'))->expand(function ($model) {
             Log::info("=== Expand rewards for model ID: {$model->id} ===");
-
+        
             $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
                 Log::info("Processing reward ID: {$memper->id}, type: {$memper->type}");
-
+        
                 $gifts = '';
                 $path  = '';
-
-                if ($memper->type == "ware") {
-                    $gifts = @$memper->ware->name ?? '';
-                    $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
-                    Log::info("Ware gift: {$gifts}, path: {$path}");
-                } elseif ($memper->type == "vip") {
-                    $gifts = @$memper->vip->name ?? '';
-                    $path  = @$memper->vip->img ?? '';
-                    Log::info("VIP gift: {$gifts}, path: {$path}");
-                } elseif ($memper->type == "badge") {
-                    $gifts = @$memper->badge->name ?? '';
-                    $path  = @$memper->badge->image ?? '';
-                    Log::info("Badge gift: {$gifts}, path: {$path}");
-                } elseif ($memper->type == "coin") {
-                    $gifts = @$memper->target;
-                    $path  = 'coin.png';
-                    Log::info("Coins gift: {$gifts}, path: {$path}");
-                } elseif ($memper->type == "achievement") {
-                    $value = getDriverUrl() . '/' . @$memper->target;
-                    $gifts = "<img src='$value' width='80' height='80'>";
-                    $path  = $memper->target;
-                    Log::info("Achievement gift: {$gifts}, path: {$path}, value: {$value}");
+        
+                switch ($memper->type) {
+                    case "ware":
+                        $gifts = @$memper->ware->name ?? '';
+                        $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+                        Log::info("Ware gift: {$gifts}, path: {$path}");
+                        break;
+                    case "vip":
+                        $gifts = @$memper->vip->name ?? '';
+                        $path  = @$memper->vip->img ?? '';
+                        Log::info("VIP gift: {$gifts}, path: {$path}");
+                        break;
+                    case "badge":
+                        $gifts = @$memper->badge->name ?? '';
+                        $path  = @$memper->badge->image ?? '';
+                        Log::info("Badge gift: {$gifts}, path: {$path}");
+                        break;
+                    case "coin":
+                        $gifts = @$memper->target;
+                        $path  = 'coin.png';
+                        Log::info("Coins gift: {$gifts}, path: {$path}");
+                        break;
+                    case "achievement":
+                        $value = getDriverUrl() . '/' . @$memper->target;
+                        $gifts = "<img src='$value' width='80' height='80'>";
+                        $path  = $memper->target;
+                        Log::info("Achievement gift: {$gifts}, path: {$path}, value: {$value}");
+                        break;
                 }
-
-                $url   = getImagePath($path);
+        
+                $url = getImagePath($path);
                 Log::info("Resolved image URL: {$url}");
-
+        
                 $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                if (in_array(getFileExtension($url), ['svga', 'zz']) && empty($url)) {
+                    $image = '<img src="' . asset('images/placeholder.png') . '" style="width:50px;height:50px;border-radius:50%;object-fit:cover;" />';
+                }
+        
                 Log::info("Generated image HTML: {$image}");
-
+        
                 return [
                     'id'       => $memper->id,
                     'type'     => $memper->type,
@@ -133,14 +143,15 @@ class SuperPackageController extends MainController
                     'expire'   => $memper->quantity,
                 ];
             });
-
+        
             Log::info("Mapped rewards: " . json_encode($mempers->toArray()));
-
+        
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
+        
 
 
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
