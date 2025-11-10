@@ -115,7 +115,6 @@ class Kernel extends HttpKernel
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
-
-
+        'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
     ];
 }

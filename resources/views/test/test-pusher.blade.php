@@ -1,41 +1,43 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Pusher Presence Test</title>
-    <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Pusher Token Test</title>
 </head>
 <body>
-<pre id="output"></pre>
+<h1>Testing Broadcast via Token</h1>
+<p>Token: {{ $token }}</p>
 
+<script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 <script>
-    const log = msg => document.getElementById('output').innerText += msg + '\n';
+    const token = @json($token);
 
-    // These are passed from Laravel
-    const PUSHER_APP_KEY   = "{{ $pusherAppKey }}";
-    const PUSHER_CLUSTER   = "{{ $pusherCluster }}";
-
-    log('Initializing Pusher with key: ' + PUSHER_APP_KEY);
-
-    const pusher = new Pusher(PUSHER_APP_KEY, {
-        cluster: PUSHER_CLUSTER,
-        authEndpoint: '/broadcasting/auth',
+    const pusher = new Pusher("{{ config('broadcasting.connections.pusher.key') }}", {
+        cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
+        authEndpoint: "/broadcasting/auth",
+        forceTLS: true,
+        // This is the key part → send token in the Authorization header
         auth: {
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+            }
         }
     });
 
-    const roomId = 12;
-    const channel = pusher.subscribe(`presence-chat.room.${roomId}`);
+    const channel = pusher.subscribe('presence-chat.room.1726');
 
-    channel.bind('pusher:subscription_succeeded', members => {
-        log('Subscribed successfully.');
-        log('Current members: ' + JSON.stringify(members.members));
+    channel.bind('pusher:subscription_succeeded', function() {
+        console.log("✅ Subscribed successfully with token");
     });
 
-    channel.bind('pusher:member_added', member => log(member.info.name + ' joined'));
-    channel.bind('pusher:member_removed', member => log(member.info.name + ' left'));
-    channel.bind('OpenChat', data => log('OpenChat: ' + JSON.stringify(data)));
+    channel.bind('pusher:subscription_error', function(status) {
+        console.error("❌ Subscription error:", status);
+    });
+
+    channel.bind('any-event', function(data) {
+        console.log("Event received:", data);
+    });
 </script>
 </body>
 </html>
