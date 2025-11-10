@@ -3884,7 +3884,9 @@
     "Welcome message": "Ailemize hoş geldiniz! Başarınıza giden her adımda size destek olacağım.",
     "select super admin": "ülke yöneticisini seçin",
   
-    "default_superadmin_status": "varsayılan ülke yöneticisi"
+    "default_superadmin_status": "varsayılan ülke yöneticisi",
+    "milestone_rewards_synced": "Kilometre taşları ödülleri başarıyla senkronize edildi"
+
 
 
 
