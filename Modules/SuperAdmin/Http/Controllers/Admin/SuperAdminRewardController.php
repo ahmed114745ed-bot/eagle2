@@ -186,13 +186,13 @@ class SuperAdminRewardController extends MainController
                     }
                     /** @var Ware $this */
                     $url = getImagePath($path);
-                    $image = handleShowImageWithType($this->id, $url, 30, 30);
+                   
 
                     return [
                         'id'    => $memper->id,
                         'type'  => $memper->type,
                         'gift'  => $gifts,
-                        'image' => $image,
+                        
                         'quantity' => $memper->expire,
                         'expire'  => $memper->quantity,
 
@@ -200,44 +200,11 @@ class SuperAdminRewardController extends MainController
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
 
-        Admin::script(
-            <<<JS
-function initSvgaPlayers(parent) {
-    const scope = parent || document;
-    scope.querySelectorAll('.rtlSvga').forEach(el => {
-        const url = el.dataset.url;
-        if (!url) return;
-
-        // Clear previous canvas
-        el.innerHTML = "";
-
-        const player = new SVGA.Player(el);
-        const parser = new SVGA.Parser();
-        parser.load(url, function(videoItem) {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
-        });
-    });
-}
-
-// Initial load
-document.addEventListener('DOMContentLoaded', () => initSvgaPlayers());
-
-// PJAX reload
-$(document).on('pjax:success', () => initSvgaPlayers());
-
-// Laravel Admin expand row click
-$(document).on('click', '.grid-expand-row', function() {
-    const row = $(this).closest('tr').next('tr'); // expanded content
-    initSvgaPlayers(row[0]);
-});
-JS
-        );
     }
 
     
