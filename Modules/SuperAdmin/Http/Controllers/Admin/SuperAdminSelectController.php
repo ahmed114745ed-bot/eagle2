@@ -49,7 +49,7 @@ class SuperAdminSelectController extends MainController
         $superAdmin->default = true;
         $superAdmin->save();
 
-        admin_success('Updated', 'Default Super Admin has been set successfully');
+        admin_success('Updated', 'Default country manager has been set successfully');
 
         return redirect()->back();
     }
