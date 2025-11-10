@@ -27,7 +27,7 @@ class RoomResource extends JsonResource
             'top_room' => $this->top_room,
             'pin' => $this->pin,
             'sort_num' => $this->sort_num,
-            'max_admin' => $this->max_admin ?? Common::getConfig('max_room_admin'),
+            'max_admin' => $this->max_admin ?? (Common::getConfig('max_room_admin') ?? 4),
             'name' => $this->room_name,
             'image' => $this->room_cover,
             'intro' => $this->room_intro,

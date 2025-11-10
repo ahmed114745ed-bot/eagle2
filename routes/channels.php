@@ -3,6 +3,8 @@
 use App\Models\RoomVisitor;
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Room;
+use Modules\Chat\Http\Services\ChatRoomService;
+
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -53,6 +55,23 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
+    return [
+        'id'   => $user->id,
+        'name' => $user->name,
+    ];
+});
+
+Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
+    $chatRoomService = app(ChatRoomService::class);
+    $checkRoom = $chatRoomService->getCreateChatRoomId($chatRoomId);
+    if (!$checkRoom){
+        return false;
+    }
+    $user->update(['current_room_chat' => $checkRoom->id]);
+    $chatRoomService->markMessagesAsSeen($checkRoom, $user);
+    $user2 = $chatRoomService->getUserInChatRoom($checkRoom, $user);
+    $chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+
     return [
         'id'   => $user->id,
         'name' => $user->name,

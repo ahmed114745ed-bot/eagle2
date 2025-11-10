@@ -655,5 +655,52 @@ function escapeHtml(unsafe) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+
+
+document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('field-name-input')) {
+        const input = e.target;
+        const container = input.closest('.field-name-container');
+
+        let name = input.value.replace(/\s+/g, '');
+        input.value = name;
+
+        if (name.length < 2) {
+            showNameStatus(container, '', '');
+            return;
+        }
+
+        fetch(`/check-field-name?name=${encodeURIComponent(name)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    showNameStatus(container, '⚠️ الاسم موجود بالفعل', 'red');
+                } else {
+                    showNameStatus(container, '✅ الاسم متاح', 'green');
+                }
+            })
+            .catch(() => {
+                showNameStatus(container, 'حدث خطأ أثناء التحقق', 'orange');
+            });
+    }
+});
+
+function showNameStatus(container, message, color) {
+    let status = container.querySelector('.name-status');
+    if (!status) {
+        status = document.createElement('div');
+        status.classList.add('name-status');
+        status.style.marginTop = '5px';
+        status.style.fontSize = '14px';
+        container.appendChild(status);
+    }
+
+    if (message === '') {
+        status.textContent = '';
+    } else {
+        status.textContent = message;
+        status.style.color = color;
+    }
+}
 </script>
 @endpush

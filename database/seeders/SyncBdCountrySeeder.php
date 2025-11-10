@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Bd;
-use App\Models\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Database\Seeder;
 
 class SyncBdCountrySeeder extends Seeder

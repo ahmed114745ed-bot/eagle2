@@ -1950,8 +1950,6 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-
-
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
                     'uuid' => $resource->receiveragency->id ?? '',
@@ -1962,6 +1960,18 @@ class Common
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
 
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
                 ];
             case 'user':
                 return [
