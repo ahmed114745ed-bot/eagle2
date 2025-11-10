@@ -2,11 +2,13 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\SuperAdmin;
+
 use Illuminate\Http\Request;
-use App\Models\SuperAdminReward;
+
 use Encore\Admin\Actions\Action;
 use App\Models\SuperPackageReward;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 class DedicateSuperPackageRewardAction extends Action
 {

@@ -383,7 +383,7 @@ Route::group(
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
 
-      
+
         Route::get('/soon', 'AllStatisticController@index2');
         Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');
         Route::get('/custom-export-users', [
@@ -473,7 +473,7 @@ Route::group(
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
- 
+
 
          //Route::resource('ovip', 'OVipController');
         // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
@@ -706,6 +706,10 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+
+            Route::get('/pusher-test', function (){
+                return view('test.test-pusher');
+            });
         });
 
         Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');

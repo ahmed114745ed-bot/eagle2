@@ -3,28 +3,19 @@
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
 use App\Models\Ware;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Selectables\Badges;
 use Modules\SuperAdmin\Actions\Admin\DedicateSuperAdminRewardAction;
 use Modules\Vip\Entities\OVip;
-use App\Selectables\SuperAdmins;
-use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
-use App\Models\SuperAdminReward;
-use App\Selectables\SuperAdmins;
+use Illuminate\Support\HtmlString;
 use Encore\Admin\Widgets\Table;
-use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
-use App\Admin\Controllers\MainController;
+
 
 class SuperAdminRewardController extends MainController
 {
@@ -104,22 +95,20 @@ class SuperAdminRewardController extends MainController
             // Optional: handle invalid type
             $grid = new Grid(new OVip());
         }
-        if ($type != 'package') {
+        if ($type == 'package') {
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
-                    $type = request('type');
-                    return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
+
+                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
                 });
             }
         } else {
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
-
-        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('dedicate'))->display(function () {
-                $type = request('type');
-                return (new DedicateSuperAdminRewardAction($this->id, $type))->render();
-            });
+                    $type = request('type');
+                    return (new DedicateSuperAdminRewardAction($this->id, $type))->render();
+                });
+            }
         }
 
 
@@ -145,6 +134,7 @@ class SuperAdminRewardController extends MainController
         return $grid;
     }
 
+
     protected function ware($grid)
     {
         $grid->filter(function (Grid\Filter $filter) {
@@ -169,7 +159,7 @@ class SuperAdminRewardController extends MainController
     }
     protected function package($grid)
     {
-        $grid->column('title', __('title'));
+        $grid->column('title', __('package'));
         $grid->column('members', __('rewards'))->expand(function ($model) {
             $mempers = $model->packageRewards()
                 ->get() // 👈 fetch the related records first
@@ -194,15 +184,15 @@ class SuperAdminRewardController extends MainController
                         $gifts = "<img src='$value' width='80' height='80'>";
                         $path = $memper->target;
                     }
-
+                    /** @var Ware $this */
                     $url = getImagePath($path);
-                    $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                   
 
                     return [
                         'id'    => $memper->id,
                         'type'  => $memper->type,
                         'gift'  => $gifts,
-                        'image' => $image,
+                        
                         'quantity' => $memper->expire,
                         'expire'  => $memper->quantity,
 
@@ -210,11 +200,14 @@ class SuperAdminRewardController extends MainController
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
+
     }
+
+    
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');
