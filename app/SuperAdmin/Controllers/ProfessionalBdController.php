@@ -137,11 +137,11 @@ class ProfessionalBdController extends MainController
         });
 
 
-        $grid->column('default', trans('default_status'))
-            ->switch(Common::getSwitchStates())
-            ->display(function ($enable) {
-                return $enable;
-            });
+//        $grid->column('default', trans('default_status'))
+//            ->switch(Common::getSwitchStates())
+//            ->display(function ($enable) {
+//                return $enable;
+//            });
         // $grid->column('default', __('default_status'))->display(function () {
         //     if (request()->filled('_export_')) {
         //         return $this->default;
