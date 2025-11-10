@@ -6,7 +6,7 @@
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    
+
         justify-content: center;
         align-items: center;
         padding: 20px;
@@ -25,7 +25,7 @@
         width: 100%;
         position: relative;
         z-index: 1;
-        animation: slideUp 0.5s 
+        animation: slideUp 0.5s
     ease-out;
     }
     .form-container {
@@ -373,7 +373,7 @@ input[type="file"]::-webkit-file-upload-button:hover {
     border-radius: 10px;
     text-align: center;
     color: #667eea;
-    transition: all 0.3s 
+    transition: all 0.3s
 ease;
     background: rgba(102, 126, 234, 0.05);
 }
@@ -544,7 +544,7 @@ ease;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1));
     border: 2px solid #ffd700;
     border-radius: 10px;
-    transition: all 0.3s 
+    transition: all 0.3s
 ease;
 }
 .agency-logo {
@@ -593,7 +593,7 @@ ease;
     .agencies-grid {
         flex-direction: column;
     }
-  
+
 }
 
 </style>
@@ -648,7 +648,7 @@ ease;
                                 <div id="field-container-{{ $section->id }}-{{ $field->id }}">
                                     {{-- Text, Email, Number, Tel, Date --}}
                                     @if (in_array($field->field_type, ['text', 'email', 'number', 'tel', 'date']))
-                                        <input 
+                                        <input
                                             type="{{ $field->field_type }}"
                                             name="{{ $field->field_name }}"
                                             class="form-control"
@@ -657,7 +657,7 @@ ease;
 
                                     {{-- Textarea --}}
                                     @elseif ($field->field_type === 'textarea')
-                                        <textarea 
+                                        <textarea
                                             name="{{ $field->field_name }}"
                                             class="form-control"
                                             rows="3"
@@ -667,19 +667,19 @@ ease;
                                     {{-- File --}}
                                     @elseif ($field->field_type === 'file')
                                     <div class="file-upload" style="position: relative; display: inline-block;">
-                                        <input 
-                                            type="file" 
-                                            id="idBack" 
-                                            name="{{ $field->field_name ?? 'idBack' }}" 
-                                            accept="image/*" 
-                                            class="file-input" 
+                                        <input
+                                            type="file"
+                                            id="idBack"
+                                            name="{{ $field->field_name ?? 'idBack' }}"
+                                            accept="image/*"
+                                            class="file-input"
                                             @required($field->is_required)
                                             onchange="handleFileUpload(this, 'idBackLabel')"
                                             style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; cursor: pointer;"
                                         >
-                                        <label for="idBack" 
-                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column" 
-                                            id="idBackLabel" 
+                                        <label for="idBack"
+                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column"
+                                            id="idBackLabel"
                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
                                             📷 اضغط لرفع صورة ظهر البطاقة
                                         </label>
@@ -695,7 +695,7 @@ ease;
 
                                         reader.onload = function(e) {
                                             label.innerHTML = `
-                                                <img src="${e.target.result}" alt="Uploaded Image" 
+                                                <img src="${e.target.result}" alt="Uploaded Image"
                                                     style="max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 8px;">
                                                 <div style="font-size: 12px; color: #555;">${file.name}</div>
                                             `;
@@ -718,7 +718,8 @@ ease;
                                             if (!empty($field->data_source)) {
                                                 switch ($field->data_source) {
                                                     case 'countries':
-                                                        $data = \App\Models\Country::select('id', 'name')->get();
+                                                        $name = app()->getLocale() == 'ar' ? 'name' : 'e_name';
+                                                        $data = \App\Models\Country::select('id', "$name as name")->get();
                                                         break;
                                                     case 'cities':
                                                         $data = \App\Models\City::select('id', 'name')->get();
@@ -733,7 +734,7 @@ ease;
                                             }
                                         @endphp
 
-                                        <select 
+                                        <select
                                             name="{{ $field->field_name }}"
                                             class="form-select"
                                             @required($field->is_required)>
@@ -758,23 +759,23 @@ ease;
                                         </select>
 
                                     {{-- Radio --}}
-                                  
-                                  
+
+
                                     @elseif ($field->field_type === 'radio')
                                         @php
-                                            $options = is_array($field->options) 
-                                                ? $field->options 
+                                            $options = is_array($field->options)
+                                                ? $field->options
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
                                         @endphp
                                         <div class="radio-group">
                                             @foreach ($options as $key => $value)
                                                 @php
-                                                    $displayValue = is_array($value) 
-                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key) 
+                                                    $displayValue = is_array($value)
+                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key)
                                                         : $value;
                                                 @endphp
                                                 <div class="form-check">
-                                                    <input 
+                                                    <input
                                                         type="radio"
                                                         name="{{ $field->field_name }}"
                                                         id="{{ $field->field_name }}_{{ $key }}"
@@ -791,19 +792,19 @@ ease;
                                     {{-- Checkbox --}}
                                     @elseif ($field->field_type === 'checkbox')
                                         @php
-                                            $options = is_array($field->options) 
-                                                ? $field->options 
+                                            $options = is_array($field->options)
+                                                ? $field->options
                                                 : (is_string($field->options) ? json_decode($field->options, true) : []);
                                         @endphp
                                         <div class="checkbox-group">
                                             @foreach ($options as $key => $value)
                                                 @php
-                                                    $displayValue = is_array($value) 
-                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key) 
+                                                    $displayValue = is_array($value)
+                                                        ? ($value[$currentLocale] ?? $value['en'] ?? $key)
                                                         : $value;
                                                 @endphp
                                                 <div class="form-check">
-                                                    <input 
+                                                    <input
                                                         type="checkbox"
                                                         name="{{ $field->field_name }}[]"
                                                         id="{{ $field->field_name }}_{{ $key }}"
@@ -858,7 +859,7 @@ ease;
             <script>
                 let selectedCard = null;
                 let searchTimeout = null;
-                let lang = "{{ $currentLocale }}"; 
+                let lang = "{{ $currentLocale }}";
 
                 const searchInput = document.getElementById('search-query');
                 const resultsContainer = document.getElementById('search-results');
@@ -908,10 +909,10 @@ ease;
                                     <span class="default-badge">${bd.is_default ? "{{ __('Recommended') }}" : ''}</span>
                                     <span class="bd-id">ID: ${bd.id ?? ''}</span>
                                     <input type="radio" name="bd" value="${bd.id ?? ''}" ${bd.is_default ? 'checked' : ''} style="display: none;">
-                                    
+
                                     <div class="bd-profile">
-                                        <img src="${bd.image ?? 'https://via.placeholder.com/80/667eea/ffffff?text=BD'}" 
-                                            alt="${bd.name ?? 'BD'}" 
+                                        <img src="${bd.image ?? 'https://via.placeholder.com/80/667eea/ffffff?text=BD'}"
+                                            alt="${bd.name ?? 'BD'}"
                                             class="bd-avatar">
                                         <div class="bd-info">
                                             <div class="bd-name">${bd.name ?? ''}</div>
@@ -980,7 +981,7 @@ ease;
         </div>
     </form>
 
-   
+
 </div>
 <script>
     const translations = {
@@ -1020,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fields.forEach(field => {
             html += `
                 <div class="flex-grow-1" style="width: 46%;">
-                    <input type="${field.type}" 
+                    <input type="${field.type}"
                         name="sections[${sectionId}][fields][${fieldId}][items][${index}][${field.name}]"
                         class="form-control form-control-sm mb-1"
                         placeholder="${field.placeholder}">
@@ -1029,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         html += `
-            <button type="button" class="btn btn-sm btn-danger remove-btn" 
+            <button type="button" class="btn btn-sm btn-danger remove-btn"
                 onclick="this.closest('.custom-item').remove()">
                 <i class="fa fa-times"></i>
             </button>
@@ -1060,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const response = await fetch(`/form-translations?id=${formId}&locale=${lang}`);
             const data = await response.json();
-            
+
             document.querySelector('h2').textContent = data.title;
 
             data.sections.forEach((section, sIndex) => {
