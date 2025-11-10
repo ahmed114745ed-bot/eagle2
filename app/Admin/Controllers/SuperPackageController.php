@@ -110,8 +110,9 @@ class SuperPackageController extends MainController
                         $imageUrl = getDriverUrl() . '/' . $memper->target;
                         break;
                 }
+           
         
-                $imageHtml = "<img src='{$imageUrl}' width='50' height='50' />";
+                $imageHtml = handleShowImageWithTypes($this->id, $imageUrl, 50, 50);
         
                 return [
                     'id' => $memper->id,
