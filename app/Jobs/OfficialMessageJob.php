@@ -62,7 +62,7 @@ class OfficialMessageJob implements ShouldQueue
             // if it's a comma-separated string or single value
             $featureIds = array_filter(explode(',', $featureIds));
         }
-       
+
         $AllUsersId = [];
         $HostUsersId = [];
         $HostAgencyUsersId = [];
@@ -71,47 +71,49 @@ class OfficialMessageJob implements ShouldQueue
         $BdUsersId = [];
         $usersId = [];
 
+        $AllUsersId = [];
+        $HostUsersId = [];
+        $HostAgencyUsersId = [];
+        $shippingAgencyUserId = [];
+        $FamilyUsersId = [];
+        $BdUsersId = [];
+
         if (!empty($this->model->multi_feature) && is_array($this->model->multi_feature)) {
             foreach ($this->model->multi_feature as $feature) {
                 if ($feature === 'all') {
                     $AllUsersId = User::pluck('id')->toArray();
                 } elseif ($feature === 'users') {
-                    $HostUsersId = User::where(function ($query) {
-                        $query->whereNull('agency_id')
-                            ->orWhere('agency_id', 0);
-                    })->pluck('id')->toArray();
+                    $HostUsersId = array_merge($HostUsersId, User::whereNull('agency_id')
+                        ->orWhere('agency_id', 0)
+                        ->pluck('id')->toArray());
                 } elseif ($feature === 'host_users') {
-                    $HostUsersId = User::where(function ($query) {
-                        $query->whereNotNull('agency_id')
-                            ->where('agency_id', '!=', 0);
-                    })->where(function ($query) {
-                        $query->whereDoesntHave('ownAgency')
-                            ->orWhereDoesntHave('shippingAgency');
-                    })->pluck('id')->toArray();
+                    $HostUsersId = array_merge($HostUsersId, User::whereNotNull('agency_id')
+                        ->where('agency_id', '!=', 0)
+                        ->where(function ($query) {
+                            $query->whereDoesntHave('ownAgency')
+                                ->orWhereDoesntHave('shippingAgency');
+                        })
+                        ->pluck('id')->toArray());
                 } elseif ($feature === 'host_agencies') {
-                    $HostAgencyUsersId = User::whereNotNull('agency_id')
+                    $HostAgencyUsersId = array_merge($HostAgencyUsersId, User::whereNotNull('agency_id')
                         ->where('agency_id', '!=', 0)
                         ->whereHas('ownAgency')
-                        ->pluck('id')
-                        ->toArray();
+                        ->pluck('id')->toArray());
                 } elseif ($feature === 'charge_agencies') {
-                    $shippingAgencyUserId = User::whereNotNull('agency_id')
+                    $shippingAgencyUserId = array_merge($shippingAgencyUserId, User::whereNotNull('agency_id')
                         ->where('agency_id', '!=', 0)
                         ->whereHas('shippingAgency')
-                        ->pluck('id')
-                        ->toArray();
+                        ->pluck('id')->toArray());
                 } elseif ($feature === 'families') {
-                    $FamilyUsersId = User::whereHas('user_family')
-                        ->pluck('id')
-                        ->toArray();
+                    $FamilyUsersId = array_merge($FamilyUsersId, User::whereHas('user_family')
+                        ->pluck('id')->toArray());
                 } elseif ($feature === 'bds') {
-                    $BdUsersId = User::where('is_bd', 1)
-                        ->pluck('id')
-                        ->toArray();
+                    $BdUsersId = array_merge($BdUsersId, User::where('is_bd', 1)
+                        ->pluck('id')->toArray());
                 }
             }
 
-            // Combine all IDs into one array (and remove duplicates)
+            // Combine all IDs into one array and remove duplicates
             $usersId = array_unique(array_merge(
                 $AllUsersId,
                 $HostUsersId,
@@ -120,7 +122,10 @@ class OfficialMessageJob implements ShouldQueue
                 $FamilyUsersId,
                 $BdUsersId
             ));
+
+           CustomNotification::officialMsg($this->model, $usersId);
         }
+
 
         // Log::info('OfficialMessageJob started', [
         //     'feature'      => $feature,
@@ -189,7 +194,7 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
-
+        dd($usersId);
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);
     }
