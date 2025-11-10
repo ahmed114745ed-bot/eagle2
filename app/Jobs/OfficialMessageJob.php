@@ -194,7 +194,6 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
-        dd($usersId);
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);
     }
