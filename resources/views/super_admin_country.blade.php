@@ -926,7 +926,7 @@
 
                 <img
                     src="{{ $avatarUrl }}"
-                    alt="{{ @$superAdmin->name ?? 'Super Admin' }}"
+                    alt="{{ @$superAdmin->name ?? 'country manager' }}"
                     class="admin-avatar"
                 />
                 <div class="admin-info">

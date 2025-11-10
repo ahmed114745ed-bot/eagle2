@@ -3,7 +3,7 @@
 return [
     'login.title'           => 'Dashboard Access',
     'login.titleBD'           => ' BD Dashboard Access',
-    'login.titleSuperAdmin'  =>' SuperAdmin Dashboard Access',
+    'login.titleSuperAdmin'  =>'country manager Dashboard Access',
     'login.remember'        => 'Remember me',
     'login.rights'          => ' © 2023. All rights reserved',
     'login.language.switch' => 'الانتقال إلى',

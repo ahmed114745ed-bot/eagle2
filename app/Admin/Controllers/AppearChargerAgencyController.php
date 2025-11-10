@@ -234,7 +234,7 @@ class AppearChargerAgencyController extends MainController
         });
 
 
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
@@ -278,7 +278,7 @@ class AppearChargerAgencyController extends MainController
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         $grid->column('owner_id', __('Owner'))->display(function () {
             // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
@@ -327,19 +327,19 @@ class AppearChargerAgencyController extends MainController
             ->display(function () {
                 return $this->chargeAgency ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();;
 
-        $grid->column('appear_charger_agency', __("Appear charger agency"))
+        $grid->column('owner.appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
                 return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('is_frozen', __("frozen"))
             ->display(function () {
                 return $this->is_frozen ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {

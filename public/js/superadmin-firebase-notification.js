@@ -46,7 +46,7 @@ function checkNotificationPermission() {
         console.log("🔔 Notifications are already enabled.");
     } else if (Notification.permission === "denied" || Notification.permission === "default") {
         if (!document.getElementById("notification-alert")) {
-            showNotificationAlert();
+            // showNotificationAlert();
         }
     }
 }
