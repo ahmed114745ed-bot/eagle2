@@ -278,7 +278,7 @@
 
                 @if ($admin->type == 'superadmin')
           
-                   @include('superadmin.notifications.super')
+                   @include('SuperAdmin::notifications.super')
 
                 @endif
 

@@ -13,6 +13,20 @@ class OfficialMessageAdmin extends Model
     protected $table = 'official_messages';
 
     protected $guarded = [];
+    protected $casts = [
+        'multi_feature' => 'array',
+    ];
+
+    public function getMultiFeatureAttribute($value)
+    {
+        $decoded = json_decode($value, true);
+
+        if (is_array($decoded) && isset($decoded[0])) {
+            return array_filter(explode(',', $decoded[0]));
+        }
+
+        return [];
+    }
 
     public function user()
     {
@@ -44,7 +58,6 @@ class OfficialMessageAdmin extends Model
             // ✅ Remove the raw arrays from the request before save
             unset($model->agency_ids);
             unset($model->shipping_agency_ids);
-           
         });
     }
 }
