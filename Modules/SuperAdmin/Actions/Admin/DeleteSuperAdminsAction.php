@@ -35,6 +35,7 @@ class DeleteSuperAdminsAction extends RowAction
 
         if ($model->default == 1) $this->response()->error(__('can not delete default super admin'))->refresh();
         $user = User::find($model->app_id);
+       
         if ($user) {
             $user->is_super_admin = 0;
             $user->save();
@@ -48,7 +49,6 @@ class DeleteSuperAdminsAction extends RowAction
             User::whereIn('id', $subAdmins)->update(['sub_area_manger' => 0]);
             SubAdmin::where('parent_id', $model->id)->delete();
         }
-
         $model->delete();
 
         return $this->response()->success(__('super admin deleted successfully.'))->refresh();
