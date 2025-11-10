@@ -184,15 +184,15 @@ class SuperAdminRewardController extends MainController
                         $gifts = "<img src='$value' width='80' height='80'>";
                         $path = $memper->target;
                     }
-
+                    /** @var Ware $this */
                     $url = getImagePath($path);
-                    $image = handleShowImageWithTypes($this->id, $url, 30, 30);
+                   
 
                     return [
                         'id'    => $memper->id,
                         'type'  => $memper->type,
                         'gift'  => $gifts,
-                        'image' => $image,
+                        
                         'quantity' => $memper->expire,
                         'expire'  => $memper->quantity,
 
@@ -200,13 +200,14 @@ class SuperAdminRewardController extends MainController
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
 
-
     }
+
+    
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');
