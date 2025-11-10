@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class Country extends Model
 {

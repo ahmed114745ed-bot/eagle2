@@ -8,6 +8,7 @@ use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bd;
@@ -35,6 +36,14 @@ class AllStatisticController extends MainController
     public function index(Content $content)
     {
 
+        return parent::index(
+            $content
+                ->title(__('Home'))
+                ->description(__('General Statistics'))
+                ->row(function (Row $row) {
+                    $row->column(12, view('admin.dashboard.chart'));
+                })
+        );
         $countryID = $this->countryId();
 
         $user = Auth::user();
@@ -56,7 +65,7 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart'));
                 }
             })
-            ->row(function (Row $row) use (  $topUsersByFollowers) {
+            ->row(function (Row $row) use ($topUsersByFollowers) {
                 $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
 
@@ -107,10 +116,10 @@ class AllStatisticController extends MainController
                             $col->row($view5);
                         });
 
-                        $row->column(6, function ($col) {
-                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
-                            $col->row($view);
-                        });
+                        //                        $row->column(6, function ($col) {
+                        //                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
+                        //                            $col->row($view);
+                        //                        });
                     });
                 });
                 $row->column(12, function ($column) {
@@ -179,7 +188,7 @@ class AllStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column)  {
+                $row->column(12, function ($column) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
                     $column->row(function ($row) {
@@ -190,6 +199,19 @@ class AllStatisticController extends MainController
             }));
     }
 
+    public function getTopFollowers(Request $request): JsonResponse
+    {
+        $countryID = $this->countryId();
+
+        $topUsersByFollowers = User::withCount('followers')
+            ->with('profile')
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->orderByDesc('followers_count')
+            ->take(10)
+            ->get();
+
+        return response()->json($topUsersByFollowers);
+    }
 
     public function peakHours(Request $request)
     {
@@ -765,10 +787,9 @@ class AllStatisticController extends MainController
                     'used' => $used,
                     'usePercentage' => $usePercentage,
                     'chartData' => $chartData,
-                    'showPaymentAlert' => $usePercentage <= 90
+                    'showPaymentAlert' => (($used > 0) && ($usePercentage <= 90)) ? 1 : 0,
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -777,7 +798,32 @@ class AllStatisticController extends MainController
         }
     }
 
-   public function getStatsData(Request $request)
+    public function gameSummary(Request $request): JsonResponse
+    {
+        $countryID = $request->get('country_id');
+
+        $game = CoinGameUserDailyAggregated::query()
+            ->whereHas('user', function ($q) use ($countryID) {
+                $q->when($countryID, fn($query, $countryID) => $query->where('country_id', $countryID));
+            })
+            ->selectRaw("
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(total_loss - total_win) as app_profit
+        ")
+            ->first();
+
+        return response()->json([
+            'total_played' => $game->total_played ?? 0,
+            'total_loss' => $game->total_loss ?? 0,
+            'total_win' => $game->total_win ?? 0,
+            'app_profit' => $game->app_profit ?? 0,
+        ]);
+    }
+
+
+    public function getStatsData(Request $request)
     {
         try {
             $countryID = $this->countryId();
@@ -795,8 +841,8 @@ class AllStatisticController extends MainController
 
             // Peak Hours
             $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-                    $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
-                })
+                $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
+            })
                 ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions")
                 ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
                 ->groupBy('hour')
@@ -827,8 +873,8 @@ class AllStatisticController extends MainController
                 ->distinct('chat_room_id')->count('chat_room_id');
 
             $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                    $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
-                })
+                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+            })
                 ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
                 ->groupBy('chat_room_id')
                 ->pluck('duration')
@@ -838,7 +884,6 @@ class AllStatisticController extends MainController
                 'success' => true,
                 'data' => $stats
             ]);
-
         } catch (\Exception $e) {
             \Log::error('Error fetching stats data: ' . $e->getMessage());
             return response()->json([

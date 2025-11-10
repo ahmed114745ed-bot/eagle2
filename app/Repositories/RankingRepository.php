@@ -2,22 +2,23 @@
 
 namespace App\Repositories;
 
-use App\helper\RankingHelper;
-use App\helper\TimeHelper;
-use App\Helpers\Common;
-use App\Models\CoinGameUserAll;
-use App\Models\CoinGameUserArchive;
-use App\Models\CoinGameUserMerged;
-use App\Models\CoinGameUserMergedMonthly;
 use Carbon\Carbon;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Agency;
+use App\Helpers\Common;
 use App\Models\GiftLog;
+use App\helper\TimeHelper;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
+use App\helper\RankingHelper;
 use App\Models\UserLuckyGift;
+use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserMerged;
 use Illuminate\Support\Facades\DB;
+use App\Models\CoinGameUserArchive;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\CoinGameUserMergedMonthly;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 
@@ -43,17 +44,17 @@ class RankingRepository
         [$from, $to] = $this->getDateRange($type);
 
         switch ($type) {
-            case 0: 
+            case 0:
                 $model = CoinGameUser::class;
                 break;
 
-            case 1: 
-            case 2: 
+            case 1:
+            case 2:
                 $model = CoinGameUserMerged::class;
 
                 break;
 
-            case 3: 
+            case 3:
                 $model = CoinGameUserMergedMonthly::class;
                 break;
 
@@ -79,7 +80,7 @@ class RankingRepository
             ->get();
     }
 
-  
+
     protected function userRelations(): array
     {
         return [
@@ -96,27 +97,27 @@ class RankingRepository
     {
         $timezone = Common::timeZone();
         switch ($type) {
-            case 0: 
+            case 0:
                 $from = Carbon::now($timezone)->startOfHour();
                 $to   = Carbon::now($timezone)->endOfHour();
                 break;
 
-            case 1: 
+            case 1:
                 $from = Carbon::now($timezone)->startOfDay();
                 $to   = Carbon::now($timezone)->endOfDay();
                 break;
 
-            case 2: 
+            case 2:
                 $from = Carbon::now($timezone)->startOfWeek();
                 $to   = Carbon::now($timezone)->endOfWeek();
                 break;
 
-            case 3: 
+            case 3:
                 $from = Carbon::now($timezone)->startOfMonth();
                 $to   = Carbon::now($timezone)->endOfMonth();
                 break;
 
-            default: 
+            default:
                 $from = Carbon::now($timezone)->startOfDay();
                 $to   = Carbon::now($timezone)->endOfDay();
                 break;
@@ -159,14 +160,14 @@ class RankingRepository
                 ->whereIn('type', [4, 18, 10, 25])
                 ->where('is_used', true)
                 ->with('ware:id,name,img1,img2,show_img,color,value'),
-    
+
             'mangerType:id,name_ar,name_en,img',
             'UserVip:id,user_id,expire,level,is_used',
             'senderLevel:id,level,type,img',
             'receiverLevel:id,level,type,img',
             'country:id,name,iso,flag',
             'profile:user_id,avatar,birthday',
-    
+
             'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image', 'user_id'])
                 ->where('picked', true)
                 ->with([
@@ -176,23 +177,31 @@ class RankingRepository
                 ])
                 ->limit(5),
         ];
-    
-      
-    
+
+
+
         return $relations;
     }
-    
+
 
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
         return GiftRanking::query()
             ->whereHas('ranker')
-            ->with([
-                'ranker' => fn($q) => $q->with($this->rankerRelations($role))
-            ])
-
             ->where('role', $role)
-            ->where('ranker_type', User::class)
+            ->when($role == 'roomId', function ($query) {
+                return $query->where('ranker_type', Room::class)->with([
+                    'ranker' => function ($q) {
+                        $q->with('owner')->select(['id', 'room_name','uid','room_cover' ]);
+                    },
+                ]);
+            })
+            ->when($role != 'roomId', function ($query) use ($role) {
+                return $query->where('ranker_type', User::class)->with([
+                    'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+                ]);
+            })
+
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts')
             ->take($perPage)
@@ -281,9 +290,9 @@ class RankingRepository
     {
         $timezone = Common::timeZone();
         $now = Carbon::now($timezone);
-    
-       
-    
+
+
+
         [$start, $end] = match ($type) {
             0 => [$now->copy()->startOfHour(), $now->copy()->endOfHour()],
             1 => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
@@ -294,13 +303,13 @@ class RankingRepository
             3 => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
             default => [null, null],
         };
-    
+
         if ($start && $end) {
             $query->whereBetween('created_at', [$start, $end]);
         }
     }
 
-   
+
 
     protected function applyDateFiltersV2(&$query, $type)
     {

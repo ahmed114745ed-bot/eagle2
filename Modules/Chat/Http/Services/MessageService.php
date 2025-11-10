@@ -165,7 +165,7 @@ class MessageService
         if ($request->message_id) {
             $this->messageRepo->createMessageReplay($message->id, $request->message_id);
         }
-        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
+//        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
 
         // Return the message and chat room resources
         return [

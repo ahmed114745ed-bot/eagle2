@@ -2,11 +2,13 @@
 
 namespace Modules\RoomCup\Http\Controllers\Api;
 
+use App\Models\Setting;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Modules\RoomBoom\Entities\TotalRoomGift;
@@ -140,22 +142,38 @@ class RoomCupController extends Controller
     }
 
 
-    private function getSettings()
+    private function getSettings(): array
     {
         $default = [
             'enabled'          => true,
             'interval_minutes' => 60,
             'type'             => 'daily',
         ];
-
-        if (!Storage::disk('local')->exists('roomcup_settings.json')) {
-            Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
-            return $default;
+    
+        $settings = [];
+    
+        foreach ($default as $key => $defaultValue) {
+            $cacheKey = 'roomcup_' . $key;
+    
+            $value = Cache::get($cacheKey);
+    
+            if ($value === null) {
+                $setting = Setting::where('key', $cacheKey)->first();
+                $value = $setting ? $setting->value : $defaultValue;
+    
+                Cache::put($cacheKey, $value, now()->addDays(30));
+            }
+    
+            if ($key === 'enabled') {
+                $value = (bool) $value;
+            } elseif ($key === 'interval_minutes') {
+                $value = (int) $value;
+            }
+    
+            $settings[$key] = $value;
         }
-
-        $settings = json_decode(Storage::disk('local')->get('roomcup_settings.json'), true);
-
-        return array_merge($default, $settings);
+    
+        return $settings;
     }
 
     public function cupTargetHtml(Request $request)

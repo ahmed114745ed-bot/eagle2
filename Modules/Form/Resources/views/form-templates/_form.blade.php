@@ -19,8 +19,6 @@
 
     $localeNames = array_intersect_key($allLocaleNames, array_flip($localeCodes));
 
-     //dd($localeNames, $locales);
-
     $availableWidgets = CustomFieldWidget::where('is_active', true)->get();
 @endphp
 
@@ -128,6 +126,7 @@ const availableWidgets = @json($availableWidgets);
 
 let sectionCount = {{ $template->sections->count() > 0 ? $template->sections->max('section_order') : 0 }};
 let fieldCounts = {};
+let optionCounts = {};
 const existingSections = @json($template->sections->keyBy('section_order'));
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -188,7 +187,6 @@ function addSection(data = null) {
 
     fieldCounts[sectionCount] = data && data.fields ? data.fields.length : 0;
 
-    // Build section titles inputs dynamically from locales
     const titlesHtml = locales.map(locale => {
         const val = data && data.title ? (data.title[locale] || '') : '';
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
@@ -201,7 +199,6 @@ function addSection(data = null) {
             </div>`;
     }).join('');
     const canDeleteSection = !data || data.can_not_delete != 1;
-    // console.log(data);
 
     const deleteSectionButton = canDeleteSection
         ? `  <button type="button" onclick="removeSection(${sectionCount})"
@@ -236,7 +233,7 @@ function addSection(data = null) {
                         ${titlesHtml}
                     </div>
                 </div>
-
+                <input type="hidden" name="sections[${sectionCount}][can_not_delete]" value="${data && data.can_not_delete ? data.can_not_delete : 0}">
                 <input type="hidden" name="sections[${sectionCount}][order]" value="${sectionCount}">
 
                 <div class="mb-4">
@@ -253,8 +250,8 @@ function addSection(data = null) {
     `;
 
     document.getElementById('sections').insertAdjacentHTML('beforeend', sectionHtml);
+    document.querySelector(`[data-section="${sectionCount}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // Initialize sorting for fields
     new Sortable(document.getElementById(`section-${sectionCount}-fields`), {
         animation: 150,
         handle: '.field-drag-handle',
@@ -284,10 +281,6 @@ function addField(sectionId, data = null) {
   
     const canDeleteSection = data && data.can_not_delete;
 
-    // console.log(canDeleteSection);
-    // console.log(data);
-
-    // build multilingual label inputs
     const labelHtml = locales.map(locale => {
         const val = data && data.field_label ? (data.field_label[locale] || '') : '';
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
@@ -300,7 +293,6 @@ function addField(sectionId, data = null) {
             </div>`;
     }).join('');
 
-    // build multilingual placeholder inputs
     const placeholderHtml = locales.map(locale => {
         const val = data && data.placeholder ? (data.placeholder[locale] || '') : '';
         const dir = locale === 'ar' ? ' dir="rtl"' : '';
@@ -313,17 +305,13 @@ function addField(sectionId, data = null) {
             </div>`;
     }).join('');
 
-    // Build widget selector options
     const widgetOptionsHtml = availableWidgets.map(widget => {
         const widgetName = widget.widget_name.en || widget.widget_type;
-        console.log( data);
-        console.log( widget.id);
-        
         const isSelected = data && data.widget_id === widget.id ? 'selected' : '';
         return `<option value="${widget.id}" ${isSelected}>${widgetName}</option>`;
     }).join('');
+    
     const canDelete = !data || data.can_not_delete != 1;
-    console.log(data);
     
     const deleteButton = canDelete
         ? `<button type="button" onclick="removeField(${sectionId}, ${fieldId})"
@@ -334,6 +322,7 @@ function addField(sectionId, data = null) {
             class="text-gray-400 cursor-not-allowed text-lg" title="This field cannot be deleted">
             <i class="fas fa-lock"></i>
         </button>`;
+
     const fieldHtml = `
         <div class="field-item  p-4 rounded-lg border" data-field="${sectionId}-${fieldId}" id="field-${sectionId}-${fieldId}">
             <div class="flex justify-between items-center mb-3">
@@ -373,12 +362,12 @@ function addField(sectionId, data = null) {
                                 onchange="handleFieldTypeChange(${sectionId}, ${fieldId}, this)">
                             <option value="text" ${data && data.field_type === 'text' ? 'selected' : ''}>${'{{ __('Text') }}'}</option>
                             <option value="email" ${data && data.field_type === 'email' ? 'selected' : ''}>${'{{ __('Email') }}'}</option>
-                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${'{{ __('Number') }}'}</option>
+                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${'{{ __('integer') }}'}</option>
                             <option value="tel" ${data && data.field_type === 'tel' ? 'selected' : ''}>${'{{ __('Phone') }}'}</option>
                             <option value="date" ${data && data.field_type === 'date' ? 'selected' : ''}>${'{{ __('Date') }}'}</option>
                             <option value="textarea" ${data && data.field_type === 'textarea' ? 'selected' : ''}>${'{{ __('Textarea') }}'}</option>
-                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${'{{ __('File') }}'}</option>
-                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${'{{ __('Select') }}'}</option>
+                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${'{{ __('file') }}'}</option>
+                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${'{{ __('select') }}'}</option>
                             <option value="checkbox" ${data && data.field_type === 'checkbox' ? 'selected' : ''}>${'{{ __('Checkbox') }}'}</option>
                             <option value="radio" ${data && data.field_type === 'radio' ? 'selected' : ''}>${'{{ __('Radio') }}'}</option>
                             <option value="custom" ${data && data.field_type === 'custom' ? 'selected' : ''}>${'{{ __('Custom Widget') }}'}</option>
@@ -386,22 +375,20 @@ function addField(sectionId, data = null) {
                     </div>
                 </div>
 
-                     <!-- Custom Field Options (Custom/Predefined) -->
-                    <div  class=" widget-selector-container custom-options-wrapper mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
-                        <!-- Widget Selector -->
-                        <div class="mb-3">
-                            <label class="block text-lg font-semibold mb-1">
-                                <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>{{ __('Select Custom Widget') }} *
-                            </label>
-                            <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
-                                    class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
-                                <option value="">-- {{ __('Choose a widget') }} --</option>
-                                ${widgetOptionsHtml}
-                            </select>
-                            <p class="text-gray-500 mt-1">
-                                <i class="fas fa-info-circle"></i> {{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}
-                            </p>
-                        </div>
+                <!-- Custom Widget Selector -->
+                <div class="widget-selector-container mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
+                    <label class="block text-lg font-semibold mb-1">
+                        <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>${'{{ __('Select Custom Widget') }}'} *
+                    </label>
+                    <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
+                            class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
+                        <option value="">-- ${'{{ __('Choose a widget') }}'} --</option>
+                        ${widgetOptionsHtml}
+                    </select>
+                    <p class="text-gray-500 mt-1">
+                        <i class="fas fa-info-circle"></i> ${'{{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}'}
+                    </p>
+                </div>
 
                 <div class="mb-4 placeholder-container" style="display: ${data && data.field_type === 'custom' ? 'none' : 'block'};">
                     <h5 class="text-lg font-semibold mb-2">${'{{ __('Placeholder Text') }}'}</h5>
@@ -410,15 +397,15 @@ function addField(sectionId, data = null) {
                     </div>
                 </div>
 
-                <!-- Select Options Configuration (shown only for select/checkbox/radio) -->
-                <div class="mb-4 options-container" style="display: none;">
+                <!-- Select Options Configuration -->
+                <div class="mb-4 options-container" style="display: ${data && ['select', 'checkbox', 'radio'].includes(data.field_type) ? 'block' : 'none'};">
                     <h5 class="text-lg font-semibold mb-2">
                         <i class="fas fa-list-ul text-blue-600 mr-1"></i>
                         ${'{{ __('Select Options Configuration') }}'}
                     </h5>
                     
                     <!-- Options Type Selector -->
-                    <div class="mb-3  p-3 rounded-lg">
+                    <div class="mb-3 p-3 rounded-lg">
                         <label class="block text-lg font-semibold mb-2">${'{{ __('Options Type') }}'}</label>
                         <div class="flex gap-4">
                             <label class="flex items-center cursor-pointer">
@@ -444,22 +431,18 @@ function addField(sectionId, data = null) {
                         </div>
                     </div>
 
-                     <!-- Custom Field Options (Custom/Predefined) -->
-                    <div class=" widget-selector-container custom-options-wrapper mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
-                        <!-- Widget Selector -->
+                    <!-- Custom Options Editor -->
+                    <div class="custom-options-editor" style="display: ${!data || !data.data_source ? 'block' : 'none'};">
                         <div class="mb-3">
-                            <label class="block text-lg font-semibold mb-1">
-                                <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>{{ __('Select Custom Widget') }} *
-                            </label>
-                            <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
-                                    class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
-                                <option value="">-- {{ __('Choose a widget') }} --</option>
-                                ${widgetOptionsHtml}
-                            </select>
-                            <p class="text-gray-500 mt-1">
-                                <i class="fas fa-info-circle"></i> {{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}
-                            </p>
+                            <button type="button" onclick="addCustomOption(${sectionId}, ${fieldId})"
+                                    class="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600">
+                                <i class="fas fa-plus mr-1"></i> ${'{{ __('Add Option') }}'}
+                            </button>
                         </div>
+                        <div id="custom-options-${sectionId}-${fieldId}" class="space-y-3">
+                            <!-- Options will be added here -->
+                        </div>
+                    </div>
 
                     <!-- Pre-defined Data Selector -->
                     <div class="predefined-options-selector" style="display: ${data && data.data_source ? 'block' : 'none'};">
@@ -486,6 +469,8 @@ function addField(sectionId, data = null) {
                     </div>
                 </div>
 
+                <input type="hidden" name="sections[${sectionId}][fields][${fieldId}][can_not_delete]" value="${data && data.can_not_delete ? data.can_not_delete : 0}">
+
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center text-lg">
                         <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][required]" value="1" ${data && data.is_required ? 'checked' : ''} class="mr-2 checkbox">
@@ -504,7 +489,16 @@ function addField(sectionId, data = null) {
 
     document.getElementById(`section-${sectionId}-fields`).insertAdjacentHTML('beforeend', fieldHtml);
 
-    // Initialize field visibility based on field type
+    // Initialize option counter
+    optionCounts[`${sectionId}-${fieldId}`] = 0;
+
+    // Load existing options if any
+    if (data && data.options && Array.isArray(data.options)) {
+        data.options.forEach(optionData => {
+            addCustomOption(sectionId, fieldId, optionData);
+        });
+    }
+
     setTimeout(() => {
         const fieldTypeSelect = document.querySelector(`#field-${sectionId}-${fieldId} .field-type-select`);
         if (fieldTypeSelect && data) {
@@ -512,7 +506,6 @@ function addField(sectionId, data = null) {
         }
     }, 50);
 
-    // Scroll to the newly added field with smooth animation
     setTimeout(() => {
         const newField = document.getElementById(`field-${sectionId}-${fieldId}`);
         if (newField) {
@@ -520,7 +513,6 @@ function addField(sectionId, data = null) {
                 behavior: 'smooth',
                 block: 'center'
             });
-            // Add a highlight animation
             newField.classList.add('ring-4', 'ring-green-300');
             setTimeout(() => {
                 newField.classList.remove('ring-4', 'ring-green-300');
@@ -529,7 +521,62 @@ function addField(sectionId, data = null) {
     }, 100);
 }
 
-// Handle field type change to show/hide widget selector
+// Add custom option with multi-language support
+function addCustomOption(sectionId, fieldId, data = null) {
+    const key = `${sectionId}-${fieldId}`;
+    optionCounts[key] = (optionCounts[key] || 0) + 1;
+    const optionId = optionCounts[key];
+
+    const optionLabelsHtml = locales.map(locale => {
+        const val = data && data.label ? (data.label[locale] || '') : '';
+        const dir = locale === 'ar' ? ' dir="rtl"' : '';
+        return `
+            <div class="relative">
+                <div class="absolute top-0 right-0 bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded">${locale.toUpperCase()}</div>
+                <input type="text" 
+                       name="sections[${sectionId}][fields][${fieldId}][options][${optionId}][label][${locale}]" 
+                       ${locale === locales[0] ? 'required' : ''} ${dir}
+                       class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
+                       placeholder="${'{{ __('Option Label') }}'}" 
+                       value="${escapeHtml(val)}">
+            </div>`;
+    }).join('');
+
+    const optionHtml = `
+        <div class="option-item border-2 border-gray-200 p-3 rounded bg-gray-50" data-option="${optionId}">
+            <div class="flex justify-between items-start mb-2">
+                <span class="font-medium text-gray-700">${'{{ __('Option') }}'} #${optionId}</span>
+                <button type="button" onclick="removeCustomOption(${sectionId}, ${fieldId}, ${optionId})"
+                        class="text-red-600 hover:text-red-800">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-2 mb-2">
+                ${optionLabelsHtml}
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">${'{{ __('Value') }}'} *</label>
+                <input type="text" 
+                       name="sections[${sectionId}][fields][${fieldId}][options][${optionId}][value]" 
+                       required
+                       class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
+                       placeholder="value_key" 
+                       value="${data && data.value ? escapeHtml(data.value) : ''}">
+            </div>
+        </div>
+    `;
+
+    document.getElementById(`custom-options-${sectionId}-${fieldId}`).insertAdjacentHTML('beforeend', optionHtml);
+}
+
+// Remove custom option
+function removeCustomOption(sectionId, fieldId, optionId) {
+    const optionElement = document.querySelector(`#custom-options-${sectionId}-${fieldId} [data-option="${optionId}"]`);
+    if (optionElement) {
+        optionElement.remove();
+    }
+}
+
 function handleFieldTypeChange(sectionId, fieldId, selectElement) {
     const fieldContainer = document.getElementById(`field-${sectionId}-${fieldId}`);
     const widgetContainer = fieldContainer.querySelector('.widget-selector-container');
@@ -545,52 +592,51 @@ function handleFieldTypeChange(sectionId, fieldId, selectElement) {
     if (placeholderContainer) placeholderContainer.style.display = 'block';
     if (fieldNameContainer) fieldNameContainer.style.display = 'block';
 
+   
     if (selectElement.value === 'custom') {
-        // Show widget selector
         widgetContainer.style.display = 'block';
         widgetSelect.required = true;
 
-        // Hide placeholder and field name
         if (placeholderContainer) placeholderContainer.style.display = 'none';
         if (fieldNameContainer) fieldNameContainer.style.display = 'none';
         fieldNameInput.required = false;
 
-        // Auto-generate field name from widget selection
-        widgetSelect.addEventListener('change', function() {
+        const newWidgetSelect = widgetSelect.cloneNode(true);
+        widgetSelect.parentNode.replaceChild(newWidgetSelect, widgetSelect);
+
+        newWidgetSelect.addEventListener('change', function() {
             if (this.value) {
                 const selectedWidget = availableWidgets.find(w => w.id == this.value);
                 if (selectedWidget) {
-                    // Generate field name from widget type
-                    const autoName = selectedWidget.widget_type + '_' + sectionId + '_' + fieldId;
-                    fieldNameInput.value = autoName;
+                    fieldNameInput.value = selectedWidget.widget_type + '_' + sectionId + '_' + fieldId;
                 }
             }
         });
     } else if (selectElement.value === 'select' || selectElement.value === 'checkbox' || selectElement.value === 'radio') {
-        // Show options configuration for select/checkbox/radio
         if (optionsContainer) optionsContainer.style.display = 'block';
         fieldNameInput.required = true;
         widgetSelect.required = false;
+
     } else {
-        // Show standard fields
         widgetSelect.required = false;
         widgetSelect.value = '';
         fieldNameInput.required = true;
     }
 }
 
-// Toggle between custom and predefined options
 function toggleOptionsType(sectionId, fieldId, type) {
     const fieldContainer = document.getElementById(`field-${sectionId}-${fieldId}`);
     const customEditor = fieldContainer.querySelector('.custom-options-editor');
     const predefinedSelector = fieldContainer.querySelector('.predefined-options-selector');
 
-    if (type === 'custom') {
-        customEditor.style.display = 'block';
-        predefinedSelector.style.display = 'none';
-    } else {
-        customEditor.style.display = 'none';
-        predefinedSelector.style.display = 'block';
+    if (customEditor && predefinedSelector) {
+        if (type === 'custom') {
+            customEditor.style.display = 'block';
+            predefinedSelector.style.display = 'none';
+        } else {
+            customEditor.style.display = 'none';
+            predefinedSelector.style.display = 'block';
+        }
     }
 }
 
@@ -600,7 +646,6 @@ function removeField(sectionId, fieldId) {
     updateFieldOrders(sectionId);
 }
 
-// small helper to avoid XSS when inserting values
 function escapeHtml(unsafe) {
     if (unsafe === null || unsafe === undefined) return '';
     return String(unsafe)
@@ -609,6 +654,53 @@ function escapeHtml(unsafe) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+
+document.addEventListener('input', function (e) {
+    if (e.target.classList.contains('field-name-input')) {
+        const input = e.target;
+        const container = input.closest('.field-name-container');
+
+        let name = input.value.replace(/\s+/g, '');
+        input.value = name;
+
+        if (name.length < 2) {
+            showNameStatus(container, '', '');
+            return;
+        }
+
+        fetch(`/check-field-name?name=${encodeURIComponent(name)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    showNameStatus(container, '⚠️ الاسم موجود بالفعل', 'red');
+                } else {
+                    showNameStatus(container, '✅ الاسم متاح', 'green');
+                }
+            })
+            .catch(() => {
+                showNameStatus(container, 'حدث خطأ أثناء التحقق', 'orange');
+            });
+    }
+});
+
+function showNameStatus(container, message, color) {
+    let status = container.querySelector('.name-status');
+    if (!status) {
+        status = document.createElement('div');
+        status.classList.add('name-status');
+        status.style.marginTop = '5px';
+        status.style.fontSize = '14px';
+        container.appendChild(status);
+    }
+
+    if (message === '') {
+        status.textContent = '';
+    } else {
+        status.textContent = message;
+        status.style.color = color;
+    }
 }
 </script>
 @endpush

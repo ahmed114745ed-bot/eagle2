@@ -207,9 +207,9 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         App\Bd\BdServiceProvider::class,
         App\Providers\TimeServiceProvider::class,
-
-        App\SuperAdmin\SuperAdminServiceProvider::class,
         Modules\AreaManager\Providers\AreaManagerServiceProvider::class,
+        Modules\SuperAdmin\Providers\SuperAdminServiceProvider::class,
+
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 

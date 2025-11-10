@@ -500,11 +500,12 @@ class Common
         return $confs ?: null;
     }
 
-    public static function upload($folder, $file)
+    public static function upload($folder, $file, $disk = null)
     {
+        $config = $disk ?: config('filesystems.default');
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
@@ -1988,7 +1989,18 @@ class Common
                     'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
-
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
                 ];
             case 'user':
                 return [

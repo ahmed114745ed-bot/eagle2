@@ -870,6 +870,7 @@
         }
 
         .feature-card {
+                color: #383232;
             background: white;
             padding: 40px;
             border-radius: 20px;
@@ -915,6 +916,7 @@
             transform: translateY(-15px);
             box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
         }
+       
 
         .feature-icon {
             width: 90px;
@@ -951,7 +953,7 @@
         }
 
         .feature-card p {
-            color: var(--text-light);
+            color: #000000;
             line-height: 1.6;
         }
 

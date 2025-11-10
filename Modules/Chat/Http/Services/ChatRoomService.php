@@ -173,6 +173,16 @@ class ChatRoomService
                         });
                 });
             })
+            ->where(function ($query) use ($user) {
+                $query->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->whereNull('user_1_deleted');
+                })
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('user_id2', $user->id)
+                            ->whereNull('user_2_deleted');
+                    });
+            })
             ->groupBy([
                 'chat_rooms.id',
                 'chat_rooms.user_id',
@@ -288,7 +298,6 @@ class ChatRoomService
         })->first();
 
         if (!$chatRoom) {
-
             $user2 = User::find($userId2);
             $type = 'guest';
             if ($user->followBack($user2)) {
@@ -300,6 +309,37 @@ class ChatRoomService
                 'user_id2' => $userId2,
                 'type' => $type,
             ]);
+        }
+
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
+
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
+        }
+
+        return $chatRoom;
+    }
+
+    public function getCreateChatRoomId($id)
+    {
+        $chatRoom = ChatRoom::where('id', $id)->first();
+
+        if (!$chatRoom) {
+            return false;
+        }
+
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
+
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
         }
 
         return $chatRoom;
@@ -415,12 +455,14 @@ class ChatRoomService
 
     public function deleteChatRoom($user, $userId2)
     {
-        // Find the chat room
         $checkRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
-            $query->where('user_id', $user->id)
-                ->where('user_id2', $userId2)
-                ->orWhere('user_id', $userId2)
-                ->where('user_id2', $user->id);
+            $query->where(function ($q) use ($user, $userId2) {
+                $q->where('user_id', $user->id)
+                    ->where('user_id2', $userId2);
+            })->orWhere(function ($q) use ($user, $userId2) {
+                $q->where('user_id', $userId2)
+                    ->where('user_id2', $user->id);
+            });
         })->first();
 
         if (!$checkRoom) {
@@ -430,26 +472,47 @@ class ChatRoomService
             ];
         }
 
-        // Fetch related media for response
         $midea = MessageAlbum::where('chat_room_id', $checkRoom->id)->get();
         $mideaStrings = $midea->flatMap(function ($item) {
             return [$item->file, $item->frame];
         })->toArray();
 
-        // Delete the related chat room data
-        try {
-            Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
-        } catch (\Throwable $th) {
-            Log::error('Error deleting chat room storage: ' . $th->getMessage());
+        if ($checkRoom->user_id == $user->id){
+            $checkRoom->update(['user_1_deleted' => now()]);
+        } else {
+            $checkRoom->update(['user_2_deleted' => now()]);
         }
 
-        // Delete related records
-        MessageAlbum::where('chat_room_id', $checkRoom->id)->delete();
-        ChatMessage::where('chat_room_id', $checkRoom->id)->delete();
-        React::where('chat_room_id', $checkRoom->id)->delete();
+        if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
+            try {
+                Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
+            } catch (\Throwable $th) {
+                Log::error('Error deleting chat room storage: ' . $th->getMessage());
+            }
 
-        // Optionally delete the chat room itself
-        $checkRoom->delete();
+            MessageAlbum::where('chat_room_id', $checkRoom->id)->delete();
+            ChatMessage::where('chat_room_id', $checkRoom->id)->delete();
+            React::where('chat_room_id', $checkRoom->id)->delete();
+
+            $checkRoom->delete();
+        } else {
+            ChatMessage::where('chat_room_id', $checkRoom->id)
+                ->chunk(200, function ($messages) use ($user) {
+                    foreach ($messages as $msg) {
+                        if ($msg->user_id == $user->id) {
+                            $msg->user_1_deleted = now();
+                        } else {
+                            $msg->user_2_deleted = now();
+                        }
+
+                        if ($msg->user_1_deleted && $msg->user_2_deleted) {
+                            $msg->delete();
+                        } else {
+                            $msg->save();
+                        }
+                    }
+                });
+        }
 
         return [
             'status' => 200,
