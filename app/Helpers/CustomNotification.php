@@ -346,12 +346,14 @@ class CustomNotification
     public  function officialMsg(OfficialMessageAdmin $msg, $usersId)
     {
         $user_id = $msg->user_id;
-        $language = $msg->language;
+      //  $language = $msg->language;
         if ($usersId) {
             // Log::info(123);
-            $usersChunk = User::where('notification_id', '!=', NULL)->whereIn('id', $usersId)->when(isset($language), function ($query) use ($language) {
-                $query->where('lan', $language);
-            })->select(['id', 'notification_id', 'lan'])->get()->unique('notification_id')->chunk(50);
+            $usersChunk = User::where('notification_id', '!=', NULL)->whereIn('id', $usersId)
+            // ->when(isset($language), function ($query) use ($language) {
+            //     $query->where('lan', $language);
+            // })
+            ->select(['id', 'notification_id', 'lan'])->get()->unique('notification_id')->chunk(50);
             $body             = $msg->content;
             $title = $msg->title;
             $data['image'] = null;

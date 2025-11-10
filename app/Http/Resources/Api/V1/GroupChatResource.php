@@ -40,7 +40,7 @@ class GroupChatResource extends JsonResource
             'profile' => [
                 'image' => @$this->user->profile->avatar ?? '',
                 // 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
-                // 'gender' => $this->user?->gender ?? 0,
+                 'gender' => $this->user?->gender ?? 0,
             ],
             'frame' => $frame,
             'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
