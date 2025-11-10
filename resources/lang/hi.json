@@ -64,7 +64,7 @@
     "Edit superadmin": "सुपर एडमिन संपादित करें",
     "Delete superadmin": "सुपर एडमिन हटाएँ",
     "Super Package reward": "सुपर पैकेज इनाम",
-
+    "package": "पैकेज",
     "Superadmin Settings": "सुपर एडमिन सेटिंग्स",
     "Browse superadmin settings": "सुपर एडमिन सेटिंग्स देखें",
 
@@ -3485,12 +3485,36 @@
     "Works since :value months": ":value महीनों से हमारे साथ हैं",
     "Works since :value days": ":value दिनों से हमारे साथ हैं",
     "Welcome message": "हमारे परिवार में आपका स्वागत है! मैं आपकी सफलता की हर कदम में साथ रहूँगा।",
-    "owner room": "कमरे का मालिक"
-
-
-
-
-
+    "owner room": "कमरे का मालिक",
+    "select super admin": "देश प्रबंधक चुनें",
+    "Select Super Admins": "देश प्रबंधक चुनें",
+    "Super Admin Configuration": "देश प्रबंधक विन्यास",
+    "Super Admin Details": "देश प्रबंधक विवरण",
+    "Super Admin Profile": "देश प्रबंधक प्रोफ़ाइल",
+    "can not delete default super admin": "डिफ़ॉल्ट देश प्रबंधक को हटाया नहीं जा सकता",
+    "restore super admin": "देश प्रबंधक को पुनर्स्थापित करें",
+    "can not restore this super admin": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
+    "can not restore this super admin user taken": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
+    "Sub Super Admin": "देश प्रबंधक कर्मचारी",
+    "Super Admin": "देश प्रबंधक",
+    "Super Admin Coins": "देश प्रबंधक सिक्के",
+    "Zones coins must be greater than super admin coins": "ज़ोन के सिक्के देश प्रबंधक के सिक्कों से अधिक होने चाहिए",
+    "super admin coins must be greater than agancy coins": "देश प्रबंधक के सिक्के एजेंसी के सिक्कों से अधिक होने चाहिए",
+    "Default Super Admin has been set successfully": "डिफ़ॉल्ट देश प्रबंधक सफलतापूर्वक सेट कर दिया गया है",
+    "superadminDescription": "सुव्यवस्थित संचालन सुनिश्चित करने के लिए, यह आवश्यक है कि आप एक आभासी देश प्रबंधक बनाएं जिसे आप प्रबंधित करते हैं। सभी एजेंसियाँ जो किसी विशिष्ट देश प्रबंधक से संबद्ध नहीं हैं, उन्हें स्वचालित रूप से इस आभासी देश प्रबंधक को सौंपा जाता है।\nजब किसी देश प्रबंधक को हटाया जाता है, तो उससे संबंधित एजेंसियाँ आभासी देश प्रबंधक को स्थानांतरित कर दी जाती हैं, जिससे प्रबंधन में कोई व्यवधान नहीं होता। यदि कोई आभासी देश प्रबंधक नहीं है, तो उपयोगकर्ता को एजेंसी खोलने का अनुरोध करते समय देश प्रबंधक आईडी दर्ज करनी होगी, लेकिन वे किसी विशिष्ट देश प्रबंधक के बिना इसका संचालन नहीं कर पाएंगे।\nइसलिए, संचालन की निरंतरता सुनिश्चित करने के लिए हमेशा एक आभासी देश प्रबंधक बनाना और उसका प्रबंधन करना उचित है।",
+    "Super Admin Reward History": "देश प्रबंधक इनाम इतिहास",
+    "default_superadmin_status": "डिफ़ॉल्ट देश प्रबंधक",
+    "You cannot delete the default super admin.": "आप डिफ़ॉल्ट देश प्रबंधक को नहीं हटा सकते।",
+    "You cannot delete a super admin created by the owner.": "आप मालिक द्वारा बनाए गए देश प्रबंधक को नहीं हटा सकते।",
+    "No default super admin found to transfer agencies to.": "एजेंसियों को स्थानांतरित करने के लिए कोई डिफ़ॉल्ट देश प्रबंधक नहीं मिला।",
+    "super admin deleted successfully.": "देश प्रबंधक सफलतापूर्वक हटाया गया।",
+    "superAdminRewardDescription": "देश प्रबंधक इनाम सुविधा आपको एक देश प्रबंधक चुनने और एक समाप्ति तिथि और इनाम सीमा के साथ इनाम असाइन करने की अनुमति देती है। चयनित देश प्रबंधक तब समान देश के उपयोगकर्ताओं को निर्दिष्ट इनाम सीमा के भीतर ये इनाम दे सकता है।",
+    "Super Admin Reward": "देश प्रबंधक इनाम",
+    "super admin": "देश प्रबंधक",
+    "Super admin": "देश प्रबंधक",
+    "superadmin": "देश प्रबंधक",
+    "super admin banner requests": "देश प्रबंधक बैनर अनुरोध",
+    "superadmin rewards": "देश प्रबंधक इनाम"
 
 
 

@@ -81,7 +81,7 @@ class SuperPackageController extends MainController
         $grid = new Grid(new SuperPackageReward());
 
         $grid->column('id', __('Id'));
-        $grid->column('title', __('Title'));
+        $grid->column('title', __('title'));
         $grid->column('members', __('rewards'))->expand(function ($model) {
             $mempers = $model->packageRewards()
                 ->get() // 👈 fetch the related records first
@@ -197,7 +197,7 @@ class SuperPackageController extends MainController
     {
         $form = new Form(new SuperPackageReward());
 
-        $form->text('title', __('Title'))->required();
+        $form->text('title', __('title'))->required();
 
         $form->tab(__('Ware'), function (Form $form) {
             $this->addWareField($form);
