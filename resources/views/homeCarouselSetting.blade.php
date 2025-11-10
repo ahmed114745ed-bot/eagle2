@@ -181,56 +181,68 @@
                     @enderror --}}
                     <div class="form">
                         <!-- Wallet Lucky Box -->
-                        <div class="form-group">
-                            <label for="discover">{{ __('Discover') }}</label>
-                            <input type="number" 
-                                id="discover" 
-                                name="discover" 
-                                min="1" 
-                                value="{{ $config['discover'] ?? 0 }}" 
-                                class="form-control" 
-                                placeholder="{{ __('Discover value') }}" required />
-                               <span class="form-text text-muted" > {{ __('Price for 1 day') }}</span>
-                        </div>
+{{--                        <div class="form-group">--}}
+{{--                            <label for="discover">{{ __('Discover') }}</label>--}}
+{{--                            <input type="number"--}}
+{{--                                id="discover"--}}
+{{--                                name="discover"--}}
+{{--                                min="1"--}}
+{{--                                value="{{ $config['discover'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_discover') }}"--}}
+{{--                                class="form-control"--}}
+{{--                                placeholder="{{ __('Discover value') }}" required />--}}
+{{--                               <span class="form-text text-muted" > {{ __('Price for 1 day') }}</span>--}}
+{{--                        </div>--}}
 
                         <div class="form-group">
                             <label for="home_top">{{ __('Home Top') }}</label>
-                            <input type="number" 
-                                id="home_top" 
-                                name="home_top" 
-                                min="1" 
-                                value="{{ $config['home_top'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="home_top"
+                                name="home_top"
+                                min="1"
+                                value="{{ $config['home_top'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_home_top') }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}"  required/>
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
 
-                        
+
                         <div class="form-group">
                             <label for="home_middle">{{ __('Home Middle') }}</label>
-                            <input type="number" 
-                                id="home_middle" 
-                                name="home_middle" 
-                                min="1" 
-                                value="{{ $config['home_middle'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="home_middle"
+                                name="home_middle"
+                                min="1"
+                                value="{{ $config['home_middle'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_home_middle') }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
 
                          <div class="form-group">
                             <label for="live">{{ __('Live') }}</label>
-                            <input type="number" 
-                                id="live" 
-                                name="live" 
-                                min="1" 
-                                value="{{ $config['live'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="live"
+                                name="live"
+                                min="1"
+                                value="{{ $config['live'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_live') }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
-                                 
+
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
                         </div>
-                        
+
+                        <div class="form-group">
+                            <label for="room">{{ __('Room') }}</label>
+                            <input type="number"
+                                   id="room"
+                                   name="room"
+                                   min="1"
+                                   value="{{ $config['room'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_room') }}"
+                                   class="form-control"
+                                   placeholder="{{ __('Enter value') }}" required />
+
+                            <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
+                        </div>
 
                         <!-- Submit Button -->
                         <div class="form-group">
