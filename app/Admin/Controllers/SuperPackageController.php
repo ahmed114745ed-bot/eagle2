@@ -127,15 +127,8 @@ class SuperPackageController extends MainController
                 $url = getImagePath($path);
                 Log::info("Resolved image URL: {$url}");
         
-                $imageType = getFileExtension($url);
+                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
 
-                if (in_array($imageType, ['svga', 'zz'])) {
-                    $image = '<img src="' . $url . '" 
-                                  style="width:50px;height:50px;border-radius:50%;object-fit:cover;" 
-                                  alt="placeholder" />';
-                } else {
-                    $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
-                }
                               
         
                 Log::info("Generated image HTML: {$image}");
@@ -166,6 +159,11 @@ class SuperPackageController extends MainController
                 return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
             });
         }
+        Admin::script("
+        if (window.innerWidth >= 1024) { 
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         $grid->disableExport();
         $this->extendGrid($grid);
         return $grid;
