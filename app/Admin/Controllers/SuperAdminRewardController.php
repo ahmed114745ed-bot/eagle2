@@ -160,7 +160,7 @@ class SuperAdminRewardController extends MainController
     }
     protected function package($grid)
     {
-        $grid->column('title', __('title'));
+        $grid->column('title', __('package'));
         $grid->column('members', __('rewards'))->expand(function ($model) {
             $mempers = $model->packageRewards()
                 ->get() // 👈 fetch the related records first

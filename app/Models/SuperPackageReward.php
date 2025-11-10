@@ -135,6 +135,7 @@ class SuperPackageReward extends Model
         parent::boot();
 
         static::saving(function ($model) {
+           
             // Get all the extra data before unsetting
             $model->wares = array_filter(request('wares'));
             $model->badges = array_filter(request('badges'));
@@ -167,7 +168,7 @@ class SuperPackageReward extends Model
             $vips = array_filter(request('vips')) ?? [];
             $coins = request('coins') ?? null;
             $achievement = request('achievement') ?? null;
-
+           $model->packageRewards()->whereIn('type', ['ware', 'badge', 'vip', 'coin', 'achievement'])->delete();
             // Wares
             foreach ($wares as $wareId) {
                 $model->packageRewards()->create([
