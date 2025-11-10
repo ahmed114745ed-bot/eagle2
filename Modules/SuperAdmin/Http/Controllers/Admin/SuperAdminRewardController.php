@@ -184,7 +184,7 @@ class SuperAdminRewardController extends MainController
                         $gifts = "<img src='$value' width='80' height='80'>";
                         $path = $memper->target;
                     }
-
+                     /** @var Ware $this */
                     $url = getImagePath($path);
                     $image = handleShowImageWithTypes($this->id, $url, 30, 30);
 
