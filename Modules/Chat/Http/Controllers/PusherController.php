@@ -38,19 +38,14 @@ class PusherController extends Controller
 
     public function chatRoomListener(Request $request)
     {
-        info('chatRoomListener');
         $events = $request->input('events', []);
 
-        info($events);
         foreach ($events as $event) {
             $eventName = $event['name'];
             $channel = $event['channel'] ?? null;
 
-            info($eventName);
-            info($channel);
-
             if ($channel && str_starts_with($channel, 'presence-chat.room.')) {
-                $roomId = str_replace('chat.room.', '', $channel);
+//                $roomId = str_replace('presence-chat.room.', '', $channel);
 
                 switch ($eventName) {
                     case 'member_removed':
@@ -67,6 +62,8 @@ class PusherController extends Controller
 
                     case 'channel_vacated':
                         //empty
+                        $roomId = str_replace('presence-chat.room.', '', $event['channel']);
+                        User::where('current_room_chat', $roomId)->update(['current_room_chat' => null]);
                         break;
                 }
             }

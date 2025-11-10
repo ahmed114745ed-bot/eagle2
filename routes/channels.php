@@ -61,9 +61,9 @@ Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
     ];
 });
 
-Broadcast::channel('chat.room.{roomId}', function ($user, $roomId) {
+Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
     $chatRoomService = app(ChatRoomService::class);
-    $checkRoom = $chatRoomService->getCreateChatRoomId($roomId);
+    $checkRoom = $chatRoomService->getCreateChatRoomId($chatRoomId);
     if (!$checkRoom){
         return false;
     }
