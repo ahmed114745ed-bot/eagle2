@@ -31,6 +31,10 @@ class CalculateRoomCupRewards extends Command
 
     public function handle(): int
     {
+        if (!$this->isModuleEnabled('RoomCup')) {
+            $this->warn("⛔ RoomCup module is disabled in modules_statuses.json.");
+            return EnumCommand::SUCCESS;
+        }
         $settings = $this->getRoomCupSettings();
         $type     = $settings['type'] ?? 'daily';
         $this->type = $type ;
@@ -49,6 +53,18 @@ class CalculateRoomCupRewards extends Command
         $this->logEnd();
 
         return EnumCommand::SUCCESS;
+    }
+
+    protected function isModuleEnabled(string $moduleName): bool
+    {
+        $path = base_path('modules_statuses.json');
+        if (!file_exists($path)) {
+            return false;
+        }
+
+        $modules = json_decode(file_get_contents($path), true);
+
+        return isset($modules[$moduleName]) && $modules[$moduleName] === true;
     }
     private function isEnabledRoomCup(array $settings): bool
     {

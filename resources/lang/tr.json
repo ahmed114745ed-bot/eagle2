@@ -2833,6 +2833,7 @@
     "set_as_default": "Varsayılan BD olarak ayarla",
     "set_superadmin_as_default": "Varsayılan Süper Yönetici olarak ayarla",
     "back": "Geri",
+     "dodo":"    ",
     "Updated": "Güncellendi",
     "Default Super Admin has been set successfully": "Varsayılan Süper Yönetici başarıyla ayarlandı",
     "edit updates_family config": "updates_family yapılandırmasını düzenle",
