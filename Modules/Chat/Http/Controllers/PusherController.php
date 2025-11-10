@@ -38,13 +38,18 @@ class PusherController extends Controller
 
     public function chatRoomListener(Request $request)
     {
+        info('chatRoomListener');
         $events = $request->input('events', []);
 
+        info($events);
         foreach ($events as $event) {
             $eventName = $event['name'];
             $channel = $event['channel'] ?? null;
 
-            if ($channel && str_starts_with($channel, 'chat.room.')) {
+            info($eventName);
+            info($channel);
+
+            if ($channel && str_starts_with($channel, 'presence-chat.room.')) {
                 $roomId = str_replace('chat.room.', '', $channel);
 
                 switch ($eventName) {
