@@ -933,3 +933,7 @@ Route::get('remove-minus', function () {
         return $e->getMessage();
     }
 });
+
+Route::get('/login', function () {
+    return 'Login placeholder';
+})->name('login');
