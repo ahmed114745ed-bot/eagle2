@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('super_package_rewards', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('super_package_rewards')) {
+            Schema::create('super_package_rewards', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**
