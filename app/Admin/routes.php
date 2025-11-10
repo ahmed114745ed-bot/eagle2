@@ -73,6 +73,7 @@ use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
+use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\MangerSettingController;
@@ -522,7 +523,7 @@ Route::group(
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
 
-        // Route::resource('ovip', 'OVipController');
+         //Route::resource('ovip', 'OVipController');
         // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
@@ -639,6 +640,7 @@ Route::group(
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('super-package-rewards', SuperPackageController::class);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
