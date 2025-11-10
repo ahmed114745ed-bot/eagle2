@@ -293,55 +293,80 @@
 
             <div id="additional_settings" class="settings-section">
                 <h3>{{ __('Additional settings') }}</h3>
-                <form action="{{ route('admin.room-settings.store') }}" method="POST">
-                    <div class="form">
-                        @csrf
+                <form action="{{ route('admin.room-settings.store') }}" method="POST" id="roomSettingsForm" novalidate>
+                <div class="form">
+                    @csrf
 
-                        <label>{{ __('Room Rule:') }}</label>
-                        <input class="form-control" type="text" name="room_rule"
-                            value="{{ $settings['room_rule'] ?? '' }}">
+                    <label>{{ __('Room Rule:') }}</label>
+                    <input class="form-control" type="text" name="room_rule"
+                        value="{{ $settings['room_rule'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
-                        <label>{{ __('Room Rule en:') }}</label>
-                        <input class="form-control" type="text" name="room_rule_en"
-                            value="{{ $settings['room_rule_en'] ?? '' }}">
+                    <label>{{ __('Room Rule en:') }}</label>
+                    <input class="form-control" type="text" name="room_rule_en"
+                        value="{{ $settings['room_rule_en'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
+                    <label>{{ __('Youtube Key:') }}</label>
+                    <input class="form-control" type="text" name="youtube_key"
+                        value="{{ $settings['youtube_key'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
-                        <label>{{ __('Youtube Key:') }}</label>
-                        <input class="form-control" type="text" name="youtube_key"
-                            value="{{ $settings['youtube_key'] ?? '' }}">
+                    <label>{{ __('Pk Background:') }}</label>
+                    <input class="form-control" type="text" name="pk_background"
+                        value="{{ $settings['pk_background'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
+                    <label>{{ __('Private Comment Price:') }}</label>
+                    <input class="form-control" type="text" name="private_comment_price"
+                        value="{{ $settings['private_comment_price'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
-                        <label>{{ __('Pk Background:') }}</label>
-                        <input class="form-control" type="text" name="pk_background"
-                            value="{{ $settings['pk_background'] ?? '' }}">
+                    <label>{{ __('Total Gift Price:') }}</label>
+                    <input class="form-control" type="number" name="total_gift_price"
+                        value="{{ $settings['total_gift_price'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
+                    <label>{{ __('special bar coin') }}</label>
+                    <input class="form-control" type="number" name="special_bar_coin"
+                        value="{{ $settings['special_bar_coin'] ?? '' }}" required>
+                    <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
-                        <label>{{ __('Private Comment Price:') }}</label>
-                        <input class="form-control" type="text" name="private_comment_price"
-                            value="{{ $settings['private_comment_price'] ?? '' }}">
+                    <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
+                </div>
+            </form>
 
-                        <label>{{ __('Total Gift Price:') }}</label>
-                        <input class="form-control" type="number" name="total_gift_price"
-                               value="{{ $settings['total_gift_price'] ?? '' }}">
-                                <label>{{ __('special bar coin') }}</label>
-                        <input class="form-control" type="number" name="special_bar_coin"
-                               value="{{ $settings['special_bar_coin'] ?? '' }}">
+            <script>
+                document.getElementById('roomSettingsForm').addEventListener('submit', function (e) {
+                    let isValid = true;
 
-                        {{-- <div class="feature-toggle-container">
-                            <span class="toggle-label">{{ __('Use Zego') }}</span>
-                            <!-- Hidden Fallback -->
-                            <input type="hidden" name="use_zego" value="0">
-                            <label class="switch">
-                                <input type="checkbox" id="use_zego"
-                                       name="use_zego" value="1"
-                                    {{ isset($settings['use_zego']) && $settings['use_zego'] == 1 ? 'checked' : '' }}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div> --}}
+                    this.querySelectorAll('input[required]').forEach(input => {
+                        const hint = input.nextElementSibling;
+                        if (!input.value.trim()) {
+                            hint.classList.remove('d-none');
+                            input.classList.add('is-invalid');
+                            isValid = false;
+                        } else {
+                            hint.classList.add('d-none');
+                            input.classList.remove('is-invalid');
+                        }
+                    });
 
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+            </script>
+
+            <style>
+                .is-invalid {
+                    border-color: #dc3545 !important;
+                }
+                small.text-danger {
+                    font-size: 0.85rem;
+                }
+            </style>
+
             </div>
 
             <div id="admin_settings" class="settings-section">
