@@ -546,7 +546,7 @@ class RoomController extends MainController
 
     protected function defineGridColumns($grid)
     {
-        $maxRoomAdmin = Common::getConfig('max_room_admin');
+        $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
         $grid->model()->collection(function (Collection $collection) {
