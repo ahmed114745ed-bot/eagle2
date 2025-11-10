@@ -67,6 +67,8 @@ class PusherController extends Controller
 
                     case 'channel_vacated':
                         //empty
+                        $roomId = str_replace('presence-chat.room.', '', $event['channel']);
+                        User::where('current_room_chat', $roomId)->update(['current_room_chat' => null]);
                         break;
                 }
             }
