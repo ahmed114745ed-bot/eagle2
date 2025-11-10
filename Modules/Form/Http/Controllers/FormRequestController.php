@@ -515,10 +515,10 @@ $(document).off('pjax:end').on('pjax:end', function() {
 
         $renderer = new FormRenderService();
 
-        $show->field('data','')->as(function ($jsonData) use ($renderer) {
+        $show->field('data', __('dodo'))->as(function ($jsonData) use ($renderer) {
             $data = json_decode($jsonData, true);
             return $renderer->renderFormData($data);
-        })->unescape()->hideLabel();
+        })->unescape();
 
         return $show;
     }
