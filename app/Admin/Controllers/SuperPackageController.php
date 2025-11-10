@@ -91,44 +91,56 @@ class SuperPackageController extends MainController
                 switch ($memper->type) {
                     case 'ware':
                         $giftName = $memper->ware->name ?? '';
-                        $imageUrl = getImagePath($memper->ware->img2 ?? $memper->ware->show_img ?? '');
+                        $imageUrl = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
                         break;
                     case 'vip':
                         $giftName = $memper->vip->name ?? '';
-                        $imageUrl = getImagePath($memper->vip->img ?? '');
+                        $imageUrl = $memper->vip->img ?? '';
                         break;
                     case 'badge':
                         $giftName = $memper->badge->name ?? '';
-                        $imageUrl = getImagePath($memper->badge->image ?? '');
+                        $imageUrl = $memper->badge->image ?? '';
                         break;
                     case 'coins':
                         $giftName = $memper->target;
-                        $imageUrl = getImagePath('coin.png');
+                        $imageUrl = 'coin.png';
                         break;
                     case 'achievement':
                         $giftName = $memper->target;
-                        $imageUrl = getDriverUrl() . '/' . $memper->target;
+                        $imageUrl = $memper->target;
                         break;
                 }
-           
-        
-                $imageHtml = handleShowImageWithTypes($this->id, $imageUrl, 50, 50);
         
                 return [
                     'id' => $memper->id,
                     'type' => $memper->type,
                     'gift' => $giftName,
-                    'image' => $imageHtml,
+                    'image' => $imageUrl, 
                     'quantity' => $memper->quantity,
                     'expire' => $memper->expire,
                 ];
             });
         
-            return new Table(
-                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $members->toArray()
-            );
+            $grid = new Grid($members);
+            $grid->column('id', 'ID');
+            $grid->column('type', __('type'));
+            $grid->column('gift', __('gift'));
+            $grid->column('image', __('image'))->display(function ($imageUrl) {
+                $fullUrl = getImagePath($imageUrl);
+                return "<img src='{$fullUrl}' style='width:50px;height:50px' />";
+            });
+            $grid->column('quantity', __('quantity'));
+            $grid->column('expire', __('expire'));
+            
+            $grid->disableActions();
+            $grid->disableCreateButton();
+            $grid->disableFilter();
+            $grid->disableExport();
+            $grid->disablePagination();
+            
+            return $grid;
         });
+        
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
                
