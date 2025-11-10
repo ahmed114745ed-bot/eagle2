@@ -2873,7 +2873,7 @@
 "select_default_superadmin": "اختر مدير دوله ليكون الافتراضي",
 "set_as_default": "تعيين كـ BD افتراضي",
     "Updated": "تم التحديث",
-    "dodo":"",
+    "dodo":"     ",
     "Default Super Admin has been set successfully": "تم تعيين مدير دوله الافتراضي بنجاح",
 "set_superadmin_as_default": "تعيين كمدير دوله افتراضي",
 "back": "رجوع",
