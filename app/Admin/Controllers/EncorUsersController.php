@@ -315,6 +315,8 @@ class EncorUsersController extends AdminController
             });
         }
 
+        $form->hidden('created_by')->default(auth()->id());
+
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');
 
