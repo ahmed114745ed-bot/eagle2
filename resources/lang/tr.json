@@ -2828,6 +2828,8 @@
   "host users": "Ev Sahibi Kullanıcılar",
   "host agencies": "Ev Sahibi Ajanslar",
   "charge agencies": "Tahsilat Ajansları",
+  "single select": "Tek Seçim",
+  "multi select": "Çoklu Seçim",
   "Selecting All will automatically select all other options": "'Tümünü Seç' seçeneği diğer tüm seçenekleri otomatik olarak seçecektir",
     "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
     "default_current": "Geçerli Varsayılan BD",
