@@ -15,6 +15,7 @@ use App\Models\SuperPackageReward;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -83,52 +84,65 @@ class SuperPackageController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
 
+
+
         $grid->column('members', __('rewards'))->expand(function ($model) {
-            $members = $model->packageRewards()->get()->map(function ($memper) {
-                $giftName = '';
-                $imageUrl = '';
-        
-                switch ($memper->type) {
-                    case 'ware':
-                        $giftName = $memper->ware->name ?? '';
-                        $imageUrl = getImagePath($memper->ware->img2 ?? $memper->ware->show_img ?? '');
-                        break;
-                    case 'vip':
-                        $giftName = $memper->vip->name ?? '';
-                        $imageUrl = getImagePath($memper->vip->img ?? '');
-                        break;
-                    case 'badge':
-                        $giftName = $memper->badge->name ?? '';
-                        $imageUrl = getImagePath($memper->badge->image ?? '');
-                        break;
-                    case 'coins':
-                        $giftName = $memper->target;
-                        $imageUrl = getImagePath('coin.png');
-                        break;
-                    case 'achievement':
-                        $giftName = $memper->target;
-                        $imageUrl = getDriverUrl() . '/' . $memper->target;
-                        break;
+            Log::info("=== Expand rewards for model ID: {$model->id} ===");
+
+            $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
+                Log::info("Processing reward ID: {$memper->id}, type: {$memper->type}");
+
+                $gifts = '';
+                $path  = '';
+
+                if ($memper->type == "ware") {
+                    $gifts = @$memper->ware->name ?? '';
+                    $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+                    Log::info("Ware gift: {$gifts}, path: {$path}");
+                } elseif ($memper->type == "vip") {
+                    $gifts = @$memper->vip->name ?? '';
+                    $path  = @$memper->vip->img ?? '';
+                    Log::info("VIP gift: {$gifts}, path: {$path}");
+                } elseif ($memper->type == "badge") {
+                    $gifts = @$memper->badge->name ?? '';
+                    $path  = @$memper->badge->image ?? '';
+                    Log::info("Badge gift: {$gifts}, path: {$path}");
+                } elseif ($memper->type == "coins") {
+                    $gifts = @$memper->target;
+                    $path  = 'coin.png';
+                    Log::info("Coins gift: {$gifts}, path: {$path}");
+                } elseif ($memper->type == "achievement") {
+                    $value = getDriverUrl() . '/' . @$memper->target;
+                    $gifts = "<img src='$value' width='80' height='80'>";
+                    $path  = $memper->target;
+                    Log::info("Achievement gift: {$gifts}, path: {$path}, value: {$value}");
                 }
-           
-        
-                $imageHtml = handleShowImageWithTypes($this->id, $imageUrl, 50, 50);
-        
+
+                $url   = getImagePath($path);
+                Log::info("Resolved image URL: {$url}");
+
+                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                Log::info("Generated image HTML: {$image}");
+
                 return [
-                    'id' => $memper->id,
-                    'type' => $memper->type,
-                    'gift' => $giftName,
-                    'image' => $imageHtml,
-                    'quantity' => $memper->quantity,
-                    'expire' => $memper->expire,
+                    'id'       => $memper->id,
+                    'type'     => $memper->type,
+                    'gift'     => $gifts,
+                    'image'    => $image,
+                    'quantity' => $memper->expire,
+                    'expire'   => $memper->quantity,
                 ];
             });
-        
+
+            Log::info("Mapped rewards: " . json_encode($mempers->toArray()));
+
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $members->toArray()
+                $mempers->toArray()
             );
         });
+
+
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
                
@@ -199,42 +213,43 @@ class SuperPackageController extends MainController
     protected function form()
     {
         $form = new Form(new SuperPackageReward());
-    
-        $form->tab(__('data'), function (Form $form) {
-            $form->text('title', __('title'))->required();
-        });
 
+        $form->tab(__('data'), function (Form $form) {
+                $form->text('title', __('title'))->required();
+        });
         $form->tab(__('Ware'), function (Form $form) {
             $this->addWareField($form);
             $form->number('expire_ware', __('expire'));
             $form->number('quantity_ware', __('number'))->min(0);
         });
-        
         $form->tab(__('Badge'), function (Form $form) {
             $this->addBadgeField($form);
             $form->number('expire_badge', __('expire'));
             $form->number('quantity_badge', __('number'))->min(0);
         });
-    
+
         $form->tab(__('VIP'), function (Form $form) {
             $form->belongsToMany('vips', OVips::class, trans('vips'));
             $form->number('expire_vip', __('expire'));
             $form->number('quantity_vip', __('number'))->min(0);
         });
-    
+
+        // 🟡 Tab for Coins
         $form->tab(__('Coins'), function (Form $form) {
             $form->number('coins', __('Coins'))->min(0);
         });
-    
+
+
         $form->tab(__('Achievement'), function (Form $form) {
             $form->image('achievement', __('Image'))->name(function ($file) {
                 return now()->timestamp . '.' . $file->guessExtension();
             })->disk('gcs');
             $form->number('expire_achievement', __('expire'));
         });
-    
+
         return $form;
     }
+
 
 
     protected function addWareField(Form $form)
