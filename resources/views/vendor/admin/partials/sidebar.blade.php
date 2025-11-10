@@ -165,7 +165,7 @@
                             'permission' => null,
                             'children' => [
                                 ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('Sub Super Admin'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
