@@ -23,7 +23,6 @@ class VerifyPusherSignature
         );
 
         if (!hash_equals($expectedSignature, $signature)) {
-            info('Pusher webhook signature mismatch.');
             return response('Invalid signature', 403);
         }
 
