@@ -402,7 +402,6 @@ class UserCommon
 
     public static function removeEventsWareFromUser(User $user, $id, $receiveType)
     {
-
         Pack::where('receive_type', $receiveType)
             ->where('user_id', $user->id)
             ->where('target_id',  $id)->delete();

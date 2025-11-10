@@ -159,13 +159,15 @@ class MessageService
         $this->updateMessageStatus($message, $user2, $chatRoom);
 
         // Send notification if user is not logged out
-        $this->sendNotification($user2, $message);
+        if (!$user2->current_room_chat !=  $chatRoom->id){
+            $this->sendNotification($user2, $message);
+        }
 
         // Handle message reply
         if ($request->message_id) {
             $this->messageRepo->createMessageReplay($message->id, $request->message_id);
         }
-        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
+//        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
 
         // Return the message and chat room resources
         return [

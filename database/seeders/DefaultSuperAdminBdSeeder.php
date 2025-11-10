@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Bd;
-use App\Models\SuperAdmin;use Illuminate\Database\Seeder;
+use Modules\SuperAdmin\Entities\SuperAdmin;use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DefaultSuperAdminBdSeeder extends Seeder
