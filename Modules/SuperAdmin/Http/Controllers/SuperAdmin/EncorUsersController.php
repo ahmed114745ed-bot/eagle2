@@ -170,9 +170,9 @@ class EncorUsersController extends AdminController
     {
         $permission_name = $this->permission_name;
 
-        $userModel = config('admin.database.users_model');
+//        $userModel = config('admin.database.users_model');
 
-        $grid = new Grid(new $userModel());
+        $grid = new Grid(new \App\Models\Admin());
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
 
         $grid->model()->where(function ($q) use ($authId) {
@@ -283,6 +283,7 @@ class EncorUsersController extends AdminController
         }
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
         $form->hidden('parent_id')->default($authId);
+        $form->hidden('created_by')->default(auth()->id());
 
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');
