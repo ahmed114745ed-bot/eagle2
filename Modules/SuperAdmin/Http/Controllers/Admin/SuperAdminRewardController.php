@@ -3,20 +3,16 @@
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
 use App\Models\Ware;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Selectables\Badges;
 use Modules\SuperAdmin\Actions\Admin\DedicateSuperAdminRewardAction;
 use Modules\Vip\Entities\OVip;
-use App\Selectables\SuperAdmins;
-use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use App\Models\SuperAdminReward;
+use Illuminate\Support\HtmlString;
 use Encore\Admin\Widgets\Table;
 use App\Models\SuperPackageReward;
 
@@ -190,7 +186,7 @@ class SuperAdminRewardController extends MainController
                     }
 
                     $url = getImagePath($path);
-                    $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                    $image = new HtmlString(handleShowImageWithTypes($memper->id, $url, 50, 50));
 
                     return [
                         'id'    => $memper->id,
