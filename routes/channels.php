@@ -70,7 +70,7 @@ Broadcast::channel('chat.room.{roomId}', function ($user, $roomId) {
     $user->update(['current_room_chat' => $checkRoom->id]);
     $chatRoomService->markMessagesAsSeen($checkRoom, $user);
     $user2 = $chatRoomService->getUserInChatRoom($checkRoom, $user);
-    $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+    $chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
 
     return [
         'id'   => $user->id,

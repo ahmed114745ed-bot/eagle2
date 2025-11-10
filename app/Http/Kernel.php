@@ -118,5 +118,6 @@ class Kernel extends HttpKernel
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
 
 
+        'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
     ];
 }

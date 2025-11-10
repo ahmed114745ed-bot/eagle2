@@ -36,6 +36,40 @@ class PusherController extends Controller
         return response()->json(['status' => 'Webhook received']);
     }
 
+    public function chatRoomListener(Request $request)
+    {
+        $events = $request->input('events', []);
+
+        foreach ($events as $event) {
+            $eventName = $event['name'];
+            $channel = $event['channel'] ?? null;
+
+            if ($channel && str_starts_with($channel, 'chat.room.')) {
+                $roomId = str_replace('chat.room.', '', $channel);
+
+                switch ($eventName) {
+                    case 'member_removed':
+                        $user = User::find($event['user_id']);
+                        $user->current_room_chat  = null;
+                        $user->save();
+                        break;
+
+                    case 'member_added':
+                        break;
+
+                    case 'channel_occupied':
+                        break;
+
+                    case 'channel_vacated':
+                        //empty
+                        break;
+                }
+            }
+        }
+
+        return response('OK', 200);
+    }
+
     public function user_status($id) {
         $user = User::find($id);
         if($user != null)
