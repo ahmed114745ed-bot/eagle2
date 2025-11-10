@@ -353,22 +353,6 @@ class PkEventGiftController extends MainController
         $form->hidden('level')->value(request()->route('level'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                // $form->select('target1', trans('wares'))->options(function () {
-                //     $ops = [0 => ''];
-                //     $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                //     foreach ($wares as  $ware) {
-                //         $ops[$ware->id] = $ware->name . '_' . $ware->id;
-
-                //         if ($ware->type == 4) {
-                //             $ops[$ware->id] .= '_' . 'bubble';
-                //         } elseif ($ware->type == 5) {
-                //             $ops[$ware->id] .= '_' . 'intro';
-                //         } elseif ($ware->type == 6) {
-                //             $ops[$ware->id] .= '_' . 'frame';
-                //         }
-                //     }
-                //     return $ops;
-                // });
                 $this->addWareField($form);
             })
             ->when("badge", function () use ($form) {

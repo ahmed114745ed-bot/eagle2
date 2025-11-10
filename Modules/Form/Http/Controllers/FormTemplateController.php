@@ -164,6 +164,34 @@ class FormTemplateController extends Controller
             'description' => 'nullable|array',
             'sections' => 'required|array',
         ]);
+
+        $allFieldNames = [];
+        foreach ($request->sections as $sectionData) {
+            if (isset($sectionData['fields'])) {
+                foreach ($sectionData['fields'] as $fieldData) {
+                    $name = trim($fieldData['name'] ?? '');
+                    if ($name !== '') {
+                        if (in_array($name, $allFieldNames)) {
+                            return back()->withErrors(['duplicate_field' => "حقل '$name' مكرر داخل نفس النموذج."])->withInput();
+                        }
+                        $allFieldNames[] = $name;
+                    }
+                }
+            }
+        }
+    
+        $existingNames = FormField::whereHas('section', function ($q) use ($formTemplate) {
+            $q->where('form_template_id', $formTemplate->id);
+        })
+            ->pluck('field_name')
+            ->toArray();
+    
+        $duplicatesInDb = array_intersect($allFieldNames, $existingNames);
+    
+        if (!empty($duplicatesInDb)) {
+            $duplicateList = implode(', ', $duplicatesInDb);
+            return back()->withErrors(['duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"])->withInput();
+        }
         // Update form template basic info
         $formTemplate->update([
             'title' => $request->title,
@@ -241,14 +269,13 @@ class FormTemplateController extends Controller
                                 $dataSource = $fieldData['data_source'];
                             }
                         }
-
                         // ============================================
                         // Create Field Record
                         // ============================================
                         FormField::create([
                             'section_id' => $section->id,
                             'field_label' => $fieldData['label'],
-                            'field_name' => $fieldData['name'],
+                            'field_name' => trim($fieldData['name']),
                             'field_type' => $fieldType,
                             'widget_id' => $widgetId,
                             'widget_config' => $widgetConfig,
@@ -323,42 +350,48 @@ class FormTemplateController extends Controller
     public function storeSubmission(Request $request, string $type)
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
+    
         $data = $request->except('_token');
-        foreach ($request->file() as $key => $fileInput) {
-            if (is_array($fileInput)) {
-                $storedFiles = [];
-                foreach ($fileInput as $file) {
-                    if ($file && $file->isValid()) {
-                        $storedFiles[] = Common::upload('data', $file);
-                    }
-                }
-                $data[$key] = $storedFiles;
-            } elseif ($fileInput instanceof \Illuminate\Http\UploadedFile && $fileInput->isValid()) {
-                $path = Common::upload('data', $fileInput);
-                $data[$key] = $path;
-            } else {
-                info("Unexpected file input type for {$key}");
-                info('Type: ' . gettype($fileInput));
-                info('Class: ' . (is_object($fileInput) ? get_class($fileInput) : 'not object'));
-            }
-        }
-        FormRequest::create([
+    
+        $data = $this->processFiles($data);
+    
+        $fields = $request->fields ?? [];
+
+     
+    
+        $save = FormRequest::create([
             'form_template_id' => $template->id,
             'submitted_by' => $request->user_id,
             'bd_id' => $request->bd_id,
             'name' => $request->agency_name ?? $request->bd_name,
             'whatsapp_number' => $request->whatsapp_number,
-            'form_template_type' => $template->form_type,
-            'data' => json_encode($data),
+            'form_template_type' => $template?->form_type,
+            'data' => json_encode($data, JSON_UNESCAPED_UNICODE),
+            'country' => $request->country_id,
             'created_at' => now(),
         ]);
-
-
+    
+        dd($data,$save,$request->all());
+    
         return response()->json([
             'success' => true,
             'message' => __('Form submitted successfully!'),
         ], 200);
     }
+    
+
+    protected function processFiles($input)
+    {
+        foreach ($input as $key => $value) {
+            if ($value instanceof \Illuminate\Http\UploadedFile) {
+                $input[$key] = Common::upload('data', $value);
+            } elseif (is_array($value)) {
+                $input[$key] = $this->processFiles($value);
+            }
+        }
+        return $input;
+    }
+    
 
     public function getTranslations(Request $request)
     {
@@ -466,4 +499,26 @@ class FormTemplateController extends Controller
 
         return response()->json(['data' => $results]);
     }
+
+
+    public function checkName(Request $request)
+    {
+        $name = trim($request->get('name'));  
+
+        if (!$name) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Name is required',
+            ]);
+        }
+
+        $exists = FormField::where('field_name', $name)->exists(); 
+
+        return response()->json([
+            'status' => true,
+            'exists' => $exists,
+            'message' => $exists ? 'Name already exists' : 'Name is available',
+        ]);
+    }
+
 }

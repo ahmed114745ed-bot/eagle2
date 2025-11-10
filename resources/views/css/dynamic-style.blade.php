@@ -21,6 +21,12 @@
         --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
+        .col-sm-8 {
+        width: 80.66666667%;
+    }
+        .col-sm-2 {
+        width: 5.66666667%;
+    }
 
     .rtl label {
         margin: 0 !important;

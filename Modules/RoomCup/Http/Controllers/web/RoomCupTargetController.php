@@ -127,7 +127,7 @@ class RoomCupTargetController extends MainController
             ->default(0)
             ->rules([
                 function ($attribute, $value, $fail) {
-                    $limit = Common::getConfig('max_room_admin');
+                    $limit = Common::getConfig('max_room_admin') ?? 4;
                     if ($value < $limit) {
                         $fail(__('api.admins_greater_than', ['limit' => $limit]));
                     }

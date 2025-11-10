@@ -2,9 +2,11 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
+use App\Models\Setting;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class RoomCupSettingsController extends AdminController
@@ -31,19 +33,36 @@ class RoomCupSettingsController extends AdminController
     private function getSettings()
     {
         $default = [
-            'enabled'          => true,
-            'interval_minutes' => 60,
-            'type'             => 'daily', 
+            'enabled'  => true,
+            'type'     => 'daily',
+            'time'     => '23:59',
+            'day'      => 0,
+            'interval' => 1,
         ];
     
-        if (!Storage::disk('local')->exists('roomcup_settings.json')) {
-            Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
-            return $default;
+        $settings = [];
+    
+        foreach ($default as $key => $defaultValue) {
+            $cacheKey = 'roomcup_' . $key;
+            $value = Cache::get($cacheKey);
+    
+            if ($value === null) {
+                $setting = Setting::where('key', $cacheKey)->first();
+                $value = $setting ? $setting->value : $defaultValue;
+    
+                Cache::put($cacheKey, $value, now()->addDays(30));
+            }
+    
+            if ($key === 'enabled') {
+                $value = (bool) $value;
+            } elseif (in_array($key, ['day', 'interval'])) {
+                $value = (int) $value;
+            }
+    
+            $settings[$key] = $value;
         }
     
-        $settings = json_decode(Storage::disk('local')->get('roomcup_settings.json'), true);
-    
-        return array_merge($default, $settings);
+        return $settings;
     }
     
 
@@ -52,16 +71,22 @@ class RoomCupSettingsController extends AdminController
     public function save()
     {
         $data = [
-            'enabled'   => request()->has('enabled'),
-            'type'      => request('type', 'daily'),
-            'time'      => request('time', '23:59'),
-            'day'       => (int) request('day', 0),
-            'interval'  => (int) request('interval', 1),
+            'enabled'  => request()->has('enabled'),
+            'type'     => request('type', 'daily'),
+            'time'     => request('time', '23:59'),
+            'day'      => (int) request('day', 0),
+            'interval' => (int) request('interval', 1),
         ];
+      
     
-        Storage::disk('local')->put('roomcup_settings.json', json_encode($data, JSON_PRETTY_PRINT));
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => 'roomcup_' . $key], 
+                ['value' => $value]
+            );
     
-        \Cache::put('roomcup:reward_schedule', $data, now()->addDays(30));
+            Cache::put('roomcup_' . $key, $value, now()->addDays(30));
+        }
     
         admin_success('تم الحفظ بنجاح ✅');
         return redirect()->back();
