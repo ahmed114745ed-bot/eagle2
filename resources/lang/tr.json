@@ -3887,7 +3887,9 @@
   
     "default_superadmin_status": "varsayılan ülke yöneticisi",
     "milestone_rewards_synced": "Kilometre taşları ödülleri başarıyla senkronize edildi",
-    "Reapply Rewards": "Ödülleri Yeniden Uygula"
+    "Reapply Rewards": "Ödülleri Yeniden Uygula",
+    "This is the default number of admins allowed per room.": "Bu, her oda için izin verilen varsayılan yönetici sayısıdır."
+
 
 
 

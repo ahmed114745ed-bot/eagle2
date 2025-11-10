@@ -352,8 +352,11 @@
 
                         <label>{{ __('admins number') }}</label>
                         <input class="form-control" type="number" min="1" name="max_room_admin"
-                            value="{{ $settings['max_room_admin'] ?? '' }}">
-
+                            value="{{ $settings['max_room_admin'] ?? 4 }}">
+                            <small class="form-text text-muted" style="    position: relative; top: -15px;">
+                                {{ __('This is the default number of admins allowed per room.') }}
+                            </small>
+                            <br>
                         <button type="submit">{{ __('save') }}</button>
                     </div>
                 </form>

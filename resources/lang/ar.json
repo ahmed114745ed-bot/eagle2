@@ -4407,7 +4407,9 @@
     "Works since :value days": "منذ :value يوم",
     "Welcome message": "مرحباً بك في عائلتنا! أنا هنا لأدعمك في كل خطوة نحو النجاح.",
     "milestone_rewards_synced": "تمت مزامنة مكافآت الإنجاز بنجاح",
-    "Reapply Rewards": "إعادة تطبيق المكافآت"
+    "Reapply Rewards": "إعادة تطبيق المكافآت",
+    "This is the default number of admins allowed per room.": "هذا هو العدد الأساسي للمشرفين المسموح بهم في كل غرفة."
+
 
 
     

@@ -1421,7 +1421,9 @@
 "Works since :value days": "Since :value day(s)",
 "Welcome message": "Welcome to our family! I’m here to support you every step toward success.",
 "milestone_rewards_synced": "Milestone rewards synced successfully",
-"Reapply Rewards": "Reapply Rewards"
+"Reapply Rewards": "Reapply Rewards",
+"This is the default number of admins allowed per room.": "This is the default number of admins allowed per room."
+
 
 
 
