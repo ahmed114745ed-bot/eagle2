@@ -16,15 +16,10 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
 use App\Models\SuperAdminReward;
-use App\Selectables\SuperAdmins;
 use Encore\Admin\Widgets\Table;
-use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
-use App\Admin\Controllers\MainController;
+
 
 class SuperAdminRewardController extends MainController
 {
@@ -104,19 +99,20 @@ class SuperAdminRewardController extends MainController
             // Optional: handle invalid type
             $grid = new Grid(new OVip());
         }
-        if ($type != 'package') {
+        if ($type == 'package') {
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
-                    $type = request('type');
-                    return (new \App\Admin\Actions\DedicateSuperAdminRewardAction($this->id, $type))->render();
+
+                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
                 });
             }
         } else {
-        if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('dedicate'))->display(function () {
-                $type = request('type');
-                return (new DedicateSuperAdminRewardAction($this->id, $type))->render();
-            });
+            if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+                $grid->column('return', __('dedicate'))->display(function () {
+                    $type = request('type');
+                    return (new DedicateSuperAdminRewardAction($this->id, $type))->render();
+                });
+            }
         }
 
 
@@ -141,6 +137,7 @@ class SuperAdminRewardController extends MainController
 
         return $grid;
     }
+
 
     protected function ware($grid)
     {
