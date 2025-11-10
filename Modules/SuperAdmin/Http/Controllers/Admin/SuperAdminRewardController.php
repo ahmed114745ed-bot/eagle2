@@ -170,6 +170,7 @@ class SuperAdminRewardController extends MainController
                     if ($memper->type == "ware") {
                         $gifts = @$memper->ware->name ?? '';
                         $path = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+                        dd($path);
                     } elseif ($memper->type == "vip") {
                         $gifts = @$memper->vip->name ?? '';
                         $path = @$memper->vip->img ?? '';
