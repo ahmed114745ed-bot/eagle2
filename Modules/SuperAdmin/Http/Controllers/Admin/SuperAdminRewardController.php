@@ -186,12 +186,13 @@ class SuperAdminRewardController extends MainController
                     }
 
                     $url = getImagePath($path);
-                    $image = handleShowImageWithTypes($this->id, $url, 50, 50);
+                    $image = handleShowImageWithTypes($this->id, $url, 30, 30);
 
                     return [
                         'id'    => $memper->id,
                         'type'  => $memper->type,
                         'gift'  => $gifts,
+                        'image' => $image,
                         'quantity' => $memper->expire,
                         'expire'  => $memper->quantity,
 
@@ -199,7 +200,7 @@ class SuperAdminRewardController extends MainController
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
