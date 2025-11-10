@@ -130,7 +130,7 @@ class SuperPackageController extends MainController
                 $imageType = getFileExtension($url);
 
                 if (in_array($imageType, ['svga', 'zz'])) {
-                    $image = '<img src="' . asset('images/placeholder.png') . '" 
+                    $image = '<img src="' . $url . '" 
                                   style="width:50px;height:50px;border-radius:50%;object-fit:cover;" 
                                   alt="placeholder" />';
                 } else {
