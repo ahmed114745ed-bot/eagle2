@@ -112,9 +112,6 @@ class SuperAdminRewardController extends MainController
                 });
             }
         } else {
-            if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-                $grid->column('return', __('dedicate'))->display(function () {
-
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
                 $type = request('type');
