@@ -23,6 +23,7 @@ Route::group(
             'admin',
             'adminIp',
             'multiLanguage',
+            'check.allowed.app'
         ],
         'as'         => config('admin.route.prefix') . 'routes',
     ],

@@ -115,6 +115,7 @@ class Kernel extends HttpKernel
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
+        'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
 
 
     ];
