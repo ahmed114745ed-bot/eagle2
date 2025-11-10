@@ -3495,7 +3495,6 @@
     "restore super admin": "देश प्रबंधक को पुनर्स्थापित करें",
     "can not restore this super admin": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
     "can not restore this super admin user taken": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
-    "Sub Super Admin": "देश प्रबंधक कर्मचारी",
     "Super Admin": "देश प्रबंधक",
     "Super Admin Coins": "देश प्रबंधक सिक्के",
     "Zones coins must be greater than super admin coins": "ज़ोन के सिक्के देश प्रबंधक के सिक्कों से अधिक होने चाहिए",

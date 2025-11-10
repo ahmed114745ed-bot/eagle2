@@ -24,7 +24,7 @@
     "restore super admin": "restore country manager",
     "can not restore this super admin": "can not restore this country manager",
     "can not restore this super admin user taken": "can not restore this country manager",
-    "Sub Super Admin": "country manager employee",
+    "Sub Super Admin": "super admin",
     "Super Admin": "country manager",
     "Super Admin Coins": "country manager Coins",
     "Zones coins must be greater than super admin coins": "Zones coins must be greater than country manager coins",
