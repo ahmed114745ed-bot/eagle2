@@ -122,7 +122,9 @@ class FormRequestController extends MainController
             'pending' => 'default',
             'approved' => 'success',
             'rejected' => 'danger'
-        ]);
+        ])->display(function ($status) {
+            return __($status);
+        });
 
 
         $grid->column('actions', __('Actions'))->display(function () {
@@ -140,7 +142,7 @@ class FormRequestController extends MainController
 
             $approveText = __('Approved');
             $rejectText  = __('Reject');
-            $viewText    = __('View');
+            $viewText    = __('Preview');
 
             // return <<<HTML
             // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
@@ -730,7 +732,7 @@ $(document).off('pjax:end').on('pjax:end', function() {
     
         $renderer = new FormRenderService();
     
-        $show->field('data')->as(function ($jsonData) use ($renderer) {
+        $show->field('data',__('data'))->as(function ($jsonData) use ($renderer) {
             $data = json_decode($jsonData, true);
             return $renderer->renderFormData($data);
         })->unescape();
