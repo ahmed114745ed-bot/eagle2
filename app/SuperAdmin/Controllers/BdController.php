@@ -293,7 +293,10 @@ class BdController extends MainController
         $user = auth()->user();
         $form->hidden('type', __('Type'))->value('bd');
         $form->hidden('transfer_salary', __('transfer_salary'));
-        $form->hidden('parent_id', __('Super Admin'))->value($user->id);
+
+        $authId = auth()->user()->type == 'superadmin' ? $user->id : $user->parent_id;
+        $form->hidden('parent_id', __('Super Admin'))->value($authId);
+
         $form->hidden('country_id', __('country'))->value($user->country_id);
 
         $form->saving(function (Form $form) {
