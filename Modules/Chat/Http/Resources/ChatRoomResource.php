@@ -33,7 +33,7 @@ class ChatRoomResource extends JsonResource
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
-            'last_message'        => @new ChatMessageResource($this->messages[0]),
+            'last_message'        => @new ChatMessageResource($this->messages->where('user_1_deleted', false)->sortByDesc('id')->first()),
         ];
     }
 }

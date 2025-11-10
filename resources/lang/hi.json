@@ -3521,7 +3521,9 @@
     "super admin banner requests": "देश प्रबंधक बैनर अनुरोध",
     "superadmin rewards": "देश प्रबंधक इनाम",
     "milestone_rewards_synced": "माइलस्टोन पुरस्कार सफलतापूर्वक सिंक किए गए",
-    "Reapply Rewards": "Réappliquer les récompenses"
+    "Reapply Rewards": "Réappliquer les récompenses",
+    "This is the default number of admins allowed per room.": "यह प्रत्येक कमरे में अनुमत प्रशासकों की डिफ़ॉल्ट संख्या है।"
+
 
 
 

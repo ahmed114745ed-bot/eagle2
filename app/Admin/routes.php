@@ -708,10 +708,10 @@ Route::group(
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
 
             Route::get('/pusher-test', function () {
-                return view('test.test-pusher', [
-                    'pusherAppKey' => config('broadcasting.connections.pusher.key'),
-                    'pusherCluster' => config('broadcasting.connections.pusher.options.cluster'),
-                ]);
+                $user = \App\Models\User::whereId(1206)->first();
+                $token = $user->createToken('broadcast')->plainTextToken;
+
+                return view('test.test-pusher', compact('token'));
             });
         });
 
