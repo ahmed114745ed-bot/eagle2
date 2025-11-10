@@ -41,12 +41,19 @@ class OfficialMessageJob implements ShouldQueue
     public function handle(): void
     {
         // Log::info('OfficialMessageJob raw request', $this->request);
-        $feature = $this->request['feature'] ;
+        $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
 
         // Handle feature_ids as array or string
         $featureIds = $this->model->feature_ids ?? [];
+        $usersId = [];
+        $AllUsersId = [];
+        $HostUsersId = [];
+        $HostAgencyUsersId = [];
+        $shippingAgencyUserId = [];
+        $FamilyUsersId = [];
+        $BdUsersId = [];
 
         // Log::info($featureIds);
 
@@ -54,6 +61,65 @@ class OfficialMessageJob implements ShouldQueue
         if (!is_array($featureIds)) {
             // if it's a comma-separated string or single value
             $featureIds = array_filter(explode(',', $featureIds));
+        }
+       
+        $AllUsersId = [];
+        $HostUsersId = [];
+        $HostAgencyUsersId = [];
+        $shippingAgencyUserId = [];
+        $FamilyUsersId = [];
+        $BdUsersId = [];
+        $usersId = [];
+
+        if (!empty($this->model->multi_feature) && is_array($this->model->multi_feature)) {
+            foreach ($this->model->multi_feature as $feature) {
+                if ($feature === 'all') {
+                    $AllUsersId = User::pluck('id')->toArray();
+                } elseif ($feature === 'users') {
+                    $HostUsersId = User::where(function ($query) {
+                        $query->whereNull('agency_id')
+                            ->orWhere('agency_id', 0);
+                    })->pluck('id')->toArray();
+                } elseif ($feature === 'host_users') {
+                    $HostUsersId = User::where(function ($query) {
+                        $query->whereNotNull('agency_id')
+                            ->where('agency_id', '!=', 0);
+                    })->where(function ($query) {
+                        $query->whereDoesntHave('ownAgency')
+                            ->orWhereDoesntHave('shippingAgency');
+                    })->pluck('id')->toArray();
+                } elseif ($feature === 'host_agencies') {
+                    $HostAgencyUsersId = User::whereNotNull('agency_id')
+                        ->where('agency_id', '!=', 0)
+                        ->whereHas('ownAgency')
+                        ->pluck('id')
+                        ->toArray();
+                } elseif ($feature === 'charge_agencies') {
+                    $shippingAgencyUserId = User::whereNotNull('agency_id')
+                        ->where('agency_id', '!=', 0)
+                        ->whereHas('shippingAgency')
+                        ->pluck('id')
+                        ->toArray();
+                } elseif ($feature === 'families') {
+                    $FamilyUsersId = User::whereHas('user_family')
+                        ->pluck('id')
+                        ->toArray();
+                } elseif ($feature === 'bds') {
+                    $BdUsersId = User::where('is_bd', 1)
+                        ->pluck('id')
+                        ->toArray();
+                }
+            }
+
+            // Combine all IDs into one array (and remove duplicates)
+            $usersId = array_unique(array_merge(
+                $AllUsersId,
+                $HostUsersId,
+                $HostAgencyUsersId,
+                $shippingAgencyUserId,
+                $FamilyUsersId,
+                $BdUsersId
+            ));
         }
 
         // Log::info('OfficialMessageJob started', [
@@ -63,9 +129,8 @@ class OfficialMessageJob implements ShouldQueue
         //     'feature_ids'  => $featureIds,
         // ]);
 
-        $usersId = [];
 
-        if ($feature === 'agency') {
+        if ($feature && $feature === 'agency') {
             $agencies = Agency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
@@ -82,7 +147,7 @@ class OfficialMessageJob implements ShouldQueue
                     $usersId = array_merge($usersId, $agency->members->pluck('user_id')->toArray());
                 }
             }
-        } elseif ($feature === 'family') {
+        } elseif ($feature && $feature === 'family') {
             $families = Family::query()
                 ->when($subFeature === 'country', function ($q) use ($featureIds) {
                     $q->whereHas('owner', fn($query) => $query->whereIn('country_id', $featureIds));
@@ -100,7 +165,7 @@ class OfficialMessageJob implements ShouldQueue
                     $usersId = array_merge($usersId, $family->members->pluck('user_id')->toArray());
                 }
             }
-        } elseif ($feature === 'users') {
+        } elseif ($feature && $feature === 'users') {
             $users = User::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
@@ -108,14 +173,14 @@ class OfficialMessageJob implements ShouldQueue
                 ->get();
 
             $usersId = $users->pluck('id')->toArray();
-        } elseif ($feature === 'bds') {
+        } elseif ($feature && $feature === 'bds') {
             $users = Bd::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
                 ->get();
 
             $usersId = $users->pluck('app_id')->toArray();
-        } elseif ($feature === 'shipping_agency') {
+        } elseif ($feature && $feature === 'shipping_agency') {
             $agencies = ShippingAgency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
