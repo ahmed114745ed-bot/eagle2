@@ -169,9 +169,9 @@ class EncorUsersController extends AdminController
     {
         $permission_name = $this->permission_name;
 
-        $userModel = config('admin.database.users_model');
+//        $userModel = config('admin.database.users_model');
 
-        $grid = new Grid(new $userModel());
+        $grid = new Grid(new \App\Models\Admin());
 
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
@@ -187,6 +187,41 @@ class EncorUsersController extends AdminController
         $grid->column('username', trans('admin.username'));
         $grid->column('name', trans('admin.name'));
         $grid->column('roles', trans('admin.roles'))->pluck('name')->label();
+
+        $grid->column('createdBy.name', __('created by'))->display(function () {
+            $user = $this->createdBy;
+            $name = $user->name ?? '';
+
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $id = $user->id ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 

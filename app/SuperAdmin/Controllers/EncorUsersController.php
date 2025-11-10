@@ -170,7 +170,7 @@ class EncorUsersController extends AdminController
     {
         $permission_name = $this->permission_name;
 
-        $userModel = config('admin.database.users_model');
+//        $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new \App\Models\Admin());
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
