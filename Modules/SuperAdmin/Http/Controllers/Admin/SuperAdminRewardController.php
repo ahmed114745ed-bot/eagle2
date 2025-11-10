@@ -206,7 +206,7 @@ class SuperAdminRewardController extends MainController
         // });
 
 
-
+        // In your controller method
         $grid->column('members', __('Rewards'))->expand(function ($model) {
 
             $members = $model->packageRewards()->get()->map(function ($memper) {
@@ -246,8 +246,8 @@ class SuperAdminRewardController extends MainController
 
                 // Handle different types
                 $imageType = getFileExtension($url);
+
                 if ($imageType === 'svga' || $imageType === 'zz') {
-                    // Generate unique div ID for each SVGA
                     $divId = 'svga_' . $memper->id;
                     $image = new HtmlString(
                         "<div class='rtlSvga' id='{$divId}' data-url='{$url}' style='width:50px;height:50px;'></div>"
@@ -281,28 +281,40 @@ class SuperAdminRewardController extends MainController
             );
         });
 
-        Admin::script(<<<JS
-            function initSvgaPlayers() {
-                document.querySelectorAll('.rtlSvga').forEach(el => {
-                    const url = el.dataset.url;
-                    if (!url) return;
+        // Include SVGA library and JS for initializing
 
-                    const player = new SVGA.Player(el);
-                    const parser = new SVGA.Parser();
-                    parser.load(url, function(videoItem) {
-                        player.setVideoItem(videoItem);
-                        player.startAnimation();
-                    });
-                });
-            }
 
-            // Initial load
-            document.addEventListener('DOMContentLoaded', initSvgaPlayers);
+        Admin::script(
+            <<<'JS'
+function initSvgaPlayers() {
+    if (typeof SVGA === 'undefined') {
+        setTimeout(initSvgaPlayers, 100);
+        return;
+    }
 
-            // Re-run after PJAX updates (Laravel Admin tables)
-            $(document).on('pjax:success', initSvgaPlayers);
-            JS
-            );
+    document.querySelectorAll('.rtlSvga').forEach(el => {
+        const url = el.dataset.url;
+        if (!url) return;
+
+        // Clear previous canvas if exists
+        el.innerHTML = "";
+
+        const player = new SVGA.Player(el);
+        const parser = new SVGA.Parser();
+        parser.load(url, function(videoItem) {
+            player.setVideoItem(videoItem);
+            player.startAnimation();
+        });
+    });
+}
+
+// Initial load
+document.addEventListener('DOMContentLoaded', initSvgaPlayers);
+
+// Re-run after PJAX updates
+$(document).on('pjax:success', initSvgaPlayers);
+JS
+        );
     }
     protected function badge($grid)
     {
