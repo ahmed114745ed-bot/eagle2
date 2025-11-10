@@ -42,6 +42,11 @@ class SuperAdmin extends Model
         return $this->hasMany(SubAdmin::class, 'parent_id', 'id');
     }
 
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
+
     //
     //    public function transactions()
     //    {
