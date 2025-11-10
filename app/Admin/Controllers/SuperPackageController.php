@@ -107,7 +107,7 @@ class SuperPackageController extends MainController
                     $gifts = @$memper->badge->name ?? '';
                     $path  = @$memper->badge->image ?? '';
                     Log::info("Badge gift: {$gifts}, path: {$path}");
-                } elseif ($memper->type == "coins") {
+                } elseif ($memper->type == "coin") {
                     $gifts = @$memper->target;
                     $path  = 'coin.png';
                     Log::info("Coins gift: {$gifts}, path: {$path}");
