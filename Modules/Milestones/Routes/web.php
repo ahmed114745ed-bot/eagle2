@@ -40,7 +40,7 @@ Route::group(
 
 
         Route::resource('milestones', MilestoneController::class);
-
+        Route::get('milestones/{id}/sync', [MilestoneController::class, 'syncMilestone'])->name('milestones.sync');
         Route::prefix('milestone-rewards/{milestone_id}')->group(function () {
             Route::get('/', [MilestoneRewardController::class, 'index']);
             Route::get('/create', [MilestoneRewardController::class, 'create'])->name('milestone-rewards.create');
@@ -50,6 +50,7 @@ Route::group(
             Route::put('/{id}', [MilestoneRewardController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [MilestoneRewardController::class, 'destroy'])->where('id', '[0-9]+');
         });
+
     }
 );
 

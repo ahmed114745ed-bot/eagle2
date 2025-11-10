@@ -2,7 +2,9 @@
 
 namespace Modules\SuperAdmin\Entities;
 
+use App\Models\Admin;
 use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\Country;
 use App\Models\User;
 use DB;

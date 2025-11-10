@@ -1411,14 +1411,16 @@
 "Choose a widget": "Choose a widget",
 "form_bd_bio":"Welcome! With me, you'll learn the secrets of success in live streaming. I have extensive experience training successful agencies. I promise daily follow-up and unlimited support until you reach the top!"
 ,    "Application Name": "Application Name",
-    "Work Duration (months)": "Work Duration (months)",
-    "Members": "Members",
-    "Top 3 Agencies": "Top 3 Agencies",
-    "Recommended": "Recommended",
-    "Works since :value years": "Since :value year(s)",
-    "Works since :value months": "Since :value month(s)",
-    "Works since :value days": "Since :value day(s)",
-    "Welcome message": "Welcome to our family! I’m here to support you every step toward success."
+"Work Duration (months)": "Work Duration (months)",
+"Members": "Members",
+"Top 3 Agencies": "Top 3 Agencies",
+"Recommended": "Recommended",
+"Works since :value years": "Since :value year(s)",
+"Works since :value months": "Since :value month(s)",
+"Works since :value days": "Since :value day(s)",
+"Welcome message": "Welcome to our family! I’m here to support you every step toward success.",
+"milestone_rewards_synced": "Milestone rewards synced successfully"
+
 
 
 
