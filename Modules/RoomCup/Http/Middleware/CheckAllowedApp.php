@@ -11,10 +11,10 @@ class CheckAllowedApp
 
     protected array $allowedApps = [
         'tempo',
-        'moon',
-        'bigo',
+        'moon light',
+        'bigo room',
         'eagle',
-        'Pop'
+        'pop live'
     ];
 
     public function handle(Request $request, Closure $next)
