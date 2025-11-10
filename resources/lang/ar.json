@@ -4405,7 +4405,9 @@
     "Works since :value months": "منذ :value شهر",
     "Works since :value days": "منذ :value يوم",
     "Welcome message": "مرحباً بك في عائلتنا! أنا هنا لأدعمك في كل خطوة نحو النجاح.",
-    "milestone_rewards_synced": "تمت مزامنة مكافآت الإنجاز بنجاح"
+    "milestone_rewards_synced": "تمت مزامنة مكافآت الإنجاز بنجاح",
+    "Reapply Rewards": "إعادة تطبيق المكافآت"
+
 
     
 
