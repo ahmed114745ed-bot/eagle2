@@ -603,6 +603,24 @@ if (!function_exists('handleShowImageWithTypes')) {
     }
 }
 
+ function handleShowImageWithType(string $uniqueId, ?string $url, int $width = 50, int $height = 50, $borderRadius = 50, $objectFit = 'cover'): string
+    {
+        $imageType = getFileExtension($url);
+
+        if ($imageType === 'svga' || $imageType === 'zz') {
+            // Output div with data-url for JS initialization
+            return "<div class='rtlSvga' id='svga_{$uniqueId}' data-url='{$url}' style='width:{$width}px;height:{$height}px;'></div>";
+        } elseif ($imageType === 'mp4') {
+            return "<video width='{$width}' height='{$height}' controls autoplay muted loop>
+                    <source src='{$url}' type='video/mp4'>
+                    <source src='{$url}' type='video/webm'>
+                    Your browser does not support the video tag.
+                </video>";
+        } else {
+            return "<img src='{$url}' width='{$width}' height='{$height}' style='border-radius: {$borderRadius}%; object-fit: {$objectFit};'/>";
+        }
+    }
+
 if (!function_exists('userType')) {
     function userType($type)
     {
