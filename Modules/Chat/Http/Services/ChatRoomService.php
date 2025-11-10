@@ -324,6 +324,27 @@ class ChatRoomService
         return $chatRoom;
     }
 
+    public function getCreateChatRoomId($id)
+    {
+        $chatRoom = ChatRoom::where('id', $id)->first();
+
+        if (!$chatRoom) {
+            return false;
+        }
+
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
+
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
+        }
+
+        return $chatRoom;
+    }
+
     public function getChatMessages($chatRoomId, $request = null, $user)
     {
         // Get messages with reacts and albums for the chat room
