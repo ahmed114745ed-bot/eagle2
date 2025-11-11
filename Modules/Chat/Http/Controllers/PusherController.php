@@ -41,12 +41,13 @@ class PusherController extends Controller
         $events = $request->input('events', []);
 
         foreach ($events as $event) {
-            info($event);
             $eventName = $event['name'];
             $channel = $event['channel'] ?? null;
 
             if ($channel && str_starts_with($channel, 'presence-chat.room.')) {
 //                $roomId = str_replace('presence-chat.room.', '', $channel);
+
+                info($event);
 
                 switch ($eventName) {
                     case 'member_removed':
