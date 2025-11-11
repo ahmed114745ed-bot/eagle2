@@ -77,7 +77,7 @@ class CalculateRoomCupRewards extends Command
             'enabled'          => true,
             'interval'         => 1,
             'type'             => 'daily',
-            'time'             => '23:59',
+            'time'             => '00:00',
             'day'              => 0,
         ];
     
@@ -111,8 +111,8 @@ class CalculateRoomCupRewards extends Command
     {
         return match ($type) {
             'daily'   => [
-                Carbon::now(getTimezone())->startOfDay(),
-                Carbon::now(getTimezone())->endOfDay(),
+                Carbon::yesterday(getTimezone())->startOfDay(),
+                Carbon::yesterday(getTimezone())->endOfDay(),
             ],
             'weekly'  => [
                 Carbon::now(getTimezone())->subWeek()->startOfWeek(),
@@ -123,8 +123,8 @@ class CalculateRoomCupRewards extends Command
                 Carbon::now(getTimezone())->subMonth()->endOfMonth(),
             ],
             default   => [
-                Carbon::now(getTimezone())->startOfDay(),
-                Carbon::now(getTimezone())->endOfDay(),
+                Carbon::yesterday(getTimezone())->startOfDay(),
+                Carbon::yesterday(getTimezone())->endOfDay(),
             ],
         };
     }
