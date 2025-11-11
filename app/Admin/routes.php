@@ -458,6 +458,25 @@ Route::group(
             Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
         });
 
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
+            Route::get('comparison-user-signup', [AllStatisticController::class, 'comparisonUserSignUp']);
+            Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
+            Route::get('top-sender', [AllStatisticController::class, 'topSender']);
+            Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [AllStatisticController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
+            Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
+            Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
+            Route::get('balance-data', [AllStatisticController::class, 'getBalanceData']);
+            Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
+            Route::get('top-followers', [AllStatisticController::class, 'getTopFollowers']);
+            Route::get('game-summary', [AllStatisticController::class, 'gameSummary']);
+        });
+
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('usersBd', BdController::class);
