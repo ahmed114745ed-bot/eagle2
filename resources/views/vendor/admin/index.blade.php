@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="renderer" content="webkit">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ Admin::title() }} @if($header) | {{ $header }}@endif</title>
+    <title>@if($header) | {{ $header }}@endif</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
 <script>
-   
+
 
         function initPhoneInput() {
         document.querySelectorAll("#phone-input").forEach(function(input) {
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.head.insertAdjacentHTML('beforeend', `
                     <style>
                         .iti { width: 100%;
-                        
+
                         // margin-bottom: 15px;
                          }
                         .iti__flag-container { z-index: 99; }
