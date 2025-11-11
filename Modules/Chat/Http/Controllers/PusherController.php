@@ -51,7 +51,7 @@ class PusherController extends Controller
                 switch ($eventName) {
                     case 'member_removed':
                         $user = User::find($event['user_id']);
-                        $user->current_room_chat  = null;
+                        $user->current_room_chat = null;
                         $user->save();
                         break;
 

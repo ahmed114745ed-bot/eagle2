@@ -731,8 +731,8 @@ Route::group(
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
 
-            Route::get('/pusher-test', function () {
-                $user = \App\Models\User::whereId(1206)->first();
+            Route::get('/pusher-test/{id}', function ($id) {
+                $user = \App\Models\User::findOrFail($id);
                 $token = $user->createToken('broadcast')->plainTextToken;
 
                 return view('test.test-pusher', compact('token'));
