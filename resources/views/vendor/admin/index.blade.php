@@ -12,11 +12,11 @@
 
 {{--    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">--}}
 {{--    <link rel="shortcut icon" href="{{ asset('images/favicon/android-chrome-512x512.png') }}" type="image/png">--}}
-    <link rel="manifest" href="{{ asset('manifest.json') }}">
 
-{{--    @if(!is_null($favicon = Admin::favicon()))--}}
-{{--    <link rel="shortcut icon" href="{{$favicon}}">--}}
-{{--    @endif--}}
+    @if(!is_null($favicon = Admin::favicon()))
+        <link rel="shortcut icon" href="{{$favicon}}">
+        <link rel="manifest" href="{{ $favicon }}">
+    @endif
     {!! Admin::css() !!}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 
