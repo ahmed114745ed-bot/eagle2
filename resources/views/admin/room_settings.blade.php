@@ -365,6 +365,11 @@
                 small.text-danger {
                     font-size: 0.85rem;
                 }
+                input[type=number] {
+                        font-variant-numeric: normal;
+                        unicode-bidi: plaintext;
+                        direction: ltr;
+                    }
             </style>
 
             </div>

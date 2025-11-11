@@ -142,6 +142,9 @@ return [
     */
 
     'custom' => [
+        'username' => [
+            'unique' => 'اسم المستخدم غير متاح للاستخدام.',
+        ],
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],

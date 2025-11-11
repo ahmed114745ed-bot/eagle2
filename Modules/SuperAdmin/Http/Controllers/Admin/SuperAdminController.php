@@ -10,6 +10,7 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Permission;
 use Illuminate\Support\Str;
@@ -366,6 +367,8 @@ class SuperAdminController extends MainController
      */
     protected function form()
     {
+        $userTable = config('admin.database.users_table');
+        $connection = config('admin.database.connection');
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
@@ -373,18 +376,21 @@ class SuperAdminController extends MainController
         $form->hidden('created_by')->default(auth()->id());
 
         $form->text('username', trans('admin.username'))
-            ->rules(function ($form) {
-                // Get the record ID if editing, otherwise null
-                $id = $form->model()?->id ?? null;
-
-                // Get the type from request or from existing model when editing
-                $type =  PermissionType::SUPER_ADMIN->value ?? $form->model()?->type;
-
-                // Default to empty string if not found (avoids SQL issues)
-                $type = $type ?? '';
-
-                // Build unique rule with type condition
-                return "required|unique:admin_users,username," . ($id ?? 'NULL') . ",id,type," . $type;
+            ->rules(function ($form) use ($connection, $userTable) {
+                $table = "{$connection}.{$userTable}";
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (! $form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
+                }
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
@@ -429,6 +435,7 @@ class SuperAdminController extends MainController
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
+            $country_id = $form->input('country_id');
             $superAdmin = SuperAdmin::where('phone_code', request('phone_code'))->where('phone', request('phone'));
             if ($isEditing) $superAdmin->where('id', '!=', $form->model()->id);
             $exists = $superAdmin->exists();
@@ -468,6 +475,7 @@ class SuperAdminController extends MainController
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_super_admin = 1;
                     $newUserAppId->save();
+                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'super-admin');
                     $form->app_id = $newAppId;
                 }
             }
@@ -475,12 +483,27 @@ class SuperAdminController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
+
+           
         });
 
         $form->saved(function (Form $form) {
+            /** @var \App\Models\AdminUser $superAdmin */
             $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
+              
+  
+            $country = Country::find($superAdmin->country_id);
+
+            if ($country && $country->area_manager_id) {
+                if ($superAdmin->parent_id != $country->area_manager_id) {
+                    $superAdmin->update([
+                        'parent_id' => $country->area_manager_id,
+                    ]);
+                }
+            }
+           
 
             $userApp = User::find($userAppId);
             if (isset($userApp)) {

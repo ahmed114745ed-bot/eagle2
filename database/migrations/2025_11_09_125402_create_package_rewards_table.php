@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('package_rewards', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('super_package_id')->nullable()->constrained('super_package_rewards')->nullOnDelete();
-            $table->string('type');
-            $table->string('target');
-            $table->unsignedTinyInteger('expire')->default('1');
-            $table->integer('quantity');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('package_rewards')) {
+            Schema::create('package_rewards', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('super_package_id')->nullable()->constrained('super_package_rewards')->nullOnDelete();
+                $table->string('type');
+                $table->string('target');
+                $table->unsignedTinyInteger('expire')->default('1');
+                $table->integer('quantity');
+                $table->timestamps();
+            });
+        };
     }
 
     /**

@@ -39,13 +39,13 @@ class DeleteBdAction extends RowAction
             }
 
             if ($model->created_by == 'owner') {
-                return $this->response()->error('You cannot delete a BD created by the owner.')->refresh();
+                return $this->response()->error(__('You cannot delete a BD created by the owner.'))->refresh();
             }
 
             if ($this->agencyCount > 0) {
                 $defaultBd = Bd::where('default', 1)->where('id', '!=', $model->app_id)->first();
                 if (!$defaultBd) {
-                    return $this->response()->error('No default BD found to transfer agencies to.')->refresh();
+                    return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
                 }
 
                 Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->app_id]);

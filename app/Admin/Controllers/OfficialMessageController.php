@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
+use Encore\Admin\Facades\Admin;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
@@ -73,7 +74,7 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()->whereNull('admin_id')
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
@@ -217,13 +218,47 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
-         $form->select('language', __('language'))
-             ->options('/api/search/language')
-             ->ajax('/api/search/language', 'code', 'name')->rules('required');
+        //  $form->select('language', __('language'))
+        //      ->options('/api/search/language')
+        //      ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
+        $form->select('type_feature', trans('type feature'))->options([
+            'single'   => __('single select'),
+            'multi' => __('multi select'),
 
-        $this->selectFeature($form);
+        ])->when('single', function (Form $form) {
+            $this->selectFeature($form);
+        })->when('multi', function (Form $form) {
+            $form->multipleSelect('multi_feature', __('feature'))
+                ->options([
+                    'all' => __('all'),
+                    'users' => __('users'),
+                    'host_users' => __('host users'),
+                    'host_agencies' => __('host agencies'),
+                    'charge_agencies' => __('charge agencies'),
+                    'families' => __('families'),
+                    'bds' => __('bds'),
+                ])->attribute([
+                    'id' => 'multi_feature_select'
+                ])
+                ->help(__('Selecting All will automatically select all other options'));
+        });
+        Admin::script(<<<JS
+            $('#multi_feature_select').on('change', function () {
+                var selected = $(this).val() || [];
 
+                // If "all" is selected
+                if (selected.includes('all')) {
+                    // Select all options
+                    $('#multi_feature_select option').prop('selected', true);
+                    $('#multi_feature_select').trigger('change.select2');
+                } else {
+                    // Deselect "all" if it’s not alone
+                    $('#multi_feature_select option[value="all"]').prop('selected', false);
+                    $('#multi_feature_select').trigger('change.select2');
+                }
+            });
+            JS);
         $form->hidden('type', __('type'))->default(2);
 
 
@@ -289,6 +324,12 @@ class OfficialMessageController extends MainController
                     ->options('/api/search/countries')
                     ->ajax('/api/search/countries', 'id', 'name');
             });
+        });
+
+        $form->saving(function (Form $form) {
+            if (is_array($form->multi_feature)) {
+                $form->multi_feature = implode(',', $form->multi_feature);
+            }
         });
 
         $form->saved(function (Form $form) {

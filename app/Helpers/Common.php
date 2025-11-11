@@ -15,18 +15,15 @@ use App\Models\Follow;
 use App\Models\Target;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
-use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
 use App\Models\Background;
-use Illuminate\Log\Logger;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
-use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
 use Modules\Vip\Entities\Vip;
@@ -39,27 +36,21 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Http\JsonResponse;
 use Modules\Vip\Entities\UserVip;
 use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Log;
 use Modules\Events\Entities\Winner;
-use App\Models\NotificationTemplate;
-use App\Tik\DTO\NotificationPayload;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Modules\Events\Entities\PkEvent;
-
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
-use App\Notifications\AgencyOwnerRole;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\HelperTraits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
-use App\Http\Resources\CountryResource;
 use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
@@ -71,11 +62,10 @@ use App\Jobs\SendFirebaseNotificationJob;
 use Illuminate\Pagination\CursorPaginator;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Notification;
-use App\Jobs\SendFirebaseTopicNotificationJob;
-use Modules\Charizma\Entities\ExtraDataInRoom;
+use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -1866,6 +1856,20 @@ class Common
                     'colored_name' => '',
                 ];
 
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
             case 'agency':
                 $agency = $resource->senderShippingAgency;
                 $owner = $agency->owner ?? null;
@@ -1960,6 +1964,31 @@ class Common
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
 
+                ];
+            case 'sub_area_manager':
+                return [
+                    'name' => $resource->receiverSubAreaManager->name ?? '',
+                    'image' => $resource->receiverSubAreaManager->img ?? '',
+                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
+                    'id' => $resource->receiverSubAreaManager->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiverSubAreaManager ? url("admin/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+                    'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
+                    'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+
+                ];
+            case 'super_admin':
+                return [
+                    'name' => $resource->receiverSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSuperAdmin->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiverSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
                 ];
             case 'sub_super_admin':
                 return [
@@ -2163,5 +2192,46 @@ class Common
 
             UserBadge::query()->create($data);
         }
+    }
+
+    public static function areaCountries(): array
+    {
+        $adminId = session('area_manager_id') ?? auth()->user()->id;
+
+        $authAdmin = AreaManager::with('countries')->find($adminId);
+
+        if (!$authAdmin) {
+            $authAdmin = SubAreaManager::with('countries')->find($adminId);
+        }
+
+        if (!$authAdmin) {
+            return [];
+        }
+
+        $countryID = session('area_manager_country_id');
+
+        if ($countryID) {
+            return (array)$countryID;
+        }
+
+        return @$authAdmin->countries->pluck('id')->toArray() ?? [];
+    }
+
+
+
+    public static function getRoleAuthId($userId)
+    {
+        $userId = $userId ?? auth()->id();
+        $user = DB::table('admin_users')->where('id', $userId)->first();
+        if (! $user) {
+            return null;
+        }
+        if ($user->type === 'area-manager') {
+            return $user->id;
+        }
+        if ($user->type === 'sub_area_manager') {
+            return $user->parent_id;
+        }
+        return $user->id;
     }
 }
