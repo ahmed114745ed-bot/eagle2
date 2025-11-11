@@ -21,10 +21,7 @@ class UserSallaryObserver
 
     public function saved(UserSallary $userSalary)
     {   
-        $originalDbValue = $userSalary->getOriginal('dB');
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateBdHostSallary($userSalary ,$originalDbValue);
-
     }
 
     public function creating(UserSallary $userSalary)
