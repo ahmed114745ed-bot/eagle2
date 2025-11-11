@@ -1461,7 +1461,33 @@
 "milestone_rewards_synced": "Milestone rewards synced successfully",
 "Reapply Rewards": "Reapply Rewards",
 "This is the default number of admins allowed per room.": "This is the default number of admins allowed per room."
+,"Form Details": "Form Details",
+"Form ID": "Form ID",
+"Full Form Information": "Full Form Information",
+"User Name": "User Name",
+"Email": "Email",
+"Form Type": "Form Type",
+"Form Status": "Form Status",
+"Pending": "Pending",
+"Awaiting Review": "Awaiting Review",
+"Approved": "Approved",
+"Approved Successfully": "Approved Successfully",
+"Rejected": "Rejected",
+"Request Rejected": "Request Rejected",
+"Unknown": "Unknown",
+"Created At": "Created At",
+"Last Updated": "Last Updated",
+"Available Actions": "Available Actions",
+"Delete Request": "Delete Request",
+"You can delete this request only while pending.": "You can delete this request only while pending.",
+"Cannot Edit": "Cannot Edit",
+"This request is processed and cannot be modified.": "This request is processed and cannot be modified.",
+"Are you sure you want to delete this request?": "Are you sure you want to delete this request?",
+"Not specified": "Not specified",
 
+"shipping_agency": "Shipping Agency",
+"bd_form": "BD Form",
+"host_agency": "Host Agency"
 
 
 

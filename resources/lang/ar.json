@@ -4481,6 +4481,32 @@
     "milestone_rewards_synced": "تمت مزامنة مكافآت الإنجاز بنجاح",
     "Reapply Rewards": "إعادة تطبيق المكافآت",
     "This is the default number of admins allowed per room.": "هذا هو العدد الأساسي للمشرفين المسموح بهم في كل غرفة."
+,    "Form Details": "تفاصيل الطلب",
+"Form ID": "رقم الطلب",
+"Full Form Information": "معلومات الطلب الكاملة",
+"User Name": "اسم المستخدم",
+"Email": "البريد الإلكتروني",
+"Form Type": "نوع النموذج",
+"Form Status": "حالة الطلب",
+"Pending": "معلق",
+"Awaiting Review": "في انتظار المراجعة",
+"Approved": "مقبول",
+"Approved Successfully": "تمت الموافقة",
+"Rejected": "مرفوض",
+"Request Rejected": "تم رفض الطلب",
+"Unknown": "غير محدد",
+"Created At": "تاريخ الإنشاء",
+"Last Updated": "آخر تحديث",
+"Available Actions": "الإجراءات المتاحة",
+"Delete Request": "حذف الطلب",
+"You can delete this request only while pending.": "يمكنك حذف الطلب فقط أثناء كونه معلقًا.",
+"Cannot Edit": "لا يمكن التعديل",
+"This request is processed and cannot be modified.": "تم معالجة هذا الطلب ولا يمكن تعديله.",
+"Are you sure you want to delete this request?": "هل أنت متأكد من حذف هذا الطلب؟",
+"Not specified": "غير محدد",
+"shipping_agency": "وكالة الشحن",
+"bd_form": "نموذج BD",
+"host_agency": "الوكالة المستضيفة"
 
 
 

@@ -3582,7 +3582,33 @@
     "milestone_rewards_synced": "माइलस्टोन पुरस्कार सफलतापूर्वक सिंक किए गए",
     "Reapply Rewards": "Réappliquer les récompenses",
     "This is the default number of admins allowed per room.": "यह प्रत्येक कमरे में अनुमत प्रशासकों की डिफ़ॉल्ट संख्या है।"
-
+,
+    "shipping_agency": "शिपिंग एजेंसी",
+    "bd_form": "बीडी फ़ॉर्म",
+    "host_agency": "होस्ट एजेंसी"
+    ,"Form Details": "फॉर्म विवरण",
+    "Form ID": "फॉर्म आईडी",
+    "Full Form Information": "पूर्ण फॉर्म जानकारी",
+    "User Name": "उपयोगकर्ता का नाम",
+    "Email": "ईमेल",
+    "Form Type": "फॉर्म प्रकार",
+    "Form Status": "फॉर्म स्थिति",
+    "Pending": "लंबित",
+    "Awaiting Review": "समीक्षा की प्रतीक्षा में",
+    "Approved": "स्वीकृत",
+    "Approved Successfully": "सफलतापूर्वक स्वीकृत",
+    "Rejected": "अस्वीकृत",
+    "Request Rejected": "अनुरोध अस्वीकृत",
+    "Unknown": "अज्ञात",
+    "Created At": "बनाने की तारीख",
+    "Last Updated": "अंतिम अद्यतन",
+    "Available Actions": "उपलब्ध क्रियाएँ",
+    "Delete Request": "अनुरोध हटाएं",
+    "You can delete this request only while pending.": "आप इस अनुरोध को केवल लंबित रहते हुए हटा सकते हैं।",
+    "Cannot Edit": "संपादित नहीं किया जा सकता",
+    "This request is processed and cannot be modified.": "यह अनुरोध संसाधित किया गया है और संशोधित नहीं किया जा सकता।",
+    "Are you sure you want to delete this request?": "क्या आप वाकई इस अनुरोध को हटाना चाहते हैं?",
+    "Not specified": "निर्दिष्ट नहीं"
 
 
 
