@@ -11,7 +11,7 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
 {{--    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">--}}
-{{--    <link rel="shortcut icon" href="{{ asset('android-chrome-512x512.png') }}" type="image/png">--}}
+    <link rel="shortcut icon" href="{{ asset('images/android-chrome-512x512.png') }}" type="image/png">
 
 {{--    @if(!is_null($favicon = Admin::favicon()))--}}
 {{--    <link rel="shortcut icon" href="{{$favicon}}">--}}
