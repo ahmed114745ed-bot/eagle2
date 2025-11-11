@@ -42,7 +42,6 @@ class CalculateRoomCupRewards extends Command
             $this->warn("⛔ Room Cup not enabled");
             return EnumCommand::SUCCESS;
         }
-
         [$start, $end] = $this->getPeriodByType($type);
  
 
@@ -78,7 +77,7 @@ class CalculateRoomCupRewards extends Command
             'enabled'          => true,
             'interval'         => 1,
             'type'             => 'daily',
-            'time'             => '23:59',
+            'time'             => '00:00',
             'day'              => 0,
         ];
     
@@ -136,6 +135,7 @@ class CalculateRoomCupRewards extends Command
             ->orderBy('id')
             ->chunk(100, function ($gifts) {
                 foreach ($gifts as $gift) {
+                    
                     $this->processGift($gift);
                 }
             });
@@ -154,109 +154,112 @@ class CalculateRoomCupRewards extends Command
     private function processGift(TotalRoomGift $gift): void
     {
         $this->line("📦 Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
-
+        $this->logRoomCup("Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
+    
         $room = Room::find($gift->room_id);
-
+    
         if (!$room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
+            $this->logRoomCup("Room not found (ID: {$gift->room_id})");
             return;
         }
-
+    
         $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
-
+    
         $this->line("👥 Admins: $adminsCount | Visitors: $visitorsCount | Total: {$gift->current_total}");
-
+        $this->logRoomCup("Room #{$room->id}: Admins=$adminsCount, Visitors=$visitorsCount, Total={$gift->current_total}");
+    
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
-        if ($gift->room_id == 215) {
-         
-        }
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
+            $this->logRoomCup("No target achieved for Room #{$room->id}");
             return;
         }
-        $room->additional_admin = 0 ;
+    
+        $this->logRoomCup("Target found for Room #{$room->id}: Target ID={$target->id}, Owner Profit={$target->owner_profit}, Admin Profit={$target->admin_profit}");
+    
+        $room->additional_admin = 0;
         $room->save();
-         self::adjustAdminsBasedOnTarget( $room , $target);
-       
-       
+    
+        self::adjustAdminsBasedOnTarget($room, $target);
+        $this->logRoomCup("Adjusted admins for Room #{$room->id}, additional_admin={$room->additional_admin}");
+    
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
             $targetId = $target->id;
-
+    
             // Owner reward
             if ($target->owner_profit > 0) {
                 $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $room->uid, 'owner', $target->owner_profit);
-                $this->line("💰 Room owner #{$room->uid} will get {$target->owner_profit}");
+                $this->logRoomCup("Room owner #{$room->uid} will get {$target->owner_profit}");
             }
-
+    
+            // Admin reward
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
                 foreach ($room->admins_v2() as $admin) {
                     $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $admin->id, 'admin', $share);
-                    $this->line("👤 Admin {$admin->id} will get $share");
+                    $this->logRoomCup("Admin {$admin->id} will get {$share}");
                 }
             }
-
+    
             foreach ($rewards as $reward) {
                 $tz = getTimezone();
-
+    
                 $query = RoomCupReward::where('room_id', $reward['room_id'])
                     ->where('user_id', $reward['user_id'])
                     ->where('type', $reward['type']);
-                
+    
                 switch ($this->type) {
                     case 'daily':
                         $start = Carbon::now($tz)->startOfDay();
                         $end   = Carbon::now($tz)->endOfDay();
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
-                
+    
                     case 'weekly':
                         $start = Carbon::now($tz)->startOfWeek();
                         $end   = Carbon::now($tz)->endOfWeek();
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
-                
+    
                     case 'monthly':
                         $start = Carbon::now($tz)->startOfMonth();
                         $end   = Carbon::now($tz)->endOfMonth();
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
-                
-                    default:
-                        break;
                 }
-                
+    
                 $exists = $query->exists();
-
                 if ($exists) {
                     $this->line("⏭️ Skipping duplicate reward for user {$reward['user_id']} in room {$reward['room_id']} (gift {$reward['total_room_gift_id']})");
+                    $this->logRoomCup("Skipping duplicate reward: Room={$reward['room_id']}, User={$reward['user_id']}, Gift={$reward['total_room_gift_id']}");
                     continue;
                 }
-
+    
                 RoomCupReward::create($reward);
-
-                // Apply reward
+    
                 $amountBefore = Common::getCurrentBalance($reward['user_id']);
                 $this->line("🪙 Adding {$reward['amount']} to user {$reward['user_id']} (balance before: {$amountBefore})");
-
+                $this->logRoomCup("Adding reward to user {$reward['user_id']}: Amount={$reward['amount']}, Balance before={$amountBefore}");
+    
                 UserCoinLogHelper::logByType(
                     $reward['user_id'],
                     $reward['amount'],
                     $amountBefore,
                     UserCoinLogType::ROOM_CUP,
                 );
-
-                User::whereKey($reward['user_id'])
-                    ->increment('di', $reward['amount']);
-
+    
+                User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
                 RoomCupHelper::updateRoomCupWallet($reward['amount']);
             }
         });
-
+    
         $this->info("✅ Rewards distributed for Room #{$room->id}");
+        $this->logRoomCup("Rewards distributed for Room #{$room->id}");
     }
+    
 
     private function findTarget(float $total, int $visitors, int $admins): ?RoomCupTarget
     {
@@ -302,6 +305,10 @@ class CalculateRoomCupRewards extends Command
         $this->normalizeRoomAdmins($room);
     }
     
+    private function logRoomCup(string $message): void
+    {
+        Log::channel('roomCup')->info($message);
+    }
     private function normalizeRoomAdmins($room): void
     {
         $roomAdmin = $room->room_admin;

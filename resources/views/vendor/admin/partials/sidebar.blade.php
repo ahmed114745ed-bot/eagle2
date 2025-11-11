@@ -246,7 +246,7 @@
                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                 ],
             ],
-            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'charge-to-superadmin'],
+            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
             [
                 'uri' => '#',
                 'icon' => 'fa-briefcase',

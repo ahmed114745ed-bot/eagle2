@@ -31,6 +31,22 @@
     "can not restore this super admin": "can not restore this country manager",
     "can not restore this super admin user taken": "can not restore this country manager",
     "Sub Super Admin": "super admin",
+        "Superadmin Banners": "country manager Banners",
+     
+
+    "SuperAdmin Banners": "country manager Banners",
+    "Browse superadmin banners": "Browse country manager banners",
+    "Add switch superadmin banners": "Add country manager banners",
+    "History switch superadmin banners": "History switch country manager banners",
+
+    "Browse super admin reward": "Browse country manager reward",
+    "Dedicate switch super admin reward": "Dedicate country manager reward",
+    "History switch super admin reward": "History country manager reward",
+    "Browse super admin reward history": "Browse country manager reward history",
+
+    "SuperAdmin Rewards": "country manager Rewards",
+
+
     "Super Admin": "country manager",
     "Super Admin Coins": "country manager Coins",
     "Zones coins must be greater than super admin coins": "Zones coins must be greater than country manager coins",

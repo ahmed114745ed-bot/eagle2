@@ -12,7 +12,6 @@ use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
-use App\Models\SuperAdmin;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
@@ -26,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Chat\Entities\ChatMessage;
 use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class HomeController extends MainController
 {
