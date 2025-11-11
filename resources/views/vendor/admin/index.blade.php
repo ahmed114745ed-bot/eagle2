@@ -6,16 +6,16 @@
     <meta name="renderer" content="webkit">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 {{--    <title>{{ Admin::title() }} @if($header) | {{ $header }}@endif</title>--}}
-    <title>{{ config('app.name', 'Laravel') }}@endif</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <link rel="shortcut icon" href="{{$favicon}}">
+    <link rel="shortcut icon" href="{{ getAppLogo() }}">
 
 
-    @if(!is_null($favicon = Admin::favicon()))
-    <link rel="shortcut icon" href="{{$favicon}}">
-    @endif
+{{--    @if(!is_null($favicon = Admin::favicon()))--}}
+{{--    <link rel="shortcut icon" href="{{$favicon}}">--}}
+{{--    @endif--}}
     {!! Admin::css() !!}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 
