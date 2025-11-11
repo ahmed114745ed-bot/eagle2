@@ -22,6 +22,7 @@ use App\Facades\CustomNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
 use App\Admin\Controllers\BdController;
 use App\Jobs\UpdateUserFollowCountsJob;
@@ -195,6 +196,16 @@ Route::get('/run-seeders', function () {
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/update-flag', function () {
+
+    Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ flag updated successfully.'
     ]);
 });
 Route::get('/clear_clear', function () {
