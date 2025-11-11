@@ -37,7 +37,17 @@
                                 <span class="badge bg-dark px-3 py-2">#{{ $formRequest->id }}</span>
                             </td>
                         </tr>
-
+                        <tr>
+                            <td class="table-label">
+                                <i class="bi bi-person-circle text-primary"></i>
+                                <strong>{{ __('Name') }}</strong>
+                            </td>
+                            <td class="table-value">
+                                <span class="user-name">
+                                    {{ $formRequest->name ?? __('Not specified') }}
+                                </span>
+                            </td>
+                        </tr>
                         <tr>
                             <td class="table-label">
                                 <i class="bi bi-person-circle text-primary"></i>
