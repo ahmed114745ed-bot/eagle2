@@ -273,6 +273,11 @@ class SuperPackageController extends MainController
             $form->number('expire_achievement', __('expire'));
         });
 
+        Admin::script('
+            $(".collapse.in").removeClass("in"); // Bootstrap 3
+            $(".collapse.show").removeClass("show"); // Bootstrap 4/5
+        ');
+
         return $form;
     }
 

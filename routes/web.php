@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Bd;
-use Modules\SuperAdmin\Entities\SuperAdmin;
 use Carbon\Carbon;
 use App\Models\Ban;
 use App\Models\Room;
@@ -35,6 +34,7 @@ use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\WelcomeController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Http\Controllers\SettingsController;
 use App\Helpers\SuperAdminNotificationHelper;
 use App\Http\Controllers\addTOjesonController;
@@ -47,6 +47,8 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
+use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -187,7 +189,8 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+    Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+    Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
         'status' => 'success',
