@@ -47,10 +47,12 @@ class PusherController extends Controller
             if ($channel && str_starts_with($channel, 'presence-chat.room.')) {
 //                $roomId = str_replace('presence-chat.room.', '', $channel);
 
+                info($event);
+
                 switch ($eventName) {
                     case 'member_removed':
                         $user = User::find($event['user_id']);
-                        $user->current_room_chat  = null;
+                        $user->current_room_chat = null;
                         $user->save();
                         break;
 
