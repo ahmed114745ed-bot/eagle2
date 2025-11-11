@@ -354,8 +354,8 @@ class EncorUsersController extends AdminController
         $form->ignore(['password_confirmation']);
         $form->hidden('type', __('Type'))->value(PermissionType::SUB_SUPER_ADMIN->value);
         $form->hidden('country_id', __('country'))->value(auth()->user()->country_id);
-
-        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('type', PermissionType::SUPER_ADMIN->value)->pluck('name', 'id'));
+       $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('admin_id', $authId)->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));

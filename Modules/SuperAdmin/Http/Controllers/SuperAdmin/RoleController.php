@@ -213,7 +213,7 @@ class RoleController extends MainController
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');
-            $form->model()->admin_id = Auth::id();
+            $form->model()->admin_id = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
             $form->model()->type = PermissionType::SUPER_ADMIN->value;
             // Automatically generate slug from name *before saving*
             $form->model()->slug = Str::slug($form->name . '-' . PermissionType::SUPER_ADMIN->value);
@@ -224,7 +224,7 @@ class RoleController extends MainController
 
         $form->saved(function (Form $form) {
             $form->slug = Str::slug(request('name') . '-' . PermissionType::SUPER_ADMIN->value);
-            $form->admin_id = Auth::id();
+            $form->admin_id = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
             $all = request('permissions_all');
             $selectedPermissionIds = array_filter(explode(',', $all));
 
