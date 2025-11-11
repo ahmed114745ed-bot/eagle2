@@ -5,6 +5,25 @@ use Illuminate\Support\Facades\Route;
 use Modules\Form\Controllers\CustomWidgetController;
 use Modules\Form\Controllers\FormTemplateController;
 use Modules\Form\Http\Controllers\Api\DataSourceController;
+use Modules\Form\Http\Controllers\FormSubmissionController;
+
+
+
+
+
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('form-list', [DataSourceController::class, 'formList']);
+});
+
+
+
+
+
+
+
 
 
 Route::prefix('v1')->group(function () {
