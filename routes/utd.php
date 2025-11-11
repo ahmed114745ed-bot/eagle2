@@ -5,6 +5,7 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\BoxController;
+use App\Admin\Controllers\SettingController;
 use App\Http\Controllers\utd\RoomController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
@@ -110,7 +111,7 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
-    
+
     Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
 
     Route::prefix('families')->group(function () {
@@ -515,6 +516,7 @@ Route::middleware([])->group(function () {
         Route::get('/ware-vips', [VipController::class, 'getWareVip']);
         Route::post('/delete-ware', [VipController::class, 'deleteWare']);
     });
+    Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic
