@@ -516,6 +516,7 @@ Route::middleware([])->group(function () {
         Route::get('/ware-vips', [VipController::class, 'getWareVip']);
         Route::post('/delete-ware', [VipController::class, 'deleteWare']);
     });
+    Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic
@@ -901,7 +902,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [PkEventController::class, 'update']);
         Route::get('/default-date', [PkEventController::class, 'defaultDate']);
     });
-    Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
+
     Route::prefix('pk-events-gift')->group(function () {
         Route::get('/', [PkEventController::class, 'allGifts']);
         Route::get('/show/{id}', [PkEventController::class, 'showGift']);
