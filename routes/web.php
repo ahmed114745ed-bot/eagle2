@@ -936,3 +936,27 @@ Route::get('remove-minus', function () {
         return $e->getMessage();
     }
 });
+
+Route::get('/manifest.json', function () {
+    $logo = getAppLogo();
+    return response()->json([
+        'name' => 'My Admin Panel',
+        'short_name' => 'Admin',
+        'start_url' => '/admin',
+        'display' => 'standalone',
+        'background_color' => '#ffffff',
+        'theme_color' => '#0d6efd',
+        'icons' => [
+            [
+                'src' => $logo,
+                'sizes' => '192x192',
+                'type' => 'image/png'
+            ],
+            [
+                'src' => $logo,
+                'sizes' => '512x512',
+                'type' => 'image/png'
+            ],
+        ]
+    ]);
+});

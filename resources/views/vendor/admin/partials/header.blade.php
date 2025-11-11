@@ -1,4 +1,4 @@
-<link rel="manifest" href="{{ asset('manifest.json') }}">
+<link rel="manifest" href="{{ url('manifest.json') }}">
 <meta name="theme-color" content="#0d6efd">
 
 <link rel="icon" sizes="192x192" href="{{ getAppLogo() }}">
