@@ -113,7 +113,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['add-switch', 'history-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
+                           // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
 
                         ],
                     ],
