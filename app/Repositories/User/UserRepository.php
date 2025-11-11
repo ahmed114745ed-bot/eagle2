@@ -11,7 +11,6 @@ use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use App\Models\User;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 
