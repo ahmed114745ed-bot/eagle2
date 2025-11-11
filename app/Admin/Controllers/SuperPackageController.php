@@ -152,6 +152,19 @@ class SuperPackageController extends MainController
         });
         
 
+        Admin::script("
+        $('.rtlSvga').each(function() {
+            var id = $(this).attr('id');
+            var url = $(this).data('url');
+            var player = new SVGA.Player('#' + id);
+            var parser = new SVGA.Parser();
+            parser.load(url, function(videoItem) {
+                player.setVideoItem(videoItem);
+                player.startAnimation();
+            });
+        });
+    ");
+
 
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
