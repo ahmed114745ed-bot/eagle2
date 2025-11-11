@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class SuperAdminRoleSeeder extends Seeder
+class AreaManagerRoleSeeder extends Seeder
 {
     public function run()
     {
