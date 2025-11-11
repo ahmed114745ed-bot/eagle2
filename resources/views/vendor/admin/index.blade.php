@@ -10,11 +10,12 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <link rel="shortcut icon" href="{{ getAppLogo() }}">
+    <link rel="shortcut icon" href="{{$favicon}}">
 
-{{--    @if(!is_null($favicon = Admin::favicon()))--}}
-{{--    <link rel="shortcut icon" href="{{$favicon}}">--}}
-{{--    @endif--}}
+
+    @if(!is_null($favicon = Admin::favicon()))
+    <link rel="shortcut icon" href="{{$favicon}}">
+    @endif
     {!! Admin::css() !!}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 
