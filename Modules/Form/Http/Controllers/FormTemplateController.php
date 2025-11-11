@@ -353,6 +353,14 @@ class FormTemplateController extends Controller
     
         $data = $request->except('_token');
     
+        $existingRequest = FormRequest::where('form_template_id', $template->id)
+                                        ->where('submitted_by', $request->user_id)
+                                        ->first();
+
+        if ($existingRequest) {
+            return redirect()->route('forms.show', $existingRequest->id);
+        }
+
         $data = $this->processFiles($data);
     
         $fields = $request->fields ?? [];
@@ -371,7 +379,6 @@ class FormTemplateController extends Controller
             'created_at' => now(),
         ]);
     
-        dd($data,$save,$request->all());
     
         return response()->json([
             'success' => true,
@@ -519,6 +526,22 @@ class FormTemplateController extends Controller
             'exists' => $exists,
             'message' => $exists ? 'Name already exists' : 'Name is available',
         ]);
+    }
+
+    public function showReqs($id)
+    {
+        $formRequest = FormRequest::with('formTemplate')->findOrFail($id);
+
+        return view('Form::form.show_request', compact('formRequest'));
+    }
+
+    public function destroyReqs($id)
+    {
+        $formRequest = FormRequest::findOrFail($id);
+        $formRequest->delete();
+
+        return redirect()->route('forms.index') 
+            ->with('success', 'تم حذف الطلب بنجاح.');
     }
 
 }
