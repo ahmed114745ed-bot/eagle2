@@ -13,7 +13,7 @@ class FlagSyrianSeeder extends Seeder
     public function run()
     {
         $flagDir = public_path('images/flags');
-        $localPath = $flagDir . '/sy.svg'; // single file path, not glob
+        $localPath = $flagDir . '/syr.svg'; // single file path, not glob
 
         if (!file_exists($localPath)) {
             return; // stop if image doesn't exist locally
@@ -22,12 +22,12 @@ class FlagSyrianSeeder extends Seeder
         $filename = basename($localPath);
         $gcsPath = 'images/flags/' . $filename;
 
-        $country = Country::where('iso3', 'SYR')->first();
+        $country = Country::where('iso3','SYR')->first();
         if (!$country) {
             return; // stop if country not found
         }
 
-        // Delete old image if exists
+        //Delete old image if exists
         if ($country->flag && Storage::disk('gcs')->exists($country->flag)) {
             Storage::disk('gcs')->delete($country->flag);
         }
