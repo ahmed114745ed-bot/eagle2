@@ -1,11 +1,3 @@
-<link rel="manifest" href="{{ url('manifest.json') }}">
-<meta name="theme-color" content="#0d6efd">
-
-<link rel="icon" sizes="192x192" href="{{ getAppLogo() }}">
-<link rel="apple-touch-icon" href="{{ getAppLogo() }}">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="My Admin Panel">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
