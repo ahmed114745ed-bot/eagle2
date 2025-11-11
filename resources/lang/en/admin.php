@@ -15,6 +15,8 @@ return [
     'user_setting'          => 'User setting',
     'avatar'                => 'Avatar',
     'list'                  => 'List',
+    "password_incorrect" => 'password incorrect',
+    "username_not_found" => 'username not found',
     'percent_total_error' => '❌ The total percentages must be exactly 100%. Current: :total%',
     'new'                   => 'New',
     'rejected_success' => 'Rejected successfully ✅',

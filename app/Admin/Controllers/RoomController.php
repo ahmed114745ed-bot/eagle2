@@ -356,7 +356,7 @@ class RoomController extends MainController
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
-                $q->where('id',  $countryID);
+                $q->whereIn('id',  $countryID);
             }))
             ->withCount('roomVisitors');
 
