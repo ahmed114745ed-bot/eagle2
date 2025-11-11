@@ -28,7 +28,7 @@ class FlagSyrianSeeder extends Seeder
         }
 
         //Delete old image if exists
-        if ($country->flag && Storage::disk('gcs')->exists($country->flag)) {
+        if ($country->flag ) {
             Storage::disk('gcs')->delete($country->flag);
         }
 
@@ -53,7 +53,7 @@ class FlagSyrianSeeder extends Seeder
         }
 
         //Delete old image if exists
-        if ($country->flag && Storage::disk('gcs')->exists($country->flag)) {
+        if ($country->flag ) {
             Storage::disk('gcs')->delete($country->flag);
         }
 
