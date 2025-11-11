@@ -121,8 +121,9 @@ class SettingController extends MainController
                     'key' => 'room_cup',
                     'value' => $request->value
                 ]);
-                Cache::put('room_cup', $request->value);
+                
             }
+            Cache::put('room_cup', $request->value);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
