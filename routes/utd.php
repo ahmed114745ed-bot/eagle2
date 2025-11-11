@@ -5,6 +5,7 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\BoxController;
+use App\Admin\Controllers\SettingController;
 use App\Http\Controllers\utd\RoomController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
@@ -110,7 +111,7 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
-    
+
     Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
 
     Route::prefix('families')->group(function () {
@@ -900,7 +901,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [PkEventController::class, 'update']);
         Route::get('/default-date', [PkEventController::class, 'defaultDate']);
     });
-
+    Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
     Route::prefix('pk-events-gift')->group(function () {
         Route::get('/', [PkEventController::class, 'allGifts']);
         Route::get('/show/{id}', [PkEventController::class, 'showGift']);
