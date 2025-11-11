@@ -2,12 +2,12 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Admin\Controllers\MainController;
-use App\AreaManager\Actions\SuperAdminChargeAction;
-use App\Models\SuperAdmin;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\AreaManager\Actions\SuperAdminChargeAction;
 
 class SuperAdminChargeController extends MainController
 {

@@ -10,7 +10,6 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
@@ -23,6 +22,7 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 

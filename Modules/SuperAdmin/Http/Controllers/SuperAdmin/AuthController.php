@@ -4,13 +4,10 @@
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
 use Exception;
-use App\Models\User;
 use App\Models\Agent;
 use Encore\Admin\Form;
 use App\Helpers\Common;
-use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
-use App\Enums\PermissionType;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Services\WhatsappOtp;
@@ -20,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 
