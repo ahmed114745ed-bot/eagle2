@@ -79,7 +79,7 @@ class RoomRepoService
         unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
 
-        if ($paidRoom && $paidRoom->value) {
+        if ($paidRoom && $paidRoom->value && $request->type === 'audio' ) {
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value) {
                 throw new \Exception(__('you do not have enough coins for creating a room'));
