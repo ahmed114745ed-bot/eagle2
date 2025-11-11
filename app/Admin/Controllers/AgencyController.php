@@ -806,6 +806,9 @@ class AgencyController extends MainController
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
+            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            $form->country_id = $bd->country_id;
+
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;

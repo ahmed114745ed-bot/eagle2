@@ -8,6 +8,8 @@ enum PermissionType: string
     case ADMIN = 'admin';
     case SUPER_ADMIN = 'super_admin';
     case SUB_SUPER_ADMIN = 'sub_super_admin';
+    case AREA_MANAGER = 'area-manager';
+    case SUB_AREA_MANAGER = 'sub_area_manager';
 
 
     public static function getOptions(): array
