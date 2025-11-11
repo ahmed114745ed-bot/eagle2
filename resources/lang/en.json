@@ -894,6 +894,8 @@
   "bd_set_default_success": "BD set as default successfully",
   "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
   "app bd id":" Bd ID",
+  "super admin charges": "country manager charges",
+
   "make_bd_default":"When you enable this option, this BD will become the default instead of the current default.",
   "make_super_admin_default":"When you enable this option, this country manager will become the default instead of the current default.",
 "vip_gift_message": "You have received a new VIP level as a gift",
