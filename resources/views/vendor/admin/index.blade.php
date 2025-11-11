@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" href="{{ asset('images/coin.jpg') }}">
     <link rel="apple-touch-startup-image" href="{{ asset('images/coin.jpg') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="ZION LIVE">
+    <meta name="apple-mobile-web-app-title" content="ZION Not LIVE">
     <link rel="shortcut icon" href="{{ asset('images/coin.jpg') }}" type="image/png">
 
     {{ info(asset('images/coin.jpg')) }}
