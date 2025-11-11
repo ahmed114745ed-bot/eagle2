@@ -45,8 +45,8 @@ class FlagSyrianSeeder extends Seeder
             return; // stop if image doesn't exist locally
         }
 
-        $filename = basename($bazel);
-        $braPath = 'images/flags/' . $filename;
+        $braFlag = basename($bazel);
+        $braPath = 'images/flags/' . $braFlag;
         $country = Country::where('iso3', 'BRA')->first();
         if (!$country) {
             return; // stop if country not found
