@@ -5,13 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="renderer" content="webkit">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@if($header) | {{ $header }}@endif</title>
+{{--    <title>{{ Admin::title() }} @if($header) | {{ $header }}@endif</title>--}}
+    <title>{{ config('app.name', 'Laravel') }}</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    @if(!is_null($favicon = Admin::favicon()))
-    <link rel="shortcut icon" href="{{$favicon}}">
-    @endif
+    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">
+
+
+{{--    @if(!is_null($favicon = Admin::favicon()))--}}
+{{--    <link rel="shortcut icon" href="{{$favicon}}">--}}
+{{--    @endif--}}
     {!! Admin::css() !!}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 
