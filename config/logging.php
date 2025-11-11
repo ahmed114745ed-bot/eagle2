@@ -132,6 +132,11 @@ return [
             'path' => storage_path('logs/charisma.log'),
             'level' => 'debug',
         ],
+        'roomCup' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/roomCup.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];
