@@ -6,7 +6,6 @@ use App\Helpers\Common;
 use App\Models\Bd;
 
 use App\Models\Agency;
-use App\Models\FormRequest;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -15,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 use Modules\Form\Entities\FormField;
+use Modules\Form\Entities\FormRequest;
 use Modules\Form\Entities\FormSection;
 use Modules\Form\Entities\FormTemplate;
 use Encore\Admin\Auth\Permission;
@@ -307,8 +307,8 @@ class FormTemplateController extends Controller
     public function showByType(Request $request)
     {
 
-        $type = $request->query('type');
-        $linkToken = $request->query('token');
+        $type = $request->query('type') ?? $request->type;
+        $linkToken = $request->query('token') ?? $request->token;
         $defaultLang = $request->query('lang') ?? app()->getLocale();
 
         if (empty($linkToken)) {
@@ -352,14 +352,18 @@ class FormTemplateController extends Controller
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
     
         $data = $request->except('_token');
-    
+   
         $existingRequest = FormRequest::where('form_template_id', $template->id)
-                                        ->where('submitted_by', $request->user_id)
-                                        ->first();
-
+                            ->where('submitted_by', $request->user_id)
+                            ->first();
         if ($existingRequest) {
-            return redirect()->route('forms.show', $existingRequest->id);
-        }
+            return redirect()->route('forms.show.reqs', [
+                'id' => $existingRequest->id,
+                'token' => $request->token,
+                'lang' => $request->lang,
+                'user_id' => $request->user_id,
+            ]);      
+          }
 
         $data = $this->processFiles($data);
     
@@ -530,18 +534,50 @@ class FormTemplateController extends Controller
 
     public function showReqs($id)
     {
-        $formRequest = FormRequest::with('formTemplate')->findOrFail($id);
-
-        return view('Form::form.show_request', compact('formRequest'));
+        $formRequest = FormRequest::with('template')->findOrFail($id);
+    
+        $token = request('token');
+        $lang = request('lang');
+        $user_id = request('user_id');
+        if ($lang) {
+            app()->setLocale($lang);
+        }
+        return view('Form::forms.show_request', compact('formRequest', 'token', 'lang', 'user_id'));
     }
 
-    public function destroyReqs($id)
+    public function destroyReqs($id,Request $request)
     {
-        $formRequest = FormRequest::findOrFail($id);
-        $formRequest->delete();
+        
 
-        return redirect()->route('forms.index') 
-            ->with('success', 'تم حذف الطلب بنجاح.');
+        $linkToken = $request->token;
+        $defaultLang = $request->lang ;
+        if (empty($linkToken)) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'Access denied. Please provide a valid token.',
+            ], 403);
+        }
+
+        $token = PersonalAccessToken::findToken($linkToken);
+        if (!$token) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'Invalid or expired token.',
+            ], 403);
+        }
+
+        $user = $token->tokenable;
+
+        if (!$user) {
+            return response()->view('Form::forms.invalid', [
+                'message' => 'User not found for this token.',
+            ], 403);
+        }
+     
+        $formRequest = FormRequest::with('template')->findOrFail($id);
+        $type = $formRequest->template->form_type;
+        $formRequest->delete();
+        return redirect()->to(route('forms.showByType') ."?type={$type}&token={$linkToken}&lang={$defaultLang}");
+
+    
     }
 
 }

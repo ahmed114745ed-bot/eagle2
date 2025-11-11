@@ -613,6 +613,8 @@ ease;
         @csrf
         @if (!empty($user))
         <input type="hidden" name="user_id" value="{{  $user->id}}">
+        <input type="hidden" name="token" value="{{ $linkToken}}">
+        <input type="hidden" name="lang" value="{{ $locale}}">
         @endif
 
         @if($template->getTranslation('description', $currentLocale))

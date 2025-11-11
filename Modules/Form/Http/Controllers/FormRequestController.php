@@ -9,7 +9,6 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\FormRequest;
 use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
@@ -18,6 +17,7 @@ use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Modules\Form\Entities\FormField;
+use Modules\Form\Entities\FormRequest;
 use Modules\Form\Services\FormRenderService;
 
 class FormRequestController extends MainController
