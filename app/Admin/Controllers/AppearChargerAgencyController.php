@@ -225,7 +225,7 @@ class AppearChargerAgencyController extends MainController
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile','country')
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {

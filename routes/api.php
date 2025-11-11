@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -122,10 +123,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
+        Route::get('users-bd-by-countries', [UserController::class, 'userBdByCountries'])->name('users-bd-by-countries');
         Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
         Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
+        Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
+        Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
@@ -137,6 +141,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
+        Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
     });
 
     // authorization
@@ -723,3 +728,6 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
+Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);

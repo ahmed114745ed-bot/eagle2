@@ -2,6 +2,7 @@
 
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
+
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
@@ -11,7 +12,6 @@ use App\Admin\Controllers\GiftController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
-use App\Admin\Controllers\BadgeController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -27,7 +27,6 @@ use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -79,7 +78,6 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
@@ -100,7 +98,6 @@ use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserChargeHistoryController;
-use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -463,14 +460,14 @@ Route::group(
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
-
         Route::resource('usersBd', BdController::class);
+         Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+//        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+//        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
 
@@ -678,6 +675,14 @@ Route::group(
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
 
+
+         Route::post('/set-preview-area-manager', function () {
+            session(['preview_area_manager' => true]);
+        });
+
+        Route::post('/unset-preview-area-manager', function () {
+            session()->forget('preview_area_manager');
+        });
 
         Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);

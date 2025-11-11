@@ -30,6 +30,7 @@
     "RoleRewards": true,
     "Milestones": true,
     "RoomCup": true,
+    "AreaManager": true,
     "Form": true,
     "SuperAdmin": true
 }

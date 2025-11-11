@@ -90,6 +90,19 @@ return [
             ],
     ],
 
+    'area_manager_route' => [
+        'prefix' => 'areaManager',
+        'namespace' => 'App\\AreaManager\\Controllers',
+        'middleware' => [
+            'web',
+            'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',
+            'multiLanguage',
+        ],
+    ],
+
     'agency_route' => [
 
         'prefix' => env('AGENCY_ROUTE_PREFIX', 'agency'),

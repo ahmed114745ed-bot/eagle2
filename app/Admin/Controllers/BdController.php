@@ -97,12 +97,14 @@ class BdController extends MainController
         $grid = new Grid(new Bd());
         $countryID =session('filter_country_id');
         $superAdmin = [];
+       
         if ($countryID) {
-            $superAdmin = SuperAdmin::select(['id', 'country_id'])->where('country_id', $countryID)->first();
+           
+            $superAdmin = SuperAdmin::select(['id', 'country_id'])->whereIn('country_id', $countryID)->first();
         }
 
         $grid->model()
-            ->when(isset($countryID), function ($query) use ($superAdmin) {
+            ->when($countryID, function ($query) use ($superAdmin) {
 
                 $query->where('parent_id', @$superAdmin->id);
             })
