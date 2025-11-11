@@ -117,7 +117,7 @@ class SuperPackageController extends MainController
                         'image' => $image,
                         'quantity' => $memper->expire,
                         'expire'  => $memper->quantity,
-                        
+
                     ];
                 });
 
@@ -128,7 +128,7 @@ class SuperPackageController extends MainController
         });
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
-               
+
                 return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
             });
         }
@@ -199,30 +199,29 @@ class SuperPackageController extends MainController
 
         $form->text('title', __('title'))->required();
 
-        $form->tab(__('Ware'), function (Form $form) {
+        $form->fieldset(__('Wares'), function (Form $form) {
             $this->addWareField($form);
             $form->number('expire_ware', __('expire'));
             $form->number('quantity_ware', __('number'))->min(0);
         });
-        $form->tab(__('Badge'), function (Form $form) {
+
+        $form->fieldset(__('Badges'), function (Form $form) {
             $this->addBadgeField($form);
             $form->number('expire_badge', __('expire'));
             $form->number('quantity_badge', __('number'))->min(0);
         });
 
-        $form->tab(__('VIP'), function (Form $form) {
+        $form->fieldset(__('vips'), function (Form $form) {
             $form->belongsToMany('vips', OVips::class, trans('vips'));
             $form->number('expire_vip', __('expire'));
             $form->number('quantity_vip', __('number'))->min(0);
         });
 
-        // 🟡 Tab for Coins
-        $form->tab(__('Coins'), function (Form $form) {
+        $form->fieldset(__('Coins'), function (Form $form) {
             $form->number('coins', __('Coins'))->min(0);
         });
 
-
-        $form->tab(__('Achievement'), function (Form $form) {
+        $form->fieldset(__('Achievement'), function (Form $form) {
             $form->image('achievement', __('Image'))->name(function ($file) {
                 return now()->timestamp . '.' . $file->guessExtension();
             })->disk('gcs');
@@ -233,11 +232,10 @@ class SuperPackageController extends MainController
     }
 
 
-
     protected function addWareField(Form $form)
     {
         $prefix = 'wares';
-        $form->belongsToMany('wares', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+        $form->belongsToMany('wares', WaresByType::class, __('Wares'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'wares')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
