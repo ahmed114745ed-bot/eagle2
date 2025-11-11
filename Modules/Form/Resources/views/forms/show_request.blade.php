@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container py-5">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 " style="    margin: 5px 14px;">
         <div>
             <h2 class="fw-bold text-dark mb-1">
                 <i class="bi bi-file-earmark-text text-primary"></i> {{ __('Form Details') }}
