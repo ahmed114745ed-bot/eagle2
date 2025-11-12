@@ -223,6 +223,10 @@ class SettingsController extends Controller
                 // Room::where('mode', 5)->update(['mode' => 1]);
             }
 
+            if ($key === 'app_fav_icon') {
+                Cache::forget('favicon');
+            }
+
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -252,7 +256,7 @@ class SettingsController extends Controller
         $sum = $request->app_wallet_lucky_gift
             + $request->owner_lucky_gift
             + $request->host_lucky_gift;
-         
+
         if ($sum !== 100) {
             return back()->withErrors([
                 'gift_percentage' => 'The total gift percentage must equal 100.'
@@ -264,7 +268,7 @@ class SettingsController extends Controller
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             $cacheKey = "percentage_{$key}";
-            Cache::put($cacheKey, $value);    
+            Cache::put($cacheKey, $value);
         }
 
         return back();
