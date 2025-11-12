@@ -33,9 +33,9 @@ class AllStatisticController extends MainController
     {
         return session('filter_country_id');
     }
+
     public function index(Content $content)
     {
-
         return parent::index(
             $content
                 ->title(__('Home'))
@@ -242,7 +242,7 @@ class AllStatisticController extends MainController
     {
         $currMonth = now()->month;
         $prevMonth = now()->subMonth()->month;
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
 
         $signups = User::when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
@@ -270,10 +270,15 @@ class AllStatisticController extends MainController
             $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
         }
 
+        $currMonthName = Carbon::create()->month($currMonth)->translatedFormat('F');
+        $prevMonthName = Carbon::create()->month($prevMonth)->translatedFormat('F');
+
         return response()->json([
             'labels'       => $labels,
             'dataCurrent'  => $dataCurrent,
             'dataPrevious' => $dataPrevious,
+            'currentMonth'  => $currMonthName,
+            'previousMonth' => $prevMonthName,
         ]);
     }
 
@@ -572,12 +577,9 @@ class AllStatisticController extends MainController
     {
         $countryID = $this->countryId();
 
-        $bdCount = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->count();
+        $bdCount = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))->count();
 
-        $totalSalaries = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        $totalSalaries = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->withSum('salaries', 'salary')
             ->withSum('salaries', 'cut_amount')
             ->withCount('agencies')

@@ -127,9 +127,13 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    fetch('{{ admin_url('statistics/room-stats') }}')
+    fetch('{{ url($prefix . "/statistics/room-stats") }}')
         .then(response => response.json())
         .then(data => {
             document.getElementById('audioRooms').innerText = data.audio;

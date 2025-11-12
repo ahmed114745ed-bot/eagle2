@@ -196,10 +196,13 @@ function createOrUpdateChart(chartData, usePercentage) {
     });
 }
 
-// دالة لجلب البيانات
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 function loadBalanceData(date = null) {
     $.ajax({
-        url: '{{ url("admin/statistics/balance-data") }}',
+        url: '{{ url($prefix . "/statistics/balance-data") }}',
         type: 'GET',
         data: {
             date: date
