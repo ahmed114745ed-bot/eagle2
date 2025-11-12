@@ -246,7 +246,7 @@ class HomeCarouselController extends MainController
     {
         return function ($value) use ($editing) {
             $ops = [];
-            foreach (User::where('id', $value)->whereHas('ownerAudioRoom')->get() as $user) {
+            foreach (User::where('id', $value)->get() as $user) {
                 $ops[$user->id] =  $user->id . '_' . $user->name;
             }
             return $ops;
