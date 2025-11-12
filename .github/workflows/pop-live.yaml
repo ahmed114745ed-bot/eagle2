@@ -4,7 +4,7 @@ on:
     branches: ["pop-live"]
 jobs:
   run_pop-live_hub:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - name: print out pop-live
       uses: appleboy/ssh-action@v1.2.1
