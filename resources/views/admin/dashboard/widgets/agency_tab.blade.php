@@ -349,12 +349,15 @@
     }
 </style>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
 
 <script>
 $(function() {
     function updateStats() {
         $.ajax({
-            url: '{{ url("admin/statistics/agency-stats") }}', // ✅ matches your route
+            url: '{{ url($prefix . "/statistics/agency-stats") }}', // ✅ matches your route
             type: 'GET',
             beforeSend: function() {
                 $('#refreshStats').html('<i class="fa fa-spinner fa-spin"></i> {{ __("Loading...") }}');

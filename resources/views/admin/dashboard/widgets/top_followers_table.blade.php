@@ -28,9 +28,13 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        fetch('admin/statistics/top-followers')
+        fetch('{{ url($prefix . "/statistics/top-followers") }}')
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('top-followers-body');

@@ -1,9 +1,4 @@
 @php use Carbon\Carbon; @endphp
-
-@php
-    $fetchUrl = admin_url('statistics/comparison-user-signup'); // Ensure route is prefixed properly
-@endphp
-
 <div class="box box-info">
     <div class="box-header with-border">
         <h3 class="box-title">{{ __('User Signups Comparison (Weeks)') }}</h3>
@@ -12,6 +7,11 @@
         <canvas id="weeklySignupsChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
+
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    $fetchUrl = $prefix . "/statistics/comparison-user-signup";
+@endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

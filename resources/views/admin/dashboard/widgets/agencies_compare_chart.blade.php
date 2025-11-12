@@ -43,9 +43,13 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const endpoint = `/admin/statistics/comparison-agencies-target`;
+    const endpoint = `/{{ $prefix }}/statistics/comparison-agencies-target`;
 
     fetch(endpoint)
         .then(response => response.json())

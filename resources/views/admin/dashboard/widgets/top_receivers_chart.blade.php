@@ -39,10 +39,14 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    fetch(`/admin/statistics/top-receiver`)
+    fetch('{{ url($prefix . "/statistics/top-receiver") }}')
         .then(response => response.json())
         .then(({ labels, data }) => {
             const ctx = document.getElementById("topReceiversRadar").getContext("2d");
