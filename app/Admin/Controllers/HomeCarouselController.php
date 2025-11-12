@@ -225,8 +225,8 @@ class HomeCarouselController extends MainController
             'event'  => __('Events')
         ])->when('room', function (Form $form) {
             $form->select('owner_id', __('Owner'))
-                ->options('/api/search/users2')
-                ->ajax('/api/search/users2', 'id', 'name');
+                ->options('/api/search/owner-rooms')
+                ->ajax('/api/search/owner-rooms', 'id', 'name');
         })->when('link', function (Form $form) {
             $form->url('url', trans('url'))->rules('nullable|url');
         })->when('event', function (Form $form) {

@@ -98,6 +98,12 @@ class UserService
         return $this->userRepository->searchWithPage($key, $page, $perPage);
     }
 
+    public function searchOwnerRoomWithPage($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchOwnerRoomWithPage($key, $page, $perPage);
+    }
+
     public function searchUsersAudioWithPage($key, $page)
     {
         $perPage = 10;

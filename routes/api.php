@@ -120,6 +120,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
+        Route::get('owner-rooms', [UserController::class, 'searchOwnerRoomWithPage'])->name('owner-rooms');
         Route::get('users7', [UserController::class, 'usersAudioRoom'])->name('users7');
         Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
