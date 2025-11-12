@@ -137,7 +137,7 @@ class ChargeController extends MainController
                 });
                 $profileUrl ='';
                 if (!empty($info['uuid'])) {
-                    $profileUrl = url('areaManager/profile-shipping-agency/{id}' . $info['uuid']);
+                    $profileUrl = url('areaManager/profile-shipping-agency/' . $info['uuid']);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
