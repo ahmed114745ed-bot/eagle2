@@ -166,7 +166,7 @@ class RankingService
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit,$type);
       
       if($rel == 'roomId') return RoomRankingResource::collection($data);
-        $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
+        $userExp = $data->firstWhere('ranker_id', $user->id)?->total_gifts ?? 0;
 
         $key = $types[$type] . '_' . $class;
 

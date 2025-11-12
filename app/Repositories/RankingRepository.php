@@ -187,7 +187,7 @@ class RankingRepository
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10 ,$type = 1 )
     {
         $query =GiftRanking::query();
-        //    $this->applyDateFiltersV2($query, $type);
+           $this->applyDateFiltersV2($query, $type);
 
            $query->whereHas('ranker')
             ->where('role', $role)
