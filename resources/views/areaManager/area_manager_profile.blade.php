@@ -844,12 +844,21 @@
                 <span class="meta-label">{{ __("salary") }}:</span>
                 <span class="meta-value">{{ $areaManager->di }}</span>
             </div>
-            <div class="meta-item">
+            {{-- <div class="meta-item">
                 <span class="meta-label">{{ __("country") }}:</span>
                  <img src="{{ getImagePath(@$areaManager->country->flag) }}"
                      class="flag-image"
                      alt="flag Image"
                      title="{{ app()->getLocale() === 'ar' ? @$areaManager->country->name : @$areaManager->country->e_name }}">
+            </div> --}}
+
+             <div class="agency-meta">
+                 <div class="meta-item">
+                        <span class="meta-label">{{__('country')}}:</span>
+                        
+                   {!! @$areaManager->flag() !!}
+                    </div>
+
             </div>
         </div>
     </div>
