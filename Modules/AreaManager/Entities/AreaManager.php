@@ -68,4 +68,26 @@ class AreaManager extends Authenticatable
     {
         return $this->hasMany(Country::class, 'area_manager_id');
     }
+
+    public function flag()
+    {
+
+        $countries = Country::where('area_manager_id', $this->id)->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($countries as $country) {
+            $url = getImagePath($country->flag);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($country->id, $url, 30, 30, 4);
+            // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
 }
