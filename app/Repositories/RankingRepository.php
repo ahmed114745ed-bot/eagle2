@@ -189,7 +189,7 @@ class RankingRepository
         $query =GiftRanking::query();
            $this->applyDateFiltersV2($query, $type);
 
-           $query->whereHas('ranker')
+           return  $query->whereHas('ranker')
             ->where('role', $role)
             ->when($role == 'roomId', function ($query) {
                 return $query->where('ranker_type', Room::class)->with([
@@ -208,7 +208,7 @@ class RankingRepository
             ->orderByDesc('total_gifts')
             ->take($perPage)
             ->get();
-       return  $query ;     
+         
     }
 
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  =1)
