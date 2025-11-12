@@ -59,7 +59,6 @@ class AllStatisticController extends MainController
             ->map(function ($user) {
                 $avatar = $user->profile?->avatar;
                 $user->avatar_url = $avatar ? getImagePath($avatar) : asset('images/businessman-icon.jpg');
-                info($user->avatar_url);
                 return $user;
             });
 
