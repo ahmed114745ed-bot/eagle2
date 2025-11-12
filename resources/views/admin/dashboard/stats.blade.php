@@ -168,11 +168,15 @@
     .info-box:hover .info-box-more { background: rgba(0,0,0,0.3); }
 </style>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
     $(function() {
         function updateStats() {
             $.ajax({
-                url: '{{ url("admin/statistics/stats-data") }}',
+                url: '{{ url($prefix . "/statistics/stats-data") }}',
                 type: 'GET',
                 success: function(data) {
                     if (data.success) data = data.data;

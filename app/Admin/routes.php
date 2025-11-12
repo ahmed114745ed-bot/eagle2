@@ -475,6 +475,10 @@ Route::group(
             Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
             Route::get('top-followers', [AllStatisticController::class, 'getTopFollowers']);
             Route::get('game-summary', [AllStatisticController::class, 'gameSummary']);
+            Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+            Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+            Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
         });
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
@@ -738,14 +742,6 @@ Route::group(
                 return view('test.test-pusher', compact('token'));
             });
         });
-
-        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
-        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
-        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
-        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
-
-
-
 
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);

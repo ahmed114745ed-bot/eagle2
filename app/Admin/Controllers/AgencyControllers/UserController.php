@@ -111,7 +111,7 @@ class UserController extends MainController
     protected function gridProfessional()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $haveCoins = (request()->have_coins == 1);
         $grid->model()
             ->ofAgency()
@@ -121,14 +121,14 @@ class UserController extends MainController
             ->where(function ($query) use ($countryID){
                 $currentCountry = $countryID;
                 $query->where(function ($q) use ($currentCountry) {
-                    $q->where('country_id', $currentCountry)
+                    $q->whereIn('country_id', $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', '!=', $currentCountry);
+                            $a->whereNotIn('country_id',  $currentCountry);
                         });
                 })->orWhere(function ($q) use ($currentCountry) {
-                    $q->where('country_id', '!=', $currentCountry)
+                    $q->whereNotIn('country_id',  $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', $currentCountry);
+                            $a->whereIn('country_id', $currentCountry);
                         });
                 });
             });
@@ -465,7 +465,7 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        $countryID =session('filter_country_id');
+       $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);

@@ -5,6 +5,10 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     (function () {
@@ -36,7 +40,7 @@
                 }
             }
         });
-        fetch('/admin/statistics/top-users-data')
+        fetch('{{ url($prefix . "/statistics/top-users-data") }}')
             .then(response => response.json())
             .then(data => {
                 salaryChart.data.labels = data.labels;

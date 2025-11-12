@@ -28,9 +28,13 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        fetch('admin/statistics/top-followers')
+        fetch('{{ url($prefix . "/statistics/top-followers") }}')
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('top-followers-body');
@@ -43,7 +47,7 @@
                         <tr>
                             <td class="text-center fw-bold">${index + 1}</td>
                             <td class="avatar-cell">
-                                <img src="${user.profile?.avatar ?? '/default-avatar.png'}" alt="avatar">
+                                <img src="${user.avatar_url}" alt="avatar">
                                 <span>${user.name}</span>
                             </td>
                             <td class="text-center">
