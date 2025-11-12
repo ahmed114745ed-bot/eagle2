@@ -35,7 +35,7 @@ class HomeCarousel extends Model
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'uid', 'owner_id');
+        return $this->hasOne(Room::class, 'uid', 'owner_id')->where('type', 'audio');
     }
 
     public function generalRole()
