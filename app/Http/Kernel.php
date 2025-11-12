@@ -114,6 +114,11 @@ class Kernel extends HttpKernel
         'local' => \App\Http\Middleware\LocalOnly::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
+        'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
+        'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
+        'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
 
+
+        'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
     ];
 }

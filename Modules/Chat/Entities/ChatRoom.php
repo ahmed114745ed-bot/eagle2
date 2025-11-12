@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatRoom extends Model
 {
@@ -28,6 +29,13 @@ class ChatRoom extends Model
     public function unReadMessages()
     {
         return $this->hasMany(ChatMessage::class)->where('status', 'not Like', 'seen');
+    }
+
+    public function unreadMessagesFor($userId): HasMany
+    {
+        return $this->hasMany(ChatMessage::class)
+            ->where('user_id', '<>', $userId)
+            ->where('status', '<>', 'seen');
     }
 
     public function userOne()

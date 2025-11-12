@@ -79,7 +79,7 @@ class RoomRepoService
         unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
 
-        if ($paidRoom && $paidRoom->value) {
+        if ($paidRoom && $paidRoom->value && $request->type === 'audio' ) {
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value) {
                 throw new \Exception(__('you do not have enough coins for creating a room'));
@@ -316,12 +316,17 @@ class RoomRepoService
             $isToZegoCharisma = true;
         }
 
-        if (isset($room->microphone)) {
+//        if (isset($room->microphone)) {
+//
+//            $microphones = explode(',', $room->microphone);
+//            if (in_array($user->id, $microphones)) {
+//                UserHandling::calcTime($user->id);
+//            }
+//        }
 
-            $microphones = explode(',', $room->microphone);
-            if (in_array($user->id, $microphones)) {
-                UserHandling::calcTime($user->id);
-            }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+        if (in_array($user->id, $micUserIds, true)) {
+            UserHandling::calcTime($user->id);
         }
 
         $res = Common::quit_hand_2($ownerId, $user->id);

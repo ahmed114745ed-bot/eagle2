@@ -22,7 +22,7 @@ return [
     "password_incorrect" => 'كلمة المرور غير صحيحة',
     "username_not_found" => 'اسم المستخدم غير موجود',
     'is_preview' => 'عرض مباشر',
-
+    'rejected_success' => 'تم الرفض بنجاح ✅',
     'lifetime_help' => '💡 إذا أدخلت <strong>0</strong>، فهذا يعني أن العنصر لن تنتهي صلاحيته أبدًا (مدى الحياة).',
 
     'percent_total_error' => '❌ يجب أن يكون مجموع النسب 100٪ بالضبط. الحالي: :total٪',

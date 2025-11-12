@@ -2,13 +2,11 @@
 
 namespace App\Helpers;
 
-use App\Enums\Charges\UserTypeEnum;
 use App\Models\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;
 use App\Models\Room;
-use App\Models\SubAreaManager;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
@@ -17,18 +15,15 @@ use App\Models\Follow;
 use App\Models\Target;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
-use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
 use App\Models\Background;
-use Illuminate\Log\Logger;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
-use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
 use Modules\Vip\Entities\Vip;
@@ -41,27 +36,21 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Http\JsonResponse;
 use Modules\Vip\Entities\UserVip;
 use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Log;
 use Modules\Events\Entities\Winner;
-use App\Models\NotificationTemplate;
-use App\Tik\DTO\NotificationPayload;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Modules\Events\Entities\PkEvent;
-
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
-use App\Notifications\AgencyOwnerRole;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\HelperTraits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
-use App\Http\Resources\CountryResource;
 use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
@@ -73,13 +62,11 @@ use App\Jobs\SendFirebaseNotificationJob;
 use Illuminate\Pagination\CursorPaginator;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Notification;
-use App\Jobs\SendFirebaseTopicNotificationJob;
-use Modules\Charizma\Entities\ExtraDataInRoom;
+use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
 use App\Models\RealtimeProject;
-use App\Models\AreaManager;
+use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -514,11 +501,12 @@ class Common
         return $confs ?: null;
     }
 
-    public static function upload($folder, $file)
+    public static function upload($folder, $file, $disk = null)
     {
+        $config = $disk ?: config('filesystems.default');
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
@@ -1472,7 +1460,7 @@ class Common
     }
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
-    {           
+    {
          Log::info('start sendToZego3');
 
         try {
@@ -1827,15 +1815,25 @@ class Common
 
         //leave mic
 
-        foreach ($usersIdInRooms as $userId) {
-            if (isset($room->microphone)) {
+//        foreach ($usersIdInRooms as $userId) {
+//            if (isset($room->microphone)) {
+//
+//                $microphones = explode(',', $room->microphone);
+//                if (in_array($userId, $microphones)) {
+//                    UserHandling::calcTime($userId);
+//                }
+//            }
+//            self::quit_hand_2($room->uid, $userId);
+//        }
 
-                $microphones = explode(',', $room->microphone);
-                if (in_array($userId, $microphones)) {
-                    UserHandling::calcTime($userId);
-                }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+
+        foreach ($usersIdInRooms as $userId) {
+            if (in_array($userId, $micUserIds, true)) {
+                UserHandling::calcTime($userId);
             }
-            self::quit_hand($room->uid, $userId);
+
+            self::quit_hand_2($room->uid, $userId);
         }
 
         $room->update(['is_live' => false]);
@@ -1850,7 +1848,7 @@ class Common
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
         $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, $users);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, $users);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, $users);
 
         $ms = [
             'messageContent' => [
@@ -2022,7 +2020,18 @@ class Common
                     'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
-
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
                 ];
             case 'user':
                 return [

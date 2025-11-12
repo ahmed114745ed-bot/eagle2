@@ -335,7 +335,7 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.img', 'agencies.is_frozen'])
             ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
@@ -343,10 +343,10 @@ class AgencyController extends MainController
                     ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
             ->with(['owner' => function ($query) {
-                $query->select('id', 'name', 'uuid');
+                $query->select('users.id', 'users.name', 'users.uuid');
             }])
-            ->where('country_id', Auth::user()->country_id)
-            ->orderByDesc('id');
+            ->where('agencies.country_id', Auth::user()->country_id)
+            ->orderByDesc('agencies.id');
 
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
@@ -356,12 +356,12 @@ class AgencyController extends MainController
         }
 
         if (request()->created == 'today') {
-            $grid->model()->whereDate('created_at', today());
+            $grid->model()->whereDate('agencies.created_at', today());
         }
 
         if (request()->created == 'month') {
-            $grid->model()->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year);
+            $grid->model()->whereMonth('agencies.created_at', now()->month)
+                ->whereYear('agencies.created_at', now()->year);
         }
 
         if (request()->pending == 1) {
@@ -396,7 +396,7 @@ class AgencyController extends MainController
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
@@ -421,7 +421,7 @@ class AgencyController extends MainController
                     </div>
                 </div>
             ";
-        });
+        }) ->sortable(['users.name' => 'asc']);
 
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
@@ -439,7 +439,7 @@ class AgencyController extends MainController
                     <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
                 </div>
             ";
-        });
+        })->sortable();
 
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $coin = truncateAndTrim($this->salary ?? 0);

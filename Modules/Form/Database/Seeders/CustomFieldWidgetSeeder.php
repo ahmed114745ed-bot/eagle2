@@ -1,9 +1,8 @@
 <?php
 
-namespace Database\Seeders;
+namespace  Modules\Form\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\CustomFieldWidget;
 
 class CustomFieldWidgetSeeder extends Seeder
 {
@@ -74,10 +73,35 @@ class CustomFieldWidgetSeeder extends Seeder
                 'allows_multiple' => false,
                 'is_active' => true,
             ],
+            [
+                'widget_type' => 'previous_experiences', 
+                'widget_name' => [
+                    'ar' => 'الخبرات السابقة في التطبيقات',
+                    'en' => 'Previous App Experience',
+                    'fr' => 'Expérience précédente dans les applications',
+                ],
+                'description' => [
+                    'ar' => 'أضف خبرة التطبيقات السابقة مع تفاصيل الاسم والمدة',
+                    'en' => 'Add previous application experience with app name and work duration',
+                    'fr' => 'Ajouter une expérience précédente de l\'application avec nom et durée',
+                ],
+                'component_path' => 'components.widgets.previous-experiences',
+                'default_config' => [
+                    'fields' => [
+                        ['name' => 'app_name', 'label' => ['en' => 'Application Name', 'ar' => 'اسم التطبيق'], 'type' => 'text'],
+                        ['name' => 'work_duration', 'label' => ['en' => 'Work Duration (months)', 'ar' => 'مدة العمل (بالشهور)'], 'type' => 'number'],
+                    ],
+                    'allow_add_more' => true,
+                    'min_items' => 0,
+                    'max_items' => 10,
+                ],
+                'allows_multiple' => true,
+                'is_active' => true,
+            ],
         ];
 
         foreach ($widgets as $widgetData) {
-            CustomFieldWidget::create($widgetData);
+            \Modules\Form\Entities\CustomFieldWidget::create($widgetData);
         }
     }
 }

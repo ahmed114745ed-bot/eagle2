@@ -193,7 +193,7 @@ class RoomController extends MainController
             '8' => 8,
         ];
 
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
@@ -265,8 +265,6 @@ class RoomController extends MainController
         $this->applyFilterType($grid, $filterType, $user);
         $this->setupFilters($grid);
         $this->defineGridColumns($grid);
-        $grid->disableRowSelector();
-        $grid->disableCreateButton();
         $grid->disableExport();
 
         $this->extendGrid($grid);
@@ -322,7 +320,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID =session('filter_country_id');
+         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()
             ->audio()
@@ -354,7 +352,7 @@ class RoomController extends MainController
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
-                ])->select(['id', 'uuid', 'special_id', 'name','country_id']),
+                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
@@ -548,8 +546,7 @@ class RoomController extends MainController
 
     protected function defineGridColumns($grid)
     {
-        $grid->disableRowSelector();
-        $maxRoomAdmin = Common::getConfig('max_room_admin');
+        $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
         $grid->model()->collection(function (Collection $collection) {
@@ -890,13 +887,18 @@ class RoomController extends MainController
     {
         $form = new Form(new Room);
         $this->disableFormTools($form);
-
         $form->display(__('ID'));
-        $form->text('numid', __('numid'));
+        if (!$form->isEditing()) {
+           $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
+        } else {
+            $form->text('numid', __('numid'));
+        }
+        $form->hidden('type', __('type'))->default('audio');
+        $form->select('uid', __('owner room'))->options($this->ownerOptions())->ajax('/api/search/users7', 'id', 'name')->rules('required');
         $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
         $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
         $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
-        $form->text('room_name', __('room name'));
+        $form->text('room_name', __('room name'))->rules('required');
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
         $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
@@ -918,10 +920,21 @@ class RoomController extends MainController
             return $options;
         });
         $form->text('room_welcome', __('room welcome'));
-        $form->number('sort_num', __('Sort Num'));
+        $form->number('sort_num', __('Sort Num'))->default(0);
 
 
         return $form;
+    }
+
+    protected function ownerOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (User::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+            }
+            return $ops;
+        };
     }
 
     public function removeAdmin(Request $request, $roomId)

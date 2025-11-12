@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
 use App\Http\Controllers\Controller;
+use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
@@ -72,8 +73,6 @@ class ChatMessagesController extends Controller
             ], 404);
         }
 
-        \Log::info('$chatRoom->user_id: ', ['$chatRoom->user_id' => $chatRoom->user_id, 'user->id' => $user->id ]);
-        \Log::info('$chatRoom->user_id: ', [ '$request->user_id' => $request->user_id]);
         if ($chatRoom->user_id != $user->id) {
             $user2 = User::withoutAppends()->find($chatRoom->user_id);
         } else {
@@ -128,10 +127,14 @@ class ChatMessagesController extends Controller
             $chatRoom->type = 'friend';
         }
 
+//        \Log::info('room_resource ', ['room_resource' => $response['room_resource']]);
+//        \Log::info('room_resource ', ['room_resource' => $response['room_resource'] , 'room req' => $response['message_resource']->toResponse(request())->getData()->data]);
+
         try {
             // return $user2;
             event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+            event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom));
         } catch (\Throwable $e) {
         }
 

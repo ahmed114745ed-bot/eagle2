@@ -5,17 +5,21 @@
     </div>
 </div>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     (function () {
         var ctx = document.getElementById('salaryChart').getContext('2d');
-        new Chart(ctx, {
+        var salaryChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: @json($labels),
+                labels: [],
                 datasets: [{
                     label: '{{ __("Live Hours") }}',
-                    data: @json($data),
+                    data: [],
                     backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 2
@@ -29,12 +33,20 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return value.toLocaleString(); // format numbers
+                                return value.toLocaleString();
                             }
                         }
                     }
                 }
             }
         });
+        fetch('{{ url($prefix . "/statistics/top-users-data") }}')
+            .then(response => response.json())
+            .then(data => {
+                salaryChart.data.labels = data.labels;
+                salaryChart.data.datasets[0].data = data.data;
+                salaryChart.update();
+            })
+            .catch(err => console.error('Error loading chart data:', err));
     })();
 </script>

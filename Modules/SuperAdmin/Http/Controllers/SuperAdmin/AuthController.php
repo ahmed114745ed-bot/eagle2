@@ -4,13 +4,11 @@
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
 use Exception;
-use App\Models\User;
 use App\Models\Agent;
 use Encore\Admin\Form;
 use App\Helpers\Common;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
-use App\Enums\PermissionType;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Services\WhatsappOtp;

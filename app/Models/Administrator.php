@@ -7,6 +7,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -68,6 +69,11 @@ class Administrator extends Model implements AuthenticatableContract
         $relatedModel = config('admin.database.roles_model');
 
         return $this->belongsToMany($relatedModel, $pivotTable, 'user_id', 'role_id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
     }
 
     /**

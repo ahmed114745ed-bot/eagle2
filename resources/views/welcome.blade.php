@@ -870,6 +870,7 @@
         }
 
         .feature-card {
+                color: #383232;
             background: white;
             padding: 40px;
             border-radius: 20px;
@@ -915,6 +916,7 @@
             transform: translateY(-15px);
             box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
         }
+       
 
         .feature-icon {
             width: 90px;
@@ -951,7 +953,7 @@
         }
 
         .feature-card p {
-            color: var(--text-light);
+            color: #000000;
             line-height: 1.6;
         }
 
@@ -1650,15 +1652,27 @@
     <section class="stats" id="stats">
         <div class="stats-grid">
             <div class="stat-item">
-                <h2>{{numToStringNew( (int)@$settings['landing_users_count'] )?? 0 }}<span >+</span></h2>
+                <h2>
+                    {{ numToStringNew( (int)@$settings['landing_users_count'] ) ?? 0 }}
+                    @if((int)@$settings['landing_users_count'] > 0)
+                        <span>+</span>
+                    @endif
+                </h2>
                 <p data-translate="stats1.desc">Active Users</p>
             </div>
             <div class="stat-item">
-                <h2>{{numToStringNew( (int)($settings['landing_countries_count'] )?? 0) }}<span>+</span></h2>
+                <h2>{{numToStringNew( (int)(@$settings['landing_countries_count'] )?? 0) }}
+                    @if((int)@$settings['landing_countries_count'] > 0)
+                        <span>+</span>
+                    @endif</h2>
                 <p data-translate="stats2.desc">Countries</p>
             </div>
             <div class="stat-item">
-                <h2>{{numToStringNew( @$settings['landing_live_count'] )?? 0 }}<span>+</span></h2>
+                <h2>{{numToStringNew( @$settings['landing_live_count'] )?? 0 }}
+                    @if((int)@$settings['landing_live_count'] > 0)
+                        <span>+</span>
+                    @endif
+                </h2>
                 <p data-translate="stats3.desc">Daily Streams</p>
             </div>
             <div class="stat-item">

@@ -26,7 +26,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Validation\ValidationException;
 use App\Models\ChargeInvoice;
 
-    
+
 
 class WalletController extends MainController
 {
@@ -296,6 +296,7 @@ class WalletController extends MainController
                 'amount' => 'required|integer|min:1',
                 'target_id' => 'nullable',
                 'target_type' => 'required|string',
+                'charge_type' => 'required|in:dollar,coins',
             ]);
 
             $types = [
@@ -326,20 +327,20 @@ class WalletController extends MainController
     {
         $user = Auth::user();
         $from = SuperAdmin::find($user->id);
-        $usd = $data['amount'] ?? null;
+        $amount = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
         if (settings()->get("stop_charge", 0)) {
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
-        
+
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
 
-        if (!is_numeric($usd) || $usd <= 0) {
+        if (!is_numeric($amount) || $amount <= 0) {
             throw new \Exception(__('This value is not allowed'));
         }
 
@@ -361,15 +362,26 @@ class WalletController extends MainController
         if (!$rate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
-        $coins = $usd * $rate;
+
+//        $coins = $amount * $rate;
+
+        $chargeType = $data['charge_type'];
+
+        if ($chargeType === 'dollar') {
+            $usdAmount = $amount;
+            $coinAmount = $amount * $rate;
+        } else {
+            $coinAmount = $amount;
+            $usdAmount = $amount / $rate;
+        }
 
         $totalSalary = $from->di;
 
-        if ($totalSalary < $coins) {
+        if ($totalSalary < $coinAmount) {
             throw new \Exception(__('balance not enough'));
         }
 
-        $this->performAgencyCharge($from, $to, $coins, $usd);
+        $this->performAgencyCharge($from, $to, $coinAmount, $usdAmount);
         return 1;
     }
 
@@ -422,43 +434,54 @@ class WalletController extends MainController
     public function chargeToSubAdmin(array $data)
     {
         $user = Auth::user();
-        $usd = $data['amount'] ?? 0;
+        $amount = $data['amount'] ?? 0;
         $toId = $data['target_id'] ?? null;
-    
-        if (!$usd || !$toId) {
+
+        if (!$amount || !$toId) {
             throw new \Exception(__('Invalid request data.'));
         }
-    
+
         $subAdmin = SubAdmin::where('parent_id', $user->id)->find($toId);
-    
+
         if (!$subAdmin) {
             throw new \Exception(__('This sub admin not found under your account.'));
         }
-    
+
         $userCoins = \Cache::rememberForever('super_admin_coins', function () {
             return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         });
-    
-        $coins = $usd * $userCoins;
-    
-        if ($user->di < $coins) {
+
+//        $coins = $amount * $userCoins;
+
+        $chargeType = $data['charge_type'];
+
+        if ($chargeType === 'dollar') {
+            $usdAmount = $amount;
+            $coinAmount = $amount * $userCoins;
+        } else {
+            $coinAmount = $amount;
+            $usdAmount = $amount / $userCoins;
+        }
+
+
+        if ($user->di < $coinAmount) {
             throw new \Exception(__('Insufficient balance.'));
         }
-    
-        $subAdmin->di += $coins;
+
+        $subAdmin->di += $coinAmount;
         $subAdmin->save();
 
-        $user->di -= $coins;
+        $user->di -= $coinAmount;
         $user->save();
 
-        $this->createChargeRecord($data, $subAdmin, $coins, $usd);
-        
-    
+        $this->createChargeRecord($data, $subAdmin, $coinAmount, $usdAmount);
+
+
         return true;
     }
-    
 
-  
+
+
 
     private function createChargeRecord( $request, SubAdmin $subAdmin, $coins = 0, $usdAmount )
     {

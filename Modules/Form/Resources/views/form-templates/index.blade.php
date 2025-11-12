@@ -36,9 +36,9 @@
                         <h3 class=" font-bold text-gray-900 mb-2">
                             {{ $template->title }}
                         </h3>
-                        <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
+                        <!-- <p class="text-lg text-gray-600 mb-3 h-12 overflow-hidden">
                             {{ $template->description }}
-                        </p>
+                        </p> -->
                     </div>
                     <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $template->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                         {{ $template->is_active ? __('Active') : __('Inactive') }}
@@ -60,7 +60,7 @@
             <div class="p-6 bg-gray-50">
                 {{-- Copy Form Link Button --}}
                 <div class="mb-3">
-                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type]) }}', this)"
+                    <button     onclick="copyFormLink('{{ route('forms.showByType', ['type' => $template->form_type , 'token' => (auth()->user()?->api_token ?? '')]) }}', this)"
                             class="w-full bg-green-600 text-white text-center px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
                         <i class="fas fa-link {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
                         <span class="button-text">{{ __('Copy') }}</span>
@@ -69,16 +69,20 @@
 
                 {{-- Action Buttons --}}
                 <div class="flex space-x-2">
-                    <a href="{{ admin_url('form-templates/' . $template->id) }}"
-                       class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition form-templates-btn">
-                        <i class="fas fa-eye {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                        {{ __('Preview') }}
-                    </a>
-                    <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
-                       class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition form-templates-btn">
-                        <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                        {{ __('Edit') }}
-                    </a>
+                     @if (\Encore\Admin\Facades\Admin::user()->can('show-templates-form') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                        <a href="{{ admin_url('form-templates/' . $template->id) }}"
+                            class="flex-1 bg-blue-600 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-700 transition form-templates-btn">
+                                <i class="fas fa-eye {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                {{ __('Preview') }}
+                        </a>
+                     @endif
+                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-templates-form') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                        <a href="{{ admin_url('form-templates/' . $template->id . '/edit') }}"
+                            class="flex-1 bg-yellow-500 text-white text-center px-4 py-2 rounded-lg hover:bg-yellow-600 transition form-templates-btn">
+                                <i class="fas fa-edit {{ app()->getLocale() == 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                {{ __('Edit') }}
+                        </a>
+                    @endif
                     <!-- <form action="{{ admin_url('form-templates/' . $template->id) }} method="POST" onsubmit="return confirm('{{ __('Are you sure?') }}');" class="flex-1">
                         @csrf
                         @method('DELETE')
@@ -105,35 +109,81 @@
 
 @push('scripts')
 <script>
+{{--function copyFormLink(url, button) {--}}
+{{--    // Copy to clipboard--}}
+{{--    navigator.clipboard.writeText(url).then(function() {--}}
+{{--        // Change button appearance--}}
+{{--        const buttonText = button.querySelector('.button-text');--}}
+{{--        const icon = button.querySelector('i');--}}
+{{--        const originalText = buttonText.textContent;--}}
+{{--        const originalIconClass = icon.className;--}}
+
+{{--        // Update to success state--}}
+{{--        buttonText.textContent = '{{ __("Link Copied!") }}';--}}
+{{--        icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';--}}
+{{--        button.classList.remove('bg-green-600', 'hover:bg-green-700');--}}
+{{--        button.classList.add('bg-green-800');--}}
+
+{{--        // Reset after 2 seconds--}}
+{{--        setTimeout(function() {--}}
+{{--            buttonText.textContent = originalText;--}}
+{{--            icon.className = originalIconClass;--}}
+{{--            button.classList.remove('bg-green-800');--}}
+{{--            button.classList.add('bg-green-600', 'hover:bg-green-700');--}}
+{{--        }, 2000);--}}
+
+{{--        // Show toast notification--}}
+{{--        showToast('{{ __("Form link copied to clipboard!") }}', 'success');--}}
+{{--    }).catch(function(err) {--}}
+{{--        console.error('Failed to copy: ', err);--}}
+{{--        showToast('{{ __("Failed to copy link") }}', 'error');--}}
+{{--    });--}}
+{{--}--}}
+
 function copyFormLink(url, button) {
-    // Copy to clipboard
-    navigator.clipboard.writeText(url).then(function() {
-        // Change button appearance
-        const buttonText = button.querySelector('.button-text');
-        const icon = button.querySelector('i');
-        const originalText = buttonText.textContent;
-        const originalIconClass = icon.className;
-        
-        // Update to success state
-        buttonText.textContent = '{{ __("Link Copied!") }}';
-        icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';
-        button.classList.remove('bg-green-600', 'hover:bg-green-700');
-        button.classList.add('bg-green-800');
-        
-        // Reset after 2 seconds
-        setTimeout(function() {
-            buttonText.textContent = originalText;
-            icon.className = originalIconClass;
-            button.classList.remove('bg-green-800');
-            button.classList.add('bg-green-600', 'hover:bg-green-700');
-        }, 2000);
-        
-        // Show toast notification
-        showToast('{{ __("Form link copied to clipboard!") }}', 'success');
-    }).catch(function(err) {
-        console.error('Failed to copy: ', err);
-        showToast('{{ __("Failed to copy link") }}', 'error');
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            handleCopySuccess(button);
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            showToast('{{ __("Failed to copy link") }}', 'error');
+        });
+    } else {
+        // Fallback method
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            handleCopySuccess(button);
+        } catch (err) {
+            console.error('Fallback: Copy failed', err);
+            showToast('{{ __("Failed to copy link") }}', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+}
+
+function handleCopySuccess(button) {
+    const buttonText = button.querySelector('.button-text');
+    const icon = button.querySelector('i');
+    const originalText = buttonText.textContent;
+    const originalIconClass = icon.className;
+
+    buttonText.textContent = '{{ __("Link Copied!") }}';
+    icon.className = 'fas fa-check {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}';
+    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+    button.classList.add('bg-green-800');
+
+    setTimeout(function() {
+        buttonText.textContent = originalText;
+        icon.className = originalIconClass;
+        button.classList.remove('bg-green-800');
+        button.classList.add('bg-green-600', 'hover:bg-green-700');
+    }, 2000);
+
+    showToast('{{ __("Form link copied to clipboard!") }}', 'success');
 }
 
 function showToast(message, type) {
@@ -148,10 +198,10 @@ function showToast(message, type) {
             <span>${message}</span>
         </div>
     `;
-    
+
     // Add to document
     document.body.appendChild(toast);
-    
+
     // Remove after 3 seconds
     setTimeout(function() {
         toast.style.opacity = '0';

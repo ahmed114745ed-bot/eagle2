@@ -137,12 +137,12 @@ class MilestoneHelper
     public static function revokeRewardFromUser(User $user, MilestoneReward $mr): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
-
         $rewards = UserHistoryReward::where('user_id', $user->id)
             ->where('receive_type', $receiveType)
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->get();
+
         if ($rewards) {
             foreach ($rewards as $r) {
                 self::removeRewardEffect($user, $r);
@@ -200,5 +200,6 @@ class MilestoneHelper
                 'milestone_slug' => $slug,
                 'user_id' => $user->id ?? null,
             ]);
-        }    }
+        }   
+     }
 }

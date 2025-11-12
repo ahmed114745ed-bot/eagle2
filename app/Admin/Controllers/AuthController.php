@@ -243,7 +243,10 @@ class AuthController extends BaseAuthController
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
+    
         return redirect('/superadmin/login');
     }
+
+    
+    
 }

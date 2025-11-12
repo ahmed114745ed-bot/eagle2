@@ -19,7 +19,8 @@ class FormTemplate extends Model
         'form_type',
         'is_active',
         'created_by',
-        'can_not_delete'
+        'can_not_delete',
+        'note_text'
     ];
 
     // Remove JSON casting since HasTranslations already handles JSON conversion

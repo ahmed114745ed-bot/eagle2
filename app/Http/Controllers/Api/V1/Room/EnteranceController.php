@@ -66,6 +66,19 @@ class EnteranceController extends Controller
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
     }
 
+    public function updateRoomCountFromZego2(Request $request)
+    {
+        \Log::info('Zego Room Count Update Request:', [
+            'url' => $request->fullUrl(),
+            // 'method' => $request->method(),
+            // 'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            // 'ip' => $request->ip(),
+        ]);
+
+        return $this->enteranceRoomService->updateRoomCountFromZego2($request);
+    }
+
     public function libraryAgoraZego()
     {
         $agora_app_id = Common::getConfig('app_id');
@@ -150,7 +163,7 @@ class EnteranceController extends Controller
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
         $message = [
             'messageContent' => [

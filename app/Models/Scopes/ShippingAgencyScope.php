@@ -13,6 +13,6 @@ class ShippingAgencyScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->where('type', '=', 2);
+        $builder->where('agencies.type', '=', 2);
     }
 }

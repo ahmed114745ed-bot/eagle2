@@ -14,6 +14,7 @@ use App\Admin\Controllers\SuperAdminStatisticController;
 use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
+
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
@@ -23,7 +24,6 @@ use App\Admin\Controllers\GiftController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
-use App\Admin\Controllers\BadgeController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -38,7 +38,6 @@ use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -80,6 +79,7 @@ use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
+use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\MangerSettingController;
@@ -87,7 +87,6 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
@@ -108,7 +107,6 @@ use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserChargeHistoryController;
-use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -167,7 +165,7 @@ Route::group(
         'namespace' => config('admin.route.namespace'),
         'middleware' => [
             'web',
-            'admin',
+            'admin.auth',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
@@ -280,7 +278,7 @@ Route::group(
             ]
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
-         Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
+        Route::post('delete-badge/{id}', [UsersAppController::class, 'deleteBadge']);
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
@@ -331,8 +329,8 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
-         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
-         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
+        Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
@@ -360,6 +358,7 @@ Route::group(
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
+        Route::get('/targets/{id}/confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
         Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel'])->middleware('web-agency-feature');
         Route::resource('polices', PoliceController::class);
@@ -392,7 +391,7 @@ Route::group(
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
 
-      
+
         Route::get('/soon', 'AllStatisticController@index2');
         Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');
         Route::get('/custom-export-users', [
@@ -470,15 +469,30 @@ Route::group(
             Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
         });
 
-        Route::resource('coin-logs-reports', CoinLogReportsController::class);
-
-        Route::resource('area-manager-users', AreaManagerController::class);
-        Route::get('area-manager-users/profile', [SuperAdminController::class, 'showPreview']);
-
-        Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
-        Route::group(['prefix' => 'area-manager-charges-report'], function () {
-            Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [AllStatisticController::class, 'topUsersData']);
+            Route::get('comparison-user-signup', [AllStatisticController::class, 'comparisonUserSignUp']);
+            Route::get('distribution-rooms', [AllStatisticController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [AllStatisticController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [AllStatisticController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [AllStatisticController::class, 'agencyTarget']);
+            Route::get('top-sender', [AllStatisticController::class, 'topSender']);
+            Route::get('top-receiver', [AllStatisticController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [AllStatisticController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [AllStatisticController::class, 'roomStats']);
+            Route::get('agency-stats', [AllStatisticController::class, 'getStats']);
+            Route::get('bd-stats', [AllStatisticController::class, 'getBdStats']);
+            Route::get('balance-data', [AllStatisticController::class, 'getBalanceData']);
+            Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
+            Route::get('top-followers', [AllStatisticController::class, 'getTopFollowers']);
+            Route::get('game-summary', [AllStatisticController::class, 'gameSummary']);
+            Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+            Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+            Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
         });
+
+        Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('usersBd', BdController::class);
          Route::resource('user-Bds', BdController::class);
@@ -492,7 +506,8 @@ Route::group(
 
  
 
-        // Route::resource('ovip', 'OVipController');
+
+         //Route::resource('ovip', 'OVipController');
         // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
@@ -609,6 +624,7 @@ Route::group(
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('super-package-rewards', SuperPackageController::class);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
@@ -655,9 +671,9 @@ Route::group(
         Route::resource('banners', BannerController::class);
         Route::resource('languages', LanguageController::class);
         Route::resource('settings', SettingController::class)
-        ->except(['update'])
-        ->names('admin.settings');
-         Route::resource('helper-links', LinkViewController::class);
+            ->except(['update'])
+            ->names('admin.settings');
+        Route::resource('helper-links', LinkViewController::class);
 
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
@@ -732,16 +748,15 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+
+            Route::get('/pusher-test/{id}', function ($id) {
+                $user = \App\Models\User::findOrFail($id);
+                $token = $user->createToken('broadcast')->plainTextToken;
+
+                return view('test.test-pusher', compact('token'));
+            });
         });
 
-        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
-        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
-        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
-        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
-
-
-
-   
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);
             Route::get('list', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'list']);

@@ -63,7 +63,7 @@ class LiveRoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory'])
+        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -95,13 +95,12 @@ class LiveRoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-        if ($room->microphone) {
-            $positions = explode(',', $room->microphone);
-            foreach ($positions as $index => $userId) {
-                if ($userId != '0') {
-                    $micPositions[$userId] = $index + 1;
-                }
-            }
+        $microphones = $room->microphones
+            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->sortBy('position')
+            ->values();
+        foreach ($microphones as $mic) {
+            $micPositions[$mic->user_id] = $mic->position + 1;
         }
 
         // Blacklist
@@ -538,40 +537,40 @@ class LiveRoomController extends MainController
     {
         $grid->disableRowSelector();
 
-        $grid->model()->collection(function (Collection $collection) {
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
-
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                ->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
-
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn ($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
-
-            return $collection; // IMPORTANT: return the collection
-        });
+//        $grid->model()->collection(function (Collection $collection) {
+//            $allIds = $collection->flatMap(function ($row) {
+//                return array_filter(explode(',', (string) $row->microphone));
+//            })->unique()->values()->all();
+//
+//            // fetch all needed users once
+//            $users = collect();
+//            if (!empty($allIds)) {
+//                $users = User::select(['id', 'name'])
+//                ->with('profile:id,user_id,avatar')
+//                    ->whereIn('id', $allIds)
+//                    ->get()
+//                    ->keyBy('id');
+//            }
+//
+//            // attach a ready-to-use collection on each row
+//            $collection->each(function ($row) use ($users) {
+//                $ids = array_filter(explode(',', (string) $row->microphone));
+//                $row->microphone_users = collect($ids)
+//                    ->map(fn ($id) => $users->get($id))
+//                    ->filter()
+//                    ->values();
+//            });
+//
+//            return $collection; // IMPORTANT: return the collection
+//        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
-        });
+        })->sortable();
 
-        $grid->id(__('ID'));
+        $grid->id(__('ID'))->sortable();
 
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
@@ -598,20 +597,20 @@ class LiveRoomController extends MainController
                     </div>
                  </a>
             ";
-        });
+        })->sortable();
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('uid', __('room owner'))->display(function ($name) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
             }
 
             return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
-        });
+        })->sortable();
 
         $grid->column('session', __('Gifts'))->display(function () {
             return $this->session  ?? 0;
-        });
+        })->sortable();
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);

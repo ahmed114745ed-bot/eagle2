@@ -26,6 +26,7 @@ use App\Facades\CustomNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
 use App\Admin\Controllers\BdController;
 use App\Jobs\UpdateUserFollowCountsJob;
@@ -42,13 +43,15 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Models\BdSalary;
-
+use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
+use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -189,11 +192,22 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SuperAdminRoleSeeder']);
+    Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+    Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/update-flag', function () {
+
+    Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ flag updated successfully.'
     ]);
 });
 Route::get('/clear_clear', function () {
@@ -205,6 +219,7 @@ Route::get('/clear_clear', function () {
 
     return "Cleared!";
 });
+Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 
 Route::get('/seed', function () {
 
@@ -1019,3 +1034,26 @@ Route::get('remove-minus', function () {
         return $e->getMessage();
     }
 });
+
+Route::get('/manifest.json', function () {
+    $favIcon = getFavIcon();
+    return response()->json([
+        "name" => "",
+        "short_name" => "",
+        "icons" => [
+            [
+                "src" => $favIcon,
+                "sizes" => "192x192",
+                "type" => "image/png",
+            ],
+            [
+                "src" => $favIcon,
+                "sizes" => "512x512",
+                "type" => "image/png",
+            ],
+        ],
+        "theme_color" => "#ffffff",
+        "background_color" => "#ffffff",
+        "display" => "standalone",
+    ]);
+})->name('manifest.json');

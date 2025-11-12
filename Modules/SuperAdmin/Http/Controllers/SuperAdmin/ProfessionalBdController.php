@@ -104,7 +104,7 @@ class ProfessionalBdController extends MainController
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         $grid->column('username', __('Bd'))->display(function ($name) {
             if (request()->filled('_export_')) {
                 return $name;
@@ -134,42 +134,20 @@ class ProfessionalBdController extends MainController
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
 
 
         $grid->column('default', trans('default_status'))
             ->switch(Common::getSwitchStates())
             ->display(function ($enable) {
                 return $enable;
-            });
-        // $grid->column('default', __('default_status'))->display(function () {
-        //     if (request()->filled('_export_')) {
-        //         return $this->default;
-        //     }
+            })->sortable();
+       
 
-        //     if ($this->default == 1) {
-        //         return <<<HTML
-        //             <span style="display: flex; align-items: center;">
-        //                 <span style="
-        //                     font-size: smaller;
-        //                     background: red;
-        //                     display: inline-block;
-        //                     border-radius: 50%;
-        //                     width: 10px;
-        //                     height: 10px;
-        //                     margin-left: 5px;
-        //                 " title=""></span>
-        //             </span>
-        //         HTML;
-        //     } else {
-        //         return '<span style="color: #999;"></span>';
-        //     }
-        // });
-
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
+        $grid->column('app_id', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
-                return $name;
+                return $user->name;
             }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
@@ -190,13 +168,13 @@ class ProfessionalBdController extends MainController
                     $image
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                         <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
                         </a>
                         <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
 
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
             return $this->total_agencies;
@@ -217,7 +195,7 @@ class ProfessionalBdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->sortable();
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
@@ -235,7 +213,7 @@ class ProfessionalBdController extends MainController
             $locale = App::getLocale();
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
-        });
+        })->sortable();
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {

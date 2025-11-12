@@ -611,6 +611,8 @@ if (!function_exists('handleShowImageWithTypes')) {
     }
 }
 
+ 
+
 if (!function_exists('userType')) {
     function userType($type)
     {

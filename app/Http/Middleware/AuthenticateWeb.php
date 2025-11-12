@@ -54,7 +54,7 @@ class AuthenticateWeb
 
             if (
                 (Str::startsWith($uri, 'bd') && $userType !== 'bd') ||
-                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin') ||
+                (Str::startsWith($uri, 'superadmin') && $userType !== 'superadmin'&& $userType !== 'sub_super_admin') ||
                 (Str::startsWith($uri, 'areaManager') && $userType !== 'area-manager' && $userType !== 'sub_area_manager') ||
                 (Str::startsWith($uri, 'admin') && $userType !== 'admin')
             ) {
@@ -65,13 +65,13 @@ class AuthenticateWeb
                 if ($userType === 'bd') {
                     return redirect('/bd/login')->withErrors(['error' => 'Please login through BD portal.']);
                 } elseif ($userType === 'superadmin') {
-                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin portal.']);
+                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through country manager portal.']);
                 } elseif ($userType === 'area-manager') {
                     return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
                 } elseif ($userType === 'sub_area_manager') {
                     return redirect('/areaManager/login')->withErrors(['error' => 'Please login through Area Manager portal.']);
                 } elseif ($userType === 'sub_super_admin') {
-                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through Superadmin 1111 portal.']);
+                    return redirect('/superadmin/login')->withErrors(['error' => 'Please login through country manager 1111 portal.']);
                 } else {
                     return redirect('/admin/login')->withErrors(['error' => 'Please login through Admin portal.']);
                 }

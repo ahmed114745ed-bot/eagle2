@@ -2,15 +2,15 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\AreaManager;
-use App\Models\Country;
-use App\Models\SubAreaManager;
+
 use App\Models\User;
-use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 class DeleteAreaManagerAction extends RowAction
 {
@@ -31,6 +31,7 @@ class DeleteAreaManagerAction extends RowAction
 
     public function handle(Model $model, Request $request)
     {
+        if($model->default ==1)  return $this->response()->error('can not delete default area admin')->refresh();
         $user = User::find($model->app_id);
         if ($user) {
             $user->is_area_manager = 0;

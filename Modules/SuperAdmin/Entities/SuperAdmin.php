@@ -2,7 +2,9 @@
 
 namespace Modules\SuperAdmin\Entities;
 
+use App\Models\Admin;
 use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\Country;
 use App\Models\User;
 use DB;
@@ -12,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\AreaManager\Entities\AreaManager;
 
 class SuperAdmin extends Model
 {
@@ -41,9 +44,25 @@ class SuperAdmin extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(AreaManager::class, 'parent_id');
+    }
+//
+//    public function transactions()
+//    {
+//        return $this->hasMany(Charge::class, 'charger_id', 'id')
+//            ->where('user_charger_type', 'bd');
+//    }
+
     public function subSuperAdmins()
     {
         return $this->hasMany(SubAdmin::class, 'parent_id', 'id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
     }
 
     //

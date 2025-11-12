@@ -7,6 +7,7 @@ use Cache;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Code;
+use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\Country;
@@ -96,6 +97,19 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchWithPage($key, $page, $perPage);
     }
+
+    public function searchUsersAudioWithPage($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchAudioOwnerWithPage($key, $page, $perPage);
+    }
+
+    public function searchUsersLiveWithPage($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchLiveOwnerWithPage($key, $page, $perPage);
+    }
+
     public function searchUsersWithPageNew($key, $page)
     {
         $perPage = 10;
@@ -109,10 +123,10 @@ class UserService
     }
 
 
-    public function bdCountryUsers($key, $page,$country_id)
+    public function bdCountryUsers($key, $page, $country_id)
     {
         $perPage = 10;
-        return $this->userRepository->bdCountryUsers($key, $page, $perPage,$country_id);
+        return $this->userRepository->bdCountryUsers($key, $page, $perPage, $country_id);
     }
 
 
@@ -271,14 +285,14 @@ class UserService
         // update location
         if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
             $this->userRepository->updateLocation($user->id, $lat, $long);
-//            if (!$countryId) {
-//                $countryId = getCountryIdFromLatLong($lat, $long, false);
-//            }
+            //            if (!$countryId) {
+            //                $countryId = getCountryIdFromLatLong($lat, $long, false);
+            //            }
         }
         // end update location
 
         $this->userRepository->updateCountry($user, $countryId);
-//        $this->updateCountryAgencyAndBD($user->id, $countryId);
+        //        $this->updateCountryAgencyAndBD($user->id, $countryId);
 
         return $this->userRepository->getUserWithMedals($user->id);
     }
@@ -523,9 +537,23 @@ class UserService
             //            'country',
             'color_image',
             'followedByAuthUser',
-            'followerByAuthUser'
+            'followerByAuthUser',
             //            'eligiblePacks',
             //            'friends',
+            'chatRoomsAsUser' => function ($q) use ($userId) {
+                $q->where('user_id2', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
         ];
 
         if ($type == 1) {
@@ -693,7 +721,8 @@ class UserService
         $room_uid = $request->input('room_uid');
         $limit    = $request->input('is_home') ? 3 : 30;
         $user_id  = $request->user()->id;
-        $query = GiftLog::query()->where('roomowner_id', $room_uid);
+        $Room = Room::where('uid', $room_uid)->where('type', 'audio')->first();
+        $query = GiftLog::query()->where('room_id', $Room->id);
 
         if ($type == 1) {
             $query = $query->whereBetween('created_at', [

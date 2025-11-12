@@ -25,8 +25,8 @@ class UserCharismaService
             return [];
         }
 
-        $microphones = $room->microphone;
-        $users       = $this->getUserIdWithPosition($microphones);
+//        $microphones = $room->microphone;
+        $users       = $this->getUserIdWithPosition2($room);
         $user_ids = $users->pluck('user_id')->toArray();
 
         $charisma = ExtraDataInRoom::whereIn('user_id', $user_ids)->where('room_id', $room->id)->get()->map(function ($item) use ($users) {
@@ -62,6 +62,7 @@ class UserCharismaService
     public function addTotalEarnedCoinsInUserRoom(Room $room, array $userIds, $earnedCoins = null): false|array
     {
 
+        info('addTotalEarnedCoinsInUserRoom');
         $roomId = $room->id;
 
         if ( !$room) {
@@ -69,7 +70,15 @@ class UserCharismaService
         }
 
 
-        $users = $this->getUserIdWithPosition($room->microphone);
+//        $users = $this->getUserIdWithPosition2($room);
+        $users = $room->microphones()
+            ->get(['user_id', 'position'])
+            ->map(fn($m) => [
+                'user_id'  => (int)$m->user_id,
+                'position' => (int)$m->position,
+            ])
+            ->values();
+
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
@@ -102,9 +111,7 @@ class UserCharismaService
             return false;
         }
 
-        $users = $room->microphones()
-            ->whereIn('user_id', $userIds)
-            ->get(['user_id', 'position']);
+        $users = $this->getUserIdWithPosition2($room);
 
         $allDataChanges = [];
 
@@ -146,6 +153,12 @@ class UserCharismaService
         return collect($users);
     }
 
+    public function getUserIdWithPosition2($room)
+    {
+        return $room->microphones()->get(['user_id', 'position']);
+    }
+
+
     public function removeRoomCharisma(int $roomId)
     {
         ExtraDataInRoom::query()->where('room_id', $roomId)->delete();
@@ -159,6 +172,20 @@ class UserCharismaService
     public function getUserResetData($microphones, array $userIds)
     {
         $users       = $this->getUserIdWithPosition($microphones);
+        $allDataChanges = [];
+        foreach ($userIds as $userId) {
+            $user = $users->where('user_id', $userId)->first();
+            if ($user){
+                $user['total'] =  0;
+                $allDataChanges[] = $user;
+            }
+        }
+        return $allDataChanges;
+    }
+
+    public function getUserResetData2($room, array $userIds)
+    {
+        $users       = $this->getUserIdWithPosition2($room);
         $allDataChanges = [];
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();

@@ -19,6 +19,7 @@ return [
     "username_not_found" => 'username not found',
     'percent_total_error' => '❌ The total percentages must be exactly 100%. Current: :total%',
     'new'                   => 'New',
+    'rejected_success' => 'Rejected successfully ✅',
     'lifetime_help' => '💡 If you enter <strong>0</strong>, this means the item will never expire (lifetime).',
     'not_in_same_country' => 'Not in the same country',
     "apple_team_id" => 'Team ID',

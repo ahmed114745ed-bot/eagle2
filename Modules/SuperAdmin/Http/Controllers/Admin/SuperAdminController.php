@@ -111,9 +111,7 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $countryID = empty((array)session('country_id')) ? Common::areaCountries(): (array)session('country_id');
-    // dd($countryID ,session('country_id'),Common::areaCountries() );
-        $grid->model()->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs'])
+        $grid->model()->with(['appUser.packs', 'createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -207,6 +205,40 @@ class SuperAdminController extends MainController
             ";
         });
 
+        $grid->column('createdBy.name', __('created by'))->display(function () {
+            $user = $this->createdBy;
+            $name = $user->name ?? '';
+
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $id = $user->id ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+
         $grid->column('country.name', __('country'));
 
         //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
@@ -277,7 +309,7 @@ class SuperAdminController extends MainController
 
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'super-admin')->first();
-                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('Acquisitions');
 
                 $customButtonHTML = <<<HTML
@@ -341,6 +373,7 @@ class SuperAdminController extends MainController
         $this->disableFormTools($form);
 
         $form->text('name', __('name'));
+        $form->hidden('created_by')->default(auth()->id());
 
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
@@ -648,7 +681,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()
@@ -692,7 +725,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
     }
 
     protected function detail($id)

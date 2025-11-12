@@ -13,9 +13,8 @@
 </div>
 
 @php
-  
-        $fetchUrl = admin_url('admin/rooms-activity');
- 
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    $fetchUrl = $prefix . "/statistics/rooms-activity";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

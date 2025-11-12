@@ -1,25 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">-->
-<!-- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    </head>  -->
-<!--
-<body>
-    <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('POST')
-        @php
-            $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
-        @endphp
-        <label for="">TimeZone</label>
 
-
-        <button type="submit">Update</button>
-    </form>
-</body>
-</html> -->
 
 @php
 use Modules\Vip\Entities\Vip;
@@ -500,13 +479,31 @@ use Modules\Vip\Entities\Vip;
     .rtl .copy-button{
         right: 95px;
     }
+
+    @media (max-width: 768px) {
+    
+
+    .settings-menu {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    .settings-menu button {
+        display: inline-block;
+        min-width: 150px;
+        margin-right: 0.5rem;
+        margin-bottom: 0; /* إزالة المسافة الرأسية */
+        white-space: normal;
+    }
+}
+
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
 
-</head>
 
 <body>
+
 
     <div class="settings-sidebar">
         <div class="settings-menu">
@@ -4350,6 +4347,7 @@ use Modules\Vip\Entities\Vip;
             </script>
 
         </div>
+
 </body>
 
 
@@ -4436,6 +4434,7 @@ use Modules\Vip\Entities\Vip;
         flex-direction: column;
     }
 .tabs-sidebar {
+       width: 100%;
         order: 0;
         border-right: none;
         border-bottom: 1px solid #eee;
@@ -4470,10 +4469,23 @@ use Modules\Vip\Entities\Vip;
 
 @media (max-width: 767px) {
     .col-md-6, .col-md-4 { flex: 1 1 100%; min-width: 0; }
+    .settings-content {
+    width: 100% !important;
+}
 }
 </style>
 
 <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const firstRow = document.querySelector('.content .row'); 
+    if (firstRow) {
+        const firstDiv = firstRow.querySelector('div'); 
+        if (firstDiv && firstDiv.classList.contains('col-md-12')) {
+            firstDiv.classList.add('col-sm-6'); 
+        }
+    }
+});
 (function () {
     const tabButtons = document.querySelectorAll('#landPageSettings .tab-btn');
     const panes = document.querySelectorAll('#landPageSettings .tab-pane');

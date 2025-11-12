@@ -304,7 +304,7 @@ class UserController extends MainController
                 });
             });
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($value) {
                 return number_format($value);
@@ -318,7 +318,7 @@ class UserController extends MainController
                     return __('No User');
                 }
                 return app(UserService::class)->adminUserAvatar($user, false, superadmin_url("users/profile/{$user->id}"));
-            });
+            })->sortable();
 
         $grid->column('agency_id', __('Agency'))
             ->display(function () {
@@ -328,7 +328,7 @@ class UserController extends MainController
                 }
 
                 return app(AgencyService::class)->adminAgencyData($agency);
-            });
+            })->sortable();
 
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
