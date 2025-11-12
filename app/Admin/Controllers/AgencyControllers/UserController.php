@@ -121,14 +121,14 @@ class UserController extends MainController
             ->where(function ($query) use ($countryID){
                 $currentCountry = $countryID;
                 $query->where(function ($q) use ($currentCountry) {
-                    $q->where('country_id', $currentCountry)
+                    $q->whereIn('country_id', $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', '!=', $currentCountry);
+                            $a->whereNotIn('country_id',  $currentCountry);
                         });
                 })->orWhere(function ($q) use ($currentCountry) {
-                    $q->where('country_id', '!=', $currentCountry)
+                    $q->whereNotIn('country_id',  $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', $currentCountry);
+                            $a->whereIn('country_id', $currentCountry);
                         });
                 });
             });
