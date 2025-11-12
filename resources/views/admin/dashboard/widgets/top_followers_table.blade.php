@@ -65,3 +65,18 @@
             });
     });
 </script>
+
+<style>
+    .avatar-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .avatar-cell img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
