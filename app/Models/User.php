@@ -250,7 +250,8 @@ class User extends Authenticatable
     {
         $month = $month ?? now(getTimezone())->month;
         $year  = $year ?? now(getTimezone())->year;
-
+        logger('month Achieved:', [$month]);
+        logger('year Achieved:', [$year]);
         return $this->monthlyDiamondReceive()
             ->where('month', $month)
             ->where('year', $year)
