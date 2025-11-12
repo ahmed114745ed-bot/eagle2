@@ -55,7 +55,12 @@ class AllStatisticController extends MainController
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc('followers_count')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                $avatar = $user->profile?->avatar;
+                $user->avatar_url = $avatar ? getImagePath($avatar) : asset('images/businessman-icon.jpg');
+                return $user;
+            });
 
         return response()->json($topUsersByFollowers);
     }

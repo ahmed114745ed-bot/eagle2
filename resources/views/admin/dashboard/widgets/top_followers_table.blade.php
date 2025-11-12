@@ -47,7 +47,7 @@
                         <tr>
                             <td class="text-center fw-bold">${index + 1}</td>
                             <td class="avatar-cell">
-                                <img src="${user.profile?.avatar ?? '/default-avatar.png'}" alt="avatar">
+                                <img src="${user.avatar_url}" alt="avatar">
                                 <span>${user.name}</span>
                             </td>
                             <td class="text-center">
@@ -65,3 +65,18 @@
             });
     });
 </script>
+
+<style>
+    .avatar-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .avatar-cell img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
