@@ -270,6 +270,7 @@ class BdController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
 
+        $form->hidden('created_by')->default(auth()->id());
         $form->hidden('transfer_salary', __('transfer_salary'));
         $form->hidden('default', __('default'))->default(0);
 

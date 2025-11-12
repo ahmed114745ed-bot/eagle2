@@ -212,6 +212,7 @@ class SuperAdminController extends MainController
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
+        $form->hidden('created_by')->default(auth()->id());
         $form->text('name', __('name'));
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
