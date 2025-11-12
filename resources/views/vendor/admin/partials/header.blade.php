@@ -355,7 +355,7 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('filter_country_id'))
+                @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
                     @if (request()->is('admin*'))
                         <li style="padding: 10px;">
                             <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
