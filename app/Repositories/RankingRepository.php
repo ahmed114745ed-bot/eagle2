@@ -12,7 +12,6 @@ use App\helper\TimeHelper;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
 use App\helper\RankingHelper;
-use App\Models\UserLuckyGift;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserMerged;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\CoinGameUserMergedMonthly;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
+use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class RankingRepository
 {
@@ -184,10 +184,12 @@ class RankingRepository
     }
 
 
-    public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
+    public function getUserRanking(string $role, string $rankingType, int $perPage = 10 ,$type = 1 )
     {
-        return GiftRanking::query()
-            ->whereHas('ranker')
+        $query =GiftRanking::query();
+           $this->applyDateFiltersV2($query, $type);
+
+           $query->whereHas('ranker')
             ->where('role', $role)
             ->when($role == 'roomId', function ($query) {
                 return $query->where('ranker_type', Room::class)->with([
@@ -206,12 +208,14 @@ class RankingRepository
             ->orderByDesc('total_gifts')
             ->take($perPage)
             ->get();
+       return  $query ;     
     }
 
-    public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
+    public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  =1)
     {
-        $query = GiftRanking::query()
-            ->with([
+        $query =GiftRanking::query();
+        $this->applyDateFiltersV2($query, $type);
+        $query->with([
                 'ranker' => function ($q) {
                     $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img', 'app_owner_id']);
                 },

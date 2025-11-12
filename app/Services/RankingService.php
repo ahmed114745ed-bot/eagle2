@@ -148,7 +148,7 @@ class RankingService
             3 => 'monthly'
         ];
 
-        return $this->rankingRepo->getAgencyRanking('agency', $types[$type], $limit);
+        return $this->rankingRepo->getAgencyRanking('agency', $types[$type], $limit,$type);
     }
 
 
@@ -163,7 +163,7 @@ class RankingService
             3 => 'monthly',
         ];
 
-        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit,$type);
       
       if($rel == 'roomId') return RoomRankingResource::collection($data);
         $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
