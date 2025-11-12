@@ -1,12 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\CodapayService;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
+use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -59,8 +58,10 @@ use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
+use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
@@ -119,6 +120,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
+        Route::get('owner-rooms', [UserController::class, 'searchOwnerRoomWithPage'])->name('owner-rooms');
         Route::get('users7', [UserController::class, 'usersAudioRoom'])->name('users7');
         Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
@@ -128,6 +130,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
         Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
+         Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');

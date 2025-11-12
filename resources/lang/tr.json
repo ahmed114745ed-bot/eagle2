@@ -21,6 +21,8 @@
 "Superadmin": "Süper Yönetici",
     "SuperAdmin Charge": "Yüklemeler",
     "Charge To Superadmin": "Yüklemeler",
+    "type admin": "yönetici türü",
+"country manager": "ülke yöneticisi",
     "Browse charge to superadmin": "Yüklemeleri Görüntüle",
     "Add switch charge to superadmin": "Yükleme Ekle",
     "History switch charge to superadmin": "Yükleme Geçmişi",
