@@ -287,6 +287,7 @@ class EncorUsersController extends AdminController
         }
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $form->hidden('parent_id')->default($authId);
+        $form->hidden('created_by')->default(auth()->id());
 
         $userTable = config('admin.database.users_table');
         $connection = config('admin.database.connection');

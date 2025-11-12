@@ -137,7 +137,7 @@ class ChargeController extends MainController
                 });
                 $profileUrl ='';
                 if (!empty($info['uuid'])) {
-                $profileUrl = route('areaManager.agency.profile', ['id' => $info['uuid']]);
+                    $profileUrl = url('areaManager/profile-shipping-agency/' . $info['uuid']);
                 }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -161,7 +161,7 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("areaManager/users/profile/{$info['id']}");
+                $showUrl = url("areaManager/area-manager-users-profile/{$info['id']}");
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
@@ -185,7 +185,7 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("areaManager/users/profile/{$info['id']}");
+                $showUrl = url("areaManager/superadmin-users-profile/{$info['id']}");
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
