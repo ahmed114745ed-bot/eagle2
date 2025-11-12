@@ -454,7 +454,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        return view('superadmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()
