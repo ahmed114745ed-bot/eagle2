@@ -1951,6 +1951,14 @@ class Common
 
     public static function getReceiverInfo($resource)
     {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1959,7 +1967,7 @@ class Common
                     'uuid' => $resource->receiveragency->id ?? '',
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
-                    'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1972,7 +1980,7 @@ class Common
                     'uuid' => $resource->receiverSubAreaManager->id ?? '',
                     'id' => $resource->receiverSubAreaManager->id ?? '',
                     'type' => 'sub_area_manager',
-                    'url' => $resource->receiverSubAreaManager ? url("admin/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
                     'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
                     'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1985,7 +1993,7 @@ class Common
                     'uuid' => $resource->receiverSuperAdmin->id ?? '',
                     'id' => $resource->receiverSuperAdmin->id ?? '',
                     'type' => 'super_admin',
-                    'url' => $resource->receiverSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
                     'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1997,7 +2005,7 @@ class Common
                     'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
                     'id' => $resource->receiverSubSuperAdmin->id ?? '',
                     'type' => 'sub_super_admin',
-                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
                     'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -2011,7 +2019,7 @@ class Common
                     'image' => $resource->receiver->profile->avatar ?? '',
                     'uuid' => $resource->receiver->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receiver ? url("admin/users/{$resource->receiver->id}") : '#',
+                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
                     'image_color'          => @$resource->receiver->color_image,
                     'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
