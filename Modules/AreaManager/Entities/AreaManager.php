@@ -79,8 +79,8 @@ class AreaManager extends Authenticatable
             $url = getImagePath($country->flag);
 
             if ($url) {
-              //  $html .= handleShowImageWithTypes($country->id, $url, 100, 100, 4, 'contain');
-             '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+                $html .= handleShowImageWithTypes($country->id, $url, 100, 100, 4, 'contain');
+            // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
 
             }
         }
