@@ -50,7 +50,6 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-        Route::get('area-manager-users-profile/{id}', [AdminAreaManagerController::class, 'profile']);
 
         Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
@@ -150,6 +149,7 @@ Route::group(
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
+        Route::get('area-manager-users-profile/{id}', [AdminAreaManagerController::class, 'profile']);
     }
 );
 
