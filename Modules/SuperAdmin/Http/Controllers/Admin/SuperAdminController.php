@@ -378,18 +378,18 @@ class SuperAdminController extends MainController
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
                 $table = "{$connection}.{$userTable}";
-        
+
                 $rules = ['required'];
-        
+
                 $uniqueRule = Rule::unique($table, 'username');
-        
+
                 if (! $form->isCreating()) {
                     $id = $form->model()?->id ?? null;
                     $uniqueRule->ignore($id);
                 }
-        
+
                 $rules[] = $uniqueRule;
-        
+
                 return $rules;
             });
         $form->password('password', __('Password'))->rules('required');
@@ -483,8 +483,6 @@ class SuperAdminController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
-
-           
         });
 
         $form->saved(function (Form $form) {
@@ -492,8 +490,8 @@ class SuperAdminController extends MainController
             $superAdmin = $form->model();
             $userId = $form->model()->id;
             $userAppId = $form->model()->app_id;
-              
-  
+
+
             $country = Country::find($superAdmin->country_id);
 
             if ($country && $country->area_manager_id) {
@@ -503,7 +501,7 @@ class SuperAdminController extends MainController
                     ]);
                 }
             }
-           
+
 
             $userApp = User::find($userAppId);
             if (isset($userApp)) {
@@ -691,10 +689,11 @@ class SuperAdminController extends MainController
         }
 
         $tab = request()->query('tab', 'agencies');
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
-            ->with('country')->where('country_id', $countryID)->firstOrFail();
+            ->with('country')->whereIn('country_id', $countryID)->firstOrFail();
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);

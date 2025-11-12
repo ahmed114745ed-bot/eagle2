@@ -6,6 +6,7 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use Encore\Admin\Facades\Admin;
@@ -74,10 +75,10 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()->whereNull('admin_id')
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
             ->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -224,13 +225,13 @@ class OfficialMessageController extends MainController
             'country_manager' => __('country manager'),
 
         ])->when('area_manager', function (Form $form) {
-           $form->select('admin_area_id', __('admin'))
-                    ->options('/api/search/area-manager')
-                    ->ajax('/api/search/area-manager', 'id', 'name');
+            $form->select('admin_area_id', __('admin'))
+                ->options('/api/search/area-manager')
+                ->ajax('/api/search/area-manager', 'id', 'name');
         })->when('country_manager', function (Form $form) {
             $form->select('admin_super_id', __('admin'))
-                    ->options('/api/search/users-superadmin2')
-                    ->ajax('/api/search/users-superadmin2', 'id', 'name');
+                ->options('/api/search/users-superadmin2')
+                ->ajax('/api/search/users-superadmin2', 'id', 'name');
         });
         $form->select('type_feature', trans('type feature'))->options([
             'single'   => __('single select'),

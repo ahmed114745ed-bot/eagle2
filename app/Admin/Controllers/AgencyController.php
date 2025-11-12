@@ -366,18 +366,18 @@ class AgencyController extends MainController
      *
      * @return Grid
      */
-   
+
 
     protected function grid()
     {
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
-            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins','agencies.country_id','agencies.img', 'agencies.is_frozen'])
-            ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
+            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -420,19 +420,19 @@ class AgencyController extends MainController
 
                 return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
-           $flagHtml = '';
-                if (!empty($this->country?->flag)) {
-                    $flagPath = getImagePath($this->country->flag);
-                    $flagTitle = app()->getLocale() === 'ar'
-                        ? e($this->country->name)
-                        : e($this->country->e_name);
+            $flagHtml = '';
+            if (!empty($this->country?->flag)) {
+                $flagPath = getImagePath($this->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->country->name)
+                    : e($this->country->e_name);
 
-                    $flagHtml = "<img src='{$flagPath}' 
+                $flagHtml = "<img src='{$flagPath}' 
                          class='flag-image' 
                          alt='flag Image' 
                          title='{$flagTitle}' 
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-                }
+            }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -448,7 +448,7 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-           
+
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
