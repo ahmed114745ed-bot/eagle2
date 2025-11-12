@@ -90,7 +90,6 @@ class PusherController extends Controller
                                 ->where('created_at', '>', $eventTimeFormatted)
                                 ->update(['status' => 'received']);
                         }
-
                         break;
                 }
             }
