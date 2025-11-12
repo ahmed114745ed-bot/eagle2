@@ -149,6 +149,7 @@ Route::group(
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
+        Route::get('area-manager-users/{id}', [AdminAreaManagerController::class, 'show']);
     }
 );
 
