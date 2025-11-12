@@ -9,6 +9,8 @@ use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\SuperAdmin\Entities\SubAdmin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AreaManager\Entities\SubAreaManager;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class Charge extends Model
 {

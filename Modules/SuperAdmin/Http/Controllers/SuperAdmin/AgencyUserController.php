@@ -120,7 +120,7 @@ class AgencyUserController extends MainController
                 });
             });
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -169,9 +169,9 @@ class AgencyUserController extends MainController
                             </div>
                         </div>
                         ";
-            });
+            })->sortable();
 
-        $grid->column('agency', __('Agency'))
+        $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 if (request()->filled('_export_')) {
                     return $this?->agency?->name ?: __('No agency');
@@ -208,7 +208,7 @@ class AgencyUserController extends MainController
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
@@ -293,7 +293,7 @@ class AgencyUserController extends MainController
                 });
             });
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -345,9 +345,9 @@ class AgencyUserController extends MainController
                             </div>
                         </div>
                         ";
-            });
+            })->sortable();
 
-        $grid->column('agency', __('Agency'))
+        $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 if (request()->filled('_export_')) {
                     return $this?->agency?->name ?: __('No agency');
@@ -386,7 +386,7 @@ class AgencyUserController extends MainController
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');

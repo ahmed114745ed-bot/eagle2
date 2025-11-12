@@ -9,7 +9,6 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\FormRequest;
 use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
@@ -17,6 +16,9 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
+use Modules\Form\Entities\FormField;
+use Modules\Form\Entities\FormRequest;
+use Modules\Form\Services\FormRenderService;
 
 class FormRequestController extends MainController
 {
@@ -120,7 +122,9 @@ class FormRequestController extends MainController
             'pending' => 'default',
             'approved' => 'success',
             'rejected' => 'danger'
-        ]);
+        ])->display(function ($status) {
+            return __($status);
+        });
 
 
         $grid->column('actions', __('Actions'))->display(function () {
@@ -138,7 +142,7 @@ class FormRequestController extends MainController
 
             $approveText = __('Approved');
             $rejectText  = __('Reject');
-            $viewText    = __('View');
+            $viewText    = __('Preview');
 
             // return <<<HTML
             // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
@@ -183,149 +187,119 @@ class FormRequestController extends MainController
         });
 
         Admin::script("
-        function initFormRequestActions() {
-    
-            function sendRequest(url) {
-                return fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': LA.token,
-                        'Accept': 'application/json',
-                    },
-                }).then(res => res.json());
-            }
-    
-            function handleAction(button, actionType) {
-                button.addEventListener('click', function(e){
-                    e.preventDefault();
-    
-                    const messages = {
-                        approve: {
-                            title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                            confirm: 'نعم',
-                            cancel: 'إلغاء',
-                            color: '#28a745'
-                        },
-                        reject: {
-                            title: 'هل أنت متأكد من رفض هذا الطلب؟',
-                            confirm: 'نعم',
-                            cancel: 'إلغاء',
-                            color: '#dc3545'
-                        },
-                        success: {
-                            en: 'Action completed successfully!',
-                            ar: 'تمت العملية بنجاح!',
-                            hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                            tr: 'İşlem başarıyla tamamlandı!'
-                        },
-                        error: {
-                            en: 'An error occurred!',
-                            ar: 'حدث خطأ أثناء العملية',
-                            hi: 'एक त्रुटि हुई!',
-                            tr: 'İşlem sırasında hata oluştu!'
-                        }
-                    };
-    
-                    const locale = document.documentElement.lang || 'ar';
-    
+function initFormRequestActions() {
+
+    function sendRequest(url) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': LA.token,
+                'Accept': 'application/json',
+            },
+        }).then(res => res.json());
+    }
+
+    function handleAction(button, actionType) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const messages = {
+                approve: {
+                    title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                    confirm: 'نعم',
+                    cancel: 'إلغاء',
+                    color: '#28a745'
+                },
+                reject: {
+                    title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                    confirm: 'نعم',
+                    cancel: 'إلغاء',
+                    color: '#dc3545'
+                },
+                success: {
+                    en: 'Action completed successfully!',
+                    ar: 'تمت العملية بنجاح!',
+                    hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                    tr: 'İşlem başarıyla tamamlandı!'
+                },
+                error: {
+                    en: 'An error occurred!',
+                    ar: 'حدث خطأ أثناء العملية',
+                    hi: 'एक त्रुटि हुई!',
+                    tr: 'İşlem sırasında hata oluştu!'
+                }
+            };
+
+            const locale = document.documentElement.lang || 'ar';
+
+            Swal.fire({
+                title: messages[actionType].title,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: messages[actionType].confirm,
+                cancelButtonText: messages[actionType].cancel,
+                confirmButtonColor: messages[actionType].color,
+                cancelButtonColor: '#6c757d',
+            }).then((result) => {
+                if (result.value) {
+                    const url = button.dataset.url;
+
                     Swal.fire({
-                        title: messages[actionType].title,
-                        type: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: messages[actionType].confirm,
-                        cancelButtonText: messages[actionType].cancel,
-                        confirmButtonColor: messages[actionType].color,
-                        cancelButtonColor: '#6c757d',
-                    }).then((result) => {
-                        if (result.value) {
-                            const url = button.dataset.url;
-                            sendRequest(url).then(res => {
-    
-                                console.group('Form Request Action Response');
-                                console.log('Request URL:', url);
-                                console.log('Response:', res);
-                                console.groupEnd();
-    
-                                if (res.success) {
-                                    Swal.fire({
-                                        title: res.message || messages.success[locale],
-                                        type: 'success',
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    });
-    
-                                    // إعادة تحميل محتوى الـ grid بدون refresh
-                                    $.pjax.reload('#pjax-container');
-                                } else {
-                                    Swal.fire('خطأ', res.message || messages.error[locale], 'error');
-                                }
-                            }).catch((err) => {
-                                console.error('Fetch error:', err);
-                                Swal.fire('خطأ', messages.error[locale], 'error');
-                            });
-                        }
+                        title: 'جاري التنفيذ...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
                     });
-                });
-            }
-    
-            document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-            document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
-        }
-    
-        // يعمل أول مرة عند تحميل الصفحة
-        initFormRequestActions();
-    
-        // يعمل بعد كل تحديث PJAX (reload)
-        $(document).off('pjax:end').on('pjax:end', function() {
-            initFormRequestActions();
+
+                    sendRequest(url)
+                        .then(res => {
+                            Swal.close();
+
+                            if (res.success) {
+                                Swal.fire({
+                                    title: res.message || messages.success[locale],
+                                    icon: res.icon || 'success', // 💡 Use icon from backend
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                // Reload grid without full refresh
+                                $.pjax.reload('#pjax-container');
+                            } else {
+                                Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                            }
+                        })
+                        .catch((err) => {
+                            console.error('Fetch error:', err);
+                            Swal.fire('خطأ', messages.error[locale], 'error');
+                        });
+                }
+            });
         });
-    ");
+    }
+
+    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+}
+
+initFormRequestActions();
+
+$(document).off('pjax:end').on('pjax:end', function() {
+    initFormRequestActions();
+});
+");
 
 
 
-        // $grid->disableActions();
+
+
+
+        $grid->disableActions();
         $grid->disableCreateButton();
 
         return $grid;
     }
 
-    protected function detail($id)
-    {
-        $show = new Show(FormRequest::findOrFail($id));
 
-        $show->field('user.name', __('Name'));
-        $show->field('bd_id', __('BD ID'));
-        $show->field('agency_name', __('Agency Name'));
-        $show->field('whatsapp_number', __('WhatsApp Number'));
-        $show->field('country', __('Country'));
-        $show->field('form_template_type', __('Form Type'));
-        $show->field('status', __('Status'));
-
-        $show->field('data', __('Additional Info'))->as(function ($data) {
-            $array = json_decode($data, true);
-
-            $renderValue = function ($value) use (&$renderValue) {
-                if (is_array($value)) {
-                    $html = '<ul style="padding-left: 15px;">';
-                    foreach ($value as $k => $v) {
-                        $html .= "<li><b>{$k}:</b> " . $renderValue($v) . "</li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } elseif (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $value)) {
-                    $url = asset('storage/' . $value);
-                    return "<img src='{$url}' style='max-width:200px;max-height:200px;'/>";
-                } else {
-                    return htmlspecialchars($value);
-                }
-            };
-
-            return $array ? $renderValue($array) : '';
-        })->unescape();
-
-
-        return $show;
-    }
 
 
     protected function form()
@@ -393,7 +367,11 @@ class FormRequestController extends MainController
         ]);
         $request->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        return response()->json([
+            'success' => true,
+            'message' => __('تمت الموافقة بنجاح'),
+        ]);
     }
 
     protected function approveBdForm($request)
@@ -429,7 +407,11 @@ class FormRequestController extends MainController
 
         $request->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        //  return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
+        return response()->json([
+            'success' => true,
+            'message' => __('تمت الموافقة بنجاح'),
+        ]);
     }
 
     protected function approveShapingAgency($request)
@@ -495,7 +477,11 @@ class FormRequestController extends MainController
         $request = FormRequest::findOrFail($id);
         $request->status = 'rejected';
         $request->save();
-
+        return response()->json([
+            'success' => true,
+            'message' =>  __('admin.rejected_success'),
+            'icon' => 'success',
+        ]);
         admin_toastr(__('rejected_message'), 'error');
         return redirect()->back();
     }
@@ -513,8 +499,27 @@ class FormRequestController extends MainController
         return parent::show(
             $id,
             $content
-                ->title(trans('appear-charger-agency'))
-            // ->body($this->detail($id))
+                ->title(trans(''))
+                ->body($this->detail($id))
         );
+    }
+
+    protected function detail($id)
+    {
+        $show = new Show(FormRequest::findOrFail($id));
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
+
+        $renderer = new FormRenderService();
+
+        $show->field('data', __('dodo'))->as(function ($jsonData) use ($renderer) {
+            $data = json_decode($jsonData, true);
+            return $renderer->renderFormData($data);
+        })->unescape();
+
+        return $show;
     }
 }

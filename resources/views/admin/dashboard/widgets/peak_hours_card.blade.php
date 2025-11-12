@@ -7,13 +7,14 @@
             <option value="month">{{ __('This Month') }}</option>
         </select>
     </div>
-    <div class="box-body" style="height:245px;">
+    <div class="box-body" style="height:367px;">
         <canvas id="peakChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
 
 @php
-    $fetchUrl = admin_url('peak-hours');
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    $fetchUrl = $prefix . "/statistics/peak-hours";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -59,7 +60,7 @@
     }
 
     function loadPeakData(period = 'day') {
-        addToAjaxQueue({
+        $.ajax({
             url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function (res) {

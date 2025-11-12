@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\SuperAdmin\Database\Seeders;
 
 use App\Models\AdminRole;

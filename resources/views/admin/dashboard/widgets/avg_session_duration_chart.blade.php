@@ -39,10 +39,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
 $(document).ready(function() {
-    addToAjaxQueue({
-        url: "{{ url('admin/statistics/active-rooms') }}", // 👈 endpoint for data
+    $.ajax({
+        url: "{{ url($prefix . '/statistics/active-rooms') }}",
         type: "GET",
         dataType: "json",
         success: function(response) {

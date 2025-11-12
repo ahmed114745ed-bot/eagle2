@@ -4,7 +4,6 @@ namespace Modules\TribeReward\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
 use App\Models\Gift;
-use App\Models\OVip;
 use App\Models\Ware;
 use App\Selectables\Wares;
 use Carbon\Carbon;
@@ -13,6 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\TribeReward\Entities\TribeReward;
+use Modules\Vip\Entities\OVip;
 
 class TribeRewardController extends MainController
 {

@@ -15,14 +15,15 @@ use Modules\Form\Http\Controllers\FormTemplateController;
 Route::get('/host-agency/search', [FormTemplateController::class, 'search'])
     ->name('host_agency.search');
 
-Route::get('/forms', [FormTemplateController::class, 'showByType'])
-->name('forms.showByType');
-Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])
-->name('form.submit')->middleware('optional.sanctum');
-Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('/forms', [FormTemplateController::class, 'showByType'])->name('forms.showByType');
+    Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])->name('form.submit');
     Route::get('/form-translations', [FormTemplateController::class, 'getTranslations']);
-});
+    Route::get('/check-field-name', [FormTemplateController::class, 'checkName'])->name('fields.checkName');
+    Route::prefix('forms')->name('forms.')->group(function () {
+        Route::get('/{id}', [FormTemplateController::class, 'showReqs'])->name('show.reqs');
+        Route::delete('/{id}', [FormTemplateController::class, 'destroyReqs'])->name('destroy.reqs');
+    });
 
  Route::group(
     [

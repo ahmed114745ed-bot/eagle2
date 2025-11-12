@@ -8,65 +8,66 @@
 </div>
 
 @php
-        $fetchUrl = admin_url('users-online-stats');
-
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    $fetchUrl = $prefix . "/statistics/users-online-stats";
 @endphp
 
 @if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            addToAjaxQueue(() => {
-                const ctx = document.getElementById('usersOnlineChart').getContext('2d');
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('usersOnlineChart').getContext('2d');
 
-                const chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Users'],
-                        datasets: [
-                            {
-                                label: "{{ __('online_users') }}",
-                                data: [0],
-                                borderColor: '#28a745',
-                                borderWidth: 2,
-                                fill: false,
-                                tension: 0.3
-                            },
-                            {
-                                label: "{{ __('offline_users') }}",
-                                data: [0],
-                                borderColor: '#dc3545',
-                                borderWidth: 2,
-                                fill: false,
-                                tension: 0.3
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: "{{ __('online_users') }}"
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: "{{ __('offline_users') }}"
-                                }
+            let chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Users'], // نقطة واحدة فقط على X
+                    datasets: [
+                        {
+                            label: "{{ __('online_users') }}",
+
+                            data: [0], // يبدأ من 0
+                            borderColor: '#28a745',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            label: "{{ __('offline_users') }}",
+                            data: [0], // يبدأ من 0
+                            borderColor: '#dc3545',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true, // المحور X يبدأ من 0
+                            title: {
+                                display: true,
+                                text: "{{ __('online_users') }}",
                             }
                         },
-                        plugins: {
-                            legend: { position: 'top' }
+                        y: {
+                            beginAtZero: true, // المحور Y يبدأ من 0
+                            title: {
+                                display: true,
+                                text: "{{ __('offline_users') }}"
+                            }
                         }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
                     }
-                });
+                }
+            });
 
-                return fetch("{{ $fetchUrl }}", {
+            function fetchData() {
+                fetch("{{ $fetchUrl }}", {
                     headers: { 'Accept': 'application/json' }
                 })
                     .then(async res => {
@@ -79,12 +80,19 @@
                         }
                     })
                     .then(data => {
-                        chart.data.datasets[0].data = [data.online];
-                        chart.data.datasets[1].data = [data.offline];
+                        // تحديث الخطوط بالنقاط الجديدة
+                        chart.data.datasets[0].data = [data.online];   // Online
+                        chart.data.datasets[1].data = [data.offline];  // Offline
                         chart.update();
                         console.log("Online:", data.online, "Offline:", data.offline);
+                    })
+                    .catch(err => {
+                        console.error("Fetch Error:", err); // طباعة الأخطاء في Console
+                    });
+            }
 
-                        setInterval(() => {
-                            fetch("{{ $fetchUrl }}", {
-                                headers: { 'Ac
+            fetchData();
+            setInterval(fetchData, 10000);
+        });
+    </script>
 @endif

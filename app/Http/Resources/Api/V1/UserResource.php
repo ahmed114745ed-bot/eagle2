@@ -15,15 +15,12 @@ class UserResource extends JsonResource
      * @param \Illuminate\Http\Request $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-
-
-
-
      public function toArray($request)
      {
-
          $packsByType = $this->packs->groupBy('type');
-
+         if ($this->relationLoaded('chatRoomsAsUser') || $this->relationLoaded('chatRoomsAsUser2')) {
+             $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
+         }
 
          $data = [
              'id'                   => $this->id,
@@ -31,7 +28,6 @@ class UserResource extends JsonResource
              'special_color'        => $this->color_id ?? '',
              'id_image'             => $this->specialId?->ware?->show_img ?? '',
              'special_id'           => $this->specialId?->ware?->id ?? 0,
-             'chat_id'              => $this->chat_id ?: '',
              'notification_id'      => $this->notification_id ?: '',
              'name'                 => $this->name ?: "user #{$this->uuid}",
              'nick_name'            => $this->nick_name,
@@ -85,13 +81,14 @@ class UserResource extends JsonResource
                 'receiver_img' => $this->receiverLevel?->img ?? '',
                 'sender_img'   => $this->senderLevel?->img  ?? '',
             ],
-
              'profile_frame'        => $this->profile_frame,
              'profile_frame_id'     => $this->getProfileFrame()?->id ?? '',
              'multi_images'         => MultiImageUserResource::collection($this->images),
              'user_types'           => $this->user_types,
              'shipping_agency'      => $this->formatShippingAgency(),
              'has_anti_ban'         => $this->getPackWithType(15),
+             'chat_id' => $chatRoom->id ?? null,
+             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
          ];
 
          if (in_array($this->is_mic, ['0', '1'])) {
@@ -154,7 +151,7 @@ class UserResource extends JsonResource
          $resource = (new NowRoomResource($this))->toArray(request());
 
          return empty($resource) ? (object)[] : $resource;
-        
+
         }
 
 

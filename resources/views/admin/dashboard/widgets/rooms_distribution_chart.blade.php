@@ -67,11 +67,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+@php
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+@endphp
+
 <script>
     $(document).ready(function() {
-        // Fetch data from your Laravel endpoint
-        addToAjaxQueue({
-            url: "{{ url('admin/statistics/distribution-rooms') }}",
+        $.ajax({
+            url: "{{ url($prefix . '/statistics/distribution-rooms') }}",
             type: "GET",
             dataType: "json",
             success: function(response) {

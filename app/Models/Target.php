@@ -25,6 +25,8 @@ class Target extends Model
         'img',
         'app_profit_percentage',
         'db_percentage',
+        'under_edit',
+        'edit_id'
     ];
 
     protected static function boot()
@@ -39,12 +41,8 @@ class Target extends Model
         });
     }
 
-    //     public function setReelAttribute($values)
-    // {
-    //     $this->attributes['reel'] = implode(',', $values);
-    // }
-    // public function setMomentAttribute($values)
-    // {
-    //     $this->attributes['moment'] = implode(',', $values);
-    // }
+    public function edit()
+    {
+        return $this->hasOne(TargetEdit::class, 'id', 'edit_id');
+    }
 }

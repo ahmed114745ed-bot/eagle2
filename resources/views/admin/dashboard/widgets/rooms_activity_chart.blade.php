@@ -13,9 +13,8 @@
 </div>
 
 @php
-
-        $fetchUrl = admin_url('rooms-activity');
-
+    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    $fetchUrl = $prefix . "/statistics/rooms-activity";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -69,7 +68,7 @@
     }
 
     function loadRoomsActivity(period = 'day') {
-        addToAjaxQueue({
+        $.ajax({
             url: "{{ $fetchUrl }}",
             data: { period: period },
             success: function(res) {

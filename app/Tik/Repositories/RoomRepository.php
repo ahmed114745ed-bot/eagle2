@@ -557,6 +557,8 @@ class RoomRepository extends AbstractRepository
 
     private function baseRoomQueryMine($user)
     {
+        $authUserId = auth()->id();
+
         return $this->model
             ->where('uid', $user->id)
             ->select([
@@ -602,6 +604,20 @@ class RoomRepository extends AbstractRepository
                 'owner.profile',
                 'owner.medals.achievementLevel.achievement',
                 'boxUse',
+                'owner.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                    $q->where('user_id2', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
+                'owner.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                    $q->where('user_id', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
             ])
             ->withCount('roomVisitors')
             ->where('room_status', 1)

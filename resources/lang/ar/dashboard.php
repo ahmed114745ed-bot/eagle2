@@ -5,6 +5,8 @@ return [
     'login.titleBD'           => ' BD دخول لوحة التحكم',
     'login.titleAreaManager'           => 'دخول لوحة تحكم مدير المنطقة',
     'login.titleSuperAdmin'           => 'دخول لوحة تحكم مدير دوله ',
+    'login.titleSuperAdmin'           => 'دخول لوحة تحكم مدير الدوله ',
+    'login.titleAreaManager'           => 'دخول لوحة تحكم مدير المنطقة',
     'login.remember'        => 'حفظ بيانات الدخول',
     'login.rights'          => '  ٢٠٢٣. جميع الحقوق محفوظة © ',
     'login.language.switch' => 'Switch to',

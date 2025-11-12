@@ -7,11 +7,11 @@ use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Follow;
-use App\Models\SuperAdmin;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
 
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +53,28 @@ class UserRepository extends Repository
             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('uuid', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function searchAudioOwnerWithPage($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')->whereDoesntHave('ownerAudioRoom')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function searchLiveOwnerWithPage($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')->whereDoesntHave('ownerLiveRoom')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -199,10 +221,6 @@ class UserRepository extends Repository
             })->where(function ($query) {
                 $query->where('is_sub_super_admin', 0)->orWhereNull('is_sub_super_admin');
             })
-            ->where(function ($query) {
-                $query->where('agency_id', 0)
-                    ->orWhereNull('agency_id');
-            })
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
@@ -213,6 +231,25 @@ class UserRepository extends Repository
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
+    // public function supSuperAdminUsers($key, $page, $perPage)
+    // {
+    //     return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+    //         ->where('is_super_admin', 0)
+    //         ->where('is_sub_super_admin', 0)
+    //         ->where(function ($query) {
+    //             $query->where('agency_id', 0)
+    //                 ->orWhereNull('agency_id');
+    //         })
+    //         ->whereDoesntHave('hostAgency', function ($query) {
+    //             $query->where('type', 1);
+    //         })
+    //         ->whereDoesntHave('shippingAgency')
+    //         ->where(function ($query) use ($key) {
+    //             $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
+    //                 ->orWhere('id', 'like', '%' . $key . '%');
+    //         })
+    //         ->paginate($perPage, ['*'], 'page', $page);
+    // }
 
     public function supSuperAdminUsers($key, $page, $perPage)
     {
@@ -479,6 +516,7 @@ class UserRepository extends Repository
 
     public function getUserWithMedals($userId)
     {
+        $authUserId = auth()->id();
         return User::with([
             'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
                 ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
@@ -491,7 +529,21 @@ class UserRepository extends Repository
             'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
-            'shippingAgency:id,app_owner_id,name,img'
+            'shippingAgency:id,app_owner_id,name,img',
+            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
         ])
             ->find($userId);
     }
@@ -659,6 +711,8 @@ class UserRepository extends Repository
 
     public function users($userId, $latitude = null, $longitude = null)
     {
+        $authUserId = auth()->id();
+
         $builder = User::query()
             ->with('profile')
             ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
@@ -674,7 +728,25 @@ class UserRepository extends Repository
                     * sin(radians(users.lat)))) AS distance")
             )->whereNotNull('lat')->whereNotNull('long');
         }
-        return     $builder->inRandomOrder()->paginate(10);
+
+        $builder->with([
+            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+        ]);
+
+        return $builder->inRandomOrder()->paginate(request('per_page'));
     }
 
 

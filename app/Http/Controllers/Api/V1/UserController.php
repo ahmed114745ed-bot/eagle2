@@ -249,6 +249,24 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function usersAudioRoom(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchUsersAudioWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersLiveRoom(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchUsersLiveWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
     public function search2_new(Request $request)
     {
         $key = $request->q;

@@ -5,16 +5,13 @@ namespace App\Selectables;
 use App\Models\Ware;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
-use Encore\Admin\Facades\Admin;
 
 class WaresByType extends Selectable
 {
-
     public $model = Ware::class;
-
     public function make()
     {
-
+        $this->model()->where('get_type', '!=', 1);
 
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
@@ -50,10 +47,8 @@ class WaresByType extends Selectable
                     5 => trans('Bubble Frame'),
                     6 => trans('Entering Special Effects'),
                     28 => __('profile frame'),
-
                 ]);
             });
         });
-
     }
 }

@@ -13,9 +13,11 @@
     "Select Super Admin": "सुपर एडमिन चुनें",
     "Roles": "भूमिकाएँ",
     "User Info": "उपयोगकर्ता जानकारी",
+    "Charge by": "चार्ज करें द्वारा",
     "Charge reports": "चार्ज रिपोर्ट",
     "Charge Reports": "चार्ज रिपोर्ट",
     "Agency name": "एजेंसी का नाम",
+    "coins per hour": "सिक्के प्रति घंटा",
     "charge-reports": "चार्ज रिपोर्ट",
     "Luck gift Settings": "लक गिफ्ट सेटिंग्स",
     "Form Request": "फॉर्म अनुरोध",
@@ -24,7 +26,8 @@
     "Approve switch form request": "फॉर्म अनुरोध स्वीकृत करें",
     "Reject switch form request": "फॉर्म अनुरोध अस्वीकार करें",
     "Show form request": "फॉर्म अनुरोध दिखाएँ",
-
+    "Form Details": "फ़ॉर्म विवरण",
+    "Additional Fields": "अतिरिक्त फ़ील्ड",
     "User Reward": "उपयोगकर्ता इनाम",
     "Browse user reward": "उपयोगकर्ता इनाम देखें",
     "reward": "इनाम",
@@ -61,7 +64,8 @@
     "Create superadmin": "सुपर एडमिन बनाएँ",
     "Edit superadmin": "सुपर एडमिन संपादित करें",
     "Delete superadmin": "सुपर एडमिन हटाएँ",
-
+    "Super Package reward": "सुपर पैकेज इनाम",
+    "package": "पैकेज",
     "Superadmin Settings": "सुपर एडमिन सेटिंग्स",
     "Browse superadmin settings": "सुपर एडमिन सेटिंग्स देखें",
 
@@ -84,7 +88,7 @@
     "History switch super admin reward": "सुपर एडमिन इनाम इतिहास",
     "Browse super admin reward history": "सुपर एडमिन इनाम इतिहास देखें",
 
-    "SuperAdmin Rewards": "सुपर एडमिन इनाम"
+    "SuperAdmin Rewards": "सुपर एडमिन इनाम",
 
 
     "audio": "आवाज़",
@@ -130,9 +134,11 @@
     "Default Country:": "डिफ़ॉल्ट देश:",
     "Sub Super Admin": "उप सुपर एडमिन",
     "you used this user name before": "आपने यह उपयोगकर्ता नाम पहले ही इस्तेमाल किया है",
-        "feature": "विशेषता",
+    "feature": "को भेजें",
         "Now charge by dollar": "अब डॉलर में शुल्क लिया जाएगा",
     "BDs": "बिजनेस डेवलपर्स (BDs)",
+    "live stream": "लाइव स्ट्रीम",
+    "live stream owner": "लाइव स्ट्रीम का मालिक",
     "shipping agency": "शिपिंग एजेंसी",
     "shipping agency in your Country": "आपके देश में शिपिंग एजेंसी",
 "Specific shipping Agency by ID": "आईडी द्वारा विशिष्ट शिपिंग एजेंसी",
@@ -2467,6 +2473,8 @@
     "User Parent": "उपयोगकर्ता अभिभावक",
     "Users Devices": "उपयोगकर्ता उपकरण",
     "Room Target": "कमरा लक्ष्य",
+    "area manager": "क्षेत्र प्रबंधक",
+    "area manager charge": "क्षेत्र प्रबंधक रिचार्ज",
     "Agent Target": "एजेंट लक्ष्य",
     "Agent Request": "एजेंट अनुरोध",
     "Agent User": "एजेंट उपयोगकर्ता",
@@ -2498,7 +2506,14 @@
 "total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!",
 "browse room vip": "कमरों के वीआईपी स्तर देखें",
 "default_current": "वर्तमान डिफ़ॉल्ट BD",
+"type feature": "विशेषता प्रकार",
+"host users": "होस्ट उपयोगकर्ता",
+  "host agencies": "होस्ट एजेंसियां",
+  "charge agencies": "चार्ज एजेंसियां","single select": "एकल चयन",
+  "multi select": "बहुविकल्प चयन",
+  "Selecting All will automatically select all other options": "'सभी चुनें' विकल्प अन्य सभी विकल्पों को स्वचालित रूप से चुन लेगा",
     "default_current_superadmin": "वर्तमान सुपर एडमिन",
+     "dodo":"    ",
 "no_default_set": "अभी तक कोई डिफ़ॉल्ट BD सेट नहीं किया गया है",
 "select_default_bd": "डिफ़ॉल्ट BD चुनें",
     "select_default_superadmin": "डिफ़ॉल्ट सुपर एडमिन चुनें",
@@ -3528,11 +3543,16 @@
   "Custom widgets provide specialized UI (BD Selector, User Picker, etc.)": "कस्टम विजेट विशेष UI प्रदान करते हैं (BD चयनकर्ता, उपयोगकर्ता चयनकर्ता, आदि)",
   "Choose a widget": "एक विजेट चुनें",
   "Choose a widget": "स्वागत है! मेरे साथ, आप लाइव स्ट्रीमिंग की दुनिया में सफलता के रहस्य सीखेंगे। मेरे पास सफल एजेंसियों को प्रशिक्षित करने का व्यापक अनुभव है। मैं आपको रोज़ाना फॉलो-अप और असीमित समर्थन का वादा करता हूँ जब तक आप शीर्ष पर नहीं पहुँच जाते!"
-
-
-
-
-
+,    "Application Name": "एप्लिकेशन का नाम",
+    "Work Duration (months)": "कार्य अवधि (महीनों में)",
+    "Members": "सदस्य",
+    "Top 3 Agencies": "शीर्ष 3 एजेंसियां",
+    "Recommended": "अनुशंसित",
+    "Works since :value years": ":value साल से हमारे साथ हैं",
+    "Works since :value months": ":value महीनों से हमारे साथ हैं",
+    "Works since :value days": ":value दिनों से हमारे साथ हैं",
+    "Welcome message": "हमारे परिवार में आपका स्वागत है! मैं आपकी सफलता की हर कदम में साथ रहूँगा।",
+    "owner room": "कमरे का मालिक",
     "select super admin": "देश प्रबंधक चुनें",
     "Select Super Admins": "देश प्रबंधक चुनें",
     "Super Admin Configuration": "देश प्रबंधक विन्यास",
@@ -3542,7 +3562,6 @@
     "restore super admin": "देश प्रबंधक को पुनर्स्थापित करें",
     "can not restore this super admin": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
     "can not restore this super admin user taken": "इस देश प्रबंधक को पुनर्स्थापित नहीं किया जा सकता",
-    "Sub Super Admin": "देश प्रबंधक कर्मचारी",
     "Super Admin": "देश प्रबंधक",
     "Super Admin Coins": "देश प्रबंधक सिक्के",
     "Zones coins must be greater than super admin coins": "ज़ोन के सिक्के देश प्रबंधक के सिक्कों से अधिक होने चाहिए",
@@ -3561,7 +3580,44 @@
     "Super admin": "देश प्रबंधक",
     "superadmin": "देश प्रबंधक",
     "super admin banner requests": "देश प्रबंधक बैनर अनुरोध",
-    "superadmin rewards": "देश प्रबंधक इनाम"
+    "superadmin rewards": "देश प्रबंधक इनाम",
+    "milestone_rewards_synced": "माइलस्टोन पुरस्कार सफलतापूर्वक सिंक किए गए",
+    "Reapply Rewards": "Réappliquer les récompenses",
+    "This is the default number of admins allowed per room.": "यह प्रत्येक कमरे में अनुमत प्रशासकों की डिफ़ॉल्ट संख्या है।"
+,
+    "shipping_agency": "शिपिंग एजेंसी",
+    "bd_form": "बीडी फ़ॉर्म",
+    "host_agency": "होस्ट एजेंसी"
+    ,"Form Details": "फॉर्म विवरण",
+    "Form ID": "फॉर्म आईडी",
+    "Full Form Information": "पूर्ण फॉर्म जानकारी",
+    "User Name": "उपयोगकर्ता का नाम",
+    "Email": "ईमेल",
+    "Form Type": "फॉर्म प्रकार",
+    "Form Status": "फॉर्म स्थिति",
+    "Pending": "लंबित",
+    "Awaiting Review": "समीक्षा की प्रतीक्षा में",
+    "Approved": "स्वीकृत",
+    "Approved Successfully": "सफलतापूर्वक स्वीकृत",
+    "Rejected": "अस्वीकृत",
+    "Request Rejected": "अनुरोध अस्वीकृत",
+    "Unknown": "अज्ञात",
+    "Created At": "बनाने की तारीख",
+    "Last Updated": "अंतिम अद्यतन",
+    "Available Actions": "उपलब्ध क्रियाएँ",
+    "Delete Request": "अनुरोध हटाएं",
+    "You can delete this request only while pending.": "आप इस अनुरोध को केवल लंबित रहते हुए हटा सकते हैं।",
+    "Cannot Edit": "संपादित नहीं किया जा सकता",
+    "This request is processed and cannot be modified.": "यह अनुरोध संसाधित किया गया है और संशोधित नहीं किया जा सकता।",
+    "Are you sure you want to delete this request?": "क्या आप वाकई इस अनुरोध को हटाना चाहते हैं?",
+    "Not specified": "निर्दिष्ट नहीं",
+    "update_start":"डेटा प्रोसेसिंग शुरू हो गई है, और संशोधन पूरा होने के बाद लागू किया जाएगा",
+    "confirm_title": "क्या आप सुनिश्चित हैं?",
+    "confirm_text": "पुष्टि करने पर, इस लक्ष्य के सभी मौजूदा वेतन बंद हो जाएंगे, उपयोगकर्ताओं के लिए अर्जित हीरे की गणना की जाएगी, और कटौती के बाद शेष हीरों के साथ इस महीने का नया वेतन चक्र शुरू होगा। इस क्रिया को पूर्ववत नहीं किया जा सकता।",
+    "confirm_button": "पुष्टि करें",
+    "cancel_button": "रद्द करें"
+
+
 
 
 

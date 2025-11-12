@@ -517,7 +517,7 @@ class RoomController extends MainController
     protected function defineGridColumns($grid)
     {
         $grid->disableRowSelector();
-        $maxRoomAdmin = Common::getConfig('max_room_admin');
+        $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
         $grid->model()->collection(function (Collection $collection) {
@@ -552,9 +552,9 @@ class RoomController extends MainController
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
-        });
+        })->sortable();
 
-        $grid->id(__('ID'));
+        $grid->id(__('ID'))->sortable();
 
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
@@ -581,27 +581,27 @@ class RoomController extends MainController
                     </div>
                 </a>
             ";
-        });
+        })->sortable();
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('uid', __('room owner'))->display(function ($name) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
             }
 
             return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
-        });
+        })->sortable();
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
             return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
-        });
+        })->sortable();
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
 
-        $grid->column(__('microphone'))->display(function () {
+        $grid->column('microphone',__('microphone'))->display(function () {
 
             $usersForRow = $this->microphone_users ?? collect();
             if ($usersForRow->isEmpty()) {
@@ -673,7 +673,7 @@ class RoomController extends MainController
             }
 
             return $html;
-        });
+        })->sortable();
     }
 
 

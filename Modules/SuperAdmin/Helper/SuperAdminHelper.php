@@ -20,26 +20,26 @@ class SuperAdminHelper
     }
     public static function bannerDeductAmount(HomeCarousel $banner, $type = null)
     {
-        
-    
-        $hourlyPrice = self::getHourlyBannerPrice($type); 
 
-        $form  = $banner->form;  
-        $input = $banner->input; 
+
+        $hourlyPrice = self::getHourlyBannerPrice($type);
+
+        $form  = $banner->form;
+        $input = $banner->input;
         switch ($form) {
             case 1:
                 $hours = $input;
                 break;
-            case 2: 
-                $hours = $input * 24; 
+            case 2:
+                $hours = $input * 24;
                 break;
-            case 3: 
-                $hours = $input * 24 * 30; 
+            case 3:
+                $hours = $input * 24 * 30;
                 break;
             default:
                 $hours = 0;
         }
-    
+
         return $hours * $hourlyPrice;
     }
 
@@ -50,6 +50,7 @@ class SuperAdminHelper
             'home_middle' => 15,
             'home_top' => 20,
             'discover' => 12,
+            'room' => 0,
         ];
 
         $settings = Setting::whereIn('key', array_keys($defaultPrices))

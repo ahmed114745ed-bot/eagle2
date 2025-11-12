@@ -2,7 +2,9 @@
 
 namespace Modules\SuperAdmin\Entities;
 
+use App\Models\Admin;
 use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\Country;
 use App\Models\User;
 use DB;
@@ -56,6 +58,11 @@ class SuperAdmin extends Model
     public function subSuperAdmins()
     {
         return $this->hasMany(SubAdmin::class, 'parent_id', 'id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
     }
 
     //

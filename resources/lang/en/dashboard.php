@@ -5,6 +5,8 @@ return [
     'login.titleBD'           => ' BD Dashboard Access',
     'login.titleAreaManager'  =>' Area Manager Dashboard Access',
     'login.titleSuperAdmin'  =>'country manager Dashboard Access',
+    'login.titleSuperAdmin'  =>' country manager Dashboard Access',
+    'login.titleAreaManager'  =>' Area Manager Dashboard Access',
     'login.remember'        => 'Remember me',
     'login.rights'          => ' © 2023. All rights reserved',
     'login.language.switch' => 'الانتقال إلى',

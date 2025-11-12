@@ -93,20 +93,24 @@ class BdController extends MainController
     protected function grid()
     {
         $authSuperAdmin = auth()->user();
+        $authId = auth()->user()->type == 'superadmin' ? $authSuperAdmin->id : $authSuperAdmin->parent_id;
+
         $grid = new Grid(new Bd());
-        $grid->model()->where('parent_id', $authSuperAdmin->id)
+        $grid->model()->where('parent_id', $authId)
             ->where('country_id', $authSuperAdmin->country_id)
+            
+            ->where('admin_users.type', 'bd')
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
-            ->orderByDesc('id');
+            ->orderByDesc('admin_users.id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
         $grid->column('username', __('Bd'))->display(function ($name) {
             if (request()->filled('_export_')) {
                 return $name;
@@ -136,7 +140,7 @@ class BdController extends MainController
                     </div>
                 </div>
             ";
-        });
+        })->sortable();
 
 
         $grid->column('default', trans('default_status'))
@@ -144,35 +148,12 @@ class BdController extends MainController
         ->display(function ($enable) {
                 return $enable;
 
-        });
-        // $grid->column('default', __('default_status'))->display(function () {
-        //     if (request()->filled('_export_')) {
-        //         return $this->default;
-        //     }
+        })->sortable();
 
-        //     if ($this->default == 1) {
-        //         return <<<HTML
-        //             <span style="display: flex; align-items: center;">
-        //                 <span style="
-        //                     font-size: smaller;
-        //                     background: red;
-        //                     display: inline-block;
-        //                     border-radius: 50%;
-        //                     width: 10px;
-        //                     height: 10px;
-        //                     margin-left: 5px;
-        //                 " title=""></span>
-        //             </span>
-        //         HTML;
-        //     } else {
-        //         return '<span style="color: #999;"></span>';
-        //     }
-        // });
-
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
+        $grid->column('app_id', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
-                return $name;
+                return $user->name;
             }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
@@ -193,9 +174,43 @@ class BdController extends MainController
                     $image
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                         <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
                         </a>
                         <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        })->sortable();
+
+        $grid->column('createdBy.name', __('created by'))->display(function () {
+            $user = $this->createdBy;
+            $name = $user->name ?? '';
+
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $id = $user->id ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
                     </div>
                 </div>
             ";
@@ -238,7 +253,7 @@ class BdController extends MainController
             $locale = App::getLocale();
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
-        });
+        })->sortable();
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -265,6 +280,8 @@ class BdController extends MainController
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
         $form->image('avatar', __('img'));
+
+        $form->hidden('created_by')->default(auth()->id());
 
         $form->hidden('transfer_salary', __('transfer_salary'));
         $form->hidden('default', __('default'))->default(0);
@@ -293,7 +310,10 @@ class BdController extends MainController
         $user = auth()->user();
         $form->hidden('type', __('Type'))->value('bd');
         $form->hidden('transfer_salary', __('transfer_salary'));
-        $form->hidden('parent_id', __('Super Admin'))->value($user->id);
+
+        $authId = auth()->user()->type == 'superadmin' ? $user->id : $user->parent_id;
+        $form->hidden('parent_id', __('Super Admin'))->value($authId);
+
         $form->hidden('country_id', __('country'))->value($user->country_id);
 
         $form->saving(function (Form $form) {

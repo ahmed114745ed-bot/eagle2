@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\TargetEdit;
+use Illuminate\Support\Facades\Auth;
 use PDF;
 use App\Models\User;
 use App\Models\Target;
@@ -82,177 +84,258 @@ class TargetController extends MainController
      *
      * @return Grid
      */
-    protected function grid()
+   
+
+     protected function grid()
     {
         $grid = new Grid(new Target);
         $grid->model()->orderBy('diamonds', 'asc');
 
         $coins = Common::getMaxCoins();
-        // $grid->id(__('ID'));
 
-        // $grid->column(__('target no'))->display(function () {
-        //     $TargetCount = Target::where('diamonds', '<', $this->diamonds)->count();
+        $this->addLevelColumn($grid);
+        $this->addDiamondsColumn($grid, $coins);
+        $this->addUsdColumn($grid, $coins);
+        $this->addAgencyShareColumn($grid, $coins);
+        $this->addDbPercentageColumn($grid, $coins);
+        // $this->addAppProfitColumn($grid, $coins);
+        $this->addHoursDaysColumns($grid);
+        $this->addReelColumn($grid);
+        $this->addMomentColumn($grid);
+        $this->addConfirmColumn($grid);
 
-        //     return  $TargetCount + 1;
-        // });
-        $grid->column(('level'), __('target no'));
-
-        $grid->diamonds(__('diamonds'))
-            ->display(function ($value) use ($coins) {
-                $endFormatted = $coins ? ($value / $coins) : 0;
-                $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
-                return "
-                <div style='display: flex; flex-direction: column;'>
-                    <span style='font-weight: bold;'>💎 {$value}</span>
-                    <span style='color: #888; font-size: smaller;'>\$ {$endFormatted}</span>
-                </div>
-            ";
-            });
-
-        $grid->usd(__('Host Percentage'))
-            ->display(function ($value) use ($coins) {
-                $endFormatted = $this->diamonds / $coins;
-
-                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
-                $value = is_numeric($value) ? floatval($value) : 0;
-                $userUsd = $endFormatted * $value / 100;
-                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
-
-                $userPercentage = number_format($value);
-                return "
-                <div style='display: flex; flex-direction: column;'>
-                    <span style='font-weight: bold;'>% {$userPercentage}</span>
-                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                </div>
-            ";
-            });
-
-        // $grid->usd(__('User Percentage'));
-
-        $grid->hours(__('hours'))->editable();
-        $grid->days(__('days'))->editable();
-        $grid->column(('reel'), __('real'))->display(function ($value) {
-
-            $reel = explode(',', $this->reel);
-
-            $update =  $reel[0] != '' ||  $reel[0] != null ? $reel[0] : 0;
-            $like = $reel[1] ?? 0;
-            $commit = $reel[2] ?? 0;
-
-            return "<span>" . __('admin.update') . "$update</span>
-                    <br>
-                    <span>" . __('admin.like') . "$like</span>
-                    <br>
-                    <span>" . __('admin.comment') . "$commit</span>";
-        });
-        $grid->column(('moment'), __('Moment'))->display(function ($value) {
-
-            $moment = explode(',', $this->moment);
-
-            $update =  $moment[0] != '' ||  $moment[0] != null ? $moment[0] : 0;
-            $like = $moment[1] ?? 0;
-            $commit = $moment[2] ?? 0;
-
-            return "<span>" . __('admin.update') . " $update</span>
-                    <br>
-                    <span>" . __('admin.like') . " $like</span>
-                    <br>
-                    <span>" . __('admin.comment') . " $commit</span>";
-        });
-
-        //        $grid->img('img');
-        // $grid->agency_share(__('agency share') . '(%)')->display(function ($column, Grid\Column $value) {
-        //     $value = $value->getOriginal();
-
-        //     return number_format($value, 2);
-        // });
-        $grid->agency_share(__('agency share'))
-            ->display(function ($value) use ($coins) {
-                $endFormatted = $this->diamonds / $coins;
-
-                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
-                $value = is_numeric($value) ? floatval($value) : 0;
-                $userUsd = $endFormatted * $value / 100;
-                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
-
-                $userPercentage = number_format($value);
-                return "
-                <div style='display: flex; flex-direction: column;'>
-                    <span style='font-weight: bold;'>% {$userPercentage}</span>
-                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                </div>
-            ";
-            });
-        $grid->db_percentage(__('DB  Percentage'))
-            ->display(function ($value) use ($coins) {
-                $endFormatted = $this->diamonds / $coins;
-
-                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
-                $value = is_numeric($value) ? floatval($value) : 0;
-                $userUsd = $endFormatted * $value / 100;
-                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
-
-                $userPercentage = number_format($value);
-                return "
-                <div style='display: flex; flex-direction: column;'>
-                    <span style='font-weight: bold;'>% {$userPercentage}</span>
-                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                </div>
-            ";
-            });
-        $grid->tools(function (Grid\Tools $tools) {
-            $button = '<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPdfModal">
-        <i class="fa fa-download"></i> ' . __('export pdf') . '
-    </button>';
-            $tools->append($button);
-        });
-
-        // $grid->tools(function (Grid\Tools $tools) {
-        //     $url = route('download.target.pdf');
-        //     $button = <<<HTML
-        //         <a href="{$url}" class="btn btn-sm btn-success" target="_blank">
-        //             <i class="fa fa-file-pdf-o"></i> {{ __('Export PDF') }}
-        //         </a>
-        //     HTML;
-
-        //     $tools->append($button);
-        // });
-        Admin::html(
-            '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                   <form id="exportForm" method="GET" action="#" target="_blank">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <label><input type="checkbox" name="columns[]" value="target_no" checked> ' . __('Target No') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="diamonds" checked> ' . __('Diamonds') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="usd" checked> ' . __('Host Percentage') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="agency_share" checked> ' . __('Agency Share') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="db_percentage" checked> ' . __('DB Percentage') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="reals" checked> ' . __('Reals') . '</label><br>
-                          <label><input type="checkbox" name="columns[]" value="moments" checked> ' . __('Moments') . '</label><br>
-                        </div>
-                         <div class="modal-footer">
-                        <button type="submit" formaction="/admin/download-target-pdf" class="btn btn-primary">' . __('Export PDF') . '</button>
-                        <button type="submit" formaction="/admin/download-target-excel" class="btn btn-success">' . __('Export Excel') . '</button>
-                    </div>
-                      </div>
-                    </form>
-                  </div>
-                </div>'
-        );
+        $this->addExportButton($grid);
+        $this->addConfirmScript();
 
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
     }
+
+    protected function addLevelColumn($grid)
+    {
+        $grid->column('level', __('target no'));
+    }
+
+    protected function addDiamondsColumn($grid, $coins)
+    {
+        $grid->diamonds(__('diamonds'))
+            ->display(function ($value) use ($coins) {
+                if ($this->under_edit && $this->edit) {
+                    $value = $this->edit->data['diamonds'] ?? $value;
+                }
+                $endFormatted = $coins ? ($value / $coins) : 0;
+                $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
+                return "<div style='display: flex; flex-direction: column;'>
+                            <span style='font-weight: bold;'>💎 {$value}</span>
+                            <span style='color: #888; font-size: smaller;'>\$ {$endFormatted}</span>
+                        </div>";
+            });
+    }
+
+    protected function addUsdColumn($grid, $coins)
+    {
+        $grid->usd(__('Host Percentage'))
+            ->display(function ($value) use ($coins) {
+                if ($this->under_edit && $this->edit) {
+                    $value = $this->edit->data['usd'] ?? $value;
+                }
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
+                $userPercentage = number_format($value);
+                return "<div style='display: flex; flex-direction: column;'>
+                            <span style='font-weight: bold;'>% {$userPercentage}</span>
+                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                        </div>";
+            });
+    }
+
+    protected function addAgencyShareColumn($grid, $coins)
+    {
+        $grid->agency_share(__('agency share'))
+            ->display(function ($value) use ($coins) {
+                if ($this->under_edit && $this->edit) {
+                    $value = $this->edit->data['agency_share'] ?? $value;
+                }
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
+                $userPercentage = number_format($value);
+                return "<div style='display: flex; flex-direction: column;'>
+                            <span style='font-weight: bold;'>% {$userPercentage}</span>
+                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                        </div>";
+            });
+    }
+
+    protected function addDbPercentageColumn($grid, $coins)
+    {
+        $grid->db_percentage(__('DB  Percentage'))
+            ->display(function ($value) use ($coins) {
+                if ($this->under_edit && $this->edit) {
+
+                    $value = $this->edit->data['db_percentage'] ?? $value;
+                }
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
+                $userPercentage = number_format($value);
+                return "<div style='display: flex; flex-direction: column;'>
+                            <span style='font-weight: bold;'>% {$userPercentage}</span>
+                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                        </div>";
+            });
+    }
+
+    protected function addAppProfitColumn($grid, $coins)
+    {
+        $grid->app_profit_percentage(__('App Profit Percentage'))
+            ->display(function ($value) use ($coins) {
+                if ($this->under_edit && $this->edit) {
+                    $value = $this->edit->data['app_profit_percentage'] ?? $value;
+                }
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
+                $userPercentage = number_format($value);
+                return "<div style='display: flex; flex-direction: column;'>
+                            <span style='font-weight: bold;'>% {$userPercentage}</span>
+                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                        </div>";
+            });
+    }
+
+    protected function addHoursDaysColumns($grid)
+    {
+        $grid->hours(__('hours'))->editable()
+            ->display(function ($value) {
+                if ($this->under_edit && $this->edit) {
+                    return $this->edit->data['hours'] ?? $value;
+                }
+                return $value;
+            });
+
+        $grid->days(__('days'))->editable()
+            ->display(function ($value) {
+                if ($this->under_edit && $this->edit) {
+                    return $this->edit->data['days'] ?? $value;
+                }
+                return $value;
+            });
+    }
+
+    protected function addReelColumn($grid)
+    {
+        $grid->column('reel', __('Reel'))
+            ->display(function ($value) {
+                $reel = $this->under_edit && $this->edit
+                    ? explode(',', $this->edit->data['reel'] ?? $value)
+                    : explode(',', $value);
+                $update = $reel[0] ?? 0;
+                $like = $reel[1] ?? 0;
+                $comment = $reel[2] ?? 0;
+                return "<span>" . __('admin.update') . " $update</span><br>
+                        <span>" . __('admin.like') . " $like</span><br>
+                        <span>" . __('admin.comment') . " $comment</span>";
+            });
+    }
+
+    protected function addMomentColumn($grid)
+    {
+        $grid->column('moment', __('Moment'))
+            ->display(function ($value) {
+                $moment = $this->under_edit && $this->edit
+                    ? explode(',', $this->edit->data['moment'] ?? $value)
+                    : explode(',', $value);
+                $update = $moment[0] ?? 0;
+                $like = $moment[1] ?? 0;
+                $comment = $moment[2] ?? 0;
+                return "<span>" . __('admin.update') . " $update</span><br>
+                        <span>" . __('admin.like') . " $like</span><br>
+                        <span>" . __('admin.comment') . " $comment</span>";
+            });
+    }
+
+    protected function addConfirmColumn($grid)
+    {
+        $grid->column('confirm', __('Procedures'))
+            ->display(function () {
+                if ($this->under_edit) {
+                    $url = route('admin.targets.confirm', $this->id);
+                    return '<button class="btn btn-sm btn-success confirm-btn" data-url="'.$url.'">'.__('تأكيد التعديل').'</button>';
+                }
+                return '';
+            });
+    }
+
+    protected function addConfirmScript()
+    {
+      
+            Admin::script("
+                document.querySelectorAll('.confirm-btn').forEach(function(button){
+                    button.addEventListener('click', function(){
+                        var url = this.dataset.url;
+        
+                        Swal.fire({
+                            title: '".__('confirm_title')."',
+                            html: '<p style=\"color: #000; font-weight: 500;\">".__('confirm_text')."</p>',
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: '".__('confirm_button')."',
+                            cancelButtonText: '".__('cancel_button')."',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.value) {
+                                window.location.href = url;
+                            }
+                        });
+                    });
+                });
+            ");
+        
+    
+    
+    }
+
+    protected function addExportButton($grid)
+    {
+        $grid->tools(function (Grid\Tools $tools) {
+            $button = '<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPdfModal">
+                        <i class="fa fa-download"></i> ' . __('export pdf') . '
+                        </button>';
+            $tools->append($button);
+        });
+
+        Admin::html(
+            '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <form id="exportForm" method="GET" action="#" target="_blank">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <label><input type="checkbox" name="columns[]" value="target_no" checked> ' . __('Target No') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="diamonds" checked> ' . __('Diamonds') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="usd" checked> ' . __('Host Percentage') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="agency_share" checked> ' . __('Agency Share') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="db_percentage" checked> ' . __('DB Percentage') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="reels" checked> ' . __('Reels') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="moments" checked> ' . __('Moments') . '</label><br>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="submit" formaction="/admin/download-target-pdf" class="btn btn-primary">' . __('Export PDF') . '</button>
+                        <button type="submit" formaction="/admin/download-target-excel" class="btn btn-success">' . __('Export Excel') . '</button>
+                    </div>
+                    </div>
+                    </form>
+                </div>
+                </div>'
+        );
+    }
+
     /**
      * Make a show builder.
      *
@@ -489,13 +572,7 @@ class TargetController extends MainController
 
 
         $form->saving(function (Form $form) {
-            // if ($form->isEditing()) {
-            //     $original = $form->model();
-            //     $users = User::where('monthly_diamond_received', '>=', $original->diamonds)->count();
-            //     if ($users > 0) {
-            //         admin_error('تحذير', 'بعض المستخدمين وصلوا إلى هذا الهدف بالفعل. هل أنت متأكد من التعديل؟');
-            //     }
-            // }
+            
 
             $fields = [
                 'usd' => request()->usd,
@@ -526,6 +603,37 @@ class TargetController extends MainController
                     ]
                 );
                 return back()->with(compact('error'));
+            }
+
+
+
+            if ($form->isEditing()) {
+                $target = $form->model();
+        
+                $editData = [
+                    'diamonds' => $form->diamonds,
+                    'usd' => $form->usd,
+                    'agency_share' => $form->agency_share,
+                    'app_profit_percentage' => $form->app_profit_percentage,
+                    'db_percentage' => $form->db_percentage,
+                    'hours' => $form->hours,
+                    'days' => $form->days,
+                    'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
+                    'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
+                ];
+        
+                $edit = \App\Models\TargetEdit::create([
+                    'target_id' => $target->id,
+                    'edited_by' => Auth::user()->id,
+                    'data' => $editData,
+                    'status' => 'pending',
+                ]);
+        
+                $target->under_edit = true;
+                $target->edit_id = $edit->id;
+                $target->save();
+                $url = url('admin/targets');
+                return redirect()->to($url);
             }
         });
 
@@ -649,4 +757,49 @@ class TargetController extends MainController
 
         return Excel::download(new TargetsExport($targets, $selectedColumns), 'target_data_' . now()->format('Y_m_d') . '.xlsx');
     }
+
+    public function confirm($id)
+    {
+        $target = Target::findOrFail($id);
+
+        $this->applyPendingEdit( $target);
+
+        \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
+        admin_toastr(__('update_start'), 'info');
+        return back();
+    }
+
+    protected function applyPendingEdit( $target): void
+    {
+        
+
+        if (!$target->under_edit || !$target->edit_id) {
+            return; 
+        }
+
+        $edit = TargetEdit::find($target->edit_id);
+        if (!$edit) {
+            return;
+        }
+
+        $data = $edit->data;
+
+        $target->update([
+            'diamonds' => $data['diamonds'] ?? $target->diamonds,
+            'usd' => $data['usd'] ?? $target->usd,
+            'agency_share' => $data['agency_share'] ?? $target->agency_share,
+            'app_profit_percentage' => $data['app_profit_percentage'] ?? $target->app_profit_percentage,
+            'db_percentage' => $data['db_percentage'] ?? $target->db_percentage,
+            'hours' => $data['hours'] ?? $target->hours,
+            'days' => $data['days'] ?? $target->days,
+            'reel' => $data['reel'] ?? $target->reel,
+            'moment' => $data['moment'] ?? $target->moment,
+            'under_edit' => false,
+            'edit_id' => 0,
+        ]);
+
+        $edit->delete();
+        
+    }
+
 }
