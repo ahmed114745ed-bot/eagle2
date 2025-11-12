@@ -230,7 +230,7 @@
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
             $areaManagerCountries = \App\Models\Country::where('area_manager_id', $authId)->select(['id', 'name', 'flag'])->get();
 
-            $selectedCountryId = session('country_id') ?? request('country_id') ?? Admin::user()->country_id;
+            $selectedCountryId = session('filter_country_id') ?? request('filter_country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
 
             $selectedAreaManagerCountryId = session('area_manager_country_id') ?? request('area_manager_country_id') ?? Admin::user()->country_id;
@@ -458,7 +458,7 @@
 
                     const url = new URL(window.location.href);
                     url.searchParams.set('clear_country', 1);
-                    url.searchParams.delete('country_id');
+                    url.searchParams.delete('filter_country_id');
 
                     if ($.pjax) {
                         setTimeout(() => {
