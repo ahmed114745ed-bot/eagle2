@@ -74,8 +74,8 @@
     }
 
     .avatar-cell img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         object-fit: cover;
         border-radius: 50%;
     }

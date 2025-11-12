@@ -2,8 +2,8 @@
     <div class="box-header with-border">
     <h4>{{ __('title_user') }}</h4>
     </div>
-    <div class="box-body">
-        <canvas id="usersOnlineChart" height="430"></canvas>
+    <div class="box-body" style="height:748px;">
+        <canvas id="usersOnlineChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
 
