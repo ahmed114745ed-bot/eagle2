@@ -75,6 +75,10 @@ class FixedTargetService
         
         $user           = $this->user;
         $month_received = $user->getMonthlyDiamondReceived($month, $year);
+        logger('user Achieved:', [$user]);
+        logger('month Achieved:', [$month]);
+        logger('year Achieved:', [$year]);
+        logger('month_received Achieved:', [$month_received]);
 
         /*     $agency=Agency::find($user->agency_id);
         if ($this->userTargetType == TargetType::FIXED) {
