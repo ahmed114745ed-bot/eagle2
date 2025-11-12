@@ -465,7 +465,7 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        $countryID =session('filter_country_id');
+        $countryID =$countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
