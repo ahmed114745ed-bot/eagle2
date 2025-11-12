@@ -51,13 +51,16 @@ class OfficialMessageAdmin extends Model
                 $featureIds = array_filter($featureIdsText); // remove nulls
                 $featureIdsText = implode(',', $featureIds);
             }
+            $adminRoleId = request('admin_area_id') ?? request('admin_super_id');
 
             // Assign to feature_ids column
             $model->feature_ids = $featureIdsText;
-
+            $model->admin_role_id =  $adminRoleId;
             // ✅ Remove the raw arrays from the request before save
             unset($model->agency_ids);
             unset($model->shipping_agency_ids);
+            unset($model->admin_area_id);
+            unset($model->admin_super_id);
         });
     }
 }

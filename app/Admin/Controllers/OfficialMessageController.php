@@ -218,10 +218,20 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
-        //  $form->select('language', __('language'))
-        //      ->options('/api/search/language')
-        //      ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
+        $form->select('admin_role', trans('type admin'))->options([
+            'area_manager'   => __('area manager'),
+            'country_manager' => __('country manager'),
+
+        ])->when('area_manager', function (Form $form) {
+           $form->select('admin_area_id', __('admin'))
+                    ->options('/api/search/area-manager')
+                    ->ajax('/api/search/area-manager', 'id', 'name');
+        })->when('country_manager', function (Form $form) {
+            $form->select('admin_super_id', __('admin'))
+                    ->options('/api/search/users-superadmin2')
+                    ->ajax('/api/search/users-superadmin2', 'id', 'name');
+        });
         $form->select('type_feature', trans('type feature'))->options([
             'single'   => __('single select'),
             'multi' => __('multi select'),
@@ -238,6 +248,7 @@ class OfficialMessageController extends MainController
                     'charge_agencies' => __('charge agencies'),
                     'families' => __('families'),
                     'bds' => __('bds'),
+                    'vips' => __('Vips'),
                 ])->attribute([
                     'id' => 'multi_feature_select'
                 ])
