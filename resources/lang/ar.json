@@ -17,7 +17,8 @@
    "Area managers" : "مديرين المناطق",
   "charges area manager": "رسوم مدير المنطقة",
     "Operation log": "سجل العمليات",
-
+   "regular users":"",
+   "hosts":"",
 "Area mangers": "مديرين المناطق",
 "Browse area manager": "تصفح مديري المناطق",
 "Create area manager": "إنشاء مدير منطقة",
@@ -2908,7 +2909,7 @@
 "app bd id":"معرف  Bd في التطبيق",
 "host users": "المستخدمون المضيفون",
   "host agencies": "الوكالات المضيفة",
-  "charge agencies": "وكالات التحصيل",
+  "charge agencies": "وكالات الشحن",
   "single select": "اختيار واحد",
   "multi select": "اختيار متعدد",
 "make_bd_default":"عند تفعيل هذا الاختيار سوف يصبح هذا bd هو الافتراضي  بدلا من الافتراضي الحالي",
