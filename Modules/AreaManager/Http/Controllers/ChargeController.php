@@ -164,7 +164,7 @@ class ChargeController extends MainController
                 $showUrl = url("areaManager/area-manager-users/{$info['id']}");
 
                 return "
-                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                        <a href='#' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
                                 <div>
