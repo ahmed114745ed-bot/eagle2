@@ -38,6 +38,11 @@ class PusherController extends Controller
 
     public function chatRoomListener(Request $request)
     {
+        $payload = $request->all();
+        $headers = $request->headers->all();
+        info('headers', $headers);
+        info('payload', $payload);
+
         $events = $request->input('events', []);
 
         foreach ($events as $event) {
