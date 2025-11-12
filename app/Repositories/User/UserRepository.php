@@ -57,10 +57,13 @@ class UserRepository extends Repository
 
     public function searchOwnerRoomWithPage($key, $page, $perPage)
     {
-        return User::selectRaw('concat(name, " - ", uuid) as name, id')->whereHas('ownerAudioRoom')
-            ->where('name', 'like', '%' . $key . '%')
-            ->orWhere('uuid', 'like', '%' . $key . '%')
-            ->orWhere('id', 'like', '%' . $key . '%')
+        return User::selectRaw('CONCAT(name, " - ", uuid) AS name, id')
+            ->whereHas('ownerAudioRoom')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', "%{$key}%")
+                    ->orWhere('uuid', 'like', "%{$key}%")
+                    ->orWhere('id', 'like', "%{$key}%");
+            })
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
