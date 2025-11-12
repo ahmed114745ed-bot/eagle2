@@ -232,9 +232,9 @@ class OfficialMessageController extends MainController
             $form->multipleSelect('multi_feature', __('feature'))
                 ->options([
                     'all' => __('all'),
-                    'users' => __('users'),
-                    'host_users' => __('host users'),
-                    'host_agencies' => __('host agencies'),
+                    'users' => __('regular users'),
+                    'host_users' => __('hosts'),
+                    'host_agencies' => __('Host Agencies'),
                     'charge_agencies' => __('charge agencies'),
                     'families' => __('families'),
                     'bds' => __('bds'),
