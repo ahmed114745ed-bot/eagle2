@@ -65,6 +65,29 @@ class FlagSyrianSeeder extends Seeder
             'flag' => $braPath,
         ]);
 
-        Country::where('iso3', 'ISR')->delete();
+        Country::where('iso3', 'ISR')->update([
+            'iso' => 'PS',
+            'name' => 'Palestine',
+            'name_ar' => 'فلسطين',
+            'iso3' => 'PSE',
+            'numcode' => '275',
+            'phonecode' => '970',
+            'iso_numeric' => '275',
+            'currency_numeric' => null,
+        ]);
+
+        $palestineFlagLocal = $flagDir . '/ps.svg';
+        if (file_exists($palestineFlagLocal)) {
+            $palestineFilename = basename($palestineFlagLocal);
+            $palestineGcsPath = 'images/flags/' . $palestineFilename;
+
+            if ($country->flag) {
+                Storage::disk('gcs')->delete($country->flag);
+            }
+
+            Storage::disk('gcs')->put($palestineGcsPath, file_get_contents($palestineFlagLocal), 'public');
+
+            $country->update(['flag' => $palestineGcsPath]);
+        }
     }
 }
