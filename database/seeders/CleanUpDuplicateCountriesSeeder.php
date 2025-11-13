@@ -185,7 +185,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             array('iso'=>'IQ','name'=>'Iraq','name_ar'=>'العراق','iso3'=>'IRQ','numcode'=>'368','phonecode'=>'964','iso_numeric'=>'368','currency_numeric'=>'368'),
 
             array('iso' => 'IE', 'name' => 'Ireland', 'name_ar' => 'أيرلندا', 'iso3' => 'IRL', 'numcode' => '372', 'phonecode' => '353', 'iso_numeric' => '372', 'currency_numeric' => '978'),
-//            array('iso' => 'IL', 'name' => 'Israel', 'name_ar' => 'إسرائيل', 'iso3' => 'ISR', 'numcode' => '376', 'phonecode' => '972', 'iso_numeric' => '376', 'currency_numeric' => '376'),
+            array('iso' => 'IL', 'name' => 'Israel', 'name_ar' => 'إسرائيل', 'iso3' => 'ISR', 'numcode' => '376', 'phonecode' => '972', 'iso_numeric' => '376', 'currency_numeric' => '376'),
             array('iso' => 'IT', 'name' => 'Italy', 'name_ar' => 'إيطاليا', 'iso3' => 'ITA', 'numcode' => '380', 'phonecode' => '39', 'iso_numeric' => '380', 'currency_numeric' => '978'),
             array('iso' => 'JM', 'name' => 'Jamaica', 'name_ar' => 'جامايكا', 'iso3' => 'JAM', 'numcode' => '388', 'phonecode' => '1876', 'iso_numeric' => '388', 'currency_numeric' => '388'),
             array('iso' => 'JP', 'name' => 'Japan', 'name_ar' => 'اليابان', 'iso3' => 'JPN', 'numcode' => '392', 'phonecode' => '81', 'iso_numeric' => '392', 'currency_numeric' => '392'),
