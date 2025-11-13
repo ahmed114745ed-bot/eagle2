@@ -45,6 +45,13 @@ class SubAreaManager extends Model
         return $this->hasMany(Country::class, 'area_manager_id', 'parent_id');
     }
 
+    public function countriesQuery()
+    {
+        return Country::whereHas('regions', function($q) {
+            $q->where('manager_id', $this->id);
+        });
+    }
+
     protected static function booted(): void
     {
 
