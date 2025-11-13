@@ -13,10 +13,11 @@ use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Modules\AreaManager\Entities\Region;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
 
 class OfficialMessageJob implements ShouldQueue
 {
@@ -78,17 +79,17 @@ class OfficialMessageJob implements ShouldQueue
         $shippingAgencyUserId = [];
         $FamilyUsersId = [];
         $BdUsersId = [];
-        $admin = null;
+        $region = null;
         $adminCountries = [];
         switch ($this->model->admin_role) {
             case 'area_manager':
-                $admin = AreaManager::with('countries')->find($this->model->admin_role_id);
-                $adminCountries = $admin ? $admin->countries->pluck('id')->toArray() : [];
+                $region = Region::with('regionCountries')->find($this->model->admin_role_id);
+                $adminCountries = $region ? $region->regionCountries->pluck('country_id')->toArray() : [];
                 break;
 
             case 'country_manager':
-                $admin = SuperAdmin::find($this->model->admin_role_id);
-                $adminCountries = $admin ? [$admin->country_id] : [];
+
+                $adminCountries =  [$this->model->admin_role_id];
                 break;
 
             default:
@@ -113,7 +114,8 @@ class OfficialMessageJob implements ShouldQueue
                                     ->orWhere('agency_id', 0);
                             })
                             ->pluck('id')
-                            ->toArray());
+                            ->toArray()
+                    );
                 } elseif ($feature === 'host_users') {
                     $HostUsersId = array_merge($HostUsersId, User::when(!empty($adminCountries), fn($q) => $q->whereIn('country_id', $adminCountries))
                         ->whereNotNull('agency_id')
