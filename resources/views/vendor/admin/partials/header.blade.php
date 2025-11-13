@@ -832,113 +832,38 @@
             }
         }
 
-    {{--    // Function to initialize area manager select--}}
-    {{--    function initAreaManagerSelect() {--}}
-    {{--        const $select = $('#area-Manager-select');--}}
-    {{--        if ($select.length) {--}}
-    {{--            // Destroy existing Select2 if it exists--}}
-    {{--            if ($select.hasClass('select2-hidden-accessible')) {--}}
-    {{--                $select.select2('destroy');--}}
-    {{--            }--}}
+        $(document).on('pjax:complete', function() {
+            // Reinitialize country select after pjax updates
+            const $countrySelect = $('#country-select');
 
-    {{--            $select.select2({--}}
-    {{--                placeholder: '{{ __("Select area manager") }}',--}}
-    {{--                allowClear: true,--}}
-    {{--                width: '190px'--}}
-    {{--            });--}}
+            if ($countrySelect.length) {
+                // Destroy if exists
+                if ($countrySelect.hasClass('select2-hidden-accessible')) {
+                    $countrySelect.select2('destroy');
+                }
 
-    {{--            // Remove existing handlers--}}
-    {{--            $select.off('change');--}}
+                // Reinitialize
+                $countrySelect.select2({
+                    placeholder: "{{ __('Select Country') }}",
+                    allowClear: true,
+                    templateResult: formatCountry,
+                    templateSelection: formatCountry,
+                    escapeMarkup: function (markup) { return markup; }
+                });
 
-    {{--            $select.on('change', function () {--}}
-    {{--                const $this = $(this);--}}
-    {{--                if (!$this.val()) {--}}
-    {{--                    setTimeout(() => $this.select2('close'), 0);--}}
+                // Reattach change handler
+                $countrySelect.off('change').on('change', function () {
+                    const countryId = $(this).val();
+                    const url = new URL(window.location.href);
 
-    {{--                    const url = new URL(window.location.href);--}}
-    {{--                    url.searchParams.set('clear_area_manager', 1);--}}
-    {{--                    url.searchParams.delete('area_manager_id');--}}
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('filter_country_id', countryId);
+                    } else {
+                        url.searchParams.delete('filter_country_id');
+                    }
 
-    {{--                    if ($.pjax) {--}}
-    {{--                        setTimeout(() => {--}}
-    {{--                            $.pjax({ url: url.toString(), container: '#pjax-container' });--}}
-    {{--                        }, 1);--}}
-    {{--                    } else {--}}
-    {{--                        window.location.href = url.toString();--}}
-    {{--                    }--}}
-    {{--                    return;--}}
-    {{--                }--}}
-
-    {{--                const areaManagerId = $(this).val();--}}
-    {{--                const url = new URL(window.location.href);--}}
-
-    {{--                if (areaManagerId && areaManagerId !== 'null') {--}}
-    {{--                    url.searchParams.set('area_manager_id', areaManagerId);--}}
-    {{--                    url.searchParams.delete('clear_area_manager');--}}
-    {{--                } else {--}}
-    {{--                    url.searchParams.set('clear_area_manager', 1);--}}
-    {{--                    url.searchParams.delete('area_manager_id');--}}
-    {{--                }--}}
-
-    {{--                if ($.pjax) {--}}
-    {{--                    setTimeout(() => {--}}
-    {{--                        $.pjax({url: url.toString(), container: '#pjax-container'});--}}
-    {{--                    }, 1);--}}
-    {{--                } else {--}}
-    {{--                    window.location.href = url.toString();--}}
-    {{--                }--}}
-    {{--            });--}}
-    {{--        }--}}
-    {{--    }--}}
-
-    {{--    // Initialize on page load--}}
-    {{--    initAreaManagerSelect();--}}
-    {{--    initCountrySelect();--}}
-
-    {{--    // Initialize preview buttons--}}
-    {{--    window.initializeAdminHeader();--}}
-
-    {{--    // Handle PJAX reload--}}
-    {{--    $(document).on('pjax:end', function() {--}}
-    {{--        $.get(window.location.href, function (response) {--}}
-    {{--            const $response = $(response);--}}
-
-    {{--            // Update preview buttons wrapper--}}
-    {{--            $('#preview-buttons-wrapper').html($response.find('#preview-buttons-wrapper').html());--}}
-
-    {{--            // Update country select HTML--}}
-    {{--            const $newCountrySelect = $response.find('#country-select');--}}
-    {{--            if ($newCountrySelect.length) {--}}
-    {{--                $('#country-select').replaceWith($newCountrySelect);--}}
-    {{--            }--}}
-
-    {{--            // Update area manager select HTML--}}
-    {{--            const $newAreaManagerSelect = $response.find('#area-Manager-select');--}}
-    {{--            if ($newAreaManagerSelect.length) {--}}
-    {{--                $('#area-Manager-select').replaceWith($newAreaManagerSelect);--}}
-    {{--            }--}}
-
-    {{--            // Reinitialize everything--}}
-    {{--            initAreaManagerSelect();--}}
-    {{--            initCountrySelect();--}}
-    {{--            window.initializeAdminHeader();--}}
-    {{--        });--}}
-    {{--    });--}}
-
-    {{--    // Rest of your code...--}}
-    {{--    const originalFetch = window.fetch;--}}
-    {{--    window.fetch = function (url, options = {}) {--}}
-    {{--        options.headers = options.headers || {};--}}
-
-    {{--        if (window.enableCountryHeader) {--}}
-    {{--            const countryId = $('#country-select').val();--}}
-    {{--            options.headers['X-Country-ID'] = countryId ? countryId : 'null';--}}
-    {{--        }--}}
-
-    {{--        if (!options.headers['Accept'])--}}
-    {{--            options.headers['Accept'] = 'application/json';--}}
-
-    {{--        return originalFetch(url, options);--}}
-    {{--    };--}}
-    {{--});--}}
+                    $.pjax({url: url.toString(), container: '#pjax-container'});
+                });
+            }
+        });
 </script>
