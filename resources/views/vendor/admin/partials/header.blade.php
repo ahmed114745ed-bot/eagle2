@@ -700,5 +700,108 @@
             })
             .catch(err => console.error('Error marking notification:', err));
     };
+
+    function initializeAdminHeader() {
+        const csrf = '{{ csrf_token() }}';
+        const previewBtn = document.getElementById('preview-superadmin-btn');
+        const exitBtn = document.getElementById('exit-preview-btn');
+        const previewBtnArea = document.getElementById('preview-area-manger-btn');
+        const isPreviewSuperadmin = @json(session('preview_superadmin'));
+        const isPreviewAreaManager = @json(session('preview_area_manager'));
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (previewBtnArea) {
+            previewBtnArea.addEventListener('click', function () {
+                fetch('/admin/set-preview-area-manager', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        if (exitBtn) {
+            if (isPreviewSuperadmin) {
+                exitBtn.addEventListener('click', function () {
+                    fetch('/admin/unset-preview-superadmin', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf }
+                    }).then(() => window.location.reload());
+                });
+            } else if (isPreviewAreaManager) {
+                exitBtn.addEventListener('click', function () {
+                    fetch('/admin/unset-preview-area-manager', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf }
+                    }).then(() => window.location.reload());
+                });
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        initializeAdminHeader();
+    });
+
+    $(document).on('pjax:end', function () {
+        initializeAdminHeader();
+    });
+
+    window.initHeaderUI = function() {
+        // Reinitialize Select2
+        const $countrySelect = $('#country-select');
+        const $AreaManagerSelect = $('#area-Manager-select');
+
+        if ($AreaManagerSelect.length) {
+            $AreaManagerSelect.select2({
+                placeholder: '{{ __("Select area manager") }}',
+                allowClear: true,
+                width: '190px'
+            });
+        }
+
+        if ($countrySelect.length) {
+            $countrySelect.select2({
+                placeholder: "{{ __('Select Country') }}",
+                allowClear: true,
+                templateResult: function formatCountry(country) {
+                    if (!country.id) return country.text;
+                    const flag = $(country.element).data('flag');
+                    const name = country.text;
+                    if (flag) {
+                        return `<span><img src="${flag}" style="width:20px;height:14px;margin-right:5px;vertical-align:middle;">${name}</span>`;
+                    }
+                    return name;
+                },
+                templateSelection: function formatCountry(country) {
+                    if (!country.id) return country.text;
+                    const flag = $(country.element).data('flag');
+                    const name = country.text;
+                    if (flag) {
+                        return `<span><img src="${flag}" style="width:20px;height:14px;margin-right:5px;vertical-align:middle;">${name}</span>`;
+                    }
+                    return name;
+                },
+                escapeMarkup: function (markup) { return markup; }
+            });
+        }
+    };
+
+    $(document).on('pjax:end', function () {
+        $.get(window.location.href, function (response) {
+            const newHeader = $(response).find('header.main-header').html();
+            $('header.main-header').html(newHeader);
+
+            window.initHeaderUI();
+            initializeAdminHeader();
+        });
+    });
 </script>
 
