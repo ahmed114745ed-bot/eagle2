@@ -486,34 +486,41 @@
                 url.searchParams.delete('filter_country_id');
             }
 
-            // Full reload for area manager change (to update header)
-            window.location.href = url.toString();
+            // Use pjax but intercept the response
+            $.pjax({
+                url: url.toString(),
+                container: '#pjax-container',
+                fragment: '#pjax-container'
+            });
         });
 
-        $countrySelect.on('change', function () {
-            const $this = $(this);
-            if (!$this.val()) {
-                setTimeout(() => $this.select2('close'), 0);
+// After pjax completes, update the country dropdown from the new HTML
+        $(document).on('pjax:complete', function(event, xhr, textStatus, options) {
+            // Parse the full HTML response to get the updated country select
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xhr.responseText, 'text/html');
+            const newCountrySelect = doc.querySelector('#country-select');
 
-                const url = new URL(window.location.href);
-                url.searchParams.set('clear_country', 1);
-                url.searchParams.delete('filter_country_id');
+            if (newCountrySelect) {
+                const $currentCountrySelect = $('#country-select');
 
-                $.pjax({ url: url.toString(), container: '#pjax-container' });
-                return;
+                // Destroy current Select2
+                if ($currentCountrySelect.hasClass('select2-hidden-accessible')) {
+                    $currentCountrySelect.select2('destroy');
+                }
+
+                // Replace options
+                $currentCountrySelect.html($(newCountrySelect).html());
+
+                // Reinitialize Select2
+                $currentCountrySelect.select2({
+                    placeholder: "{{ __('Select Country') }}",
+                    allowClear: true,
+                    templateResult: formatCountry,
+                    templateSelection: formatCountry,
+                    escapeMarkup: function (markup) { return markup; }
+                });
             }
-
-            const countryId = $(this).val();
-            const url = new URL(window.location.href);
-
-            if (countryId && countryId !== 'null') {
-                url.searchParams.set('filter_country_id', countryId);
-            } else {
-                url.searchParams.delete('filter_country_id');
-            }
-
-            // Pjax for country change (only content updates)
-            $.pjax({url: url.toString(), container: '#pjax-container'});
         });
 
         if ($countrySelect.length) {
@@ -874,39 +881,4 @@
                 });
             }
         }
-
-        $(document).on('pjax:complete', function() {
-            // Reinitialize country select after pjax updates
-            const $countrySelect = $('#country-select');
-
-            if ($countrySelect.length) {
-                // Destroy if exists
-                if ($countrySelect.hasClass('select2-hidden-accessible')) {
-                    $countrySelect.select2('destroy');
-                }
-
-                // Reinitialize
-                $countrySelect.select2({
-                    placeholder: "{{ __('Select Country') }}",
-                    allowClear: true,
-                    templateResult: formatCountry,
-                    templateSelection: formatCountry,
-                    escapeMarkup: function (markup) { return markup; }
-                });
-
-                // Reattach change handler
-                $countrySelect.off('change').on('change', function () {
-                    const countryId = $(this).val();
-                    const url = new URL(window.location.href);
-
-                    if (countryId && countryId !== 'null') {
-                        url.searchParams.set('filter_country_id', countryId);
-                    } else {
-                        url.searchParams.delete('filter_country_id');
-                    }
-
-                    $.pjax({url: url.toString(), container: '#pjax-container'});
-                });
-            }
-        });
 </script>
