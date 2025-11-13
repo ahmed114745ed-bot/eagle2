@@ -6,6 +6,7 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use Encore\Admin\Facades\Admin;
@@ -74,10 +75,10 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()->whereNull('admin_id')
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
             ->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -218,10 +219,20 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
-        //  $form->select('language', __('language'))
-        //      ->options('/api/search/language')
-        //      ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
+        $form->select('admin_role', trans('type admin'))->options([
+            'area_manager'   => __('area manager'),
+            'country_manager' => __('country manager'),
+
+        ])->when('area_manager', function (Form $form) {
+            $form->select('admin_area_id', __('area'))
+                ->options('/api/search/area-manager')
+                ->ajax('/api/search/area-manager', 'id', 'name');
+        })->when('country_manager', function (Form $form) {
+            $form->select('admin_super_id', __('country'))
+                ->options('/api/search/users-superadmin2')
+                ->ajax('/api/search/users-superadmin2', 'id', 'name');
+        });
         $form->select('type_feature', trans('type feature'))->options([
             'single'   => __('single select'),
             'multi' => __('multi select'),
@@ -232,12 +243,13 @@ class OfficialMessageController extends MainController
             $form->multipleSelect('multi_feature', __('feature'))
                 ->options([
                     'all' => __('all'),
-                    'users' => __('users'),
-                    'host_users' => __('host users'),
-                    'host_agencies' => __('host agencies'),
+                    'users' => __('regular users'),
+                    'host_users' => __('hosts'),
+                    'host_agencies' => __('Host Agencies'),
                     'charge_agencies' => __('charge agencies'),
                     'families' => __('families'),
                     'bds' => __('bds'),
+                    'vips' => __('Vips'),
                 ])->attribute([
                     'id' => 'multi_feature_select'
                 ])

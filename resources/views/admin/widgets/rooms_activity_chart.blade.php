@@ -13,10 +13,12 @@
 </div>
 
 @php
-    if (request()->is('admin/*')) {
+    if (request()->is('admin') || request()->is('admin/*')) {
         $fetchUrl = admin_url('superadmin/rooms-activity');
-    } elseif (request()->is('superadmin/*')) {
+    } elseif (request()->is('superadmin') || request()->is('superadmin/*')) {
         $fetchUrl = superAdmin_url('rooms-activity');
+    } elseif (request()->is('areaManager') || request()->is('areaManager/*')) {
+        $fetchUrl = areaManager_url('rooms-activity');
     } else {
         $fetchUrl = url('rooms-activity');
     }

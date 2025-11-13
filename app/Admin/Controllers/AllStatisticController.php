@@ -33,9 +33,9 @@ class AllStatisticController extends MainController
     {
         return session('filter_country_id');
     }
+
     public function index(Content $content)
     {
-
         return parent::index(
             $content
                 ->title(__('Home'))
@@ -44,159 +44,6 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart'));
                 })
         );
-        $countryID = $this->countryId();
-
-        $user = Auth::user();
-
-        $topUsersByFollowers = User::withCount('followers')
-            ->with('packs', 'profile')
-            ->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            })
-            ->orderByDesc('followers_count')
-            ->take(10)
-            ->get();
-
-        return parent::index($content
-            ->title(__('Home'))
-            ->description(__('General Statistics'))
-            ->row(function (Row $row) use ($user) {
-                if ($user->isRole('admin') || $user->isRole('developer')) {
-                    $row->column(12, view('admin.dashboard.chart'));
-                }
-            })
-            ->row(function (Row $row) use ($topUsersByFollowers) {
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
-
-                    $column->row(function (Row $row) {
-                        $row->column(12, view('admin.dashboard.stats'));
-                    });
-
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.users_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.top_users_visits_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.signups_weekly_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.peak_hours_card')->render();
-                            $column->row($view);
-                        });
-                    });
-                });
-
-                $row->column(12, function ($column) use ($topUsersByFollowers) {
-                    $column->row(function (Row $row) use ($topUsersByFollowers) {
-                        $row->column(6, function ($col) use ($topUsersByFollowers) {
-                            $top5 = $topUsersByFollowers
-                                ->filter(fn($user) => $user->followers_count > 0)
-                                ->take(5);
-
-                            $view5 = view('admin.dashboard.widgets.top_followers_table', [
-                                'top5' => $top5,
-                            ])->render();
-
-                            $col->row($view5);
-                        });
-
-                        //                        $row->column(6, function ($col) {
-                        //                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
-                        //                            $col->row($view);
-                        //                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.room_tab')->render();
-                        $row->column(12, $view);
-                    });
-
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.rooms_activity_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-
-                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.avg_session_duration_chart')->render();
-
-                            $column->row($view);
-                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.agency_tab')->render();
-                        $row->column(12, $view);
-                    });
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.agencies_targets_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.top_senders_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.top_receivers_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.agencies_compare_chart')->render();
-
-                            $column->row($view);
-                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.bd_tab')->render();
-                        $row->column(12, $view);
-                    });
-                });
-            }));
     }
 
     public function getTopFollowers(Request $request): JsonResponse
@@ -208,7 +55,12 @@ class AllStatisticController extends MainController
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc('followers_count')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                $avatar = $user->profile?->avatar;
+                $user->avatar_url = $avatar ? getImagePath($avatar) : asset('images/businessman-icon.jpg');
+                return $user;
+            });
 
         return response()->json($topUsersByFollowers);
     }
@@ -395,7 +247,7 @@ class AllStatisticController extends MainController
     {
         $currMonth = now()->month;
         $prevMonth = now()->subMonth()->month;
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
 
         $signups = User::when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
@@ -423,10 +275,15 @@ class AllStatisticController extends MainController
             $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
         }
 
+        $currMonthName = Carbon::create()->month($currMonth)->translatedFormat('F');
+        $prevMonthName = Carbon::create()->month($prevMonth)->translatedFormat('F');
+
         return response()->json([
             'labels'       => $labels,
             'dataCurrent'  => $dataCurrent,
             'dataPrevious' => $dataPrevious,
+            'currentMonth'  => $currMonthName,
+            'previousMonth' => $prevMonthName,
         ]);
     }
 
@@ -725,12 +582,9 @@ class AllStatisticController extends MainController
     {
         $countryID = $this->countryId();
 
-        $bdCount = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->count();
+        $bdCount = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))->count();
 
-        $totalSalaries = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        $totalSalaries = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->withSum('salaries', 'salary')
             ->withSum('salaries', 'cut_amount')
             ->withCount('agencies')

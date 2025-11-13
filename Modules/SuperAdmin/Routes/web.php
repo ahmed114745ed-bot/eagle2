@@ -73,8 +73,8 @@ Route::group(
 
         Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
         Route::resource('super-admin-rewards', Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminRewardController::class);
-        
-        
+
+
         Route::post('/set-preview-superadmin', function () {
             session(['preview_superadmin' => true]);
         });
@@ -82,7 +82,7 @@ Route::group(
         Route::post('/unset-preview-superadmin', function () {
             session()->forget('preview_superadmin');
         });
-    
+
         Route::resource('superadmin-banner-requests', SuperadminBannerRequestController::class);
         Route::post('superadmin-banner/{id}/approve', [SuperadminBannerRequestController::class, 'approve'])->name('superadmin-banner.approve');
         Route::post('superadmin-banner/{id}/reject', [SuperadminBannerRequestController::class, 'reject'])->name('superadmin-banner.reject');
@@ -251,6 +251,29 @@ Route::group(
         });
         Route::resource('roles', RoleController::class);
         Route::resource('auth-users', AdminUserController::class);
+
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [HomeController::class, 'topUsersData']);
+            Route::get('comparison-user-signup', [HomeController::class, 'comparisonUserSignUp']);
+            Route::get('distribution-rooms', [HomeController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [HomeController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [HomeController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [HomeController::class, 'agencyTarget']);
+            Route::get('top-sender', [HomeController::class, 'topSender']);
+            Route::get('top-receiver', [HomeController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [HomeController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [HomeController::class, 'roomStats']);
+            Route::get('agency-stats', [HomeController::class, 'getStats']);
+            Route::get('bd-stats', [HomeController::class, 'getBdStats']);
+            Route::get('balance-data', [HomeController::class, 'getBalanceData']);
+            Route::get('stats-data', [HomeController::class, 'getStatsData']);
+            Route::get('top-followers', [HomeController::class, 'getTopFollowers']);
+            Route::get('game-summary', [HomeController::class, 'gameSummary']);
+            Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('owner.peak-hours');
+            Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('owner.rooms-activity');
+            Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
+        });
     }
 );
 

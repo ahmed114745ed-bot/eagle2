@@ -67,11 +67,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+@php
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+@endphp
+
 <script>
     $(document).ready(function() {
-        // Fetch data from your Laravel endpoint
         $.ajax({
-            url: "{{ url('admin/statistics/distribution-rooms') }}",
+            url: "{{ url($prefix . '/statistics/distribution-rooms') }}",
             type: "GET",
             dataType: "json",
             success: function(response) {

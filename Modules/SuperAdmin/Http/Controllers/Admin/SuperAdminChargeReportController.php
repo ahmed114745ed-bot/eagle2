@@ -2,6 +2,7 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
+use App\Enums\Charges\UserTypeEnum;
 use App\Admin\Controllers\MainController;
 use App\Helpers\UserCommon;
 use App\Models\User;
@@ -134,9 +135,12 @@ class SuperAdminChargeReportController extends MainController
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
-            $grid->model()->where('charger_type', "dash");
+            $grid->model()->where('charger_type', "dash")
+                ->orWhere('charger_type', UserTypeEnum::AREA_MANAGER);
+
         } else {
-            $grid->model()->where('charger_type', "!=", "dash");
+            $grid->model()->where('charger_type', "!=", "dash")
+                ->orWhere('charger_type','!=', UserTypeEnum::AREA_MANAGER);
         }
 
 

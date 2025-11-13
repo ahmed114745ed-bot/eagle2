@@ -32,13 +32,14 @@ class BanUser extends Action
 
     public function handle(Request $request)
     {
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
 
         if (!AuthAdmin::user()->can('*')) {
             Permission::check('create-' . $this->permission_name);
         }
         $user = User::query()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->searchByUuid($request->uuid)->first();
         if (!$user) return $this->response()->error('user not found')->refresh();
         $userUuid  = $user->original_uuid;

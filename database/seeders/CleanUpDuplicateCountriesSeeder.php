@@ -246,7 +246,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             array('iso' => 'OM', 'name' => 'Oman', 'name_ar' => 'عُمان', 'iso3' => 'OMN', 'numcode' => '512', 'phonecode' => '968', 'iso_numeric' => '512', 'currency_numeric' => '512'),
             array('iso' => 'PK', 'name' => 'Pakistan', 'name_ar' => 'باكستان', 'iso3' => 'PAK', 'numcode' => '586', 'phonecode' => '92', 'iso_numeric' => '586', 'currency_numeric' => '586'),
             array('iso' => 'PW', 'name' => 'Palau', 'name_ar' => 'بالاو', 'iso3' => 'PLW', 'numcode' => '585', 'phonecode' => '680', 'iso_numeric' => '585', 'currency_numeric' => '585'),
-            array('iso' => 'PS', 'name' => 'Palestinian Territory, Occupied', 'name_ar' => 'فلسطين', 'iso3' => 'PSE', 'numcode' => '275', 'phonecode' => '970', 'iso_numeric' => '275', 'currency_numeric' => NULL),
+            array('iso' => 'PS', 'name' => 'Palestine', 'name_ar' => 'فلسطين', 'iso3' => 'PSE', 'numcode' => '275', 'phonecode' => '970', 'iso_numeric' => '275', 'currency_numeric' => NULL),
             array('iso' => 'PA', 'name' => 'Panama', 'name_ar' => 'بنما', 'iso3' => 'PAN', 'numcode' => '591', 'phonecode' => '507', 'iso_numeric' => '591', 'currency_numeric' => '591'),
             array('iso' => 'PG', 'name' => 'Papua New Guinea', 'name_ar' => 'بابوا غينيا الجديدة', 'iso3' => 'PNG', 'numcode' => '598', 'phonecode' => '675', 'iso_numeric' => '598', 'currency_numeric' => '598'),
             array('iso' => 'PY', 'name' => 'Paraguay', 'name_ar' => 'باراغواي', 'iso3' => 'PRY', 'numcode' => '600', 'phonecode' => '595', 'iso_numeric' => '600', 'currency_numeric' => '600'),

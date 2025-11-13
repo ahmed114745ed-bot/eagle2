@@ -321,30 +321,24 @@ class EncorUsersController extends AdminController
         $connection = config('admin.database.connection');
 
         $form->display('id', 'ID');
+   
         $form->text('username', trans('admin.username'))
-            ->rules(function ($form) use ($connection, $userTable) {
-                // Build the table name (with or without connection prefix)
-                $table = "{$connection}.{$userTable}";
-
-                // When creating
-                if ($form->isCreating()) {
-                    return [
-                        'required',
-                        Rule::unique($table, 'username')
-                            ->where(fn($query) => $query->whereNull('type')),
-                    ];
-                }
-
-                // When editing
+        ->rules(function ($form) use ($connection, $userTable) {
+            $table = "{$connection}.{$userTable}";
+    
+            $rules = ['required'];
+    
+            $uniqueRule = Rule::unique($table, 'username');
+    
+            if (! $form->isCreating()) {
                 $id = $form->model()?->id ?? null;
-
-                return [
-                    'required',
-                    Rule::unique($table, 'username')
-                        ->ignore($id) // correctly ignore the current record
-                        ->where(fn($query) => $query->whereNull('type')),
-                ];
-            });
+                $uniqueRule->ignore($id);
+            }
+    
+            $rules[] = $uniqueRule;
+    
+            return $rules;
+        });
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));

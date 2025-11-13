@@ -16,7 +16,7 @@ use Modules\RoomCup\Http\Controllers\Api\RoomCupController;
 
 Route::group([
     'prefix' => 'room-cup',
-    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization' ,'update.last.seen']
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization', 'update.last.seen', 'room.cup']
 ], function () {
     Route::get('/report/{room_id}', [RoomCupController::class, 'myReward']);
     Route::get('/history/{room_id}', [RoomCupController::class, 'roomAdministratorManagement']);
