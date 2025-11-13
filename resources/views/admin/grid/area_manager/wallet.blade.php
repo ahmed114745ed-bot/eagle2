@@ -465,11 +465,7 @@ function initSelect2(targetType = null) {
         dropdownParent: $('#chargeModal'),
         placeholder: placeholderText,
         allowClear: true,
-        language: {
-            noResults: function() {
-                return "{{ __('not_in_same_country') }}";
-            }
-        },
+       
         ajax: {
             url: ajaxUrl,
             dataType: 'json',
