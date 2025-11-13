@@ -58,13 +58,12 @@ class Target extends Model
     
         $color = $new > $old ? '#28a745' : '#dc3545';
         $arrow = $new > $old ? '↑' : '↓';
-    
+        $arrowIcon =  '🔁';
+
         return "
             <div style='align-items:center;gap:5px;'>
                 <span style='color:#dc3545;text-decoration:line-through;'>{$oldFormatted}</span>
-                <br>
-                <span style='color:#6c757d;'>→</span>
-                <br>
+                <span style='display: block;font-size:1.2em;'>$arrowIcon</span>
                 <strong style='color:{$color};'>{$newFormatted} {$arrow}</strong>
             </div>
         ";
