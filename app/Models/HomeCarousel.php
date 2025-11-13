@@ -27,7 +27,7 @@ class HomeCarousel extends Model
 
     ];
 
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -172,7 +172,7 @@ class HomeCarousel extends Model
         );
     }
 
-    
+
 
 
     protected function syncDisplay(string $type, $value)
