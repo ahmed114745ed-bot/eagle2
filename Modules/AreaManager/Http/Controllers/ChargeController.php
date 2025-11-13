@@ -104,7 +104,7 @@ class ChargeController extends MainController
                         ->where('user_id', $this->input);
                 }
             }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
-            if ($authUser == 'area-manager') {
+            if ($authUser->type == 'area-manager') {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $query->where('charger_id', $this->input);
