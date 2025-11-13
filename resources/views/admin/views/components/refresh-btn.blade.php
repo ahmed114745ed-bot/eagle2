@@ -1,11 +1,11 @@
-<li>
+{{-- <li>
     <a href="javascript:void(0);" class="container-refresh">
         <i class="fa fa-refresh"></i>
     </a>
-</li>
+</li> --}}
 <script>
     $('.container-refresh').off('click').on('click', function() {
-        $.admin.reload();
-        $.admin.toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
+        location.reload();
+        toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
     });
 </script>

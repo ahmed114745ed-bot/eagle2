@@ -322,6 +322,7 @@
 
             </ul>
                 {!! Admin::getNavbar()->render() !!}
+                @include('admin.views.components.refresh-btn')
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
