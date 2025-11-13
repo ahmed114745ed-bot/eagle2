@@ -235,8 +235,8 @@
                     ->select(['id', 'name', 'flag'])
                     ->get();
             } else {
-                $areaManagerCountries = collect(); 
-                
+                $areaManagerCountries = collect();
+
             }
             $selectedCountryId = session('filter_country_id') ?? request('filter_country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
@@ -763,7 +763,6 @@
     });
 
     window.initHeaderUI = function() {
-        // Reinitialize Select2
         const $countrySelect = $('#country-select');
         const $AreaManagerSelect = $('#area-Manager-select');
 
@@ -808,7 +807,16 @@
             $('header.main-header').html(newHeader);
 
             window.initHeaderUI();
-            initializeAdminHeader();
+            window.initializeAdminHeader();
+
+            try {
+                if (typeof $.AdminLTE !== 'undefined' && $.AdminLTE.layout) {
+                    $.AdminLTE.layout.fix();
+                }
+                $(document).trigger('admin::load');
+            } catch (e) {
+                console.warn('AdminLTE reinit skipped:', e);
+            }
         });
     });
 </script>
