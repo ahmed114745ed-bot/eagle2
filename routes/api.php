@@ -130,7 +130,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
         Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
-         Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
+        Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
@@ -142,6 +142,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('regions', [CountryController::class, 'searchRegions'])->name('regions');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
         Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');

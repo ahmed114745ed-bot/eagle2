@@ -228,8 +228,16 @@
             $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
 
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $areaManagerCountries = \App\Models\Country::where('area_manager_id', $authId)->select(['id', 'name', 'flag'])->get();
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
+            if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+                $areaManagerCountries = $authAdmin->countriesQuery()
+                    ->select(['id', 'name', 'flag'])
+                    ->get();
+            } else {
+                $areaManagerCountries = collect(); 
+                
+            }
             $selectedCountryId = session('filter_country_id') ?? request('filter_country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
 

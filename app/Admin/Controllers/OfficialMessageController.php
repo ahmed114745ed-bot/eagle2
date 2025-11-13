@@ -12,7 +12,7 @@ use App\Selectables\Families;
 use Encore\Admin\Facades\Admin;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -225,13 +225,13 @@ class OfficialMessageController extends MainController
             'country_manager' => __('country manager'),
 
         ])->when('area_manager', function (Form $form) {
-            $form->select('admin_area_id', __('area'))
-                ->options('/api/search/area-manager')
-                ->ajax('/api/search/area-manager', 'id', 'name');
+            $form->select('region_id', __('area'))
+                ->options('/api/search/regions')
+                ->ajax('/api/search/regions', 'id', 'name');
         })->when('country_manager', function (Form $form) {
-            $form->select('admin_super_id', __('country'))
-                ->options('/api/search/users-superadmin2')
-                ->ajax('/api/search/users-superadmin2', 'id', 'name');
+            $form->select('country_id', __('country'))
+                ->options('/api/search/countries')
+                ->ajax('/api/search/countries', 'id', 'name');
         });
         $form->select('type_feature', trans('type feature'))->options([
             'single'   => __('single select'),
