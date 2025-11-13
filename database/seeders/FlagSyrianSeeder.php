@@ -77,6 +77,8 @@ class FlagSyrianSeeder extends Seeder
             'currency_numeric' => null,
         ]);
 
+        $palestine = Country::where('iso3', 'PSE')->first();
+
         $palestineFlagLocal = $flagDir . '/ps.svg';
         if (file_exists($palestineFlagLocal)) {
             $palestineFilename = basename($palestineFlagLocal);
@@ -88,7 +90,7 @@ class FlagSyrianSeeder extends Seeder
 
             Storage::disk('gcs')->put($palestineGcsPath, file_get_contents($palestineFlagLocal), 'public');
 
-            $country->update(['flag' => $palestineGcsPath]);
+            $palestine->update(['flag' => $palestineGcsPath]);
         }
     }
 }
