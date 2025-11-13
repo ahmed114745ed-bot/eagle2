@@ -185,7 +185,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             array('iso'=>'IQ','name'=>'Iraq','name_ar'=>'العراق','iso3'=>'IRQ','numcode'=>'368','phonecode'=>'964','iso_numeric'=>'368','currency_numeric'=>'368'),
 
             array('iso' => 'IE', 'name' => 'Ireland', 'name_ar' => 'أيرلندا', 'iso3' => 'IRL', 'numcode' => '372', 'phonecode' => '353', 'iso_numeric' => '372', 'currency_numeric' => '978'),
-            array('iso' => 'IL', 'name' => 'Israel', 'name_ar' => 'إسرائيل', 'iso3' => 'ISR', 'numcode' => '376', 'phonecode' => '972', 'iso_numeric' => '376', 'currency_numeric' => '376'),
+//            array('iso' => 'IL', 'name' => 'Israel', 'name_ar' => 'إسرائيل', 'iso3' => 'ISR', 'numcode' => '376', 'phonecode' => '972', 'iso_numeric' => '376', 'currency_numeric' => '376'),
             array('iso' => 'IT', 'name' => 'Italy', 'name_ar' => 'إيطاليا', 'iso3' => 'ITA', 'numcode' => '380', 'phonecode' => '39', 'iso_numeric' => '380', 'currency_numeric' => '978'),
             array('iso' => 'JM', 'name' => 'Jamaica', 'name_ar' => 'جامايكا', 'iso3' => 'JAM', 'numcode' => '388', 'phonecode' => '1876', 'iso_numeric' => '388', 'currency_numeric' => '388'),
             array('iso' => 'JP', 'name' => 'Japan', 'name_ar' => 'اليابان', 'iso3' => 'JPN', 'numcode' => '392', 'phonecode' => '81', 'iso_numeric' => '392', 'currency_numeric' => '392'),
@@ -246,7 +246,7 @@ class CleanUpDuplicateCountriesSeeder extends Seeder
             array('iso' => 'OM', 'name' => 'Oman', 'name_ar' => 'عُمان', 'iso3' => 'OMN', 'numcode' => '512', 'phonecode' => '968', 'iso_numeric' => '512', 'currency_numeric' => '512'),
             array('iso' => 'PK', 'name' => 'Pakistan', 'name_ar' => 'باكستان', 'iso3' => 'PAK', 'numcode' => '586', 'phonecode' => '92', 'iso_numeric' => '586', 'currency_numeric' => '586'),
             array('iso' => 'PW', 'name' => 'Palau', 'name_ar' => 'بالاو', 'iso3' => 'PLW', 'numcode' => '585', 'phonecode' => '680', 'iso_numeric' => '585', 'currency_numeric' => '585'),
-            array('iso' => 'PS', 'name' => 'Palestinian Territory, Occupied', 'name_ar' => 'فلسطين', 'iso3' => 'PSE', 'numcode' => '275', 'phonecode' => '970', 'iso_numeric' => '275', 'currency_numeric' => NULL),
+            array('iso' => 'PS', 'name' => 'Palestine', 'name_ar' => 'فلسطين', 'iso3' => 'PSE', 'numcode' => '275', 'phonecode' => '970', 'iso_numeric' => '275', 'currency_numeric' => NULL),
             array('iso' => 'PA', 'name' => 'Panama', 'name_ar' => 'بنما', 'iso3' => 'PAN', 'numcode' => '591', 'phonecode' => '507', 'iso_numeric' => '591', 'currency_numeric' => '591'),
             array('iso' => 'PG', 'name' => 'Papua New Guinea', 'name_ar' => 'بابوا غينيا الجديدة', 'iso3' => 'PNG', 'numcode' => '598', 'phonecode' => '675', 'iso_numeric' => '598', 'currency_numeric' => '598'),
             array('iso' => 'PY', 'name' => 'Paraguay', 'name_ar' => 'باراغواي', 'iso3' => 'PRY', 'numcode' => '600', 'phonecode' => '595', 'iso_numeric' => '600', 'currency_numeric' => '600'),
