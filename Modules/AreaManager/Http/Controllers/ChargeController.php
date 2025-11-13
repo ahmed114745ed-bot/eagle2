@@ -41,7 +41,7 @@ class ChargeController extends MainController
         $user = Auth::user();
         $authUser = auth()->user();
 
-        if ($authUser->type == 'area-manager'){
+        if ($authUser->type == 'area-manager') {
             $authId = auth()->id();
             $type = UserTypeEnum::AREA_MANAGER;
         } else {
@@ -53,8 +53,10 @@ class ChargeController extends MainController
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            $type, $authId,
-            $type, $authId
+            $type,
+            $authId,
+            $type,
+            $authId
         ])
             ->first();
 
@@ -69,9 +71,9 @@ class ChargeController extends MainController
             ->row(function ($row) use ($finalSalary) {
                 $row->column(12, view('admin.grid.area_manager.wallet', ['finalSalary' => $finalSalary]));
             })
-            ->row(function (Row $row) use ($totalCharges, $totalSpent ) {
-                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
-                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
+            ->row(function (Row $row) use ($totalCharges, $totalSpent) {
+                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
+                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
@@ -83,17 +85,28 @@ class ChargeController extends MainController
         $authUser = auth()->user();
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
 
-        $grid->model()
-            ->where('charger_type', UserTypeEnum::AREA_MANAGER)
-            ->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER)
-            ->with('receiverUser', 'receiveragency')
-            ->where(function ($q) use ($authUser, $authId) {
-                $q->where('charger_id', $authUser->id);
+        // $grid->model()
+        //     ->where('charger_type', UserTypeEnum::AREA_MANAGER)
+        //     ->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER)
+        //     ->with('receiverUser', 'receiveragency')
+        //     ->where(function ($q) use ($authUser, $authId) {
+        //         $q->where('charger_id', $authUser->id);
 
-                $subAreaManagers = SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray();
-                $q->orWhereIn('charger_id', $subAreaManagers);
+        //         $subAreaManagers = SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray();
+        //         $q->orWhereIn('charger_id', $subAreaManagers);
+        //     })
+        //     ->orderBy('id', 'desc');
+        $grid->model()
+            ->with(['receiverUser', 'receiveragency'])
+            ->where(function ($query) use ($authUser, $authId) {
+                $query->where('charger_id', $authUser->id)
+                    ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
             })
-            ->orderBy('id', 'desc');
+            ->whereIn('charger_type', [
+                UserTypeEnum::AREA_MANAGER,
+                UserTypeEnum::SUB_AREA_MANAGER,
+            ])
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -135,7 +148,7 @@ class ChargeController extends MainController
                     if (!isImageExists($url)) $url = $defaultImage;
                     return handleShowImageWithTypes($info['uuid'], $url, 40, 40, 0);
                 });
-                $profileUrl ='';
+                $profileUrl = '';
                 if (!empty($info['uuid'])) {
                     $profileUrl = url('areaManager/profile-shipping-agency/' . $info['uuid']);
                 }
@@ -301,7 +314,8 @@ class ChargeController extends MainController
         return $form;
     }
 
-    public function subAreaManagers(Request $request){
+    public function subAreaManagers(Request $request)
+    {
         $key = $request->q;
         $page = $request->get('page', 1);
         $perPage = 10;
