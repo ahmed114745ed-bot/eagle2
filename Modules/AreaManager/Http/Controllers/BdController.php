@@ -271,7 +271,9 @@ class BdController extends MainController
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $countries = Country::where('area_manager_id', $authId)->get();
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+            $countries = $authAdmin->countriesQuery()
+            ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
