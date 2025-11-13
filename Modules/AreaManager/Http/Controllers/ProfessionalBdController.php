@@ -94,6 +94,9 @@ class ProfessionalBdController extends MainController
         $countriesIds = Common::areaCountries($authSuperAdmin->id);
         $grid->model()
             ->whereNotIn('country_id', $countriesIds)
+            ->whereHas('appUser', function ($query) use ($countriesIds) {
+                $query->whereIn('country_id', $countriesIds);
+            })
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
