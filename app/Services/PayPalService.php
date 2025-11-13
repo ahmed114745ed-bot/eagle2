@@ -24,8 +24,8 @@ class PayPalService
     $clientId = config('paypal.client_id');
     $clientSecret = config('paypal.client_secret');
 //    $environment = new ProductionEnvironment($clientId, $clientSecret);
-    $environment = new SandboxEnvironment($clientId, $clientSecret);
-    $this->client = new PayPalHttpClient($environment);
+//    $environment = new SandboxEnvironment($clientId, $clientSecret);
+//    $this->client = new PayPalHttpClient($environment);
 }
 
    public static function redirectUrl()
@@ -307,7 +307,7 @@ class PayPalService
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
 
-         
+
                 return response()->json([
                     'status'  => true,
                     'trx'     =>  $paypalId,
@@ -315,7 +315,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.PENDING':
-            
+
                 $coinLog->update(['status' => PaymentStatus::PENDING, 'trx' => $paypalId]);
                 return response()->json([
                     'status'  => true,
@@ -324,11 +324,11 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
-           
+
                 return $this->webhookPayment($paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
-            
+
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
 
                 return response()->json([
@@ -338,7 +338,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
-             
+
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
                 return response()->json([
                     'status'  => false,
@@ -347,7 +347,7 @@ class PayPalService
                 ]);
 
             default:
-          
+
                 $coinLog->update(['trx' => $paypalId]);
                 return response()->json([
                     'status'  => 'ignored',
