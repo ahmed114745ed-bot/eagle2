@@ -24,8 +24,8 @@ class PayPalService
     $clientId = config('paypal.client_id');
     $clientSecret = config('paypal.client_secret');
 //    $environment = new ProductionEnvironment($clientId, $clientSecret);
-//    $environment = new SandboxEnvironment($clientId, $clientSecret);
-//    $this->client = new PayPalHttpClient($environment);
+    $environment = new SandboxEnvironment($clientId, $clientSecret);
+    $this->client = new PayPalHttpClient($environment);
 }
 
    public static function redirectUrl()
