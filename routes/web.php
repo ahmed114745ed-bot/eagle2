@@ -48,6 +48,7 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Admin\Controllers\AppearChargerAgencyController;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
