@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-if (window.__countryMapInitialized) return;
-window.__countryMapInitialized = true;
+// if (window.__countryMapInitialized) return;
+// window.__countryMapInitialized = true;
 
 function loadScriptsSequentially(scripts, callback) {
     if (!scripts.length) return callback();
