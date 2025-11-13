@@ -191,6 +191,11 @@
             padding: 1rem !important;
         }
 
+        #preview-buttons-wrapper {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 576px) {
             .modal-no {
@@ -363,34 +368,35 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
-                    @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
-                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
-                            </button>
-                        </li>
+                <span id="preview-buttons-wrapper">
+                    @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                                    <i class="fa fa-eye"></i> {{ __('go to the country') }}
+                                </button>
+                            </li>
+                        @endif
+                    @elseif(!session('preview_area_manager')  && session('area_manager_id') )
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
+                                    <i class="fa fa-eye"></i> {{ __('go to the preview') }}
+                                </button>
+                            </li>
+                        @endif
                     @endif
-                @elseif(!session('preview_area_manager')  && session('area_manager_id') )
-                @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
-                                <i class="fa fa-eye"></i> {{ __('go to the preview') }}
-                            </button>
-                        </li>
-                    @endif
-                @endif
 
-                @if(session('preview_superadmin') || session('preview_area_manager') )
-                    @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                            <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
-                            </button>
-                        </li>
+                    @if(session('preview_superadmin') || session('preview_area_manager') )
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                                <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
+                                </button>
+                            </li>
+                        @endif
                     @endif
-                @endif
-
+                </span>
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
             </ul>
@@ -709,114 +715,10 @@
             .catch(err => console.error('Error marking notification:', err));
     };
 
-    function initializeAdminHeader() {
-        const csrf = '{{ csrf_token() }}';
-        const previewBtn = document.getElementById('preview-superadmin-btn');
-        const exitBtn = document.getElementById('exit-preview-btn');
-        const previewBtnArea = document.getElementById('preview-area-manger-btn');
-        const isPreviewSuperadmin = @json(session('preview_superadmin'));
-        const isPreviewAreaManager = @json(session('preview_area_manager'));
-
-        if (previewBtn) {
-            previewBtn.addEventListener('click', function () {
-                fetch('/admin/set-preview-superadmin', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
-        }
-
-        if (previewBtnArea) {
-            previewBtnArea.addEventListener('click', function () {
-                fetch('/admin/set-preview-area-manager', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
-        }
-
-        if (exitBtn) {
-            if (isPreviewSuperadmin) {
-                exitBtn.addEventListener('click', function () {
-                    fetch('/admin/unset-preview-superadmin', {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrf }
-                    }).then(() => window.location.reload());
-                });
-            } else if (isPreviewAreaManager) {
-                exitBtn.addEventListener('click', function () {
-                    fetch('/admin/unset-preview-area-manager', {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrf }
-                    }).then(() => window.location.reload());
-                });
-            }
-        }
-    }
-
-    $(document).ready(function () {
-        initializeAdminHeader();
-    });
-
-    $(document).on('pjax:end', function () {
-        initializeAdminHeader();
-    });
-
-    window.initHeaderUI = function() {
-        const $countrySelect = $('#country-select');
-        const $AreaManagerSelect = $('#area-Manager-select');
-
-        if ($AreaManagerSelect.length) {
-            $AreaManagerSelect.select2({
-                placeholder: '{{ __("Select area manager") }}',
-                allowClear: true,
-                width: '190px'
-            });
-        }
-
-        if ($countrySelect.length) {
-            $countrySelect.select2({
-                placeholder: "{{ __('Select Country') }}",
-                allowClear: true,
-                templateResult: function formatCountry(country) {
-                    if (!country.id) return country.text;
-                    const flag = $(country.element).data('flag');
-                    const name = country.text;
-                    if (flag) {
-                        return `<span><img src="${flag}" style="width:20px;height:14px;margin-right:5px;vertical-align:middle;">${name}</span>`;
-                    }
-                    return name;
-                },
-                templateSelection: function formatCountry(country) {
-                    if (!country.id) return country.text;
-                    const flag = $(country.element).data('flag');
-                    const name = country.text;
-                    if (flag) {
-                        return `<span><img src="${flag}" style="width:20px;height:14px;margin-right:5px;vertical-align:middle;">${name}</span>`;
-                    }
-                    return name;
-                },
-                escapeMarkup: function (markup) { return markup; }
-            });
-        }
-    };
-
     $(document).on('pjax:end', function () {
         $.get(window.location.href, function (response) {
-            const newHeader = $(response).find('header.main-header').html();
-            $('header.main-header').html(newHeader);
-
-            window.initHeaderUI();
-            window.initializeAdminHeader();
-
-            try {
-                if (typeof $.AdminLTE !== 'undefined' && $.AdminLTE.layout) {
-                    $.AdminLTE.layout.fix();
-                }
-                $(document).trigger('admin::load');
-            } catch (e) {
-                console.warn('AdminLTE reinit skipped:', e);
-            }
+            const newButtons = $(response).find('#preview-buttons-wrapper').html();
+            $('#preview-buttons-wrapper').html(newButtons);
         });
     });
 </script>
