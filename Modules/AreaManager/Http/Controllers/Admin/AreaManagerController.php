@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AreaManager\Http\Controllers\Admin; 
+namespace Modules\AreaManager\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Models\Charge;
@@ -26,6 +26,7 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use App\Helpers\Common;
 
 class AreaManagerController extends MainController
 {
@@ -101,7 +102,7 @@ class AreaManagerController extends MainController
             $url = getImagePath($this->avatar) ?? asset("images/businessman-icon.jpg");
             if (!isImageExists($url)) $url = asset("images/businessman-icon.jpg");
             $image = handleShowImageWithTypes($id, $url, 40, 40);
-            $showUrl = url("admin/area-managers/{$id}");
+            $showUrl = url("admin/area-manager-users/{$id}");
 
             return "
                 <div style='display:flex; align-items:center; gap:10px;'>
@@ -265,14 +266,13 @@ class AreaManagerController extends MainController
         $this->addPhoneFields($form);
 
         $form->text('area_name', __('Area Name'))
-        ->default(function ($form) {
-            if ($form->isEditing()) {
-                $areaManager = $form->model();
-                $regionName = Region::where('manager_id', $areaManager->id)->value('name');
-                return $regionName;
-            }
-            return null;
-    
+            ->default(function ($form) {
+                if ($form->isEditing()) {
+                    $areaManager = $form->model();
+                    $regionName = Region::where('manager_id', $areaManager->id)->value('name');
+                    return $regionName;
+                }
+                return null;
             });
 
         $this->addMapField($form, $id);
@@ -321,7 +321,6 @@ class AreaManagerController extends MainController
                 $form->password = Hash::make($form->password);
             }
             $form->ignore(['area_name']);
-
         });
 
         $form->saved(function (Form $form) {
@@ -349,13 +348,13 @@ class AreaManagerController extends MainController
                     'name' => 'Default Region for Default Manager',
                 ]);
             }
-            
+
             $oldCountryIds = RegionCountry::where('region_id', $area->id)
                 ->pluck('country_id')
                 ->toArray();
-            
+
             RegionCountry::where('region_id', $area->id)->delete();
-            
+
             if (!empty($oldCountryIds) && isset($defaultRegion)) {
                 foreach ($oldCountryIds as $countryId) {
                     RegionCountry::firstOrCreate([
@@ -364,24 +363,24 @@ class AreaManagerController extends MainController
                     ]);
                 }
             }
-        
+
             $countries = json_decode($coveredCountries, true);
             $countryIds = array_column($countries, 'id');
             RegionCountry::where('region_id', $area->id)->delete();
             RegionCountry::whereIn('country_id', $countryIds)->delete();
 
             if (is_array($countries) && count($countries) > 0) {
-                foreach ($countries as $country) {         
+                foreach ($countries as $country) {
 
                     RegionCountry::create([
                         'region_id' => $area->id,
                         'country_id' => $country['id']
                     ]);
                 }
-    
+
                 SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $form->model()->id]);
             }
-            
+
 
             $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
             if ($role && $userId) {
@@ -406,15 +405,15 @@ class AreaManagerController extends MainController
 
     protected function addMapField(Form $form, $id = null)
     {
-      
+
         $countries = Country::select([
             'id',
             'e_name as name',
             'iso as iso2',
         ])
-        ->with('regions.manager')
-        ->get();
-     
+            ->with('regions.manager')
+            ->get();
+
         $countriesJson = $countries->toJson();
 
         $selectedCountries = [];
@@ -422,11 +421,10 @@ class AreaManagerController extends MainController
 
         if ($form->isEditing()) {
             $currentAreaManagerId = $id;
-            $area = Region::where('manager_id' ,$currentAreaManagerId )->first();
+            $area = Region::where('manager_id', $currentAreaManagerId)->first();
             if ($area) {
                 $selectedCountries = $area->countries()->pluck('iso')->toArray();
             }
-        
         }
         $selectedCountriesJson = json_encode($selectedCountries);
 
@@ -564,18 +562,30 @@ class AreaManagerController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-        $types = ['vip', 'badge', 'ware'];
-        $type = request()->get('type', 'vip');
+
+        $chargeTabType = request()->get('type', 'receiver');
+
+
+        $charges = Charge::query()
+            ->when($chargeTabType == 'receiver', function ($q) use ($id) {
+                $q->where('user_id', $id)->where('user_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->when($chargeTabType == 'charger', function ($q) use ($id) {
+                $q->where('charger_id', $id)->where('charger_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->with(Common::chargerRelationsQuery())
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'charges_page');
         switch ($tab) {
             case 'agencies':
                 $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
                 break;
-                //            case 'rewards':
-                //                $rewards = SuperAdminReward::where('super_admin_id', $areaManager->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                //                break;
+            case 'charge':
+
+                break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType','charges'));
     }
 
     public function profilePreview()
@@ -673,7 +683,7 @@ class AreaManagerController extends MainController
         Admin::script($this->mapJs());
     }
 
-   
+
 
     protected function mapJs0()
     {
@@ -893,6 +903,4 @@ class AreaManagerController extends MainController
         });
     JS;
     }
-
-    
 }
