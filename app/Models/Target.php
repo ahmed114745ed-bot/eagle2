@@ -45,4 +45,29 @@ class Target extends Model
     {
         return $this->hasOne(TargetEdit::class, 'id', 'edit_id');
     }
+
+    public  function displayOldNewValue($old, $new, $prefix = '', $isPercentage = false)
+    {
+        if ($old == $new) {
+            $formatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+            return "<span style='font-weight:bold;'>{$formatted}</span>";
+        }
+    
+        $oldFormatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+        $newFormatted = $isPercentage ? "% {$new}" : "{$prefix}{$new}";
+    
+        $color = $new > $old ? '#28a745' : '#dc3545';
+        $arrow = $new > $old ? '↑' : '↓';
+    
+        return "
+            <div style='align-items:center;gap:5px;'>
+                <span style='color:#dc3545;text-decoration:line-through;'>{$oldFormatted}</span>
+                <br>
+                <span style='color:#6c757d;'>→</span>
+                <br>
+                <strong style='color:{$color};'>{$newFormatted} {$arrow}</strong>
+            </div>
+        ";
+    }
+    
 }

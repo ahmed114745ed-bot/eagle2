@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\TargetEdit;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use PDF;
 use App\Models\User;
@@ -84,11 +85,16 @@ class TargetController extends MainController
      *
      * @return Grid
      */
-   
+    protected bool $under_edit = false;
+
 
      protected function grid()
-    {
+    {        
+        
+        $this->under_edit = Target::where('under_edit', 1)->exists();
+
         $grid = new Grid(new Target);
+
         $grid->model()->orderBy('diamonds', 'asc');
 
         $coins = Common::getMaxCoins();
@@ -102,10 +108,22 @@ class TargetController extends MainController
         $this->addHoursDaysColumns($grid);
         $this->addReelColumn($grid);
         $this->addMomentColumn($grid);
-        $this->addConfirmColumn($grid);
+        // $this->addConfirmColumn($grid);
 
         $this->addExportButton($grid);
         $this->addConfirmScript();
+
+        $grid->tools(function (Grid\Tools $tools) {
+            if ($this->under_edit) {
+                $url = route('admin.targets.confirm');
+
+               $tools->append('<button class="btn btn-sm btn-success confirm-btn" data-url="'.$url.'">
+                            <i class="fa fa-check"></i> '.__('Confirm Update').'
+                        </button>');
+            }
+            return '';
+        });
+
 
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -116,142 +134,193 @@ class TargetController extends MainController
     {
         $grid->column('level', __('target no'));
     }
-
+    
     protected function addDiamondsColumn($grid, $coins)
     {
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
+                $old = $value;
+                $new = $value;
+    
                 if ($this->under_edit && $this->edit) {
-                    $value = $this->edit->data['diamonds'] ?? $value;
+                    $new = $this->edit->data['diamonds'] ?? $value;
                 }
-                $endFormatted = $coins ? ($value / $coins) : 0;
+    
+                $endFormatted = $coins ? ($new / $coins) : 0;
                 $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
-                return "<div style='display: flex; flex-direction: column;'>
-                            <span style='font-weight: bold;'>💎 {$value}</span>
-                            <span style='color: #888; font-size: smaller;'>\$ {$endFormatted}</span>
-                        </div>";
+    
+                $display = $this->displayOldNewValue($old, $new, '💎 ');
+    
+                return "
+                    <div style='display:flex;flex-direction:column;'>
+                        {$display}
+                        <span style='color:#888;font-size:smaller;'>\$ {$endFormatted}</span>
+                    </div>
+                ";
             });
     }
-
+    
     protected function addUsdColumn($grid, $coins)
     {
         $grid->usd(__('Host Percentage'))
             ->display(function ($value) use ($coins) {
+                $old = $value;
+                $new = $value;
+    
                 if ($this->under_edit && $this->edit) {
-                    $value = $this->edit->data['usd'] ?? $value;
+                    $new = $this->edit->data['usd'] ?? $value;
                 }
+    
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
-                $userPercentage = number_format($value);
-                return "<div style='display: flex; flex-direction: column;'>
-                            <span style='font-weight: bold;'>% {$userPercentage}</span>
-                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                        </div>";
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+    
+                $display = $this->displayOldNewValue($old, $new, '', true);
+    
+                return "
+                    <div style='display:flex;flex-direction:column;'>
+                        {$display}
+                        <span style='color:#888;font-size:smaller;'>\$ {$userUsd}</span>
+                    </div>
+                ";
             });
     }
-
+    
     protected function addAgencyShareColumn($grid, $coins)
     {
         $grid->agency_share(__('agency share'))
             ->display(function ($value) use ($coins) {
+                $old = $value;
+                $new = $value;
+    
                 if ($this->under_edit && $this->edit) {
-                    $value = $this->edit->data['agency_share'] ?? $value;
+                    $new = $this->edit->data['agency_share'] ?? $value;
                 }
+    
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
-                $userPercentage = number_format($value);
-                return "<div style='display: flex; flex-direction: column;'>
-                            <span style='font-weight: bold;'>% {$userPercentage}</span>
-                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                        </div>";
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+    
+                $display = $this->displayOldNewValue($old, $new, '', true);
+    
+                return "
+                    <div style='display:flex;flex-direction:column;'>
+                        {$display}
+                        <span style='color:#888;font-size:smaller;'>\$ {$userUsd}</span>
+                    </div>
+                ";
             });
     }
-
+    
     protected function addDbPercentageColumn($grid, $coins)
     {
-        $grid->db_percentage(__('DB  Percentage'))
+        $grid->db_percentage(__('DB Percentage'))
             ->display(function ($value) use ($coins) {
+                $old = $value;
+                $new = $value;
+    
                 if ($this->under_edit && $this->edit) {
-
-                    $value = $this->edit->data['db_percentage'] ?? $value;
+                    $new = $this->edit->data['db_percentage'] ?? $value;
                 }
+    
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
-                $userPercentage = number_format($value);
-                return "<div style='display: flex; flex-direction: column;'>
-                            <span style='font-weight: bold;'>% {$userPercentage}</span>
-                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                        </div>";
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+    
+                $display = $this->displayOldNewValue($old, $new, '', true);
+    
+                return "
+                    <div style='display:flex;flex-direction:column;'>
+                        {$display}
+                        <span style='color:#888;font-size:smaller;'>\$ {$userUsd}</span>
+                    </div>
+                ";
             });
     }
-
+    
     protected function addAppProfitColumn($grid, $coins)
     {
         $grid->app_profit_percentage(__('App Profit Percentage'))
             ->display(function ($value) use ($coins) {
+                $old = $value;
+                $new = $value;
+    
                 if ($this->under_edit && $this->edit) {
-                    $value = $this->edit->data['app_profit_percentage'] ?? $value;
+                    $new = $this->edit->data['app_profit_percentage'] ?? $value;
                 }
+    
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $value / 100);
-                $userPercentage = number_format($value);
-                return "<div style='display: flex; flex-direction: column;'>
-                            <span style='font-weight: bold;'>% {$userPercentage}</span>
-                            <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
-                        </div>";
+                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+    
+                $display = $this->displayOldNewValue($old, $new, '', true);
+    
+                return "
+                    <div style='display:flex;flex-direction:column;'>
+                        {$display}
+                        <span style='color:#888;font-size:smaller;'>\$ {$userUsd}</span>
+                    </div>
+                ";
             });
     }
-
+    
     protected function addHoursDaysColumns($grid)
     {
-        $grid->hours(__('hours'))->editable()
-            ->display(function ($value) {
-                if ($this->under_edit && $this->edit) {
-                    return $this->edit->data['hours'] ?? $value;
-                }
-                return $value;
-            });
-
-        $grid->days(__('days'))->editable()
-            ->display(function ($value) {
-                if ($this->under_edit && $this->edit) {
-                    return $this->edit->data['days'] ?? $value;
-                }
-                return $value;
-            });
+        $grid->hours(__('hours'))->display(function ($value) {
+            $old = $value;
+            $new = $value;
+            if ($this->under_edit && $this->edit) {
+                $new = $this->edit->data['hours'] ?? $value;
+            }
+            return $this->displayOldNewValue($old, $new);
+        });
+    
+        $grid->days(__('days'))->display(function ($value) {
+            $old = $value;
+            $new = $value;
+            if ($this->under_edit && $this->edit) {
+                $new = $this->edit->data['days'] ?? $value;
+            }
+            return $this->displayOldNewValue($old, $new);
+        });
     }
-
+    
     protected function addReelColumn($grid)
     {
         $grid->column('reel', __('Reel'))
             ->display(function ($value) {
-                $reel = $this->under_edit && $this->edit
-                    ? explode(',', $this->edit->data['reel'] ?? $value)
-                    : explode(',', $value);
-                $update = $reel[0] ?? 0;
-                $like = $reel[1] ?? 0;
-                $comment = $reel[2] ?? 0;
-                return "<span>" . __('admin.update') . " $update</span><br>
-                        <span>" . __('admin.like') . " $like</span><br>
-                        <span>" . __('admin.comment') . " $comment</span>";
+                $old = explode(',', $value);
+                $new = $old;
+    
+                if ($this->under_edit && $this->edit) {
+                    $new = explode(',', $this->edit->data['reel'] ?? $value);
+                }
+    
+                $labels = [__('admin.update'), __('admin.like'), __('admin.comment')];
+                $html = '';
+                foreach ($labels as $i => $label) {
+                    $html .= "<div>{$label}: " . $this->displayOldNewValue($old[$i] ?? 0, $new[$i] ?? 0) . "</div>";
+                }
+                return $html;
             });
     }
-
+    
     protected function addMomentColumn($grid)
     {
         $grid->column('moment', __('Moment'))
             ->display(function ($value) {
-                $moment = $this->under_edit && $this->edit
-                    ? explode(',', $this->edit->data['moment'] ?? $value)
-                    : explode(',', $value);
-                $update = $moment[0] ?? 0;
-                $like = $moment[1] ?? 0;
-                $comment = $moment[2] ?? 0;
-                return "<span>" . __('admin.update') . " $update</span><br>
-                        <span>" . __('admin.like') . " $like</span><br>
-                        <span>" . __('admin.comment') . " $comment</span>";
+                $old = explode(',', $value);
+                $new = $old;
+    
+                if ($this->under_edit && $this->edit) {
+                    $new = explode(',', $this->edit->data['moment'] ?? $value);
+                }
+    
+                $labels = [__('admin.update'), __('admin.like'), __('admin.comment')];
+                $html = '';
+                foreach ($labels as $i => $label) {
+                    $html .= "<div>{$label}: " . $this->displayOldNewValue($old[$i] ?? 0, $new[$i] ?? 0) . "</div>";
+                }
+                return $html;
             });
     }
+    
 
     protected function addConfirmColumn($grid)
     {
@@ -264,6 +333,29 @@ class TargetController extends MainController
                 return '';
             });
     }
+    protected function displayOldNewValue($old, $new, $prefix = '', $isPercentage = false)
+    {
+        if ($old == $new) {
+            $formatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+            return "<span style='font-weight:bold;'>{$formatted}</span>";
+        }
+    
+        $oldFormatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+        $newFormatted = $isPercentage ? "% {$new}" : "{$prefix}{$new}";
+    
+        $color = $new > $old ? '#28a745' : '#dc3545';
+        $arrow = $new > $old ? '↑' : '↓';
+    
+        return "
+            <div style='display:flex;align-items:center;gap:5px;'>
+                <span style='color:#dc3545;text-decoration:line-through;'>{$oldFormatted}</span>
+                <span style='color:#6c757d;'>→</span>
+                <strong style='color:{$color};'>{$newFormatted} {$arrow}</strong>
+            </div>
+        ";
+    }
+    
+
 
     protected function addConfirmScript()
     {
@@ -622,12 +714,15 @@ class TargetController extends MainController
                     'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
                 ];
         
-                $edit = \App\Models\TargetEdit::create([
-                    'target_id' => $target->id,
-                    'edited_by' => Auth::user()->id,
-                    'data' => $editData,
-                    'status' => 'pending',
-                ]);
+
+                $edit = TargetEdit::updateOrCreate(
+                    ['target_id' => $target->id], 
+                    [
+                        'edited_by' => Auth::id(), 
+                        'data' => $editData,
+                        'status' => 'pending',
+                    ]
+                );
         
                 $target->under_edit = true;
                 $target->edit_id = $edit->id;
@@ -758,13 +853,24 @@ class TargetController extends MainController
         return Excel::download(new TargetsExport($targets, $selectedColumns), 'target_data_' . now()->format('Y_m_d') . '.xlsx');
     }
 
-    public function confirm($id)
+    public function confirm()
     {
-        $target = Target::findOrFail($id);
+        Artisan::call('users:update-salaries');
+        $targets = Target::where('under_edit', true)->get();
 
-        $this->applyPendingEdit( $target);
-
-        \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
+        if ($targets->isEmpty()) {
+            admin_toastr(__('not found'), 'info');
+            return back();
+        }
+    
+        foreach ($targets as $target) {
+            try {
+                $this->applyPendingEdit($target);
+                \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
+            } catch (\Throwable $e) {
+                \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
+            }
+        }
         admin_toastr(__('update_start'), 'info');
         return back();
     }
