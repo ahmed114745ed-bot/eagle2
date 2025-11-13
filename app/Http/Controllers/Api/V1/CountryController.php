@@ -74,4 +74,12 @@ class CountryController extends Controller
         $countries = $this->countryService->searchCountries($key, $page);
         return response()->json($countries);
     }
+
+    public function searchRegions(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $countries = $this->countryService->searchRegions($key, $page);
+        return response()->json($countries);
+    }
 }
