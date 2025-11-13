@@ -12,7 +12,7 @@ use App\Selectables\Families;
 use Encore\Admin\Facades\Admin;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;

@@ -93,7 +93,6 @@ class OfficialMessageJob implements ShouldQueue
                 break;
 
             default:
-                $admin = null;
                 $adminCountries = [];
                 break;
         }
