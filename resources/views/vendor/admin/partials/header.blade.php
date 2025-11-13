@@ -832,113 +832,113 @@
             }
         }
 
-        // Function to initialize area manager select
-        function initAreaManagerSelect() {
-            const $select = $('#area-Manager-select');
-            if ($select.length) {
-                // Destroy existing Select2 if it exists
-                if ($select.hasClass('select2-hidden-accessible')) {
-                    $select.select2('destroy');
-                }
+    {{--    // Function to initialize area manager select--}}
+    {{--    function initAreaManagerSelect() {--}}
+    {{--        const $select = $('#area-Manager-select');--}}
+    {{--        if ($select.length) {--}}
+    {{--            // Destroy existing Select2 if it exists--}}
+    {{--            if ($select.hasClass('select2-hidden-accessible')) {--}}
+    {{--                $select.select2('destroy');--}}
+    {{--            }--}}
 
-                $select.select2({
-                    placeholder: '{{ __("Select area manager") }}',
-                    allowClear: true,
-                    width: '190px'
-                });
+    {{--            $select.select2({--}}
+    {{--                placeholder: '{{ __("Select area manager") }}',--}}
+    {{--                allowClear: true,--}}
+    {{--                width: '190px'--}}
+    {{--            });--}}
 
-                // Remove existing handlers
-                $select.off('change');
+    {{--            // Remove existing handlers--}}
+    {{--            $select.off('change');--}}
 
-                $select.on('change', function () {
-                    const $this = $(this);
-                    if (!$this.val()) {
-                        setTimeout(() => $this.select2('close'), 0);
+    {{--            $select.on('change', function () {--}}
+    {{--                const $this = $(this);--}}
+    {{--                if (!$this.val()) {--}}
+    {{--                    setTimeout(() => $this.select2('close'), 0);--}}
 
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('clear_area_manager', 1);
-                        url.searchParams.delete('area_manager_id');
+    {{--                    const url = new URL(window.location.href);--}}
+    {{--                    url.searchParams.set('clear_area_manager', 1);--}}
+    {{--                    url.searchParams.delete('area_manager_id');--}}
 
-                        if ($.pjax) {
-                            setTimeout(() => {
-                                $.pjax({ url: url.toString(), container: '#pjax-container' });
-                            }, 1);
-                        } else {
-                            window.location.href = url.toString();
-                        }
-                        return;
-                    }
+    {{--                    if ($.pjax) {--}}
+    {{--                        setTimeout(() => {--}}
+    {{--                            $.pjax({ url: url.toString(), container: '#pjax-container' });--}}
+    {{--                        }, 1);--}}
+    {{--                    } else {--}}
+    {{--                        window.location.href = url.toString();--}}
+    {{--                    }--}}
+    {{--                    return;--}}
+    {{--                }--}}
 
-                    const areaManagerId = $(this).val();
-                    const url = new URL(window.location.href);
+    {{--                const areaManagerId = $(this).val();--}}
+    {{--                const url = new URL(window.location.href);--}}
 
-                    if (areaManagerId && areaManagerId !== 'null') {
-                        url.searchParams.set('area_manager_id', areaManagerId);
-                        url.searchParams.delete('clear_area_manager');
-                    } else {
-                        url.searchParams.set('clear_area_manager', 1);
-                        url.searchParams.delete('area_manager_id');
-                    }
+    {{--                if (areaManagerId && areaManagerId !== 'null') {--}}
+    {{--                    url.searchParams.set('area_manager_id', areaManagerId);--}}
+    {{--                    url.searchParams.delete('clear_area_manager');--}}
+    {{--                } else {--}}
+    {{--                    url.searchParams.set('clear_area_manager', 1);--}}
+    {{--                    url.searchParams.delete('area_manager_id');--}}
+    {{--                }--}}
 
-                    if ($.pjax) {
-                        setTimeout(() => {
-                            $.pjax({url: url.toString(), container: '#pjax-container'});
-                        }, 1);
-                    } else {
-                        window.location.href = url.toString();
-                    }
-                });
-            }
-        }
+    {{--                if ($.pjax) {--}}
+    {{--                    setTimeout(() => {--}}
+    {{--                        $.pjax({url: url.toString(), container: '#pjax-container'});--}}
+    {{--                    }, 1);--}}
+    {{--                } else {--}}
+    {{--                    window.location.href = url.toString();--}}
+    {{--                }--}}
+    {{--            });--}}
+    {{--        }--}}
+    {{--    }--}}
 
-        // Initialize on page load
-        initAreaManagerSelect();
-        initCountrySelect();
+    {{--    // Initialize on page load--}}
+    {{--    initAreaManagerSelect();--}}
+    {{--    initCountrySelect();--}}
 
-        // Initialize preview buttons
-        window.initializeAdminHeader();
+    {{--    // Initialize preview buttons--}}
+    {{--    window.initializeAdminHeader();--}}
 
-        // Handle PJAX reload
-        $(document).on('pjax:end', function() {
-            $.get(window.location.href, function (response) {
-                const $response = $(response);
+    {{--    // Handle PJAX reload--}}
+    {{--    $(document).on('pjax:end', function() {--}}
+    {{--        $.get(window.location.href, function (response) {--}}
+    {{--            const $response = $(response);--}}
 
-                // Update preview buttons wrapper
-                $('#preview-buttons-wrapper').html($response.find('#preview-buttons-wrapper').html());
+    {{--            // Update preview buttons wrapper--}}
+    {{--            $('#preview-buttons-wrapper').html($response.find('#preview-buttons-wrapper').html());--}}
 
-                // Update country select HTML
-                const $newCountrySelect = $response.find('#country-select');
-                if ($newCountrySelect.length) {
-                    $('#country-select').replaceWith($newCountrySelect);
-                }
+    {{--            // Update country select HTML--}}
+    {{--            const $newCountrySelect = $response.find('#country-select');--}}
+    {{--            if ($newCountrySelect.length) {--}}
+    {{--                $('#country-select').replaceWith($newCountrySelect);--}}
+    {{--            }--}}
 
-                // Update area manager select HTML
-                const $newAreaManagerSelect = $response.find('#area-Manager-select');
-                if ($newAreaManagerSelect.length) {
-                    $('#area-Manager-select').replaceWith($newAreaManagerSelect);
-                }
+    {{--            // Update area manager select HTML--}}
+    {{--            const $newAreaManagerSelect = $response.find('#area-Manager-select');--}}
+    {{--            if ($newAreaManagerSelect.length) {--}}
+    {{--                $('#area-Manager-select').replaceWith($newAreaManagerSelect);--}}
+    {{--            }--}}
 
-                // Reinitialize everything
-                initAreaManagerSelect();
-                initCountrySelect();
-                window.initializeAdminHeader();
-            });
-        });
+    {{--            // Reinitialize everything--}}
+    {{--            initAreaManagerSelect();--}}
+    {{--            initCountrySelect();--}}
+    {{--            window.initializeAdminHeader();--}}
+    {{--        });--}}
+    {{--    });--}}
 
-        // Rest of your code...
-        const originalFetch = window.fetch;
-        window.fetch = function (url, options = {}) {
-            options.headers = options.headers || {};
+    {{--    // Rest of your code...--}}
+    {{--    const originalFetch = window.fetch;--}}
+    {{--    window.fetch = function (url, options = {}) {--}}
+    {{--        options.headers = options.headers || {};--}}
 
-            if (window.enableCountryHeader) {
-                const countryId = $('#country-select').val();
-                options.headers['X-Country-ID'] = countryId ? countryId : 'null';
-            }
+    {{--        if (window.enableCountryHeader) {--}}
+    {{--            const countryId = $('#country-select').val();--}}
+    {{--            options.headers['X-Country-ID'] = countryId ? countryId : 'null';--}}
+    {{--        }--}}
 
-            if (!options.headers['Accept'])
-                options.headers['Accept'] = 'application/json';
+    {{--        if (!options.headers['Accept'])--}}
+    {{--            options.headers['Accept'] = 'application/json';--}}
 
-            return originalFetch(url, options);
-        };
-    });
+    {{--        return originalFetch(url, options);--}}
+    {{--    };--}}
+    {{--});--}}
 </script>
