@@ -72,11 +72,33 @@ class AreaManager extends Authenticatable
         return $this->hasManyThrough(Agency::class, Country::class, 'area_manager_id', 'country_id', 'id', 'id');
     }
 
+    // public function countries()
+    // {
+    //     return $this->hasMany(Country::class, 'area_manager_id');
+    // }
+
+    public function regions()
+    {
+        return $this->hasMany(Region::class, 'manager_id');
+    }
     public function countries()
     {
-        return $this->hasMany(Country::class, 'area_manager_id');
+        return $this->belongsToMany(
+            Country::class,
+            'region_countries',
+            'region_id',     
+            'country_id'    
+        )->join('regions', 'region_countries.region_id', '=', 'regions.id')
+         ->where('regions.manager_id', $this->id)
+         ->select('countries.*'); 
     }
 
+    public function countriesQuery()
+    {
+        return Country::whereHas('regions', function($q) {
+            $q->where('manager_id', $this->id);
+        });
+    }
     public function flag()
     {
 

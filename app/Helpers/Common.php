@@ -2226,25 +2226,27 @@ class Common
 
     public static function areaCountries(): array
     {
-        $adminId = session('area_manager_id') ?? auth()->user()->id;
 
-        $authAdmin = AreaManager::with('countries')->find($adminId);
+        $adminId = session('area_manager_id') ?? auth()->id();
 
-        if (!$authAdmin) {
-            $authAdmin = SubAreaManager::with('countries')->find($adminId);
-        }
-
+        $authAdmin = AreaManager::find($adminId)
+                    ?? SubAreaManager::find($adminId);
+    
         if (!$authAdmin) {
             return [];
         }
-
-        $countryID = session('area_manager_country_id');
-
-        if ($countryID) {
-            return (array)$countryID;
+    
+        $sessionCountryId = session('area_manager_country_id');
+        if ($sessionCountryId) {
+            return (array)$sessionCountryId;
         }
-
-        return @$authAdmin->countries->pluck('id')->toArray() ?? [];
+    
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+    
+        return [];
+    
     }
 
 
