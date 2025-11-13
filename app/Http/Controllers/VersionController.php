@@ -88,6 +88,7 @@ class VersionController extends Controller
             'live_status'    => (bool) ($settings['live_status'] ?? true),
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
             'default_room_background'    => $default_background ?? '',
+            'is_show_room_activity' => (bool)($settings['room_cup'] ?? false),
             
         ];
 
@@ -186,7 +187,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','room_cup'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool
