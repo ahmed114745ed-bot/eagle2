@@ -65,7 +65,7 @@ class FlagSyrianSeeder extends Seeder
             'flag' => $braPath,
         ]);
 
-        Country::where('iso3', 'PSEx')->delete();
+        Country::where('iso3', 'PSE')->delete();
 
         Country::where('iso3', 'ISR')->update([
             'iso' => 'PS',
