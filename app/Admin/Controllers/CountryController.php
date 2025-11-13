@@ -79,22 +79,14 @@ class CountryController extends MainController
         });
 
         $grid->id(__ ('ID'));
-//        $grid->name(trans('name'));
-//        $grid->e_name(trans('english name'));
         $grid->column('e_name', __('name'))->display(function ($value) {
             return __("countries.$value");
         });
         $grid->phone_code(trans('phone code'));
-        // $grid->column('language',trans ('language'));
         $grid->column ('flag',trans ('flag'))->image ('',30);
-        // $grid->iso(trans('iso'));
-        // $grid->iso3(trans('iso3'));
-        // $grid->continent_name(trans('continent name'));
-        // $grid->e_continent_name(trans('english continent name'));
         $grid->column ('status',trans ('status'))->switch (Common::getSwitchStates ());
         $this->extendGrid ($grid);
         $grid->disableExport();
-//        $grid->disableActions();
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableDelete();
@@ -140,14 +132,8 @@ class CountryController extends MainController
         $form->display(__ ('ID'));
         $form->text('name', trans('name'))->rules ('required');;
         $form->text('e_name', trans('english name'))->rules ('required');;
-//        $form->text('phone_code', trans('phone code'))->rules ('required');
-        // $form->text('language', trans('language'))->rules ('required');
         $form->image ('flag',trans ('flag'))->rules ('required');
-//        $form->text('iso', trans('iso'))->rules ('required');
-        // $form->text('iso3', trans('iso3'))->rules ('required');
-        // $form->text('continent_name', trans('continent name'))->rules ('required');
-        // $form->text('e_continent_name', trans('english continent name'))->rules ('required');
-        $form->switch ('status',trans ('status'))->states (Common::getSwitchStates ());
+
 
 
         return $form;
