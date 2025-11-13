@@ -225,11 +225,11 @@ class OfficialMessageController extends MainController
             'country_manager' => __('country manager'),
 
         ])->when('area_manager', function (Form $form) {
-            $form->select('admin_area_id', __('admin'))
+            $form->select('admin_area_id', __('area'))
                 ->options('/api/search/area-manager')
                 ->ajax('/api/search/area-manager', 'id', 'name');
         })->when('country_manager', function (Form $form) {
-            $form->select('admin_super_id', __('admin'))
+            $form->select('admin_super_id', __('country'))
                 ->options('/api/search/users-superadmin2')
                 ->ajax('/api/search/users-superadmin2', 'id', 'name');
         });
