@@ -34,27 +34,27 @@ class AuthController extends BaseAuthController
 
     public function showLoginForm()
     {
-        $user = Admin::user(); 
-        $uri = request()->path(); 
-    
+        $user = Admin::user();
+        $uri = request()->path();
+
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
-   
+
         if ($user) {
-           
+
             if (str_contains($uri, $bdLogin) && $user->type == null) {
                 return redirect('/admin');
             }
-           
+
             if (str_contains($uri, $bdLogin) && $user->type === 'bd') {
                 return redirect('/bd');
             }
         }
-    
+
         if (str_contains($uri, $adminLogin)) {
             return view('admin.login');
         }
-  
+
 
         $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
@@ -66,7 +66,7 @@ class AuthController extends BaseAuthController
         }
         return view("bd.auth.login", compact('languages', 'current', 'test'));
     }
-  
+
 
     public function postLogin(Request $request)
     {
@@ -91,16 +91,30 @@ class AuthController extends BaseAuthController
         admin_toastr(trans('admin.login_successful'));
 
         $request->session()->regenerate();
-        if ($this->guard()->user()->type === 'bd') {
-            return redirect()->route('bd.home');
+        $user = $this->guard()->user();
+
+        if (!$user) {
+            return back()->withInput()->withErrors([
+                $this->username() => $this->getFailedLoginMessage(),
+            ]);
         }
 
-        return redirect()->intended($request->url??$this->redirectPath());
+        switch ($user->type) {
+            case 'bd':
+                return redirect()->route('bd.home');
+            default:
+                $this->guard()->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withInput()->withErrors([
+                    $this->username() => $this->getFailedLoginMessage(),
+                ]);
+        }
     }
 
     public function logout(Request $request)
     {
-        
+
         $this->getLogout( $request);
         return redirect()->route('bd.login');
     }
@@ -113,7 +127,7 @@ class AuthController extends BaseAuthController
             ]);
             DB::table ('sessions')->where ('user_id',Admin::user ()->getAuthIdentifier ())->delete ();
         }
-         parent ::putSetting (); 
+         parent ::putSetting ();
 
          return redirect(bd_url('/'));
         }

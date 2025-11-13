@@ -86,26 +86,17 @@ class CoinGameUserAllController extends AdminController
     public function ajaxTotals(Request $request)
     {
         $filters = $request->all();
-        Log::info('ajaxTotals called', [
-            'filters' => $filters
-        ]);
+   
        
         $query = CoinGameUserDailyAggregated::query();
-        Log::info('Initial query builder created');
     
         $query = $this->service->applyFilters($query, $filters);
-        Log::info('Query after filters', [
-            'sql'  => $query->toSql(),
-            'bindings' => $query->getBindings(),
-        ]);
+     
     
         $totals = $this->service->calculateTotals($query, $filters);
-        Log::info('Totals calculated', [
-            'totals' => $totals
-        ]);
+   
     
         $html = view('admin.info_boxes', compact('totals'))->render();
-        Log::info('View rendered successfully');
         return response()->json(['html' => $html]);
     }
 

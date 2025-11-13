@@ -27,15 +27,20 @@
     $(".language").click(function () {
         let id = $(this).data('id');
 
-        // تحديد الـ URL حسب نوع اليوزر
         @if(auth()->check() && auth()->user()->type === 'bd')
-            var url = "{{ url('bd/locale') }}";
+        var url = "{{ url('bd/locale') }}";
+        @elseif(auth()->check() && auth()->user()->type === 'superadmin')
+        var url = "{{ url('superadmin/locale') }}";
         @else
-            var url = "{{ admin_url('/locale') }}";
+        var url = "{{ admin_url('/locale') }}";
         @endif
 
-        $.post(url, {locale: id}, function () {
+        $.post(url, {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            locale: id
+        }, function () {
             location.reload();
         });
-    })
+    });
 </script>
+

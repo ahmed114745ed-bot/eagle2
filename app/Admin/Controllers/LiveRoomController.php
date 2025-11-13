@@ -43,7 +43,7 @@ class LiveRoomController extends MainController
 
     public function index(Content $content)
     {
-        $content = $content->title(trans('Rooms'));
+        $content = $content->title(trans('live stream'));
 
         // if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
         //     $content = $content->row(function (Row $row) {
@@ -67,7 +67,7 @@ class LiveRoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory'])
+        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -99,13 +99,12 @@ class LiveRoomController extends MainController
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
         $micPositions = [];
-        if ($room->microphone) {
-            $positions = explode(',', $room->microphone);
-            foreach ($positions as $index => $userId) {
-                if ($userId != '0') {
-                    $micPositions[$userId] = $index + 1;
-                }
-            }
+        $microphones = $room->microphones
+            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->sortBy('position')
+            ->values();
+        foreach ($microphones as $mic) {
+            $micPositions[$mic->user_id] = $mic->position + 1;
         }
 
         // Blacklist
@@ -241,14 +240,13 @@ class LiveRoomController extends MainController
 
     protected function grid2()
     {
-        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function() {
+        $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function () {
             return settings()->get('make_rooms_top');
         });
-            return (new Box(
-                title: __('admin.Actions'),
-                content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
-            ));
-
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
+        ));
     }
 
     /**
@@ -260,7 +258,7 @@ class LiveRoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->where('type','live');
+        $grid->model()->where('type', 'live');
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
@@ -271,7 +269,6 @@ class LiveRoomController extends MainController
         $this->setupFilters($grid);
         $this->defineGridColumns($grid);
         $grid->disableRowSelector();
-        $grid->disableCreateButton();
         $grid->disableExport();
 
         $this->extendGrid($grid);
@@ -327,8 +324,11 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
+       $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
         $grid->model()
-            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top','top_room' , "room_name", "room_cover", "room_admin", \DB::raw("
+            ->where('is_live', 1)
+            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("
                 CASE room_status
                     WHEN 1 THEN 100
                     WHEN 2 THEN 10
@@ -339,13 +339,16 @@ class LiveRoomController extends MainController
                  WHERE room_visitors.room_id = rooms.id) AS visitor_ids
             "))
             ->with([
-
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-                    'profile:id,user_id,avatar'
-                ])->select(['id', 'uuid', 'special_id', 'name']),
+                    'profile:id,user_id,avatar',
+                    'country:id,flag,name,e_name',
+                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
 
             ])
+            ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
+                $q->whereIn('id',  $countryID);
+            }))
             ->withCount('roomVisitors');
 
         $makeRoomsTop = Cache::rememberForever('rooms_make_rooms_top', function () {
@@ -360,9 +363,19 @@ class LiveRoomController extends MainController
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
+        if (request()->online == 1) {
+            $grid->model()->whereHas('roomVisitors');
+        }
+
+        if (request()->is_live == 1) {
+            $grid->model()->where('is_live', 1);
+        }
+
+        if (request()->is_live == 0 && !is_null(request()->is_live)) {
+            $grid->model()->where('is_live', 0);
+        }
+
         $grid->model()->orderByRaw(implode(', ', $orderSql));
-
-
     }
 
 
@@ -393,7 +406,7 @@ class LiveRoomController extends MainController
                 $grid->model()
                     ->orderByDesc('top_room')
                     ->orderByDesc('pin');
-                    // ->orderByDesc('room_visitors_count');
+                // ->orderByDesc('room_visitors_count');
                 break;
 
             case 'last_create':
@@ -532,32 +545,32 @@ class LiveRoomController extends MainController
     {
         $grid->disableRowSelector();
 
-        $grid->model()->collection(function (Collection $collection) {
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
-
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                ->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
-
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn ($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
-
-            return $collection; // IMPORTANT: return the collection
-        });
+        //        $grid->model()->collection(function (Collection $collection) {
+        //            $allIds = $collection->flatMap(function ($row) {
+        //                return array_filter(explode(',', (string) $row->microphone));
+        //            })->unique()->values()->all();
+        //
+        //            // fetch all needed users once
+        //            $users = collect();
+        //            if (!empty($allIds)) {
+        //                $users = User::select(['id', 'name'])
+        //                ->with('profile:id,user_id,avatar')
+        //                    ->whereIn('id', $allIds)
+        //                    ->get()
+        //                    ->keyBy('id');
+        //            }
+        //
+        //            // attach a ready-to-use collection on each row
+        //            $collection->each(function ($row) use ($users) {
+        //                $ids = array_filter(explode(',', (string) $row->microphone));
+        //                $row->microphone_users = collect($ids)
+        //                    ->map(fn ($id) => $users->get($id))
+        //                    ->filter()
+        //                    ->values();
+        //            });
+        //
+        //            return $collection; // IMPORTANT: return the collection
+        //        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
@@ -567,7 +580,7 @@ class LiveRoomController extends MainController
 
         $grid->id(__('ID'));
 
-        $grid->column('room_name', __('room'))->display(function ($name) {
+        $grid->column('room_name', __('live stream'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
@@ -577,8 +590,8 @@ class LiveRoomController extends MainController
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50){
-                $name = substr($name,0,50) . ' ...';
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
             }
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -591,23 +604,21 @@ class LiveRoomController extends MainController
             ";
         });
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('owner_id', __('live stream owner'))->display(function ($name) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
             }
 
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
 
         $grid->column('session', __('Gifts'))->display(function () {
-            return $this->session  ?? 0; 
+            return $this->session  ?? 0;
         });
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
-
-
     }
 
 
@@ -730,7 +741,7 @@ class LiveRoomController extends MainController
             });
             </script>
             HTML);
-        }
+    }
     /**
      * Make a show builder.
      *
@@ -794,12 +805,17 @@ class LiveRoomController extends MainController
         $this->disableFormTools($form);
 
         $form->display(__('ID'));
-        $form->text('numid', __('numid'));
+        if (!$form->isEditing()) {
+            $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
+        } else {
+            $form->text('numid', __('numid'));
+        }
+        $form->select('uid', __('owner room'))->options($this->ownerOptions())->ajax('/api/search/users8', 'id', 'name')->rules('required');
         $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
         $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
         $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
         $form->text('max_admin', __('max admin'));
-        $form->text('room_name', __('room name'));
+        $form->text('room_name', __('room name'))->rules('required');
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
         $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
@@ -822,10 +838,21 @@ class LiveRoomController extends MainController
             return $options;
         });
         $form->text('room_welcome', __('room welcome'));
-        $form->number('sort_num', __('Sort Num'));
+        $form->number('sort_num', __('Sort Num'))->default(0);
 
 
         return $form;
+    }
+
+    protected function ownerOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (User::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+            }
+            return $ops;
+        };
     }
 
     public function removeAdmin(Request $request, $roomId)
@@ -915,14 +942,14 @@ class LiveRoomController extends MainController
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "") {
                     $newList[] = $item;
                 }
             }
 
             $newList = array_filter($newList);
 
-            $blackList= implode(',', $newList) ?: null;
+            $blackList = implode(',', $newList) ?: null;
         }
 
         $room->room_black = $blackList;

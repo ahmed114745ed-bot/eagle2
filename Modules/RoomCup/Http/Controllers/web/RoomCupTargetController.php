@@ -121,21 +121,24 @@ class RoomCupTargetController extends MainController
     {
         $form = new Form(new RoomCupTarget());
 
-        $form->number('total', __('Total'))->default(0);
-        $form->number('number_of_visitors', __('Number of Visitors'))->default(0);
-        $form->number('number_of_admins', __('Number of Admins'))
+        $form->number('total', __('Target of Room Diamond (Total)'))->default(0)
+            ->help(__('TargetDiamond'));
+        $form->number('number_of_visitors', __('Condition for Room Growth (Num of Visitors)'))->default(0)
+            ->help(__('ConditionGroeth'));
+        $form->number('number_of_admins', __('Number of Admin Seats (Num of Admins)'))
             ->default(0)
             ->rules([
                 function ($attribute, $value, $fail) {
-                    $limit = Common::getConfig('max_room_admin');
+                    $limit = Common::getConfig('max_room_admin') ?? 4;
                     if ($value < $limit) {
                         $fail(__('api.admins_greater_than', ['limit' => $limit]));
                     }
                 },
-            ]);
-        $form->number('total_profit', __('total profit'))->default(0);
-        $form->decimal('owner_percentage', __('Owner Profit %'))->default(0.00);
-        $form->decimal('admin_percentage', __('Admin Profit %'))->default(0.00);
+            ])->help(__('NumberSeats'));
+
+        $form->number('total_profit', __('total profit'))->default(0)->help(__('ProfitsTargetTotal'));
+        $form->decimal('owner_percentage', __('Owner Profit Percentage (Owner Profit %)'))->default(0.00)->help(__('Specifies the percentage of the total profit allocated to the room owner.'));
+        $form->decimal('admin_percentage', __('Admin Profit Percentage (Admin Profit %)'))->default(0.00)->help(__('Specifies the percentage of the total profit distributed among all admins.'));
 
         $form->saving(function (Form $form) {
             $ownerPercentage = request('owner_percentage');

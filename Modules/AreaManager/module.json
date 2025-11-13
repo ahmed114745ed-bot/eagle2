@@ -1,0 +1,13 @@
+{
+    "name": "AreaManager",
+    "alias": "areamanager",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AreaManager\\Providers\\AreaManagerServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

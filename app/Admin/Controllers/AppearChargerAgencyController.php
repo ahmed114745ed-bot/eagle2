@@ -221,10 +221,13 @@ class AppearChargerAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile')
-             ->orderByDesc('id');  
+        $grid->model()->with('owner.profile', 'country')
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -232,7 +235,7 @@ class AppearChargerAgencyController extends MainController
         });
 
 
-        $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'))->sortable();
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
@@ -249,6 +252,20 @@ class AppearChargerAgencyController extends MainController
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
+                $flagHtml = '';
+                if (!empty($this->country?->flag)) {
+                    $flagPath = getImagePath($this->country->flag);
+                    $flagTitle = app()->getLocale() === 'ar'
+                        ? e($this->country->name)
+                        : e($this->country->e_name);
+
+                    $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+                }
+
                 $profileUrl = route('admin.shipping.agency.profile', ['id' => $this->id]);
 
                 return "
@@ -256,13 +273,13 @@ class AppearChargerAgencyController extends MainController
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>{$flagHtml}<br>
                                 <span style='font-size: smaller;'>ID: {$this->id}</span>
                             </div>
                         </div>
                     </a>
                 ";
-            });
+            })->sortable();
 
         $grid->column('owner_id', __('Owner'))->display(function () {
             // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
@@ -281,13 +298,25 @@ class AppearChargerAgencyController extends MainController
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
 
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            $flagHtml = '';
+            if (!empty($this->owner?->country?->flag)) {
+                $flagPath = getImagePath($this->owner->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->owner->country->name)
+                    : e($this->owner->country->e_name);
 
+                $flagHtml = "<img src='{$flagPath}' 
+                         class='flag-image' 
+                         alt='flag Image' 
+                         title='{$flagTitle}' 
+                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
+            }
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                        <strong>$name</strong><br>
+                        <strong>$name</strong> {$flagHtml}<br>
                         <span style=' font-size: smaller;'>UID: $uid</span><br>
                         <span style=' font-size: smaller;'>Phone: $phone</span>
                     </div>
@@ -299,19 +328,19 @@ class AppearChargerAgencyController extends MainController
             ->display(function () {
                 return $this->chargeAgency ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();;
 
-        $grid->column('appear_charger_agency', __("Appear charger agency"))
+        $grid->column('owner.appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
                 return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('is_frozen', __("frozen"))
             ->display(function () {
                 return $this->is_frozen ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates());
+            ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {
@@ -479,7 +508,7 @@ class AppearChargerAgencyController extends MainController
 
             $appOwnerId = intval($form->model()->app_owner_id);
 
-            $user = User::find($appOwnerId)  ;
+            $user = User::find($appOwnerId);
             MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
         });
 
@@ -545,7 +574,7 @@ class AppearChargerAgencyController extends MainController
                     ->where('user_type', 'shipping_agency')
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
-                break;     
+                break;
         }
 
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');

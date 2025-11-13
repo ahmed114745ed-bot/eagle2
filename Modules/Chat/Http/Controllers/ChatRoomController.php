@@ -5,6 +5,8 @@ namespace Modules\Chat\Http\Controllers;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 // use Modules\Chat\Entities\Follow;
@@ -118,7 +120,7 @@ class ChatRoomController extends Controller
         $user->current_room_chat = $checkRoom->id;
         $user->update();
         // Retrieve and paginate chat messages
-        $messages = $this->chatRoomService->getChatMessages($checkRoom->id);
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request, $user);
 
         // Mark unread messages as seen
         $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
@@ -136,9 +138,37 @@ class ChatRoomController extends Controller
         $responseData = $this->chatRoomService->prepareResponseData($messages, $checkRoom, $user2, $roomData);
 
         return Common::apiResponse(1, 'successfully', $responseData, 200, '', 'messages');
-
     }
 
+    public function cursor(Request $request): JsonResponse
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'type' => ['sometimes', 'string', Rule::in(['new', 'old'])],
+            'message_id' => ['sometimes', 'integer']
+        ]);
+
+        $user = $request->user();
+        $checkRoom = $this->chatRoomService->getOrCreateChatRoom($user, $request->user_id);
+
+        $user->current_room_chat = $checkRoom->id;
+        $user->update();
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request,$user);
+     //   dd( $messages->toArray());
+
+        $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
+
+        $user2 = $this->chatRoomService->getUserInChatRoom($checkRoom, $user);
+
+        $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+
+        $roomData = $this->chatRoomService->getRoomData($user2);
+
+        $responseData = $this->chatRoomService->prepareResponseData($messages, $checkRoom, $user2, $roomData);
+
+        return Common::apiResponse(1, 'successfully', $responseData, 200, '', 'messages');
+
+    }
     // public function store(Request $request)
     // {
     //     $request->validate([

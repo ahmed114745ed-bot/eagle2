@@ -574,7 +574,7 @@ class User extends Authenticatable
 
     public function country()
     {
-        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name', 'phone_code', 'iso');
+        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name', 'phone_code', 'iso', 'iso_numeric', 'currency_numeric');
     }
 
     public function getLangAttribute()
@@ -808,6 +808,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
     }
 
+    public function ownerLiveRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'live');
+    }
+
     public function familyType()
     {
         return $this->hasOne(FamilyUser::class, 'user_id', 'id');
@@ -1038,6 +1043,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Family::class, 'family_id');
     }
+
 
     public function followPacks()
     {
@@ -1748,16 +1754,28 @@ class User extends Authenticatable
         return $this->shippingAgency()->exists();
     }
 
+
+
     public function hostAgency()
     {
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
 
+    
     public function hasHostAgency()
     {
-        return $this->shippingAgency()->exists();
+        return $this->hasOne(Agency::class, 'app_owner_id');
     }
-
+    
+    public function hasShippingAgencyV2()
+    {
+        return $this->hasOne(Agency::class, 'app_owner_id'); 
+    }
+    
+    public function hasFamily()
+    {
+        return $this->belongsTo(Family::class, 'family_id'); 
+    }
     public function bdSalaries()
     {
         return $this->hasMany(BDSallary::class, 'bd_id');
@@ -2202,4 +2220,13 @@ class User extends Authenticatable
     {
         return $this->agencyJobs()->where('type', 'requestManger')->exists();
     }
+
+    public function roomVisitors()
+    {
+        return $this->hasMany(RoomVisitor::class, 'user_id');
+    }
+    public function liveTimes() {
+        return $this->hasMany(LiveTime::class, 'uid');
+    }
+
 }

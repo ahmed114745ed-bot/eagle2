@@ -71,7 +71,14 @@ class UserTargetController extends MainController
     {
 
         $grid = new Grid(new UserSallary);
+        $countryID =session('filter_country_id');
 
+        $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }));
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 

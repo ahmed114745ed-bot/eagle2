@@ -91,7 +91,16 @@ class AgencyJoinRequestController extends MainController
     {
 
         $grid = new Grid(new AgencyJoinRequest);
-        $grid->model()->orderByDesc('id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
+
+        $grid->model()
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->whereIn('country_id', $countryID));
+            }))
+            ->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -318,7 +327,7 @@ class AgencyJoinRequestController extends MainController
                         'message' => 'Failed to update user',
                     ]);
                 }
-              
+
                 uploadMonthlyDiamondReceive($user_id, 0);
             }
         });

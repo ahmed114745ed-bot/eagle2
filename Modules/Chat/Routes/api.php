@@ -10,13 +10,15 @@ use Modules\Chat\Http\Controllers\PinToTopController;
 use Modules\Chat\Http\Controllers\PusherController;
 
 Route::post('/puhser-edit-user', [PusherController::class, 'edit_user']);
+Route::post('/chat-room-listener', [PusherController::class, 'chatRoomListener'])->middleware('verify.pusher');
 Route::get('user-status/{id}',   [PusherController::class,'user_status']);
 
-Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization' ,'update.last.seen'])->group(function () {
 
     Route::get('/users/list', [ChatRoomController::class, 'users_list']);
     //Chat Room
     Route::get('/Chat-room/search-user', [ChatRoomController::class, 'findUserByUUid']);
+    Route::post('/Chat-room/cursor', [ChatRoomController::class, 'cursor']);
     Route::resource('/Chat-room', ChatRoomController::class);
     Route::post('/Chat-room/accept-request', [ChatRoomController::class,'accept_request']);
     Route::get('/close-chat', [ChatRoomController::class,'close_Chat']);

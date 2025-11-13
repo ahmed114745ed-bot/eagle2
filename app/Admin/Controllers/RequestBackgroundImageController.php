@@ -83,7 +83,10 @@ class RequestBackgroundImageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new RequestBackgroundImage);
-        $grid->model()->orderByDesc('id');
+        $countryID =session('filter_country_id');
+        $grid->model()
+            ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
+            ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -118,20 +121,17 @@ class RequestBackgroundImageController extends MainController
             $escapedName = substr($escapedName, 1, -1); // remove surrounding quotes
 
             return <<<EOT
-        <div style='display: flex; align-items: center; gap: 10px;'>
-            $image
-            <div>
-                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
-                </a>
-                <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
-            </div>
-        </div>
-    EOT;
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
+                    </div>
+                </div>
+            EOT;
         });
-
-
-
 
         $grid->column('owner.name', __('owner'))
             ->display(function ($name) {

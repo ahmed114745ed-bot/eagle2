@@ -2,15 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use Exception;
 use App\Helpers\Common;
-use App\Models\PaymentCoin;
+use App\Models\Country;
 use App\Models\Setting;
 use App\Models\Timezone;
+use App\Models\BrandImage;
+use App\Models\PaymentCoin;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use App\Models\BrandImage;
-use Encore\Admin\Controllers\AdminController;
+use Cache;
 
 class SettingController extends MainController
 {
@@ -45,6 +47,9 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
+        $is_auto_preview = Common::getConf('is_auto_preview');
+        $countries = Country::select(['id', 'name', 'e_name'])->get();
+
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
@@ -77,16 +82,19 @@ class SettingController extends MainController
                 'liveLibrary',
                 'gamesLibrary',
                 'agora_app_certificate',
-                'zego_filter_enabled'
+                'zego_filter_enabled',
+                'is_auto_preview',
+                'countries'
             ]))));
     }
 
-    public function save_image(Request $request){
+    public function save_image(Request $request)
+    {
         $name = Common::upload('images', $request->image);
         BrandImage::create([
             'name' => $name
         ]);
-        return Common::apiResponse(true,'Success');
+        return Common::apiResponse(true, 'Success');
     }
 
     public function saveSettings(Request $request)
@@ -98,5 +106,28 @@ class SettingController extends MainController
         }
 
         return back()->with('success', 'تم تحديث الإعدادات بنجاح!');
+    }
+
+
+    public function updateRoomCup(Request $request)
+    {
+        try {
+            $setting = Setting::where('key', 'room_cup')->first();
+            if ($setting) {
+                $setting->value = $request->value;
+                $setting->save();
+            } else {
+                Setting::create([
+                    'key' => 'room_cup',
+                    'value' => $request->value
+                ]);
+                
+            }
+            Cache::put('room_cup', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }

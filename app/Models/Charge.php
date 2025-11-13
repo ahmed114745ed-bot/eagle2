@@ -4,8 +4,13 @@ namespace App\Models;
 
 use App\Models\Scopes\HostAgencyScope;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\AreaManager\Entities\AreaManager;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AreaManager\Entities\SubAreaManager;
+use Modules\SuperAdmin\Entities\SubAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class Charge extends Model
 {
@@ -105,10 +110,26 @@ class Charge extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+
     public function receiveragency()
     {
         return $this->belongsTo(Agency::class, 'user_id')
             ->withoutGlobalScope(HostAgencyScope::class);
+    }
+
+    public function receiverSubAdmin()
+    {
+        return $this->belongsTo(SubAdmin::class, 'user_id');
+    }
+
+    public function receiverSubAreaManager(): BelongsTo
+    {
+        return $this->belongsTo(SubAreaManager::class, 'user_id');
+    }
+
+    public function receiverSuperAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SuperAdmin::class, 'user_id');
     }
 
     /**
@@ -134,6 +155,15 @@ class Charge extends Model
         return $this->belongsTo(Admin::class, 'charger_id');
     }
 
+    public function areaManager(): BelongsTo
+    {
+        return $this->belongsTo(AreaManager::class, 'charger_id');
+    }
+
+    public function subAreaManager(): BelongsTo
+    {
+        return $this->belongsTo(SubAreaManager::class, 'charger_id');
+    }
 
     public function bd()
     {

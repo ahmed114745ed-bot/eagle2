@@ -22,21 +22,21 @@ class UpdatePkAndSendToZigo implements ShouldQueue
     private $receivedIds;
     private $totalPrice;
     private $roomId;
-    private string $roomMics;
+    private $room;
 
 
     /**
      * @param array $receivedIds
      * @param float $totalPrice
-     * @param string $roomMics
+     * @param string $room
      * @param $userId
      */
-    public function __construct($userId, $roomId, array $receivedIds, float $totalPrice, string $roomMics)
+    public function __construct($userId, $roomId, array $receivedIds, float $totalPrice, $room)
     {
 
         $this->receivedIds = $receivedIds;
         $this->totalPrice  = $totalPrice;
-        $this->roomMics    = $roomMics;
+        $this->room        = $room;
         $this->userId      = $userId;
         $this->roomId      = $roomId;
     }
@@ -54,7 +54,7 @@ class UpdatePkAndSendToZigo implements ShouldQueue
             Pk::query()->where('room_id', $this->roomId)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();*/
 
         $lastPk = Room::select(['id'])->where('id', $this->roomId)->first()?->lastPk;
-        (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->roomMics);
+        (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->room);
     }
 
 

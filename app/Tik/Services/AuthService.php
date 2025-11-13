@@ -92,6 +92,7 @@ class AuthService
             } else {
                 $data = [
                     'phone' => $phone,
+                    'firebase_uuid' => $request->uuid,
                     'password' => $request->password,
                     'status' => 1
                 ];
@@ -103,9 +104,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;
@@ -141,7 +142,8 @@ class AuthService
         if (!$user || !Hash::check($request['password'], $user->password)) {
             throw new \Exception('credentials does`t match');
         }
-
+         $user->firebase_uuid = $request['uuid'];
+         $user->save();
 
         $this->rule($user, '', @$request['device_token'], $request);
 
@@ -179,6 +181,8 @@ class AuthService
                     'status' => true,
                     'email' => $request['email'],
                     'name' => $request['name'],
+                    'firebase_uuid' =>$request['uuid'],
+
                 ];
                 /*return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);*/
@@ -199,6 +203,8 @@ class AuthService
                     'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => true,
+                    'firebase_uuid' =>$request['uuid'],
+
                 ];
 
                 $lat = $request['lat'];
@@ -213,9 +219,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;
@@ -234,6 +240,9 @@ class AuthService
                 $user->save();*/
             }
         }
+
+        $user->firebase_uuid = $request['uuid'];
+        $user->save();
         $this->rule($user, '', @$request['device_token'], $request);
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0, $is_new);
@@ -298,9 +307,9 @@ class AuthService
                 }
             }
 
-            if (!$countryId && $lat && $long){
-                $countryId = getCountryIdFromLatLong($lat, $long);
-            }
+//            if (!$countryId && $lat && $long){
+//                $countryId = getCountryIdFromLatLong($lat, $long);
+//            }
 
             if ($countryId) {
                 $data['country_id'] = $countryId;
@@ -347,9 +356,9 @@ class AuthService
                     }
                 }
 
-                if (!$countryId && $lat && $long){
-                    $countryId = getCountryIdFromLatLong($lat, $long);
-                }
+//                if (!$countryId && $lat && $long){
+//                    $countryId = getCountryIdFromLatLong($lat, $long);
+//                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;

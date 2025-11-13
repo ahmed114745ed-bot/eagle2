@@ -603,6 +603,8 @@ if (!function_exists('handleShowImageWithTypes')) {
     }
 }
 
+ 
+
 if (!function_exists('userType')) {
     function userType($type)
     {
@@ -792,6 +794,44 @@ if (!function_exists('getAppLogo')) {
     }
 }
 
+if (!function_exists('superadmin_url')) {
+    function superadmin_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
+        }
+
+        $base = trim(config('superadmin.route.prefix', 'superadmin'), '/');
+
+        $secure = $secure ?? (config('superadmin.https') || config('superadmin.secure'));
+
+        if (app()->environment(['production', 'Production'])) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        }
+
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}
+
+if (!function_exists('areaManager_url')) {
+    function areaManager_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
+        }
+
+        $base = trim(config('areaManager.route.prefix', 'areaManager'), '/');
+
+        $secure = $secure ?? (config('areaManager.https') || config('areaManager.secure'));
+
+        if (app()->environment(['production', 'Production'])) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        }
+
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
+}
+
 
 if (!function_exists('getToday')) {
     function getToday(): array
@@ -914,7 +954,7 @@ if (!function_exists('bd_url')) {
 }
 
 if (!function_exists('getCountryIdFromLatLong')) {
-    function getCountryIdFromLatLong($lat, $lon)
+    function getCountryIdFromLatLong($lat, $lon, $register = true)
     {
         $responseEn = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
@@ -937,6 +977,10 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $country = Country::where('iso', $countryCode)->first();
         if ($country) {
             return $country->id;
+        }
+
+        if ($register) {
+            return null;
         }
 
         $responseAr = Http::withHeaders([

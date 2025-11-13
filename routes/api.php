@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
+use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -57,8 +58,10 @@ use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
+use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
@@ -100,6 +103,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
+    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
     });
@@ -114,17 +120,31 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
+        Route::get('owner-rooms', [UserController::class, 'searchOwnerRoomWithPage'])->name('owner-rooms');
+        Route::get('users7', [UserController::class, 'usersAudioRoom'])->name('users7');
+        Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
+        Route::get('users-bd-by-countries', [UserController::class, 'userBdByCountries'])->name('users-bd-by-countries');
+        Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
+        Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
+        Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
+        Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
+         Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
+        Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
+        Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
+        Route::get('superadmin-agencies', [UserController::class, 'superAdminAgencies'])->name('superadmin-agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
+        Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
+        Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
     });
 
     // authorization
@@ -150,7 +170,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     // all route with auth
-    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
+    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
@@ -220,7 +240,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
                 Route::post('remove_pass', [RoomController::class, 'removeRoomPass']);
                 Route::post('room_background_list', [BackgroundController::class, 'roomBackground']);
-                Route::post('quit_room', [RoomController::class, 'quit_room']);
+                Route::post('quit_room', [RoomController::class, 'quit_room_2']);
+                //                Route::post('quit_room_2', [RoomController::class, 'quit_room_2']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
                 Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
@@ -249,15 +270,20 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
-                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
-                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
+                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone2']);
+                //                Route::post('up-microphone2', [MicrophoneController::class, 'upMicrophone2']);
+                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone2']);
+                //                Route::post('leave-microphone2', [MicrophoneController::class, 'goMicrophone2']);
                 Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
-                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone']);
-                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
-                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
-                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
+                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone2']);
+                //                Route::post('mute_microphone2', [MicrophoneController::class, 'mute_microphone2']);
+                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone2']);
+                //                Route::post('unmute_microphone2', [MicrophoneController::class, 'unmute_microphone2']);
+                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone2']);
+                //                Route::post('lock_microphone_place2', [MicrophoneController::class, 'shut_microphone2']);
+                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone2']);
+                //                Route::post('unlock_microphone_place2', [MicrophoneController::class, 'open_microphone2']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-                // Invite user to room
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
@@ -318,7 +344,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('home_carousels')->group(function () {
-                Route::get('/',[HomeCarouselController::class, 'index']);
+                Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
 
@@ -369,7 +395,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
-                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
+                Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
@@ -651,7 +677,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
-
 });
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
@@ -706,3 +731,6 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
+Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);

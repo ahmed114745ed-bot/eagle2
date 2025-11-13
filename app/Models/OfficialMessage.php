@@ -17,4 +17,9 @@ class OfficialMessage extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+     public function userOfficialMessages()
+    {
+        return $this->hasMany(UserOfficialMessage::class);
+    }
 }

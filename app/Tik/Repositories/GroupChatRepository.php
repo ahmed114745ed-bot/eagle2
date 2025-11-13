@@ -25,7 +25,7 @@ class GroupChatRepository extends AbstractRepository
     public function getWithPaginate()
     {
         return $this->model->whereHas('user')->with([
-            'user.profile:id,user_id,avatar',
+            'user.profile:id,user_id,avatar,gender',
             'user.UserVip',
             'user.receiverLevel',
             'user.senderLevel',

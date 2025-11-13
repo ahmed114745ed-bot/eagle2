@@ -95,7 +95,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'super_admin_coins');
+        $data = $request->except('_token');
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -222,6 +222,11 @@ class SettingsController extends Controller
 
                 // Room::where('mode', 5)->update(['mode' => 1]);
             }
+
+            if ($key === 'app_fav_icon') {
+                Cache::forget('favicon');
+            }
+
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -251,7 +256,7 @@ class SettingsController extends Controller
         $sum = $request->app_wallet_lucky_gift
             + $request->owner_lucky_gift
             + $request->host_lucky_gift;
-         
+
         if ($sum !== 100) {
             return back()->withErrors([
                 'gift_percentage' => 'The total gift percentage must equal 100.'
@@ -263,7 +268,7 @@ class SettingsController extends Controller
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             $cacheKey = "percentage_{$key}";
-            Cache::put($cacheKey, $value);    
+            Cache::put($cacheKey, $value);
         }
 
         return back();
@@ -276,7 +281,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'super_admin_coins');
+        $data = $request->except('_token');
 
 
         if ($request->background_type === 'color') {

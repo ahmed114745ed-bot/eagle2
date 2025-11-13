@@ -6,9 +6,15 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Selectables\Agencies;
+use App\Selectables\Families;
+use Encore\Admin\Facades\Admin;
+use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Models\OfficialMessageAdmin;
+use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
 
@@ -69,7 +75,12 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $grid->model()->where('type', 2)->orderByDesc('id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
+        $grid->model()->whereNull('admin_id')
+            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
+            ->where('type', 2)->orderByDesc('id');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -103,6 +114,7 @@ class OfficialMessageController extends MainController
 
 
         $grid->content(__('content'));
+        $grid->feature(__('type'));
         $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
@@ -149,6 +161,9 @@ class OfficialMessageController extends MainController
         $grid->disableExport();
 
         $this->extendGrid($grid);
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
         return $grid;
     }
 
@@ -199,23 +214,140 @@ class OfficialMessageController extends MainController
     {
         $form = new Form(new OfficialMessageAdmin);
         $this->disableFormTools($form);
-
         $form->display('ID');
-        $form->text('title', __('title'))->rules('nullable|max:255');;
+        $form->text('title', __('title'))->rules('required|max:255');
+        $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
-        $form->select('user_id', __('user'))->options(function ($search) {
-            $ops = [0 => __('all')];
-            return $ops;
-        })->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name', 'uuid');
-        $form->text('content', __('content'));
-        $form->select('type', __('type'))->options(
-            [
-                2 => trans(__('official message'))
-            ]
-        )->default(2);
         $form->text('url', __('url'));
+
+        $form->select('admin_role', trans('type admin'))->options([
+            'area_manager'   => __('area manager'),
+            'country_manager' => __('country manager'),
+
+        ])->when('area_manager', function (Form $form) {
+            $form->select('admin_area_id', __('area'))
+                ->options('/api/search/area-manager')
+                ->ajax('/api/search/area-manager', 'id', 'name');
+        })->when('country_manager', function (Form $form) {
+            $form->select('admin_super_id', __('country'))
+                ->options('/api/search/users-superadmin2')
+                ->ajax('/api/search/users-superadmin2', 'id', 'name');
+        });
+        $form->select('type_feature', trans('type feature'))->options([
+            'single'   => __('single select'),
+            'multi' => __('multi select'),
+
+        ])->when('single', function (Form $form) {
+            $this->selectFeature($form);
+        })->when('multi', function (Form $form) {
+            $form->multipleSelect('multi_feature', __('feature'))
+                ->options([
+                    'all' => __('all'),
+                    'users' => __('regular users'),
+                    'host_users' => __('hosts'),
+                    'host_agencies' => __('Host Agencies'),
+                    'charge_agencies' => __('charge agencies'),
+                    'families' => __('families'),
+                    'bds' => __('bds'),
+                    'vips' => __('Vips'),
+                ])->attribute([
+                    'id' => 'multi_feature_select'
+                ])
+                ->help(__('Selecting All will automatically select all other options'));
+        });
+        Admin::script(<<<JS
+            $('#multi_feature_select').on('change', function () {
+                var selected = $(this).val() || [];
+
+                // If "all" is selected
+                if (selected.includes('all')) {
+                    // Select all options
+                    $('#multi_feature_select option').prop('selected', true);
+                    $('#multi_feature_select').trigger('change.select2');
+                } else {
+                    // Deselect "all" if it’s not alone
+                    $('#multi_feature_select option[value="all"]').prop('selected', false);
+                    $('#multi_feature_select').trigger('change.select2');
+                }
+            });
+            JS);
+        $form->hidden('type', __('type'))->default(2);
 
 
         return $form;
+    }
+
+    protected function selectFeature(Form $form)
+    {
+        $form->select('feature', trans('feature'))->options([
+            'agency'   => __('agency'),
+            'family' => __('family'),
+            'users'   => __('users'),
+            'bds'  => __('BDs'),
+            'shipping_agency'  => __('shipping agency')
+        ])->when('agency', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all'   => __('all agencies'),
+                'country' => __('All Agencies in Country'),
+                'ids'   => __('Specific Agency by ID'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            })->when('ids', function (Form $form) {
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
+                $form->select('member_title', trans('member'))->options([
+                    'owner'   => __('owner'),
+                    'admin' => __('admins'),
+                    'members'   => __('members'),
+                ]);
+            })->default('owner');
+        })->when('family', function (Form $form) {
+            $form->belongsToMany('family_ids', Families::class, trans('families'));
+            $form->select('member_title', trans('member'))->options([
+                'owner'   => __('owner'),
+                'admin' => __('admins'),
+                'members'   => __('members'),
+            ])->default('owner');
+        })->when('users', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'country' => __('Users in Specific Country'),
+                'logout'   => __('Logged Out Users'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        })->when('bds', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all' => __('All BDS'),
+                'country' => __('Bds in Specific Country'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        })->when('shipping_agency', function (Form $form) {
+            $form->select('sub_feature', __('type'))->options([
+                'all' => __('All Shipping Agencies'),
+                'country' => __('Shipping Agencies in Specific Country'),
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+        });
+
+        $form->saving(function (Form $form) {
+            if (is_array($form->multi_feature)) {
+                $form->multi_feature = implode(',', $form->multi_feature);
+            }
+        });
+
+        $form->saved(function (Form $form) {
+            $model = $form->model();
+            $data = request()->except(['img']);
+            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
+        });
     }
 }

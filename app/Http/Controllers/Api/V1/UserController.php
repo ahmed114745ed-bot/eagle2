@@ -249,6 +249,33 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function searchOwnerRoomWithPage(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchOwnerRoomWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersAudioRoom(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchUsersAudioWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersLiveRoom(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchUsersLiveWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
     public function search2_new(Request $request)
     {
         $key = $request->q;
@@ -265,6 +292,16 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    public function bdCountryUsers(Request $request)
+    {
+        $key = $request->q;
+        $country_id = $request->country_id;
+        $page = $request->get('page', 1);
+        $users = $this->userService->bdCountryUsers($key, $page, $country_id);
+
+        return response()->json($users);
+    }
+
 
     public function user_bd(Request $request)
     {
@@ -275,6 +312,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+
     public function user_bd2(Request $request)
     {
         $key = $request->q;
@@ -284,11 +322,104 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function userBdByCountries(Request $request)
+    {
+         $areaManager = $request->get('area_manager_id');
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->userBdByCountries($areaManager,$key, $page);
+
+        return response()->json($users);
+    }
+
+    public function superAdminUsers(Request $request)
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->superAdminUsers($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function subSuperAdminUsers(Request $request)
+    {
+        $key = $request->q;
+        
+        $page = $request->get('page', 1);
+        $users = $this->userService->subSuperAdminUsers($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function subAreaManager(Request $request)
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->subAreaManager($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersAreaManager(Request $request)
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->usersAreaManager($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function superAdminUsers2(Request $request): JsonResponse
+    {
+        $key = $request->q;
+
+        $page = $request->get('page', 1);
+        $users = $this->userService->superAdminUsers2($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersByCountry(Request $request): JsonResponse
+    {
+        $superAdminId = $request->get('super_admin_id');
+        $key = $request->get('q'); // search keyword
+        $page = $request->get('page', 1);
+
+        $users = $this->userService->usersByCountry($superAdminId, $key, $page);
+
+        return response()->json($users);
+    }
+
+    public function usersByCountries(Request $request): JsonResponse
+    {
+        $areaManager = $request->get('area_manager_id');
+        $key = $request->get('q'); // search keyword
+        $page = $request->get('page', 1);
+
+        $users = $this->userService->usersByCountries($areaManager, $key, $page);
+
+        return response()->json($users);
+    }
+
     public function agencies(Request $request)
     {
         $key = $request->q;
         $page = $request->get('page', 1);
         $users = $this->userService->searchInAgency($key, $page);
+
+        return response()->json($users);
+    }
+
+    public function superAdminAgencies(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $countryId = $request->get('country_id');
+
+        $users = $this->userService->superAdminAgencies($key, $page, $countryId);
 
         return response()->json($users);
     }

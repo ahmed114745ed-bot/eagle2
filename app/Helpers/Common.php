@@ -15,18 +15,15 @@ use App\Models\Follow;
 use App\Models\Target;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
-use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
 use App\Models\Background;
-use Illuminate\Log\Logger;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
-use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
 use Modules\Vip\Entities\Vip;
@@ -39,27 +36,21 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Http\JsonResponse;
 use Modules\Vip\Entities\UserVip;
 use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Log;
 use Modules\Events\Entities\Winner;
-use App\Models\NotificationTemplate;
-use App\Tik\DTO\NotificationPayload;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Modules\Events\Entities\PkEvent;
-
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
-use App\Notifications\AgencyOwnerRole;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\HelperTraits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
-use App\Http\Resources\CountryResource;
 use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
@@ -71,11 +62,10 @@ use App\Jobs\SendFirebaseNotificationJob;
 use Illuminate\Pagination\CursorPaginator;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Notification;
-use App\Jobs\SendFirebaseTopicNotificationJob;
-use Modules\Charizma\Entities\ExtraDataInRoom;
+use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -510,11 +500,12 @@ class Common
         return $confs ?: null;
     }
 
-    public static function upload($folder, $file)
+    public static function upload($folder, $file, $disk = null)
     {
+        $config = $disk ?: config('filesystems.default');
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
@@ -1439,7 +1430,10 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
+         Log::info('start sendToZego3');
+
         try {
+
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
             $AppId            = self::getConf('zego_app_id');
@@ -1467,28 +1461,10 @@ class Common
                 $params['MessageContent'] = $messageContent;
                 $promises[rand(1, 999) . ''] = $client->getAsync($url, ['query' => $params]);
             }
-            Log::info('🛰️ Sending Zego request', [
-                'url'    => $url,
-                'params' => $params,
-            ]);
-
-
-
-            Log::info('📬 Zego response received', [
-                'promises' => $promises,
-            ]);
-
-          
-         
-    
-            Log::info('🛰️ Sending Zego request', [
-                'sendToZego3' => '',
-                'params' => $params,
-            ]);
-          
-    
             return $promises;
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
         }
     }
 
@@ -1808,15 +1784,25 @@ class Common
 
         //leave mic
 
-        foreach ($usersIdInRooms as $userId) {
-            if (isset($room->microphone)) {
+//        foreach ($usersIdInRooms as $userId) {
+//            if (isset($room->microphone)) {
+//
+//                $microphones = explode(',', $room->microphone);
+//                if (in_array($userId, $microphones)) {
+//                    UserHandling::calcTime($userId);
+//                }
+//            }
+//            self::quit_hand_2($room->uid, $userId);
+//        }
 
-                $microphones = explode(',', $room->microphone);
-                if (in_array($userId, $microphones)) {
-                    UserHandling::calcTime($userId);
-                }
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+
+        foreach ($usersIdInRooms as $userId) {
+            if (in_array($userId, $micUserIds, true)) {
+                UserHandling::calcTime($userId);
             }
-            self::quit_hand($room->uid, $userId);
+
+            self::quit_hand_2($room->uid, $userId);
         }
 
         $room->update(['is_live' => false]);
@@ -1831,7 +1817,7 @@ class Common
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
         $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, $users);
-        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, $users);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, $users);
 
         $ms = [
             'messageContent' => [
@@ -1855,6 +1841,14 @@ class Common
 
     public static function getChargerInfo($resource)
     {
+
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
         switch ($resource->charger_type) {
             case 'dash':
                 $admin = $resource->admin;
@@ -1865,6 +1859,34 @@ class Common
                     'id' => $admin->id ?? '',
                     'type' => 'dash',
                     'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url($prefix ."/auth/users/{$areaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+                case UserTypeEnum::SUB_AREA_MANAGER:
+                $subAreaManager = $resource->subAreaManager;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix ."/auth/users/{$subAreaManager->id}") : '#',
                     'image_color' => null,
                     'id_image' => '',
                     'colored_name' => '',
@@ -1951,21 +1973,64 @@ class Common
 
     public static function getReceiverInfo($resource)
     {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-
-
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
                     'uuid' => $resource->receiveragency->id ?? '',
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
-                    'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
 
+                ];
+            case 'sub_area_manager':
+                return [
+                    'name' => $resource->receiverSubAreaManager->name ?? '',
+                    'image' => $resource->receiverSubAreaManager->img ?? '',
+                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
+                    'id' => $resource->receiverSubAreaManager->id ?? '',
+                    'type' => 'sub_area_manager',
+                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+                    'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
+                    'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+
+                ];
+            case 'super_admin':
+                return [
+                    'name' => $resource->receiverSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSuperAdmin->id ?? '',
+                    'type' => 'super_admin',
+                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
                 ];
             case 'user':
                 return [
@@ -1976,7 +2041,7 @@ class Common
                     'image' => $resource->receiver->profile->avatar ?? '',
                     'uuid' => $resource->receiver->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receiver ? url("admin/users/{$resource->receiver->id}") : '#',
+                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
                     'image_color'          => @$resource->receiver->color_image,
                     'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
@@ -2151,11 +2216,52 @@ class Common
             $data = [
                 'user_id' => $userId,
                 'badge_id' => $badgeId,
-                'expire' => time() + (($days) * 86400),
+                'expire' => $days == 0 ? 0 : time() + (($days) * 86400),
                 'receive_type' => $type,
             ];
 
             UserBadge::query()->create($data);
         }
+    }
+
+    public static function areaCountries(): array
+    {
+        $adminId = session('area_manager_id') ?? auth()->user()->id;
+
+        $authAdmin = AreaManager::with('countries')->find($adminId);
+
+        if (!$authAdmin) {
+            $authAdmin = SubAreaManager::with('countries')->find($adminId);
+        }
+
+        if (!$authAdmin) {
+            return [];
+        }
+
+        $countryID = session('area_manager_country_id');
+
+        if ($countryID) {
+            return (array)$countryID;
+        }
+
+        return @$authAdmin->countries->pluck('id')->toArray() ?? [];
+    }
+
+
+
+    public static function getRoleAuthId($userId)
+    {
+        $userId = $userId ?? auth()->id();
+        $user = DB::table('admin_users')->where('id', $userId)->first();
+        if (! $user) {
+            return null;
+        }
+        if ($user->type === 'area-manager') {
+            return $user->id;
+        }
+        if ($user->type === 'sub_area_manager') {
+            return $user->parent_id;
+        }
+        return $user->id;
     }
 }

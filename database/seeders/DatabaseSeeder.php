@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Modules\CP\Database\Seeders\CPDatabaseSeeder;
+use Modules\Form\Database\Seeders\AgencyAndBdFormsSeeder;
+use Modules\Form\Database\Seeders\CustomFieldWidgetSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,12 +33,14 @@ class DatabaseSeeder extends Seeder
 //        $this->call(UserSeeder::class);
         $this->call([
 //        CoreWalletsSeeder::class,
-            PaymentGatewaysSeeder::class,
+//            PaymentGatewaysSeeder::class,
 //            AdminPermissionRefact::class,
 //            CPDatabaseSeeder::class,
 //        AdminPermission::class,
 //        AdminNewPermission::class,
 //        AdminRoleBDSeeder::class,
+        CustomFieldWidgetSeeder::class,
+            AgencyAndBdFormsSeeder::class
         ]);
     }
 }

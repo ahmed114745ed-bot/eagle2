@@ -75,18 +75,37 @@ class SearchRepository implements SearchRepositoryInterface
 
         $keywords = $user->id;
 
-        return Room::with('owner')
+        $query = Room::with([
+            'owner',
+            'owner.packs'
+        ])
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
+            ->where(function ($query) use ($keywords, $blockedUserIds) {
+                $query->where('uid', 'like', $keywords . '%')
+                    ->whereNotIn('uid', $blockedUserIds);
+            })
+            ->where(function ($query) {
+                $query->where('type', '!=', 'live')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'live')
+                            ->where('room_status', 1)
+                            ->where('is_live', 1);
+                    });
+            })
             ->orderBy('hot', 'desc')
-            ->take(2)
-            ->get();
+            ->take(2);
+
+
+        $rooms = $query->get();
+
+        // \Log::info('Room Results:', $rooms->toArray());
+
+        return $rooms;
     }
 
-    public function searchRoomsV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1): array|Collection
+    public function searchRoomsV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1): array|Collection
     {
         $user = User::query()
             ->fitterByUuid($keywords)
@@ -118,8 +137,17 @@ class SearchRepository implements SearchRepositoryInterface
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
-            ->where('uid', 'like',  $keywords . '%')
-            ->whereNotIn('uid', $blockedUserIds)
+            ->where(function ($query) use ($keywords, $blockedUserIds) {
+                $query->where('uid', 'like', $keywords . '%')
+                    ->whereNotIn('uid', $blockedUserIds);
+            })
+            ->where(function ($query) {
+                $query->where('type', '!=', 'live')
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('type', 'live')
+                            ->where('room_status', 1);
+                    });
+            })
             ->orderBy('hot', 'desc')
             ->take(2)
             ->get();
@@ -184,7 +212,7 @@ class SearchRepository implements SearchRepositoryInterface
         return $users;
     }
 
-    public function userSearchHandV2(int $userId, string $keywords,array $blockedUserIds, int $page = 1)
+    public function userSearchHandV2(int $userId, string $keywords, array $blockedUserIds, int $page = 1)
     {
         if (!$userId || !$keywords) {
             return [];
@@ -223,7 +251,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderByDesc('total_score')
             ->take(10)
             ->get();
-//            ->paginate(10, ['*'], 'page', $page);
+        //            ->paginate(10, ['*'], 'page', $page);
 
         return $users;
     }
@@ -290,9 +318,18 @@ class SearchRepository implements SearchRepositoryInterface
             ->get();
 
         $official = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
             ->where('type', 2)
+            ->where(function ($query) use ($userId) {
+                $query->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })
+                    ->orWhere(function ($q) use ($userId) {
+                        $q->whereIn('user_id', [0, $userId])
+                            ->whereDoesntHave('userOfficialMessages');
+                    });
+            })
             ->orderBy('created_at', 'desc')
+            ->limit(10)
             ->get();
 
         $agency = OfficialMessage::query()
@@ -311,8 +348,22 @@ class SearchRepository implements SearchRepositoryInterface
     public function getNotifications(int $userId, int $type): AnonymousResourceCollection
     {
         $messages = OfficialMessage::query()
-            ->whereIn('user_id', [0, $userId])
-            ->where('type', $type)
+
+            ->when($type == 2, function ($q) use ($userId) {
+                $q->where('type', 2)
+                    ->where(function ($query) use ($userId) {
+                        $query->whereHas('userOfficialMessages', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        })
+                            ->orWhere(function ($q) use ($userId) {
+                                $q->whereIn('user_id', [0, $userId])->whereNull('feature') ;
+                            });
+                    });
+            })
+            ->when($type != 2, function ($q) use ($userId, $type) {
+                $q->whereIn('user_id', [0, $userId])
+                    ->where('type', $type);
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

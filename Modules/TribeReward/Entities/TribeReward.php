@@ -3,11 +3,11 @@
 namespace Modules\TribeReward\Entities;
 
 use App\Helpers\Common;
-use App\Models\OVip;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Modules\Vip\Entities\OVip;
 
 class TribeReward extends Model
 {

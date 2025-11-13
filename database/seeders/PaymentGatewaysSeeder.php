@@ -165,14 +165,14 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         // sky pay
-        $pay_sky_id = PaymentCoin::firstOrCreate([
-            'type' => 'sky_pay',
+         $pay_sky_id = PaymentCoin::firstOrCreate([
+             'type' => 'sky_pay',
         ], [
-            'title' => 'skyPay',
-            'photo' => 'images/paysky.png',
-            'status' => 1,
-            'package_type' => 'user'
-        ]);
+             'title' => 'skyPay',
+             'photo' => 'images/paysky.png',
+             'status' => 1,
+             'package_type' => 'user'
+         ]);
 
         $pay_sky_fields = [
             'new_2' => [

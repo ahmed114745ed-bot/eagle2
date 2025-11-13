@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])->group (
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan' ,'update.last.seen'])->group (
     function (){
 
         Route::prefix('/')->middleware("appFeatureEnable:reel")->group(function (){

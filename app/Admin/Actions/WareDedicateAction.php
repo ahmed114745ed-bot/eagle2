@@ -37,7 +37,12 @@ class WareDedicateAction extends Action
     }
     public function handle(Request $request)
     {
-        $user = User::query()->searchByUuid($request->user_uuid)->first();
+                 $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
+        $user = User::query()
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->searchByUuid($request->user_uuid)->first();
+
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();
         }

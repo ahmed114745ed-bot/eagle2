@@ -39,3 +39,7 @@ Artisan::command ('monthly_update',function (){
     );
     $this->comment('updated');
 })->purpose ('update data every month');
+
+
+
+

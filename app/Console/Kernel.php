@@ -2,9 +2,11 @@
 
 namespace App\Console;
 
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Cache;
 use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
 use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
@@ -138,6 +140,14 @@ class Kernel extends ConsoleKernel
 
         $this->scheduleRoomCupRewards($schedule);
 
+    
+        $schedule->command('users:update-offline')
+            ->everyThirtyMinutes()
+            ->timezone(getTimezone()) 
+            ->withoutOverlapping()
+            ->runInBackground();
+        
+
         // $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
 
 
@@ -158,7 +168,7 @@ class Kernel extends ConsoleKernel
         }
     
         $type     = $settings['type'] ?? 'daily';
-        $time     =  '23:59';
+        $time     =  '00:00';
     
         $command = $schedule->command('roomcup:calculate-rewards')
                             ->timezone(getTimezone());
@@ -173,19 +183,39 @@ class Kernel extends ConsoleKernel
     
     private function getRoomCupSettings(): array
     {
+
         $default = [
             'enabled'          => true,
             'interval_minutes' => 60,
             'type'             => 'daily',
-            'time'             => '23:59',
+            'time'             => '00:00',
         ];
     
-        if (!Storage::disk('local')->exists('roomcup_settings.json')) {
-            Storage::disk('local')->put('roomcup_settings.json', json_encode($default, JSON_PRETTY_PRINT));
+        $settings = [];
+    
+        foreach ($default as $key => $defaultValue) {
+            $cacheKey = 'roomcup_' . $key;
+    
+            $value = Cache::get($cacheKey);
+    
+            if ($value === null) {
+                $setting = Setting::where('key', $cacheKey)->first();
+                $value = $setting ? $setting->value : $defaultValue;
+    
+                Cache::put($cacheKey, $value, now()->addDays(30));
+            }
+    
+            if ($key === 'enabled') {
+                $value = (bool) $value;
+            } elseif ($key === 'interval_minutes') {
+                $value = (int) $value;
+            }
+    
+            $settings[$key] = $value;
         }
     
-        return array_merge($default, json_decode(Storage::disk('local')->get('roomcup_settings.json'), true) ?? []);
-    }
+        return $settings;
+  }
     
 
 }

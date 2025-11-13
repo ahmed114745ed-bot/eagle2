@@ -33,6 +33,6 @@ class ResetTodayTopRoomRank extends Command
             SET  top_user_id = null
         ");
 
-//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+       $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }

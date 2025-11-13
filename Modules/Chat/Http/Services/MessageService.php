@@ -13,6 +13,7 @@ use Modules\Chat\Entities\ChatRoom as EntitiesChatRoom;
 use Modules\Chat\Http\Repositories\MessageAlbumRepository;
 use Modules\Chat\Http\Repositories\MessageRepository;
 use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomPusherV2Resource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Traits\FfmpegTrait;
 use Modules\Public\Events\UnreadCounterIndividual;
@@ -158,24 +159,31 @@ class MessageService
         $this->updateMessageStatus($message, $user2, $chatRoom);
 
         // Send notification if user is not logged out
-        $this->sendNotification($user2, $message);
+        if (!$user2->current_room_chat !=  $chatRoom->id){
+            $this->sendNotification($user2, $message);
+        }
 
         // Handle message reply
         if ($request->message_id) {
             $this->messageRepo->createMessageReplay($message->id, $request->message_id);
         }
+//        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
 
         // Return the message and chat room resources
         return [
             'message_resource' => new ChatMessageResource($this->messageRepo->findMessageById($message->id)),
-            'room_resource' => new ChatRoomResourcePusher($chatRoom)
+            'room_resource' => new ChatRoomPusherV2Resource($chatRoom)
         ];
     }
 
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
+        \Log::info('updateMessageStatus: ', ['user2' =>  $user2->id]);
+
         if ($user2->online == 1) {
             $condition = ($user2->current_room_chat == $chatRoom->id);
+            \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
+
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
             if (!$condition) {

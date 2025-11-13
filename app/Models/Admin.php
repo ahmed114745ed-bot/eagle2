@@ -10,13 +10,17 @@ class Admin extends Administrator
 
     protected $appends = ['agency_id'];
 
-    protected $fillable = ['username', 'password', 'name', 'avatar', 'is_preview'];
+    protected $fillable = ['username', 'password', 'name','app_id', 'avatar', 'is_preview','type'];
 
     protected $guarded = [];
 
     public function agency()
     {
         return $this->hasOne(Agency::class, 'owner_id');
+    }
+    public function user()
+    {
+         return $this->belongsTo(User::class, 'app_id');
     }
 
     public function getAgencyIdAttribute()
@@ -38,10 +42,6 @@ class Admin extends Administrator
     public function agencies()
     {
         return $this->hasMany(Agency::class, 'agency_manger_id');
-    }
-    public function user()
-    {
-        return $this->hasOne(User::class, 'app_id');
     }
 
     public function per()

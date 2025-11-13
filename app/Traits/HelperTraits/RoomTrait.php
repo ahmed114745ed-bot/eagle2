@@ -13,6 +13,7 @@ use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait RoomTrait
 {
@@ -91,6 +92,85 @@ trait RoomTrait
         return $data;
     }
 
+    public static function get_room_users_2($owner_id,$user_id){
+        $room = Room::query()->where('uid', $owner_id)->select('id', 'uid', 'room_visitor')->with(['microphones.user.profile'])->first();
+
+        if(!$room)   return __('room does not exist');
+
+//        $mic_arr=$room->microphone ? explode(',', $room->microphone) : [];
+//        foreach ($mic_arr as $k => &$v) {
+//            if($v == 0 || $v == -1 || $v == $owner_id)   unset($mic_arr[$k]);
+//        }
+
+        $mic_arr = $room->microphones->whereNotIn('user_id', [0, -1, $owner_id])->pluck('user_id')->filter()->values()->all();
+
+
+        $vis_arr=$room->room_visitor ? explode(',', $room->room_visitor) : [];
+        if($user_id && !in_array($user_id,$vis_arr))    return __('User is not in this room');
+        $sea_user=array();
+
+//        $mic_user=User::query ()->whereIn('id',$mic_arr)->with ('profile')->get ();
+//        foreach ($mic_user as $k => &$v){
+//            $v->is_mic=1;
+//            if($user_id == $v->id)  $sea_user[]=$v;
+//        }
+//        unset($v);
+
+        $mic_user = $room->microphones
+            ->whereNotIn('user_id', [0, -1, $owner_id])
+            ->pluck('user')
+            ->filter()
+            ->map(function ($user) use ($user_id) {
+                $user->is_mic = 1;
+                if ($user->id == $user_id) {
+                    $user->is_self = true;
+                }
+                return $user;
+            })
+            ->values();
+
+        $pm_arr=$paimai=$shiyin=[];
+        $paimai_data=Mic::where('roomowner_id',$owner_id)->select('type','created_at','user_id','roomowner_id')->get ();
+        $i=$j=0;
+        foreach ($paimai_data as $k => &$v2) {
+            $v2->id = $v2->user->id;
+            $v2->is_mic=0;
+            $v2->name = @$v2->user->name;
+            $v2->avatar = @$v2->user->profile->avatar;
+
+            if($v2->type==1){
+                $i++;
+                $v2->sort=$i;
+                $paimai[]=$v2;
+            }elseif($v2->type==2){
+                $j++;
+                $v2->sort=$j;
+                $shiyin[]=$v2;
+            }
+
+            $pm_arr[]=$v2->user_id;
+            if($user_id == $v2->user_id) $sea_user[]=$v2;
+            unset($v2->user);
+            unset($v2->user_id);
+            unset($v2->roomowner_id);
+        }
+        unset($v2);
+
+        $vis_arr=array_diff($vis_arr,$mic_arr);
+        $vis_arr=array_diff($vis_arr,$pm_arr);
+        $room_user=User::query ()->whereIn('id',$vis_arr)->get ();
+        foreach ($room_user as $k1 => &$v1){
+            $v1->is_mic=0;
+            if($user_id == $v1->id) $sea_user[]=$v1;
+        }
+
+        unset($v1);
+
+        $data['mic_users']= UserResource::collection ($mic_user) ;
+        $data['room_users']= UserResource::collection ($room_user);
+
+        return $data;
+    }
 
     //Get blacklist list
     public static function getUserBlackList($user_id = null) {
@@ -210,7 +290,29 @@ trait RoomTrait
         return $new_visitor;
     }
 
-
+    public static function quit_hand_2($uid,$user_id){
+        $Visitor=DB::table('rooms')->where(['uid'=>$uid])->value('room_visitor');
+        $room_visitor=explode(',', $Visitor);
+        $room = Room::query ()->where('uid',$uid)->first ();
+        if($uid == $user_id){
+            if ($room){
+                $room->update (['is_afk'=>0]);
+            }
+            Room::query ()->where('uid',$uid)->update(['is_afk'=>0]);
+        }
+        if( $uid != $user_id && !in_array($user_id, $room_visitor)){
+            return $Visitor;
+        }
+        foreach ($room_visitor as $k => &$v) {
+            if($user_id == $v){
+                unset($room_visitor[$k]);
+            }
+        }
+        $new_visitor=trim(implode(',', $room_visitor),',');
+        self::go_microphone_hand_2($uid,$user_id);
+        self::delMicHand($user_id);
+        return $new_visitor;
+    }
     //Down the wheat - execute the operation
     public static function go_microphone_hand($uid,$user_id){
         $room      = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
@@ -236,7 +338,7 @@ trait RoomTrait
         if ($microphone[$position] > 0){
             $baseMic[$position] = $mainMicrophone[$position];
         }
-        
+
 
         $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>implode(',', $baseMic)]);
         $room = Room::query ()->where ('uid',$uid)->first ();
@@ -257,6 +359,56 @@ trait RoomTrait
         $json = json_encode ($ms);
         Common::sendToZego ('SendCustomCommand',$room->id,$user_id,$json);*/
         return $result;
+    }
+
+    public static function go_microphone_hand_2($uid,$user_id){
+        $room = Room::withoutAppends()->where('type', 'audio')->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
+        // Log::info('Room object:', ['room' => $room]);
+
+        if (!$room) {
+            // Log::warning("Room not found for UID: {$uid}");
+            return 0;
+        }
+    
+        $micSeat = $room->microphones()
+            ->where('user_id', $user_id)
+            ->first();
+
+            $micSeat2 = $room->microphones();
+            // Log::info('micSeat2  object:', ['$micSeat2 ' => $micSeat2 ]);
+
+        if (!$micSeat) {
+            // Log::warning("User ID {$user_id} is not on microphone in Room UID: {$uid}");
+            return 0;
+        }
+    
+        // Log::info("Deleting microphone seat for User ID {$user_id} in Room UID: {$uid}");
+        $micSeat->delete();
+    
+        $micString = $room->microphones()
+            ->orderBy('position')
+            ->get()
+            ->map(function ($mic) {
+                $userId = $mic->user_id ?? 0;
+                $status = $mic->status ?? 0;
+    
+                return $userId > 0 ? "{$userId}#{$status}" : (string)$status;
+            })
+            ->implode(',');
+    
+        // Log::info("Updated microphone string for Room UID {$uid}: {$micString}");
+    
+        $pk = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
+        if ($pk) {
+            $pk->mics = $micString;
+            $pk->save();
+            // Log::info("Updated PK mics for Room ID {$room->id}");
+        }
+    
+        DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $user_id])->delete();
+        // Log::info("Deleted time_logs for User ID {$user_id} in Room UID {$uid}");
+    
+        return 1;
     }
 
     //Remove mic discharge operation

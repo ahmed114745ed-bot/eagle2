@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use App\Observers\ConfigObserver;
 use App\Observers\SettingObserver;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Modules\Vip\Entities\Vip;
@@ -89,10 +90,29 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
+    }
+
+    public function dashboardAdminConfig(): void
+    {
+        $prefix = request()->segment(1);
+
+        $originalConfig = config('admin.route');
+
+        if ($prefix === 'superadmin') {
+            config(['admin.route' => config('admin.superadmin_route')]);
+            Admin::routes();
+        } elseif ($prefix === 'areaManager') {
+            config(['admin.route' => config('admin.area_manager_route')]);
+            Admin::routes();
+        } elseif ($prefix === 'admin') {
+            // Admin::routes();
+            config(['admin.route' => $originalConfig]);
+        }
     }
 
     protected function defineCarbonMacros(): void
@@ -194,6 +214,20 @@ class AppServiceProvider extends ServiceProvider
                 'webhook_id' => $settings['paypal_webhook_id'] ?? '',
             ],
 
+            'codapay' => [
+                'base_url'   => $settings['codapay_base_url'] ?? '',
+                'api_key'    => $settings['codapay_api_key'] ?? '',
+                'project_id' => $settings['codapay_project_id'] ?? '',
+                'country'    => $settings['codapay_country'] ?? '',
+                'pay_type'   => $settings['codapay_pay_type'] ?? '',
+                'currency'   => $settings['codapay_currency'] ?? '',
+            ],
+
+            'googlePay' => [
+                'payment_url' => $settings['google_pay_payment_url'] ?? '',
+                'node_server_name' => $settings['google_pay_node_server_name'] ?? '',
+            ],
+
             'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
             'is_paypal_active' => $settings['is_paypal_active'] ?? 0,
             'is_utd_fawry_active' => $settings['is_utd_fawry_active'] ?? 0,
@@ -201,6 +235,8 @@ class AppServiceProvider extends ServiceProvider
             'is_strip_active' => $settings['is_strip_active'] ?? 0,
             'is_opay_active' => $settings['is_opay_active'] ?? 0,
             'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
+            'is_google_pay_active' => $settings['is_google_pay_active'] ?? 0,
+            'is_codapay_active' => $settings['is_codapay_active'] ?? 0,
         ]);
 
         Cache::put('app_title', $appName, now()->addHours(24));

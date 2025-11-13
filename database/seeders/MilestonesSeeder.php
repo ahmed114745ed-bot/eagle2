@@ -54,12 +54,19 @@ class MilestonesSeeder extends Seeder
                 'description' => 'Milestone for BD',
                 'is_active'   => true,
             ],
+            [
+                'name'        => 'Area Manager',
+                'slug'        => 'area-manager',
+                'description' => 'Milestone for Area manager',
+                'is_active'   => true,
+            ],
         ];
 
         foreach ($milestones as $milestone) {
-            Milestone::create($milestone);
+            Milestone::firstOrCreate(
+                ['slug' => $milestone['slug']], // check by slug
+                $milestone                      // create if not exist
+            );
         }
-
-    
     }
 }
