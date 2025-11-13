@@ -31,6 +31,14 @@ class AreaManager extends Authenticatable
             $builder->where('type', 'area-manager');
         });
 
+        parent::boot();
+
+        static::saving(function ($model) {
+            if (isset($model->area_name)) {
+                unset($model->area_name);
+            }
+
+        });
 
         static::deleting(function ($manager) {
 
@@ -90,4 +98,11 @@ class AreaManager extends Authenticatable
 
         return $html;
     }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'manager_id','id'); 
+    }
+
+
 }

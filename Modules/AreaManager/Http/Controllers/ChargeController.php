@@ -17,8 +17,9 @@ use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 
 class ChargeController extends MainController
@@ -95,7 +96,7 @@ class ChargeController extends MainController
             ])
             ->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) use ($authId, $authUser) {
             $filter->expand();
 
             $filter->where(function ($query) {
@@ -104,6 +105,19 @@ class ChargeController extends MainController
                         ->where('user_id', $this->input);
                 }
             }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
+            if ($authUser->type == 'area-manager') {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->where('charger_id', $this->input);
+                    }
+                }, __('created by'))->select(
+                    // Combine SubAreaManagers and AreaManager themselves
+                    SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')
+                        ->merge(AreaManager::where('id', $authId)->pluck('name', 'id'))
+                        ->toArray()
+                );
+            }
+
 
             $filter->where(function ($query) {
                 if ($this->input) {
