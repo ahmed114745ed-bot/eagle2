@@ -65,15 +65,9 @@ class FlagSyrianSeeder extends Seeder
             'flag' => $braPath,
         ]);
 
-        Country::where('iso3', 'PSE')->delete();
-
         Country::where('iso3', 'ISR')->update([
-            'iso' => 'PS',
             'e_name' => 'Palestine',
             'name' => 'فلسطين',
-            'iso3' => 'PSE',
-            'phone_code' => '+970',
-            'iso_numeric' => '275',
             'currency_numeric' => null,
         ]);
 
