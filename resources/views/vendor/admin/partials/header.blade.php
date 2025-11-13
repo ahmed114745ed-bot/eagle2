@@ -230,12 +230,14 @@
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);
 
+//            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
+
             $countries = collect();
             if ($selectAreaManagerId) {
                 $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
                 if ($areaManager && method_exists($areaManager, 'countries')) {
-                    $countries = $areaManager->countries()
-                        ->select(['countries.id', 'countries.name', 'countries.flag'])
+                    $countries = $areaManager->countriesQuery()
+                        ->select(['id', 'name', 'flag'])
                         ->get();
                 }
             } else {
@@ -724,58 +726,219 @@
             })
             .catch(err => console.error('Error marking notification:', err));
     };
-
-    window.initializeAdminHeader = function () {
-        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        const previewBtn     = document.getElementById('preview-superadmin-btn');
-        const previewAreaBtn = document.getElementById('preview-area-manger-btn');
-        const exitBtn        = document.getElementById('exit-preview-btn');
-
-        // handle "go to country" button
-        if (previewBtn) {
-            previewBtn.addEventListener('click', function () {
-                fetch('/admin/set-preview-superadmin', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-                }).then(() => window.location.reload());
-            });
-        }
-
-        // handle "go to preview" button
-        if (previewAreaBtn) {
-            previewAreaBtn.addEventListener('click', function () {
-                fetch('/admin/set-preview-area-manager', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-                }).then(() => window.location.reload());
-            });
-        }
-
-        // handle "exit preview" button
-        if (exitBtn) {
-            exitBtn.addEventListener('click', function () {
-                Promise.all([
-                    fetch('/admin/unset-preview-superadmin', {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-                    }),
-                    fetch('/admin/unset-preview-area-manager', {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-                    })
-                ]).then(() => window.location.reload());
-            });
-        }
-    };
-
-    $(document).on('pjax:end', function() {
-        $.get(window.location.href, function (response) {
-            $('#preview-buttons-wrapper').html($(response).find('#preview-buttons-wrapper').html());
-            $('#country-select').html($(response).find('#country-select').html());
-            window.initializeAdminHeader();
-            $('#country-select').select2({});
-        });
-    });
 </script>
 
+<script>
+    $(document).ready(function () {
+        const $countrySelect = $('#country-select');
+        const $AreaManagerSelect = $('#area-Manager-select');
+        const isPreviewSuperadmin = @json(session('preview_superadmin'));
+        const isPreviewAreaManager = @json(session('preview_area_manager'));
+
+        // Function to format country options with flags
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+            const flag = $(country.element).data('flag');
+            const name = country.text;
+            if (flag) {
+                return `
+                <span>
+                    <img src="${flag}" style="width:20px; height:14px; margin-right:5px; vertical-align:middle;">
+                    ${name}
+                </span>
+            `;
+            }
+            return name;
+        }
+
+        // Function to initialize country select
+        function initCountrySelect() {
+            const $select = $('#country-select');
+            if ($select.length) {
+                // Destroy existing Select2 if it exists
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
+                }
+
+                // Initialize Select2
+                $select.select2({
+                    placeholder: "{{ __('Select Country') }}",
+                    allowClear: true,
+                    templateResult: formatCountry,
+                    templateSelection: formatCountry,
+                    escapeMarkup: function (markup) { return markup; }
+                });
+
+                // Remove any existing change handlers to prevent duplicates
+                $select.off('change');
+
+                // Add change handler
+                $select.on('change', function () {
+                    const $this = $(this);
+                    if (!$this.val()) {
+                        setTimeout(() => $this.select2('close'), 0);
+
+                        const url = new URL(window.location.href);
+
+                        @if(request()->is('admin*'))
+                        url.searchParams.set('clear_country', 1);
+                        url.searchParams.delete('filter_country_id');
+                        @else
+                        url.searchParams.set('clear_area_manager_country', 1);
+                        url.searchParams.delete('area_manager_country_id');
+                        @endif
+
+                        if ($.pjax) {
+                            setTimeout(() => {
+                                $.pjax({ url: url.toString(), container: '#pjax-container' });
+                            }, 1);
+                        } else {
+                            window.location.href = url.toString();
+                        }
+                        return;
+                    }
+
+                    const countryId = $(this).val();
+                    const url = new URL(window.location.href);
+
+                    @if(request()->is('admin*'))
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('filter_country_id', countryId);
+                        url.searchParams.delete('clear_country');
+                    } else {
+                        url.searchParams.set('clear_country', 1);
+                        url.searchParams.delete('filter_country_id');
+                    }
+                    @else
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('area_manager_country_id', countryId);
+                        url.searchParams.delete('clear_area_manager_country');
+                    } else {
+                        url.searchParams.set('clear_area_manager_country', 1);
+                        url.searchParams.delete('area_manager_country_id');
+                    }
+                    @endif
+
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
+                });
+            }
+        }
+
+        // Function to initialize area manager select
+        function initAreaManagerSelect() {
+            const $select = $('#area-Manager-select');
+            if ($select.length) {
+                // Destroy existing Select2 if it exists
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
+                }
+
+                $select.select2({
+                    placeholder: '{{ __("Select area manager") }}',
+                    allowClear: true,
+                    width: '190px'
+                });
+
+                // Remove existing handlers
+                $select.off('change');
+
+                $select.on('change', function () {
+                    const $this = $(this);
+                    if (!$this.val()) {
+                        setTimeout(() => $this.select2('close'), 0);
+
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('clear_area_manager', 1);
+                        url.searchParams.delete('area_manager_id');
+
+                        if ($.pjax) {
+                            setTimeout(() => {
+                                $.pjax({ url: url.toString(), container: '#pjax-container' });
+                            }, 1);
+                        } else {
+                            window.location.href = url.toString();
+                        }
+                        return;
+                    }
+
+                    const areaManagerId = $(this).val();
+                    const url = new URL(window.location.href);
+
+                    if (areaManagerId && areaManagerId !== 'null') {
+                        url.searchParams.set('area_manager_id', areaManagerId);
+                        url.searchParams.delete('clear_area_manager');
+                    } else {
+                        url.searchParams.set('clear_area_manager', 1);
+                        url.searchParams.delete('area_manager_id');
+                    }
+
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
+                });
+            }
+        }
+
+        // Initialize on page load
+        initAreaManagerSelect();
+        initCountrySelect();
+
+        // Initialize preview buttons
+        window.initializeAdminHeader();
+
+        // Handle PJAX reload
+        $(document).on('pjax:end', function() {
+            $.get(window.location.href, function (response) {
+                const $response = $(response);
+
+                // Update preview buttons wrapper
+                $('#preview-buttons-wrapper').html($response.find('#preview-buttons-wrapper').html());
+
+                // Update country select HTML
+                const $newCountrySelect = $response.find('#country-select');
+                if ($newCountrySelect.length) {
+                    $('#country-select').replaceWith($newCountrySelect);
+                }
+
+                // Update area manager select HTML
+                const $newAreaManagerSelect = $response.find('#area-Manager-select');
+                if ($newAreaManagerSelect.length) {
+                    $('#area-Manager-select').replaceWith($newAreaManagerSelect);
+                }
+
+                // Reinitialize everything
+                initAreaManagerSelect();
+                initCountrySelect();
+                window.initializeAdminHeader();
+            });
+        });
+
+        // Rest of your code...
+        const originalFetch = window.fetch;
+        window.fetch = function (url, options = {}) {
+            options.headers = options.headers || {};
+
+            if (window.enableCountryHeader) {
+                const countryId = $('#country-select').val();
+                options.headers['X-Country-ID'] = countryId ? countryId : 'null';
+            }
+
+            if (!options.headers['Accept'])
+                options.headers['Accept'] = 'application/json';
+
+            return originalFetch(url, options);
+        };
+    });
+</script>

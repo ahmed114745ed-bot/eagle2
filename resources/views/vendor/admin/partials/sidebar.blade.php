@@ -106,12 +106,12 @@
 
 
 
-     
+
             @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
                         ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'], 
+                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
                         ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
                         ,
                         [
@@ -197,7 +197,7 @@
                     @if(isset($link['children']))
 
                         @if(hasVisibleChildren($link['children']))
-                      
+
                             <li class="treeview">
                                 <a href="#">
                                     <i class="fa {{ $link['icon'] }}"></i>
@@ -418,23 +418,63 @@
                 @elseif(session('preview_area_manager'))
                     @php
                         $areaManagerPreviewLinks = [
-                             ['uri' => '/','icon' => 'fa-home','title' => __('Dashboard')],
-                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin')],
-                                    ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD')],
-                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users')],
+                            ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-users',
+                                'title' => __('Super Admin'),
+                                'children' => [
+                                    ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
+                                ],
+                            ],
+                            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-briefcase',
+                                'title' => __('BD'),
+                                'children' => [
+                                    ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
+                                    ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ],
+                            ],
+                            ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-building',
                                 'title' => __('Agencies'),
                                 'children' => [
-                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
-                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
-                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
+                                    ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                    ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                    ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
+                                    ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
                                 ],
                             ],
-                           ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'),],
-                           ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms')],
-
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-building',
+                                'title' => __('rooms'),
+                                'children' => [
+                                    ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                    ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Advertisements'),
+                                'children' => [
+                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                ],
+                            ],
+                            [
+                                'uri' => '#',
+                                'icon' => 'fa-home',
+                                'title' => __('Employees and Permissions'),
+                                'children' => [
+                                    ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
+                                    ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ],
+                            ],
                         ];
                     @endphp
 
