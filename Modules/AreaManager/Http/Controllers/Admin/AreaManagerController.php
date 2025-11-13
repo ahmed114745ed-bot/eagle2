@@ -19,6 +19,8 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\Region;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
@@ -262,6 +264,17 @@ class AreaManagerController extends MainController
 
         $this->addPhoneFields($form);
 
+        $form->text('area_name', __('Area Name'))
+        ->default(function ($form) {
+            if ($form->isEditing()) {
+                $areaManager = $form->model();
+                $regionName = Region::where('manager_id', $areaManager->id)->value('name');
+                return $regionName;
+            }
+            return null;
+    
+            });
+
         $this->addMapField($form, $id);
 
         $form->hidden('type')->value('area-manager');
@@ -307,6 +320,8 @@ class AreaManagerController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
+            $form->ignore(['area_name']);
+
         });
 
         $form->saved(function (Form $form) {
@@ -319,18 +334,54 @@ class AreaManagerController extends MainController
             }
             $userId = $form->model()->id;
 
-            Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
+            // Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
 
             $coveredCountries = request('covered_countries');
-            if ($coveredCountries) {
-                $countries = json_decode($coveredCountries, true);
-                if (is_array($countries) && count($countries) > 0) {
-                    $countryIds = array_column($countries, 'id');
-                    Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
-
-                    SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $userId]);
+            $areaName  =  request('area_name');
+            $area = Region::updateOrCreate(
+                ['manager_id' => $form->model()->id],
+                ['name' => $areaName]
+            );
+            $defaultManager = AreaManager::where('default', 1)->first();
+            if ($defaultManager) {
+                $defaultRegion = Region::firstOrCreate([
+                    'manager_id' => $defaultManager->id,
+                    'name' => 'Default Region for Default Manager',
+                ]);
+            }
+            
+            $oldCountryIds = RegionCountry::where('region_id', $area->id)
+                ->pluck('country_id')
+                ->toArray();
+            
+            RegionCountry::where('region_id', $area->id)->delete();
+            
+            if (!empty($oldCountryIds) && isset($defaultRegion)) {
+                foreach ($oldCountryIds as $countryId) {
+                    RegionCountry::firstOrCreate([
+                        'region_id' => $defaultRegion->id,
+                        'country_id' => $countryId,
+                    ]);
                 }
             }
+        
+            $countries = json_decode($coveredCountries, true);
+            $countryIds = array_column($countries, 'id');
+            RegionCountry::where('region_id', $area->id)->delete();
+            RegionCountry::whereIn('country_id', $countryIds)->delete();
+
+            if (is_array($countries) && count($countries) > 0) {
+                foreach ($countries as $country) {         
+
+                    RegionCountry::create([
+                        'region_id' => $area->id,
+                        'country_id' => $country['id']
+                    ]);
+                }
+    
+                SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $form->model()->id]);
+            }
+            
 
             $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
             if ($role && $userId) {
@@ -355,10 +406,15 @@ class AreaManagerController extends MainController
 
     protected function addMapField(Form $form, $id = null)
     {
-        $countries = \App\Models\Country::select(['id', 'e_name as name', 'iso as iso2', 'area_manager_id'])
-            ->with(['areaManager:id,default'])
-            ->get();
-
+      
+        $countries = Country::select([
+            'id',
+            'e_name as name',
+            'iso as iso2',
+        ])
+        ->with('regions.manager')
+        ->get();
+     
         $countriesJson = $countries->toJson();
 
         $selectedCountries = [];
@@ -366,16 +422,18 @@ class AreaManagerController extends MainController
 
         if ($form->isEditing()) {
             $currentAreaManagerId = $id;
-            $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
-                ->pluck('iso')
-                ->toArray();
+            $area = Region::where('manager_id' ,$currentAreaManagerId )->first();
+            if ($area) {
+                $selectedCountries = $area->countries()->pluck('iso')->toArray();
+            }
+        
         }
         $selectedCountriesJson = json_encode($selectedCountries);
 
         $form->html(view('admin.partials.country_map', [
             'countriesJson' => $countriesJson,
             'selectedCountriesJson' => $selectedCountriesJson,
-            'currentAreaManagerId' => $currentAreaManagerId
+            'currentAreaManagerId' => $currentAreaManagerId,
         ])->render());
     }
 
