@@ -29,7 +29,13 @@
 </div>
 
 @php
-    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
 @endphp
 
 <script>
