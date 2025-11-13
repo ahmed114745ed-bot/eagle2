@@ -251,8 +251,8 @@
                     ->get();
             } else {
                 $areaManagerCountries = collect();
-
             }
+
             $selectedCountryId = session('filter_country_id') ?? request('filter_country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
 
@@ -725,10 +725,56 @@
             .catch(err => console.error('Error marking notification:', err));
     };
 
-    $(document).on('pjax:end', function () {
+    window.initializeAdminHeader = function () {
+        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const previewBtn     = document.getElementById('preview-superadmin-btn');
+        const previewAreaBtn = document.getElementById('preview-area-manger-btn');
+        const exitBtn        = document.getElementById('exit-preview-btn');
+
+        // handle "go to country" button
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-superadmin', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        // handle "go to preview" button
+        if (previewAreaBtn) {
+            previewAreaBtn.addEventListener('click', function () {
+                fetch('/admin/set-preview-area-manager', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                }).then(() => window.location.reload());
+            });
+        }
+
+        // handle "exit preview" button
+        if (exitBtn) {
+            exitBtn.addEventListener('click', function () {
+                Promise.all([
+                    fetch('/admin/unset-preview-superadmin', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                    }),
+                    fetch('/admin/unset-preview-area-manager', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
+                    })
+                ]).then(() => window.location.reload());
+            });
+        }
+    };
+
+    $(document).on('pjax:end', function() {
         $.get(window.location.href, function (response) {
-            const newButtons = $(response).find('#preview-buttons-wrapper').html();
-            $('#preview-buttons-wrapper').html(newButtons);
+            $('#preview-buttons-wrapper').html($(response).find('#preview-buttons-wrapper').html());
+            $('#country-select').html($(response).find('#country-select').html());
+            window.initializeAdminHeader();
+            $('#country-select').select2({});
         });
     });
 </script>
