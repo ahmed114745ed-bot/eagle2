@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // if (window.__countryMapInitialized) return;
 // window.__countryMapInitialized = true;
 
-function loadScriptsSequentially(scripts, callback) {
+function loadScriptsSequentially(scripts, callback = () => {}) {
     if (!scripts.length) return callback();
     const [first, ...rest] = scripts;
     $.getScript(first)
