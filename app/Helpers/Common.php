@@ -1839,7 +1839,7 @@ class Common
     }
 
 
-    public static function getChargerInfo($resource)
+    public static function getReceiverInfo($resource)
     {
 
         if (request()->is('superadmin/*')) {
@@ -1971,96 +1971,96 @@ class Common
     }
 
 
-    public static function getReceiverInfo($resource)
-    {
-        if (request()->is('superadmin/*')) {
-            $prefix = 'superadmin';
-        } elseif (request()->is('areamanager/*')) {
-            $prefix = 'areamanager';
-        } else {
-            $prefix = 'admin';
-        }
+    // public static function getReceiverInfo($resource)
+    // {
+    //     if (request()->is('superadmin/*')) {
+    //         $prefix = 'superadmin';
+    //     } elseif (request()->is('areamanager/*')) {
+    //         $prefix = 'areamanager';
+    //     } else {
+    //         $prefix = 'admin';
+    //     }
 
-        switch ($resource->user_type ??  '') {
-            case 'agency':
-                return [
-                    'name' => $resource->receiveragency->name ?? '',
-                    'image' => $resource->receiveragency->img ?? '',
-                    'uuid' => $resource->receiveragency->id ?? '',
-                    'id' => $resource->receiveragency->id ?? '',
-                    'type' => 'agency',
-                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
-                    'image_color'          => @$resource->receiveragency->owner->color_image,
-                    'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' =>  '',
+    //     switch ($resource->user_type ??  '') {
+    //         case 'agency':
+    //             return [
+    //                 'name' => $resource->receiveragency->name ?? '',
+    //                 'image' => $resource->receiveragency->img ?? '',
+    //                 'uuid' => $resource->receiveragency->id ?? '',
+    //                 'id' => $resource->receiveragency->id ?? '',
+    //                 'type' => 'agency',
+    //                 'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+    //                 'image_color'          => @$resource->receiveragency->owner->color_image,
+    //                 'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' =>  '',
 
-                ];
-            case 'sub_area_manager':
-                return [
-                    'name' => $resource->receiverSubAreaManager->name ?? '',
-                    'image' => $resource->receiverSubAreaManager->img ?? '',
-                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
-                    'id' => $resource->receiverSubAreaManager->id ?? '',
-                    'type' => 'sub_area_manager',
-                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
-                    'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
-                    'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' =>  '',
+    //             ];
+    //         case 'sub_area_manager':
+    //             return [
+    //                 'name' => $resource->receiverSubAreaManager->name ?? '',
+    //                 'image' => $resource->receiverSubAreaManager->img ?? '',
+    //                 'uuid' => $resource->receiverSubAreaManager->id ?? '',
+    //                 'id' => $resource->receiverSubAreaManager->id ?? '',
+    //                 'type' => 'sub_area_manager',
+    //                 'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+    //                 'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
+    //                 'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' =>  '',
 
-                ];
-            case 'super_admin':
-                return [
-                    'name' => $resource->receiverSuperAdmin->name ?? '',
-                    'image' => $resource->receiverSuperAdmin->img ?? '',
-                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
-                    'id' => $resource->receiverSuperAdmin->id ?? '',
-                    'type' => 'super_admin',
-                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
-                    'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
-                    'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' =>  '',
-                ];
-            case 'sub_super_admin':
-                return [
-                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
-                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
-                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
-                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
-                    'type' => 'sub_super_admin',
-                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
-                    'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
-                    'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' =>  '',
-                ];
-            case 'user':
-                return [
-                    $hasColor = Common::hasInPack(@$resource->receiver?->id, 18, true),
+    //             ];
+    //         case 'super_admin':
+    //             return [
+    //                 'name' => $resource->receiverSuperAdmin->name ?? '',
+    //                 'image' => $resource->receiverSuperAdmin->img ?? '',
+    //                 'uuid' => $resource->receiverSuperAdmin->id ?? '',
+    //                 'id' => $resource->receiverSuperAdmin->id ?? '',
+    //                 'type' => 'super_admin',
+    //                 'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+    //                 'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
+    //                 'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' =>  '',
+    //             ];
+    //         case 'sub_super_admin':
+    //             return [
+    //                 'name' => $resource->receiverSubSuperAdmin->name ?? '',
+    //                 'image' => $resource->receiverSubSuperAdmin->img ?? '',
+    //                 'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+    //                 'id' => $resource->receiverSubSuperAdmin->id ?? '',
+    //                 'type' => 'sub_super_admin',
+    //                 'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+    //                 'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
+    //                 'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' =>  '',
+    //             ];
+    //         case 'user':
+    //             return [
+    //                 $hasColor = Common::hasInPack(@$resource->receiver?->id, 18, true),
 
-                    'id' => $resource->receiver->id ?? '',
-                    'name' => $resource->receiver->name ?? '',
-                    'image' => $resource->receiver->profile->avatar ?? '',
-                    'uuid' => $resource->receiver->uuid ?? '',
-                    'type' => 'user',
-                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
-                    'image_color'          => @$resource->receiver->color_image,
-                    'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
+    //                 'id' => $resource->receiver->id ?? '',
+    //                 'name' => $resource->receiver->name ?? '',
+    //                 'image' => $resource->receiver->profile->avatar ?? '',
+    //                 'uuid' => $resource->receiver->uuid ?? '',
+    //                 'type' => 'user',
+    //                 'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
+    //                 'image_color'          => @$resource->receiver->color_image,
+    //                 'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
 
-                ];
-            default:
-                return [
-                    'name' => '',
-                    'image' => '',
-                    'uuid' => '',
-                    'id' => '',
-                    'type' => '',
-                    'url' => '#',
-                    'image_color'          => null,
-                    'id_image'             => '',
-                    'colored_name'         => '',
-                ];
-        }
-    }
+    //             ];
+    //         default:
+    //             return [
+    //                 'name' => '',
+    //                 'image' => '',
+    //                 'uuid' => '',
+    //                 'id' => '',
+    //                 'type' => '',
+    //                 'url' => '#',
+    //                 'image_color'          => null,
+    //                 'id_image'             => '',
+    //                 'colored_name'         => '',
+    //             ];
+    //     }
+    // }
 
 
     public static function chargerRelationsQuery()
