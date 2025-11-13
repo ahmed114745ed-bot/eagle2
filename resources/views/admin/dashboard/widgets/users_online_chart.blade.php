@@ -8,11 +8,17 @@
 </div>
 
 @php
-    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
     $fetchUrl = $prefix . "/statistics/users-online-stats";
 @endphp
 
-@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin'))
+@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin') ||  request()->is('areaManager'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

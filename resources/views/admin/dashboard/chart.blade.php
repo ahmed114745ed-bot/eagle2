@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> --}}
 
 <div style="margin-bottom: 15px;">
     <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
@@ -197,7 +197,13 @@ function createOrUpdateChart(chartData, usePercentage) {
 }
 
 @php
-    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
 @endphp
 
 function loadBalanceData(date = null) {

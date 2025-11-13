@@ -81,11 +81,11 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     [
                         'key' => 'superadmin',
-                        'except' => ['show'],
+                        'except' => [],
                         'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete','show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create','show'],
 
                         ],
                     ],
@@ -859,7 +859,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'country', 'except' => ['show','create'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
