@@ -174,6 +174,10 @@
     margin-left: 10px;
 }
 
+.transferForm .actions {
+    margin: 10px 73px 4px 3px;
+}
+
 .btn-success {
     background-color: #28a745;
     border: none;
