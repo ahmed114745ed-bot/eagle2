@@ -434,92 +434,42 @@
                 width: '190px'
             });
 
-        // $AreaManagerSelect.on('change', function () {
-        //     const $this = $(this);
-        //     if (!$this.val()) {
-        //         setTimeout(() => $this.select2('close'), 0);
-        //
-        //         const url = new URL(window.location.href);
-        //         url.searchParams.set('clear_area_manager', 1);
-        //         url.searchParams.delete('area_manager_id');
-        //
-        //         if ($.pjax) {
-        //             setTimeout(() => {
-        //                 $.pjax({ url: url.toString(), container: '#pjax-container' });
-        //             }, 1);
-        //         } else {
-        //             window.location.href = url.toString();
-        //         }
-        //         return;
-        //     }
-        //
-        //     const areaManagerId = $(this).val();
-        //     const url = new URL(window.location.href);
-        //
-        //     if (areaManagerId && areaManagerId !== 'null') {
-        //         url.searchParams.set('area_manager_id', areaManagerId);
-        //         url.searchParams.delete('clear_area_manager');
-        //     } else {
-        //         url.searchParams.set('clear_area_manager', 1);
-        //         url.searchParams.delete('area_manager_id');
-        //     }
-        //
-        //     if ($.pjax) {
-        //         setTimeout(() => {
-        //             $.pjax({url: url.toString(), container: '#pjax-container'});
-        //         }, 1);
-        //     } else {
-        //         window.location.href = url.toString();
-        //     }
-        // });
-
         $AreaManagerSelect.on('change', function () {
             const $this = $(this);
+            if (!$this.val()) {
+                setTimeout(() => $this.select2('close'), 0);
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('clear_area_manager', 1);
+                url.searchParams.delete('area_manager_id');
+
+                if ($.pjax) {
+                    setTimeout(() => {
+                        $.pjax({ url: url.toString(), container: '#pjax-container' });
+                    }, 1);
+                } else {
+                    window.location.href = url.toString();
+                }
+                return;
+            }
+
             const areaManagerId = $(this).val();
             const url = new URL(window.location.href);
 
-            if (!$this.val()) {
-                url.searchParams.delete('area_manager_id');
-                url.searchParams.delete('filter_country_id');
-            } else {
+            if (areaManagerId && areaManagerId !== 'null') {
                 url.searchParams.set('area_manager_id', areaManagerId);
-                url.searchParams.delete('filter_country_id');
+                url.searchParams.delete('clear_area_manager');
+            } else {
+                url.searchParams.set('clear_area_manager', 1);
+                url.searchParams.delete('area_manager_id');
             }
 
-            // Use pjax but intercept the response
-            $.pjax({
-                url: url.toString(),
-                container: '#pjax-container',
-                fragment: '#pjax-container'
-            });
-        });
-
-// After pjax completes, update the country dropdown from the new HTML
-        $(document).on('pjax:complete', function(event, xhr, textStatus, options) {
-            // Parse the full HTML response to get the updated country select
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(xhr.responseText, 'text/html');
-            const newCountrySelect = doc.querySelector('#country-select');
-
-            if (newCountrySelect) {
-                const $currentCountrySelect = $('#country-select');
-
-                // Destroy current Select2
-                if ($currentCountrySelect.hasClass('select2-hidden-accessible')) {
-                    $currentCountrySelect.select2('destroy');
-                }
-
-                // Replace options
-                $currentCountrySelect.html($(newCountrySelect).html());
-
-                // Reinitialize Select2
-                $currentCountrySelect.select2({
-                    placeholder: "{{ __('Select Country') }}",
-                    allowClear: true,
-                    templateResult: formatCountry,
-                    templateSelection: formatCountry,
-                    escapeMarkup: function (markup) { return markup; }
-                });
+            if ($.pjax) {
+                setTimeout(() => {
+                    $.pjax({url: url.toString(), container: '#pjax-container'});
+                }, 1);
+            } else {
+                window.location.href = url.toString();
             }
         });
 
