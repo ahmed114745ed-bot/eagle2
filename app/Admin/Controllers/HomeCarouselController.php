@@ -99,7 +99,9 @@ class HomeCarouselController extends MainController
         foreach ($types as $attr => $label) {
             $grid->column($attr, __($label))
                 ->display(function () use ($attr) {
-                    return $this->{$attr} ? 1 : 0;
+                    return $this->displays->where('display_type', $attr)->isNotEmpty() ? 1 : 0;
+
+//                    return $this->{$attr} ? 1 : 0;
                 })
                 ->switch([
                     'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
