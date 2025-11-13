@@ -264,7 +264,7 @@ class AreaManagerController extends MainController
 
         $this->addPhoneFields($form);
 
-        $form->text('area_name', __('Area Name'))
+        $form->text('area_name', __('area name'))
         ->default(function ($form) {
             if ($form->isEditing()) {
                 $areaManager = $form->model();
