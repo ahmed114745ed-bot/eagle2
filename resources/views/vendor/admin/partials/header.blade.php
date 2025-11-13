@@ -322,7 +322,6 @@
 
             </ul>
                 {!! Admin::getNavbar()->render() !!}
-                @include('admin.views.components.refresh-btn')
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -392,6 +391,11 @@
 </header>
 
 <script>
+
+     $('.container-refresh').off('click').on('click', function() {
+        location.reload();
+        toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
+    });
     $(document).ready(function () {
         const $countrySelect = $('#country-select');
         const $AreaManagerSelect = $('#area-Manager-select');
