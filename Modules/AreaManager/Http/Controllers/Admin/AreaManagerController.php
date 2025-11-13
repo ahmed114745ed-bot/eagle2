@@ -265,14 +265,15 @@ class AreaManagerController extends MainController
 
         $this->addPhoneFields($form);
 
-        $form->text('area_name', __('Area Name'))
-            ->default(function ($form) {
-                if ($form->isEditing()) {
-                    $areaManager = $form->model();
-                    $regionName = Region::where('manager_id', $areaManager->id)->value('name');
-                    return $regionName;
-                }
-                return null;
+        $form->text('area_name', __('area name'))
+        ->default(function ($form) {
+            if ($form->isEditing()) {
+                $areaManager = $form->model();
+                $regionName = Region::where('manager_id', $areaManager->id)->value('name');
+                return $regionName;
+            }
+            return null;
+    
             });
 
         $this->addMapField($form, $id);
