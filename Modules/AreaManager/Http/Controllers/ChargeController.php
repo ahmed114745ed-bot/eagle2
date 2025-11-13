@@ -95,7 +95,7 @@ class ChargeController extends MainController
             ])
             ->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) use ($authId, $authUser) {
             $filter->expand();
 
             $filter->where(function ($query) {
@@ -104,6 +104,14 @@ class ChargeController extends MainController
                         ->where('user_id', $this->input);
                 }
             }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
+            if ($authUser == 'area-manager') {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->where('charger_id', $this->input);
+                    }
+                }, __('created by'))->select(SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')->toArray());
+            }
+
 
             $filter->where(function ($query) {
                 if ($this->input) {
