@@ -1841,6 +1841,14 @@ class Common
 
     public static function getChargerInfo($resource)
     {
+
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
         switch ($resource->charger_type) {
             case 'dash':
                 $admin = $resource->admin;
@@ -1864,7 +1872,21 @@ class Common
                     'uuid' => $areaManager->id ?? '',
                     'id' => $areaManager->id ?? '',
                     'type' => 'dash',
-                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
+                    'url' => $areaManager ? url($prefix ."/auth/users/{$areaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+                case UserTypeEnum::SUB_AREA_MANAGER:
+                $subAreaManager = $resource->subAreaManager;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix ."/auth/users/{$subAreaManager->id}") : '#',
                     'image_color' => null,
                     'id_image' => '',
                     'colored_name' => '',

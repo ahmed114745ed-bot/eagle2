@@ -231,6 +231,38 @@ class ChargeController extends MainController
         $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
+        if ($authUser == UserTypeEnum::AREA_MANAGER) {
+            $grid->column('charger_id', __('created by'))->display(function () {
+                $info = Common::getReceiverInfo($this);
+
+
+
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($info['image']) ?? $defaultImage;
+                if (!isImageExists($url)) $url = $defaultImage;
+
+                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+
+                return "
+                        <a href='#' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+
+
+                return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
+            });
+        }
+
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
