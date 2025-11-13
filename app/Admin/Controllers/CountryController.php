@@ -72,6 +72,12 @@ class CountryController extends MainController
         $grid = new Grid(new Country);
         $grid->model()->orderByDesc('status');
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->equal('e_name', __('name'));
+        });
+
         $grid->id(__ ('ID'));
 //        $grid->name(trans('name'));
 //        $grid->e_name(trans('english name'));
@@ -88,7 +94,11 @@ class CountryController extends MainController
         $grid->column ('status',trans ('status'))->switch (Common::getSwitchStates ());
         $this->extendGrid ($grid);
         $grid->disableExport();
-        $grid->disableActions();
+//        $grid->disableActions();
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+            $actions->disableDelete();
+        });
         $grid->disableCreateButton();
         return $grid;
     }
@@ -130,10 +140,10 @@ class CountryController extends MainController
         $form->display(__ ('ID'));
         $form->text('name', trans('name'))->rules ('required');;
         $form->text('e_name', trans('english name'))->rules ('required');;
-        $form->text('phone_code', trans('phone code'))->rules ('required');
+//        $form->text('phone_code', trans('phone code'))->rules ('required');
         // $form->text('language', trans('language'))->rules ('required');
         $form->image ('flag',trans ('flag'))->rules ('required');
-        $form->text('iso', trans('iso'))->rules ('required');
+//        $form->text('iso', trans('iso'))->rules ('required');
         // $form->text('iso3', trans('iso3'))->rules ('required');
         // $form->text('continent_name', trans('continent name'))->rules ('required');
         // $form->text('e_continent_name', trans('english continent name'))->rules ('required');
