@@ -230,7 +230,17 @@
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);
 
-            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
+            $countries = collect();
+            if ($selectAreaManagerId) {
+                $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
+                if ($areaManager && method_exists($areaManager, 'countries')) {
+                    $countries = $areaManager->countries()
+                        ->select(['countries.id', 'countries.name', 'countries.flag'])
+                        ->get();
+                }
+            } else {
+                $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+            }
 
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
