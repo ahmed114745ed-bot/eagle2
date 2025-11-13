@@ -5,7 +5,7 @@
 </li>
 <script>
     $('.container-refresh').off('click').on('click', function() {
-        $.admin.reload();
-        $.admin.toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
+        location.reload();
+        toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
     });
 </script>
