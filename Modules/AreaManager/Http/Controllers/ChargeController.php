@@ -233,7 +233,7 @@ class ChargeController extends MainController
         });
         if ($authUser->type == 'area-manager') {
             $grid->column('charger_id', __('created by'))->display(function () {
-                $info = Common::getReceiverInfo($this);
+                $info = Common::getChargerInfo($this);
 
 
 
