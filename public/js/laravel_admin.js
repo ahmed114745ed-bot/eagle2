@@ -142,4 +142,4 @@ const scripts = [
     'https://cdn.jsdelivr.net/npm/jvectormap-content/world-mill.js'
 ];
 
-loadScriptsSequentially(scripts, initWorldMap);
+loadScriptsSequentially(scripts);
