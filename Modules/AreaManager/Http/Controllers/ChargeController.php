@@ -231,7 +231,7 @@ class ChargeController extends MainController
         $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
-        if ($authUser == UserTypeEnum::AREA_MANAGER) {
+        if ($authUser->type == 'area-manager') {
             $grid->column('charger_id', __('created by'))->display(function () {
                 $info = Common::getReceiverInfo($this);
 
