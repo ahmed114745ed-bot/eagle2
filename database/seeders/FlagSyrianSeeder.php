@@ -71,7 +71,7 @@ class FlagSyrianSeeder extends Seeder
             'currency_numeric' => null,
         ]);
 
-        $palestine = Country::where('iso3', 'PSE')->first();
+        $palestine = Country::where('iso3', 'ISR')->first();
 
         $palestineFlagLocal = $flagDir . '/ps.svg';
         if (file_exists($palestineFlagLocal)) {
