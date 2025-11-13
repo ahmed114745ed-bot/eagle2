@@ -348,7 +348,7 @@ Route::group(
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
-        Route::get('/targets/{id}/confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
+        Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
         Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel'])->middleware('web-agency-feature');
         Route::resource('polices', PoliceController::class);
