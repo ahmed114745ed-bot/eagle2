@@ -68,7 +68,13 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @php
-    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
 @endphp
 
 <script>
