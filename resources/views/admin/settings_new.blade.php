@@ -503,6 +503,12 @@
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/path/to/bootstrap-switch.min.js"></script>
+<script src="/path/to/jquery.slimscroll.min.js"></script>
+<script src="/path/to/app.min.js"></script>
+<script src="/path/to/settings.js"></script>
 
 </head>
 
