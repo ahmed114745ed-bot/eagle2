@@ -170,7 +170,7 @@ class OfficialMessageJob implements ShouldQueue
         //     'feature_ids'  => $featureIds,
         // ]);
 
-        $countriesIds = Common::areaCountries($this->admin->id);
+        $countriesIds = Common::areaCountriesV2($this->admin->id);
 
         $usersId = [];
 
@@ -238,6 +238,14 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
+        // Log::info('OfficialMessageJob raw usersId', [
+        //     'usersId'      => $usersId,
+        //     'feature'      => $feature,
+        //     'subFeature' => $subFeature,
+        //     'countriesIds' => $countriesIds,
+        //     'admin' => $this->admin,
+        // ]);
+        
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);
     }
