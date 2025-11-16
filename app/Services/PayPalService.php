@@ -333,6 +333,8 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
+                return $this->webhookPayment($trx, method: 'paypal');
+
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $trx]);
                 return response()->json([
                     'status'  => false,
