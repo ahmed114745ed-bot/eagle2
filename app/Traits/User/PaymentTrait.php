@@ -66,12 +66,15 @@ trait PaymentTrait
     public function webhookPayment($orderId, $method = null, $newTrx = null): JsonResponse
     {
 
+        info('in trait');
         if ($method === 'paypal'){
+            info('in paypal');
             $coinLog = $this->findCoinLogTrx($orderId, $method);
         } else {
             $coinLog = $this->findCoinLog($orderId, $method);
         }
 
+        info($coinLog);
         if (!$coinLog) {
             return $this->transactionNotFoundResponse();
         }
