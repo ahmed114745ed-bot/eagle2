@@ -23,7 +23,6 @@ class AdminAreaManagerChargeController extends MainController
      * @var string
      */
     protected $title = 'Charge';
-    public $permission_name = 'coin-recharge';
 
     /**
      * Make a grid builder.

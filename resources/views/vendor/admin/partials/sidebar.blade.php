@@ -444,7 +444,7 @@
                                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                                 ],
                             ],
-                            ['uri' => '/area-manager-charges', 'icon' => 'fa-building', 'title' => __('charges')],
+                            ['uri' => '/area-manager-charges-reports', 'icon' => 'fa-building', 'title' => __('charges')],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-briefcase',

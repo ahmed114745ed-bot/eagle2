@@ -357,7 +357,7 @@ Route::group(
         Route::resource('payment-coins', PaymentCoinController::class);
         Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
-        Route::get('/area-manager-charges', [AdminAreaManagerChargeController::class, 'index']);
+        Route::get('/area-manager-charges-reports', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [

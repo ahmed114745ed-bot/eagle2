@@ -138,7 +138,7 @@ Route::group(
 
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
-        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::get('/charges', [ChargeController::class, 'index']);
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
