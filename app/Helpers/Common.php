@@ -1838,6 +1838,115 @@ class Common
         return $date->setTimezone($timezone);
     }
 
+    public static function getChargerInfo($resource)
+    {
+        switch ($resource->charger_type) {
+            case 'dash':
+                $admin = $resource->admin;
+                return [
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
+                    'type' => 'dash',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+            case 'agency':
+                $agency = $resource->senderShippingAgency;
+                $owner = $agency->owner ?? null;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' =>  '',
+                ];
+
+            case 'host_agency':
+                $agency = $resource->senderAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'host_agency',
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                ];
+
+            case 'bd':
+                $bd = $resource->bd;
+                return [
+                    'name' => $bd->username ?? '',
+                    'image' => $bd->avatar ?? '',
+                    'uuid' => $bd->id ?? '',
+                    'id' => $bd->id ?? '',
+                    'type' => 'bd',
+                    'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+            case 'user':
+                $user = $resource->senderUser;
+                $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
+
+                return [
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
+                    'type' => 'user',
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                    'image_color' => $user->color_image ?? null,
+                    'id_image' => $user?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+                ];
+
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'type_name' => '',
+                    'url' => '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+        }
+    }
+
 
     public static function getReceiverInfo($resource)
     {

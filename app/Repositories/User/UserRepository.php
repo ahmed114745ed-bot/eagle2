@@ -209,7 +209,8 @@ class UserRepository extends Repository
         $areaManager = AreaManager::find($areaManagerId);
         if (!$areaManager)  $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
-        $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
+      
+        $countries =$areaManager->countriesQuery()->pluck('id')->toArray();
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
             ->where(function ($query) use ($key) {
 
@@ -424,7 +425,9 @@ class UserRepository extends Repository
         $areaManager = AreaManager::find($areaManagerId);
         if (!$areaManager) $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
-        $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
+        // $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
+        $countries =$areaManager->countriesQuery()->pluck('id')->toArray();
+
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where(function ($query) {
                 $query->where('is_bd', 0)->orWhereNull('is_bd');
