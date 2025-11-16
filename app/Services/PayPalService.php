@@ -295,6 +295,7 @@ class PayPalService
 
         $coinLog = CoinLog::where('trx', $trx)->first();
 
+        info('coin log', [$coinLog]);
         if (! $coinLog){
             return response()->json([
                 'status'  => 'ignored',
