@@ -2340,12 +2340,6 @@ class Common
 
         $authAdmin = AreaManager::find($adminId)
                     ?? SubAreaManager::find($adminId);
-    
-
-        Log::info('OfficialMessageJob adminId', [
-            'adminId'      => $adminId,
-         
-        ]);
 
         if (!$authAdmin) {
             return [];
@@ -2355,11 +2349,17 @@ class Common
         if ($sessionCountryId) {
             return (array)$sessionCountryId;
         }
-    
+
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
     
+        if (method_exists($authAdmin, 'subCountriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+
+
+
         return [];
     
     }
