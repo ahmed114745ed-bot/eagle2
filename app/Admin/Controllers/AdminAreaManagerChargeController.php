@@ -1,28 +1,21 @@
 <?php
 
-namespace Modules\AreaManager\Http\Controllers;
+namespace App\Admin\Controllers;
 
-use DB;
+
 use App\Models\Charge;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
-use App\Enums\PermissionType;
 use App\Models\ShippingAgency;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;
-use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
 
 
-class ChargeController extends MainController
+class AdminAreaManagerChargeController extends MainController
 {
     /**
      * Title for current resource.
@@ -40,62 +33,9 @@ class ChargeController extends MainController
     public function index(Content $content): Content
     {
 
- 
-        $user = Auth::user();
-        $authUser = auth()->user();
-
-        if ($authUser->type == 'area-manager') {
-            $authId = auth()->id();
-            $type = UserTypeEnum::AREA_MANAGER;
-        } else {
-            $authId = $authUser->id;
-            $type = UserTypeEnum::SUB_AREA_MANAGER;
-        }
-
-        $totals = Charge::selectRaw("
-            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
-            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
-        ", [
-            $type,
-            $authId,
-            $type,
-            $authId
-        ])->first();
-
-        $totalCharges = $totals->total_charges;
-        $totalSpent   = $totals->total_spent;
-
-        $finalSalary = $user->di;
         $content = $content
             ->header(trans('Charges'))
             ->description(trans('Charges'));
-
-        
-            $content->row(function ($row) use ($finalSalary) {
-                $row->column(12, view('admin.grid.area_manager.wallet', [
-                    'finalSalary' => $finalSalary
-                ]));
-            });
-
-            $content->row(function (Row $row) use ($totalCharges, $totalSpent) {
-                $row->column(6, new InfoBox(
-                    __('total charges'),
-                    'money',
-                    'green',
-                    '',
-                    truncateAndTrim($totalCharges, 2) . ' 💰'
-                ));
-
-                $row->column(6, new InfoBox(
-                    __('total spent'),
-                    'money',
-                    'red',
-                    'charges',
-                    truncateAndTrim($totalSpent, 2)
-                ));
-            });
-        
-
         $content->row(function ($row) {
             $row->column(12, $this->grid());
         });
@@ -316,86 +256,5 @@ class ChargeController extends MainController
         $grid->disableRowSelector();
         $grid->disableActions();
         return $grid;
-    }
-
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(Charge::findOrFail($id));
-
-        $show->field('id', __('Id'));
-        $show->field('charger_id', __('Charger id'));
-        $show->field('charger_type', __('Charger type'));
-        $show->field('user_charger_type', __('User charger type'));
-        $show->field('user_id', __('User id'));
-        $show->field('user_type', __('User type'));
-        $show->field('amount', __('Amount'));
-        $show->field('amount_type', __('Amount type'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-        $show->field('balance_before', __('Balance before'));
-        $show->field('is_used_transferred', __('Is used transferred'));
-        $show->field('usd', __('Usd'));
-        $show->field('agency_id', __('Agency id'));
-
-        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        $form = new Form(new Charge());
-
-        // $form->number('charger_id', __('Charger id'));
-        $form->text('charger_type', __('Charger type'));
-        $form->text('user_charger_type', __('User charger type'));
-        $form->number('user_id', __('user id'));
-        // $form->text('user_type', __('User type'));
-        // $form->decimal('amount', __('Amount'))->default(0.00);
-        $form->switch('amount_type', __('Amount type'))->default(1);
-        // $form->decimal('balance_before', __('Balance before'));
-        $form->switch('is_used_transferred', __('Is used transferred'));
-        $form->decimal('usd', __('usd'));
-        $form->number('agency_id', __('Agency id'));
-
-        return $form;
-    }
-
-    public function subAreaManagers(Request $request)
-    {
-        $key = $request->q;
-        $page = $request->get('page', 1);
-        $perPage = 10;
-        $offset = ($page - 1) * $perPage;
-
-        $query = DB::table('admin_users')
-            ->where('type', PermissionType::SUB_AREA_MANAGER->value)
-            ->where('is_preview', 0)
-            ->where('parent_id', auth('admin')->id());
-
-
-        if ($key) {
-            $query->where(function ($q) use ($key) {
-                $q->where('name', 'like', "%{$key}%")
-                    ->orWhere('username', 'like', "%{$key}%")
-                    ->orWhere('id', $key);
-            });
-        }
-
-        $total = $query->count();
-
-        $users = $query->select('id', 'name', 'username')
-            ->paginate($perPage, ['*'], 'page', $page);
-
-        return response()->json([$users]);
     }
 }
