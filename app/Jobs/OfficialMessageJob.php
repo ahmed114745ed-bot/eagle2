@@ -42,7 +42,7 @@ class OfficialMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Log::info('OfficialMessageJob raw request', $this->request);
+        Log::info('OfficialMessageJob raw request', $this->request);
         $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
