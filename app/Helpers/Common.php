@@ -2364,6 +2364,29 @@ class Common
     
     }
 
+    public static function areaCountriesV2($adminId): array
+    {
+
+
+        $authAdmin = AreaManager::find($adminId)
+                    ?? SubAreaManager::find($adminId);
+
+        if (!$authAdmin) {
+            return [];
+        }
+    
+        $sessionCountryId = session('area_manager_country_id');
+        if ($sessionCountryId) {
+            return (array)$sessionCountryId;
+        }
+    
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+    
+        return [];
+    
+    }
 
 
     public static function getRoleAuthId($userId)

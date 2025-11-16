@@ -170,7 +170,7 @@ class OfficialMessageJob implements ShouldQueue
         //     'feature_ids'  => $featureIds,
         // ]);
 
-        $countriesIds = Common::areaCountries($this->admin->id);
+        $countriesIds = Common::areaCountriesV2($this->admin->id);
 
         $usersId = [];
 
