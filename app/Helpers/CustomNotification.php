@@ -270,7 +270,7 @@ class CustomNotification
     public function follow(User $receiver, User $user)
     {
         $tokens_notfacion = DB::table('users')->where('id', $receiver->id)->value('notification_id');
-        $lang = $user->lan ?? 'en';
+        $lang = $receiver->lan ?? 'en';
         $body = __('api.followed_you', ['name' => $user->name], $lang);
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
@@ -282,7 +282,7 @@ class CustomNotification
     public function followBack(User $receiver, User $user)
     {
         $tokens_notfacion = DB::table('users')->where('id', $receiver->id)->value('notification_id');
-        $lang = $user->lan ?? 'en';
+        $lang = $receiver->lan ?? 'en';
         $body = __('api.follow_back', ['name' =>  $user->name], $lang);
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
@@ -773,7 +773,7 @@ class CustomNotification
     {
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body =  $type == 0 ? Lang::get('api.closeNormalBox', [], $lang) : __('api.closeSuperBox', [], $lang);
+        $body =  $type == 0 ? __('api.closeNormalBox', [], $lang) : __('api.closeSuperBox', [], $lang);
 
         $content = __('api.lucky_box', [], $lang);
         $data['image'] = getImagePath(@$imageBox);
@@ -789,7 +789,7 @@ class CustomNotification
         $body = '';
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body =  $type == 0 ?
-            Lang::get('api.closeNormalBoxReturnCoins', ['coins' => $coins], $lang)
+            __('api.closeNormalBoxReturnCoins', ['coins' => $coins], $lang)
             : __('api.closeSuperBoxReturnCoins', ['coins' => $coins], $lang);
 
         $content = __('api.lucky_box', [], $lang);
