@@ -241,6 +241,7 @@ class OfficialMessageJob implements ShouldQueue
         Log::info('OfficialMessageJob raw usersId', [
             'usersId'      => $usersId,
             'feature'      => $feature,
+            'subFeature' => $subFeature,
             'countriesIds' => $countriesIds,
             'admin' => $this->admin,
         ]);
