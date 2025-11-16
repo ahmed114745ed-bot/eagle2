@@ -697,6 +697,7 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
+        Route::get('professional-bd', [BdController::class ,'professionalBd']);
 
 
          Route::post('/set-preview-area-manager', function () {

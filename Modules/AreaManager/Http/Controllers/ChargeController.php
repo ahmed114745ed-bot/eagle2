@@ -39,6 +39,8 @@ class ChargeController extends MainController
      */
     public function index(Content $content): Content
     {
+
+ 
         $user = Auth::user();
         $authUser = auth()->user();
 
