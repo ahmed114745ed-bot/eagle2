@@ -85,7 +85,7 @@ class ChargeController extends MainController
         $authUser = auth()->user();
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $grid->model()
-            ->with(['receiverUser', 'receiveragency'])
+            ->with(['receiverUser', 'receiveragency','subAreaManager','areaManager'])
             ->where(function ($query) use ($authUser, $authId) {
                 $query->where('charger_id', $authUser->id)
                     ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
