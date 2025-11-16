@@ -44,9 +44,9 @@ class VerifyPayPalWebhook extends PayPalService
             'response' => $response->json(),
         ]);
 
-//        if ($response->json('verification_status') !== 'SUCCESS') {
-//            return response()->json(['status' => 'unauthorized'], 401);
-//        }
+        if ($response->json('verification_status') !== 'SUCCESS') {
+            return response()->json(['status' => 'unauthorized'], 401);
+        }
 
         return $next($request);
     }

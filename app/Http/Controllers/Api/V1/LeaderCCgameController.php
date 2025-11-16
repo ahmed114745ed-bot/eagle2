@@ -161,17 +161,82 @@ class LeaderCCgameController extends Controller
             ],
         ]);
     }
+
+    public function makeUpOrders(Request $request)
+    {
+    
+        // 1️⃣ Validate input
+        $validator = Validator::make($request->all(), [
+            'orderId'     => 'required|string',
+            'gameId'      => 'required|string',
+            'roundId'     => 'required|string',
+            'uid'         => 'required|string',
+            'coin'        => 'required|numeric',
+            'rewardType'  => 'required|integer',
+            'winId'       => 'nullable|string',
+            'roomid'      => 'nullable|string',
+            'sign'        => 'required|string',
+            
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errorCode' => 4005,
+                'errorMsg'  => 'Missing or invalid parameters',
+                'errors'    => $validator->errors(),
+            ], 400);
+        }
+
+        // 2️⃣ Secret key from .env
+        $key = config('games.leader_CC_game_key'); // put your real secret key in .env
+
+        // 3️⃣ Prepare values for signature verification
+        $orderId    = $request->orderId;
+        $gameId     = $request->gameId;
+        $roundId    = $request->roundId;
+        $uid        = $request->uid;
+        $coin       = $request->coin;
+        $rewardType = $request->rewardType;
+        $winId      = $request->winId ?? '';
+
+        // 4️⃣ Generate expected sign
+        $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $rewardType . $winId . $key);
+
+        // 5️⃣ Compare signs
+        if (strtolower($expectedSign) !== strtolower($request->sign)) {
+            return response()->json([
+                'errorCode' => 10004,
+                'errorMsg'  => 'Verify signature fail',
+            ], 10004);
+        }
+        Cache::put("order_$orderId", true, now()->addHour());
+        $user = User::find($uid);
+        if (!$user) {
+            return response()->json([
+                'errorCode' => 4005,
+                'errorMsg'  => 'user not found',
+            ], 4005);
+        }
+
+        // 7️⃣ Return success response
+        return response()->json([
+            'errorCode' => 0,
+            'data' => [
+                'coin' => $user->di,
+            ],
+        ]);
+    }
+
     public function validationOrderId($orderId)
     {
-            if (Cache::has("order_$orderId")) {
-                return [
-                    'valid' => false,
-                    'response' => response()->json([
-                        'errorCode' => 10003,
-                        'message' => 'Order already exists'
-                    ]),
-                ];
-            }
+        if (Cache::has("order_$orderId")) {
+            return [
+                'valid' => false,
+                'response' => response()->json([
+                    'errorCode' => 10003,
+                    'message' => 'Order already exists'
+                ]),
+            ];
         }
-    
+    }
 }
