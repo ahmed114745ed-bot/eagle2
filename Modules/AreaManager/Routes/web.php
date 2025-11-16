@@ -51,7 +51,7 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-        Route::get('/area-manager-charges', [ChargeController::class, 'index'])->name('charges');
+        Route::get('/area-manager-charges', [ChargeController::class, 'index']);
         Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {

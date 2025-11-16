@@ -68,7 +68,7 @@ class ChargeController extends MainController
             ->header(trans('Charges'))
             ->description(trans('Charges'));
 
-        if ($authUser->type != 'area-manager') {
+        if ($authUser->type == 'area-manager' || $authUser->type == UserTypeEnum::SUB_AREA_MANAGER) {
             $content->row(function ($row) use ($finalSalary) {
                 $row->column(12, view('admin.grid.area_manager.wallet', [
                     'finalSalary' => $finalSalary
