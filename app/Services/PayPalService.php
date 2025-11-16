@@ -293,6 +293,9 @@ class PayPalService
         $paypalId   = $resource['id'] ?? null;
         $trx = $resource['supplementary_data']['related_ids']['order_id'] ?? null;
 
+        info('paypalId', [$paypalId]);
+        info('trx', [$trx]);
+
         if ($trx){
             $coinLog = CoinLog::where('trx', $trx)->first();
         } else {
