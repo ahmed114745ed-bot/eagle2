@@ -576,7 +576,7 @@ class AgencyController extends MainController
 
         $form->row(function ($row) {
             $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd-by-countries?area_manager_id=' . auth()->id(), 'id', 'name');
-            $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users-by-countries?area_manager_id=' . auth()->id(), 'id', 'name')->rules('required');
             $row->width(12)->hidden('agency_manger_id', __('app manger id'));
             $row->width(12)->text('name', __('agency name'))->rules('required');
             $row->width(12)->hidden('status', __('status'))->default(1);
