@@ -110,6 +110,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
@@ -356,6 +357,7 @@ Route::group(
         Route::resource('payment-coins', PaymentCoinController::class);
         Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
+        Route::get('/area-manager-charges', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [

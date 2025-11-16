@@ -11,10 +11,8 @@ use Modules\AreaManager\Http\Controllers\UserController;
 use Modules\AreaManager\Http\Controllers\AgencyController;
 use Modules\AreaManager\Http\Controllers\ChargeController;
 use Modules\AreaManager\Http\Controllers\WalletController;
-use App\Admin\Controllers\AdminAreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
-
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
@@ -52,7 +50,7 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-        Route::get('/area-manager-charges', [AdminAreaManagerChargeController::class, 'index']);
+        
         Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
