@@ -78,8 +78,8 @@ class CustomNotification
     {
         $tokens_notification = $user?->notification_id;
         $lang = $user->lan ?? 'en';
-       $body = $type == 0 ?
-             __('api.background_accept', ['name' => $user->name], $lang)
+        $body = $type == 0 ?
+            __('api.background_accept', ['name' => $user->name], $lang)
             : __('api.background_refuse', ['name' => $user->name], $lang);
         $title = __('api.roomBackground', [], $lang);
 
