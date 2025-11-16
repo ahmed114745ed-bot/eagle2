@@ -481,7 +481,7 @@ use Modules\Vip\Entities\Vip;
     }
 
     @media (max-width: 768px) {
-    
+
 
     .settings-menu {
         display: flex;
@@ -509,7 +509,7 @@ use Modules\Vip\Entities\Vip;
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('landPageSettings')">{{ __('land settings') }}</button>
-            
+
             <button onclick="showSection('workSettings')" class="position-relative">
                 {{ __('Work') }}
             </button>
@@ -2089,16 +2089,16 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
-                                                        <input type="text" id="apple_redirect_uri"
-                                                            name="apple_redirect_uri" placeholder="apple_redirect_uri"
-                                                            value="{{ $settings['apple_redirect_uri'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>--}}
+{{--                                                        <input type="text" id="apple_redirect_uri"--}}
+{{--                                                            name="apple_redirect_uri" placeholder="apple_redirect_uri"--}}
+{{--                                                            value="{{ $settings['apple_redirect_uri'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
 
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -2114,18 +2114,18 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control">
                                                     </div>
                                                 </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="apple_webhook_url" name="apple_webhook_url"
-                                                                       placeholder="apple_webhook_url"
-                                                                       value="{{ $settings['apple_webhook_url'] ?? '' }}"
-                                                                       class="form-control" readonly>
-                                                                <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="apple_webhook_url" name="apple_webhook_url"--}}
+{{--                                                                       placeholder="apple_webhook_url"--}}
+{{--                                                                       value="{{ $settings['apple_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" readonly>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
                                                 @endif
                                             @if ($coin->type == 'google_pay')
                                                 <div class="col-md-6">
@@ -4458,11 +4458,11 @@ use Modules\Vip\Entities\Vip;
 <script>
 
 document.addEventListener("DOMContentLoaded", function() {
-    const firstRow = document.querySelector('.content .row'); 
+    const firstRow = document.querySelector('.content .row');
     if (firstRow) {
-        const firstDiv = firstRow.querySelector('div'); 
+        const firstDiv = firstRow.querySelector('div');
         if (firstDiv && firstDiv.classList.contains('col-md-12')) {
-            firstDiv.classList.add('col-sm-6'); 
+            firstDiv.classList.add('col-sm-6');
         }
     }
 });
