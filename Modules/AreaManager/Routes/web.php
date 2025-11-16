@@ -36,6 +36,7 @@ use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController
 */
 
 /*============================= DASHBOARD ROUTE THAT SPECIAL owner DASH ==============================*/
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -50,8 +51,8 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-
- Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
+        Route::get('/area-manager-charges', [ChargeController::class, 'index'])->name('charges');
+        Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
             Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
@@ -180,4 +181,3 @@ Route::prefix('areaManager')->name('areaManager.')->group(function () {
 });
 
 /*============================= End DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
-

@@ -64,28 +64,49 @@ class ChargeController extends MainController
         $totalSpent   = $totals->total_spent;
 
         $finalSalary = $user->di;
-        return $content
+        $content = $content
             ->header(trans('Charges'))
-            ->description(trans('Charges'))
+            ->description(trans('Charges'));
 
-            ->row(function ($row) use ($finalSalary) {
-                $row->column(12, view('admin.grid.area_manager.wallet', ['finalSalary' => $finalSalary]));
-            })
-            ->row(function (Row $row) use ($totalCharges, $totalSpent) {
-                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
-                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
-            })
-            ->row(function ($row) {
-                $row->column(12, $this->grid());
+        if ($authUser->type != 'area-manager') {
+            $content->row(function ($row) use ($finalSalary) {
+                $row->column(12, view('admin.grid.area_manager.wallet', [
+                    'finalSalary' => $finalSalary
+                ]));
             });
+
+            $content->row(function (Row $row) use ($totalCharges, $totalSpent) {
+                $row->column(6, new InfoBox(
+                    __('total charges'),
+                    'money',
+                    'green',
+                    '',
+                    truncateAndTrim($totalCharges, 2) . ' 💰'
+                ));
+
+                $row->column(6, new InfoBox(
+                    __('total spent'),
+                    'money',
+                    'red',
+                    'charges',
+                    truncateAndTrim($totalSpent, 2)
+                ));
+            });
+        }
+
+        $content->row(function ($row) {
+            $row->column(12, $this->grid());
+        });
+
+        return $content;
     }
     protected function grid()
     {
         $grid = new Grid(new Charge());
         $authUser = auth()->user();
-        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
         $grid->model()
-            ->with(['receiverUser', 'receiveragency','subAreaManager','areaManager'])
+            ->with(['receiverUser', 'receiveragency', 'subAreaManager', 'areaManager'])
             ->where(function ($query) use ($authUser, $authId) {
                 $query->where('charger_id', $authUser->id)
                     ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
