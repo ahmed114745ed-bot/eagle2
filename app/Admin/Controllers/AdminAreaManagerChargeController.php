@@ -23,7 +23,6 @@ class AdminAreaManagerChargeController extends MainController
      * @var string
      */
     protected $title = 'Charge';
-    public $permission_name = 'coin-recharge';
 
     /**
      * Make a grid builder.
@@ -45,12 +44,12 @@ class AdminAreaManagerChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge());
-        $authUser = auth()->user();
+        
         $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
         $grid->model()
             ->with(['receiverUser', 'receiveragency', 'subAreaManager', 'areaManager'])
-            ->where(function ($query) use ($authUser, $authId) {
-                $query->where('charger_id', $authUser->id)
+            ->where(function ($query) use ( $authId) {
+                $query->where('charger_id', $authId)
                     ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
             })
             ->whereIn('charger_type', [
@@ -59,7 +58,7 @@ class AdminAreaManagerChargeController extends MainController
             ])
             ->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) use ($authId, $authUser) {
+        $grid->filter(function (Grid\Filter $filter) use ($authId) {
             $filter->expand();
 
             $filter->where(function ($query) {
@@ -68,18 +67,18 @@ class AdminAreaManagerChargeController extends MainController
                         ->where('user_id', $this->input);
                 }
             }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
-            if ($authUser->type == 'area-manager') {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $query->where('charger_id', $this->input);
-                    }
-                }, __('created by'))->select(
-                    // Combine SubAreaManagers and AreaManager themselves
-                    SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')
-                        ->merge(AreaManager::where('id', $authId)->pluck('name', 'id'))
-                        ->toArray()
-                );
-            }
+            // if ($authUser->type == 'area-manager') {
+            //     $filter->where(function ($query) {
+            //         if ($this->input) {
+            //             $query->where('charger_id', $this->input);
+            //         }
+            //     }, __('created by'))->select(
+            //         // Combine SubAreaManagers and AreaManager themselves
+            //         SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')
+            //             ->merge(AreaManager::where('id', $authId)->pluck('name', 'id'))
+            //             ->toArray()
+            //     );
+            // }
 
 
             $filter->where(function ($query) {
@@ -195,7 +194,7 @@ class AdminAreaManagerChargeController extends MainController
         $grid->column('created_at', __('created_at'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
-        if ($authUser->type == 'area-manager') {
+       
             $grid->column('charger_id', __('created by'))->display(function () {
                 $info = Common::getChargerInfo($this);
 
@@ -225,7 +224,7 @@ class AdminAreaManagerChargeController extends MainController
 
                 return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
             });
-        }
+    
 
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
