@@ -42,7 +42,7 @@ class OfficialMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('OfficialMessageJob raw request', $this->request);
+        // Log::info('OfficialMessageJob raw request', $this->request);
         $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
@@ -238,13 +238,13 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
-        Log::info('OfficialMessageJob raw usersId', [
-            'usersId'      => $usersId,
-            'feature'      => $feature,
-            'subFeature' => $subFeature,
-            'countriesIds' => $countriesIds,
-            'admin' => $this->admin,
-        ]);
+        // Log::info('OfficialMessageJob raw usersId', [
+        //     'usersId'      => $usersId,
+        //     'feature'      => $feature,
+        //     'subFeature' => $subFeature,
+        //     'countriesIds' => $countriesIds,
+        //     'admin' => $this->admin,
+        // ]);
         
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);

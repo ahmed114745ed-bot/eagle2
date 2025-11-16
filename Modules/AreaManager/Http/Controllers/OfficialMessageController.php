@@ -141,9 +141,9 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
-        $form->select('language', __('language'))
-            ->options('/api/search/language')
-            ->ajax('/api/search/language', 'code', 'name')->rules('required');
+        // $form->select('language', __('language'))
+        //     ->options('/api/search/language')
+        //     ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
         $form->hidden('admin_type', __('type'))->default(PermissionType::AREA_MANAGER->value);
         $form->hidden('type', __('type'))->default(2);

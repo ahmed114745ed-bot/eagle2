@@ -47,8 +47,10 @@ class SubAreaManager extends Model
 
     public function countriesQuery()
     {
-        return Country::whereHas('regions', function($q) {
-            $q->where('manager_id', $this->id);
+        $managerId = $this->parent_id ?: $this->id;
+    
+        return Country::whereHas('regions', function ($q) use ($managerId) {
+            $q->where('manager_id', $managerId);
         });
     }
 

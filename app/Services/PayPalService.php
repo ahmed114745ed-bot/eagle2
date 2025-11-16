@@ -293,8 +293,9 @@ class PayPalService
         $paypalId   = $resource['id'] ?? null;
         $trx = $resource['supplementary_data']['related_ids']['order_id'] ?? null;
 
-        $coinLog = CoinLog::where('trx', $paypalId)->first();
+        $coinLog = CoinLog::where('trx', $trx)->first();
 
+        info('coin log', [$coinLog]);
         if (! $coinLog){
             return response()->json([
                 'status'  => 'ignored',
@@ -304,6 +305,7 @@ class PayPalService
         }
 
         LogHelper::info($eventType, $request->all());
+        info('event type', [$eventType]);
 
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
@@ -333,6 +335,9 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
+                info('DECLINED');
+                return $this->webhookPayment($trx, method: 'paypal');
+
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $trx]);
                 return response()->json([
                     'status'  => false,
