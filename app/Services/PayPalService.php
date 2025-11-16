@@ -304,6 +304,7 @@ class PayPalService
         }
 
         LogHelper::info($eventType, $request->all());
+        info('event type', [$eventType]);
 
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
@@ -333,6 +334,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
+                info('DECLINED');
                 return $this->webhookPayment($trx, method: 'paypal');
 
                 $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $trx]);
