@@ -21,6 +21,7 @@ use App\Models\UserTarget;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
 
@@ -32,6 +33,37 @@ class AllStatisticController extends MainController
     protected function countryId()
     {
         return session('filter_country_id');
+    }
+
+    public static function countryIds(): array
+    {
+        $filterCountryId = session('filter_country_id');
+        if (!empty($filterCountryId)) {
+            return [(int) $filterCountryId];
+        }
+    
+        $adminId = session('area_manager_id') ?? auth()->id();
+    
+        if (!$adminId) {
+            return [];
+        }
+    
+        $authAdmin = AreaManager::find($adminId);
+    
+        if (!$authAdmin) {
+            return [];
+        }
+    
+        $sessionCountryId = session('area_manager_country_id');
+        if (!empty($sessionCountryId)) {
+            return (array) $sessionCountryId;
+        }
+    
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+    
+        return [];
     }
 
     public function index(Content $content)
@@ -680,10 +712,10 @@ class AllStatisticController extends MainController
     public function getStatsData(Request $request)
     {
         try {
-            $countryID = $this->countryId();
+            $countryID = $this->countryIds();
 
             // تجميع جميع الاستعلامات في مرة واحدة
-            $userBaseQuery = User::when($countryID, fn($q) => $q->where('country_id', $countryID));
+            $userBaseQuery = User::when($countryID, fn($q) => $q->whereIn('country_id', $countryID));
 
             $stats = [
                 'usersCount' => $userBaseQuery->count(),
@@ -695,7 +727,7 @@ class AllStatisticController extends MainController
 
             // Peak Hours
             $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-                $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
+                $q->when($countryID, fn($query) => $query->whereIn('country_id', $countryID));
             })
                 ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions")
                 ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
@@ -713,7 +745,7 @@ class AllStatisticController extends MainController
 
             // Chat Statistics
             $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
             });
 
             $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
@@ -727,7 +759,7 @@ class AllStatisticController extends MainController
                 ->distinct('chat_room_id')->count('chat_room_id');
 
             $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
             })
                 ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
                 ->groupBy('chat_room_id')

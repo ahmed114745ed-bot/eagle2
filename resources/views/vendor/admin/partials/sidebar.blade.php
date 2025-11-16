@@ -444,7 +444,7 @@
                                     ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                                 ],
                             ],
-                            ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
+                            ['uri' => '/area-manager-charges-reports', 'icon' => 'fa-building', 'title' => __('charges')],
                             [
                                 'uri' => '#',
                                 'icon' => 'fa-briefcase',
@@ -484,7 +484,7 @@
                                 'title' => __('Advertisements'),
                                 'permission' => null,
                                 'children' => [
-                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                    ['uri' => '/official_msgs', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                                 ],
                             ],
                             [
@@ -493,8 +493,8 @@
                                 'title' => __('Employees and Permissions'),
                                 'permission' => null,
                                 'children' => [
-                                    ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                    ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                    ['uri' => '/auth/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
+                                    ['uri' => '/auth/users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
                                 ],
                             ],
                         ];

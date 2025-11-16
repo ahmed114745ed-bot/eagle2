@@ -111,7 +111,9 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $grid->model()->with(['appUser.packs', 'createdBy'])
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $areaManagerPreview = session('preview_area_manager');
+        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {

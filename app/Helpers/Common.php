@@ -2376,9 +2376,7 @@ class Common
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
     
-        if (method_exists($authAdmin, 'subCountriesQuery')) {
-            return $authAdmin->countriesQuery()->pluck('id')->toArray();
-        }
+
 
 
 

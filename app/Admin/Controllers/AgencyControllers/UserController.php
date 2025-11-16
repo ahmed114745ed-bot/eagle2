@@ -61,7 +61,7 @@ class UserController extends MainController
 
     public function indexProfessionals(Content $content)
     {
-        if (!session('preview_superadmin') || !session('country_id')){
+        if (!session('preview_superadmin') && !session('filter_country_id') && !session('preview_area_manager')){
             abort(404, __('not found'));
         }
 
