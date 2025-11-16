@@ -242,6 +242,7 @@ class OfficialMessageJob implements ShouldQueue
             'usersId'      => $usersId,
             'feature'      => $feature,
             'countriesIds' => $countriesIds,
+            'admin' => $this->admin,
         ]);
         
         // Call your custom notification logic

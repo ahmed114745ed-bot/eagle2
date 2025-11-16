@@ -2341,6 +2341,12 @@ class Common
         $authAdmin = AreaManager::find($adminId)
                     ?? SubAreaManager::find($adminId);
     
+
+        Log::info('OfficialMessageJob adminId', [
+            'adminId'      => $adminId,
+         
+        ]);
+
         if (!$authAdmin) {
             return [];
         }
