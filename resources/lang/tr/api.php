@@ -100,6 +100,9 @@ return [
     'rejectCp' => ':name ilişki isteğinizi reddetti',
     'luckBox' => 'Tebrikler! Şans kutusundan :coins coin kazandınız',
     'closeNormalBox' => 'Normal şans kutunuzun süresi doldu.',
+    
+    "closeSuperBoxReturnCoins" => "Süper şans kutunuzun süresi doldu ve :coins coin size iade edildi",
+
     'rejectYourAgency' => 'Ajansınız reddedildi',
     'likeReal' => 'Reali beğen',
     'realComment' => 'Reale yorum',
