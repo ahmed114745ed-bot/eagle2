@@ -270,7 +270,7 @@ class CustomNotification
     public function follow(User $receiver, User $user)
     {
         $tokens_notfacion = DB::table('users')->where('id', $receiver->id)->value('notification_id');
-        $lang = $user->lan ?? 'en';
+        $lang = $receiver->lan ?? 'en';
         $body = __('api.followed_you', ['name' => $user->name], $lang);
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
@@ -282,7 +282,7 @@ class CustomNotification
     public function followBack(User $receiver, User $user)
     {
         $tokens_notfacion = DB::table('users')->where('id', $receiver->id)->value('notification_id');
-        $lang = $user->lan ?? 'en';
+        $lang = $receiver->lan ?? 'en';
         $body = __('api.follow_back', ['name' =>  $user->name], $lang);
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
