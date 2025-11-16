@@ -63,9 +63,14 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($orderId, $method = null, $newTrx = null)
+    public function webhookPayment($orderId, $method = null, $newTrx = null): JsonResponse
     {
-        $coinLog = $this->findCoinLog($orderId, $method);
+
+        if ($method === 'paypal'){
+            $coinLog = $this->findCoinLogTrx($orderId, $method);
+        } else {
+            $coinLog = $this->findCoinLog($orderId, $method);
+        }
 
         if (!$coinLog) {
             return $this->transactionNotFoundResponse();
@@ -85,6 +90,13 @@ trait PaymentTrait
     private function findCoinLog($orderId, $method = null): ?CoinLog
     {
         return CoinLog::where('id', $orderId)
+            ->when($method != null, fn($q) => $q->where('method', $method))
+            ->first();
+    }
+
+    private function findCoinLogTrx($orderId, $method = null): ?CoinLog
+    {
+        return CoinLog::where('trx', $orderId)
             ->when($method != null, fn($q) => $q->where('method', $method))
             ->first();
     }
