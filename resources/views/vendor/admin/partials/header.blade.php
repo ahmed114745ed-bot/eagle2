@@ -464,13 +464,14 @@
                 url.searchParams.delete('area_manager_id');
             }
 
-            if ($.pjax) {
-                setTimeout(() => {
-                    $.pjax({url: url.toString(), container: '#pjax-container'});
-                }, 1);
-            } else {
+            // if ($.pjax) {
+          
+            //     setTimeout(() => {
+            //         $.pjax({url: url.toString(), container: '#pjax-container'});
+            //     }, 1);
+            // } else {
                 window.location.href = url.toString();
-            }
+            // }
         });
 
         if ($countrySelect.length) {
