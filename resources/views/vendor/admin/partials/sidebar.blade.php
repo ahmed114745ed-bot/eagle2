@@ -484,7 +484,7 @@
                                 'title' => __('Advertisements'),
                                 'permission' => null,
                                 'children' => [
-                                    ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                    ['uri' => '/official_msgs', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                                 ],
                             ],
                             [
@@ -493,8 +493,8 @@
                                 'title' => __('Employees and Permissions'),
                                 'permission' => null,
                                 'children' => [
-                                    ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                    ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                    ['uri' => '/auth/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
+                                    ['uri' => '/auth/users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
                                 ],
                             ],
                         ];

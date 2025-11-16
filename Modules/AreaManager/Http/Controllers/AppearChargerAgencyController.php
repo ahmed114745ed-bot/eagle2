@@ -203,7 +203,7 @@ class AppearChargerAgencyController extends MainController
      */
     protected function grid()
     {
-
+       
         $grid = new Grid(new ShippingAgency());
         $adminId = auth()->user()->id;
         $countriesIds = Common::areaCountries($adminId);
