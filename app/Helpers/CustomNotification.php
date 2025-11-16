@@ -773,7 +773,7 @@ class CustomNotification
     {
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body =  $type == 0 ? Lang::get('api.closeNormalBox', [], $lang) : __('api.closeSuperBox', [], $lang);
+        $body =  $type == 0 ? __('api.closeNormalBox', [], $lang) : __('api.closeSuperBox', [], $lang);
 
         $content = __('api.lucky_box', [], $lang);
         $data['image'] = getImagePath(@$imageBox);
@@ -789,7 +789,7 @@ class CustomNotification
         $body = '';
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body =  $type == 0 ?
-            Lang::get('api.closeNormalBoxReturnCoins', ['coins' => $coins], $lang)
+            __('api.closeNormalBoxReturnCoins', ['coins' => $coins], $lang)
             : __('api.closeSuperBoxReturnCoins', ['coins' => $coins], $lang);
 
         $content = __('api.lucky_box', [], $lang);
