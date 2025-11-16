@@ -481,7 +481,7 @@ use Modules\Vip\Entities\Vip;
     }
 
     @media (max-width: 768px) {
-    
+
 
     .settings-menu {
         display: flex;
@@ -500,7 +500,12 @@ use Modules\Vip\Entities\Vip;
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/path/to/bootstrap-switch.min.js"></script>
+<script src="/path/to/jquery.slimscroll.min.js"></script>
+<script src="/path/to/app.min.js"></script>
+<script src="/path/to/settings.js"></script>
 
 <body>
 
@@ -509,7 +514,7 @@ use Modules\Vip\Entities\Vip;
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('landPageSettings')">{{ __('land settings') }}</button>
-            
+
             <button onclick="showSection('workSettings')" class="position-relative">
                 {{ __('Work') }}
             </button>
@@ -4458,11 +4463,11 @@ use Modules\Vip\Entities\Vip;
 <script>
 
 document.addEventListener("DOMContentLoaded", function() {
-    const firstRow = document.querySelector('.content .row'); 
+    const firstRow = document.querySelector('.content .row');
     if (firstRow) {
-        const firstDiv = firstRow.querySelector('div'); 
+        const firstDiv = firstRow.querySelector('div');
         if (firstDiv && firstDiv.classList.contains('col-md-12')) {
-            firstDiv.classList.add('col-sm-6'); 
+            firstDiv.classList.add('col-sm-6');
         }
     }
 });
