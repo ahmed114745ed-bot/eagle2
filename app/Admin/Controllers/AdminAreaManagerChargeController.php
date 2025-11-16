@@ -46,6 +46,7 @@ class AdminAreaManagerChargeController extends MainController
         $grid = new Grid(new Charge());
         $authUser = auth()->user();
         $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
+        dd($authId,session('area_manager_id'));
         $grid->model()
             ->with(['receiverUser', 'receiveragency', 'subAreaManager', 'areaManager'])
             ->where(function ($query) use ($authUser, $authId) {
