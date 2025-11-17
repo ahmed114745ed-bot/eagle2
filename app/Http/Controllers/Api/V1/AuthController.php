@@ -165,13 +165,13 @@ class AuthController extends Controller
     {
         $fields = $data;
         $unique_id = $data['apple_id'];
-        $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
-        $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
-        $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
+        $teamId = 'A6L3JR3Q4Q'; // Use the correct environment variable name
+        $keyId =  '4HVYR73NB7'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $clientId = 'com.jimo.app.live'; //'com.tikkchat.app'; // Use the correct environment variable name
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
-        $keyContent = file_get_contents(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+        $keyContent = file_get_contents(public_path('files/AuthKey_4HVYR73NB7.p8'));
         // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
 
 
