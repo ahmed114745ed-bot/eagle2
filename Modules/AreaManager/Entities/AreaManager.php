@@ -2,6 +2,8 @@
 
 namespace Modules\AreaManager\Entities;
 
+use App\Models\AdminUser;
+use App\Traits\CreatedByTrait;
 use Exception;
 use App\Models\User;
 use App\Models\Agency;
@@ -11,10 +13,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class AreaManager extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes,CreatedByTrait;
 
     protected $table = 'admin_users';
 
@@ -130,5 +133,9 @@ class AreaManager extends Authenticatable
     public function region()
     {
         return $this->belongsTo(Region::class, 'manager_id', 'id');
+    }
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 }
