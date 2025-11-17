@@ -1,0 +1,13 @@
+{
+    "name": "MixStream",
+    "alias": "mixstream",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MixStream\\Providers\\MixStreamServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
