@@ -1925,6 +1925,7 @@
     "questions":"أسئلة",
     "payment-coins":"العملات المعدنية",
     "host":"مضيف",
+    "Host":"مضيف",
 
     "categories":"التصنيفات",
     "Fields": "الحقول",
@@ -2071,7 +2072,6 @@
     "Reel Settings" : "اعدادات الفيديوهات",
     "reel settings" : "اعدادات الفيديوهات",
     "Moment Settings" : "اعدادات اللحظات",
-    "Host":"وكيل مضيفين",
     "Application Fav Icon:": "صورة التطبيق المصغرة:",
     "Host Agent":"وكيل مضيفين",
     "Shipping Agent":"وكيل شحن",
@@ -2253,6 +2253,7 @@
     "Regions":"المناطق",
     "Region Settings":"اعدادات المناطق",
     "Store":"المتجر",
+    "Show superadmin":" عرض مدير الدوله",
     "Store Settings":"اعدادات المتجر",
     "soon:": " :قريباً",
     "helper": "مساعد",

@@ -23,6 +23,7 @@
     "SuperAdmin Charge": "Yüklemeler",
     "Charge To Superadmin": "Yüklemeler",
     "type admin": "yönetici türü",
+    "Show superadmin": "देश प्रबंधक दिखाएँ",
     "Specifies the percentage of the total profit distributed among all admins.": "Tüm yöneticiler arasında dağıtılan toplam kâr yüzdesini belirtir.",
 "Specifies the percentage of the total profit allocated to the room owner.": "Oda sahibine tahsis edilen toplam kâr yüzdesini belirtir.",
 "Admin Profit Percentage (Admin Profit %)": "Yönetici Kâr Yüzdesi (Admin Kâr %)",

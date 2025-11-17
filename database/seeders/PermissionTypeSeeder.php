@@ -386,10 +386,10 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'splash', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'official-messages', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
-                        PermissionType::AREA_MANAGER->value => $defaultMethods,
+                    ['key' => 'official-messages', 'except' => ['edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['create', 'browse', 'delete', 'show'],
+                        PermissionType::SUPER_ADMIN->value => ['create', 'browse', 'delete', 'show'],
+                        PermissionType::AREA_MANAGER->value => ['create', 'browse', 'delete', 'show'],
                     ],],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -1019,11 +1019,11 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     [
                         'key' => 'Bds',
-                        'except' => [],
+                        'except' => ['delete'],
                         'additional' => ['delete-switch', 'choose-switch', 'stop-salary-switch'],
                         'types' => [
-                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'delete', 'show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'delete', 'show'],
+                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
 
 
                         ],
@@ -1074,7 +1074,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'host', 'except' => ['create'], 'additional' => [], 'types' => [
                         PermissionType::SUPER_ADMIN->value => ['browse', 'edit', 'delete', 'show',],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'edit', 'delete', 'show',],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'edit',  'show',],
                     ],],
 
                 ],
