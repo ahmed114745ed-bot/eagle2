@@ -6,10 +6,12 @@
 </div>
 
 @php
-    if (request()->is('admin/*')) {
+    if (request()->is('admin') || request()->is('admin/*')) {
         $fetchUrl = admin_url('superadmin/top-users-visits');
-    } elseif (request()->is('superadmin/*')) {
+    } elseif (request()->is('superadmin') || request()->is('superadmin/*')) {
         $fetchUrl = superAdmin_url('top-users-visits');
+    } elseif (request()->is('areaManager') || request()->is('areaManager/*')) {
+        $fetchUrl = areaManager_url('top-users-visits');
     } else {
         $fetchUrl = url('top-users-visits');
     }

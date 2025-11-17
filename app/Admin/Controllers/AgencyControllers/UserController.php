@@ -61,7 +61,7 @@ class UserController extends MainController
 
     public function indexProfessionals(Content $content)
     {
-        if (!session('preview_superadmin') || !session('country_id')){
+        if (!session('preview_superadmin') && !session('filter_country_id') && !session('preview_area_manager')){
             abort(404, __('not found'));
         }
 
@@ -111,7 +111,7 @@ class UserController extends MainController
     protected function gridProfessional()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $haveCoins = (request()->have_coins == 1);
         $grid->model()
             ->ofAgency()
@@ -121,14 +121,14 @@ class UserController extends MainController
             ->where(function ($query) use ($countryID){
                 $currentCountry = $countryID;
                 $query->where(function ($q) use ($currentCountry) {
-                    $q->where('country_id', $currentCountry)
+                    $q->whereIn('country_id', $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', '!=', $currentCountry);
+                            $a->whereNotIn('country_id',  $currentCountry);
                         });
                 })->orWhere(function ($q) use ($currentCountry) {
-                    $q->where('country_id', '!=', $currentCountry)
+                    $q->whereNotIn('country_id',  $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->where('country_id', $currentCountry);
+                            $a->whereIn('country_id', $currentCountry);
                         });
                 });
             });
@@ -465,12 +465,12 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        $countryID =session('filter_country_id');
+       $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'ownerRoom:id,uid',

@@ -38,6 +38,16 @@ class Conversation implements ShouldBroadcastNow
 
     public function broadcastWith() : array
     {
-        return (array) $this->message;
+        $data = (array) $this->message;
+
+        Log::info('Broadcasting Conversation Event', [
+            'chat_room_id' => $this->check_room->id,
+            'message_id' => $this->message->id,
+            'status' => $this->message->status,
+            'payload' => $data
+        ]);
+    
+        return $data;
+    
     }
 }

@@ -35,7 +35,7 @@ class RoomCupSettingsController extends AdminController
         $default = [
             'enabled'  => true,
             'type'     => 'daily',
-            'time'     => '23:59',
+            'time'     => '00:00',
             'day'      => 0,
             'interval' => 1,
         ];
@@ -73,7 +73,7 @@ class RoomCupSettingsController extends AdminController
         $data = [
             'enabled'  => request()->has('enabled'),
             'type'     => request('type', 'daily'),
-            'time'     => request('time', '23:59'),
+            'time'     => request('time', '00:00'),
             'day'      => (int) request('day', 0),
             'interval' => (int) request('interval', 1),
         ];

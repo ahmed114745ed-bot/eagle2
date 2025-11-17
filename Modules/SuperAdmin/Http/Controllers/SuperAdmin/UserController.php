@@ -83,7 +83,7 @@ class UserController extends MainController
     // {
     //     return $content
     //         ->title(__($this->title));
-           
+
     //         // ->body($this->form());
     // }
 
@@ -215,9 +215,10 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
+        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
 
         $grid->model()
-            ->where('country_id', auth()->user()->country_id)
+            ->whereIn('country_id', $countries)
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',

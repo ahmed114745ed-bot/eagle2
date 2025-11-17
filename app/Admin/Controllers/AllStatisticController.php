@@ -21,6 +21,7 @@ use App\Models\UserTarget;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
 
@@ -33,9 +34,40 @@ class AllStatisticController extends MainController
     {
         return session('filter_country_id');
     }
+
+    public static function countryIds(): array
+    {
+        $filterCountryId = session('filter_country_id');
+        if (!empty($filterCountryId)) {
+            return [(int) $filterCountryId];
+        }
+    
+        $adminId = session('area_manager_id') ?? auth()->id();
+    
+        if (!$adminId) {
+            return [];
+        }
+    
+        $authAdmin = AreaManager::find($adminId);
+    
+        if (!$authAdmin) {
+            return [];
+        }
+    
+        $sessionCountryId = session('area_manager_country_id');
+        if (!empty($sessionCountryId)) {
+            return (array) $sessionCountryId;
+        }
+    
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+    
+        return [];
+    }
+
     public function index(Content $content)
     {
-
         return parent::index(
             $content
                 ->title(__('Home'))
@@ -44,159 +76,6 @@ class AllStatisticController extends MainController
                     $row->column(12, view('admin.dashboard.chart'));
                 })
         );
-        $countryID = $this->countryId();
-
-        $user = Auth::user();
-
-        $topUsersByFollowers = User::withCount('followers')
-            ->with('packs', 'profile')
-            ->when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            })
-            ->orderByDesc('followers_count')
-            ->take(10)
-            ->get();
-
-        return parent::index($content
-            ->title(__('Home'))
-            ->description(__('General Statistics'))
-            ->row(function (Row $row) use ($user) {
-                if ($user->isRole('admin') || $user->isRole('developer')) {
-                    $row->column(12, view('admin.dashboard.chart'));
-                }
-            })
-            ->row(function (Row $row) use ($topUsersByFollowers) {
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>👤 " . __('Users') . "</h3>");
-
-                    $column->row(function (Row $row) {
-                        $row->column(12, view('admin.dashboard.stats'));
-                    });
-
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.users_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.top_users_visits_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.signups_weekly_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.peak_hours_card')->render();
-                            $column->row($view);
-                        });
-                    });
-                });
-
-                $row->column(12, function ($column) use ($topUsersByFollowers) {
-                    $column->row(function (Row $row) use ($topUsersByFollowers) {
-                        $row->column(6, function ($col) use ($topUsersByFollowers) {
-                            $top5 = $topUsersByFollowers
-                                ->filter(fn($user) => $user->followers_count > 0)
-                                ->take(5);
-
-                            $view5 = view('admin.dashboard.widgets.top_followers_table', [
-                                'top5' => $top5,
-                            ])->render();
-
-                            $col->row($view5);
-                        });
-
-                        //                        $row->column(6, function ($col) {
-                        //                            $view = view('admin.dashboard.widgets.users_online_chart')->render();
-                        //                            $col->row($view);
-                        //                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>🏠 " . __('Rooms') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.room_tab')->render();
-                        $row->column(12, $view);
-                    });
-
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.rooms_distribution_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.rooms_activity_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-
-
-                            $view = view('admin.dashboard.widgets.top_gifted_rooms_chart')->render();
-
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.avg_session_duration_chart')->render();
-
-                            $column->row($view);
-                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>🏢 " . __('Agencies') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.agency_tab')->render();
-                        $row->column(12, $view);
-                    });
-                    $column->row(function (Row $row) {
-                        $row->column(6, function ($column) {
-
-                            $view = view('admin.dashboard.widgets.agencies_targets_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.top_senders_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.top_receivers_chart')->render();
-                            $column->row($view);
-                        });
-
-                        $row->column(6, function ($column) {
-                            $view = view('admin.dashboard.widgets.agencies_compare_chart')->render();
-
-                            $column->row($view);
-                        });
-                    });
-                });
-                $row->column(12, function ($column) {
-                    $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
-
-                    $column->row(function ($row) {
-                        $view = view('admin.dashboard.widgets.bd_tab')->render();
-                        $row->column(12, $view);
-                    });
-                });
-            }));
     }
 
     public function getTopFollowers(Request $request): JsonResponse
@@ -208,7 +87,12 @@ class AllStatisticController extends MainController
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc('followers_count')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                $avatar = $user->profile?->avatar;
+                $user->avatar_url = $avatar ? getImagePath($avatar) : asset('images/businessman-icon.jpg');
+                return $user;
+            });
 
         return response()->json($topUsersByFollowers);
     }
@@ -395,7 +279,7 @@ class AllStatisticController extends MainController
     {
         $currMonth = now()->month;
         $prevMonth = now()->subMonth()->month;
-        $countryID = request('country_id', null);
+        $countryID = $this->countryId();
 
         $signups = User::when($countryID, function ($query, $countryID) {
             return $query->where('country_id', $countryID);
@@ -423,10 +307,15 @@ class AllStatisticController extends MainController
             $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
         }
 
+        $currMonthName = Carbon::create()->month($currMonth)->translatedFormat('F');
+        $prevMonthName = Carbon::create()->month($prevMonth)->translatedFormat('F');
+
         return response()->json([
             'labels'       => $labels,
             'dataCurrent'  => $dataCurrent,
             'dataPrevious' => $dataPrevious,
+            'currentMonth'  => $currMonthName,
+            'previousMonth' => $prevMonthName,
         ]);
     }
 
@@ -725,12 +614,9 @@ class AllStatisticController extends MainController
     {
         $countryID = $this->countryId();
 
-        $bdCount = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->count();
+        $bdCount = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))->count();
 
-        $totalSalaries = Bd::where('parent_id', auth()->id())
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        $totalSalaries = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->withSum('salaries', 'salary')
             ->withSum('salaries', 'cut_amount')
             ->withCount('agencies')
@@ -826,10 +712,10 @@ class AllStatisticController extends MainController
     public function getStatsData(Request $request)
     {
         try {
-            $countryID = $this->countryId();
+            $countryID = $this->countryIds();
 
             // تجميع جميع الاستعلامات في مرة واحدة
-            $userBaseQuery = User::when($countryID, fn($q) => $q->where('country_id', $countryID));
+            $userBaseQuery = User::when($countryID, fn($q) => $q->whereIn('country_id', $countryID));
 
             $stats = [
                 'usersCount' => $userBaseQuery->count(),
@@ -841,7 +727,7 @@ class AllStatisticController extends MainController
 
             // Peak Hours
             $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
-                $q->when($countryID, fn($query) => $query->where('country_id', $countryID));
+                $q->when($countryID, fn($query) => $query->whereIn('country_id', $countryID));
             })
                 ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions")
                 ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
@@ -859,7 +745,7 @@ class AllStatisticController extends MainController
 
             // Chat Statistics
             $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
             });
 
             $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
@@ -873,7 +759,7 @@ class AllStatisticController extends MainController
                 ->distinct('chat_room_id')->count('chat_room_id');
 
             $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->where('country_id', $countryID));
+                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
             })
                 ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
                 ->groupBy('chat_room_id')

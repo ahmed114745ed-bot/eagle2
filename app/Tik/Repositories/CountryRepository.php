@@ -2,6 +2,7 @@
 
 namespace App\Tik\Repositories;
 
+use App\Helpers\Common;
 use App\Models\Country;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -75,12 +76,21 @@ class CountryRepository extends AbstractRepository
         return $this->model->query()->where('phone_code', $phoneCode)->first();
     }
 
-    public function searchCountry($key, $page, $perPage)
+    public function searchCountry($key, $page, $perPage, $areaManagerId = null)
     {
-        return $this->model->query()->selectRaw('concat(name, " - ", e_name) as name, id')
-            ->where('name', 'like', '%' . $key . '%')
-            ->orWhere('e_name', 'like', '%' . $key . '%')
-            ->orWhere('id', 'like', '%' . $key . '%')
+        $countriesIds = Common::areaCountriesV2($areaManagerId);
+
+        return $this->model
+            ->query()
+            ->selectRaw('concat(name, " - ", e_name) as name, id')
+            ->when(!empty($countriesIds), function ($q) use ($countriesIds) {
+                $q->whereIn('id', $countriesIds);
+            })
+            ->where(function ($q) use ($key) {
+                $q->where('name', 'like', "%{$key}%")
+                    ->orWhere('e_name', 'like', "%{$key}%")
+                    ->orWhere('id', 'like', "%{$key}%");
+            })
             ->paginate($perPage, ['*'], 'page', $page);
     }
 }

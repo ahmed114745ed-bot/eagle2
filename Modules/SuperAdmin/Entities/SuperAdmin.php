@@ -3,10 +3,12 @@
 namespace Modules\SuperAdmin\Entities;
 
 use App\Models\Admin;
+use App\Models\AdminUser;
 use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\Country;
 use App\Models\User;
+use App\Traits\CreatedByTrait;
 use DB;
 use Exception;
 use App\Traits\TimestampsWithTimezone;
@@ -14,12 +16,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\AreaManager\Entities\AreaManager;
 
 class SuperAdmin extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes;
+    use TimestampsWithTimezone, SoftDeletes ,CreatedByTrait;
 
     protected $table = 'admin_users';
+    protected $guarded = [];
 
     protected $dates = ['deleted_at'];
 
@@ -41,6 +45,17 @@ class SuperAdmin extends Model
     {
         return $this->belongsTo(Country::class);
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(AreaManager::class, 'parent_id');
+    }
+//
+//    public function transactions()
+//    {
+//        return $this->hasMany(Charge::class, 'charger_id', 'id')
+//            ->where('user_charger_type', 'bd');
+//    }
 
     public function subSuperAdmins()
     {
@@ -178,4 +193,10 @@ class SuperAdmin extends Model
     //
     //        return floor($userSallary);
     //    }
+
+
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
+    }
 }

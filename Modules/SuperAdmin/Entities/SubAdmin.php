@@ -5,6 +5,7 @@ namespace Modules\SuperAdmin\Entities;
 use App\Models\Agency;
 use App\Models\Country;
 use App\Models\User;
+use App\Traits\CreatedByTrait;
 use DB;
 use Exception;
 use App\Traits\TimestampsWithTimezone;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubAdmin extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes;
+    use TimestampsWithTimezone, SoftDeletes,CreatedByTrait;
 
     protected $table = 'admin_users';
 
@@ -61,5 +62,9 @@ class SubAdmin extends Model
         self::creating(function ($model) {});
 
         self::updating(function ($model) {});
+    }
+    public function creator()
+    {
+        return $this->belongsTo(SuperAdmin::class, 'created_by');
     }
 }

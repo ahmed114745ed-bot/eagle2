@@ -13,14 +13,17 @@
 </div>
 
 @php
-    if (request()->is('admin/*')) {
+    if (request()->is('admin') || request()->is('admin/*')) {
         $fetchUrl = admin_url('superadmin/peak-hours');
-    } elseif (request()->is('superadmin/*')) {
+    } elseif (request()->is('superadmin') || request()->is('superadmin/*')) {
         $fetchUrl = superAdmin_url('peak-hours');
+    } elseif (request()->is('areaManager') || request()->is('areaManager/*')) {
+        $fetchUrl = areaManager_url('peak-hours');
     } else {
         $fetchUrl = url('peak-hours');
     }
 @endphp
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

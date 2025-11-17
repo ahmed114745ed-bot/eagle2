@@ -188,6 +188,9 @@ class Bd extends Model
     public function salaries()
     {
         return $this->hasMany(BdSalary::class, 'bd_id', 'id');
-
+    }
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 }

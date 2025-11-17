@@ -366,18 +366,18 @@ class AgencyController extends MainController
      *
      * @return Grid
      */
-   
+
 
     protected function grid()
     {
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
-            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins','agencies.country_id','agencies.img', 'agencies.is_frozen'])
-            ->with(['owner:id,name,uuid,country_id','owner.country', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
+            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries','creator'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -420,19 +420,19 @@ class AgencyController extends MainController
 
                 return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
-           $flagHtml = '';
-                if (!empty($this->country?->flag)) {
-                    $flagPath = getImagePath($this->country->flag);
-                    $flagTitle = app()->getLocale() === 'ar'
-                        ? e($this->country->name)
-                        : e($this->country->e_name);
+            $flagHtml = '';
+            if (!empty($this->country?->flag)) {
+                $flagPath = getImagePath($this->country->flag);
+                $flagTitle = app()->getLocale() === 'ar'
+                    ? e($this->country->name)
+                    : e($this->country->e_name);
 
-                    $flagHtml = "<img src='{$flagPath}' 
+                $flagHtml = "<img src='{$flagPath}' 
                          class='flag-image' 
                          alt='flag Image' 
                          title='{$flagTitle}' 
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-                }
+            }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -448,7 +448,7 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-           
+
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -521,6 +521,9 @@ class AgencyController extends MainController
             ->display(fn() => $this->is_frozen ? 1 : 0)
             ->switch(Common::getSwitchStates())->sortable();
 
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         // --- Actions ---
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -806,6 +809,9 @@ class AgencyController extends MainController
                     throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
                 }
             }
+            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            $form->country_id = $bd->country_id;
+
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
@@ -994,98 +1000,6 @@ class AgencyController extends MainController
         return $this->response;
     }
 
-
-
-
-
-    //////////////////show agency ///////////////////////////////
-
-    // public function show($id, Content $content)
-    // {
-    //     return $content->row(function ($row) use ($id) {
-
-
-    //         // Info Boxes
-    //         // $row->column(12, function ($column)  {
-    //         //     $column->row(view('admin.grid.users.show', compact('user')));
-
-
-    //         // });
-
-    //         $row->column(12, function ($column) use ($id) {
-    //             $tab = new Tab();
-
-    //             Admin::style('
-    //                         .nav-tabs-custom {
-    //                             background: transparent !important;
-    //                             box-shadow: none !important;
-    //                             border: none !important;
-    //                         }
-    //                         .nav-tabs-custom>.nav-tabs {
-    //                             background: transparent;
-    //                             border: none;
-    //                             display: flex;
-    //                             padding: 0;
-    //                             margin: 0;
-    //                             width: 100%;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li {
-    //                             flex: 1;
-    //                             border: none;
-    //                             margin: 0;
-    //                             padding: 0 2px;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li:first-child {
-    //                             padding-left: 0;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li:last-child {
-    //                             padding-right: 0;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li > a {
-    //                             background: #1e1e1e;
-    //                             color: white;
-    //                             padding: 8px 24px;
-    //                             border-radius: 4px;
-    //                             margin: 0;
-    //                             border: none;
-    //                             font-size: 14px;
-    //                             text-align: center;
-    //                             width: 100%;
-    //                             display: block;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li.active > a {
-    //                             background: #ff9800;
-    //                             color: white;
-    //                             border: none;
-    //                         }
-    //                         .nav-tabs-custom > .nav-tabs > li > a:hover {
-    //                             background: #ff9800;
-    //                             color: white;
-    //                             border: none;
-    //                         }
-    //                         .nav-tabs-custom>.tab-content {
-    //                             background: transparent;
-    //                             border: none;
-    //                             padding: 10px 0;
-    //                         }
-    //                        .nav-tabs-custom > .nav-tabs > li.pull-right.header {
-    //                             display: none !important;
-    //                         }
-
-    //                         .nav-tabs-custom > .nav-tabs > li.pull-right {
-    //                             display: none !important;
-    //                         }
-    //                     ');
-    //             $tab->add(__('Agency Join Requests'), $this->joinRequest($id)->render());
-    //             $tab->add(__('Assign Admin'), $this->members($id)->render());
-    //             $tab->add(__('Stars'), $this->stars($id)->render());
-    //             // $tab->add(__('Heroes'), $this->heroes($id)->render());
-    //             // $tab->add(__('Target'), $this->targets($id)->render());
-
-    //             $column->append($tab);
-    //         });
-    //     });
-    // }
 
 
 
