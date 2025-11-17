@@ -41,7 +41,7 @@ class CoinService
         return $this->coinRepository->allCoinsByPaymentId($payment_id);
     }
 
-    public function buyCoins( $request )
+    public function buyCoins($request)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
@@ -81,14 +81,13 @@ class CoinService
                 }
                 $sessionUrl = $this->createStripePayment($settings, $data);
                 return Common::apiResponse(1, 'ok', $sessionUrl, 200);
-
             } elseif ($paymentMethod == 'fawry') {
                 $Active = config('is_fawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
-               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
+                $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
@@ -113,8 +112,8 @@ class CoinService
             } else if ($paymentMethod == 'paypal') {
                 $Active = config('is_paypal_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
-//                $paypalService = new PayPalService();
-//                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                //                $paypalService = new PayPalService();
+                //                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 // $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
                 $bladeUrl = url("/paypal/checkout/{$log->id}");
 
@@ -134,7 +133,7 @@ class CoinService
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
-                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+                return Common::apiResponse(1, $paymentUrl, $paymentUrl, 200);
             } else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
@@ -268,9 +267,4 @@ class CoinService
 
         return $this->stripeService->pay($settings, $request);
     }
-
 }
-
-
-
-
