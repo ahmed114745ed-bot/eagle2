@@ -1070,9 +1070,9 @@
                         @foreach($charges as $index => $charge)
                             @php
                                 if($chargeTabType == 'receiver') {
-                                    $userCharges = Common::getChargerInfo($charge);
+                                    $userCharges = \App\Helpers\Common::getChargerInfo($charge);
                                   } else {
-                                    $userCharges = Common::getReceiverInfo($charge);
+                                    $userCharges = \App\Helpers\Common::getReceiverInfo($charge);
                                   }
                                   $name = $userCharges['name'] ?? '-';
                                   $uid = $userCharges['uuid'] ?? '-';
