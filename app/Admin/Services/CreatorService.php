@@ -35,7 +35,7 @@ class CreatorService
         $name = htmlspecialchars($creator->name ?? 'Unknown', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         $defaultImage = asset('images/businessman-icon.jpg');
-        $avatarPath = $creator->profile?->avatar ?? null;
+        $avatarPath = $creator?->avatar ?? null;
         $url = getImagePath($avatarPath) ?? $defaultImage;
 
         if (!isImageExists($url)) {
