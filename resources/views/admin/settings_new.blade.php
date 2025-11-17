@@ -8,6 +8,49 @@ use Modules\Vip\Entities\Vip;
 
 @endphp
 <style>
+
+/* General colorpicker dropdown styling */
+.colorpicker {
+    min-width: 220px;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+}
+
+/* Saturation square */
+.colorpicker-saturation {
+    border-radius: 5px !important;
+}
+
+/* Hue slider */
+.colorpicker-hue {
+    border-radius: 5px !important;
+}
+
+/* Alpha slider */
+.colorpicker-alpha {
+    border-radius: 5px !important;
+}
+
+/* Color preview box */
+.colorpicker-color div {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Force dropdown alignment */
+.colorpicker.colorpicker-right {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.colorpicker.colorpicker-left {
+    left: 0 !important;
+    right: auto !important;
+}
+
+
     /* Add this CSS to your stylesheet */
     .radio-options-container {
         display: flex;
@@ -3721,12 +3764,34 @@ use Modules\Vip\Entities\Vip;
                     <div class="form row">
                      <input type="hidden" name="reset" id="reset" value=3>
                         {{-- Primary Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
                             <input type="color" name="app_primary_color" id="app_primary_color"
                                    value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
                                    class="form-control">
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_primary_color">{{ __('Primary Color') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="app_primary_color"
+                                        id="app_primary_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
 
                         {{-- Background Type --}}
                         <div class="col-md-6">
@@ -3739,13 +3804,38 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         {{-- Background Color --}}
-                        <div class="col-md-6" id="background_color_group"
+                        {{-- <div class="col-md-6" id="background_color_group"
                              style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
                             <label>{{ __('Background Color') }}</label>
                             <input type="color" name="background_color" id="background_color"
                                    value="{{ data_get($settings, 'background_color', '#ffffff') }}"
                                    class="form-control">
+                        </div> --}}
+
+                        <div class="col-md-6" id="background_color_group"
+                            style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
+
+                            <div class="form-group">
+                                <label for="background_color">{{ __('Background Color') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'background_color', '#ffffff') }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="background_color"
+                                        id="background_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'background_color', '#ffffff') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+
                         </div>
+
 
                         {{-- Background Image --}}
                         <div class="col-md-6" id="background_image_group"
@@ -3760,13 +3850,13 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         {{-- Bottom Nav --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Bottom Nav Color') }}</label>
                             <input type="color" name="bottom_color" id="bottom_color"
                                    value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
                                    class="form-control">
-                        </div>
-                        <div class="col-md-6">
+                        </div> --}}
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Bottom Nav Active Color') }}</label>
                             <input type="color" name="active_color" id="active_color"
                                    value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
@@ -3777,23 +3867,120 @@ use Modules\Vip\Entities\Vip;
                             <input type="color" name="inactive_color" id="inactive_color"
                                    value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
                                    class="form-control">
-                        </div>
+                        </div> --}}
 
                         {{-- Text Header Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Text Header Color') }}</label>
                             <input type="color" name="text_header_color" id="text_header_color"
                                    value="{{ data_get($settings, 'text_header_color', '#000000') }}"
                                    class="form-control">
-                        </div>
+                        </div> --}}
 
                         {{-- Button Text Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Button Text Color') }}</label>
                             <input type="color" name="button_text_color" id="button_text_color"
                                    value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
                                    class="form-control">
+                        </div> --}}
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bottom_color">{{ __('Bottom Nav Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_bottom_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="bottom_color"
+                                        id="bottom_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="active_color">{{ __('Bottom Nav Active Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_active_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="active_color"
+                                        id="active_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="inactive_color">{{ __('Bottom Nav Inactive Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_inactive_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="inactive_color"
+                                        id="inactive_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="text_header_color">{{ __('Text Header Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'text_header_color', '#000000') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="text_header_color"
+                                        id="text_header_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'text_header_color', '#000000') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="button_text_color">{{ __('Button Text Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'button_text_color', '#ffffff') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="button_text_color"
+                                        id="button_text_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
 
                     </div>
 
@@ -4525,7 +4712,15 @@ use Modules\Vip\Entities\Vip;
 
     
 
-    $('.colorpicker-element').colorpicker();
+    // $('.colorpicker-element').colorpicker();
+
+     $('.colorpicker-element').colorpicker({
+       
+        align: 'left',     // Align dropdown to the right (for English dashboard)
+        horizontal: true    // Show horizontal sliders
+    });
+
+    
 
 
 document.addEventListener("DOMContentLoaded", function() {

@@ -54,7 +54,7 @@ class SettingController extends MainController
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
-            ->description('')
+            ->description('   ')
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
                 'pusher_app_key',
