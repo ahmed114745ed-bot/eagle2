@@ -297,6 +297,7 @@ class BdController extends MainController
 
         $grid->column('country.name', __('country'));
 
+        
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
                 ->display(function () {
@@ -308,6 +309,9 @@ class BdController extends MainController
             }
         }
 
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
