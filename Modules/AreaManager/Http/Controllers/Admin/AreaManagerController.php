@@ -88,7 +88,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -149,7 +149,8 @@ class AreaManagerController extends MainController
             ";
         });
 
-         $grid->column('regions.name', __('Regions'));
+         $grid->column('regionArea.name', __('Regions'));
+       
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date)->locale(App::getLocale());
@@ -268,14 +269,13 @@ class AreaManagerController extends MainController
         $this->addPhoneFields($form);
 
         $form->text('area_name', __('area name'))
-        ->default(function ($form) {
-            if ($form->isEditing()) {
-                $areaManager = $form->model();
-                $regionName = Region::where('manager_id', $areaManager->id)->value('name');
-                return $regionName;
-            }
-            return null;
-    
+            ->default(function ($form) {
+                if ($form->isEditing()) {
+                    $areaManager = $form->model();
+                    $regionName = Region::where('manager_id', $areaManager->id)->value('name');
+                    return $regionName;
+                }
+                return null;
             });
 
         $this->addMapField($form, $id);
@@ -588,7 +588,7 @@ class AreaManagerController extends MainController
                 break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType','charges'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
     }
 
     public function profilePreview()

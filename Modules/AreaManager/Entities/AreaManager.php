@@ -37,7 +37,6 @@ class AreaManager extends Authenticatable
             if (isset($model->area_name)) {
                 unset($model->area_name);
             }
-
         });
 
         static::deleting(function ($manager) {
@@ -81,21 +80,28 @@ class AreaManager extends Authenticatable
     {
         return $this->hasMany(Region::class, 'manager_id');
     }
+
+    public function regionArea()
+    {
+        return $this->hasOne(Region::class, 'manager_id');
+    }
+
+
     public function countries()
     {
         return $this->belongsToMany(
             Country::class,
             'region_countries',
-            'region_id',     
-            'country_id'    
+            'region_id',
+            'country_id'
         )->join('regions', 'region_countries.region_id', '=', 'regions.id')
-         ->where('regions.manager_id', $this->id)
-         ->select('countries.*'); 
+            ->where('regions.manager_id', $this->id)
+            ->select('countries.*');
     }
 
     public function countriesQuery()
     {
-        return Country::whereHas('regions', function($q) {
+        return Country::whereHas('regions', function ($q) {
             $q->where('manager_id', $this->id);
         });
     }
@@ -110,7 +116,7 @@ class AreaManager extends Authenticatable
 
             if ($url) {
                 $html .= handleShowImageWithTypes($country->id, $url, 30, 30, 4);
-            // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+                // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
 
             }
         }
@@ -123,8 +129,6 @@ class AreaManager extends Authenticatable
 
     public function region()
     {
-        return $this->belongsTo(Region::class, 'manager_id','id'); 
+        return $this->belongsTo(Region::class, 'manager_id', 'id');
     }
-
-
 }
