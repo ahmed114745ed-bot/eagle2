@@ -107,7 +107,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
        
-        $grid->model()->with(['appUser.packs'])
+        $grid->model()->with(['appUser.packs','creator'])
             // ->where('parent_id', auth()->id())
             ->whereIn('country_id',  $countries)
             ->orderByDesc('id');
@@ -181,7 +181,9 @@ class SuperAdminController extends MainController
         });
 
         $grid->column('country.name', __('country'));
-
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();

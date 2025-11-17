@@ -113,7 +113,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'createdBy'])
+        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'creator','createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -272,6 +272,10 @@ class SuperAdminController extends MainController
         //                $col->switch(Common::getSwitchStates());
         //            }
         //        }
+
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
