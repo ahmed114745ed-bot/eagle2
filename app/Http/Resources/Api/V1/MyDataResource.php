@@ -61,7 +61,7 @@ class MyDataResource extends JsonResource
                 'top_stars' => [],
             ];
         } else {
-            $agency_joined = [];
+            $agency_joined = (object)[];
         }
 
         $pass_status = false;
