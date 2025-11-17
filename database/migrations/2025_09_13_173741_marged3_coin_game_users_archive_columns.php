@@ -9,21 +9,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // إضافة indexes بأسماء جديدة لتجنب أي duplicates
-        Schema::table('coin_game_users', function (Blueprint $table) {
-            $table->index('user_id', 'idx_cgu_user_id');
-            $table->index('created_at', 'idx_cgu_created_at');
-            $table->index(['user_id', 'created_at'], 'idx_cgu_user_created');
-            $table->index('type', 'idx_cgu_type');
-        });
+        // coin_game_users
+        DB::statement("ALTER TABLE coin_game_users ADD INDEX idx_cgu_user_id (user_id)"); 
+        DB::statement("ALTER TABLE coin_game_users ADD INDEX idx_cgu_created_at (created_at)");
+        DB::statement("ALTER TABLE coin_game_users ADD INDEX idx_cgu_user_created (user_id, created_at)");
+        DB::statement("ALTER TABLE coin_game_users ADD INDEX idx_cgu_type (type)");
 
-        Schema::table('coin_game_users_archive', function (Blueprint $table) {
-            $table->index('user_id', 'idx_cgua_user_id');
-            $table->index('created_at', 'idx_cgua_created_at');
-            $table->index(['user_id', 'created_at'], 'idx_cgua_user_created');
-            $table->index('type', 'idx_cgua_type');
-        });
+        // coin_game_users_archive
+        DB::statement("ALTER TABLE coin_game_users_archive ADD INDEX idx_cgua_user_id (user_id)");
+        DB::statement("ALTER TABLE coin_game_users_archive ADD INDEX idx_cgua_created_at (created_at)");
+        DB::statement("ALTER TABLE coin_game_users_archive ADD INDEX idx_cgua_user_created (user_id, created_at)");
+        DB::statement("ALTER TABLE coin_game_users_archive ADD INDEX idx_cgua_type (type)");
 
+        // Create view
         DB::statement("
             CREATE OR REPLACE VIEW coin_game_users_merged AS
             SELECT 
@@ -50,18 +48,14 @@ return new class extends Migration
     {
         DB::statement("DROP VIEW IF EXISTS coin_game_users_merged");
 
-        Schema::table('coin_game_users', function (Blueprint $table) {
-            $table->dropIndex('idx_cgu_user_id');
-            $table->dropIndex('idx_cgu_created_at');
-            $table->dropIndex('idx_cgu_user_created');
-            $table->dropIndex('idx_cgu_type');
-        });
+        DB::statement("ALTER TABLE coin_game_users DROP INDEX idx_cgu_user_id");
+        DB::statement("ALTER TABLE coin_game_users DROP INDEX idx_cgu_created_at");
+        DB::statement("ALTER TABLE coin_game_users DROP INDEX idx_cgu_user_created");
+        DB::statement("ALTER TABLE coin_game_users DROP INDEX idx_cgu_type");
 
-        Schema::table('coin_game_users_archive', function (Blueprint $table) {
-            $table->dropIndex('idx_cgua_user_id');
-            $table->dropIndex('idx_cgua_created_at');
-            $table->dropIndex('idx_cgua_user_created');
-            $table->dropIndex('idx_cgua_type');
-        });
+        DB::statement("ALTER TABLE coin_game_users_archive DROP INDEX idx_cgua_user_id");
+        DB::statement("ALTER TABLE coin_game_users_archive DROP INDEX idx_cgua_created_at");
+        DB::statement("ALTER TABLE coin_game_users_archive DROP INDEX idx_cgua_user_created");
+        DB::statement("ALTER TABLE coin_game_users_archive DROP INDEX idx_cgua_type");
     }
 };
