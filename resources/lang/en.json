@@ -20,7 +20,8 @@
 "NumberSeats":"Indicates how many admins are currently assigned to this room.When the room achieves its diamond target, more admin seats can be unlocked.(Hint: If a room starts with 4 admins and hits the target, it can increase to 5 admins.",
 "ProfitsTargetTotal":"The total profit in coins generated from the room’s performance.This value will later be divided among the room owner and admins based on their profit percentages.",
 "Show superadmin": "Show  Country Manager",
-
+"bdsDescription" : "BDs displayed belong to the Area Manager's country",
+"professionalBdsDescription": "User BDs displayed belong to the Area Manager's country",
     
     "SuperAdmin Charge":"charges",
     "Charge To Superadmin":"charges",
