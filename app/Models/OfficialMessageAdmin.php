@@ -45,7 +45,7 @@ class OfficialMessageAdmin extends Model
             // Determine which request field exists (priority order)
             $featureIdsText = request('feature_ids')
                 ?? request('agency_ids')
-                ?? request('shipping_agency_ids');
+                ?? request('shipping_agency_ids') ?? request('Bds_id');
 
             if (is_array($featureIdsText)) {
                 $featureIds = array_filter($featureIdsText); // remove nulls
@@ -61,6 +61,7 @@ class OfficialMessageAdmin extends Model
             unset($model->shipping_agency_ids);
             unset($model->region_id);
             unset($model->country_id);
+            unset($model->Bds_id);
         });
     }
 }

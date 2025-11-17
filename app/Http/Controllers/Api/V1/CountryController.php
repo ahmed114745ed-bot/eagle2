@@ -71,7 +71,8 @@ class CountryController extends Controller
     {
         $key = $request->q;
         $page = $request->get('page', 1);
-        $countries = $this->countryService->searchCountries($key, $page);
+        $areaManagerId = $request->areaManagerId;
+        $countries = $this->countryService->searchCountries($key, $page, $areaManagerId);
         return response()->json($countries);
     }
 

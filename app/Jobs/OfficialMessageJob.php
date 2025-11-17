@@ -184,7 +184,8 @@ class OfficialMessageJob implements ShouldQueue
 
             foreach ($agencies as $agency) {
                 if ($memberTitle === 'owner') {
-                    $usersId[] = $agency->app_owner_id;
+                    $usersId = $agencies->pluck('app_owner_id')->toArray();
+                   
                     // Log::info($usersId);
                 } elseif ($memberTitle === 'admin') {
                     $usersId = array_merge($usersId, $agency->admins->pluck('user_id')->toArray());
@@ -225,6 +226,7 @@ class OfficialMessageJob implements ShouldQueue
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
+                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
 
             $usersId = $users->pluck('app_id')->toArray();

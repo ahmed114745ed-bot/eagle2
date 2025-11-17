@@ -24,7 +24,11 @@
     "Show superadmin": "देश प्रबंधक दिखाएँ",
     "bdsDescription": "दिखाए गए BD क्षेत्र प्रबंधक के देश से संबंधित हैं",
     "professionalBdsDescription": "दिखाए गए उपयोगकर्ता BD क्षेत्र प्रबंधक के देश से संबंधित हैं",
-
+    "Users around your regions": "आपके क्षेत्रों के आसपास उपयोगकर्ता",
+"bds around your regions": "आपके क्षेत्रों के आसपास BD",
+"shipping agency around your regions": "आपके क्षेत्रों के आसपास शिपिंग एजेंसी",
+"member": "सदस्य",
+"All Agencies around your region": "आपके क्षेत्र के आसपास सभी एजेंसियाँ",
 
     "Specifies the percentage of the total profit distributed among all admins.": "यह सभी प्रशासकों (एडमिन) के बीच वितरित कुल लाभ का प्रतिशत निर्दिष्ट करता है।",
 "Specifies the percentage of the total profit allocated to the room owner.": "यह कक्ष (रूम) के मालिक को आवंटित कुल लाभ का प्रतिशत निर्दिष्ट करता है।",

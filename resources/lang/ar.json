@@ -1928,7 +1928,10 @@
     "Host":"مضيف",
     "bdsDescription": "الـ BD المعروضة تتبع بلد مدير المنطقة",
     "professionalBdsDescription": " المستخدم الخاصة  بالBDs بالمستخدم المعروضة تتبع بلد مدير المنطقة",
-
+    "Users around your regions": "المستخدمون حول مناطقك",
+"bds around your regions": "الـ BDs حول مناطقك",
+"All Agencies around your region": "جميع الوكالات حول منطقتك",
+"shipping agency around your regions": "وكالات الشحن حول مناطقك",
     "categories":"التصنيفات",
     "Fields": "الحقول",
     "Details":"التفاصيل",
