@@ -206,8 +206,8 @@ class AuthController extends BaseAuthController
             case 'area-manager':
                 return redirect()->route('areaManager.home');
             case 'sub_area_manager':
-
-                return redirect()->route('areaManager.home');
+                return $this->redirectSubAreaManager($user,$request);
+                // return redirect()->route('areaManager.home');
             default:
                 $this->guard()->logout();
                 $request->session()->invalidate();
@@ -321,4 +321,57 @@ class AuthController extends BaseAuthController
             'message'       => 'تم جلب بيانات الرقم بنجاح',
         ]);
     }
+
+    protected function redirectSubAreaManager($user, $request)
+    {
+        $routesMap = [
+            'dashboard'            => areaManager_url('dashboard'),
+            'superadmin'           => areaManager_url('superadmin-users'),
+            'coin-recharge'        => areaManager_url('charges'),
+            'Bds'                  => areaManager_url('user-Bds'),
+            'professional-bd'      => areaManager_url('professional-bd'),
+            'agency'               => areaManager_url('agencies'),
+            'shipping-agency'      => areaManager_url('charge-agencies'),
+            'host'                 => areaManager_url('agency/users'),
+            'professional-users'   => areaManager_url('agency/professional-users'),
+            'rooms'                => areaManager_url('rooms'),
+            'live-rooms'           => areaManager_url('live-rooms'),
+            'official-messages'    => areaManager_url('official-message'),
+            'roles'                => areaManager_url('roles'),
+            'auth-users'           => areaManager_url('auth-users'),
+        ];
+        
+
+        foreach ($routesMap as $permission => $url) {
+            if ($this->hasPermission($permission)) {
+                return redirect()->to($url);
+            }
+        }
+    
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return back()->withInput()->withErrors([
+            $this->username() => 'ليس لديك صلاحيات للدخول.',
+        ]);
+    }
+    
+
+    protected function hasPermission($permission)
+    {
+        $user = Admin::user();
+
+        if ($user->can('*')) {
+            return true;
+        }
+
+        if (is_null($permission)) {
+            return true;
+        }
+
+        return $user->can('browse-' . $permission);
+    }
+
+
 }
