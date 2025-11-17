@@ -199,7 +199,7 @@
                                 id="home_top"
                                 name="home_top"
                                 min="1"
-                                value="{{ $config['home_top'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_home_top') }}"
+                                value="{{ $config['home_top'] ?? \Modules\SuperAdmin\Helper\SuperAdminHelper::getHourlyBannerPrice('display_home_top') }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter  value') }}"  required/>
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
