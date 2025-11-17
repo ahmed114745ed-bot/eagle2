@@ -99,7 +99,7 @@ class BdController extends MainController
         //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')

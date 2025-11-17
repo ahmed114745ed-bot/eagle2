@@ -334,7 +334,7 @@ class AgencyController extends MainController
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
             ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
-            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries','creator'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -448,7 +448,9 @@ class AgencyController extends MainController
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
         });
-
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
