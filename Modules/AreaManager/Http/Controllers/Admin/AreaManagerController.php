@@ -149,6 +149,8 @@ class AreaManagerController extends MainController
             ";
         });
 
+         $grid->column('regions.name', __('Regions'));
+
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date)->locale(App::getLocale());
             return $carbonDate->translatedFormat('d F Y H:i');
