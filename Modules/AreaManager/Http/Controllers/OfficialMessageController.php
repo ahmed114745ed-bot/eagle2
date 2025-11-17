@@ -5,6 +5,7 @@ namespace Modules\AreaManager\Http\Controllers;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use App\Selectables\Bds;
 use App\Enums\PermissionType;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
@@ -44,40 +45,13 @@ class OfficialMessageController extends MainController
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $grid->model()->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user.uuid', __('uuid'));
-            });
-        });
         $grid->id(__('ID'));
-        $grid->column('user.name', trans('user id'))->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $path = @$this->user?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                </div>
-            </div>
-        ";
-        });
         $grid->title(trans('title'));
 
 
         $grid->content(__('content'));
-        $grid->feature(__('type'));
+        $grid->feature(__('feature'));
         $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
@@ -141,9 +115,6 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
-        // $form->select('language', __('language'))
-        //     ->options('/api/search/language')
-        //     ->ajax('/api/search/language', 'code', 'name')->rules('required');
 
         $form->hidden('admin_type', __('type'))->default(PermissionType::AREA_MANAGER->value);
         $form->hidden('type', __('type'))->default(2);
@@ -165,7 +136,8 @@ class OfficialMessageController extends MainController
             'shipping_agency'  => __('shipping agency')
         ])->when('agency', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
-                'area_country' => __('All Agencies around your country'),
+                'area_country' => __('All Agencies around your region'),
+                'country' => __('All Agencies in Country'),
                 'ids'   => __('Specific Agency by ID'),
             ])->when('ids', function (Form $form) {
                 $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
@@ -174,6 +146,10 @@ class OfficialMessageController extends MainController
                     'admin' => __('admins'),
                     'members'   => __('members'),
                 ])->default('owner');
+            })->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
             });
         })->when('family', function (Form $form) {
             $form->belongsToMany('feature_ids', Families::class, trans('families'));
@@ -184,23 +160,42 @@ class OfficialMessageController extends MainController
             ])->default('owner');
         })->when('users', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
-                'area_country' => __('Users around your country'),
+                'area_country' => __('Users around your regions'),
+                'country' => __('Users in Specific Country'),
                 'logout'   => __('Logged Out Users'),
-            ]);
+            ])->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
         })->when('bds', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
-                'area_country' => __('bds around your country'),
-            ]);
+                'area_country' => __('bds around your regions'),
+                'ids'   => __('bds'),
+                'country' => __('Bds in Specific Country'),
+
+            ])->when('ids', function (Form $form) {
+                $form->belongsToMany('Bds_id', Bds::class, trans('Bds'));
+            })->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
         })->when('shipping_agency', function (Form $form) {
             $form->select('sub_feature', __('type'))->options([
                 'ids'   => __('Specific shipping Agency by ID'),
-                'area_country' => __('shipping agency around your country'),
+                'area_country' => __('shipping agency around your regions'),
+                'country' => __('Shipping Agencies in Specific Country'),
             ])->when('ids', function (Form $form) {
                 $form->belongsToMany('shipping_agency_ids', ShippingAgencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
                 ])->default('owner');
-            });;
+            })->when('country', function (Form $form) {
+                $form->select('feature_ids', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
         });
 
 
