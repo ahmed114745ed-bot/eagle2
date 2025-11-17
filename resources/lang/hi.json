@@ -3624,7 +3624,9 @@
     "Cannot Edit": "संपादित नहीं किया जा सकता",
     "This request is processed and cannot be modified.": "यह अनुरोध संसाधित किया गया है और संशोधित नहीं किया जा सकता।",
     "Are you sure you want to delete this request?": "क्या आप वाकई इस अनुरोध को हटाना चाहते हैं?",
-    "Not specified": "निर्दिष्ट नहीं"
+    "Not specified": "निर्दिष्ट नहीं",
+    "upload_card_back": "📷 कार्ड के पीछे की तस्वीर अपलोड करने के लिए क्लिक करें"
+
 
 
 
