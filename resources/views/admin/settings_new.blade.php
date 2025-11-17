@@ -705,7 +705,8 @@ use Modules\Vip\Entities\Vip;
                     <div class="form row">
                         @csrf
 
-                        <div class="col-md-6">
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="secondary_color">{{ __('Primary Color:') }}</label>
                                 <input type="color" id="secondary_color" name="secondary_color"
@@ -713,9 +714,31 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
                                     title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="secondary_color">{{ __('Primary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text" 
+                                        id="secondary_color" 
+                                        name="secondary_color"
+                                        class="form-control"
+                                        value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="primary_color">{{ __('Secondary Color:') }}</label>
                                 <input type="color" id="primary_color" name="primary_color"
@@ -723,19 +746,33 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['primary_color'] ?? '#000000' }};"
                                     title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
                             </div>
-                        </div>
-
-                        {{--                        <div class="col-md-6"> --}}
-                        {{--                            <div class="form-group"> --}}
-                        {{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label> --}}
-                        {{--                                <input type="color" id="text_primary_color" name="text_primary_color" --}}
-                        {{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}" --}}
-                        {{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};" --}}
-                        {{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي."> --}}
-                        {{--                            </div> --}}
-                        {{--                        </div> --}}
+                        </div> --}}
 
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="primary_color">{{ __('Secondary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['primary_color'] ?? '#000000' }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        id="primary_color"
+                                        name="primary_color"
+                                        class="form-control"
+                                        value="{{ $settings['primary_color'] ?? '#000000' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
                                 <input type="color" id="text_secondary_color" name="text_secondary_color"
@@ -743,30 +780,33 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};"
                                     title="لون النص الثانوي المستخدم في الشروحات أو النصوص المساعدة.">
                             </div>
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['text_secondary_color'] ?? '#808080' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text"
+                                        id="text_secondary_color"
+                                        name="text_secondary_color"
+                                        class="form-control"
+                                        value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
 
-                        {{--                        <div class="col-md-6"> --}}
-                        {{--                            <div class="form-group"> --}}
-                        {{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label> --}}
-                        {{--                                <input type="color" id="box_background_color" name="box_background_color" --}}
-                        {{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}" --}}
-                        {{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};" --}}
-                        {{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق."> --}}
-                        {{--                            </div> --}}
-                        {{--                        </div> --}}
+
+                    
                     </div>
 
-                    {{--                    <div class="form row"> --}}
-                    {{--                        <div class="col-md-6"> --}}
-                    {{--                            <div class="form-group"> --}}
-                    {{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label> --}}
-                    {{--                                <input type="color" id="table_background_color" name="table_background_color" --}}
-                    {{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}" --}}
-                    {{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};" --}}
-                    {{--                                       title="لون خلفية الجداول في التقارير أو البيانات."> --}}
-                    {{--                            </div> --}}
-                    {{--                        </div> --}}
-                    {{--                    </div> --}}
                     <div class="form row">
                         <!-- New Background Type Selection -->
                         <div class="col-md-6">
@@ -788,7 +828,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         <!-- Background Color Input -->
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group" id="brand_background_color_group"
                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
@@ -797,7 +837,31 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
                                     title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
                             </div>
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="brand_background_color_group"
+                                style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
+                                
+                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text"
+                                        id="box_background_color"
+                                        name="box_background_color"
+                                        class="form-control"
+                                        value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
 
 
                         <input type="hidden" name="brand_image" id="brand_image">
@@ -4454,8 +4518,15 @@ use Modules\Vip\Entities\Vip;
 }
 }
 </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/css/bootstrap-colorpicker.min.css" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.min.js"></script>
 <script>
+
+    
+
+    $('.colorpicker-element').colorpicker();
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const firstRow = document.querySelector('.content .row');
