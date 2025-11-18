@@ -285,44 +285,93 @@ class AuthService
         }
     }
 
-    public function loginWithApple($request, $unique_id)
-    {
-        $user = $this->userRepository->findByAppleId($unique_id);
-        if (!$user) {
-            $data = [
-                'name' => implode('@', explode('@', $request['email'], -1)),
-                'email' => @$request['email'],
-                'apple_id' => $unique_id,
-            ];
+//     public function loginWithApple($request, $unique_id)
+//     {
+//         $user = $this->userRepository->findByAppleId($unique_id);
+//         if (!$user) {
+//             $data = [
+//                 'name' => implode('@', explode('@', $request['email'], -1)),
+//                 'email' => @$request['email'],
+//                 'apple_id' => $unique_id,
+//             ];
 
-            $lat = $request['lat'];
-            $long = $request['long'];
-            $iso = $request['iso'];
-            $countryId = null;
+//             $lat = $request['lat'];
+//             $long = $request['long'];
+//             $iso = $request['iso'];
+//             $countryId = null;
 
-            if ($iso){
-                $country = Country::where('iso', strtoupper($iso))->first();
-                if ($country) {
-                    $countryId = $country->id;
-                }
-            }
+//             if ($iso){
+//                 $country = Country::where('iso', strtoupper($iso))->first();
+//                 if ($country) {
+//                     $countryId = $country->id;
+//                 }
+//             }
 
-//            if (!$countryId && $lat && $long){
-//                $countryId = getCountryIdFromLatLong($lat, $long);
-//            }
+// //            if (!$countryId && $lat && $long){
+// //                $countryId = getCountryIdFromLatLong($lat, $long);
+// //            }
 
-            if ($countryId) {
-                $data['country_id'] = $countryId;
-            }
+//             if ($countryId) {
+//                 $data['country_id'] = $countryId;
+//             }
 
-            $user = $this->userRepository->create($data);
+//             $user = $this->userRepository->create($data);
+//         }
+//         $this->rule($user, '', @$request['device_token'], $request);
+
+//         $token = $user->createToken('api_token')->plainTextToken;
+//         $this->userRepository->updateIsLogout($user, 0);
+//         return [$user, $token];
+//     }
+
+public function loginWithApple($request, $unique_id)
+{
+    $appleUser = $this->userRepository->findByAppleId($unique_id);
+
+    if ($appleUser) {
+
+        if (!$request['email']) {
+            $request['email'] = $appleUser->email;
         }
+
+        return $this->finishLogin($appleUser, $request);
+    }
+
+    $email = $request['email'];
+    $name  = $request['name'] ?? ($email ? explode("@", $email)[0] : "AppleUser-" . rand(1000,9999));
+
+    if ($email && $this->userRepository->emailExists($email)) {
+        $email = null;
+    }
+
+    $data = [
+        'name' => $name,
+        'email' => $email,
+        'apple_id' => $unique_id,
+    ];
+
+    if (!empty($request['iso'])) {
+        $country = Country::where('iso', strtoupper($request['iso']))->first();
+        if ($country) $data['country_id'] = $country->id;
+    }
+
+    $newUser = $this->userRepository->create($data);
+
+    return $this->finishLogin($newUser, $request);
+}
+
+
+    private function finishLogin($user, $request)
+    {
         $this->rule($user, '', @$request['device_token'], $request);
 
         $token = $user->createToken('api_token')->plainTextToken;
+
         $this->userRepository->updateIsLogout($user, 0);
+
         return [$user, $token];
     }
+
 
     public function loginWithHuawei($data)
     {
