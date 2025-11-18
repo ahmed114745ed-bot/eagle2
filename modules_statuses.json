@@ -34,5 +34,6 @@
     "Form": true,
     "SuperAdmin": true,
     "MixStream4": true,
-    "MixStream": true
+    "MixStream": true,
+    "TaskStream": true
 }

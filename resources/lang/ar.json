@@ -2294,7 +2294,7 @@
     "Search": "ابحث",
     "Moment id": "رقم اللحظة",
     "room-vips": "نخبة الغرفة",
-   
+
     "UserTarget": "التارجت المحقق",
     "userTarget": "التارجت المحقق",
     "Report_user": "الإبلاغ عن المستخدم",
@@ -4516,6 +4516,18 @@
 "Created At": "تاريخ الإنشاء",
 "Last Updated": "آخر تحديث",
 "Available Actions": "الإجراءات المتاحة",
+"max mix stream": "الحد الأقصى للبث المختلط",
+"This is the default number of rooms allowed per mix.": "هذا هو العدد الافتراضي للغرف المسموح بها لكل مزيج.",
+
+"You cannot invite yourself.": "لا يمكنك دعوة نفسك.",
+"This user is already part of your mix stream.": "هذا المستخدم بالفعل جزء من المزيج الخاص بك.",
+"This user already has a pending invitation.": "هذا المستخدم لديه دعوة قيد الانتظار بالفعل.",
+"No pending invitation found for this mix.": "لم يتم العثور على دعوة قيد الانتظار لهذا المزيج.",
+"You dont have live room or not live": "ليس لديك غرفة بث مباشر أو أن البث غير نشط.",
+"Your room is not part of this mix stream.": "غرفتك ليست جزءًا من هذا المزيج.",
+"This room is already part of another mix stream.": "هذه الغرفة بالفعل جزء من مزيج آخر.",
+"This mix stream has reached the maximum number of rooms allowed.": "لقد وصل هذا المزيج إلى الحد الأقصى المسموح به من الغرف.",
+
 "Delete Request": "حذف الطلب",
 "You can delete this request only while pending.": "يمكنك حذف الطلب فقط أثناء كونه معلقًا.",
 "Cannot Edit": "لا يمكن التعديل",
@@ -4529,7 +4541,7 @@
 
 
 
-    
+
 
 
 
