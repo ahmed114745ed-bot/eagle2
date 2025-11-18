@@ -36,7 +36,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 4005);
+            ], 400);
         }
         $key = config('games.leader_CC_game_key');
 
@@ -53,14 +53,14 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail',
-            ], 10004);
+            ], 400);
         }
         $user = User::find($request->uid);
         if (!$user) {
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
 
         $userData = [
@@ -123,7 +123,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail',
-            ], 10004);
+            ], 400);
         }
         Cache::put("order_$orderId", true, now()->addHour());
         $user = User::find($uid);
@@ -131,7 +131,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
         if ($type == 1) {
             $user->di -= $coin;
@@ -207,7 +207,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail',
-            ], 10004);
+            ], 400);
         }
         Cache::put("order_$orderId", true, now()->addHour());
         $user = User::find($uid);
@@ -215,7 +215,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
 
         // 7️⃣ Return success response
