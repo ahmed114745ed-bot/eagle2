@@ -143,6 +143,14 @@ class LeaderCCgameController extends Controller
                 'errorMsg'  => 'user not found',
             ], 400);
         }
+
+        if ($type == 1 && $user->di < $coin) {
+            return response()->json([
+                'errorCode' => 4004,
+                'errorMsg'  => 'Insufficient game coins'
+            ], 400);
+        }
+        
         if ($type == 1) {
             $user->di -= $coin;
         } else {
