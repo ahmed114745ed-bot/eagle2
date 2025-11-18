@@ -22,7 +22,7 @@ class VerifyGameCoinSignature
 
         $key = config('games.leader_CC_game_key'); 
 
-        if (!$orderId || !$gameId || !$roundId || !$uid || !$coin || !$rewardType || !$type || !$sign || $token ) {
+        if (!$orderId || !$gameId || !$roundId || !$uid || !$coin || !$rewardType || !$type || !$sign || !$token ) {
             return response()->json([
                  'errorCode' => 4005,
                 'errorMsg'  => 'Missing signature parameters'
