@@ -19,7 +19,7 @@ use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use Google_Client;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
 use Google\Client as GoogleClient;
-
+use Firebase\JWT\JWK;
 
 class AuthController extends Controller
 {
@@ -238,10 +238,9 @@ class AuthController extends Controller
         $appleKeys = Http::get('https://appleid.apple.com/auth/keys')->json();
     
         try {
-            $decoded = \Firebase\JWT\JWT::decode(
+            $decoded = JWT::decode(
                 $data['id_token'],
-                \Firebase\JWT\JWK::parseKeySet($appleKeys),
-                ['RS256']
+                JWK::parseKeySet($appleKeys) 
             );
         } catch (\Exception $e) {
             return Common::apiResponse(false, 'invalid apple token', null, 401);
