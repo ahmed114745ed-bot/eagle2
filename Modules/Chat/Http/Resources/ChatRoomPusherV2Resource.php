@@ -25,8 +25,8 @@ class ChatRoomPusherV2Resource extends JsonResource
             ->where('status', '!=', 'seen')
             ->count();
 
-//        \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'chat_room_id' => $this->id]);
-//        \Log::info('Total unread messages: ', ['total_unread_message' => $total_unread_message]);
+       \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'chat_room_id' => $this->id]);
+       \Log::info('Total unread messages: ', ['total_unread_message' => $total_unread_message]);
 
         return [
             'id'             => $this->id,
