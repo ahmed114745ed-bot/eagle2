@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaskStream extends Model
 {
-    protected $fillable = ['room_id'];
+    protected $fillable = ['room_id', 'mix_id', 'is_remote'];
 
     public function rooms(): HasMany
     {

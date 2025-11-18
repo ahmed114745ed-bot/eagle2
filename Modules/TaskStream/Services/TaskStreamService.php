@@ -14,10 +14,10 @@ use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 class TaskStreamService
 {
     public function __construct(
-        private readonly TaskStreamRepository           $taskStreamRepository,
-        private readonly TaskStreamRoomRepository       $taskStreamRoomRepository,
+        private readonly TaskStreamRepository $taskStreamRepository,
+        private readonly TaskStreamRoomRepository $taskStreamRoomRepository,
         private readonly TaskStreamInvitationRepository $taskStreamInvitationRepository,
-        private readonly UserRepository                 $userRepository,
+        private readonly UserRepository $userRepository,
     )
     {
     }
@@ -44,21 +44,31 @@ class TaskStreamService
     /**
      * @throws Exception
      */
-    public function join($data)
+    public function getIntoTask($taskStream)
     {
         $liveRoom = $this->validateAuthLiveRoom();
-
-        $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
         $this->validateLimit($taskStream);
 
         $this->validateRoomInAnotherTask($taskStream->id, $liveRoom->id);
+
+        $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 1);
 
         $this->taskStreamRepository->createTaskRoom($taskStream, $liveRoom->id);
 
         $this->sendTaskToZego('newJoinedTaskStream', $taskStream->id, $liveRoom);
 
         return $taskStream->load('rooms');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function join($data)
+    {
+        $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
+
+        return $this->getIntoTask($taskStream);
     }
 
     /**
@@ -73,6 +83,8 @@ class TaskStreamService
         $taskStreamRoom = $this->validateRoomNotInTask($taskStream, $liveRoom->id);
 
         $taskStreamRoom->delete();
+
+        $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 0);
 
 //        if ($taskStream->rooms()->count() === 0) {
 //            $taskStream->delete();
@@ -144,19 +156,9 @@ class TaskStreamService
         }
 
         if ($status === 'accept') {
-            $liveRoom = $this->validateAuthLiveRoom();
-
-            $this->validateLimit($taskStream);
-
-            $this->validateRoomInAnotherTask($taskStream->id, $liveRoom->id);
-
-            $this->taskStreamRepository->createTaskRoom($taskStream, $liveRoom->id);
-
             $invitation->update(['status' => 'accepted']);
 
-            $this->sendTaskToZego('newJoinedTaskStream', $taskStream->id, $liveRoom);
-
-            return $taskStream->load('rooms');
+            return $this->getIntoTask($taskStream);
         }
 
         $invitation->update(['status' => 'rejected']);
@@ -221,6 +223,17 @@ class TaskStreamService
 
         if ($taskStream->rooms()->count() >= $limit) {
             throw new Exception(__('This task stream has reached the maximum number of rooms allowed.'));
+        }
+    }
+
+    public function remoteUpdate($taskStreamRoomId, $liveRoomId, $status): void
+    {
+        if ($taskStreamRoomId != $liveRoomId) {
+            $myTask = $this->taskStreamRepository->findByRoomId($liveRoomId);
+
+            if ($myTask) {
+                $myTask->update(['is_remote' => $status]);
+            }
         }
     }
 

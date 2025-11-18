@@ -42,4 +42,9 @@ class TaskStreamRepository extends AbstractRepository
     {
         return $taskStream->rooms()->where('room_id', $liveRoomId)->first();
     }
+
+    public function findByRoomId($roomId)
+    {
+        return $this->model->where('room_id', $roomId)->first();
+    }
 }
