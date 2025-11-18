@@ -28,19 +28,19 @@ class CreatorService
         } else {
             $creator = $creatorModelOrIdOrArray;
         }
-
+           
         if (!$creator) return __('No creator');
 
-        $uid = e($creator->original_uuid ?? $creator->id);
-        $name = htmlspecialchars($creator->name ?? 'Unknown', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $uid =  $creator->id;
+        $name = htmlspecialchars($creator->username ?? 'Unknown', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-        $defaultImage = asset('images/businessman-icon.jpg');
-        $avatarPath = $creator?->avatar ?? null;
-        $url = getImagePath($avatarPath) ?? $defaultImage;
+        $url = getImagePath($creator?->avatar);
+        $url = $creator?->avatar;
 
-        if (!isImageExists($url)) {
-            $url = $defaultImage;
-        }
+        $url = $url ?: asset('images/businessman-icon.jpg');
+        \Log::info('URL: ' . $url);
+        \Log::info('AvatarPath: ' . $creator?->avatar);
+    
 
         $image = "<img src='{$url}' alt='{$name}' style='width:50px;height:50px;border-radius:50%;object-fit:cover;'>";
 
