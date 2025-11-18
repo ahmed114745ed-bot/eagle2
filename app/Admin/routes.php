@@ -44,6 +44,7 @@ use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
+use App\Admin\Controllers\SuperRoleController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
@@ -241,20 +242,13 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        // Route::resource('auth/roles', 'RoleControllerNew');
+        
         Route::resource('auth/roles', RoleControllerNew::class);
-        // Route::resource('roles', 'RoleControllerNew');
+        Route::resource('auth/super-roles', SuperRoleController::class);
+       
 
         Route::resource('auth/rolesTest', 'RoleController');
-        // Route::prefix('auth/rolesTest')->group(function () {
-        //     Route::get('/', [RoleControllerNew::class, 'index']);
-        //     Route::get('/create', [RoleControllerNew::class, 'create']);
-        //     Route::post('/', [RoleControllerNew::class, 'store']);
-        //     Route::get('/{id}', [RoleControllerNew::class, 'show']);
-        //     Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
-        //     Route::put('/{id}', [RoleControllerNew::class, 'update']);
-        //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
-        // });
+        
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
 
         Route::resource('auth/permissions', PermissionController::class);
