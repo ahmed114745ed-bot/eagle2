@@ -42,13 +42,14 @@ class VersionController extends Controller
             //            $user->update(['android_version' => $version]);
         }
 
-        if ($request->OS == 'Android') {
-            $appUrl = $settings['android_link'] ?? null;
-        } elseif ($request->OS == 'IOS') {
-            $appUrl =  $settings['ios_link'] ?? null;
-        } elseif ($request->OS == 'Huawei') {
-            $appUrl =  $settings['huawei_link'] ?? null;
-        }
+        $links = [
+            'Android' => $settings['android_link'] ?? null,
+            'IOS'     => $settings['ios_link'] ?? null,
+            'Huawei'  => $settings['huawei_link'] ?? null,
+        ];
+
+        $appUrl = $links[$request->OS] ?? null;
+
         $isBan          = $this->haveBan(@$user->uuid);
         $isGiftUpdated  = $this->isUpdated('gifts_update_at', @$request->gift_time);
         $isIntroUpdated = $this->isUpdated('intro_updated_at', @$request->intro_time);
