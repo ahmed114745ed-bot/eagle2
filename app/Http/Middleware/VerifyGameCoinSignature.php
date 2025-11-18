@@ -33,16 +33,16 @@ class VerifyGameCoinSignature
         }
         
         $rawString = 
-                $orderId
-                . $gameId
-                . $roundId
-                . $uid
-                . $coin  
-                . $type
-                . $rewardType
-                . $token
-                . $winId
-                . $key;
+            (string)$orderId
+            . (string)$gameId
+            . (string)$roundId
+            . (string)$uid
+            . (string)$coin
+            . (string)$type
+            . (string)$rewardType
+            . (string)$token
+            . (string)$winId
+            . (string)$key;
         
         \Log::channel('daily')->info('🔍 GAME SIGNATURE DEBUG', [
             'orderId'       => $orderId,
