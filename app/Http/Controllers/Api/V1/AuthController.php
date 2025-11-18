@@ -68,19 +68,19 @@ class AuthController extends Controller
 
         switch ($request['type']) {
             case 'phone_pass':
-                $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token'],'uuid'=> $request['uuid']];
+                $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
-                $fields = ['name' => $request->name, 'apple_id' => $request->apple_id, 'device_token' => @$request['device_token'], 'email' => @$request->email, 'user_id', @$request['user_id'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = ['name' => $request->name, 'apple_id' => $request->apple_id, 'device_token' => @$request['device_token'], 'email' => @$request->email, 'user_id', @$request['user_id'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithApple($fields);
             case 'huawei':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithHuawei($fields);
 
@@ -165,6 +165,7 @@ class AuthController extends Controller
     {
         $fields = $data;
         $unique_id = $data['apple_id'];
+        if (!$unique_id)  return Common::apiResponse(0, 'missing app id', null, 400);
         $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
         $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
         $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
@@ -191,11 +192,12 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
+        \App\Helpers\LogHelper::info('response apple', $res->json());
             if ($res->successful()) {
                 $claims = explode('.', $res['id_token'])[1];
                 $data = json_decode(base64_decode($claims), true);
             } else {
-               // return      Common::apiResponse(0, 'data not full', null, 400);
+                return      Common::apiResponse(0, 'data not full', null, 400);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
