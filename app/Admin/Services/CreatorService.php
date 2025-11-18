@@ -38,8 +38,8 @@ class CreatorService
         $url = $creator?->avatar;
 
         $url = $url ?: asset('images/businessman-icon.jpg');
-        \Log::info('URL: ' . $url);
-        \Log::info('AvatarPath: ' . $creator?->avatar);
+        // \Log::info('URL: ' . $url);
+        // \Log::info('AvatarPath: ' . $creator?->avatar);
     
 
         $image = "<img src='{$url}' alt='{$name}' style='width:50px;height:50px;border-radius:50%;object-fit:cover;'>";
