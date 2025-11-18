@@ -28,7 +28,7 @@ class CreatorService
         } else {
             $creator = $creatorModelOrIdOrArray;
         }
-
+           
         if (!$creator) return __('No creator');
 
         $uid =  $creator->id;

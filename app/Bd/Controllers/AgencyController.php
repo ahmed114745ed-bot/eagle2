@@ -398,7 +398,7 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen','created_by')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid','creator')])
             ->where(function ($query) {
                 $query
