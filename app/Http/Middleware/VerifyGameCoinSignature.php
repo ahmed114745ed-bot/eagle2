@@ -24,7 +24,7 @@ class VerifyGameCoinSignature
 
         if (!$orderId || !$gameId || !$roundId || !$uid || !$coin || !$rewardType || $type || !$sign || $token ) {
             return response()->json([
-                'errorCode' => 4005,
+                // 'errorCode' => 4005,
                 'errorMsg'  => 'Missing signature parameters'
             ], 400);
         }
@@ -33,7 +33,7 @@ class VerifyGameCoinSignature
 
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
-                'errorCode' => 10004,
+                // 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail'
             ], 400);
         }
