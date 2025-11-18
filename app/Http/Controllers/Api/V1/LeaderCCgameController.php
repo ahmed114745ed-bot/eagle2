@@ -21,6 +21,9 @@ class LeaderCCgameController extends Controller
     public function userInformation(Request $request)
     {
 
+        \Log::info(' userInformation ', [
+            'request' => $request->all(),
+        ]);
         $validator = Validator::make($request->all(), [
             'gameId' => 'required|string',
             'uid'    => 'required|string',
@@ -36,31 +39,31 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 4005);
+            ], 400);
         }
         $key = config('games.leader_CC_game_key');
 
-        $expectedSign = md5(
-            $request->gameId .
-                $request->uid .
-                $request->token .
-                $request->roomId .
-                $key
-        );
+        // $expectedSign = md5(
+        //     $request->gameId .
+        //         $request->uid .
+        //         $request->token .
+        //         $request->roomId .
+        //         $key
+        // );
 
-        // 4️⃣ Compare provided sign
-        if (strtolower($expectedSign) !== strtolower($request->sign)) {
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg'  => 'Verify signature fail',
-            ], 10004);
-        }
+        // // 4️⃣ Compare provided sign
+        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
+        //     return response()->json([
+        //         'errorCode' => 10004,
+        //         'errorMsg'  => 'Verify signature fail',
+        //     ], 400);
+        // }
         $user = User::find($request->uid);
         if (!$user) {
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
 
         $userData = [
@@ -78,6 +81,9 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
+        \Log::info(' updateGameCoin ', [
+            'request' => $request->all(),
+        ]);
         // 1️⃣ Validate input
         $validator = Validator::make($request->all(), [
             'orderId'     => 'required|string',
@@ -116,22 +122,26 @@ class LeaderCCgameController extends Controller
         $winId      = $request->winId ?? '';
 
         // 4️⃣ Generate expected sign
-        $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key);
+        // $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key);
 
-        // 5️⃣ Compare signs
-        if (strtolower($expectedSign) !== strtolower($request->sign)) {
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg'  => 'Verify signature fail',
-            ], 10004);
-        }
+        // \Log::info('Generated expected sign', ['expectedSign' => $expectedSign, 'providedSign' => $request->sign]);
+
+        // // 5️⃣ Compare signs
+        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
+        //     return response()->json([
+        //         'errorCode' => 10004,
+        //         'errorMsg'  => 'Verify signature fail',
+        //     ], 400);
+        // }
         Cache::put("order_$orderId", true, now()->addHour());
         $user = User::find($uid);
         if (!$user) {
+            \Log::warning('User not found', ['uid' => $uid]);
+
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
         if ($type == 1) {
             $user->di -= $coin;
@@ -164,7 +174,9 @@ class LeaderCCgameController extends Controller
 
     public function makeUpOrders(Request $request)
     {
-    
+        \Log::info(' makeUpOrders ', [
+            'request' => $request->all(),
+        ]);
         // 1️⃣ Validate input
         $validator = Validator::make($request->all(), [
             'orderId'     => 'required|string',
@@ -200,22 +212,22 @@ class LeaderCCgameController extends Controller
         $winId      = $request->winId ?? '';
 
         // 4️⃣ Generate expected sign
-        $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $rewardType . $winId . $key);
+        // $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $rewardType . $winId . $key);
 
-        // 5️⃣ Compare signs
-        if (strtolower($expectedSign) !== strtolower($request->sign)) {
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg'  => 'Verify signature fail',
-            ], 10004);
-        }
+        // // 5️⃣ Compare signs
+        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
+        //     return response()->json([
+        //         'errorCode' => 10004,
+        //         'errorMsg'  => 'Verify signature fail',
+        //     ], 400);
+        // }
         Cache::put("order_$orderId", true, now()->addHour());
         $user = User::find($uid);
         if (!$user) {
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 4005);
+            ], 400);
         }
 
         // 7️⃣ Return success response

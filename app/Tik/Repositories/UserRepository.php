@@ -588,4 +588,8 @@ class UserRepository extends AbstractRepository
             fn() => $this->model->where('id', $id)->exists()
         );
     }
+    public function emailExists(string $email): bool
+    {
+        return $this->model->where('email', $email)->exists();
+    }
 }

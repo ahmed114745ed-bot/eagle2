@@ -333,7 +333,7 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen','created_by'])
             ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries','creator'])
             ->where(function ($query) {
                 $query
@@ -448,7 +448,7 @@ class AgencyController extends MainController
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
         });
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $permission = $this->permission_name;

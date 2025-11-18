@@ -100,7 +100,7 @@ class VersionController extends Controller
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
             'default_room_background'    => $default_background ?? '',
             'is_show_room_activity' => (bool)($settings['room_cup'] ?? false),
-            'app_url' => $appUrl,
+            'app_url' => @$appUrl,
 
         ];
 

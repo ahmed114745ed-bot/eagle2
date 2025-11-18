@@ -217,10 +217,11 @@ class UserController extends MainController
         $countriesIds = Common::areaCountries();
         $grid->model()
             ->whereIn('country_id', $countriesIds)
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'transfer_salary', 'country_id','is_bd'])
             ->with([
                 'profile',
                 'agency',
+                'country',
                 'userSetting',
                 'senderLevel',
                 'receiverLevel',

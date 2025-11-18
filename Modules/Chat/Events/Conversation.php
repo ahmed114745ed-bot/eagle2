@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class Conversation implements ShouldBroadcastNow
+class Conversation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -40,12 +40,12 @@ class Conversation implements ShouldBroadcastNow
     {
         $data = (array) $this->message;
 
-        Log::info('Broadcasting Conversation Event', [
-            'chat_room_id' => $this->check_room->id,
-            'message_id' => $this->message->id,
-            'status' => $this->message->status,
-            'payload' => $data
-        ]);
+        // Log::info('Broadcasting Conversation Event', [
+        //     'chat_room_id' => $this->check_room->id,
+        //     'message_id' => $this->message->id,
+        //     'status' => $this->message->status,
+        //     'payload' => $data
+        // ]);
     
         return $data;
     
