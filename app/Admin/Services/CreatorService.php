@@ -35,6 +35,7 @@ class CreatorService
         $name = htmlspecialchars($creator->username ?? 'Unknown', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         $url = getImagePath($creator?->avatar);
+        $url = $creator?->avatar;
 
         $url = $url ?: asset('images/businessman-icon.jpg');
         \Log::info('URL: ' . $url);
