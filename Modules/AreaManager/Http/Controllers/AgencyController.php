@@ -448,7 +448,7 @@ class AgencyController extends MainController
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
         });
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $permission = $this->permission_name;
