@@ -244,7 +244,8 @@ Route::group(
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
         
         Route::resource('auth/roles', RoleControllerNew::class);
-        Route::resource('auth/super-roles', SuperRoleController::class);
+        Route::get('super-roles', [SuperRoleController::class,'index']);
+        Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
        
 
         Route::resource('auth/rolesTest', 'RoleController');
