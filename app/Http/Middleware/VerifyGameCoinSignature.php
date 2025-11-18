@@ -14,48 +14,61 @@ class VerifyGameCoinSignature
         $roundId     = $request->input('roundId');
         $uid         = $request->input('uid');
         $coin        = $request->input('coin');
-        $type         = $request->input('type');
+        $type        = $request->input('type');
         $rewardType  = $request->input('rewardType');
         $winId       = $request->input('winId', '');
         $token       = $request->input('token');
         $sign        = $request->input('sign');
-
+        
         $key = config('games.leader_CC_game_key'); 
-
-        if (!$orderId || !$gameId || !$roundId || !$uid || !$coin || !$rewardType || !$type || !$sign || !$token ) {
+        
+        if (
+            !$orderId || !$gameId || !$roundId || !$uid ||
+            !$coin || !$rewardType || !$type || !$sign || !$token
+        ) {
             return response()->json([
-                 'errorCode' => 4005,
+                'errorCode' => 4005,
                 'errorMsg'  => 'Missing signature parameters'
             ], 400);
         }
-
+        
+        $rawString = 
+              $orderId
+            . $gameId
+            . $roundId
+            . $uid
+            . $coin
+            . $type
+            . $rewardType
+            . $token    
+            . $winId    
+            . $key;
+        
         \Log::channel('daily')->info('🔍 GAME SIGNATURE DEBUG', [
-            'orderId'     => $orderId,
-            'gameId'      => $gameId,
-            'roundId'     => $roundId,
-            'uid'         => $uid,
-            'coin'        => $coin,
-            'type'        => $type,
-            'rewardType'  => $rewardType,
-            'winId'       => $winId,
-            'token'       => $token,
-            'key'         => $key,
-        
-            'raw_string' => $orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $winId . $token . $key,
-        
-            'expected_sign' => md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $winId . $token . $key),
+            'orderId'       => $orderId,
+            'gameId'        => $gameId,
+            'roundId'       => $roundId,
+            'uid'           => $uid,
+            'coin'          => $coin,
+            'type'          => $type,
+            'rewardType'    => $rewardType,
+            'winId'         => $winId,
+            'token'         => $token,
+            'key'           => $key,
+            'raw_string'    => $rawString,
+            'expected_sign' => md5($rawString),
             'client_sign'   => $sign,
         ]);
         
-        $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType  . $winId . $token . $key);
-
+        $expectedSign = md5($rawString);
+        
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
-                 'errorCode' => 10004,
+                'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail'
             ], 400);
         }
-
+        
         return $next($request);
     }
 }
