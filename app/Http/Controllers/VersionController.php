@@ -43,11 +43,11 @@ class VersionController extends Controller
         }
 
         if ($request->OS == 'Android') {
-            $appUrl = $settings['android_link'];
+            $appUrl = $settings['android_link'] ?? null;
         } elseif ($request->OS == 'IOS') {
-            $appUrl =  $settings['ios_link'];
+            $appUrl =  $settings['ios_link'] ?? null;
         } elseif ($request->OS == 'Huawei') {
-            $appUrl =  $settings['huawei_link'];
+            $appUrl =  $settings['huawei_link'] ?? null;
         }
         $isBan          = $this->haveBan(@$user->uuid);
         $isGiftUpdated  = $this->isUpdated('gifts_update_at', @$request->gift_time);
@@ -99,7 +99,7 @@ class VersionController extends Controller
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
             'default_room_background'    => $default_background ?? '',
             'is_show_room_activity' => (bool)($settings['room_cup'] ?? false),
-            'app_url' => $appUrl,
+            'app_url' => @$appUrl,
 
         ];
 
