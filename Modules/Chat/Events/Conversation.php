@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class Conversation implements ShouldBroadcastNow
+class Conversation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
