@@ -29,6 +29,24 @@ class VerifyGameCoinSignature
             ], 400);
         }
 
+        \Log::channel('daily')->info('🔍 GAME SIGNATURE DEBUG', [
+            'orderId'     => $orderId,
+            'gameId'      => $gameId,
+            'roundId'     => $roundId,
+            'uid'         => $uid,
+            'coin'        => $coin,
+            'type'        => $type,
+            'rewardType'  => $rewardType,
+            'winId'       => $winId,
+            'token'       => $token,
+            'key'         => $key,
+        
+            'raw_string' => $orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $winId . $token . $key,
+        
+            'expected_sign' => md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $winId . $token . $key),
+            'client_sign'   => $sign,
+        ]);
+        
         $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType  . $winId . $token . $key);
 
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
