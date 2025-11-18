@@ -40,12 +40,12 @@ class Conversation implements ShouldBroadcast
     {
         $data = (array) $this->message;
 
-        Log::info('Broadcasting Conversation Event', [
-            'chat_room_id' => $this->check_room->id,
-            'message_id' => $this->message->id,
-            'status' => $this->message->status,
-            'payload' => $data
-        ]);
+        // Log::info('Broadcasting Conversation Event', [
+        //     'chat_room_id' => $this->check_room->id,
+        //     'message_id' => $this->message->id,
+        //     'status' => $this->message->status,
+        //     'payload' => $data
+        // ]);
     
         return $data;
     
