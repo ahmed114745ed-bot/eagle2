@@ -192,11 +192,12 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
+        \App\Helpers\LogHelper::info('response apple', $res->json());
             if ($res->successful()) {
                 $claims = explode('.', $res['id_token'])[1];
                 $data = json_decode(base64_decode($claims), true);
             } else {
-                // return      Common::apiResponse(0, 'data not full', null, 400);
+                return      Common::apiResponse(0, 'data not full', null, 400);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
