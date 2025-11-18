@@ -278,11 +278,11 @@ class AuthService
 
     public function loginWithApple($request, $unique_id)
     {
-        $user = $this->userRepository->findByAppleId($request['apple_id']);
+        $user = $this->userRepository->findByAppleId($unique_id);
         if (!$user) {
             $data = [
                 'name' => implode('@', explode('@', $request['email'], -1)),
-                'email' => $request['email'],
+                'email' => @$request['email'],
                 'apple_id' => $unique_id,
             ];
 
