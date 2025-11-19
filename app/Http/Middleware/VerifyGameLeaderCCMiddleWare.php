@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Support\Facades\Cache;
 use Closure;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 
 class VerifyGameLeaderCCMiddleWare
 {
@@ -16,6 +16,14 @@ class VerifyGameLeaderCCMiddleWare
      */
     public function handle(Request $request, Closure $next)
     {
+         Log::info('Middleware Request Details', [
+            'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
         $key = config('games.leader_CC_game_key');
         if (!$key) {
             return response()->json([
