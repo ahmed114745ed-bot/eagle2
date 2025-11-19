@@ -35,11 +35,11 @@
     /*.ltr label {*/
     /*    margin: 0 !important;*/
     /*}*/
-
+/* 
     .ltr .fields-group .form-group{
 
        display: flex !important;
-    }
+    } */
 
     .pagination {
         padding-left: revert !important;
