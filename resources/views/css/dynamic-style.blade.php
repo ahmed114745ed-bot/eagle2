@@ -1217,12 +1217,11 @@ html.ltr .dropdown-menu {
         order: 2;
     }
     
-    .form-horizontal .form-group {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
+   [lang="en"] .form-horizontal .form-group {
+    margin-left: -1500px;
+    margin-right: -15;
+    
 }
-
 
 
     .box-footer .pull-right {
