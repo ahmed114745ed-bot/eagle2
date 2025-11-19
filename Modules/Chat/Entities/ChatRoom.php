@@ -16,7 +16,8 @@ class ChatRoom extends Model
 
     public function messages()
     {
-        return $this->hasMany(ChatMessage::class)->orderBy('id', 'desc');
+        return $this->hasMany(ChatMessage::class)  
+                    ->orderBy('id', 'desc');
     }
 
     public function getLastMessageCreatedAtAttribute()
