@@ -39,7 +39,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 200);
+            ], 400);
         }
         $key = config('games.leader_CC_game_key');
 
@@ -63,7 +63,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 200);
+            ], 400);
         }
 
         $userData = [
@@ -185,83 +185,19 @@ class LeaderCCgameController extends Controller
             DB::commit();
     
             return response()->json([
-                'errorCode' => 4005,
-                'errorMsg'  => 'Missing or invalid parameters',
-                'errors'    => $validator->errors(),
-            ], 200);
-        }
-
-        // 2️⃣ Secret key from .env
-        $key = config('games.leader_CC_game_key'); // put your real secret key in .env
-
-        // 3️⃣ Prepare values for signature verification
-        $orderId    = $request->orderId;
-        $gameId     = $request->gameId;
-        $roundId    = $request->roundId;
-        $uid        = $request->uid;
-        $coin       = $request->coin;
-        $type       = $request->type;
-        $rewardType = $request->rewardType;
-        $token      = $request->token;
-        $winId      = $request->winId ?? '';
-
-        // 4️⃣ Generate expected sign
-        // $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key);
-
-        // \Log::info('Generated expected sign', ['expectedSign' => $expectedSign, 'providedSign' => $request->sign]);
-
-        // // 5️⃣ Compare signs
-        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
-        //     return response()->json([
-        //         'errorCode' => 10004,
-        //         'errorMsg'  => 'Verify signature fail',
-        //     ], 400);
-        // }
-        Cache::put("order_$orderId", true, now()->addHour());
-        $user = User::find($uid);
-        if (!$user) {
-            \Log::warning('User not found', ['uid' => $uid]);
-
+                'errorCode' => 0,
+                'message'   => 'SUCCESS'
+            ]);
+    
+        } catch (\Exception $e) {
+    
+            DB::rollBack();
+    
             return response()->json([
-                'errorCode' => 4005,
-                'errorMsg'  => 'user not found',
-            ], 200);
+                'errorCode' => 500,
+                'message'   => 'Server error: ' . $e->getMessage()
+            ], 500);
         }
-
-        if ($type == 1 && $user->di < $coin) {
-            return response()->json([
-                'errorCode' => 4004,
-                'errorMsg'  => 'Insufficient game coins'
-            ], 200);
-        }
-        
-        if ($type == 1) {
-            $user->di -= $coin;
-        } else {
-            $user->di +=  $coin;
-        }
-
-        $user->save();
-
-        DB::table('coin_game_users')->insert([
-            'user_id' => $user->id,
-            'coins' => abs($coin),
-            'app_profit_coins' => abs($coin),
-            'type' => $type,
-            'game_id' => $gameId,
-            'round_id' => $roundId,
-            'order_id' => $orderId,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // 7️⃣ Return success response
-        return response()->json([
-            'errorCode' => 0,
-            'data' => [
-                'coin' => $user->di,
-            ],
-        ]);
     }
     
 
@@ -289,7 +225,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 200);
+            ], 400);
         }
 
         // 2️⃣ Secret key from .env
@@ -320,7 +256,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 200);
+            ], 400);
         }
 
         // 7️⃣ Return success response
@@ -338,7 +274,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10003,
                 'errorMsg'  => 'Order already exists'
-            ], 200);
+            ], 400);
         }
         
         return response()->json([
