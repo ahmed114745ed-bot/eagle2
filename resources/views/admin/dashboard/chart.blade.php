@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> --}}
 
 <div style="margin-bottom: 15px;">
     <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
@@ -196,10 +196,19 @@ function createOrUpdateChart(chartData, usePercentage) {
     });
 }
 
-// دالة لجلب البيانات
+@php
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+@endphp
+
 function loadBalanceData(date = null) {
     $.ajax({
-        url: '{{ url("admin/statistics/balance-data") }}',
+        url: '{{ url($prefix . "/statistics/balance-data") }}',
         type: 'GET',
         data: {
             date: date

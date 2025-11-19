@@ -199,7 +199,7 @@
                                 id="home_top"
                                 name="home_top"
                                 min="1"
-                                value="{{ $config['home_top'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_home_top') }}"
+                                value="{{ $config['home_top'] ?? \Modules\SuperAdmin\Helper\SuperAdminHelper::getHourlyBannerPrice('display_home_top') }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter  value') }}"  required/>
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
@@ -212,7 +212,7 @@
                                 id="home_middle"
                                 name="home_middle"
                                 min="1"
-                                value="{{ $config['home_middle'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_home_middle') }}"
+                                value="{{ $config['home_middle'] ?? \Modules\SuperAdmin\Helper\SuperAdminHelper::getHourlyBannerPrice('display_home_middle') }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
                                  <span class="form-text text-muted"> {{ __('Price for 1 day') }}</span>
@@ -224,7 +224,7 @@
                                 id="live"
                                 name="live"
                                 min="1"
-                                value="{{ $config['live'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_live') }}"
+                                value="{{ $config['live'] ?? \Modules\SuperAdmin\Helper\SuperAdminHelper::getHourlyBannerPrice('display_live') }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
 
@@ -237,7 +237,7 @@
                                    id="room"
                                    name="room"
                                    min="1"
-                                   value="{{ $config['room'] ?? \App\helper\SuperAdminHelper::getHourlyBannerPrice('display_room') }}"
+                                   value="{{ $config['room'] ?? \Modules\SuperAdmin\Helper\SuperAdminHelper::getHourlyBannerPrice('display_room') }}"
                                    class="form-control"
                                    placeholder="{{ __('Enter value') }}" required />
 

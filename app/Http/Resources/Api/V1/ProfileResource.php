@@ -19,7 +19,7 @@ class ProfileResource extends JsonResource
         return [
             'image' => $this->whenHas('avatar') ?: '',
             'image_id' => $this->whenHas('image_id') ?: '',
-            'gender' => $this->when($this->whenHas('gender'), $this->gender !== null ? intval($this->gender) : 2),
+            'gender' => $this->gender !== null ? intval($this->gender) : null,
             'birthday' => $this->when(isset($this->birthday), $this->birthday ? Carbon::parse($this->birthday)->format('Y-m-d') : ''),
             'age' => $this->when(isset($this->birthday), $this->birthday ? Carbon::parse($this->birthday)->age : null),
             'province' => $this->whenHas('province') ?: '',

@@ -207,7 +207,7 @@ class AppearChargerAgencyController extends MainController
     {
         $grid = new Grid(new ShippingAgency());
 
-        $grid->model()->with('owner.profile')->where('country_id', auth()->user()->country_id)
+        $grid->model()->with('owner.profile','creator')->where('country_id', auth()->user()->country_id)
             ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -298,7 +298,9 @@ class AppearChargerAgencyController extends MainController
                 ->switch(Common::getSwitchStates());
         }
         $permission = $this->permission_name;
-
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
             $actions->disableDelete();

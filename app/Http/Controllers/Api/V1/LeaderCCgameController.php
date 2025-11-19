@@ -91,12 +91,11 @@ class LeaderCCgameController extends Controller
             'roundId'     => 'required|string',
             'uid'         => 'required|string',
             'coin'        => 'required|numeric',
-            'type'        => 'required|in:1,2', // 1=consume, 2=obtain
             'rewardType'  => 'required|integer',
-            'token'       => 'required|string',
             'winId'       => 'nullable|string',
             'roomid'      => 'nullable|string',
             'sign'        => 'required|string',
+            
         ]);
 
         if ($validator->fails()) {
@@ -116,9 +115,7 @@ class LeaderCCgameController extends Controller
         $roundId    = $request->roundId;
         $uid        = $request->uid;
         $coin       = $request->coin;
-        $type       = $request->type;
         $rewardType = $request->rewardType;
-        $token      = $request->token;
         $winId      = $request->winId ?? '';
 
         // 4️⃣ Generate expected sign

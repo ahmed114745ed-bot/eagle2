@@ -56,7 +56,7 @@ class LoginRequest extends FormRequest
             $rules['code']  = ['required'];
             $rules['uuid'] = ['nullable'];
         } elseif ($this->get('type') == 'apple') {
-            $rules['apple_id']     = ['required'];
+            $rules['id_token']     = ['required'];
             $rules['device_token'] = ['sometimes'];
             $rules['email']        = ['sometimes'];
             $rules['name']         = ['sometimes'];
