@@ -27,13 +27,11 @@ class VerifyGameLeaderCCMiddleWare
         if ($request->has('orderId')) {
             $orderId = $request->orderId;
             if (Cache::has("order_$orderId")) {
-                return [
-
-                    'response' => response()->json([
-                        'errorCode' => 10003,
-                        'message' => 'Order already exists'
-                    ]),
-                ];
+                return response()->json([
+                    'errorCode' => 10003,
+                    'message'   => 'Order already exists'
+                ], 400);
+                
             }
         }
 
