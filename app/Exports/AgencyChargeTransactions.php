@@ -54,8 +54,6 @@ class AgencyChargeTransactions implements FromView
             ]);
 
         } catch (\Exception $e) {
-           \Log::error("AgencyChargeTransactions export failed for agency_id {$this->agency_id}: ".$e->getMessage());
-
             // return view('admin.excel.chargeAgencyTransactions', [
             //     'agency'   => null,
             //     'received' => collect(),

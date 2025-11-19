@@ -50,11 +50,6 @@ class StripeService {
             return $session->url;
 
         } catch (\Exception $e) {
-            Log::error("Stripe payment error", [
-                'message' => $e->getMessage(),
-                'data'    => $data,
-            ]);
-
             throw new \Exception('Error generating payment link: ' . $e->getMessage());
         }
     }
