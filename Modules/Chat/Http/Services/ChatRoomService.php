@@ -479,20 +479,13 @@ class ChatRoomService
             return [$item->file, $item->frame];
         })->toArray();
 
-        Log::info("checkRoom  info", [
-            'user' => $user,
-            'userId2'    => $userId2,
-            'checkRoom'    => $checkRoom,
-        ]);
+
         if ($checkRoom->user_id == $user->id){
             $checkRoom->update(['user_1_deleted' => now()]);
         } else {
             $checkRoom->update(['user_2_deleted' => now()]);
         }
-        Log::info("checkRoom  ", [
-         
-            'checkRoom'    => $checkRoom,
-        ]);
+    
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
             try {
@@ -507,22 +500,23 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
-            // ChatMessage::where('chat_room_id', $checkRoom->id)
-            //     ->chunk(200, function ($messages) use ($user) {
-            //         foreach ($messages as $msg) {
-            //             if ($msg->user_id == $user->id) {
-            //                 $msg->user_1_deleted = now();
-            //             } else {
-            //                 $msg->user_2_deleted = now();
-            //             }
+            ChatMessage::where('chat_room_id', $checkRoom->id)
+                ->chunk(200, function ($messages) use ($user) {
+                    foreach ($messages as $msg) {
+                        if ($msg->user_id == $user->id) {
+                            
+                            $msg->old_deleted_chat = true;
+                        } else {
+                            $msg->old_deleted_chat = true;
+                        }
 
-            //             if ($msg->user_1_deleted && $msg->user_2_deleted) {
-            //                 $msg->delete();
-            //             } else {
-            //                 $msg->save();
-            //             }
-            //         }
-            //     });
+                        // if ($msg->user_1_deleted && $msg->user_2_deleted) {
+                        //     $msg->delete();
+                        // } else {
+                        //     $msg->save();
+                        // }
+                    }
+                });
         }
 
         return [
