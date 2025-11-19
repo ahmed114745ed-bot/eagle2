@@ -108,12 +108,12 @@ class LeaderCCgameController extends Controller
     
                 $op = $validator->validated();
     
-                if (Cache::has("order_{$op['orderId']}")) {
-                    return response()->json([
-                        'errorCode' => 10003,
-                        'message'   => 'Order already exists'
-                    ], 200);
-                }
+                // if (Cache::has("order_{$op['orderId']}")) {
+                //     return response()->json([
+                //         'errorCode' => 10003,
+                //         'message'   => 'Order already exists'
+                //     ], 200);
+                // }
     
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
     
@@ -133,12 +133,12 @@ class LeaderCCgameController extends Controller
                     $coin = (int)$op['coin'];
                     $type = (int)$op['type'];
                 
-                    if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
-                        return response()->json([
-                            'errorCode' => 10003,
-                            'message'   => 'Order already exists'
-                        ], 200);
-                    }
+                    // if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
+                    //     return response()->json([
+                    //         'errorCode' => 10003,
+                    //         'message'   => 'Order already exists'
+                    //     ], 200);
+                    // }
                 
                     if ($type == 1 && $user->di < $coin) {
                         return response()->json([
