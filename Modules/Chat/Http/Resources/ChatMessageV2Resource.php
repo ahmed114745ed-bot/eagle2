@@ -28,30 +28,7 @@ class ChatMessageV2Resource extends JsonResource
         $pageNumber = ceil(ChatMessage::where('chat_room_id', $check_room_id)->where('id', '>', $message_id)->count() / $perPage);
         return $pageNumber;
     }
-    // function create_at($timeZone = null) {
-    //     // $createdAt = Carbon::parse($this->created_at);
-    //     $createdAt = $this->created_at->timezone($timeZone)->toDateTimeString();
-    //     if ($createdAt->isCurrentHour()) {
-    //         return  Carbon::parse($this->created_at)->format('h:m:i A');
-    //     }
 
-    //    else if ($createdAt->isCurrentDay()) {
-    //         // Calculate the number of days since the creation date
-    //         $daysSinceCreation = $createdAt->diffInHours(Carbon::now());
-    //         return  Carbon::parse($this->created_at)->format('h:m:i A');
-    //     }
-    //     elseif ($createdAt->isYesterday()) {
-    //         return 'Yesterday';
-    //     }
-    //     else if ($createdAt->isCurrentWeek()) {
-    //         // Calculate the number of days since the creation date
-    //         $daysSinceCreation = Carbon::parse($this->created_at)->dayName;
-    //         return $daysSinceCreation ;
-    //     }
-    //     else{
-    //         return  Carbon::parse($this->created_at)->format('Y-m-d');
-    //     }
-    // }
 
 
 
@@ -123,6 +100,7 @@ class ChatMessageV2Resource extends JsonResource
                 'page' => $this->Replay_page($data->id, $data->chat_room_id)
             ];
         }
+         $authUser =$this->user_id == Auth::user()->id;
 
         return [
             'replay' => $replay ? $replay_array : null,
@@ -135,8 +113,8 @@ class ChatMessageV2Resource extends JsonResource
             'type' => $this->type,
             'duration' => $this->duration ?? '',
             'chat_room_id ' => $this->chat_room_id,
-            'sender_deleted' => $this->user_1_deleted ? true : false,
-            'receiver_deleted' => $this->user_2_deleted ? true : false,
+            'sender_deleted'   => !$authUser && !is_null($this->user_1_deleted),
+            'receiver_deleted' =>  $authUser && !is_null($this->user_2_deleted),
             'reacts' => $reacts->count() > 0 ? ChatReactResource::collection($reacts) : null,
             'albums' => $albums->count() > 0 ?  $album_array : null,
             'created_at' => $this->create_at($timeZone),
