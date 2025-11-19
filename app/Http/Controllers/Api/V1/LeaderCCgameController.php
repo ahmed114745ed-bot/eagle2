@@ -81,116 +81,147 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
-        \Log::info(' updateGameCoin ', [
-            'request' => $request->all(),
-        ]);
+        \Log::info('updateGameCoin', ['request' => $request->all()]);
 
-        // 1️⃣ Validate input
-        $validator = Validator::make($request->all(), [
-            'orderId'     => 'required|string',
-            'gameId'      => 'required|string',
-            'roundId'     => 'required|string',
-            'uid'         => 'required|string',
-            'coin'        => 'required|numeric',
-            'type'        => 'required|in:1,2', // 1=consume, 2=obtain
-            'rewardType'  => 'required|integer',
-            'token'       => 'required|string',
-            'winId'       => 'nullable|string',
-            'roomid'      => 'nullable|string',
-            'sign'        => 'required|string',
-        ]);
+        $operations =  [$request->all()];
 
-        if ($validator->fails()) {
+        DB::beginTransaction();
+
+        try {
+            $results = [];
+
+            foreach ($operations as $op) {
+
+                $validator = Validator::make($op, [
+                    'orderId'     => 'required|string',
+                    'gameId'      => 'required|string',
+                    'roundId'     => 'required|string',
+                    'uid'         => 'required|string',
+                    'coin'        => 'required|numeric',
+                    'type'        => 'required|in:1,2',
+                    'rewardType'  => 'required|integer',
+                    'token'       => 'required|string',
+                    'winId'       => 'nullable|string',
+                    'roomid'      => 'nullable|string',
+                    'sign'        => 'required|string',
+                ]);
+
+                if ($validator->fails()) {
+                    $results[] = [
+                        'errorCode' => 4005,
+                        'errorMsg'  => 'Invalid params',
+                        'errors'    => $validator->errors(),
+                    ];
+                    continue;
+                }
+
+                $op = $validator->validated();
+
+                if (Cache::has("order_{$op['orderId']}")) {
+                    $results[] = [
+                        'uid' => $op['uid'],
+                        'orderId' => $op['orderId'],
+                        'errorCode' => 10003,
+                        'errorMsg' => 'Repeat order',
+                    ];
+                    continue;
+                }
+
+                Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
+
+                $lock = Cache::lock("user_lock_{$op['uid']}", 5);
+
+                if (!$lock->get()) {
+                    $results[] = [
+                        'uid' => $op['uid'],
+                        'errorCode' => 5001,
+                        'errorMsg' => 'User is currently busy, try later',
+                    ];
+                    continue;
+                }
+
+                try {
+                    $user = User::where('id', $op['uid'])->lockForUpdate()->first();
+
+                    if (!$user) {
+                        $results[] = [
+                            'uid' => $op['uid'],
+                            'errorCode' => 4005,
+                            'errorMsg' => 'User not found',
+                        ];
+                        continue;
+                    }
+
+                    $coin = (int)$op['coin'];
+                    $type = (int)$op['type'];
+
+                    if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
+                        $results[] = [
+                            'uid' => $user->id,
+                            'orderId' => $op['orderId'],
+                            'errorCode' => 10003,
+                            'errorMsg' => 'Repeat order (DB)',
+                        ];
+                        continue;
+                    }
+
+                    if ($type == 1 && $user->di < $coin) {
+                        $results[] = [
+                            'uid' => $user->id,
+                            'orderId' => $op['orderId'],
+                            'errorCode' => 4004,
+                            'errorMsg' => 'Insufficient game coins',
+                        ];
+                        continue;
+                    }
+
+                    $type == 1 ? $user->di -= $coin : $user->di += $coin;
+                    $logType =  $type == 1 ? 0 : 1 ;
+                    $user->save();
+
+                    DB::table('coin_game_users')->insert([
+                        'user_id' => $user->id,
+                        'coins' => abs($coin),
+                        'app_profit_coins' => abs($coin),
+                        'type' => $logType,
+                        'game_id' => $op['gameId'],
+                        'round_id' => $op['roundId'],
+                        'order_id' => $op['orderId'],
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+
+                    $results[] = [
+                        'uid' => $user->id,
+                        'orderId' => $op['orderId'],
+                        'errorCode' => 0,
+                        'coin' => $user->di,
+                    ];
+
+                } finally {
+                    $lock->release();
+                }
+            }
+
+            DB::commit();
+
             return response()->json([
-                'errorCode' => 4005,
-                'errorMsg'  => 'Missing or invalid parameters',
-                'errors'    => $validator->errors(),
-            ], 400);
-        }
+                'errorCode' => 0,
+                'data' => $results
+            ]);
 
-        // 🔴 NEW: Check if order already exists
-        if (Cache::has("order_{$request->orderId}")) {
-            return response()->json([
-                'errorCode' => 10003,
-                'errorMsg'  => 'Order already exists'
-            ], 400);
-        }
+        } catch (\Exception $e) {
 
-        // 2️⃣ Secret key from .env
-        $key = config('games.leader_CC_game_key');
-
-        // 3️⃣ Prepare values for signature verification
-        $orderId    = $request->orderId;
-        $gameId     = $request->gameId;
-        $roundId    = $request->roundId;
-        $uid        = $request->uid;
-        $coin       = $request->coin;
-        $type       = $request->type;
-        $rewardType = $request->rewardType;
-        $token      = $request->token;
-        $winId      = $request->winId ?? '';
-
-        // 4️⃣ Generate expected sign
-        // $expectedSign = md5($orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key);
-
-        // \Log::info('Generated expected sign', ['expectedSign' => $expectedSign, 'providedSign' => $request->sign]);
-
-        // // 5️⃣ Compare signs
-        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
-        //     return response()->json([
-        //         'errorCode' => 10004,
-        //         'errorMsg'  => 'Verify signature fail',
-        //     ], 400);
-        // }
-
-        // 🟢 Move Cache::put here - after all validations pass
-        Cache::put("order_$orderId", true, now()->addHour());
-        
-        $user = User::find($uid);
-        if (!$user) {
-            \Log::warning('User not found', ['uid' => $uid]);
+            DB::rollBack();
 
             return response()->json([
-                'errorCode' => 4005,
-                'errorMsg'  => 'user not found',
-            ], 400);
+                'errorCode' => 500,
+                'errorMsg' => 'Server error',
+                'exception' => $e->getMessage(),
+            ], 500);
         }
-
-        if ($type == 1 && $user->di < $coin) {
-            return response()->json([
-                'errorCode' => 4004,
-                'errorMsg'  => 'Insufficient game coins'
-            ], 400);
-        }
-        
-        if ($type == 1) {
-            $user->di -= $coin;
-        } else {
-            $user->di +=  $coin;
-        }
-
-        $user->save();
-
-        DB::table('coin_game_users')->insert([
-            'user_id' => $user->id,
-            'coins' => abs($coin),
-            'app_profit_coins' => abs($coin),
-            'type' => $type,
-            'game_id' => $gameId,
-            'round_id' => $roundId,
-            'order_id' => $orderId,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // 7️⃣ Return success response
-        return response()->json([
-            'errorCode' => 0,
-            'data' => [
-                'coin' => $user->di,
-            ],
-        ]);
     }
+
 
     public function makeUpOrders(Request $request)
     {
