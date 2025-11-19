@@ -122,18 +122,17 @@ class LeaderCCgameController extends Controller
     
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
     
-                $lock = Cache::lock("user_lock_{$op['uid']}", 5);
+                // $lock = Cache::lock("user_lock_{$op['uid']}", 5);
 
-                if (!$lock->get()) {
-                    return response()->json([
-                        'errorCode' => 5001,
-                        'message'   => 'User is currently busy, try later'
-                    ], 200);
-                }
+                // if (!$lock->get()) {
+                //     return response()->json([
+                //         'errorCode' => 5001,
+                //         'message'   => 'User is currently busy, try later'
+                //     ], 400);
+                // }
                 
                 $user = null;
                 
-                try {
                     $user = User::where('id', $op['uid'])->lockForUpdate()->first();
                 
                     if (!$user) {
@@ -176,9 +175,7 @@ class LeaderCCgameController extends Controller
                         'updated_at' => now()
                     ]);
                 
-                } finally {
-                    $lock->release();
-                }
+                
                 
             }
     
