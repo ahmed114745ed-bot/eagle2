@@ -54,6 +54,12 @@ class MilestonesSeeder extends Seeder
                 'description' => 'Milestone for BD',
                 'is_active'   => true,
             ],
+            [
+                'name'        => 'Area Manager',
+                'slug'        => 'area-manager',
+                'description' => 'Milestone for Area manager',
+                'is_active'   => true,
+            ],
         ];
 
         foreach ($milestones as $milestone) {

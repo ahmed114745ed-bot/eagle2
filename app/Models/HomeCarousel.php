@@ -27,7 +27,7 @@ class HomeCarousel extends Model
 
     ];
 
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -35,7 +35,7 @@ class HomeCarousel extends Model
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'uid', 'owner_id');
+        return $this->hasOne(Room::class, 'uid', 'owner_id')->where('type', 'audio');
     }
 
     public function generalRole()
@@ -126,7 +126,12 @@ class HomeCarousel extends Model
     public function displayDiscover(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'discover')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'discover');
+                }
+                return $this->displays()->where('display_type', 'discover')->exists();
+            },
             set: fn($value) => $this->syncDisplay('discover', $value)
         );
     }
@@ -134,7 +139,12 @@ class HomeCarousel extends Model
     public function displayHomeTop(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'home_top')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'home_top');
+                }
+                return $this->displays()->where('display_type', 'home_top')->exists();
+            },
             set: fn($value) => $this->syncDisplay('home_top', $value)
         );
     }
@@ -142,7 +152,12 @@ class HomeCarousel extends Model
     public function displayHomeMiddle(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'home_middle')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'home_middle');
+                }
+                return $this->displays()->where('display_type', 'home_middle')->exists();
+            },
             set: fn($value) => $this->syncDisplay('home_middle', $value)
         );
     }
@@ -150,7 +165,12 @@ class HomeCarousel extends Model
     public function displayLive(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'live')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'live');
+                }
+                return $this->displays()->where('display_type', 'live')->exists();
+            },
             set: fn($value) => $this->syncDisplay('live', $value)
         );
     }
@@ -158,22 +178,28 @@ class HomeCarousel extends Model
     public function displayCountry(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'country')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'country');
+                }
+                return $this->displays()->where('display_type', 'country')->exists();
+            },
             set: fn($value) => $this->syncDisplay('country', $value)
         );
     }
 
-
     public function displayRoom(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->displays()->where('display_type', 'room')->exists(),
+            get: function () {
+                if ($this->relationLoaded('displays')) {
+                    return $this->displays->contains('display_type', 'room');
+                }
+                return $this->displays()->where('display_type', 'room')->exists();
+            },
             set: fn($value) => $this->syncDisplay('room', $value)
         );
     }
-
-    
-
 
     protected function syncDisplay(string $type, $value)
     {

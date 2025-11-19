@@ -2,8 +2,10 @@
 
 namespace Modules\Form\Http\Controllers\Api;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Form\Entities\FormTemplate;
 
 class DataSourceController extends Controller
 {
@@ -205,5 +207,30 @@ class DataSourceController extends Controller
         }
 
         return $options;
+    }
+
+
+    public function formList(Request $request)
+    {
+        $type = $request->query('type');
+
+        $query = FormTemplate::query()
+            ->where('is_active', true);
+
+        if ($type) {
+            $query->where('form_type', $type);
+        }
+
+        $forms = $query->get(['id', 'title', 'form_type']);
+
+        $formLinks = $forms->map(function ($form) use ($forms) {
+            return [
+                'form_type' => $form->form_type,
+                'link' => "/forms?type={$form->form_type}&token=&lang=",
+            ];
+        });
+        return Common::apiResponse(true, 'Success', $formLinks);
+
+    
     }
 }

@@ -13,7 +13,14 @@
 </div>
 
 @php
-    $fetchUrl = admin_url('peak-hours');
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+    $fetchUrl = $prefix . "/statistics/peak-hours";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

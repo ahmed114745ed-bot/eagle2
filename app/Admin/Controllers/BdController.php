@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\DeleteBdAction;
 use App\Models\Bd;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -95,19 +96,22 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $countryID =session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries(): (array)session('filter_country_id');
+
         $superAdmin = [];
+       
         if ($countryID) {
-            $superAdmin = SuperAdmin::select(['id', 'country_id'])->where('country_id', $countryID)->first();
+           
+            $superAdmin = SuperAdmin::select(['id', 'country_id'])->whereIn('country_id', $countryID)->first();
         }
 
         $grid->model()
-            ->when(isset($countryID), function ($query) use ($superAdmin) {
+            ->when($countryID, function ($query) use ($superAdmin) {
 
                 $query->where('parent_id', @$superAdmin->id);
             })
 
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
+            ->with(['bdSalaries', 'appUser.packs','creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -293,6 +297,7 @@ class BdController extends MainController
 
         $grid->column('country.name', __('country'));
 
+        
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
                 ->display(function () {
@@ -304,6 +309,9 @@ class BdController extends MainController
             }
         }
 
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
@@ -644,5 +652,153 @@ class BdController extends MainController
             'status' => 'success',
             'message' => $updated
         ]);
+    }
+
+
+    protected function professionalBd()
+    {
+        $authSuperAdmin = auth()->user();
+        $grid = new Grid(new Bd());
+
+        $countriesIds = Common::areaCountries($authSuperAdmin->id);
+        $grid->model()
+            ->whereNotIn('country_id', $countriesIds)
+            ->whereHas('appUser', function ($query) use ($countriesIds) {
+                $query->whereIn('country_id', $countriesIds);
+            })
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->withSum('bdSalaries', 'salary')
+            ->withSum('bdSalaries', 'cut_amount')
+            ->withCount('agencies as total_agencies')
+            ->orderByDesc('id');
+
+        $grid->filter(function ($filter) {
+            $filter->like('appUser.uuid', __('App User UUID'));
+            $filter->like('appUser.name', __('User Name'));
+        });
+        $grid->column('id', __('Id'));
+        $grid->column('username', __('Bd'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+
+            $id = $this->id ?? '-';
+            $name = $this->username ?? 'غير معروف';
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("areaManager/user-Bds/{$this->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+
+
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
+            $user = $this->appUser;
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $uid = $user->uuid ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("superadmin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
+        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
+            return $this->total_agencies;
+        });
+
+
+        $grid->column('total_salary', __('total proft'))->display(function () {
+            return truncateAndTrim($this->bd_salaries_sum_salary ?? 0, 2);
+        });
+
+        $grid->column('current_balance', __('current_balance'))->display(function () {
+            $total = floatval($this->bd_salaries_sum_salary ?? 0);
+            $cut   = floatval($this->bd_salaries_sum_cut_amount ?? 0);
+            return truncateAndTrim($total - $cut, 2);
+        });
+
+        $grid->column('total_cut', __('Cut amount'))->display(function () {
+            return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
+        });
+
+        $grid->column('country.name', __('country'));
+
+        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $col = $grid->column('transfer_salary', __("transfer_salary"))
+                ->display(function () {
+                    return $this->transfer_salary ? 1 : 0;
+                });
+
+            if (! request()->filled('_export_')) {
+                $col->switch(Common::getSwitchStates());
+            }
+        }
+
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            $carbonDate = Carbon::parse($date);
+            $locale = App::getLocale();
+            $carbonDate->locale($locale);
+            return $carbonDate->translatedFormat('d F Y H:i'); 
+        });
+
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteBdAction());
+            }
+        });
+
+        $grid->disableRowSelector();
+        $grid->disableCreateButton();
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+            $actions->disableDelete();
+        });
+        $grid->disableExport();
+        return Admin::content(function (Content $content) use ($grid) {
+            $content->header(__('Professional BD'));
+            $content->description(__('Professional BD List'));
+            $content->body($grid);
+        });
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\HostAgencyScope;
+use App\Traits\CreatedByTrait;
 use App\Traits\DefaultBdAssignmentTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
@@ -17,7 +18,7 @@ use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
 class Agency extends Model
 {
-    use AgencyAdditionalInfoTraits, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone;
+    use AgencyAdditionalInfoTraits, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone ,CreatedByTrait;
 
     protected $guarded = [];
 
@@ -476,5 +477,9 @@ class Agency extends Model
     public function bd()
     {
         return $this->belongsTo(Bd::class, 'bd_id');
+    }
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 }

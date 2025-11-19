@@ -14,7 +14,7 @@ class Wares extends Selectable
 
     public function make()
     {
-        $this->grid->model()->whereIn('type', [4, 5, 6, 28]);
+        $this->grid->model()->whereIn('type', [4, 5, 6, 28])->where('get_type', '!=', 1);
         $this->column('id');
         $this->column('name');
         $this->column('show_img', __('show_img'))->image('', 30);

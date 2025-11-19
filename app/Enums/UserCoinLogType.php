@@ -5,6 +5,7 @@ namespace App\Enums;
 enum UserCoinLogType: string
 {
     case ADMIN_CHARGES = 'admin_charge';
+    case AREA_MANAGER_CHARGES = 'area_manager_charge';
     case BD_CHARGES = 'bd_charge';
     case APP_CHARGE = 'app_charge';
     case ROOM_COMMENT = 'comment';

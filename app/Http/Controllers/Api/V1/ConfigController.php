@@ -32,12 +32,13 @@ class ConfigController extends Controller
         $this->configService = $configService;
     }
 
-    public function uploadBadges(Request $request){
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_name);
+    public function uploadBadges(Request $request)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
         }
 
-        foreach($request->allFiles() as $input => $file){
+        foreach ($request->allFiles() as $input => $file) {
 
             if (is_array($file)) {
                 foreach ($file as $singleFile) {
@@ -117,13 +118,32 @@ class ConfigController extends Controller
 
     public function updateConfigChatGroup(Request $request)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_config_name);
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_config_name);
         }
 
         $config = Config::find($request->id);
         $config->value = $request->value;
         $config->save();
+        return Redirect::back();
+    }
+
+
+    public function UpdateConfigsGroupChat(Request $request)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_config_name);
+        }
+
+        foreach ($request->except('_token') as $key => $value) {
+            if (!is_null($value)) {
+                Config::updateOrCreate(['name' => $key], ['value' => $value]);
+
+                Cache::forget($key);
+                Cache::forever($key, $value);
+            }
+        }
+         admin_success('Saved Successfully');
         return Redirect::back();
     }
 

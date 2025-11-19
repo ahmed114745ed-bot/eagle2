@@ -324,32 +324,26 @@ class EncorUsersController extends AdminController
         $connection = config('admin.database.connection');
 
         $form->display('id', 'ID');
+        $form->text('name', trans('admin.name'))->rules('required');
+
+
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
-                // Build the table name (with or without connection prefix)
                 $table = "{$connection}.{$userTable}";
-
-                // When creating
-                if ($form->isCreating()) {
-                    return [
-                        'required',
-                        Rule::unique($table, 'username')
-                            ->where(fn($query) => $query->where('type', PermissionType::SUB_SUPER_ADMIN->value)),
-                    ];
+        
+                $rules = ['required'];
+        
+                $uniqueRule = Rule::unique($table, 'username');
+        
+                if (!$form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
                 }
-
-                // When editing
-                $id = $form->model()?->id ?? null;
-
-                return [
-                    'required',
-                    Rule::unique($table, 'username')
-                        ->ignore($id) // correctly ignore the current record
-                        ->where(fn($query) => $query->where('type', PermissionType::SUB_SUPER_ADMIN->value)),
-                ];
+        
+                $rules[] = $uniqueRule;
+        
+                return $rules;
             });
-
-        $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
         $form->password('password', trans('admin.password'))->rules('required|confirmed');
         $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
@@ -360,8 +354,8 @@ class EncorUsersController extends AdminController
         $form->ignore(['password_confirmation']);
         $form->hidden('type', __('Type'))->value(PermissionType::SUB_SUPER_ADMIN->value);
         $form->hidden('country_id', __('country'))->value(auth()->user()->country_id);
-
-        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('type', PermissionType::SUPER_ADMIN->value)->pluck('name', 'id'));
+       $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->where('admin_id', $authId)->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));

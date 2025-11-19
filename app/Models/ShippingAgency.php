@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\ShippingAgencyScope;
+use App\Traits\CreatedByTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
 use DB;
@@ -16,7 +17,7 @@ use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
 class ShippingAgency extends Model
 {
-    use AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone;
+    use AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone ,CreatedByTrait;
 
     protected $table = 'agencies';
 
@@ -382,5 +383,10 @@ class ShippingAgency extends Model
     public function coinLogs()
     {
         return $this->morphMany(CoinLog::class, 'owner', 'user_type', 'user_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 }
