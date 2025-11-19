@@ -17,7 +17,6 @@ class ChatRoom extends Model
     public function messages()
     {
         return $this->hasMany(ChatMessage::class)  
-                    ->where('old_deleted_chat', false) 
                     ->orderBy('id', 'desc');
     }
 
