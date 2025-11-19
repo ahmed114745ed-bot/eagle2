@@ -100,7 +100,7 @@ class BdController extends MainController
             ->where('country_id', $authSuperAdmin->country_id)
             
             ->where('admin_users.type', 'bd')
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -248,6 +248,9 @@ class BdController extends MainController
             }
         }
 
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();

@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
+use Modules\AreaManager\Entities\Region;
 use App\Tik\Repositories\CountryRepository;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -48,9 +49,18 @@ class CountryService
         return Common::apiResponse(0, __('not found'), null, 404);
     }
 
-    public function searchCountries($key, $page)
+    public function searchCountries($key, $page, $areaManagerId = null)
     {
         $perPage = 10;
-        return $this->countryRepository->searchCountry($key, $page, $perPage);
+        return $this->countryRepository->searchCountry($key, $page, $perPage, $areaManagerId);
+    }
+
+    public function searchRegions($key, $page)
+    {
+        $perPage = 10;
+        return Region::query()->selectRaw('concat(name) as name, id')
+            ->where('name', 'like', '%' . $key . '%')
+            ->orWhere('id', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 }

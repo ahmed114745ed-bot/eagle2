@@ -106,6 +106,9 @@ class AppServiceProvider extends ServiceProvider
         if ($prefix === 'superadmin') {
             config(['admin.route' => config('admin.superadmin_route')]);
             Admin::routes();
+        } elseif ($prefix === 'areaManager') {
+            config(['admin.route' => config('admin.area_manager_route')]);
+            Admin::routes();
         } elseif ($prefix === 'admin') {
             // Admin::routes();
             config(['admin.route' => $originalConfig]);

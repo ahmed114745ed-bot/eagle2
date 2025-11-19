@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace  Modules\Form\Entities;
 
+use App\Models\Bd;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Form\Entities\FormTemplate;

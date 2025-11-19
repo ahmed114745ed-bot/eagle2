@@ -199,6 +199,7 @@ textarea.form-control {
     padding: 0.6rem 1.2rem;
     font-size: 1rem;
     transition: all 0.2s ease-in-out;
+    margin-bottom: 12px;
 }
 
 .btn:hover {
@@ -613,6 +614,8 @@ ease;
         @csrf
         @if (!empty($user))
         <input type="hidden" name="user_id" value="{{  $user->id}}">
+        <input type="hidden" name="token" value="{{ $linkToken}}">
+        <input type="hidden" name="lang" value="{{ $locale}}">
         @endif
 
         @if($template->getTranslation('description', $currentLocale))
@@ -681,7 +684,7 @@ ease;
                                             class="file-upload-label d-flex align-items-center justify-content-center flex-column"
                                             id="idBackLabel"
                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
-                                            📷 اضغط لرفع صورة ظهر البطاقة
+                                        {{ __('upload_card_back') }}
                                         </label>
                                     </div>
 

@@ -2,6 +2,7 @@
 
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
+
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
@@ -11,7 +12,6 @@ use App\Admin\Controllers\GiftController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
-use App\Admin\Controllers\BadgeController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -27,7 +27,6 @@ use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -45,6 +44,7 @@ use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
+use App\Admin\Controllers\SuperRoleController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
@@ -79,7 +79,6 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
@@ -100,7 +99,6 @@ use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserChargeHistoryController;
-use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -113,6 +111,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
@@ -243,20 +242,14 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        // Route::resource('auth/roles', 'RoleControllerNew');
+        
         Route::resource('auth/roles', RoleControllerNew::class);
-        // Route::resource('roles', 'RoleControllerNew');
+        Route::get('super-roles', [SuperRoleController::class,'index']);
+        Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
+       
 
         Route::resource('auth/rolesTest', 'RoleController');
-        // Route::prefix('auth/rolesTest')->group(function () {
-        //     Route::get('/', [RoleControllerNew::class, 'index']);
-        //     Route::get('/create', [RoleControllerNew::class, 'create']);
-        //     Route::post('/', [RoleControllerNew::class, 'store']);
-        //     Route::get('/{id}', [RoleControllerNew::class, 'show']);
-        //     Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
-        //     Route::put('/{id}', [RoleControllerNew::class, 'update']);
-        //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
-        // });
+        
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
 
         Route::resource('auth/permissions', PermissionController::class);
@@ -359,6 +352,7 @@ Route::group(
         Route::resource('payment-coins', PaymentCoinController::class);
         Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
+        Route::get('/area-manager-charges-reports', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [
@@ -478,18 +472,22 @@ Route::group(
             Route::get('stats-data', [AllStatisticController::class, 'getStatsData']);
             Route::get('top-followers', [AllStatisticController::class, 'getTopFollowers']);
             Route::get('game-summary', [AllStatisticController::class, 'gameSummary']);
+            Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
+            Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
+            Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
         });
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
-
         Route::resource('usersBd', BdController::class);
+         Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+//        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+//        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
 
@@ -696,7 +694,16 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
+        Route::get('professional-bd', [BdController::class ,'professionalBd']);
 
+
+         Route::post('/set-preview-area-manager', function () {
+            session(['preview_area_manager' => true]);
+        });
+
+        Route::post('/unset-preview-area-manager', function () {
+            session()->forget('preview_area_manager');
+        });
 
         Route::group(['middleware' => 'local'], function () {
             Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm']);
@@ -726,21 +733,13 @@ Route::group(
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
 
-            Route::get('/pusher-test', function () {
-                $user = \App\Models\User::whereId(1206)->first();
+            Route::get('/pusher-test/{id}', function ($id) {
+                $user = \App\Models\User::findOrFail($id);
                 $token = $user->createToken('broadcast')->plainTextToken;
 
                 return view('test.test-pusher', compact('token'));
             });
         });
-
-        Route::get('peak-hours', [AllStatisticController::class, 'peakHours'])->name('owner.peak-hours');
-        Route::get('rooms-activity', [AllStatisticController::class, 'roomsActivity'])->name('owner.rooms-activity');
-        Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
-        Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
-
-
-
 
         Route::prefix('notifications')->group(function () {
             Route::get('count', [App\Http\Controllers\Dashboard\Notification\AdminNotificationController::class, 'count']);

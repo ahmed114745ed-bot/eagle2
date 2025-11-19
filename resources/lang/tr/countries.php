@@ -164,7 +164,7 @@ return [
     "Oman" => "Umman",
     "Pakistan" => "Pakistan",
     "Palau" => "Palau",
-    "Palestinian Territory, Occupied" => "Filistin",
+    "Palestine" => "Filistin",
     "Panama" => "Panama",
     "Papua New Guinea" => "Papua Yeni Gine",
     "Paraguay" => "Paraguay",

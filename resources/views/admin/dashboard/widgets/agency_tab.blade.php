@@ -349,12 +349,21 @@
     }
 </style>
 
+@php
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+@endphp
 
 <script>
 $(function() {
     function updateStats() {
         $.ajax({
-            url: '{{ url("admin/statistics/agency-stats") }}', // ✅ matches your route
+            url: '{{ url($prefix . "/statistics/agency-stats") }}', // ✅ matches your route
             type: 'GET',
             beforeSend: function() {
                 $('#refreshStats').html('<i class="fa fa-spinner fa-spin"></i> {{ __("Loading...") }}');

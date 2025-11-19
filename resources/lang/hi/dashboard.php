@@ -15,6 +15,7 @@ return [
     'username'              => 'उपयोगकर्ता नाम',
     'password'              => 'पासवर्ड',
     'password_confirmation' => 'पासवर्ड की पुष्टि',
+    'login.titleAreaManager' => 'एरिया मैनेजर डैशबोर्ड में लॉगिन करें',
 
     'user_setting'          => 'उपयोगकर्ता सेटिंग',
     'avatar'                => 'अवतार',
