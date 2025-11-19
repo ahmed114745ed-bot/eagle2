@@ -47,6 +47,8 @@ trait WinLuckyGift
         $json  = json_encode($d);
         // AllOpeningRoomsZegoRequest::dispatch($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true )
         // ->onQueue('zegoRequests');
-        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true ), 'heavyProcessing');
+        if($zigoData['percentage'] >= 250 && $zigoData['percentage'] <= 1000){
+            dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true ), 'heavyProcessing');
+        }
     }
 }
