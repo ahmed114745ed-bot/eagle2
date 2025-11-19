@@ -555,12 +555,12 @@ class UserController extends Controller
                 return (new UserResource($user))->toArray(request());
             }
         );
-        $chatRoom = $user->chatRoomsAsUser()
-            ->withCount(['messages as unread_messages' => function($q) use ($id) {
-                $q->where('status', '<>', 'seen')
-                ->where('user_id', '<>', $id); 
-            }])
-        ->first();
+        $user = User::with(['chatRoomsAsUser' => function ($q) use ($id) {
+            $q->withCount(['messages as unread_messages' => function ($q2) use ($id) {
+                $q2->where('status', '<>', 'seen')
+                   ->where('user_id', '<>', $id); 
+            }]);
+        }])->find($id);
 
         $chatRoom = $user->chatRoomsAsUser->first() ?? null;
 
