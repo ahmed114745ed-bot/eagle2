@@ -107,6 +107,7 @@ class LeaderCCgameController extends Controller
                 }
     
                 $op = $validator->validated();
+        Log::info('after condition');
     
                 // if (Cache::has("order_{$op['orderId']}")) {
                 //     return response()->json([
@@ -139,6 +140,7 @@ class LeaderCCgameController extends Controller
                     //         'message'   => 'Order already exists'
                     //     ], 200);
                     // }
+        Log::info('after type');
                 
                     if ($type == 1 && $user->di < $coin) {
                         return response()->json([
@@ -150,6 +152,7 @@ class LeaderCCgameController extends Controller
                     $type == 1 ? $user->di -= $coin : $user->di += $coin;
                     $logType = $type == 1 ? 0 : 1;
                     $user->save();
+        Log::info('before coin_game_users');
                 
                     DB::table('coin_game_users')->insert([
                         'user_id' => $user->id,
@@ -162,6 +165,7 @@ class LeaderCCgameController extends Controller
                         'created_at' => now(),
                         'updated_at' => now()
                     ]);
+        Log::info('before coin_game_users');
                 
                 
                 
@@ -177,7 +181,8 @@ class LeaderCCgameController extends Controller
         } catch (\Exception $e) {
     
             DB::rollBack();
-    
+        Log::info($e->getMessage());
+            
             return response()->json([
                 'errorCode' => 500,
                 'message'   => 'Server error: ' . $e->getMessage()
