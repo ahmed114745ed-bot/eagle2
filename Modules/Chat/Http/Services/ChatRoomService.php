@@ -500,6 +500,10 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
+            Log::info("checkRoom  ", [
+         
+                'checkRoom'    => $checkRoom,
+            ]);
             ChatMessage::where('chat_room_id', $checkRoom->id)
                 ->chunk(200, function ($messages) use ($user) {
                     foreach ($messages as $msg) {
