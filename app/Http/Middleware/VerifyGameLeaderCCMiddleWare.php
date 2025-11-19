@@ -16,14 +16,7 @@ class VerifyGameLeaderCCMiddleWare
      */
     public function handle(Request $request, Closure $next)
     {
-         \App\Helpers\LogHelper::info('VerifyGameLeaderCCMiddleWare Middleware Request Details', [
-            'headers' => $request->headers->all(),
-            'body' => $request->all(),
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+         
         $key = config('games.leader_CC_game_key');
         if (!$key) {
             return response()->json([
@@ -43,6 +36,18 @@ class VerifyGameLeaderCCMiddleWare
             }
         }
 
-        return $next($request);
+        $response =  $next($request);
+
+        \App\Helpers\LogHelper::info('VerifyGameLeaderCCMiddleWare Middleware Request Details', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'body' => $request->all(),
+            'ip' => $request->ip(),
+            'response_body' => method_exists($response,'getContent') 
+            ? json_decode($response->getContent(), true) 
+            : null,            
+            'headers' => $request->headers->all(),
+        ]);
+        return $response;
     }
 }

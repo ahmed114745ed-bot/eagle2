@@ -12,14 +12,14 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-         LogHelper::info('Middleware Request Details', [
+        /*  LogHelper::info('Middleware Request Details', [
             'headers' => $request->headers->all(),
             'body' => $request->all(),
             'method' => $request->method(),
             'url' => $request->fullUrl(),
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
-        ]);
+        ]); */
         // $orderId     = $request->input('orderId');
         // $gameId      = $request->input('gameId');
         // $roundId     = $request->input('roundId');
