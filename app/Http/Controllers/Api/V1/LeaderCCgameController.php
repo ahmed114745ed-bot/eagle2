@@ -175,7 +175,9 @@ class LeaderCCgameController extends Controller
     
             return response()->json([
                 'errorCode' => 0,
-                'message'   => 'SUCCESS'
+                'data'   => [
+                    'coins' : $user->di
+                ]
             ]);
     
         } catch (\Exception $e) {
