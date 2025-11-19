@@ -2011,6 +2011,8 @@
     "you used this user name before": "لقد استخدمت اسم المستخدم هذا من قبل",
     "Browse live rooms": "تصفح البث المباشر",
     "Show live rooms": "عرض البث المباشر",
+    "max message": "أقصى عدد للرسائل",
+"group chat setting": "إعدادات الدردشة الجماعية",
     "Show host": "عرض المضيف",
     "Delete host": "حذف المضيف",
     "Edit host": "تعديل المضيف",
