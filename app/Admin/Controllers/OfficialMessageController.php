@@ -7,12 +7,13 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Country;
+use Illuminate\Http\Request;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
 use Encore\Admin\Facades\Admin;
 use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
-use Illuminate\Http\Request;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -75,10 +76,24 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
+        $areaManagerId = request('area_manager_id');
+
+        if ($areaManagerId) {
+            session(['area_manager_id' => $areaManagerId]);
+        }
+
+        if (request()->has('clear_area_manager')) {
+            session()->forget('area_manager_id');
+            $areaManagerId = null;
+        }
+
+        $roleAuthId = $areaManagerId ?? session('area_manager_id');
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
-        $grid->model()->whereNull('admin_id')
+        $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
+            ->when($roleAuthId, fn($q) => $q->where('admin_id', $roleAuthId))
+            ->when(empty($roleAuthId), fn($q) => $q->whereNull('admin_id'))
             ->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -212,6 +227,18 @@ class OfficialMessageController extends MainController
 
     protected function form()
     {
+        $areaManagerId = request('area_manager_id');
+
+        if ($areaManagerId) {
+            session(['area_manager_id' => $areaManagerId]);
+        }
+
+        if (request()->has('clear_area_manager')) {
+            session()->forget('area_manager_id');
+            $areaManagerId = null;
+        }
+
+        $roleAuthId = $areaManagerId ?? session('area_manager_id');
         $form = new Form(new OfficialMessageAdmin);
         $this->disableFormTools($form);
         $form->display('ID');
@@ -219,43 +246,44 @@ class OfficialMessageController extends MainController
         $form->textarea('content', __('content'))->rules('required');
         $form->image('img', __('img'));
         $form->text('url', __('url'));
+        if (!$roleAuthId) {
 
-        $form->select('admin_role', trans('type admin'))->options([
-            'area_manager'   => __('area manager'),
-            'country_manager' => __('country manager'),
+            $form->select('admin_role', trans('type admin'))->options([
+                'area_manager'   => __('area manager'),
+                'country_manager' => __('country manager'),
 
-        ])->when('area_manager', function (Form $form) {
-            $form->select('region_id', __('area'))
-                ->options('/api/search/regions')
-                ->ajax('/api/search/regions', 'id', 'name');
-        })->when('country_manager', function (Form $form) {
-            $form->select('country_id', __('country'))
-                ->options('/api/search/countries')
-                ->ajax('/api/search/countries', 'id', 'name');
-        });
-        $form->select('type_feature', trans('type feature'))->options([
-            'single'   => __('single select'),
-            'multi' => __('multi select'),
+            ])->when('area_manager', function (Form $form) {
+                $form->select('region_id', __('area'))
+                    ->options('/api/search/regions')
+                    ->ajax('/api/search/regions', 'id', 'name');
+            })->when('country_manager', function (Form $form) {
+                $form->select('country_id', __('country'))
+                    ->options('/api/search/countries')
+                    ->ajax('/api/search/countries', 'id', 'name');
+            });
+            $form->select('type_feature', trans('type feature'))->options([
+                'single'   => __('single select'),
+                'multi' => __('multi select'),
 
-        ])->when('single', function (Form $form) {
-            $this->selectFeature($form);
-        })->when('multi', function (Form $form) {
-            $form->multipleSelect('multi_feature', __('feature'))
-                ->options([
-                    'all' => __('all'),
-                    'users' => __('regular users'),
-                    'host_users' => __('hosts'),
-                    'host_agencies' => __('Host Agencies'),
-                    'charge_agencies' => __('charge agencies'),
-                    'families' => __('families'),
-                    'bds' => __('bds'),
-                    'vips' => __('Vips'),
-                ])->attribute([
-                    'id' => 'multi_feature_select'
-                ])
-                ->help(__('Selecting All will automatically select all other options'));
-        });
-        Admin::script(<<<JS
+            ])->when('single', function (Form $form) {
+                $this->selectFeature($form);
+            })->when('multi', function (Form $form) {
+                $form->multipleSelect('multi_feature', __('feature'))
+                    ->options([
+                        'all' => __('all'),
+                        'users' => __('regular users'),
+                        'host_users' => __('hosts'),
+                        'host_agencies' => __('Host Agencies'),
+                        'charge_agencies' => __('charge agencies'),
+                        'families' => __('families'),
+                        'bds' => __('bds'),
+                        'vips' => __('Vips'),
+                    ])->attribute([
+                        'id' => 'multi_feature_select'
+                    ])
+                    ->help(__('Selecting All will automatically select all other options'));
+            });
+            Admin::script(<<<JS
             $('#multi_feature_select').on('change', function () {
                 var selected = $(this).val() || [];
 
@@ -271,10 +299,99 @@ class OfficialMessageController extends MainController
                 }
             });
             JS);
+        } else {
+            $this->selectFeatureManager($form, $roleAuthId);
+        }
         $form->hidden('type', __('type'))->default(2);
 
 
         return $form;
+    }
+
+    protected function selectFeatureManager(Form $form, $authId)
+    {
+        $countriesIds = Common::areaCountriesV2($authId);
+        $countries = Country::selectRaw('concat(name, " - ", e_name) as name, id')->when(!empty($countriesIds), function ($q) use ($countriesIds) {
+            $q->whereIn('id', $countriesIds);
+        })
+            ->pluck('name', 'id')
+            ->toArray();
+        $form->select('feature', trans('feature'))->options([
+            'agency'   => __('agency'),
+            'family' => __('family'),
+            'users'   => __('users'),
+            'bds'  => __('BDs'),
+            'shipping_agency'  => __('shipping agency')
+        ])->when('agency', function (Form $form) use ($countries) {
+            $form->select('sub_feature', __('type'))->options([
+                'area_country' => __('All Agencies around your region'),
+                'country' => __('All Agencies in Country'),
+                'ids'   => __('Specific Agency by ID'),
+            ])->when('ids', function (Form $form) {
+                $form->belongsToMany('agency_ids', Agencies::class, trans('agencies'));
+                $form->select('member_title', trans('member'))->options([
+                    'owner'   => __('owner'),
+                    'admin' => __('admins'),
+                    'members'   => __('members'),
+                ])->default('owner');
+            })->when('country', function (Form $form) use ($countries) {
+                $form->select('feature_ids', __('country'))
+                    ->options($countries);
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
+        })->when('family', function (Form $form) {
+            $form->belongsToMany('feature_ids', Families::class, trans('families'));
+            $form->select('member_title', trans('member'))->options([
+                'owner'   => __('owner'),
+                'admin' => __('admins'),
+                'members'   => __('members'),
+            ])->default('owner');
+        })->when('users', function (Form $form) use ($countries) {
+            $form->select('sub_feature', __('type'))->options([
+                'area_country' => __('Users around your regions'),
+                'country' => __('Users in Specific Country'),
+                'logout'   => __('Logged Out Users'),
+            ])->when('country', function (Form $form) use ($countries) {
+                $form->select('feature_ids', __('country'))
+                    ->options($countries);
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
+        })->when('bds', function (Form $form) use ($countries) {
+            $form->select('sub_feature', __('type'))->options([
+                'area_country' => __('bds around your regions'),
+                'ids'   => __('bds'),
+                'country' => __('Bds in Specific Country'),
+
+            ])->when('ids', function (Form $form) {
+                $form->belongsToMany('Bds_id', Bds::class, trans('Bds'));
+            })->when('country', function (Form $form) use ($countries) {
+                $form->select('feature_ids', __('country'))
+                    ->options($countries);
+                //->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
+        })->when('shipping_agency', function (Form $form) use ($countries) {
+            $form->select('sub_feature', __('type'))->options([
+                'ids'   => __('Specific shipping Agency by ID'),
+                'area_country' => __('shipping agency around your regions'),
+                'country' => __('Shipping Agencies in Specific Country'),
+            ])->when('ids', function (Form $form) use ($countries) {
+                $form->belongsToMany('shipping_agency_ids', ShippingAgencies::class, trans('agencies'));
+                $form->select('member_title', trans('member'))->options([
+                    'owner'   => __('owner'),
+                ])->default('owner');
+            })->when('country', function (Form $form) use ($countries) {
+                $form->select('feature_ids', __('country'))
+                    ->options($countries);
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+            });
+        });
+
+
+        $form->saved(function (Form $form) {
+            $model = $form->model();
+            $data = request()->except(['img']);
+            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
+        });
     }
 
     protected function selectFeature(Form $form)
