@@ -247,13 +247,18 @@ class LeaderCCgameController extends Controller
         ]);
     }
 
-    public function validationOrderId($orderId)
+   public function validationOrderId($orderId)
     {
-          if (Cache::has("order_$orderId")) {
-                return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'Order already exists'
-                ], 400);
-            }
+        if (Cache::has("order_$orderId")) {
+            return response()->json([
+                'errorCode' => 10003,
+                'errorMsg'  => 'Order already exists'
+            ], 400);
+        }
+        
+        return response()->json([
+            'errorCode' => 0,
+            'errorMsg'  => 'Order is valid'
+        ]);
     }
 }
