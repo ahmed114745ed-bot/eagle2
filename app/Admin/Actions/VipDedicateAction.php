@@ -28,11 +28,12 @@ class VipDedicateAction extends Action
     public function handle(Request $request)
     {
         try {
-            $countryID = session('filter_country_id');
+            $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+
 
             // Validate user
             $user = User::query()
-                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+                ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
                 ->searchByUuid($request->user_uuid)->first();
 
             if (!$user) {
@@ -55,7 +56,7 @@ class VipDedicateAction extends Action
             $enableVipAuto = config('admin.isUsed_vip');
 
 
-            VipCommon::createUserVip($vip ,$user ,$request->days , Admin::user()->id,'',1,0,0,'admin-dedicate' );
+            VipCommon::createUserVip($vip, $user, $request->days, Admin::user()->id, '', 1, 0, 0, 'admin-dedicate');
 
 
             DB::commit();

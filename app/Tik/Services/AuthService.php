@@ -142,8 +142,8 @@ class AuthService
         if (!$user || !Hash::check($request['password'], $user->password)) {
             throw new \Exception('credentials does`t match');
         }
-         $user->firebase_uuid = $request['uuid'];
-         $user->save();
+        //  $user->firebase_uuid = $request['uuid'];
+        //  $user->save();
 
         $this->rule($user, '', @$request['device_token'], $request);
 
@@ -241,7 +241,7 @@ class AuthService
             }
         }
 
-        $user->firebase_uuid = $request['uuid'];
+        // $user->firebase_uuid = $request['uuid'];
         $user->save();
         $this->rule($user, '', @$request['device_token'], $request);
         $token = $user->createToken('api_token')->plainTextToken;

@@ -13,6 +13,9 @@ return [
 
 
     ],
+    "lucky_box" => 'lucky box',
+    "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
+    "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",
     "banRoom" => "You banned for :duration hours remain hours is :remaining",
     'admins_greater_than' => 'Number of admins must be greater than :limit.',
     'notCharge' => ' your agency not active please call administrator',
@@ -32,6 +35,7 @@ return [
     'maleCp' => "A relationship of type :type was sent by :name.",
     'acceptCp' => ' :name accepted your relation request',
     'rejectCp' => ' :name rejected your relation request',
+    
 
     'chat_with_friends_description_allow'    => "All my friends now have the ability to chat with you",
     'chat_with_all_description_allow'    => "After activating this option, users will be able to chat with you'",
@@ -76,8 +80,10 @@ return [
     'got_earned_coin' => 'Through the invitation code 🎉 Congratulations :name, :coins coins have been added to your account',
     'code_invitation_uses' => '🎉 Congratulations :name, your invitation code has been used!',
     'sender_level'        => 'Congratulations you reach sender level :level',
+    'senderLevelUpgrade' => 'Sender level upgraded',
     'receiver_level'      => 'Congratulations you reach receiver level :level',
     'send_level'          => 'You sent :level level',
+    'receiverLevelUpgrade' => 'Receiver level upgraded',
     'enter_room'          => ":name opened own room\nClick to join and have fun with them",
     'admin_family'        => "Congrats! You are now admin in family :name \nBe worthy of your position to raise :appName",
     'accept_family'       => "Congrats! Your request to join family :name is accepted \nFamily is everything, come on participate and grow your family",
@@ -95,6 +101,10 @@ return [
     'king'                => 'king',
     'queen'               => 'queen',
     'target' => 'Congrats! you achieve new target in :agency your salary now is :salary',
+    'momentComment'=> 'moment comment',
+    'likeReal' =>'like real',
+    'realComment' => 'real comment',
+    'likeMoment' => 'like moment',
     'family_level_up' => 'Congrats! your family :name level up to :level',
     "buyVip" => 'You can not buy this  until you  buy vip :level',
     'account' => "account",
@@ -105,8 +115,10 @@ return [
     'type_ban' => 'You have a action ban with :type for :time hours because :description',
     'dont_have_coin' => 'you dont have this number of coins',
     'anther_dont_have_coin' => 'other player does not have this number of coins',
-    'background_accept' => "تم قبول طلب صوره الخلفية",
-    'background_refuse' => "تم رفض طلب صوره الخلفية",
+    'background_accept' => "Background image request accepted",
+    'background_refuse' => "Background image request rejected",
+    'roomBackground'=>'room background',
+    'newTarget' => 'New target',
     'freez_charge' => 'Your wallet has been frozen. Contact the administration!',
     'freez_charge_user' => 'User wallet has been frozen!',
     'phone' => 'this account doesn\'t have phone number',
@@ -139,6 +151,8 @@ return [
     'remove_admin_agency' => 'You have been removed as an admin from the agency: :name',
     'reject_agency' => 'Your request to join the agency :name has been rejected.',
     'closeNormalBox' => 'Your normal luck box has expired.',
-    'closeSuperBox' => 'Your super luck box has expired.'
+    'closeSuperBox' => 'Your super luck box has expired.',
+    'acceptYourAgency'=> 'Your agency has been accepted',
+    'rejectYourAgency'=>'Your agency has been refused',
 
 ];

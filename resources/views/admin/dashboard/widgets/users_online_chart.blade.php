@@ -2,17 +2,23 @@
     <div class="box-header with-border">
     <h4>{{ __('title_user') }}</h4>
     </div>
-    <div class="box-body">
-        <canvas id="usersOnlineChart" height="430"></canvas>
+    <div class="box-body" style="height:748px;">
+        <canvas id="usersOnlineChart" style="width:100%; height:100%;"></canvas>
     </div>
 </div>
 
 @php
-        $fetchUrl = admin_url('users-online-stats');
-
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+    $fetchUrl = $prefix . "/statistics/users-online-stats";
 @endphp
 
-@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin'))
+@if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin') ||  request()->is('areaManager'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

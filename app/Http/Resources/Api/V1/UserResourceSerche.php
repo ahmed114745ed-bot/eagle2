@@ -51,6 +51,9 @@ class UserResourceSerche extends JsonResource
         $dress_1_data = $this->getUserDress(4, $this->owner?->dress_1, 'img2');
         $dress_1_fallback = $this->getUserDress(4, $this->owner?->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
+        if ($this->relationLoaded('chatRoomsAsUser') || $this->relationLoaded('chatRoomsAsUser2')) {
+            $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
+        }
         $data = [
             'id'=>@$this->id, // both
             'uuid'=>@$this->uuid, // both
@@ -66,11 +69,11 @@ class UserResourceSerche extends JsonResource
             ], // user data
 
             'profile'=>new ProfileResourceSerche(@$this->profile), // both       ------- img type   oge    contry   reqouerd
-           // 'level'=>Common::level_centerSerch (@$this->id), // both 
+           // 'level'=>Common::level_centerSerch (@$this->id), // both
            'level' => [
                 'receiver_img' => $this->receiverLevel?->img,
                 'sender_img'   => $this->senderLevel?->img,
-            ], 
+            ],
             'vip'=>@Common::ovip_center ($this->resource), // both
             'is_agent'=>$this->is_agent, // both
             'has_color_name' => $this->hasPackOfType(18), // both
@@ -82,7 +85,8 @@ class UserResourceSerche extends JsonResource
             'country'          =>  @$this->country ?? (object)[],
             'image_color'          => @$this->color_image,
             'frame' => $frame,
-
+            'chat_id' => $chatRoom->id ?? null,
+            'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
         return $data;
     }

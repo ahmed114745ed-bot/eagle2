@@ -15,6 +15,19 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "TargetDiamond":"This represents the goal amount of diamonds the room needs to achieve (e.g., 1,000,000).Once this target is reached, it may trigger certain rewards or unlock new features.",
+"ConditionGroeth":"Define the minimum number of visitors required for the room to gain more visibility or unlock new benefits.You can customize this condition based on room performance.",
+"NumberSeats":"Indicates how many admins are currently assigned to this room.When the room achieves its diamond target, more admin seats can be unlocked.(Hint: If a room starts with 4 admins and hits the target, it can increase to 5 admins.",
+"ProfitsTargetTotal":"The total profit in coins generated from the room’s performance.This value will later be divided among the room owner and admins based on their profit percentages.",
+"Show superadmin": "Show  Country Manager",
+"bdsDescription" : "BDs displayed belong to the Area Manager's country",
+"professionalBdsDescription": "User BDs displayed belong to the Area Manager's country",
+"member": "عضو",    
+    "SuperAdmin Charge":"charges",
+    "Charge To Superadmin":"charges",
+    "Browse charge to superadmin":"Browse charges ",
+    "Add switch charge to superadmin":" add charge",
+    "History switch charge to superadmin":"history charges",
      "select super admin": "select country manager",
      "Select Super Admins": "select countries managers",
      "Super Admin Configuration": "country manager configuration",
@@ -25,6 +38,22 @@
     "can not restore this super admin": "can not restore this country manager",
     "can not restore this super admin user taken": "can not restore this country manager",
     "Sub Super Admin": "super admin",
+        "Superadmin Banners": "country manager Banners",
+     
+
+    "SuperAdmin Banners": "country manager Banners",
+    "Browse superadmin banners": "Browse country manager banners",
+    "Add switch superadmin banners": "Add country manager banners",
+    "History switch superadmin banners": "History switch country manager banners",
+
+    "Browse super admin reward": "Browse country manager reward",
+    "Dedicate switch super admin reward": "Dedicate country manager reward",
+    "History switch super admin reward": "History country manager reward",
+    "Browse super admin reward history": "Browse country manager reward history",
+
+    "SuperAdmin Rewards": "country manager Rewards",
+
+
     "Super Admin": "country manager",
     "Super Admin Coins": "country manager Coins",
     "Zones coins must be greater than super admin coins": "Zones coins must be greater than country manager coins",
@@ -44,10 +73,6 @@
 "superadmin": "country manager",
 "super admin banner requests": "country manager banner requests",
 "superadmin rewards": "country manager rewards",
-
-
-
-
     "not_in_same_country":"not in same country",
     "Make every minute in :app LIFE an authentic celebration!": "Make every minute in :app LIFE an authentic celebration!",
     ":app LIFE Legends": ":app LIFE Legends",
@@ -84,6 +109,7 @@
     "registered successfully": "Registered Successfully",
     "required": "Required",
     "exists": "Exists",
+    "Live Rooms": "Live Broadcast",
     "delete user parent": "delete Users",
      "edit user parent": "edit users",
     "show user parent": "show users",
@@ -892,6 +918,8 @@
   "bd_set_default_success": "BD set as default successfully",
   "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
   "app bd id":" Bd ID",
+  "super admin charges": "country manager charges",
+
   "make_bd_default":"When you enable this option, this BD will become the default instead of the current default.",
   "make_super_admin_default":"When you enable this option, this country manager will become the default instead of the current default.",
 "vip_gift_message": "You have received a new VIP level as a gift",
@@ -1283,7 +1311,8 @@
   "dashboard.login.cancel": "Cancel",
   "dashboard.login.success": "Success",
   "dashboard.login.error.enter_username_first": "Please enter the username first",
-  "dashboard.login.loading.prepare": "Preparing...",
+  "login.error.enter_type":"Please enter the type first",
+  
   "dashboard.login.error.try_again": "An error occurred, please try again later",
   "dashboard.login.whatsapp.send_to_number": "A code will be sent via WhatsApp to the number:",
   "dashboard.login.loading.sending": "Sending...",
@@ -1333,6 +1362,23 @@
 "banner_approved_message": "Admin :name (ID: :id) has approved the banner request and deducted :coins coins.",
 "banner_rejected_title": "The banner request has been rejected",
 "banner_rejected_message": "The admin :name (ID: :id) has rejected the banner request.",
+"areaManagerDescription":"To ensure smooth operations, it is necessary to create a default Area Manager under your supervision. All countries or agencies that do not belong to a specific Area Manager are automatically assigned to this default manager. When an Area Manager is deleted, the associated countries or agencies are transferred to the default manager, ensuring uninterrupted management. If no default Area Manager exists, users must specify an Area Manager when opening any country or agency, and they will not be able to operate it without a designated manager. Therefore, it is always recommended to create and manage a default Area Manager to guarantee continuous operational workflow without complications."
+,"area_manager_default":"Default Area Manager",
+"Area Manager": "Area Manager",
+"Not Linked": "Not Linked",
+"areaManagerDescriptionTitle": "Area Manager Description",
+"Clear Selection": "Clear Selection",
+"Show Selected Countries": " Selecte Countries",
+"Selected Countries": "Selected Countries",
+"Please select an area on the map first": "Please select an area on the map first",
+"Searching for countries... This may take a few seconds": "Searching for countries... This may take a few seconds",
+"Searching...": "Searching...",
+"No countries found in the selected area. Try expanding the area.": "No countries found in the selected area. Try expanding the area.",
+"Found": "Found",
+"Arabic Name": "Arabic Name",
+"English Name": "English Name",
+"Phone Code": "Phone Code",
+"An error occurred while searching for countries. Please check your Google Maps API Key.": "An error occurred while searching for countries. Please check your Google Maps API Key.",
 "Banner approved successfully": "Banner approved successfully",
 "Banner rejected successfully": "Banner rejected successfully",
 "sub admin" : "Sup Admin",
@@ -1423,6 +1469,38 @@
 "milestone_rewards_synced": "Milestone rewards synced successfully",
 "Reapply Rewards": "Reapply Rewards",
 "This is the default number of admins allowed per room.": "This is the default number of admins allowed per room."
+,"Form Details": "Form Details",
+"Form ID": "Form ID",
+"Full Form Information": "Full Form Information",
+"User Name": "User Name",
+"Email": "Email",
+"Form Type": "Form Type",
+"Form Status": "Form Status",
+"Pending": "Pending",
+"Awaiting Review": "Awaiting Review",
+"Approved": "Approved",
+"Approved Successfully": "Approved Successfully",
+"Rejected": "Rejected",
+"Request Rejected": "Request Rejected",
+"Unknown": "Unknown",
+"Created At": "Created At",
+"Last Updated": "Last Updated",
+"Available Actions": "Available Actions",
+"Delete Request": "Delete Request",
+"You can delete this request only while pending.": "You can delete this request only while pending.",
+"Cannot Edit": "Cannot Edit",
+"This request is processed and cannot be modified.": "This request is processed and cannot be modified.",
+"Are you sure you want to delete this request?": "Are you sure you want to delete this request?",
+"Not specified": "Not specified",
+
+"shipping_agency": "Shipping Agency",
+"bd_form": "BD Form",
+"host_agency": "Host Agency",
+"area name":"Area Name",
+"upload_card_back": "📷 Click to upload ",
+"Browse live rooms": "Browse live broadcasts",
+"Show live rooms": "Show live broadcasts"
+
 
 
 

@@ -48,6 +48,7 @@
                        placeholder="{{ trans('admin.password') }}" 
                        name="password" required>
                 <input type="hidden" name="username" value="{{ @$userName }}">
+                <input type="hidden" name="type" value="{{ @$type }}">
             </div>
 
             <div class="form-group">

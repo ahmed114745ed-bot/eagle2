@@ -95,11 +95,11 @@ class ProfileService
             $profile->avatar = $profile->gender == 1 ? "custom_image/male.png" : "custom_image/female.png";
             $this->profileRepo->updateAvatar($profile, $profile->avatar);
         }
-
+        $lang = $user->lan ?? 'en';
         if ($profile->wasRecentlyCreated) {
-            $title = __('api.welcome', ['name' => $user->name, 'app_name' => env('APP_NAME')], 'en');
-            $titleAr = __('api.welcome', ['name' => $user->name, 'app_name' => __(env('APP_NAME'), locale: 'ar')], 'ar');
-            Common::sendOfficialMessage($user->id, $title, $user->name, titleAr: $titleAr);
+
+            $title = __('api.welcome', ['name' => $user->name, 'app_name' => __(env('APP_NAME'), locale: $lang)], $lang);
+            Common::sendOfficialMessage($user->id, $title, $user->name, titleAr: $title);
             (new ServicesUserCounterServices)->eventUser($user, 'official-messages');
         }
         return $out;

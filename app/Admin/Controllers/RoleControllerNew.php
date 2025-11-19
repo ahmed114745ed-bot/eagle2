@@ -71,9 +71,28 @@ class RoleControllerNew extends MainController
     {
         \Admin::js('js/admin/preview.js');
         $roleModel = config('admin.database.roles_model');
+        $areaManagerId = request('area_manager_id');
+
+        if ($areaManagerId) {
+            session(['area_manager_id' => $areaManagerId]);
+        }
+    
+        if (request()->has('clear_area_manager')) {
+            session()->forget('area_manager_id');
+            $areaManagerId = null;
+        }
+    
+        $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new $roleModel());
-        $grid->model()->where('admin_id', null);
+        // $grid->model()->where('admin_id', null);
+
+        if ($roleAuthId) {
+            $grid->model()->where('admin_id', $roleAuthId);
+        } else{
+             $grid->model()->where('admin_id', null);
+  
+        }
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
 

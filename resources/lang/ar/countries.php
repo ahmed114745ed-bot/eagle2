@@ -164,7 +164,7 @@ return [
     "Oman" => "عُمان",
     "Pakistan" => "باكستان",
     "Palau" => "بالاو",
-    "Palestinian Territory, Occupied" => "فلسطين",
+    "Palestine" => "فلسطين",
     "Panama" => "بنما",
     "Papua New Guinea" => "بابوا غينيا الجديدة",
     "Paraguay" => "باراغواي",

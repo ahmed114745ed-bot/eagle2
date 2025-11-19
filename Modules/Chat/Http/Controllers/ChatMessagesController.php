@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Helpers\Common;
 use App\Models\BlackList;
+use App\Models\Config;
 use DB;
 use Modules\Chat\Events\CardDeleteMessage;
 use Modules\Chat\Events\DeleteMessage;
@@ -44,6 +45,7 @@ class ChatMessagesController extends Controller
 
     public function store(ChatStoreRequest $request)
     {
+        
         $user = $request->user();
 
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
@@ -66,7 +68,12 @@ class ChatMessagesController extends Controller
 
         $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
 
-        if ($chatRoom->type == 'guest' && $total_message >= 3 && $totalDistinctUsers < 2) {
+        $maxMessage = \Cache::rememberForever('max_message', function () {
+            $setting =   Config::where('name', 'max_message')->first();
+            return $setting?->value ?? 0;
+        });
+
+        if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
                 'message' => 'You have reached the limit for sending messages',
@@ -127,8 +134,8 @@ class ChatMessagesController extends Controller
             $chatRoom->type = 'friend';
         }
 
-//        \Log::info('room_resource ', ['room_resource' => $response['room_resource']]);
-//        \Log::info('room_resource ', ['room_resource' => $response['room_resource'] , 'room req' => $response['message_resource']->toResponse(request())->getData()->data]);
+        //    \Log::info('room_resource ', ['room_resource' => $response['room_resource']]);
+        //    \Log::info('room_resource ', ['room_resource' => $response['room_resource'] , 'room req' => $response['message_resource']->toResponse(request())->getData()->data]);
 
         try {
             // return $user2;
@@ -186,7 +193,6 @@ class ChatMessagesController extends Controller
         }
 
         return response()->json($response);
-
     }
 
     public function deleteForMe(DeleteForMeRequest $request)
