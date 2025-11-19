@@ -71,6 +71,7 @@ class ChatRoomController extends Controller
  \Log::info('ChatRooms Response', [
         'success' => $response['success'],
         'status'  => $response['status'],
+        'data' => $response['data'],
         'message' => $response['message'],
         'rooms_count' => isset($response['data']) ? count($response['data']) : 0,
     ]);
