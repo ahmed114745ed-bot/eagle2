@@ -67,6 +67,7 @@ class RoleController extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
+ 
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
         $grid->column('name', trans('admin.name'));

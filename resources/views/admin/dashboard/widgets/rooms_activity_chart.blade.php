@@ -13,9 +13,14 @@
 </div>
 
 @php
-
-        $fetchUrl = admin_url('rooms-activity');
-
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+    $fetchUrl = $prefix . "/statistics/rooms-activity";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

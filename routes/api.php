@@ -3,9 +3,9 @@
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\CodapayService;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
+use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -58,8 +58,10 @@ use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
+use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
@@ -118,14 +120,19 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
+        Route::get('owner-rooms', [UserController::class, 'searchOwnerRoomWithPage'])->name('owner-rooms');
         Route::get('users7', [UserController::class, 'usersAudioRoom'])->name('users7');
         Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
         Route::get('users-bd2', [UserController::class, 'user_bd2'])->name('users-bd2');
+        Route::get('users-bd-by-countries', [UserController::class, 'userBdByCountries'])->name('users-bd-by-countries');
         Route::get('users-superadmin', [UserController::class, 'superAdminUsers'])->name('users-superadmin');
         Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
+        Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
+        Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
+        Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
@@ -135,8 +142,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('regions', [CountryController::class, 'searchRegions'])->name('regions');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
+        Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
     });
 
     // authorization
@@ -723,3 +732,6 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
+Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);

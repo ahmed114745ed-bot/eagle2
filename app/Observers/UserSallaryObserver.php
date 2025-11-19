@@ -20,10 +20,8 @@ class UserSallaryObserver
     }
 
     public function saved(UserSallary $userSalary)
-    {
+    {   
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateBdHostSallary($userSalary);
-
     }
 
     public function creating(UserSallary $userSalary)
@@ -33,8 +31,7 @@ class UserSallaryObserver
 
         if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateBdHostSallary($userSalary);
-        app()->singleton('originalDbValue', fn () => $originalDbValue);
+        $this->updateBdHostSallary($userSalary,$originalDbValue);
 
     }
 
@@ -47,7 +44,9 @@ class UserSallaryObserver
         if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0) {
             dispatch(new SendCustomOfficialMessageToUser($userSalary->user_id, NotificationType::TARGET))->onQueue('notification');
         }
-        app()->singleton('originalDbValue', fn () => $originalDbValue);
+            
+        $this->updateBdHostSallary($userSalary, $originalDbValue);
+
 
 
     }
@@ -90,19 +89,18 @@ class UserSallaryObserver
 
 
 
-    private function updateBdHostSallary(UserSallary $userSallary): void
+    private function updateBdHostSallary(UserSallary $userSallary ,$originalDbValue = null): void
     {
         $agency = Agency::find($userSallary->user_agency_id);
 
         if ($agency && $agency->bd_id && $agency->status == 1) {
-            $oldDbValue = app()->has('originalDbValue') ? app('originalDbValue') : $userSallary->getOriginal('dB');
 
             BdAgencyHostSallaryService::storeOrUpdate([
                 'bd_id'     => $agency->bd_id,
                 'user_id'   => $userSallary->user_id,
                 'agency_id' => $agency->id,
                 'amount'    => $userSallary->dB ?? 0,
-                'oldDbValue'   => $oldDbValue,
+                'oldDbValue'   => $originalDbValue,
                 'month'     => $userSallary->month,
                 'year'      => $userSallary->year,
             ]);

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class AdminUser extends Administrator
 {
     protected $table = 'admin_users';
+    protected $guarded = [];
 
     public function user()
     {

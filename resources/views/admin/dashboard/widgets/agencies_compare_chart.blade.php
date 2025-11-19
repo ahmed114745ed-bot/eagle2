@@ -43,9 +43,19 @@
     </div>
 </div>
 
+@php
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+@endphp
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const endpoint = `/admin/statistics/comparison-agencies-target`;
+    const endpoint = `/{{ $prefix }}/statistics/comparison-agencies-target`;
 
     fetch(endpoint)
         .then(response => response.json())

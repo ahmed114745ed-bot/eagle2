@@ -462,7 +462,7 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'SuperAdmin',
                 'sort' => 38,
                 'permissions' => [
-                    ['key' => 'superadmin', 'except' => ['show'], 'additional' => []],
+                    ['key' => 'superadmin', 'except' => [], 'additional' => []],
                     ['key' => 'superadmin-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],

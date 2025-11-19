@@ -6,10 +6,15 @@
 </div>
 
 @php
-        $fetchUrl = admin_url('top-users-visits');
-
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+    $fetchUrl = $prefix . "/statistics/top-users-visits";
 @endphp
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

@@ -88,13 +88,13 @@ class SuperPackageController extends MainController
 
         $grid->column('members', __('rewards'))->expand(function ($model) {
             Log::info("=== Expand rewards for model ID: {$model->id} ===");
-        
+
             $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
                 Log::info("Processing reward ID: {$memper->id}, type: {$memper->type}");
-        
+
                 $gifts = '';
                 $path  = '';
-        
+
                 switch ($memper->type) {
                     case "ware":
                         $gifts = @$memper->ware->name ?? '';
@@ -123,16 +123,16 @@ class SuperPackageController extends MainController
                         Log::info("Achievement gift: {$gifts}, path: {$path}, value: {$value}");
                         break;
                 }
-        
+
                 $url = getImagePath($path);
                 Log::info("Resolved image URL: {$url}");
-        
+
                 $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
 
-                              
-        
+
+
                 Log::info("Generated image HTML: {$image}");
-        
+
                 return [
                     'id'       => $memper->id,
                     'type'     => $memper->type,
@@ -142,15 +142,15 @@ class SuperPackageController extends MainController
                     'expire'   => $memper->quantity,
                 ];
             });
-        
+
             Log::info("Mapped rewards: " . json_encode($mempers->toArray()));
-        
+
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
-        
+
 
         Admin::script("
         $('.rtlSvga').each(function() {
@@ -168,12 +168,12 @@ class SuperPackageController extends MainController
 
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
-               
+
                 return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
             });
         }
         Admin::script("
-        if (window.innerWidth >= 1024) { 
+        if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
@@ -242,48 +242,50 @@ class SuperPackageController extends MainController
     {
         $form = new Form(new SuperPackageReward());
 
-        $form->tab(__('data'), function (Form $form) {
-                $form->text('title', __('title'))->required();
-        });
-        $form->tab(__('Ware'), function (Form $form) {
+        $form->text('title', __('title'))->required();
+
+        $form->fieldset(__('Wares'), function (Form $form) {
             $this->addWareField($form);
             $form->number('expire_ware', __('expire'));
             $form->number('quantity_ware', __('number'))->min(0);
         });
-        $form->tab(__('Badge'), function (Form $form) {
+
+        $form->fieldset(__('Badges'), function (Form $form) {
             $this->addBadgeField($form);
             $form->number('expire_badge', __('expire'));
             $form->number('quantity_badge', __('number'))->min(0);
         });
 
-        $form->tab(__('VIP'), function (Form $form) {
+        $form->fieldset(__('vips'), function (Form $form) {
             $form->belongsToMany('vips', OVips::class, trans('vips'));
             $form->number('expire_vip', __('expire'));
             $form->number('quantity_vip', __('number'))->min(0);
         });
 
-        // 🟡 Tab for Coins
-        $form->tab(__('Coins'), function (Form $form) {
+        $form->fieldset(__('Coins'), function (Form $form) {
             $form->number('coins', __('Coins'))->min(0);
         });
 
-
-        $form->tab(__('Achievement'), function (Form $form) {
+        $form->fieldset(__('Achievement'), function (Form $form) {
             $form->image('achievement', __('Image'))->name(function ($file) {
                 return now()->timestamp . '.' . $file->guessExtension();
             })->disk('gcs');
             $form->number('expire_achievement', __('expire'));
         });
 
+        Admin::script('
+            $(".collapse.in").removeClass("in"); // Bootstrap 3
+            $(".collapse.show").removeClass("show"); // Bootstrap 4/5
+        ');
+
         return $form;
     }
-
 
 
     protected function addWareField(Form $form)
     {
         $prefix = 'wares';
-        $form->belongsToMany('wares', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+        $form->belongsToMany('wares', WaresByType::class, __('Wares'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'wares')
                 ->select('id', __('wares'))
                 ->options(function ($id) {

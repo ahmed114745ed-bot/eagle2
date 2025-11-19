@@ -300,7 +300,7 @@ class WalletController extends MainController
             ]);
 
             $types = [
-               'user' => [$this, 'chargeToSubAdmin'],
+                'user' => [$this, 'chargeToSubAdmin'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 

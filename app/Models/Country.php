@@ -4,8 +4,11 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Modules\AreaManager\Entities\AreaManager;
+use Modules\AreaManager\Entities\Region;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class Country extends Model
@@ -52,6 +55,54 @@ class Country extends Model
 
     public function superAdmin()
     {
-        return $this->hasMany( SuperAdmin::class,'country_id');
+        return $this->hasMany(SuperAdmin::class,'country_id');
+    }
+  
+
+    public function scopeNonDefaultOrUnassigned($query)
+    {
+        return $query->where(function($q) {
+            $q->whereNull('area_manager_id')
+              ->orWhereHas('areaManager', function($q2) {
+                 $q2->where('default', 0);
+              });
+        });
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($country) {
+      
+        });
+    }
+
+    public function regions()
+    {
+        return $this->belongsToMany(
+            Region::class,
+            'region_countries', 
+            'country_id',
+            'region_id'
+        );
+    }
+    
+    
+    public function areaManagers()
+    {
+        return $this->hasManyThrough(
+            AreaManager::class, 
+            Region::class, 
+            'id',            
+            'id',            
+            'id',            
+            'manager_id' 
+        );
+    }
+    public function getRegionManagerIdAttribute()
+    {
+        $region = $this->regions->first();
+        return $region?->areaManager?->id ?? null;
     }
 }
