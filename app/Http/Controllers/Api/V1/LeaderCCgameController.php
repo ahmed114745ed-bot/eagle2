@@ -123,45 +123,47 @@ class LeaderCCgameController extends Controller
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
     
                 $lock = Cache::lock("user_lock_{$op['uid']}", 5);
-    
+
                 if (!$lock->get()) {
                     return response()->json([
                         'errorCode' => 5001,
                         'message'   => 'User is currently busy, try later'
                     ], 400);
                 }
-    
+                
+                $user = null;
+                
                 try {
                     $user = User::where('id', $op['uid'])->lockForUpdate()->first();
-    
+                
                     if (!$user) {
                         return response()->json([
                             'errorCode' => 4005,
                             'message'   => 'User not found'
                         ], 404);
                     }
-    
+                
                     $coin = (int)$op['coin'];
                     $type = (int)$op['type'];
-    
+                
                     if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
                         return response()->json([
                             'errorCode' => 10003,
                             'message'   => 'Order already exists'
                         ], 400);
                     }
-    
+                
                     if ($type == 1 && $user->di < $coin) {
                         return response()->json([
                             'errorCode' => 4004,
                             'message'   => 'Insufficient game coins'
                         ], 400);
                     }
-    
+                
                     $type == 1 ? $user->di -= $coin : $user->di += $coin;
                     $logType = $type == 1 ? 0 : 1;
                     $user->save();
-    
+                
                     DB::table('coin_game_users')->insert([
                         'user_id' => $user->id,
                         'coins' => abs($coin),
@@ -173,10 +175,11 @@ class LeaderCCgameController extends Controller
                         'created_at' => now(),
                         'updated_at' => now()
                     ]);
-    
+                
                 } finally {
                     $lock->release();
                 }
+                
             }
     
             DB::commit();
