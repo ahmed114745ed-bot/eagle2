@@ -561,12 +561,14 @@ class UserController extends Controller
                    ->where('user_id', '<>', $id); 
             }]);
         }])->find($id);
-
+        
         $chatRoom = $user->chatRoomsAsUser->first() ?? null;
-
-        $response['unread_messages_count'] = $chatRoom ? $chatRoom->unread_messages : 0;
-        \Log::info("Unread message for user ".$chatRoom->unread_messages);
-
+        
+        $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
+        
+        \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
+        
+        $response['unread_messages_count'] = $unreadMessagesCount;
 
         return Common::apiResponse(true, '', $response, 200);
     }
