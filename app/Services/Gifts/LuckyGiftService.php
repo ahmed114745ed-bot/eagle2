@@ -239,6 +239,7 @@ class LuckyGiftService
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
+        $responseData['total_user_win'] = $total_user_win;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;
