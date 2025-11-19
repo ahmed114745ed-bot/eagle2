@@ -133,7 +133,6 @@ class LeaderCCgameController extends Controller
                 
                 $user = null;
                 
-                try {
                     $user = User::where('id', $op['uid'])->lockForUpdate()->first();
                 
                     if (!$user) {
@@ -176,9 +175,7 @@ class LeaderCCgameController extends Controller
                         'updated_at' => now()
                     ]);
                 
-                } finally {
-                    $lock->release();
-                }
+                
                 
             }
     
