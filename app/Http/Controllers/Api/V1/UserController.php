@@ -565,7 +565,8 @@ class UserController extends Controller
         $chatRoom = $user->chatRoomsAsUser->first() ?? null;
 
         $response['unread_messages_count'] = $chatRoom ? $chatRoom->unread_messages : 0;
-      
+        \Log::info("Unread message for user ".$chatRoom->unread_messages);
+
 
         return Common::apiResponse(true, '', $response, 200);
     }
