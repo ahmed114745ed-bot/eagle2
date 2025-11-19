@@ -55,6 +55,7 @@
         display: flex;
         align-items: flex-start;
         gap: 8px;
+        margin: 20px 0px;
     }
     .form-check-input {
         margin: 0;
@@ -954,7 +955,13 @@
         .card-target-filter {
             display: none;
         }
+        #permissions-container{
+            margin: 0px 20px !important;
 
+        }
+        .save-btn{
+            margin: 17px 16px !important;
+        }
         @media (max-width: 768px) {
             .stats-row {
                 flex-direction: column;
@@ -1146,6 +1153,8 @@
             background-color: var(--secondary-color) !important;
             filter: brightness(0.95);
         }
+
+    
     </style>
 
 </head>
@@ -1311,7 +1320,7 @@
                <br>
                 {{-- Save Button --}}
                 <div class="mt-3 text-end">
-                    <button type="submit" class="btn btn-primary">{{ __('Save Permissions') }}</button>
+                    <button type="submit" class="btn btn-primary save-btn">{{ __('Save Permissions') }}</button>
                 </div>
             </form>
         </div>
@@ -1446,7 +1455,7 @@
                 <br>
                 {{-- Save Button --}}
                 <div class="mt-3 text-end">
-                    <button type="submit" class="btn btn-primary">{{ __('Save Permissions') }}</button>
+                    <button type="submit" class="btn btn-primary save-btn">{{ __('Save Permissions') }}</button>
                 </div>
             </form>
         </div>
