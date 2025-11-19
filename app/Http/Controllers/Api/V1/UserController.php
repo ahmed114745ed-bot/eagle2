@@ -560,7 +560,7 @@ class UserController extends Controller
                 $q->where('status', '<>', 'seen')
                 ->where('user_id', '<>', $id); 
             }])
-        ->first()م
+        ->first();
 
         $chatRoom = $user->chatRoomsAsUser->first() ?? null;
 
