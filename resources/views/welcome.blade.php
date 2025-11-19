@@ -11,7 +11,7 @@
         :root {
             /* Enhanced color scheme */
             --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};     
-            --secondary-color:{{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            --secondary-color:{{ data_get($settings, 'app_primary_color', '#ffffff') }};
             --accent-color: #06b6d4;
             --dark-bg: #0f0f23;
             --text-color: #1a1a2e;
