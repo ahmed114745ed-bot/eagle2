@@ -516,6 +516,7 @@ class ChatRoomService
                         } else {
                             $msg->user_2_deleted = now();
                         }
+                           $msg->save();
 
                         // if ($msg->user_1_deleted && $msg->user_2_deleted) {
                         //     $msg->delete();
