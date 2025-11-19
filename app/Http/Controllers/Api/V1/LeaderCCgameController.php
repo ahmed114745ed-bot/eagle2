@@ -122,14 +122,7 @@ class LeaderCCgameController extends Controller
     
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
     
-                // $lock = Cache::lock("user_lock_{$op['uid']}", 5);
-
-                // if (!$lock->get()) {
-                //     return response()->json([
-                //         'errorCode' => 5001,
-                //         'message'   => 'User is currently busy, try later'
-                //     ], 400);
-                // }
+         
                 
                 $user = null;
                 
