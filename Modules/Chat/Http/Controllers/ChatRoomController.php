@@ -68,6 +68,12 @@ class ChatRoomController extends Controller
             return response()->json($response['message'], $response['status']);
         }
 
+ \Log::info('ChatRooms Response', [
+        'success' => $response['success'],
+        'status'  => $response['status'],
+        'message' => $response['message'],
+        'rooms_count' => isset($response['data']) ? count($response['data']) : 0,
+    ]);
         return Common::apiResponse(
             1,
             $response['message'],
