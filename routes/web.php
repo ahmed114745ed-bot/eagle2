@@ -861,8 +861,6 @@ Route::get('/codapay/create-payment', function () {
             'result'  => $result,
         ]);
     } catch (\Throwable $e) {
-        Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
-
         return response()->json([
             'error'   => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),

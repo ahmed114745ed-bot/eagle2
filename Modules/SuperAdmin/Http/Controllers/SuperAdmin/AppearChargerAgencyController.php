@@ -298,7 +298,7 @@ class AppearChargerAgencyController extends MainController
                 ->switch(Common::getSwitchStates());
         }
         $permission = $this->permission_name;
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {

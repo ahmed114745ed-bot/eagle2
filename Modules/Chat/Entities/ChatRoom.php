@@ -14,9 +14,12 @@ class ChatRoom extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['unread_messages'];
+
     public function messages()
     {
-        return $this->hasMany(ChatMessage::class)->orderBy('id', 'desc');
+        return $this->hasMany(ChatMessage::class)  
+                    ->orderBy('id', 'desc');
     }
 
     public function getLastMessageCreatedAtAttribute()
@@ -29,6 +32,13 @@ class ChatRoom extends Model
     public function unReadMessages()
     {
         return $this->hasMany(ChatMessage::class)->where('status', 'not Like', 'seen');
+    }
+    public function getUnreadMessagesAttribute()
+    {
+        return $this->messages()
+            ->where('status', '!=', 'seen')
+            ->where('user_id', '!=', auth()->id())
+            ->count();
     }
 
     public function unreadMessagesFor($userId): HasMany

@@ -455,6 +455,8 @@ class ChatRoomService
 
     public function deleteChatRoom($user, $userId2)
     {
+    
+
         $checkRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
             $query->where(function ($q) use ($user, $userId2) {
                 $q->where('user_id', $user->id)
@@ -477,13 +479,19 @@ class ChatRoomService
             return [$item->file, $item->frame];
         })->toArray();
 
+
         if ($checkRoom->user_id == $user->id){
             $checkRoom->update(['user_1_deleted' => now()]);
         } else {
             $checkRoom->update(['user_2_deleted' => now()]);
         }
+    
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
+            Log::info("user_1_deleted &&  user_2_deleted ", [
+         
+                'checkRoom'    => $checkRoom,
+            ]);
             try {
                 Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
             } catch (\Throwable $th) {
@@ -496,22 +504,26 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
-            // ChatMessage::where('chat_room_id', $checkRoom->id)
-            //     ->chunk(200, function ($messages) use ($user) {
-            //         foreach ($messages as $msg) {
-            //             if ($msg->user_id == $user->id) {
-            //                 $msg->user_1_deleted = now();
-            //             } else {
-            //                 $msg->user_2_deleted = now();
-            //             }
+            Log::info("checkRoom  ", [
+         
+                'checkRoom'    => $checkRoom,
+            ]);
+            ChatMessage::where('chat_room_id', $checkRoom->id)
+                ->chunk(200, function ($messages) use ($user) {
+                    foreach ($messages as $msg) {
+                        if ($msg->user_id == $user->id) {
+                            $msg->user_1_deleted = now();
+                        } else {
+                            $msg->user_2_deleted = now();
+                        }
 
-            //             if ($msg->user_1_deleted && $msg->user_2_deleted) {
-            //                 $msg->delete();
-            //             } else {
-            //                 $msg->save();
-            //             }
-            //         }
-            //     });
+                        if ($msg->user_1_deleted && $msg->user_2_deleted) {
+                            $msg->delete();
+                        } else {
+                            $msg->save();
+                        }
+                    }
+                });
         }
 
         return [

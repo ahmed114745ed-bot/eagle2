@@ -127,7 +127,12 @@ class AllGameController extends MainController
         $grid->column('custom_id', __('custom_id'));
         $grid->column('name', __('name_ar'));
         $grid->column('name_en', __('name_en'));
-        $grid->column('type', __('type'))->using([0 => __('joy'), 1 => __('OX'), 2 => __('Baishun')]);
+        $grid->column('type', __('type'))->using([
+            0 => __('joy'),
+            1 => __('OX'),
+            2 => __('Baishun'),
+            3 => __('Leader cc'),
+        ]);
         $grid->column('url', __('Full Url'));
         $grid->column('mini_url', __('Mini Url'));
         $grid->column('image', __('Image'))->image('', 50);
@@ -184,7 +189,7 @@ class AllGameController extends MainController
             [
                 0 => __('mini'),
                 1 => __('full'),
-
+                2 => __('mini-hd'),
             ]
         )->default(0);
         $form->text('hight', __('hight'));

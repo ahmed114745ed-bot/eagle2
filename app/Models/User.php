@@ -1909,8 +1909,6 @@ class User extends Authenticatable
 
                 if ($model->agency) {
                     $model->agency->update(['is_frozen' => request()->is_frozen]);
-                } else {
-                    Log::warning("User ID {$model->id} does not have an agency.");
                 }
                 request()->request->remove('is_frozen');
             }
