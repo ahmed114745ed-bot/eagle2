@@ -564,7 +564,6 @@ class UserController extends Controller
         } else {
             $response['unread_messages_count'] = 0;
         }
-        \Log::info("User response for ID {$id}:", $response['unread_messages_count']);
 
         return Common::apiResponse(true, '', $response, 200);
     }
