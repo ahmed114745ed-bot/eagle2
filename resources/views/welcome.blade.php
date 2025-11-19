@@ -959,7 +959,7 @@
 
         /* Stats Section */
         .stats {
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get($settings, 'app_primary_color', '#ffffff') }};
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             padding: 80px 8%;
             color: white;
