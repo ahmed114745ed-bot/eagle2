@@ -555,13 +555,16 @@ class UserController extends Controller
                 return (new UserResource($user))->toArray(request());
             }
         );
+        \Log::info("User response for ID {$id}:", $response);
 
         $chatRoom = $response['chatRoomsAsUser'] ?? null;
+        \Log::info("User response for ID {$id}:", $chatRoom);
         if ($chatRoom) {
             $response['unread_messages_count'] = $chatRoom->unreadMessagesFor($id)->count();
         } else {
             $response['unread_messages_count'] = 0;
         }
+        \Log::info("User response for ID {$id}:", $response['unread_messages_count']);
 
         return Common::apiResponse(true, '', $response, 200);
     }
