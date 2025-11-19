@@ -13,7 +13,20 @@ class GroupChatSettingController extends MainController
 
 
 
+
     public function index(Content $content)
+    {
+        $config = Config::whereIn('name', ['group_chat', 'max_message'])->get();
+
+        $groupChat = $config->firstWhere('name', 'group_chat')->value ?? 0;
+        $maxMessage = $config->firstWhere('name', 'max_message')->value ?? 0;
+        return parent::index(
+            $content->title(__('settings'))
+                ->view('group_chat_settings', compact('groupChat', 'maxMessage'))
+        );
+    }
+
+    public function index1(Content $content)
     {
         $config = Config::where('name', 'group_chat')->first();
 
@@ -31,7 +44,7 @@ class GroupChatSettingController extends MainController
 
         return parent::index(
             $content->title(trans('Settings'))
-                    ->body(new HtmlString($form))
+                ->body(new HtmlString($form))
         );
     }
 
@@ -46,7 +59,7 @@ class GroupChatSettingController extends MainController
 
                 <div class="form-group">
                     <label class="form-label">{$this->escapeHtml($label)}</label>
-                    {$this->buildFormInput($inputType, $config->value ?? '', $inputAttributes)}
+                    {$this->buildFormInput($inputType,$config->value ?? '',$inputAttributes)}
                 </div>
 
                 <div class="form-footer">
@@ -66,17 +79,17 @@ class GroupChatSettingController extends MainController
 
     protected function getHiddenIdField(?Config $config): string
     {
-        return $config ? '<input type="hidden" name="id" value="'.$this->escapeHtml($config->id).'">' : '';
+        return $config ? '<input type="hidden" name="id" value="' . $this->escapeHtml($config->id) . '">' : '';
     }
 
     protected function buildFormInput(string $type, $value, array $attributes = []): string
     {
         $attrs = '';
         foreach ($attributes as $name => $val) {
-            $attrs .= ' '.$name.'="'.$this->escapeHtml($val).'"';
+            $attrs .= ' ' . $name . '="' . $this->escapeHtml($val) . '"';
         }
 
-        return '<input type="'.$this->escapeHtml($type).'" name="value" value="'.$this->escapeHtml($value).'"'.$attrs.'>';
+        return '<input type="' . $this->escapeHtml($type) . '" name="value" value="' . $this->escapeHtml($value) . '"' . $attrs . '>';
     }
 
     protected function escapeHtml($value): string

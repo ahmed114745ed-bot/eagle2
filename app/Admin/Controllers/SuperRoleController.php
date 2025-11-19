@@ -31,19 +31,17 @@ class SuperRoleController extends MainController
             $q->where('type', $permissionType);
         })->get();
 
-        $selectedPermissions =  Role::where('slug', 'super-admin')->first()->permissions->pluck('id')->toArray() ?? [];
         $superAdminRole = Role::where('slug', 'super-admin')->first();
-        $areaPermissionType =  'area-manager';
+        $selectedPermissions =   $superAdminRole->permissions->pluck('id')->toArray() ?? [];
 
+        $areaPermissionType =  'area-manager';
         // load permissions based on selected type
         $areaPermissions = Permission::whereHas('permissionTypes', function ($q) use ($areaPermissionType) {
             $q->where('type', $areaPermissionType);
         })->get();
-
-
-
-        $areaSelectedPermissions =  Role::where('slug', 'area-manager')->first()->permissions->pluck('id')->toArray() ?? [];
         $areaManagerRole = Role::where('slug', 'area-manager')->first();
+        $areaSelectedPermissions =   $areaManagerRole->permissions->pluck('id')->toArray() ?? [];
+
         return parent::index($content
             ->header(__('Roles'))
             ->description('   ')
