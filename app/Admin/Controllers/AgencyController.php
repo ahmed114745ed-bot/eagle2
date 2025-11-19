@@ -521,7 +521,7 @@ class AgencyController extends MainController
             ->display(fn() => $this->is_frozen ? 1 : 0)
             ->switch(Common::getSwitchStates())->sortable();
 
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---
