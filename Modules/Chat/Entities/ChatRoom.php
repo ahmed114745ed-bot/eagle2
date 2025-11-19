@@ -33,13 +33,7 @@ class ChatRoom extends Model
     {
         return $this->hasMany(ChatMessage::class)->where('status', 'not Like', 'seen');
     }
-    public function getUnreadMessagesAttribute()
-    {
-        return $this->messages()
-            ->where('status', '!=', 'seen')
-            ->where('user_id', '!=', auth()->id())
-            ->count();
-    }
+  
 
     public function unreadMessagesFor($userId): HasMany
     {
@@ -47,6 +41,20 @@ class ChatRoom extends Model
             ->where('user_id', '<>', $userId)
             ->where('status', '<>', 'seen');
     }
+
+    public function getUnreadMessagesAttribute()
+    {
+        $userId = auth()->id();
+        \Log::info("Unread message for user ".auth()->id(), [
+            'userId' => $userId,
+          
+        ]);
+        return $this->messages()
+            ->where('user_id', '<>', $userId)
+            ->where('status', '<>', 'seen')
+            ->count();
+    }
+
 
     public function userOne()
     {
