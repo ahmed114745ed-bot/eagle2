@@ -25,12 +25,16 @@ class ChatRoomResource extends JsonResource
         $total_undread_message = ChatMessage::where('chat_room_id', $this->id)->where('user_id', 'not Like', $user->id)->where('status', 'not Like', 'seen')->count();
         $hasColor = Common::hasInPack($user2, 18, true);
         $filteredMessages = $this->messages->filter(function ($msg) use ($request) {
+
             if ($msg->user_id == $request->user()->id) {
-                return is_null($msg->user_1_deleted);
-            } else {
-                return true;
+                return is_null($msg->user_1_deleted); 
             }
+        
+            return is_null($msg->user_2_deleted); 
         });
+        
+        $lastMessage = $filteredMessages->sortByDesc('id')->first();
+        
 
         $latestMessage = $filteredMessages->sortByDesc('id')->first();
         return [
@@ -41,7 +45,7 @@ class ChatRoomResource extends JsonResource
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
-            'last_message'   => $latestMessage ? new ChatMessageV2Resource($latestMessage) : null,
+            'last_message'        =>    $lastMessage ? new ChatMessageV2Resource($lastMessage) : null,
 
             ];
     }
