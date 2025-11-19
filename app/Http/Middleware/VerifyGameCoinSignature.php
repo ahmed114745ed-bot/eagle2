@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\LogHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Log\LogManager;
@@ -11,16 +12,14 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-          $logger = app(LogManager::class);
-    
-            $logger->info('Middleware Request Details', [
-                'headers' => $request->headers->all(),
-                'body' => $request->all(),
-                'method' => $request->method(),
-                'url' => $request->fullUrl(),
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+         LogHelper::info('Middleware Request Details', [
+            'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
         // $orderId     = $request->input('orderId');
         // $gameId      = $request->input('gameId');
         // $roundId     = $request->input('roundId');
