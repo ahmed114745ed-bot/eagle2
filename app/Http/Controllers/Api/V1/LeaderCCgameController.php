@@ -84,6 +84,7 @@ class LeaderCCgameController extends Controller
         \Log::info(' updateGameCoin ', [
             'request' => $request->all(),
         ]);
+
         // 1️⃣ Validate input
         $validator = Validator::make($request->all(), [
             'orderId'     => 'required|string',
@@ -107,8 +108,16 @@ class LeaderCCgameController extends Controller
             ], 400);
         }
 
+        // 🔴 NEW: Check if order already exists
+        if (Cache::has("order_{$request->orderId}")) {
+            return response()->json([
+                'errorCode' => 10003,
+                'errorMsg'  => 'Order already exists'
+            ], 400);
+        }
+
         // 2️⃣ Secret key from .env
-        $key = config('games.leader_CC_game_key'); // put your real secret key in .env
+        $key = config('games.leader_CC_game_key');
 
         // 3️⃣ Prepare values for signature verification
         $orderId    = $request->orderId;
@@ -133,7 +142,10 @@ class LeaderCCgameController extends Controller
         //         'errorMsg'  => 'Verify signature fail',
         //     ], 400);
         // }
+
+        // 🟢 Move Cache::put here - after all validations pass
         Cache::put("order_$orderId", true, now()->addHour());
+        
         $user = User::find($uid);
         if (!$user) {
             \Log::warning('User not found', ['uid' => $uid]);
@@ -249,14 +261,11 @@ class LeaderCCgameController extends Controller
 
     public function validationOrderId($orderId)
     {
-        if (Cache::has("order_$orderId")) {
-            return [
-                'valid' => false,
-                'response' => response()->json([
+          if (Cache::has("order_$orderId")) {
+                return response()->json([
                     'errorCode' => 10003,
-                    'message' => 'Order already exists'
-                ]),
-            ];
-        }
+                    'errorMsg'  => 'Order already exists'
+                ], 400);
+            }
     }
 }
