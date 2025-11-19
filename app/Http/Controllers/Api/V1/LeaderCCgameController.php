@@ -77,6 +77,7 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
+        Log::info($request->all());
         $operations = [$request->all()];
     
         DB::beginTransaction();
