@@ -39,7 +39,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 200);
         }
         $key = config('games.leader_CC_game_key');
 
@@ -63,7 +63,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 400);
+            ], 200);
         }
 
         $userData = [
@@ -108,7 +108,7 @@ class LeaderCCgameController extends Controller
                     return response()->json([
                         'errorCode' => 4005,
                         'message'   => 'Invalid params'
-                    ], 400);
+                    ], 200);
                 }
     
                 $op = $validator->validated();
@@ -117,7 +117,7 @@ class LeaderCCgameController extends Controller
                     return response()->json([
                         'errorCode' => 10003,
                         'message'   => 'Order already exists'
-                    ], 400);
+                    ], 200);
                 }
     
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
@@ -140,7 +140,7 @@ class LeaderCCgameController extends Controller
                         return response()->json([
                             'errorCode' => 4005,
                             'message'   => 'User not found'
-                        ], 404);
+                        ], 200);
                     }
                 
                     $coin = (int)$op['coin'];
@@ -150,14 +150,14 @@ class LeaderCCgameController extends Controller
                         return response()->json([
                             'errorCode' => 10003,
                             'message'   => 'Order already exists'
-                        ], 400);
+                        ], 200);
                     }
                 
                     if ($type == 1 && $user->di < $coin) {
                         return response()->json([
                             'errorCode' => 4004,
                             'message'   => 'Insufficient game coins'
-                        ], 400);
+                        ], 200);
                     }
                 
                     $type == 1 ? $user->di -= $coin : $user->di += $coin;
@@ -225,7 +225,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 200);
         }
 
         // 2️⃣ Secret key from .env
@@ -256,7 +256,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 400);
+            ], 200);
         }
 
         // 7️⃣ Return success response
@@ -274,7 +274,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10003,
                 'errorMsg'  => 'Order already exists'
-            ], 400);
+            ], 200);
         }
         
         return response()->json([
