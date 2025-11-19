@@ -35,10 +35,10 @@ class ChatRoomResource extends JsonResource
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
             'last_message' => @new ChatMessageResource(
                 $this->messages
-                    ->filter(function ($msg) {
-                        return is_null($msg->user_1_deleted)
-                            || (!is_null($msg->user_1_deleted) && !is_null($msg->user_2_deleted));
-                    })
+                    // ->filter(function ($msg) {
+                    //     return is_null($msg->user_1_deleted)
+                    //         || (!is_null($msg->user_1_deleted) && !is_null($msg->user_2_deleted));
+                    // })
                     ->sortByDesc('id')
                     ->first()
             ),
