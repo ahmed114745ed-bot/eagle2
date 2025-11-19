@@ -1216,6 +1216,10 @@ html.ltr .dropdown-menu {
         width: auto;
         order: 2;
     }
+    .form-horizontal .form-group {
+    margin-right: -1500px;
+    margin-left: -15px;
+}
 
     .box-footer .pull-right {
         display: flex;
