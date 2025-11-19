@@ -39,7 +39,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 200);
         }
         $key = config('games.leader_CC_game_key');
 
@@ -63,7 +63,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 400);
+            ], 200);
         }
 
         $userData = [
@@ -104,7 +104,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 200);
         }
 
         // 2️⃣ Secret key from .env
@@ -141,14 +141,14 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 400);
+            ], 200);
         }
 
         if ($type == 1 && $user->di < $coin) {
             return response()->json([
                 'errorCode' => 4004,
                 'errorMsg'  => 'Insufficient game coins'
-            ], 400);
+            ], 200);
         }
         
         if ($type == 1) {
@@ -204,7 +204,7 @@ class LeaderCCgameController extends Controller
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters',
                 'errors'    => $validator->errors(),
-            ], 400);
+            ], 200);
         }
 
         // 2️⃣ Secret key from .env
@@ -235,7 +235,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'user not found',
-            ], 400);
+            ], 200);
         }
 
         // 7️⃣ Return success response
@@ -253,7 +253,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 10003,
                 'errorMsg'  => 'Order already exists'
-            ], 400);
+            ], 200);
         }
         
         return response()->json([

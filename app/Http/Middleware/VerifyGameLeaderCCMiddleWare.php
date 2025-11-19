@@ -28,7 +28,7 @@ class VerifyGameLeaderCCMiddleWare
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing or invalid parameters key',
 
-            ], 4005);
+            ], 200);
         }
         if ($request->has('orderId')) {
             $orderId = $request->orderId;
@@ -36,7 +36,7 @@ class VerifyGameLeaderCCMiddleWare
                 return response()->json([
                     'errorCode' => 10003,
                     'message'   => 'Order already exists'
-                ], 400);
+                ], 200);
                 
             }
         }
