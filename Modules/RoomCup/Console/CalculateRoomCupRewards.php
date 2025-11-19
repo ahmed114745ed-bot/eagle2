@@ -29,7 +29,7 @@ class CalculateRoomCupRewards extends Command
     protected $description = 'Calculate RoomCup rewards and distribute profits to the owner and admins if the target is achieved';
     protected string $type;
 
-    public function handle(): int
+   public function handle(): int
     {
         if (!$this->isModuleEnabled('RoomCup')) {
             $this->warn("⛔ RoomCup module is disabled in modules_statuses.json.");
@@ -45,11 +45,11 @@ class CalculateRoomCupRewards extends Command
         [$start, $end] = $this->getPeriodByType($type);
  
 
-        // $this->logStart($start, $end);
+        $this->logStart($start, $end);
 
-        // $this->processGiftsInPeriod($start, $end , );
+        $this->processGiftsInPeriod($start, $end , );
 
-        // $this->logEnd();
+        $this->logEnd();
 
         return EnumCommand::SUCCESS;
     }
