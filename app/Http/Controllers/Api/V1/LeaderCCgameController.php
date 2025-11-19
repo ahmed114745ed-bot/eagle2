@@ -82,16 +82,14 @@ class LeaderCCgameController extends Controller
     public function updateGameCoin(Request $request)
     {
         \Log::info('updateGameCoin', ['request' => $request->all()]);
-
-        $operations =  [$request->all()];
-
+    
+        $operations = [$request->all()];
+    
         DB::beginTransaction();
-
+    
         try {
-            $results = [];
-
             foreach ($operations as $op) {
-
+    
                 $validator = Validator::make($op, [
                     'orderId'     => 'required|string',
                     'gameId'      => 'required|string',
@@ -105,80 +103,65 @@ class LeaderCCgameController extends Controller
                     'roomid'      => 'nullable|string',
                     'sign'        => 'required|string',
                 ]);
-
+    
                 if ($validator->fails()) {
-                    $results[] = [
+                    return response()->json([
                         'errorCode' => 4005,
-                        'errorMsg'  => 'Invalid params',
-                        'errors'    => $validator->errors(),
-                    ];
-                    continue;
+                        'message'   => 'Invalid params'
+                    ], 400);
                 }
-
+    
                 $op = $validator->validated();
-
+    
                 if (Cache::has("order_{$op['orderId']}")) {
-                    $results[] = [
-                        'uid' => $op['uid'],
-                        'orderId' => $op['orderId'],
+                    return response()->json([
                         'errorCode' => 10003,
-                        'errorMsg' => 'Repeat order',
-                    ];
-                    continue;
+                        'message'   => 'Order already exists'
+                    ], 400);
                 }
-
+    
                 Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
-
+    
                 $lock = Cache::lock("user_lock_{$op['uid']}", 5);
-
+    
                 if (!$lock->get()) {
-                    $results[] = [
-                        'uid' => $op['uid'],
+                    return response()->json([
                         'errorCode' => 5001,
-                        'errorMsg' => 'User is currently busy, try later',
-                    ];
-                    continue;
+                        'message'   => 'User is currently busy, try later'
+                    ], 400);
                 }
-
+    
                 try {
                     $user = User::where('id', $op['uid'])->lockForUpdate()->first();
-
+    
                     if (!$user) {
-                        $results[] = [
-                            'uid' => $op['uid'],
+                        return response()->json([
                             'errorCode' => 4005,
-                            'errorMsg' => 'User not found',
-                        ];
-                        continue;
+                            'message'   => 'User not found'
+                        ], 404);
                     }
-
+    
                     $coin = (int)$op['coin'];
                     $type = (int)$op['type'];
-
+    
                     if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
-                        $results[] = [
-                            'uid' => $user->id,
-                            'orderId' => $op['orderId'],
+                        return response()->json([
                             'errorCode' => 10003,
-                            'errorMsg' => 'Repeat order (DB)',
-                        ];
-                        continue;
+                            'message'   => 'Order already exists'
+                        ], 400);
                     }
-
+    
                     if ($type == 1 && $user->di < $coin) {
-                        $results[] = [
-                            'uid' => $user->id,
-                            'orderId' => $op['orderId'],
+                        return response()->json([
                             'errorCode' => 4004,
-                            'errorMsg' => 'Insufficient game coins',
-                        ];
-                        continue;
+                            'message'   => 'Insufficient game coins'
+                        ], 400);
                     }
-
+    
                     $type == 1 ? $user->di -= $coin : $user->di += $coin;
-                    $logType =  $type == 1 ? 0 : 1 ;
+                    $logType = $type == 1 ? 0 : 1;
                     $user->save();
-
+    
                     DB::table('coin_game_users')->insert([
                         'user_id' => $user->id,
                         'coins' => abs($coin),
@@ -190,37 +173,30 @@ class LeaderCCgameController extends Controller
                         'created_at' => now(),
                         'updated_at' => now()
                     ]);
-
-                    $results[] = [
-                        'uid' => $user->id,
-                        'orderId' => $op['orderId'],
-                        'errorCode' => 0,
-                        'coin' => $user->di,
-                    ];
-
+    
                 } finally {
                     $lock->release();
                 }
             }
-
+    
             DB::commit();
-
+    
             return response()->json([
                 'errorCode' => 0,
-                'data' => $results
+                'message'   => 'SUCCESS'
             ]);
-
+    
         } catch (\Exception $e) {
-
+    
             DB::rollBack();
-
+    
             return response()->json([
                 'errorCode' => 500,
-                'errorMsg' => 'Server error',
-                'exception' => $e->getMessage(),
+                'message'   => 'Server error: ' . $e->getMessage()
             ], 500);
         }
     }
+    
 
 
     public function makeUpOrders(Request $request)
