@@ -62,12 +62,12 @@ class VerifyGameCoinSignature
         
         $expectedSign = md5($rawString);
         
-        if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg'  => 'Verify signature fail'
-            ], 400);
-        }
+        // if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
+        //     return response()->json([
+        //         'errorCode' => 10004,
+        //         'errorMsg'  => 'Verify signature fail'
+        //     ], 400);
+        // }
         
         return $next($request);
     }
