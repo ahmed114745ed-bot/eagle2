@@ -536,17 +536,17 @@ class UserRepository extends AbstractRepository
         return $this->model->whereNotNull('game_id')->with(['profile:id,user_id,avatar'])->where('online', 1)->with('nowGame')->paginate(10);
     }
 
-    public function friends($Mixes): LengthAwarePaginator
+    public function friends($tasks): LengthAwarePaginator
     {
         $user = $this->model->where('id', auth()->id())->firstOrFail();
 
         return $user->friends()
             ->where('online', 1)
-            ->whereHas('ownerRoom', function ($query) use ($Mixes){
+            ->whereHas('ownerRoom', function ($query) use ($tasks){
                 $query->where('type', 'live')
                     ->where('is_live', 1)
-                    ->when(!empty($Mixes), function ($q) use ($Mixes) {
-                        $q->whereNotIn('id', $Mixes);
+                    ->when(!empty($tasks), function ($q) use ($tasks) {
+                        $q->whereNotIn('id', $tasks);
                     });
             })
             ->with([

@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use Modules\TaskStream\Http\Controllers\PkSessionController;
 use Modules\TaskStream\Http\Controllers\TaskStreamController;
 
 /*
@@ -31,4 +31,11 @@ Route::group([
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization' ,'update.last.seen']
 ], function (){
     Route::get('online', [TaskStreamController::class, 'liveFriends']);
+});
+
+Route::group([
+    'prefix' => 'v1/pk',
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization' ,'update.last.seen']
+], function (){
+    Route::get('start', [PkSessionController::class, 'start']);
 });

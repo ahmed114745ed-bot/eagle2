@@ -33,7 +33,5 @@
     "AreaManager": true,
     "Form": true,
     "SuperAdmin": true,
-    "MixStream4": true,
-    "MixStream": true,
     "TaskStream": true
 }

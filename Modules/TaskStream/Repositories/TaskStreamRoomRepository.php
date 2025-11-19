@@ -17,6 +17,11 @@ class TaskStreamRoomRepository extends AbstractRepository
         return $this->model->where('task_stream_id', '<>', $taskStreamId)->where('room_id', $liveRoomId)->exists();
     }
 
+    public function getRoomTask($liveRoomId)
+    {
+        return $this->model->where('room_id', $liveRoomId)->first();
+    }
+
     public function getArrayTasks()
     {
         return TaskStreamRoom::pluck('room_id')->toArray();

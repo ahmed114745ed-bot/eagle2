@@ -2,26 +2,13 @@
 
 namespace Modules\TaskStream\Services;
 
-use App\Helpers\Common;
 use App\Models\User;
-use App\Repositories\User\UserRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
-use Modules\TaskStream\Repositories\TaskStreamRepository;
-use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 
-class TaskStreamService
+
+class TaskStreamService extends TaskStreamValidationService
 {
-    public function __construct(
-        private readonly TaskStreamRepository $taskStreamRepository,
-        private readonly TaskStreamRoomRepository $taskStreamRoomRepository,
-        private readonly TaskStreamInvitationRepository $taskStreamInvitationRepository,
-        private readonly UserRepository $userRepository,
-    )
-    {
-    }
-
     public function index(): LengthAwarePaginator
     {
         return $this->taskStreamRepository->get();
@@ -46,6 +33,8 @@ class TaskStreamService
      */
     public function getIntoTask($taskStream)
     {
+        $this->validateTaskLiveRoom($taskStream->room_id);
+
         $liveRoom = $this->validateAuthLiveRoom();
 
         $this->validateLimit($taskStream);
@@ -53,6 +42,10 @@ class TaskStreamService
         $this->validateRoomInAnotherTask($taskStream->id, $liveRoom->id);
 
         $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 1);
+
+        if ($taskStream->rooms()->count() === 0) {
+            $this->taskStreamRepository->createTaskRoom($taskStream, $taskStream->room_id);
+        }
 
         $this->taskStreamRepository->createTaskRoom($taskStream, $liveRoom->id);
 
@@ -82,36 +75,49 @@ class TaskStreamService
 
         $taskStreamRoom = $this->validateRoomNotInTask($taskStream, $liveRoom->id);
 
-        $taskStreamRoom->delete();
+        if ($taskStream->rooms()->count() === 2) {
+            $roomIds = $taskStream->rooms()->pluck('room_id')->toArray();
 
-        $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 0);
+            $this->taskStreamRepository->updateAllRemotes($roomIds);
 
-//        if ($taskStream->rooms()->count() === 0) {
-//            $taskStream->delete();
-//        }
+            $taskStream->rooms()->delete();
+        } else {
+            $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 0);
+            $taskStreamRoom->delete();
+        }
 
         //TODO 3.If host is in an active PK → trigger PK leave logic (see §3.3).
         return $taskStream->load('rooms');
     }
 
     /**
-     * Host invites another user to join their task stream.
-     *
      * @throws Exception
      */
     public function sendInvitation(array $data): true
     {
         $authUser = auth()->user();
         $liveRoom = $this->validateAuthLiveRoom();
+        $inviteeUserId = $data['invitee_user_id'];
 
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
-        $inviteeUserId = $data['invitee_user_id'];
 
         if ($inviteeUserId == $authUser->id) {
             throw new Exception(__('You cannot invite yourself.'));
         }
 
-        $this->validateRoomNotInTask($taskStream, $liveRoom->id);
+        if ($taskStream->room_id != $liveRoom->id) {
+            $this->validateRoomNotInTask($taskStream, $liveRoom->id);
+        }
+
+        if ($taskStream->room_id == $liveRoom->id) {
+            $roomsCount = $taskStream->rooms()->count();
+
+            $ownerRoomExists = $this->taskStreamRepository->getExistenceTask($taskStream, $taskStream->room_id);
+
+            if (! $ownerRoomExists && $roomsCount > 0) {
+                throw new Exception(__('You cannot send an invitation while your task is empty. Please join your task first.'));
+            }
+        }
 
         $invitee = User::findOrFail($inviteeUserId);
 
@@ -139,8 +145,6 @@ class TaskStreamService
     }
 
     /**
-     * Invited user responds to an invitation (accept or reject)
-     *
      * @throws Exception
      */
     public function respondInvitation(array $data)
@@ -156,9 +160,11 @@ class TaskStreamService
         }
 
         if ($status === 'accept') {
+            $result = $this->getIntoTask($taskStream);
+
             $invitation->update(['status' => 'accepted']);
 
-            return $this->getIntoTask($taskStream);
+            return $result;
         }
 
         $invitation->update(['status' => 'rejected']);
@@ -171,83 +177,5 @@ class TaskStreamService
         $tasks = $this->taskStreamRoomRepository->getArrayTasks();
 
         return $this->userRepository->friends($tasks);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function validateAuthLiveRoom($checkUser = null)
-    {
-        $user = $checkUser ?: auth()->user();
-        $liveRoom = $user->ownerRoom()->where('type', 'live')->where('is_live', 1)->first();
-
-        if (! $liveRoom){
-            throw new Exception(__('You dont have live room or not live'));
-        }
-
-        return $liveRoom;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function validateRoomNotInTask($taskStream, $liveRoomId)
-    {
-        $taskStreamRoom = $this->taskStreamRepository->getExistenceTask($taskStream, $liveRoomId);
-
-        if (!$taskStreamRoom) {
-            throw new Exception(__('Your room is not part of this task stream.'));
-        }
-
-        return $taskStreamRoom;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function validateRoomInAnotherTask($taskStreamId, $liveRoomId): void
-    {
-        $alreadyInTask = $this->taskStreamRoomRepository->checkExistenceTask($taskStreamId, $liveRoomId);
-
-        if ($alreadyInTask) {
-            throw new Exception(__('This room is already part of another task stream.'));
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function validateLimit($taskStream): void
-    {
-        $limit = Common::getConfig('max_task_stream') ?? 4;
-
-        if ($taskStream->rooms()->count() >= $limit) {
-            throw new Exception(__('This task stream has reached the maximum number of rooms allowed.'));
-        }
-    }
-
-    public function remoteUpdate($taskStreamRoomId, $liveRoomId, $status): void
-    {
-        if ($taskStreamRoomId != $liveRoomId) {
-            $myTask = $this->taskStreamRepository->findByRoomId($liveRoomId);
-
-            if ($myTask) {
-                $myTask->update(['is_remote' => $status]);
-            }
-        }
-    }
-
-    public function sendTaskToZego(string $message, $taskStreamId, $liveRoom): void
-    {
-        $data = [
-            "messageContent" => [
-                "message" => $message,
-                'task_stream' => $taskStreamId,
-                'room_id' => $liveRoom->id
-            ]
-        ];
-        $json = json_encode($data);
-
-        Common::sendToZego('SendCustomCommand', $liveRoom->id, $liveRoom->uid, $json);
     }
 }

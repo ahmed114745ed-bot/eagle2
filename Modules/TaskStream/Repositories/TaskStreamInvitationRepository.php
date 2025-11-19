@@ -3,6 +3,7 @@
 namespace Modules\TaskStream\Repositories;
 
 use App\Tik\Repositories\AbstractRepository;
+use Carbon\Carbon;
 use Modules\TaskStream\Entities\TaskStreamInvitation;
 
 class TaskStreamInvitationRepository extends AbstractRepository
@@ -25,10 +26,14 @@ class TaskStreamInvitationRepository extends AbstractRepository
 
     public function findPendingInvitation($taskStreamId, $inviteeUserId)
     {
+        $tz = getTimezone();
+        $subMinute = Carbon::now($tz)->subMinute();
+
         return $this->model
             ->where('task_stream_id', $taskStreamId)
             ->where('invitee_user_id', $inviteeUserId)
             ->where('status', 'pending')
-            ->first();
+            ->where('created_at', '>=', $subMinute)
+            ->latest()->first();
     }
 }

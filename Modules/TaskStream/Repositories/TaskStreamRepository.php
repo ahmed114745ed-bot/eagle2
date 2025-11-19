@@ -4,6 +4,9 @@ namespace Modules\TaskStream\Repositories;
 
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\TaskStream\Entities\TaskStream;
 
 class TaskStreamRepository extends AbstractRepository
@@ -15,18 +18,17 @@ class TaskStreamRepository extends AbstractRepository
 
     public function get(): LengthAwarePaginator
     {
-        return $this->model->with(['rooms'])->paginate(request('per_page', 10));
+        return $this->model->where('is_remote', 0)->with(['rooms'])->paginate(request('per_page', 10));
+    }
+
+    public function findOrFail(int $id,array $relations = []): Model|Collection|Builder|array|null
+    {
+        return $this->model->where('is_remote', 0)->findOrFail($id);
     }
 
     public function createTask($liveRoomId)
     {
-        $taskStream = $this->model->firstOrCreate(['room_id' => $liveRoomId]);
-
-        $taskStream->rooms()->firstOrCreate([
-            'room_id' => $taskStream->room_id,
-        ]);
-
-        return $taskStream;
+        return $this->model->firstOrCreate(['room_id' => $liveRoomId]);
     }
 
     public function createTaskRoom($taskStream, $liveRoomId)
@@ -46,5 +48,10 @@ class TaskStreamRepository extends AbstractRepository
     public function findByRoomId($roomId)
     {
         return $this->model->where('room_id', $roomId)->first();
+    }
+
+    public function updateAllRemotes(array $roomIds)
+    {
+        return $this->model->whereIn('room_id', $roomIds)->update(['is_remote' => 0]);
     }
 }
