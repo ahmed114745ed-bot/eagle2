@@ -135,9 +135,7 @@ class LuckyGiftService
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
-            // \Log::info('⚡ isWinner check result', [
-            //     'isWinner'           => $isWinner,
-            // ]);
+           
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
@@ -163,12 +161,7 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
-                // \Log::info('⚡ Popular check result', [
-                //     'isPopular'           => $isPopular,
-                //     'cashback_percentage' => $cashback_percentage,
-                // ]);
-
-
+        
                 if ($isPopular) {
 
                     //  \Log::info('🚀 Sending Popular To Zego...', [

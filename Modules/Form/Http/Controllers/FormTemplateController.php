@@ -148,8 +148,6 @@ class FormTemplateController extends Controller
             admin_error(__('Error'), __('Form Template not found.'));
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error('Form Template Edit Error: ' . $e->getMessage(), ['id' => $id]);
-
             admin_error(__('Unexpected Error'), __('Something went wrong while loading the form template.'));
             return redirect()->back();
         }

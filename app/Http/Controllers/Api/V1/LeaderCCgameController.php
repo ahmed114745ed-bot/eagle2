@@ -20,10 +20,6 @@ class LeaderCCgameController extends Controller
 
     public function userInformation(Request $request)
     {
-
-        \Log::info(' userInformation ', [
-            'request' => $request->all(),
-        ]);
         $validator = Validator::make($request->all(), [
             'gameId' => 'required|string',
             'uid'    => 'required|string',
@@ -81,8 +77,6 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
-        \Log::info('updateGameCoin', ['request' => $request->all()]);
-    
         $operations = [$request->all()];
     
         DB::beginTransaction();
