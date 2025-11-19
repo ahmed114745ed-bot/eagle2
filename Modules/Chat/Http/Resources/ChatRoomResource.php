@@ -34,13 +34,16 @@ class ChatRoomResource extends JsonResource
             'unread_message'      => $total_undread_message,
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
             'last_message' => @new ChatMessageResource(
-                $this->messages
-                    ->filter(function ($msg) {
-                        return is_null($msg->user_1_deleted)
-                            || (!is_null($msg->user_1_deleted) && !is_null($msg->user_2_deleted));
-                    })
-                    ->sortByDesc('id')
-                    ->first()
+                resource: $this->messages
+                ->filter(function ($msg) use ($request) {
+                    if ($msg->user_id == $request->user()->id) {
+                        return is_null($msg->user_1_deleted);
+                    } else {
+                        return is_null($msg->user_2_deleted);
+                    }
+                })
+                ->sortByDesc('id')
+                ->first()
             ),
             ];
     }
