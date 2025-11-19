@@ -547,14 +547,21 @@ class UserController extends Controller
         $cacheKey = "user_response_{$id}";
 
         $response =
-        //  \Cache::remember(
-        //     $cacheKey,
-        //     now()->addMinutes(30),
-        //     function () use ($id) {
+         \Cache::remember(
+            $cacheKey,
+            now()->addMinutes(30),
+            function () use ($id) {
                 $user = $this->userService->showUser($id);
                 return (new UserResource($user))->toArray(request());
-        //     }
-        // );
+            }
+        );
+
+        $chatRoom = $response['chatRoomsAsUser'] ?? null;
+        if ($chatRoom) {
+            $response['unread_messages_count'] = $chatRoom->unreadMessagesFor($id)->count();
+        } else {
+            $response['unread_messages_count'] = 0;
+        }
 
         return Common::apiResponse(true, '', $response, 200);
     }
