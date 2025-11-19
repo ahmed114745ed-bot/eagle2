@@ -185,7 +185,7 @@ class EncorUsersController extends AdminController
         $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new \App\Models\Admin());
-        $countryID = empty((array)session('filter_country_id'));
+     //   $countryID = empty((array)session('filter_country_id'));
 
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
