@@ -196,7 +196,7 @@ class LuckyGiftService
             $message = null;
             $total_user_win += ($totalGiftPrice * $cashback_percentage);
             $total_count_win += 1;
-            // $cashback_percentage = 0;
+            $cashback_percentage = 0;
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
