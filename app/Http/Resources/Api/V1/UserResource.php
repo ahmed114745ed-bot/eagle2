@@ -90,7 +90,10 @@ class UserResource extends JsonResource
              'chat_id' => $chatRoom->id ?? null,
              'unread_messages_count' => $chatRoom->unread_messages ?? 0,
          ];
-
+         \Log::info("Unread message for user ".auth()->id(), [
+            '$chatRoom->unread_messages' => $chatRoom->unread_messages,
+          
+        ]);
          if (in_array($this->is_mic, ['0', '1'])) {
              $data['is_mic'] = $this->is_mic;
          }
