@@ -455,6 +455,8 @@ class ChatRoomService
 
     public function deleteChatRoom($user, $userId2)
     {
+    
+
         $checkRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
             $query->where(function ($q) use ($user, $userId2) {
                 $q->where('user_id', $user->id)
@@ -477,11 +479,20 @@ class ChatRoomService
             return [$item->file, $item->frame];
         })->toArray();
 
+        Log::info("checkRoom  info", [
+            'user' => $user,
+            'userId2'    => $userId2,
+            'checkRoom'    => $checkRoom,
+        ]);
         if ($checkRoom->user_id == $user->id){
             $checkRoom->update(['user_1_deleted' => now()]);
         } else {
             $checkRoom->update(['user_2_deleted' => now()]);
         }
+        Log::info("checkRoom  ", [
+         
+            'checkRoom'    => $checkRoom,
+        ]);
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
             try {
