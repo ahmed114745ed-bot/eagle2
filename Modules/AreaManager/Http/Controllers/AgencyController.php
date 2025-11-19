@@ -333,8 +333,8 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen'])
-            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries'])
+            ->select(['id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen','created_by'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries','creator'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -448,7 +448,9 @@ class AgencyController extends MainController
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
         });
-
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
@@ -576,7 +578,7 @@ class AgencyController extends MainController
 
         $form->row(function ($row) {
             $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd-by-countries?area_manager_id=' . auth()->id(), 'id', 'name');
-            $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users-by-countries?area_manager_id=' . auth()->id(), 'id', 'name')->rules('required');
             $row->width(12)->hidden('agency_manger_id', __('app manger id'));
             $row->width(12)->text('name', __('agency name'))->rules('required');
             $row->width(12)->hidden('status', __('status'))->default(1);

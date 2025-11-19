@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Modules\AreaManager\Entities\Region;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\Milestones\Helpers\MilestoneHelper;
@@ -39,6 +41,8 @@ class DeleteAreaManagerAction extends RowAction
             MilestoneHelper::removeReward($user, 'area-manager');
         }
         $default = AreaManager::where('default', 1)->first();
+        $this->transferCountriesToDefaultManager($model,$default);
+
         if ($default) SuperAdmin::where('parent_id', $model->id)->update(['parent_id' => $default->id]);
         $subAppId = SubAreaManager::where('parent_id', $model->id)->pluck('app_id')->toArray();
         if (!empty($subAppId)) {
@@ -51,6 +55,34 @@ class DeleteAreaManagerAction extends RowAction
         return $this->response()->success(__('dashboard.successful'))->refresh();
     }
 
+    protected function transferCountriesToDefaultManager(AreaManager $manager,AreaManager $defaultManager): void
+    {
+        if (!$defaultManager) {
+            return; 
+        }
+        $defaultRegion = Region::firstOrCreate(
+            ['manager_id' => $defaultManager->id],
+            ['name' => 'Default Region for Default Manager']
+        );
+        $region = Region::where('manager_id', $manager->id)->first();
+        if (!$region) {
+            return;
+        }
+        $countryIds = RegionCountry::where('region_id', $region->id)
+            ->pluck('country_id')
+            ->toArray();
+
+        if (!empty($countryIds)) {
+            RegionCountry::where('region_id', $region->id)->delete();
+
+            foreach ($countryIds as $countryId) {
+                RegionCountry::firstOrCreate([
+                    'region_id' => $defaultRegion->id,
+                    'country_id' => $countryId,
+                ]);
+            }
+        }
+    }
 
     public function dialog()
     {

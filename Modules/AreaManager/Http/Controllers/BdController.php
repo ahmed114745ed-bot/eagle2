@@ -99,7 +99,7 @@ class BdController extends MainController
         //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -204,7 +204,9 @@ class BdController extends MainController
                 $col->switch(Common::getSwitchStates());
             }
         }
-
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
@@ -271,7 +273,9 @@ class BdController extends MainController
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $countries = Country::where('area_manager_id', $authId)->get();
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+            $countries = $authAdmin->countriesQuery()
+            ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }

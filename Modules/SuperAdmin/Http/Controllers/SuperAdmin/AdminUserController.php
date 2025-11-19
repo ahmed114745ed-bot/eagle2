@@ -46,6 +46,36 @@ class AdminUserController extends EncorUsersController
                 $actions->add(new DeleteSubSuperAdmin());
         });
 
+        $grid->tools(function ($tools) {
+                $logoutUrl = route('admin.superadmin.logout');
+                $loginText = __('login');
+                $areaManagerUrl = url('/superadmin/login');
+
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>
+                    </button>
+
+                </div>
+                     <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
+                HTML;
+
+                $tools->append($customButtonHTML);
+            });
+
         return $grid;
 
     }

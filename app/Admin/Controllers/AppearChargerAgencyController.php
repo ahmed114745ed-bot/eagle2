@@ -220,12 +220,12 @@ class AppearChargerAgencyController extends MainController
      */
     protected function grid()
     {
+       
         $grid = new Grid(new ShippingAgency());
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile', 'country')
+        $grid->model()->with(['owner.profile', 'creator','country'])
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
@@ -342,7 +342,9 @@ class AppearChargerAgencyController extends MainController
             })
             ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
-
+        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {

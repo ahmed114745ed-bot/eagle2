@@ -17,8 +17,9 @@ use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 
 class ChargeController extends MainController
@@ -38,6 +39,8 @@ class ChargeController extends MainController
      */
     public function index(Content $content): Content
     {
+
+ 
         $user = Auth::user();
         $authUser = auth()->user();
 
@@ -63,28 +66,49 @@ class ChargeController extends MainController
         $totalSpent   = $totals->total_spent;
 
         $finalSalary = $user->di;
-        return $content
+        $content = $content
             ->header(trans('Charges'))
-            ->description(trans('Charges'))
+            ->description(trans('Charges'));
 
-            ->row(function ($row) use ($finalSalary) {
-                $row->column(12, view('admin.grid.area_manager.wallet', ['finalSalary' => $finalSalary]));
-            })
-            ->row(function (Row $row) use ($totalCharges, $totalSpent) {
-                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges, 2) . ' 💰'));
-                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent, 2)));
-            })
-            ->row(function ($row) {
-                $row->column(12, $this->grid());
+        
+            $content->row(function ($row) use ($finalSalary) {
+                $row->column(12, view('admin.grid.area_manager.wallet', [
+                    'finalSalary' => $finalSalary
+                ]));
             });
+
+            $content->row(function (Row $row) use ($totalCharges, $totalSpent) {
+                $row->column(6, new InfoBox(
+                    __('total charges'),
+                    'money',
+                    'green',
+                    '',
+                    truncateAndTrim($totalCharges, 2) . ' 💰'
+                ));
+
+                $row->column(6, new InfoBox(
+                    __('total spent'),
+                    'money',
+                    'red',
+                    'charges',
+                    truncateAndTrim($totalSpent, 2)
+                ));
+            });
+        
+
+        $content->row(function ($row) {
+            $row->column(12, $this->grid());
+        });
+
+        return $content;
     }
     protected function grid()
     {
         $grid = new Grid(new Charge());
         $authUser = auth()->user();
-        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
         $grid->model()
-            ->with(['receiverUser', 'receiveragency'])
+            ->with(['receiverUser', 'receiveragency', 'subAreaManager', 'areaManager'])
             ->where(function ($query) use ($authUser, $authId) {
                 $query->where('charger_id', $authUser->id)
                     ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
@@ -95,7 +119,7 @@ class ChargeController extends MainController
             ])
             ->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) use ($authId, $authUser) {
             $filter->expand();
 
             $filter->where(function ($query) {
@@ -104,6 +128,19 @@ class ChargeController extends MainController
                         ->where('user_id', $this->input);
                 }
             }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
+            if ($authUser->type == 'area-manager') {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->where('charger_id', $this->input);
+                    }
+                }, __('created by'))->select(
+                    // Combine SubAreaManagers and AreaManager themselves
+                    SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')
+                        ->merge(AreaManager::where('id', $authId)->pluck('name', 'id'))
+                        ->toArray()
+                );
+            }
+
 
             $filter->where(function ($query) {
                 if ($this->input) {

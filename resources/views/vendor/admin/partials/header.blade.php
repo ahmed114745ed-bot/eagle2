@@ -191,6 +191,11 @@
             padding: 1rem !important;
         }
 
+        #preview-buttons-wrapper {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 576px) {
             .modal-no {
@@ -225,10 +230,30 @@
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             $country   = \App\Models\Country::find(Admin::user()->country_id);
 
-            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
+//            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
+
+            $countries = collect();
+            if ($selectAreaManagerId) {
+                $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
+                if ($areaManager && method_exists($areaManager, 'countries')) {
+                    $countries = $areaManager->countriesQuery()
+                        ->select(['id', 'name', 'flag'])
+                        ->get();
+                }
+            } else {
+                $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+            }
 
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $areaManagerCountries = \App\Models\Country::where('area_manager_id', $authId)->select(['id', 'name', 'flag'])->get();
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+
+            if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+                $areaManagerCountries = $authAdmin->countriesQuery()
+                    ->select(['id', 'name', 'flag'])
+                    ->get();
+            } else {
+                $areaManagerCountries = collect();
+            }
 
             $selectedCountryId = session('filter_country_id') ?? request('filter_country_id') ?? Admin::user()->country_id;
             $selectedCountry = $countries->firstWhere('id', (int) $selectedCountryId);
@@ -355,34 +380,35 @@
                     </ul>
                 </li>
 
-                @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
-                    @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
-                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
-                            </button>
-                        </li>
+                <span id="preview-buttons-wrapper">
+                    @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="preview-superadmin-btn" class="btn btn-default preview-superadmin-btn">
+                                    <i class="fa fa-eye"></i> {{ __('go to the country') }}
+                                </button>
+                            </li>
+                        @endif
+                    @elseif(!session('preview_area_manager')  && session('area_manager_id') )
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
+                                    <i class="fa fa-eye"></i> {{ __('go to the preview') }}
+                                </button>
+                            </li>
+                        @endif
                     @endif
-                @elseif(!session('preview_area_manager')  && session('area_manager_id') )
-                @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="preview-area-manger-btn" class="btn btn-default preview-area-manger-btn">
-                                <i class="fa fa-eye"></i> {{ __('go to the preview') }}
-                            </button>
-                        </li>
-                    @endif
-                @endif
 
-                @if(session('preview_superadmin') || session('preview_area_manager') )
-                    @if (request()->is('admin*'))
-                        <li style="padding: 10px;">
-                            <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
-                            <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
-                            </button>
-                        </li>
+                    @if(session('preview_superadmin') || session('preview_area_manager') )
+                        @if (request()->is('admin*'))
+                            <li style="padding: 10px;">
+                                <button id="exit-preview-btn" class="btn btn-danger exit-preview-btn"">
+                                <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
+                                </button>
+                            </li>
+                        @endif
                     @endif
-                @endif
-
+                </span>
                 <!-- Control Sidebar Toggle Button -->
                 {{-- <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li> --}}
             </ul>
@@ -438,13 +464,14 @@
                 url.searchParams.delete('area_manager_id');
             }
 
-            if ($.pjax) {
-                setTimeout(() => {
-                    $.pjax({url: url.toString(), container: '#pjax-container'});
-                }, 1);
-            } else {
+            // if ($.pjax) {
+          
+            //     setTimeout(() => {
+            //         $.pjax({url: url.toString(), container: '#pjax-container'});
+            //     }, 1);
+            // } else {
                 window.location.href = url.toString();
-            }
+            // }
         });
 
         if ($countrySelect.length) {
@@ -702,3 +729,108 @@
     };
 </script>
 
+<script>
+    $(document).ready(function () {
+        const $countrySelect = $('#country-select');
+        const $AreaManagerSelect = $('#area-Manager-select');
+        const isPreviewSuperadmin = @json(session('preview_superadmin'));
+        const isPreviewAreaManager = @json(session('preview_area_manager'));
+
+        // Function to format country options with flags
+        function formatCountry(country) {
+            if (!country.id) {
+                return country.text;
+            }
+            const flag = $(country.element).data('flag');
+            const name = country.text;
+            if (flag) {
+                return `
+                <span>
+                    <img src="${flag}" style="width:20px; height:14px; margin-right:5px; vertical-align:middle;">
+                    ${name}
+                </span>
+            `;
+            }
+            return name;
+        }
+
+        // Function to initialize country select
+        function initCountrySelect() {
+            const $select = $('#country-select');
+            if ($select.length) {
+                // Destroy existing Select2 if it exists
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('destroy');
+                }
+
+                // Initialize Select2
+                $select.select2({
+                    placeholder: "{{ __('Select Country') }}",
+                    allowClear: true,
+                    templateResult: formatCountry,
+                    templateSelection: formatCountry,
+                    escapeMarkup: function (markup) { return markup; }
+                });
+
+                // Remove any existing change handlers to prevent duplicates
+                $select.off('change');
+
+                // Add change handler
+                $select.on('change', function () {
+                    const $this = $(this);
+                    if (!$this.val()) {
+                        setTimeout(() => $this.select2('close'), 0);
+
+                        const url = new URL(window.location.href);
+
+                        @if(request()->is('admin*'))
+                        url.searchParams.set('clear_country', 1);
+                        url.searchParams.delete('filter_country_id');
+                        @else
+                        url.searchParams.set('clear_area_manager_country', 1);
+                        url.searchParams.delete('area_manager_country_id');
+                        @endif
+
+                        if ($.pjax) {
+                            setTimeout(() => {
+                                $.pjax({ url: url.toString(), container: '#pjax-container' });
+                            }, 1);
+                        } else {
+                            window.location.href = url.toString();
+                        }
+                        return;
+                    }
+
+                    const countryId = $(this).val();
+                    const url = new URL(window.location.href);
+
+                    @if(request()->is('admin*'))
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('filter_country_id', countryId);
+                        url.searchParams.delete('clear_country');
+                    } else {
+                        url.searchParams.set('clear_country', 1);
+                        url.searchParams.delete('filter_country_id');
+                    }
+                    @else
+                    if (countryId && countryId !== 'null') {
+                        url.searchParams.set('area_manager_country_id', countryId);
+                        url.searchParams.delete('clear_area_manager_country');
+                    } else {
+                        url.searchParams.set('clear_area_manager_country', 1);
+                        url.searchParams.delete('area_manager_country_id');
+                    }
+                    @endif
+
+                    if ($.pjax) {
+                        setTimeout(() => {
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
+                        }, 1);
+                    } else {
+                        window.location.href = url.toString();
+                    }
+                });
+            }
+        }
+    })
+</script>

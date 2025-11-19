@@ -13,10 +13,11 @@ use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Modules\AreaManager\Entities\Region;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
 
 class OfficialMessageJob implements ShouldQueue
 {
@@ -78,21 +79,20 @@ class OfficialMessageJob implements ShouldQueue
         $shippingAgencyUserId = [];
         $FamilyUsersId = [];
         $BdUsersId = [];
-        $admin = null;
+        $region = null;
         $adminCountries = [];
         switch ($this->model->admin_role) {
             case 'area_manager':
-                $admin = AreaManager::with('countries')->find($this->model->admin_role_id);
-                $adminCountries = $admin ? $admin->countries->pluck('id')->toArray() : [];
+                $region = Region::with('regionCountries')->find($this->model->admin_role_id);
+                $adminCountries = $region ? $region->regionCountries->pluck('country_id')->toArray() : [];
                 break;
 
             case 'country_manager':
-                $admin = SuperAdmin::find($this->model->admin_role_id);
-                $adminCountries = $admin ? [$admin->country_id] : [];
+
+                $adminCountries =  [$this->model->admin_role_id];
                 break;
 
             default:
-                $admin = null;
                 $adminCountries = [];
                 break;
         }
@@ -113,7 +113,8 @@ class OfficialMessageJob implements ShouldQueue
                                     ->orWhere('agency_id', 0);
                             })
                             ->pluck('id')
-                            ->toArray());
+                            ->toArray()
+                    );
                 } elseif ($feature === 'host_users') {
                     $HostUsersId = array_merge($HostUsersId, User::when(!empty($adminCountries), fn($q) => $q->whereIn('country_id', $adminCountries))
                         ->whereNotNull('agency_id')
@@ -169,7 +170,7 @@ class OfficialMessageJob implements ShouldQueue
         //     'feature_ids'  => $featureIds,
         // ]);
 
-        $countriesIds = Common::areaCountries($this->admin->id);
+        $countriesIds = Common::areaCountriesV2($this->admin->id);
 
         $usersId = [];
 
@@ -183,7 +184,8 @@ class OfficialMessageJob implements ShouldQueue
 
             foreach ($agencies as $agency) {
                 if ($memberTitle === 'owner') {
-                    $usersId[] = $agency->app_owner_id;
+                    $usersId = $agencies->pluck('app_owner_id')->toArray();
+                   
                     // Log::info($usersId);
                 } elseif ($memberTitle === 'admin') {
                     $usersId = array_merge($usersId, $agency->admins->pluck('user_id')->toArray());
@@ -224,6 +226,7 @@ class OfficialMessageJob implements ShouldQueue
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
                 ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
                 ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
+                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
                 ->get();
 
             $usersId = $users->pluck('app_id')->toArray();
@@ -237,6 +240,14 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
+        // Log::info('OfficialMessageJob raw usersId', [
+        //     'usersId'      => $usersId,
+        //     'feature'      => $feature,
+        //     'subFeature' => $subFeature,
+        //     'countriesIds' => $countriesIds,
+        //     'admin' => $this->admin,
+        // ]);
+        
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);
     }

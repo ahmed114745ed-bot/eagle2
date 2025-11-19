@@ -14,15 +14,14 @@ use Modules\AreaManager\Http\Controllers\WalletController;
 use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
-
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
-use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
 use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
+use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +35,7 @@ use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController
 */
 
 /*============================= DASHBOARD ROUTE THAT SPECIAL owner DASH ==============================*/
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -50,8 +50,8 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-
- Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
+        
+        Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
             Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
@@ -138,7 +138,7 @@ Route::group(
 
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
-        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::get('/charges', [ChargeController::class, 'index']);
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
@@ -180,4 +180,3 @@ Route::prefix('areaManager')->name('areaManager.')->group(function () {
 });
 
 /*============================= End DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
-

@@ -94,8 +94,9 @@ class RoleController extends MainController
         \Admin::js('js/admin/preview.js');
         $roleModel = config('admin.database.roles_model');
         $roleAuthId = Common::getRoleAuthId(auth()->id());
-
+  
         $grid = new Grid(new $roleModel());
+
         $grid->model()->where('admin_id', $roleAuthId);
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));

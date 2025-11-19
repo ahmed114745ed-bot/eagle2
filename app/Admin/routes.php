@@ -44,6 +44,7 @@ use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
+use App\Admin\Controllers\SuperRoleController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
@@ -110,6 +111,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
@@ -240,20 +242,14 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        // Route::resource('auth/roles', 'RoleControllerNew');
+        
         Route::resource('auth/roles', RoleControllerNew::class);
-        // Route::resource('roles', 'RoleControllerNew');
+        Route::get('super-roles', [SuperRoleController::class,'index']);
+        Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
+       
 
         Route::resource('auth/rolesTest', 'RoleController');
-        // Route::prefix('auth/rolesTest')->group(function () {
-        //     Route::get('/', [RoleControllerNew::class, 'index']);
-        //     Route::get('/create', [RoleControllerNew::class, 'create']);
-        //     Route::post('/', [RoleControllerNew::class, 'store']);
-        //     Route::get('/{id}', [RoleControllerNew::class, 'show']);
-        //     Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
-        //     Route::put('/{id}', [RoleControllerNew::class, 'update']);
-        //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
-        // });
+        
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
 
         Route::resource('auth/permissions', PermissionController::class);
@@ -356,6 +352,7 @@ Route::group(
         Route::resource('payment-coins', PaymentCoinController::class);
         Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
+        Route::get('/area-manager-charges-reports', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [
@@ -697,6 +694,7 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
+        Route::get('professional-bd', [BdController::class ,'professionalBd']);
 
 
          Route::post('/set-preview-area-manager', function () {

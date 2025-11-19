@@ -1925,8 +1925,16 @@
     "questions":"أسئلة",
     "payment-coins":"العملات المعدنية",
     "host":"مضيف",
-
+    "Host":"مضيف",
+    "bdsDescription": "الـ BD المعروضة تتبع بلد مدير المنطقة",
+    "professionalBdsDescription": " المستخدم الخاصة  بالBDs بالمستخدم المعروضة تتبع بلد مدير المنطقة",
+    "Users around your regions": "المستخدمون حول مناطقك",
+"bds around your regions": "الـ BDs حول مناطقك",
+"All Agencies around your region": "جميع الوكالات حول منطقتك",
+"shipping agency around your regions": "وكالات الشحن حول مناطقك",
     "categories":"التصنيفات",
+    "Save Permissions":"  حفظ الصلاحيات  ",
+    "Creator": "المنشئ",
     "Fields": "الحقول",
     "Details":"التفاصيل",
     "delete-accounts" :" سياسه الحسبات المحذوفه",
@@ -2001,8 +2009,10 @@
     "Dedicate switch reward center": "تخصيص  اهداء المكافآت",
     "Action switch banner": "تبديل حركة البانر",
     "you used this user name before": "لقد استخدمت اسم المستخدم هذا من قبل",
-    "Browse live rooms": "تصفح الغرف المباشرة",
-    "Show live rooms": "عرض الغرف المباشرة",
+    "Browse live rooms": "تصفح البث المباشر",
+    "Show live rooms": "عرض البث المباشر",
+    "max message": "أقصى عدد للرسائل",
+"group chat setting": "إعدادات الدردشة الجماعية",
     "Show host": "عرض المضيف",
     "Delete host": "حذف المضيف",
     "Edit host": "تعديل المضيف",
@@ -2071,7 +2081,6 @@
     "Reel Settings" : "اعدادات الفيديوهات",
     "reel settings" : "اعدادات الفيديوهات",
     "Moment Settings" : "اعدادات اللحظات",
-    "Host":"وكيل مضيفين",
     "Application Fav Icon:": "صورة التطبيق المصغرة:",
     "Host Agent":"وكيل مضيفين",
     "Shipping Agent":"وكيل شحن",
@@ -2253,6 +2262,7 @@
     "Regions":"المناطق",
     "Region Settings":"اعدادات المناطق",
     "Store":"المتجر",
+    "Show superadmin":" عرض مدير الدوله",
     "Store Settings":"اعدادات المتجر",
     "soon:": " :قريباً",
     "helper": "مساعد",
@@ -3991,7 +4001,7 @@
     "The special video for this level, displayed after completion. Each level has its own unique video.": "الفيديو الخاص المخصص لهذا المستوى، والذي يتم عرضه بعد إكمال المستوى. كل مستوى له فيديو مميز خاص به.",
   "filters.yes": "نعم",
   "Live-rooms":"الغرف المباشرة",
-  "Live Rooms":"الغرف المباشرة",
+  "Live Rooms":"البث المباشر",
   "live rooms":"الغرف المباشرة",
   "live-rooms":"الغرف المباشرة",
   "invitation.earn_percentage": "نسبة أرباح الداعي (%)",
@@ -4524,7 +4534,10 @@
 "Not specified": "غير محدد",
 "shipping_agency": "وكالة الشحن",
 "bd_form": "نموذج BD",
-"host_agency": "الوكالة المضيفين"
+"host_agency": "الوكالة المضيفين",
+"area name":"اسم المنطقة",
+"upload_card_back": "📷 اضغط لرفع صورة  "
+
 
 
 

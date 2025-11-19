@@ -100,7 +100,7 @@
         }
     },
     "config": {
-        "audit": {
+         "audit": {
             "block-insecure": false
         },
         "optimize-autoloader": true,

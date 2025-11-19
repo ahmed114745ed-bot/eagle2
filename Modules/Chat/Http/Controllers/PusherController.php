@@ -40,6 +40,10 @@ class PusherController extends Controller
     public function chatRoomListener(Request $request)
     {
         $payload = $request->all();
+        // \Log::channel('chat_room')->info('Chat Room Listener Triggered', [
+        //     'payload'     => $request->all(),
+        //     'user_id'     => optional($request->user())->id,
+        // ]);
         $timeMs = $payload['time_ms'] ?? null;
         $eventTime = $timeMs ? Carbon::createFromTimestampMs($timeMs) : now();
 

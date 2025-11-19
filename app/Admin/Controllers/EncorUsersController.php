@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -170,8 +171,21 @@ class EncorUsersController extends AdminController
         $permission_name = $this->permission_name;
 
 //        $userModel = config('admin.database.users_model');
+        $areaManagerId = request('area_manager_id');
+
+        if ($areaManagerId) {
+            session(['area_manager_id' => $areaManagerId]);
+        }
+
+        if (request()->has('clear_area_manager')) {
+            session()->forget('area_manager_id');
+            $areaManagerId = null;
+        }
+
+        $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new \App\Models\Admin());
+        $countryID = empty((array)session('filter_country_id')) ;
 
         $grid->model()->where(function ($q) {
             $q->where('type', '!=', 'bd')
@@ -182,7 +196,9 @@ class EncorUsersController extends AdminController
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
             });
-
+        if ($roleAuthId) {
+            $grid->model()->where('parent_id', $roleAuthId);
+        }
         $grid->column('id', 'ID')->sortable();
         $grid->column('username', trans('admin.username'));
         $grid->column('name', trans('admin.name'));

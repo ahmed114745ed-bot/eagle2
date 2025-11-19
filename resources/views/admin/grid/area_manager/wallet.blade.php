@@ -360,7 +360,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998;"></div>
 
 {{-- JS --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/vendor/laravel-admin/AdminLTE/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 

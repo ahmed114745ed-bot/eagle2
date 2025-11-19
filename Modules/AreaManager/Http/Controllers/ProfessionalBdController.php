@@ -42,7 +42,7 @@ class ProfessionalBdController extends MainController
     {
         return (new Box(
             title: __('admin.description'),
-            content: view('admin.grid.bd.description'),
+            content: view('admin.grid.bd.dbProfessionalDescription'),
         ));
     }
 

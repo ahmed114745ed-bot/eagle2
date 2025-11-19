@@ -35,11 +35,11 @@
     /*.ltr label {*/
     /*    margin: 0 !important;*/
     /*}*/
-
+/* 
     .ltr .fields-group .form-group{
 
        display: flex !important;
-    }
+    } */
 
     .pagination {
         padding-left: revert !important;
@@ -1216,6 +1216,17 @@ html.ltr .dropdown-menu {
         width: auto;
         order: 2;
     }
+    [dir="rtl"] .form-horizontal .form-group {
+    margin-right: -15px;
+    margin-left: -1500px;
+}
+
+[dir="ltr"] .form-horizontal .form-group {
+    margin-left: -15px;
+    margin-right: 0;
+}
+
+
 
     .box-footer .pull-right {
         display: flex;

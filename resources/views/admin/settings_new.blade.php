@@ -8,6 +8,49 @@ use Modules\Vip\Entities\Vip;
 
 @endphp
 <style>
+
+/* General colorpicker dropdown styling */
+.colorpicker {
+    min-width: 220px;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+}
+
+/* Saturation square */
+.colorpicker-saturation {
+    border-radius: 5px !important;
+}
+
+/* Hue slider */
+.colorpicker-hue {
+    border-radius: 5px !important;
+}
+
+/* Alpha slider */
+.colorpicker-alpha {
+    border-radius: 5px !important;
+}
+
+/* Color preview box */
+.colorpicker-color div {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Force dropdown alignment */
+.colorpicker.colorpicker-right {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.colorpicker.colorpicker-left {
+    left: 0 !important;
+    right: auto !important;
+}
+
+
     /* Add this CSS to your stylesheet */
     .radio-options-container {
         display: flex;
@@ -481,7 +524,7 @@ use Modules\Vip\Entities\Vip;
     }
 
     @media (max-width: 768px) {
-    
+
 
     .settings-menu {
         display: flex;
@@ -509,7 +552,7 @@ use Modules\Vip\Entities\Vip;
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('landPageSettings')">{{ __('land settings') }}</button>
-            
+
             <button onclick="showSection('workSettings')" class="position-relative">
                 {{ __('Work') }}
             </button>
@@ -705,7 +748,8 @@ use Modules\Vip\Entities\Vip;
                     <div class="form row">
                         @csrf
 
-                        <div class="col-md-6">
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="secondary_color">{{ __('Primary Color:') }}</label>
                                 <input type="color" id="secondary_color" name="secondary_color"
@@ -713,9 +757,31 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
                                     title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="secondary_color">{{ __('Primary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text" 
+                                        id="secondary_color" 
+                                        name="secondary_color"
+                                        class="form-control"
+                                        value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="primary_color">{{ __('Secondary Color:') }}</label>
                                 <input type="color" id="primary_color" name="primary_color"
@@ -723,19 +789,33 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['primary_color'] ?? '#000000' }};"
                                     title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
                             </div>
-                        </div>
-
-                        {{--                        <div class="col-md-6"> --}}
-                        {{--                            <div class="form-group"> --}}
-                        {{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label> --}}
-                        {{--                                <input type="color" id="text_primary_color" name="text_primary_color" --}}
-                        {{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}" --}}
-                        {{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};" --}}
-                        {{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي."> --}}
-                        {{--                            </div> --}}
-                        {{--                        </div> --}}
+                        </div> --}}
 
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="primary_color">{{ __('Secondary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['primary_color'] ?? '#000000' }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        id="primary_color"
+                                        name="primary_color"
+                                        class="form-control"
+                                        value="{{ $settings['primary_color'] ?? '#000000' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
                                 <input type="color" id="text_secondary_color" name="text_secondary_color"
@@ -743,30 +823,33 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};"
                                     title="لون النص الثانوي المستخدم في الشروحات أو النصوص المساعدة.">
                             </div>
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['text_secondary_color'] ?? '#808080' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text"
+                                        id="text_secondary_color"
+                                        name="text_secondary_color"
+                                        class="form-control"
+                                        value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
 
-                        {{--                        <div class="col-md-6"> --}}
-                        {{--                            <div class="form-group"> --}}
-                        {{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label> --}}
-                        {{--                                <input type="color" id="box_background_color" name="box_background_color" --}}
-                        {{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}" --}}
-                        {{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};" --}}
-                        {{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق."> --}}
-                        {{--                            </div> --}}
-                        {{--                        </div> --}}
+
+                    
                     </div>
 
-                    {{--                    <div class="form row"> --}}
-                    {{--                        <div class="col-md-6"> --}}
-                    {{--                            <div class="form-group"> --}}
-                    {{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label> --}}
-                    {{--                                <input type="color" id="table_background_color" name="table_background_color" --}}
-                    {{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}" --}}
-                    {{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};" --}}
-                    {{--                                       title="لون خلفية الجداول في التقارير أو البيانات."> --}}
-                    {{--                            </div> --}}
-                    {{--                        </div> --}}
-                    {{--                    </div> --}}
                     <div class="form row">
                         <!-- New Background Type Selection -->
                         <div class="col-md-6">
@@ -788,7 +871,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         <!-- Background Color Input -->
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group" id="brand_background_color_group"
                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
@@ -797,7 +880,31 @@ use Modules\Vip\Entities\Vip;
                                     style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
                                     title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
                             </div>
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="brand_background_color_group"
+                                style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
+                                
+                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"></i>
+                                    </span>
+
+                                    <input 
+                                        type="text"
+                                        id="box_background_color"
+                                        name="box_background_color"
+                                        class="form-control"
+                                        value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                                        placeholder="ادخل لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
 
 
                         <input type="hidden" name="brand_image" id="brand_image">
@@ -2089,16 +2196,16 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
-                                                        <input type="text" id="apple_redirect_uri"
-                                                            name="apple_redirect_uri" placeholder="apple_redirect_uri"
-                                                            value="{{ $settings['apple_redirect_uri'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>--}}
+{{--                                                        <input type="text" id="apple_redirect_uri"--}}
+{{--                                                            name="apple_redirect_uri" placeholder="apple_redirect_uri"--}}
+{{--                                                            value="{{ $settings['apple_redirect_uri'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
 
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -2114,18 +2221,18 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control">
                                                     </div>
                                                 </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="apple_webhook_url" name="apple_webhook_url"
-                                                                       placeholder="apple_webhook_url"
-                                                                       value="{{ $settings['apple_webhook_url'] ?? '' }}"
-                                                                       class="form-control" readonly>
-                                                                <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="apple_webhook_url" name="apple_webhook_url"--}}
+{{--                                                                       placeholder="apple_webhook_url"--}}
+{{--                                                                       value="{{ $settings['apple_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" readonly>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
                                                 @endif
                                             @if ($coin->type == 'google_pay')
                                                 <div class="col-md-6">
@@ -3657,12 +3764,34 @@ use Modules\Vip\Entities\Vip;
                     <div class="form row">
                      <input type="hidden" name="reset" id="reset" value=3>
                         {{-- Primary Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
                             <input type="color" name="app_primary_color" id="app_primary_color"
                                    value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
                                    class="form-control">
+                        </div> --}}
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_primary_color">{{ __('Primary Color') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="app_primary_color"
+                                        id="app_primary_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
 
                         {{-- Background Type --}}
                         <div class="col-md-6">
@@ -3675,13 +3804,38 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         {{-- Background Color --}}
-                        <div class="col-md-6" id="background_color_group"
+                        {{-- <div class="col-md-6" id="background_color_group"
                              style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
                             <label>{{ __('Background Color') }}</label>
                             <input type="color" name="background_color" id="background_color"
                                    value="{{ data_get($settings, 'background_color', '#ffffff') }}"
                                    class="form-control">
+                        </div> --}}
+
+                        <div class="col-md-6" id="background_color_group"
+                            style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
+
+                            <div class="form-group">
+                                <label for="background_color">{{ __('Background Color') }}</label>
+
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'background_color', '#ffffff') }};"></i>
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="background_color"
+                                        id="background_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'background_color', '#ffffff') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+
                         </div>
+
 
                         {{-- Background Image --}}
                         <div class="col-md-6" id="background_image_group"
@@ -3696,13 +3850,13 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
                         {{-- Bottom Nav --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Bottom Nav Color') }}</label>
                             <input type="color" name="bottom_color" id="bottom_color"
                                    value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
                                    class="form-control">
-                        </div>
-                        <div class="col-md-6">
+                        </div> --}}
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Bottom Nav Active Color') }}</label>
                             <input type="color" name="active_color" id="active_color"
                                    value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
@@ -3713,23 +3867,120 @@ use Modules\Vip\Entities\Vip;
                             <input type="color" name="inactive_color" id="inactive_color"
                                    value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
                                    class="form-control">
-                        </div>
+                        </div> --}}
 
                         {{-- Text Header Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Text Header Color') }}</label>
                             <input type="color" name="text_header_color" id="text_header_color"
                                    value="{{ data_get($settings, 'text_header_color', '#000000') }}"
                                    class="form-control">
-                        </div>
+                        </div> --}}
 
                         {{-- Button Text Color --}}
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <label>{{ __('Button Text Color') }}</label>
                             <input type="color" name="button_text_color" id="button_text_color"
                                    value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
                                    class="form-control">
+                        </div> --}}
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="bottom_color">{{ __('Bottom Nav Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_bottom_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="bottom_color"
+                                        id="bottom_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="active_color">{{ __('Bottom Nav Active Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_active_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="active_color"
+                                        id="active_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="inactive_color">{{ __('Bottom Nav Inactive Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'bottom_nav_inactive_color', '') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="inactive_color"
+                                        id="inactive_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="text_header_color">{{ __('Text Header Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'text_header_color', '#000000') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="text_header_color"
+                                        id="text_header_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'text_header_color', '#000000') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="button_text_color">{{ __('Button Text Color') }}</label>
+                                <div class="input-group colorpicker-element">
+                                    <span class="input-group-addon">
+                                        <i style="background-color: {{ data_get($settings, 'button_text_color', '#ffffff') }};"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="button_text_color"
+                                        id="button_text_color"
+                                        class="form-control"
+                                        value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
+                                        placeholder="اختر لون"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
 
                     </div>
 
@@ -4454,15 +4705,30 @@ use Modules\Vip\Entities\Vip;
 }
 }
 </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/css/bootstrap-colorpicker.min.css" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.min.js"></script>
 <script>
 
+    
+
+    // $('.colorpicker-element').colorpicker();
+
+     $('.colorpicker-element').colorpicker({
+       
+        align: 'left',     // Align dropdown to the right (for English dashboard)
+        horizontal: true    // Show horizontal sliders
+    });
+
+    
+
+
 document.addEventListener("DOMContentLoaded", function() {
-    const firstRow = document.querySelector('.content .row'); 
+    const firstRow = document.querySelector('.content .row');
     if (firstRow) {
-        const firstDiv = firstRow.querySelector('div'); 
+        const firstDiv = firstRow.querySelector('div');
         if (firstDiv && firstDiv.classList.contains('col-md-12')) {
-            firstDiv.classList.add('col-sm-6'); 
+            firstDiv.classList.add('col-sm-6');
         }
     }
 });

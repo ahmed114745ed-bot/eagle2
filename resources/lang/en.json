@@ -19,8 +19,10 @@
 "ConditionGroeth":"Define the minimum number of visitors required for the room to gain more visibility or unlock new benefits.You can customize this condition based on room performance.",
 "NumberSeats":"Indicates how many admins are currently assigned to this room.When the room achieves its diamond target, more admin seats can be unlocked.(Hint: If a room starts with 4 admins and hits the target, it can increase to 5 admins.",
 "ProfitsTargetTotal":"The total profit in coins generated from the room’s performance.This value will later be divided among the room owner and admins based on their profit percentages.",
-
-    
+"Show superadmin": "Show  Country Manager",
+"bdsDescription" : "BDs displayed belong to the Area Manager's country",
+"professionalBdsDescription": "User BDs displayed belong to the Area Manager's country",
+"member": "عضو",    
     "SuperAdmin Charge":"charges",
     "Charge To Superadmin":"charges",
     "Browse charge to superadmin":"Browse charges ",
@@ -107,6 +109,7 @@
     "registered successfully": "Registered Successfully",
     "required": "Required",
     "exists": "Exists",
+    "Live Rooms": "Live Broadcast",
     "delete user parent": "delete Users",
      "edit user parent": "edit users",
     "show user parent": "show users",
@@ -1492,7 +1495,13 @@
 
 "shipping_agency": "Shipping Agency",
 "bd_form": "BD Form",
-"host_agency": "Host Agency"
+"host_agency": "Host Agency",
+"area name":"Area Name",
+"upload_card_back": "📷 Click to upload ",
+"Browse live rooms": "Browse live broadcasts",
+"Show live rooms": "Show live broadcasts"
+
+
 
 
 
