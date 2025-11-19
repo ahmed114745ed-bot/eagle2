@@ -1218,8 +1218,8 @@ html.ltr .dropdown-menu {
     }
     
    [lang="en"] .form-horizontal .form-group {
-    margin-left: -1500px;
-    margin-right: -15px;
+    margin-left: -15px;
+    margin-right: -1500px;
     
 }
 
