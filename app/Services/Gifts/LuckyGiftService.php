@@ -135,9 +135,9 @@ class LuckyGiftService
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
-            \Log::info('⚡ isWinner check result', [
-                'isWinner'           => $isWinner,
-            ]);
+            // \Log::info('⚡ isWinner check result', [
+            //     'isWinner'           => $isWinner,
+            // ]);
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
