@@ -247,7 +247,7 @@ class LeaderCCgameController extends Controller
         ]);
     }
 
-    public function validationOrderId($orderId)
+   public function validationOrderId($orderId)
     {
         if (Cache::has("order_$orderId")) {
             return response()->json([
