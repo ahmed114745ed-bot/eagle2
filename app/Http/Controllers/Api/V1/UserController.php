@@ -546,14 +546,15 @@ class UserController extends Controller
 
         $cacheKey = "user_response_{$id}";
 
-        $response = \Cache::remember(
-            $cacheKey,
-            now()->addMinutes(30),
-            function () use ($id) {
+        $response =
+        //  \Cache::remember(
+        //     $cacheKey,
+        //     now()->addMinutes(30),
+        //     function () use ($id) {
                 $user = $this->userService->showUser($id);
                 return (new UserResource($user))->toArray(request());
-            }
-        );
+        //     }
+        // );
 
         return Common::apiResponse(true, '', $response, 200);
     }
