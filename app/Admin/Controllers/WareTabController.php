@@ -459,13 +459,6 @@ class WareTabController extends MainController
 
                 // معالجة img2 - الحل الرئيسي للمشكلة
                 if ($img2 instanceof UploadedFile) {
-            
-
-                    // Log::info('🖼 img2 uploaded', [
-                    //     'original_name' => $img2->getClientOriginalName(),
-                    //     'mime' => $img2->getMimeType(),
-                    // ]);
-        
                     /** @var FileService $fileService*/
                     $fileService = app( FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);

@@ -43,23 +43,6 @@ class VerifyGameCoinSignature
             . (string)$token
             . (string)$winId
             . (string)$key;
-        
-        \Log::channel('daily')->info('🔍 GAME SIGNATURE DEBUG', [
-            'orderId'       => $orderId,
-            'gameId'        => $gameId,
-            'roundId'       => $roundId,
-            'uid'           => $uid,
-            'coin'          => $coin,
-            'type'          => $type,
-            'rewardType'    => $rewardType,
-            'winId'         => $winId,
-            'token'         => $token,
-            'key'           => $key,
-            'raw_string'    => $rawString,
-            'expected_sign' => md5($rawString),
-            'client_sign'   => $sign,
-        ]);
-        
         $expectedSign = md5($rawString);
         
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {

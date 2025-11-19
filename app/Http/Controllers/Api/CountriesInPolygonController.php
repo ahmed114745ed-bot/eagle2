@@ -45,15 +45,10 @@ class CountriesInPolygonController extends Controller
         $countryCodes = $this->fetchCountriesParallel($testPoints, $apiKey);
         
         if ($areaSize > 1000 && count($countryCodes) < 15) {
-            Log::info('Area is large, generating additional points');
             $additionalPoints = $this->generateTargetedPoints($polygon, $bounds, 30);
             $additionalCountries = $this->fetchCountriesParallel($additionalPoints, $apiKey);
             $countryCodes = array_unique(array_merge($countryCodes, $additionalCountries));
         }
-        
-        Log::info('Total countries found: ' . count($countryCodes));
-        Log::info('Country codes: ' . implode(', ', $countryCodes));
-
         return $this->getCountriesData($countryCodes);
     }
 
@@ -196,7 +191,6 @@ class CountriesInPolygonController extends Controller
                         
                         if (!in_array($countryCode, $countryCodes)) {
                             $countryCodes[] = $countryCode;
-                            Log::info("Found country: {$countryCode} at point {$index}");
                         }
                     }
                 }
