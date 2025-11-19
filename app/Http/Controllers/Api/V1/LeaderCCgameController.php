@@ -165,7 +165,7 @@ class LeaderCCgameController extends Controller
                         'created_at' => now(),
                         'updated_at' => now()
                     ]);
-        Log::info('before coin_game_users');
+        Log::info('after coin_game_users');
                 
                 
                 
