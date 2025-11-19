@@ -488,6 +488,10 @@ class ChatRoomService
     
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
+            Log::info("user_1_deleted &&  user_2_deleted ", [
+         
+                'checkRoom'    => $checkRoom,
+            ]);
             try {
                 Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
             } catch (\Throwable $th) {
