@@ -106,19 +106,20 @@ class OfficialMessageController extends MainController
             });
         });
         $grid->id(__('ID'));
-        $grid->column('user.name', trans('user id'))->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $path = @$this->user?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+        if (!$roleAuthId) {
+            $grid->column('user.name', trans('user id'))->display(function ($name) {
+                $uid = @$this->user->uuid;
+                $path = @$this->user?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
@@ -127,7 +128,9 @@ class OfficialMessageController extends MainController
                 </div>
             </div>
         ";
-        });
+            });
+        }
+
         $grid->title(trans('title'));
 
 
