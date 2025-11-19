@@ -95,7 +95,7 @@ class WareTabController extends MainController
         $type = request()->get('type', 4);
         $grid = new Grid(new Ware());
         //  $types = [6, 4, 5];
-        $grid->model()->where('type',  $type)->where('get_type','!=', 1);
+        $grid->model()->where('type',  $type)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
