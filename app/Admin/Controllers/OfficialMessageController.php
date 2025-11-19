@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
+use App\Selectables\Bds;
 use Illuminate\Http\Request;
 use App\Selectables\Agencies;
 use App\Selectables\Families;
@@ -16,8 +17,10 @@ use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
+use App\Selectables\ShippingAgencies;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
+use Modules\AreaManager\Entities\AreaManager;
 
 class OfficialMessageController extends MainController
 {
@@ -91,7 +94,7 @@ class OfficialMessageController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
+            ->when($countryID && !$roleAuthId, fn($q) => $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID)))
             ->when($roleAuthId, fn($q) => $q->where('admin_id', $roleAuthId))
             ->when(empty($roleAuthId), fn($q) => $q->whereNull('admin_id'))
             ->where('type', 2)->orderByDesc('id');
@@ -311,6 +314,7 @@ class OfficialMessageController extends MainController
     protected function selectFeatureManager(Form $form, $authId)
     {
         $countriesIds = Common::areaCountriesV2($authId);
+        $areaManager = AreaManager::find($authId);
         $countries = Country::selectRaw('concat(name, " - ", e_name) as name, id')->when(!empty($countriesIds), function ($q) use ($countriesIds) {
             $q->whereIn('id', $countriesIds);
         })
@@ -390,7 +394,7 @@ class OfficialMessageController extends MainController
         $form->saved(function (Form $form) {
             $model = $form->model();
             $data = request()->except(['img']);
-            dispatch(new OfficialMessageJob($model, $data, Auth::user()))->onQueue('official-message');
+            dispatch(new OfficialMessageJob($model, $data, ($areaManager ?? Auth::user())))->onQueue('official-message');
         });
     }
 
