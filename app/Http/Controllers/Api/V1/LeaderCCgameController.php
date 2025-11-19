@@ -176,7 +176,7 @@ class LeaderCCgameController extends Controller
             return response()->json([
                 'errorCode' => 0,
                 'data'   => [
-                    'coins' : $user->di
+                    'coins' => $user->di
                 ]
             ]);
     
