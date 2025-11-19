@@ -16,7 +16,7 @@ class VerifyGameLeaderCCMiddleWare
      */
     public function handle(Request $request, Closure $next)
     {
-         Log::info('Middleware Request Details', [
+         \App\Helpers\LogHelper::info('VerifyGameLeaderCCMiddleWare Middleware Request Details', [
             'headers' => $request->headers->all(),
             'body' => $request->all(),
             'method' => $request->method(),

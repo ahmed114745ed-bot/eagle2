@@ -14,5 +14,7 @@ class LogHelper
             $logMessage .= PHP_EOL . json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
 
+        Log::info($logMessage);
+
     }
 }
