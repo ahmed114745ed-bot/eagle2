@@ -46,10 +46,10 @@ class VerifyLeaderCCMiddleWare
         if ($request->has('token')) {
             $token = $request->token;
             $userId = $this->findUserByToken($token);
-            if ($userId) {
+            if (!$userId) {
                 return response()->json([
                     'errorCode' => 10003,
-                    'errorMsg'  => 'Order already exists for this token'
+                    'errorMsg'  => 'user not found'
                 ], 400);
             }
         }
