@@ -36,7 +36,7 @@ class FeatureAppController extends MainController
 
     public function index(Content $content)
     {
-        $keys = ['host_agency', 'reel_status', 'youtube_status', 'live_status'];
+        $keys = ['host_agency', 'reel_status', 'youtube_status', 'live_status','room_cup_setting'];
 
         $settings = Setting::whereIn('key', $keys)
             ->pluck('value', 'key')
@@ -48,6 +48,7 @@ class FeatureAppController extends MainController
                 'reelSettings'     => $settings['reel_status'] ?? 1,
                 'youtubeSettings'  => $settings['youtube_status'] ?? 1,
                 'liveSettings'     => $settings['live_status'] ?? 1,
+                'roomCupSetting'     => $settings['room_cup_setting'] ?? 0,
             ])
         );
     }

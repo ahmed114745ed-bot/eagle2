@@ -246,6 +246,11 @@
                     style="text-align: right;">
                 {{ __('Live Settings') }}
             </button>
+             </button>
+                         <button onclick="showSection('RoomCupSetting')"
+                    style="text-align: right;">
+                {{ __('room cup setting') }}
+            </button>
         </div>
     </div>
 
@@ -368,6 +373,39 @@
                             <span class="slider round"></span>
                         </label>
                         <input type="hidden" name="live_status" id="host_live_value" value="{{ $liveSettings ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+         <div id="RoomCupSetting" class="settings-section">
+            <h2>{{ __('room cup setting') }}</h2>
+            <form id="roomCupForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable room cup Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="room_cup_toggle" {{ $roomCupSetting ? 'checked' : '' }}
+                            onchange="document.getElementById('room_cup_value').value = this.checked ? '1' : '0';
+                                document.getElementById('roomCupForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="room_cup_setting" id="room_cup_value" value="{{ $roomCupSetting ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">

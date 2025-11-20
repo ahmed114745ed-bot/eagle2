@@ -19,11 +19,15 @@ class RoomCupMiddleware
     public function handle(Request $request, Closure $next): Response
     {
 
-        $roomCup = \Cache::rememberForever('room_cup', function () {
-            $setting =   Setting::where('key', 'room_cup')->first();
-            return $setting?->value ?? 0;
-        });
-        if (!$roomCup) return response()->json(['error' => 'something wrong'], 500);
+        $getSetting = function ($key, $default = 0) {
+            return \Cache::rememberForever($key, function () use ($key, $default) {
+                return Setting::where('key', $key)->value('value') ?? $default;
+            });
+        };
+
+        $roomCup = $getSetting('room_cup');
+        $roomCupSetting = $getSetting('room_cup_setting');
+        if (!$roomCup && !$roomCupSetting) return response()->json(['error' => 'something wrong'], 500);
 
         return $next($request);
     }
