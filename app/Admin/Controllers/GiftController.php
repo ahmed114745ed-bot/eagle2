@@ -367,18 +367,18 @@ class GiftController extends MainController
                 }
             }
         });
-        Admin::style(
-            <<<CSS
-                [lang="en"] .form-horizontal .form-group {
-                    margin-left: -15px;
-                    margin-right: -1500px;
-                }
+        // Admin::style(
+        //     <<<CSS
+        //         [lang="en"] .form-horizontal .form-group {
+        //             margin-left: -15px;
+        //             margin-right: -1500px;
+        //         }
 
-                [lang="en"] .col-sm-8 {
-                    width: 1000px !important;
-                }
-                CSS
-                        );
+        //         [lang="en"] .col-sm-8 {
+        //             width: 1000px !important;
+        //         }
+        //         CSS
+        //                 );
         return $form;
     }
 
