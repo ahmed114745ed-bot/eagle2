@@ -51,6 +51,12 @@
         background: var(--secondary-color);
             border-bottom: var(--primary-color);
     }
+
+    .nav-tabs>li>a:hover {
+    border-color: var(--primary-color);
+}
+
+
     .nav-link.active {
         background-color: var(--primary-color);
         color: white;
