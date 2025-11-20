@@ -76,7 +76,7 @@ class VerifyGameCoinSignature
             'receivedSign' => $sign
         ]);
 
-        if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
+        if (strtolower($expectedSign) !== strtolower($sign)) {
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail'
