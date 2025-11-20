@@ -52,18 +52,8 @@ class VerifyGameCoinSignature
         }
         // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key);
 
-        $rawString = implode('', [
-            $orderId,
-            $gameId,
-            $roundId,
-            $uid,
-            $coin,
-            $type,
-            $rewardType,
-            $token, 
-            $winId,
-            $key
-        ]);
+        $rawString = $orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key;
+        $expectedSign = md5($rawString);
         
         $expectedSign = md5($rawString);
 //   LogHelper::info('Middleware -expectedSign', [
