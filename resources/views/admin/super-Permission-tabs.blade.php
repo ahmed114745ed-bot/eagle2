@@ -53,7 +53,7 @@
     .nav-tabs {
     background: var(--secondary-color);
     display: flex;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: var(--secondary-color);
     margin-bottom: 24px;
     overflow-x: auto;
     padding: 0 8px;
@@ -89,7 +89,7 @@
 
 .nav-link:hover {
     color: white;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--primary-color);
     transform: translateY(-1px);
 }
 
