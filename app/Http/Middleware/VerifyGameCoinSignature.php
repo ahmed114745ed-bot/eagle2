@@ -61,7 +61,11 @@ class VerifyGameCoinSignature
             . (string)$winId
             . (string)$key;
         $expectedSign = md5($rawString);
-        
+        LogHelper::info('Check signature', [
+            'rawString' => $rawString,
+            'expectedSign' => $expectedSign,
+            'clientSign' => $sign
+        ]);
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
                 'errorCode' => 10004,
