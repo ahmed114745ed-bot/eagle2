@@ -34,6 +34,6 @@ Route::prefix('leader-cc-game')
     ->group(function () {
 
     Route::post('get-user-info', [LeaderCCgameController::class, 'userInformation'])  ->middleware('verify.game.userInformation.signature');
-    Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin'])  /*->middleware('verify.gamecoin.signature')*/;
+    Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin']) ->middleware('verify.gamecoin.signature')  ;
     Route::post('make-up-orders', [LeaderCCgameController::class, 'makeUpOrders'])  ->middleware('verify.game.userInformation.signature');
 });
