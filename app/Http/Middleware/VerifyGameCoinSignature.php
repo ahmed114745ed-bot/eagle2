@@ -49,17 +49,10 @@ class VerifyGameCoinSignature
         }
      // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key); => *change-balance*
 
-        $rawString = 
-            (string)$orderId
-            . (string)$gameId
-            . (string)$roundId
-            . (string)$uid
-            . (string)$coin
-            . (string)$type
-            . (string)$rewardType
-            . (string)$token
-            . (string)$winId
-            . (string)$key;
+        $rawString = implode('', [
+                $orderId, $gameId, $roundId, $uid, $coin, 
+                $type, $rewardType, $token, $winId, $key
+            ]);
         $expectedSign = md5($rawString);
         LogHelper::info('Check signature', [
             'rawString' => $rawString,
