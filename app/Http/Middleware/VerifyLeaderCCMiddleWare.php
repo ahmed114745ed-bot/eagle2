@@ -18,7 +18,7 @@ class VerifyLeaderCCMiddleWare
 
         try {
     
-        $path = $request->path(); 
+        $path = ltrim(str_replace('api/', '', $request->path()), '/');
         $key = config('games.leader_CC_game_key');
         LogHelper::info('LeaderCC Request Timing', [
             'url'      => $request->fullUrl(),
