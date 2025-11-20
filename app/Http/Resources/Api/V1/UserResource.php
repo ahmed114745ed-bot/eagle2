@@ -88,9 +88,12 @@ class UserResource extends JsonResource
              'shipping_agency'      => $this->formatShippingAgency(),
              'has_anti_ban'         => $this->getPackWithType(15),
              'chat_id' => $chatRoom->id ?? null,
-             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
+             'unread_messages_count' => $chatRoom->unread_messages ?? 0,
          ];
-
+        //  \Log::info("Unread message for user ".auth()->id(), [
+        //     '$chatRoom->unread_messages' => $chatRoom->unread_messages,
+          
+        // ]);
          if (in_array($this->is_mic, ['0', '1'])) {
              $data['is_mic'] = $this->is_mic;
          }

@@ -125,10 +125,6 @@ class CharizmaController extends Controller
             ]
         ];
         $json = json_encode($ms);
-        Log::channel('charisma')->info('Charisma sendToZego sent successfully', [
-            'charizma_status' => $room->charizma_status,
-            'json' => $json,
-        ]);
         Common::sendToZego('SendCustomCommand', $roomId, Auth::id(), $json);
 
         //delete all charisma in room

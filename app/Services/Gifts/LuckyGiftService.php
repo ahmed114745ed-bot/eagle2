@@ -47,7 +47,7 @@ class LuckyGiftService
         $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
         $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
         $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
-
+        $total_cashback_percentage = 0;
 
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
@@ -135,6 +135,7 @@ class LuckyGiftService
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
+           
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
@@ -160,12 +161,7 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
-                \Log::info('⚡ Popular check result', [
-                    'isPopular'           => $isPopular,
-                    'cashback_percentage' => $cashback_percentage,
-                ]);
-
-
+        
                 if ($isPopular) {
 
                     //  \Log::info('🚀 Sending Popular To Zego...', [
@@ -200,6 +196,8 @@ class LuckyGiftService
             $message = null;
             $total_user_win += ($totalGiftPrice * $cashback_percentage);
             $total_count_win += 1;
+            $total_count_win += 1;
+            $total_cashback_percentage += $cashback_percentage;
             $cashback_percentage = 0;
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
@@ -240,6 +238,8 @@ class LuckyGiftService
         $responseData['user_coins'] = $userCoins;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
+        $responseData['cashback_percentage'] = $total_cashback_percentage;
+        $responseData['total_user_win'] = $total_user_win;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;
@@ -615,7 +615,6 @@ class LuckyGiftService
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
             'gift_price'   => $gift->price,
             'cache_value'  => ceil($cashbackValue ?? 0.0),
-            'gift_price'   => @$gift->price,
             'room_name'   => $room->room_name ?: '',
             'room_cover'   => $room->room_cover ?? '',
             'room_background'   =>$room->final_room_image ?? '',

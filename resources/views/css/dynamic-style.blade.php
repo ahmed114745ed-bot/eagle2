@@ -1224,6 +1224,11 @@ html.ltr .dropdown-menu {
 }
 
 
+[lang="en"] .col-sm-8 {
+    width: 1000px !important;
+}
+
+
     .box-footer .pull-right {
         display: flex;
         align-items: center;
