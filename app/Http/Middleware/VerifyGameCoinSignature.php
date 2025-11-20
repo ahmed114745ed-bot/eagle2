@@ -12,6 +12,11 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
+        LogHelper::info('Check signature request', [
+            'request' => $request->all(),
+           
+        ]);
+
         $orderId    = (string)$request->input('orderId');
         $gameId     = (string)$request->input('gameId');
         $roundId    = (string)$request->input('roundId');
@@ -20,22 +25,22 @@ class VerifyGameCoinSignature
         $type       = (integer)$request->input('type');
         $rewardType = (integer)$request->input('rewardType');
         $winId      = $request->input('winId', "");
-        $token      = urldecode($request->input('token'));
+        $token      = $request->input('token');
         $sign       = $request->input('sign');
         $key        = config('games.leader_CC_game_key');
-          LogHelper::info('Middleware - All inputs', [
-            'orderId' => $orderId,
-            'gameId' => $gameId,
-            'roundId' => $roundId,
-            'roomId' => $request->input('roomId'),
-            'uid' => $uid,
-            'coin' => $coin,
-            'type' => $type,
-            'rewardType' => $rewardType,
-            'winId' => $winId,
-            'token' => $token,
-            'sign' => $sign
-        ]);
+        //   LogHelper::info('Middleware - All inputs', [
+        //     'orderId' => $orderId,
+        //     'gameId' => $gameId,
+        //     'roundId' => $roundId,
+        //     'roomId' => $request->input('roomId'),
+        //     'uid' => $uid,
+        //     'coin' => $coin,
+        //     'type' => $type,
+        //     'rewardType' => $rewardType,
+        //     'winId' => $winId,
+        //     'token' => $token,
+        //     'sign' => $sign
+        // ]);
         if (
             !$orderId || !$gameId || !$roundId || !$uid ||
             !$coin || !$rewardType || !$type || !$sign || !$token
@@ -45,16 +50,15 @@ class VerifyGameCoinSignature
                 'errorMsg'  => 'Missing signature parameters'
             ], 400);
         }
+        // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key);
 
-        $rawString = implode('', [
-            $orderId, $gameId, $roundId, $uid, $coin, 
-            $type, $rewardType, $token, $winId, $key
-        ]);
+        $rawString = $orderId . $gameId . $roundId . $uid . $coin . $type . $rewardType . $token . $winId . $key;
+        $expectedSign = md5($rawString);
         
         $expectedSign = md5($rawString);
-  LogHelper::info('Middleware -expectedSign', [
-            $expectedSign
-    ]);
+//   LogHelper::info('Middleware -expectedSign', [
+//             $expectedSign
+//     ]);
         LogHelper::info('Check signature', [
             'rawString' => $rawString,
             'expectedSign' => $expectedSign,

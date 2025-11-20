@@ -31,10 +31,8 @@ class VerifyGameLeaderCCUserInformationMiddleWare
         
         $key = config('games.leader_CC_game_key'); 
         
-        if (
-            !$roomId || !$gameId  || !$uid ||
-             !$sign || !$token
-        ) {
+        if (!isset($roomId, $gameId, $uid, $sign)) {
+            
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing signature parameters'
@@ -47,7 +45,7 @@ class VerifyGameLeaderCCUserInformationMiddleWare
             . (string)$token
             . (string)$roomId
             . (string)$key;
-            
+
         $expectedSign = md5($rawString);
         
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
