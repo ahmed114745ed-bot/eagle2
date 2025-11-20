@@ -61,11 +61,11 @@ class VerifyGameCoinSignature
 //   LogHelper::info('Middleware -expectedSign', [
 //             $expectedSign
 //     ]);
-        // LogHelper::info('Check signature', [
-        //     'rawString' => $rawString,
-        //     'expectedSign' => $expectedSign,
-        //     'clientSign' => $sign
-        // ]);
+        LogHelper::info('Check signature', [
+            'rawString' => $rawString,
+            'expectedSign' => $expectedSign,
+            'clientSign' => $sign
+        ]);
 
         if (strtolower($expectedSign) !== strtolower($sign)) {
             Log::info("inside ");
