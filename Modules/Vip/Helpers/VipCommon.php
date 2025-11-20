@@ -57,7 +57,7 @@ class VipCommon
 
             return true;
         } catch (\Throwable $e) {
-            \Log::error($e->getMessage());
+          //  \Log::error($e->getMessage());
             return false;
         }
     }

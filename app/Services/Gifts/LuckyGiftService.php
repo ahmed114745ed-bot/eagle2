@@ -47,7 +47,7 @@ class LuckyGiftService
         $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
         $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
         $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
-
+        $total_cashback_percentage = 0;
 
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
@@ -196,7 +196,9 @@ class LuckyGiftService
             $message = null;
             $total_user_win += ($totalGiftPrice * $cashback_percentage);
             $total_count_win += 1;
-            // $cashback_percentage = 0;
+            $total_count_win += 1;
+            $total_cashback_percentage += $cashback_percentage;
+            $cashback_percentage = 0;
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
@@ -236,7 +238,8 @@ class LuckyGiftService
         $responseData['user_coins'] = $userCoins;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
-        $responseData['cashback_percentage'] = $cashback_percentage;
+        $responseData['cashback_percentage'] = $total_cashback_percentage;
+        $responseData['total_user_win'] = $total_user_win;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;

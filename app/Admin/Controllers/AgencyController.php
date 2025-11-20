@@ -370,14 +370,15 @@ class AgencyController extends MainController
 
     protected function grid()
     {
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = null;
+       if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator', 'country'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
