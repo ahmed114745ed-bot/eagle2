@@ -30,7 +30,7 @@ class VerifyGameCoinSignature
         $type       = (string)$request->input('type');
         $rewardType = (string)$request->input('rewardType');
         $winId      = (string)$request->input('winId', '');
-        $token      = (string)$request->input('token');
+        $token      = urldecode($request->input('token'));
         $sign       = $request->input('sign');
         $key        = config('games.leader_CC_game_key');
         
