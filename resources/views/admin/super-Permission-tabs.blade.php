@@ -32,7 +32,7 @@
                .label-small-font {
     font-size: 12px;
 }
-    .nav-tabs{
+    /* .nav-tabs{
         background: var(--primary-color);
         display: flex;
             border-bottom: 1px solid #ddd;
@@ -48,7 +48,132 @@
             border-bottom: 1px solid #ddd;
             margin-bottom: 20px;
             overflow-x: auto;
+    } */
+
+    .nav-tabs {
+    background: var(--secondary-color);
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding: 0 8px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.nav-tabs::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
+.nav-item {
+    margin-bottom: -2px;
+    flex-shrink: 0;
+}
+
+.nav-link {
+    position: relative;
+    padding: 12px 24px;
+    color: rgba(255, 255, 255, 0.8);
+    background: transparent;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    margin: 0 2px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.nav-link.active {
+    background-color: white;
+    color: var(--primary-color);
+    border: 2px solid #e9ecef;
+    border-bottom: 2px solid white;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+}
+
+/* Optional: Add icons or indicators */
+.nav-link::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.nav-link.active::before {
+    opacity: 1;
+    background: var(--primary-color);
+}
+
+/* Smooth scrolling for better UX */
+.nav-tabs {
+    scroll-behavior: smooth;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nav-tabs {
+        padding: 0 4px;
+        margin-bottom: 16px;
     }
+    
+    .nav-link {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+/* Loading state */
+.nav-link.loading {
+    position: relative;
+    color: transparent;
+}
+
+.nav-link.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+}
+
+.nav-link.active.loading::after {
+    border: 2px solid rgba(var(--primary-color-rgb), 0.3);
+    border-top: 2px solid var(--primary-color);
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
     .permissions-section {
         display: none;
     }
