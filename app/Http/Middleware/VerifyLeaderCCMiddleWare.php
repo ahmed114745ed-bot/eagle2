@@ -143,20 +143,46 @@ class VerifyLeaderCCMiddleWare
 
     public function findUserByToken($token): mixed
     {
+        LogHelper::info('Raw token received', [
+            'token' => $token
+        ]);
+    
         $token = urldecode($token);
+    
+        LogHelper::info('Token after urldecode', [
+            'decoded_token' => $token
+        ]);
     
         if (strpos($token, '|') !== false) {
             [$_, $plainToken] = explode('|', $token, 2);
+    
+            LogHelper::info('Plain token extracted after | split', [
+                'plain_token' => $plainToken
+            ]);
         } else {
             $plainToken = $token;
+    
+            LogHelper::info('Token has no | returning as plain', [
+                'plain_token' => $plainToken
+            ]);
         }
     
         $personalToken = PersonalAccessToken::findToken($plainToken);
+    
         if (!$personalToken) {
+            LogHelper::info('Token not found in personal_access_tokens', [
+                'plain_token' => $plainToken
+            ]);
             return null;
         }
     
+        LogHelper::info('Token matched successfully', [
+            'user_id' => $personalToken->tokenable_id,
+            'plain_token' => $plainToken
+        ]);
+    
         return $personalToken->tokenable_id;
     }
+    
 }
 
