@@ -49,6 +49,7 @@
 }
     .nav-tabs{
         background: var(--secondary-color);
+            border-bottom: var(--primary-color);
     }
     .nav-link.active {
         background-color: var(--primary-color);
