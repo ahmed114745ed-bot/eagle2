@@ -97,8 +97,9 @@ class Kernel extends HttpKernel
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
         'verify.gamecoin.signature' => \App\Http\Middleware\VerifyGameCoinSignature::class,
         'verify.game.userInformation.signature' => \App\Http\Middleware\VerifyGameLeaderCCUserInformationMiddleWare::class,
+        'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
         
-        'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
+        // 'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
 //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
