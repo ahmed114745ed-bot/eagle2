@@ -54,6 +54,10 @@ class VerifyLeaderCCMiddleWare
             // }
         }
 
+        LogHelper::info('LeaderCC Request change-balance', [
+            'change-balance'      => 'change-balance',
+           
+        ]);
         switch ($path) {
             case 'leader-cc-game/change-balance':
                 $requiredParams = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
