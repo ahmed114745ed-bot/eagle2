@@ -12,14 +12,8 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-        /*  LogHelper::info('Middleware Request Details', [
-            'headers' => $request->headers->all(),
-            'body' => $request->all(),
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]); */
+        
+
         $orderId     = $request->input('orderId');
         $gameId      = $request->input('gameId');
         $roundId     = $request->input('roundId');
@@ -28,7 +22,9 @@ class VerifyGameCoinSignature
         $type        = $request->input('type');
         $rewardType  = $request->input('rewardType');
         $winId       = $request->input('winId', '');
-        $token       = $request->input('token');
+        // $token       = $request->input('token');
+        $token = urldecode($request->input('token'));
+
         $sign        = $request->input('sign');
         
         $key = config('games.leader_CC_game_key'); 
@@ -42,7 +38,8 @@ class VerifyGameCoinSignature
                 'errorMsg'  => 'Missing signature parameters'
             ], 400);
         }
-        
+     // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key); => *change-balance*
+
         $rawString = 
             (string)$orderId
             . (string)$gameId
