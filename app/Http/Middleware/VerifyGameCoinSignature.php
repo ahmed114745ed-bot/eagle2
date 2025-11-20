@@ -30,8 +30,8 @@ class VerifyGameCoinSignature
         $type       = (string)$request->input('type');
         $rewardType = (string)$request->input('rewardType');
         $winId      = (string)$request->input('winId', '');
-        $token      = "10156%7CoYeE836AMI9gsvsYY53Ypsbz5AcnxpGGAqx3ZpVcba51274f";
-        $sign       = strtolower($request->input('sign'));
+        $token      = (string)$request->input('token');
+        $sign       = $request->input('sign');
         $key        = config('games.leader_CC_game_key');
         
         LogHelper::info('Middleware Request Details {token}', [
@@ -61,20 +61,20 @@ class VerifyGameCoinSignature
         ]);
 
         LogHelper::info('Sign Calculation Details', [
-    'orderId' => $orderId,
-    'gameId' => $gameId,
-    'roundId' => $roundId,
-    'uid' => $uid,
-    'coin' => $coin,
-    'type' => $type,
-    'rewardType' => $rewardType,
-    'token' => $token,
-    'winId' => $winId,
-    'key' => $key, // تأكد أن الـ key غير فارغ
-    'rawString' => $rawString,
-    'expectedSign' => $expectedSign,
-    'receivedSign' => $sign
-]);
+            'orderId' => $orderId,
+            'gameId' => $gameId,
+            'roundId' => $roundId,
+            'uid' => $uid,
+            'coin' => $coin,
+            'type' => $type,
+            'rewardType' => $rewardType,
+            'token' => $token,
+            'winId' => $winId,
+            'key' => $key, // تأكد أن الـ key غير فارغ
+            'rawString' => $rawString,
+            'expectedSign' => $expectedSign,
+            'receivedSign' => $sign
+        ]);
 
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
