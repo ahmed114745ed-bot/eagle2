@@ -378,7 +378,7 @@ class AgencyController extends MainController
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator', 'country:id'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator', 'country'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
