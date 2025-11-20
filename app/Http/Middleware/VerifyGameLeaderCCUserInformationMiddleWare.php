@@ -31,7 +31,7 @@ class VerifyGameLeaderCCUserInformationMiddleWare
         
         $key = config('games.leader_CC_game_key'); 
         
-        if (!isset($roomId, $gameId, $uid, $sign, $token)) {
+        if (!isset($roomId, $gameId, $uid, $sign)) {
             
             return response()->json([
                 'errorCode' => 4005,
