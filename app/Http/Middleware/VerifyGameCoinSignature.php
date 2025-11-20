@@ -12,7 +12,7 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-         $orderId    = $request->input('orderId');
+        $orderId    = $request->input('orderId');
         $gameId     = $request->input('gameId');
         $roundId    = $request->input('roundId');
         $uid        = $request->input('uid');
@@ -40,6 +40,11 @@ class VerifyGameCoinSignature
         ]);
         
         $expectedSign = md5($rawString);
+        LogHelper::info('Check signature', [
+            'rawString' => $rawString,
+            'expectedSign' => $expectedSign,
+            'clientSign' => $sign
+        ]);
 
         if (strtolower($expectedSign) !== strtolower($sign)) {
             Log::info("inside ");
