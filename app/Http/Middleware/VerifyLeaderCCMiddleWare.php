@@ -114,10 +114,10 @@ class VerifyLeaderCCMiddleWare
                 'sign'      => $request->input('sign'),
              
             ]);
-            // return response()->json([
-            //     'errorCode' => 10004,
-            //     'errorMsg' => 'Verify signature fail'
-            // ], 400);
+            return response()->json([
+                'errorCode' => 10004,
+                'errorMsg' => 'Verify signature fail'
+            ], 400);
         }
 
       
