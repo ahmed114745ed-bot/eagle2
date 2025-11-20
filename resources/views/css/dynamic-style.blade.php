@@ -1222,9 +1222,7 @@ html.ltr .dropdown-menu {
     margin-right: -1500px;
     
 }
-/* .col-sm-8 {
-    width: 1000px;
-} */
+
 
 [lang="en"] .col-sm-8 {
     width: 1000px !important;
