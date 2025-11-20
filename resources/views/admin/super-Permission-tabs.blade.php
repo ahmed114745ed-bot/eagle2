@@ -8,7 +8,21 @@
 
     <style>
 
- 
+     
+
+    /* RTL Specific Styles */
+    [dir="rtl"] .form-check {
+        padding-right: 0;
+        padding-left: 25px;
+        flex-direction: row-reverse;
+    }
+    [dir="rtl"] .form-check-input {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    [dir="rtl"] .permission-group-title {
+        flex-direction: row-reverse;
+    }
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
@@ -29,151 +43,17 @@
             --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
         }
 
-               .label-small-font {
+
+           .label-small-font {
     font-size: 12px;
 }
-    /* .nav-tabs{
-        background: var(--primary-color);
-        display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            
+    .nav-tabs{
+        background: var(--box-background-color);
     }
-   
     .nav-link.active {
-        background-color: white;
-        color:var(--primary-color);
-        display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            overflow-x: auto;
-    } */
-
-    .nav-tabs {
-    background: var(--secondary-color);
-    display: flex;
-    border-bottom: var(--secondary-color);
-    margin-bottom: 24px;
-    overflow-x: auto;
-    padding: 0 8px;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-}
-
-.nav-tabs::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-}
-
-.nav-item {
-    margin-bottom: -2px;
-    flex-shrink: 0;
-}
-
-.nav-link {
-    position: relative;
-    padding: 12px 24px;
-    color: rgba(255, 255, 255, 0.8);
-    background: transparent;
-    border: none;
-    border-radius: 8px 8px 0 0;
-    margin: 0 2px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-link:hover {
-    color: white;
-    background: var(--primary-color);
-    transform: translateY(-1px);
-}
-
-.nav-link.active {
-    background-color: white;
-    color: var(--primary-color);
-    border: 2px solid #e9ecef;
-    border-bottom: 2px solid white;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: white;
-}
-
-/* Optional: Add icons or indicators */
-.nav-link::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-}
-
-.nav-link.active::before {
-    opacity: 1;
-    background: var(--primary-color);
-}
-
-/* Smooth scrolling for better UX */
-.nav-tabs {
-    scroll-behavior: smooth;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .nav-tabs {
-        padding: 0 4px;
-        margin-bottom: 16px;
+        background-color: var(--primary-color);
+        color: white;
     }
-    
-    .nav-link {
-        padding: 10px 16px;
-        font-size: 14px;
-    }
-}
-
-/* Loading state */
-.nav-link.loading {
-    position: relative;
-    color: transparent;
-}
-
-.nav-link.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    transform: translate(-50%, -50%);
-}
-
-.nav-link.active.loading::after {
-    border: 2px solid rgba(var(--primary-color-rgb), 0.3);
-    border-top: 2px solid var(--primary-color);
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
     .permissions-section {
         display: none;
     }
@@ -224,20 +104,6 @@
         line-height: 1.4;
         word-wrap: break-word;
         flex: 1;
-    }
-
-    /* RTL Specific Styles */
-    [dir="rtl"] .form-check {
-        padding-right: 0;
-        padding-left: 25px;
-        flex-direction: row-reverse;
-    }
-    [dir="rtl"] .form-check-input {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    [dir="rtl"] .permission-group-title {
-        flex-direction: row-reverse;
     }
 
         .filter-container {
@@ -361,6 +227,19 @@
             }
         }
 
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 57px;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
         .stat-icon.bg-blue {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         }
@@ -467,7 +346,17 @@
             font-size: 14px;
         }
 
-        
+        .agency-profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            /* background: var(--secondary-color); */
+            /* filter: brightness(0.85); */
+
+        }
+
         .agency-header {
             display: flex;
             align-items: flex-start;
@@ -482,7 +371,22 @@
 
         }
 
-               .agency-info {
+        .agency-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .agency-avatar .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .agency-info {
             flex: 1;
         }
 
@@ -960,7 +864,25 @@
             font-size: 14px;
         }
 
-       
+        .user-avatar,
+        .supporter-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .supporters-avatars {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
 
         .pagination-wrapper {
@@ -1062,7 +984,19 @@
             }
 
 
-          
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 118px;
+                color: white;
+                font-size: 20px;
+                margin-bottom: 6px;
+
+            }
 
 
             .target-card-stat {
@@ -1833,3 +1767,115 @@
 
 
 
+{{-- @php
+    use App\Models\RoleCategory;
+    use App\Enums\PermissionType;
+    // Group permissions by category first
+    $grouped = $permissions->groupBy('category');
+    $permissionType = $permissionType ??'role-country-manager';
+    $categories = RoleCategory::orderBy('sort')
+    ->select('slug', 'type')
+    ->where(function ($q) use($permissionType) {
+        $q->where('type',$permissionType);
+    })->get();
+    //dd($categories);
+    $selected = $selectedPermissions ?? [];
+
+    // Pre-process all permissions by category and group
+    $allGroupedPermissions = [];
+ foreach ($grouped as $categorySlug => $categoryPermissions) {
+    $allGroupedPermissions[$categorySlug] = $categoryPermissions->groupBy(function ($permission) {
+        $slug = $permission->slug;
+
+        if (str_contains($slug, '-switch-')) {
+            // Split by '-switch-'
+            $parts = explode('-switch-', $slug);
+            // $parts[1] is what comes after 'switch-'
+            return $parts[1];  // group by 'user' or 'agency' or whatever after switch-
+        } else {
+            // Normal grouping: remove first part and group by the rest
+            $parts = explode('-', $slug);
+            array_shift($parts);
+            return implode('-', $parts);
+        }
+    });
+}
+//dd($allGroupedPermissions);
+    $firstCategory = $categories->first()->slug ?? null;
+@endphp
+
+<style>
+    
+</style>
+
+<input type="hidden" name="permissions_all" id="permissions_all">
+<ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">
+    @foreach($categories as $category)
+        <li class="nav-item">
+            <a class="nav-link {{ $loop->first ? 'active' : '' }}"
+               data-category="{{ $category->slug }}"
+               href="#">
+                {{ __($category->slug) }}
+            </a>
+        </li>
+    @endforeach
+</ul>
+
+<div class="category-select-all-container mb-3" style="padding: 0 20px;">
+    @foreach($categories as $category)
+        <div class="category-select-wrapper {{ $category->slug === $firstCategory ? 'active' : '' }}"
+             data-category="{{ $category->slug }}"
+             style="display: {{ $category->slug === $firstCategory ? 'block' : 'none' }};">
+            <div class="form-check">
+                <input class="form-check-input category-select-all"
+                       type="checkbox"
+                       data-category="{{ $category->slug }}"
+                       id="category-{{ $category->slug }}">
+                <label class="form-check-label fw-bold" for="category-{{ $category->slug }}">
+                    {{ __('Select All') }} {{ __($category->slug) }}
+                </label>
+            </div>
+        </div>
+    @endforeach
+</div>
+
+<div id="permissions-container">
+    @foreach($allGroupedPermissions as $categorySlug => $groupedPermissions)
+        <div class="permissions-section {{ $categorySlug === $firstCategory ? 'active' : '' }}"
+             data-category="{{ $categorySlug }}">
+            <div class="permissions-grid">
+                @foreach($groupedPermissions as $group => $perms)
+                    <div class="permission-group">
+                        <h6 class="permission-group-title">
+                            <input class="form-check-input group-select-all"
+                                   type="checkbox"
+                                   data-group="{{ $group }}"
+                                   data-category="{{ $categorySlug }}"
+                                   id="group-{{ $categorySlug }}-{{ $group }}">
+                            <label for="group-{{ $categorySlug }}-{{ $group }}"class="label-small-font">
+                                {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
+                            </label>
+                        </h6>
+                        @foreach($perms as $perm)
+                            <div class="form-check">
+                                <input class="form-check-input permission-checkbox"
+                                       type="checkbox"
+                                       value="{{ $perm->id }}"
+                                       data-slug="{{ $perm->slug }}"
+                                       data-group="{{ $group }}"
+                                       data-category="{{ $categorySlug }}"
+                                       id="perm-{{ $perm->id }}"
+                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="perm-{{ $perm->id }}">
+                                    {{ __($perm->name) }}
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endforeach
+</div>
+
+ --}}
