@@ -503,6 +503,8 @@ class WareTabController extends MainController
             });
         }
 
+        Admin::css('.form-group .control-label, .form-horizontal .control-label { width: 13% !important; }');
+
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
