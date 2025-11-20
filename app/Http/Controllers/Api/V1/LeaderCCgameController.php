@@ -30,13 +30,13 @@ class LeaderCCgameController extends Controller
        $errorExists = $this->checkWallet($request);
        if ($errorExists ) return response()->json($errorExists);
 
-       $userId = $this->findUserByToken($request->token);
+       /* $userId = $this->findUserByToken($request->token);
        if($userId != $request->uid){
             return response()->json([
                             'errorCode' => 4005,
                             'errorMsg'  => 'user not found',
                         ], 200);
-       }
+       } */
         $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
                 ->select('id', 'name', 'di')
                 ->find($request->uid);
