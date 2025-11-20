@@ -38,16 +38,16 @@ class VerifyGameLeaderCCMiddleWare
 
         $response =  $next($request);
 
-        // \App\Helpers\LogHelper::info('VerifyGameLeaderCCMiddleWare Middleware Request Details', [
-        //     'url' => $request->fullUrl(),
-        //     'method' => $request->method(),
-        //     'body' => $request->all(),
-        //     'ip' => $request->ip(),
-        //     'response_body' => method_exists($response,'getContent') 
-        //     ? json_decode($response->getContent(), true) 
-        //     : null,            
-        //     'headers' => $request->headers->all(),
-        // ]);
+        \App\Helpers\LogHelper::info('VerifyGameLeaderCCMiddleWare Middleware Request Details', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'body' => $request->all(),
+            'ip' => $request->ip(),
+            'response_body' => method_exists($response,'getContent') 
+            ? json_decode($response->getContent(), true) 
+            : null,            
+            'headers' => $request->headers->all(),
+        ]);
         return $response;
     }
 }
