@@ -8,12 +8,55 @@
 
     <style>
 
-        .label-small-font {
+     
+
+    /* RTL Specific Styles */
+    [dir="rtl"] .form-check {
+        padding-right: 0;
+        padding-left: 25px;
+        flex-direction: row-reverse;
+    }
+    [dir="rtl"] .form-check-input {
+        margin-right: 0;
+        margin-left: 0;
+    }
+    [dir="rtl"] .permission-group-title {
+        flex-direction: row-reverse;
+    }
+        :root {
+            --primary-color: {{ config('themes.primaryColor') }};
+            --secondary-color: {{ config('themes.secondaryColor') }};
+            --green-color: {{ config('themes.greenColor') }};
+            --text-primary-color: {{ config('themes.textPrimaryColor') }};
+            --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+            --box-background-color: {{ config('themes.boxBackgroundColor') }};
+            --table-background-color: {{ config('themes.tableBackGroundColor')}}
+             --background-image:{{ config('themes.backgroundImage') }};
+            --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+            --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+            --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+            --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+            --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+            --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+            --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+            --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+            --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        }
+
+
+           .label-small-font {
     font-size: 12px;
 }
     .nav-tabs{
-        background: var(--box-background-color);
+        background: var(--secondary-color);
+            border-bottom: var(--primary-color);
     }
+
+    .nav-tabs>li>a:hover {
+    border-color: var(--primary-color);
+}
+
+
     .nav-link.active {
         background-color: var(--primary-color);
         color: white;
@@ -69,39 +112,6 @@
         word-wrap: break-word;
         flex: 1;
     }
-
-    /* RTL Specific Styles */
-    [dir="rtl"] .form-check {
-        padding-right: 0;
-        padding-left: 25px;
-        flex-direction: row-reverse;
-    }
-    [dir="rtl"] .form-check-input {
-        margin-right: 0;
-        margin-left: 0;
-    }
-    [dir="rtl"] .permission-group-title {
-        flex-direction: row-reverse;
-    }
-        :root {
-            --primary-color: {{ config('themes.primaryColor') }};
-            --secondary-color: {{ config('themes.secondaryColor') }};
-            --green-color: {{ config('themes.greenColor') }};
-            --text-primary-color: {{ config('themes.textPrimaryColor') }};
-            --text-secondary-color: {{ config('themes.textSecondaryColor') }};
-            --box-background-color: {{ config('themes.boxBackgroundColor') }};
-            --table-background-color: {{ config('themes.tableBackGroundColor')}}
-             --background-image:{{ config('themes.backgroundImage') }};
-            --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
-            --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-            --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-            --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
-            --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
-            --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
-            --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
-            --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-            --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-        }
 
         .filter-container {
             background: #ffffff;
