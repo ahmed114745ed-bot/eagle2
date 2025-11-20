@@ -34,6 +34,9 @@ class VerifyGameCoinSignature
         $sign       = strtolower($request->input('sign'));
         $key        = config('games.leader_CC_game_key');
         
+        LogHelper::info('Middleware Request Details {token}', [
+            'token' => $token,
+        ]); 
         
         if (
             !$orderId || !$gameId || !$roundId || !$uid ||
