@@ -30,13 +30,13 @@ class LeaderCCgameController extends Controller
        $errorExists = $this->checkWallet($request);
        if ($errorExists ) return response()->json($errorExists);
 
-       $userId = $this->findUserByToken($request->token);
+       /* $userId = $this->findUserByToken($request->token);
        if($userId != $request->uid){
             return response()->json([
                             'errorCode' => 4005,
                             'errorMsg'  => 'user not found',
                         ], 200);
-       }
+       } */
         $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
                 ->select('id', 'name', 'di')
                 ->find($request->uid);
@@ -145,7 +145,7 @@ class LeaderCCgameController extends Controller
             // Cache the order to prevent duplicates
             Cache::put("order_{$orderId}", true, now()->addMinutes(30));
 
-            dispatch(new \App\Jobs\GameWalletJop($request->coins * (($type == 1) ? -1 : 1) ));
+            dispatch(new \App\Jobs\GameWalletJop($request->coin * (($type == 1) ? -1 : 1) ));
 
 
             DB::commit();
@@ -287,7 +287,7 @@ class LeaderCCgameController extends Controller
 
     public function checkWallet($request)
     {
-        if ($request->type == 1 && $this->checkLoseWallet($request->coins)) {
+        if ($request->type == 1 && $this->checkLoseWallet($request->coin)) {
             $responseArray = [
                 'errorCode' => 4005,
                 'errorMsg' => 'game not available'
