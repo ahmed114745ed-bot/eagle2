@@ -237,11 +237,11 @@
                 $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
                 if ($areaManager && method_exists($areaManager, 'countries')) {
                     $countries = $areaManager->countriesQuery()
-                        ->select(['id', 'name', 'flag'])
+                        ->select(['id', 'name', 'e_name','flag'])
                         ->get();
                 }
             } else {
-                $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+                $countries = \App\Models\Country::select(['id', 'name', 'e_name','flag'])->get();
             }
 
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
@@ -260,6 +260,7 @@
 
             $selectedAreaManagerCountryId = session('area_manager_country_id') ?? request('area_manager_country_id') ?? Admin::user()->country_id;
             $selectedAreaManagerCountry   = $areaManagerCountries->firstWhere('id', (int) $selectedAreaManagerCountryId);
+           
         @endphp
 
         @if (request()->is('admin*'))
@@ -284,7 +285,7 @@
                             value="{{ $currentCountry->id }}"
                             data-flag="{{ getImagePath($currentCountry->flag) }}"
                             {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
+                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
                         </option>
                     @endforeach
                 </select>

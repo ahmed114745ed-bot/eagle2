@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\GameWallet;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -20,45 +21,25 @@ class LeaderCCgameController extends Controller
 
     public function userInformation(Request $request)
     {
-
-        \Log::info(' userInformation ', [
-            'request' => $request->all(),
-        ]);
-        $validator = Validator::make($request->all(), [
-            'gameId' => 'required|string',
-            'uid'    => 'required|string',
-            'token'  => 'required|string',
-            'roomId' => 'required|string',
-            'sign'   => 'required|string',
-
-
-        ]);
-
-        if ($validator->fails()) {
+        if (!$request->uid || !$request->gameId || !$request->token) {
             return response()->json([
                 'errorCode' => 4005,
-                'errorMsg'  => 'Missing or invalid parameters',
-                'errors'    => $validator->errors(),
+                'errorMsg' => 'Missing parameters'
             ], 200);
         }
-        $key = config('games.leader_CC_game_key');
+       $errorExists = $this->checkWallet($request);
+       if ($errorExists ) return response()->json($errorExists);
 
-        // $expectedSign = md5(
-        //     $request->gameId .
-        //         $request->uid .
-        //         $request->token .
-        //         $request->roomId .
-        //         $key
-        // );
-
-        // // 4️⃣ Compare provided sign
-        // if (strtolower($expectedSign) !== strtolower($request->sign)) {
-        //     return response()->json([
-        //         'errorCode' => 10004,
-        //         'errorMsg'  => 'Verify signature fail',
-        //     ], 400);
-        // }
-        $user = User::find($request->uid);
+       /* $userId = $this->findUserByToken($request->token);
+       if($userId != $request->uid){
+            return response()->json([
+                            'errorCode' => 4005,
+                            'errorMsg'  => 'user not found',
+                        ], 200);
+       } */
+        $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
+                ->select('id', 'name', 'di')
+                ->find($request->uid);
         if (!$user) {
             return response()->json([
                 'errorCode' => 4005,
@@ -81,125 +62,112 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
-        \Log::info('updateGameCoin', ['request' => $request->all()]);
-    
-        $operations = [$request->all()];
-    
-        DB::beginTransaction();
-    
-        try {
-            foreach ($operations as $op) {
-    
-                $validator = Validator::make($op, [
-                    'orderId'     => 'required|string',
-                    'gameId'      => 'required|string',
-                    'roundId'     => 'required|string',
-                    'uid'         => 'required|string',
-                    'coin'        => 'required|numeric',
-                    'type'        => 'required|in:1,2',
-                    'rewardType'  => 'required|integer',
-                    'token'       => 'required|string',
-                    'winId'       => 'nullable|string',
-                    'roomid'      => 'nullable|string',
-                    'sign'        => 'required|string',
-                ]);
-    
-                if ($validator->fails()) {
-                    return response()->json([
-                        'errorCode' => 4005,
-                        'message'   => 'Invalid params'
-                    ], 200);
-                }
-    
-                $op = $validator->validated();
-    
-                if (Cache::has("order_{$op['orderId']}")) {
-                    return response()->json([
-                        'errorCode' => 10003,
-                        'message'   => 'Order already exists'
-                    ], 200);
-                }
-    
-                Cache::put("order_{$op['orderId']}", true, now()->addMinutes(30));
-    
-                $lock = Cache::lock("user_lock_{$op['uid']}", 5);
+        // Fast custom validation
+        if (!$request->orderId || !$request->gameId || !$request->roundId ||
+            !$request->uid || !isset($request->coin) || !$request->type ||
+            !isset($request->rewardType) || !$request->token || !$request->sign) {
+            return response()->json([
+                'errorCode' => 4005,
+                'message'   => 'Invalid params'
+            ], 200);
+        }
 
-                if (!$lock->get()) {
-                    return response()->json([
-                        'errorCode' => 5001,
-                        'message'   => 'User is currently busy, try later'
-                    ], 200);
-                }
-                
-                $user = null;
-                
-                try {
-                    $user = User::where('id', $op['uid'])->lockForUpdate()->first();
-                
-                    if (!$user) {
-                        return response()->json([
-                            'errorCode' => 4005,
-                            'message'   => 'User not found'
-                        ], 200);
-                    }
-                
-                    $coin = (int)$op['coin'];
-                    $type = (int)$op['type'];
-                
-                    if (DB::table('coin_game_users')->where('order_id', $op['orderId'])->exists()) {
-                        return response()->json([
-                            'errorCode' => 10003,
-                            'message'   => 'Order already exists'
-                        ], 200);
-                    }
-                
-                    if ($type == 1 && $user->di < $coin) {
-                        return response()->json([
-                            'errorCode' => 4004,
-                            'message'   => 'Insufficient game coins'
-                        ], 200);
-                    }
-                
-                    $type == 1 ? $user->di -= $coin : $user->di += $coin;
-                    $logType = $type == 1 ? 0 : 1;
-                    $user->save();
-                
-                    DB::table('coin_game_users')->insert([
-                        'user_id' => $user->id,
-                        'coins' => abs($coin),
-                        'app_profit_coins' => abs($coin),
-                        'type' => $logType,
-                        'game_id' => $op['gameId'],
-                        'round_id' => $op['roundId'],
-                        'order_id' => $op['orderId'],
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]);
-                
-                } finally {
-                    $lock->release();
-                }
-                
+        $errorExists = $this->checkWallet($request);
+        if ($errorExists) return response()->json($errorExists);
+
+
+        // Validate type is 1 or 2
+        $type = (int)$request->type;
+        if (!in_array($type, [1, 2])) {
+            return response()->json([
+                'errorCode' => 4005,
+                'message'   => 'Invalid type'
+            ], 200);
+        }
+
+        $orderId = $request->orderId;
+        $coin = (int)$request->coin;
+        $uid = $request->uid;
+
+        // Check cache for duplicate order
+        if (Cache::has("order_{$orderId}")) {
+            return response()->json([
+                'errorCode' => 10003,
+                'message'   => 'Order already exists'
+            ], 200);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Lock and get user
+            $user = User::where('id', $uid)->lockForUpdate()->first();
+
+            if (!$user) {
+                DB::rollBack();
+                return response()->json([
+                    'errorCode' => 4005,
+                    'message'   => 'User not found'
+                ], 200);
             }
-    
+
+            // Check sufficient balance for deduction
+            if ($type == 1 && $user->di < $coin) {
+                DB::rollBack();
+                return response()->json([
+                    'errorCode' => 4004,
+                    'message'   => 'Insufficient game coins'
+                ], 200);
+            }
+
+            // Update user balance
+            if ($type == 1) {
+                $user->di -= $coin;
+            } else {
+                $user->di += $coin;
+            }
+
+            $user->save();
+
+            // Log transaction
+            DB::table('coin_game_users')->insert([
+                'user_id' => $user->id,
+                'coins' => abs($coin),
+                'app_profit_coins' => abs($coin),
+                'type' => $type == 1 ? 0 : 1,
+                'game_id' => $request->gameId,
+                'round_id' => $request->roundId,
+                'order_id' => $orderId,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Cache the order to prevent duplicates
+            Cache::put("order_{$orderId}", true, now()->addMinutes(30));
+
+            dispatch(new \App\Jobs\GameWalletJop($request->coin * (($type == 1) ? -1 : 1) ));
+
+
             DB::commit();
-    
+
             return response()->json([
                 'errorCode' => 0,
-                'message'   => 'SUCCESS'
+                'data' => [
+                    'coins' => $user->di
+                ]
             ]);
-    
+
         } catch (\Exception $e) {
-    
             DB::rollBack();
-    
+            Log::error('updateGameCoin error: ' . $e->getMessage());
+
             return response()->json([
                 'errorCode' => 500,
-                'message'   => 'Server error: ' . $e->getMessage()
+                'message' => 'Server error'
             ], 500);
         }
     }
-    
+
 
     public function makeUpOrders(Request $request)
     {
@@ -217,7 +185,7 @@ class LeaderCCgameController extends Controller
             'winId'       => 'nullable|string',
             'roomid'      => 'nullable|string',
             'sign'        => 'required|string',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -276,10 +244,65 @@ class LeaderCCgameController extends Controller
                 'errorMsg'  => 'Order already exists'
             ], 200);
         }
-        
+
         return response()->json([
             'errorCode' => 0,
             'errorMsg'  => 'Order is valid'
         ]);
+    }
+
+    public function findUserByToken($token): mixed
+    {
+        $personalToken = @PersonalAccessToken::findToken($token);
+        if (!$personalToken) {
+            return null;
+        }
+
+        $userId = $personalToken->tokenable_id;
+
+        // Get only the token column instead of full user model
+        $lastToken = DB::table('personal_access_tokens')
+            ->where('tokenable_type', User::class)
+            ->where('tokenable_id', $userId)
+            ->orderByDesc('id')
+            ->value('token');
+
+        if (!$lastToken) {
+            return null;
+        }
+
+        // Extract token from pipe format if needed
+        if (strpos($token, '|') !== false) {
+            [$_, $token] = explode('|', $token, 2);
+        }
+
+        $hashedToken = hash('sha256', $token);
+
+        if (!hash_equals($lastToken, $hashedToken)) {
+            return null;
+        }
+
+        return $userId;
+    }
+
+    public function checkWallet($request)
+    {
+        if ($request->type == 1 && $this->checkLoseWallet($request->coin)) {
+            $responseArray = [
+                'errorCode' => 4005,
+                'errorMsg' => 'game not available'
+            ];
+            return response()->json($responseArray);
+        }
+        return null;
+    }
+
+    public function checkLoseWallet(float $coins) : bool
+    {
+        $gameWallet = GameWallet::filterByMonth()->first();
+        $gameUsed = $gameWallet?->used ?? 0;
+        $used = $gameUsed + $coins;
+
+        return !$gameWallet || $used >= $gameWallet->balance;
     }
 }

@@ -546,7 +546,8 @@ class UserController extends Controller
 
         $cacheKey = "user_response_{$id}";
 
-        $response = \Cache::remember(
+        $response =
+         \Cache::remember(
             $cacheKey,
             now()->addMinutes(30),
             function () use ($id) {
@@ -554,6 +555,34 @@ class UserController extends Controller
                 return (new UserResource($user))->toArray(request());
             }
         );
+    
+
+        $user = User::with([
+            'chatRoomsAsUser' => function ($q) use ($id) {
+                $q->withCount([
+                    'messages as unread_messages' => function ($q2) use ($id) {
+                        $q2->where('status', '<>', 'seen')
+                           ->where('user_id', '<>', $id);
+                    }
+                ]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($id) {
+                $q->withCount([
+                    'messages as unread_messages' => function ($q2) use ($id) {
+                        $q2->where('status', '<>', 'seen')
+                           ->where('user_id', '<>', $id);
+                    }
+                ]);
+            }
+        ])->find($id);
+        
+        $chatRoom = $user->chatRoomsAsUser->first() ?? $user->chatRoomsAsUser2->first() ?? null;
+        
+        $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
+        
+      //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
+        
+        $response['unread_messages_count'] = $unreadMessagesCount;
 
         return Common::apiResponse(true, '', $response, 200);
     }
