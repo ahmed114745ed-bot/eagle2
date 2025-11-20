@@ -60,7 +60,7 @@ class VerifyLeaderCCMiddleWare
                     }
                 }
                 $rawString = 
-                    $request->orderId .
+                    // $request->orderId .
                     $request->gameId .
                     $request->roundId .
                     $request->uid .
