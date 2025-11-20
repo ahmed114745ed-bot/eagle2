@@ -610,7 +610,7 @@ ease;
         </h2>
     </div>
 
-    <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
+    <form id="dynamicForm" action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if (!empty($user))
         <input type="hidden" name="user_id" value="{{  $user->id}}">
@@ -1020,38 +1020,35 @@ ease;
 
     @endif
 
+      
 
-
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">
-                <i class="fa fa-paper-plane me-2"></i> {{ __('Submit') }}
-            </button>
-        </div>
+             <div class="text-center mb-5">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fa fa-paper-plane me-2"></i> {{ __('Submit') }}
+                </button>
+            </div>
     </form>
 
-    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; text-align:center;">
+    
+
+</div>
+
+ <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; text-align:center;">
     <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
         <i class="fa fa-spinner fa-spin fa-3x"></i>
         <p>{{ __('Loading...') }}</p>
     </div>
-
 </div>
 
 
 
 
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
-       $(document).ready(function() {
-            $('#dynamicForm').on('submit', function() {
-                // Show the overlay
-                $('#loadingOverlay').show();
+    
 
-                // Disable the submit button to prevent double submit
-                $('#submitBtn').prop('disabled', true);
-            });
-        });
     const translations = {
         members: "{{ __('Members') }}",
         recommended: "{{ __('موصى به') }}",
@@ -1062,6 +1059,19 @@ ease;
     };
 </script>
 <script>
+
+     jQuery(document).ready(function($) {
+        $('#dynamicForm').on('submit', function(e) {
+            // Show overlay immediately
+            jQuery('#loadingOverlay').show();
+
+            // Disable the submit button to prevent multiple clicks
+            jQuery('#submitBtn').prop('disabled', true);
+
+            // Optional: prevent actual submit for testing
+            // e.preventDefault();
+        });
+    });
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('.form-container');
     const formId = "{{ $template->id }}";
