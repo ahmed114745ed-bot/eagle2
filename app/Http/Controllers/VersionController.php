@@ -69,7 +69,7 @@ class VersionController extends Controller
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
 
         $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
-
+       
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version,
@@ -99,7 +99,7 @@ class VersionController extends Controller
             'live_status'    => (bool) ($settings['live_status'] ?? true),
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
             'default_room_background'    => $default_background ?? '',
-            'is_show_room_activity' => (bool)($settings['room_cup'] ?? false),
+            'is_show_room_activity' => ($settings['room_cup'] ?? 0) == 1 || ($settings['room_cup_setting'] ?? 0) == 1,
             'app_url' => @$appUrl,
 
         ];
@@ -199,7 +199,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool
