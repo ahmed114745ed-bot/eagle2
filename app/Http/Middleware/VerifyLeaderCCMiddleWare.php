@@ -45,7 +45,8 @@ class VerifyLeaderCCMiddleWare
         }
         if ($request->has('token')) {
             $token = $request->token;
-            if ($this->findUserByToken($token)) {
+            $userId = $this->findUserByToken($token);
+            if ($userId) {
                 return response()->json([
                     'errorCode' => 10003,
                     'errorMsg'  => 'Order already exists for this token'
