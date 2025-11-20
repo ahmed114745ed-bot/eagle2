@@ -1034,6 +1034,7 @@ ease;
         <i class="fa fa-spinner fa-spin fa-3x"></i>
         <p>{{ __('Loading...') }}</p>
     </div>
+
 </div>
 
 
