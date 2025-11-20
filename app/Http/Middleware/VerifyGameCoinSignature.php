@@ -13,21 +13,30 @@ class VerifyGameCoinSignature
     public function handle(Request $request, Closure $next)
     {
         
+        LogHelper::info('Middleware Request Details', [
+            'headers' => $request->headers->all(),
+            'body' => $request->all(),
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]); 
 
-        $orderId     = $request->input('orderId');
-        $gameId      = $request->input('gameId');
-        $roundId     = $request->input('roundId');
-        $uid         = $request->input('uid');
-        $coin        = $request->input('coin');
-        $type        = $request->input('type');
-        $rewardType  = $request->input('rewardType');
-        $winId       = $request->input('winId', '');
-        // $token       = $request->input('token');
-        $token = urldecode($request->input('token'));
-
-        $sign        = $request->input('sign');
+        $orderId    = (string)$request->input('orderId');
+        $gameId     = (string)$request->input('gameId');
+        $roundId    = (string)$request->input('roundId');
+        $uid        = (string)$request->input('uid');
+        $coin       = (string)$request->input('coin');
+        $type       = (string)$request->input('type');
+        $rewardType = (string)$request->input('rewardType');
+        $winId      = (string)$request->input('winId', '');
+        $token      = urldecode($request->input('token'));
+        $sign       = strtolower($request->input('sign'));
+        $key        = config('games.leader_CC_game_key');
         
-        $key = config('games.leader_CC_game_key'); 
+        LogHelper::info('Middleware Request Details {token}', [
+            'token' => $token,
+        ]); 
         
         if (
             !$orderId || !$gameId || !$roundId || !$uid ||
@@ -40,19 +49,33 @@ class VerifyGameCoinSignature
         }
      // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key); => *change-balance*
 
-        $rawString = 
-            (string)$orderId
-            . (string)$gameId
-            . (string)$roundId
-            . (string)$uid
-            . (string)$coin
-            . (string)$type
-            . (string)$rewardType
-            . (string)$token
-            . (string)$winId
-            . (string)$key;
+        $rawString = implode('', [
+                $orderId, $gameId, $roundId, $uid, $coin, 
+                $type, $rewardType, $token, $winId, $key
+            ]);
         $expectedSign = md5($rawString);
-        
+        LogHelper::info('Check signature', [
+            'rawString' => $rawString,
+            'expectedSign' => $expectedSign,
+            'clientSign' => $sign
+        ]);
+
+        LogHelper::info('Sign Calculation Details', [
+    'orderId' => $orderId,
+    'gameId' => $gameId,
+    'roundId' => $roundId,
+    'uid' => $uid,
+    'coin' => $coin,
+    'type' => $type,
+    'rewardType' => $rewardType,
+    'token' => $token,
+    'winId' => $winId,
+    'key' => $key, // تأكد أن الـ key غير فارغ
+    'rawString' => $rawString,
+    'expectedSign' => $expectedSign,
+    'receivedSign' => $sign
+]);
+
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
                 'errorCode' => 10004,
