@@ -25,11 +25,15 @@ class CheckAllowedApp
         //     throw new NotFoundHttpException();
         // }
 
-        $roomCup = \Cache::rememberForever('room_cup', function () {
-            $setting =   Setting::where('key', 'room_cup')->first();
-            return $setting?->value ?? 0;
-        });
-        if (!$roomCup) return throw new NotFoundHttpException();
+        $getSetting = function ($key, $default = 0) {
+            return \Cache::rememberForever($key, function () use ($key, $default) {
+                return Setting::where('key', $key)->value('value') ?? $default;
+            });
+        };
+
+        $roomCup = $getSetting('room_cup') ?? 0;
+        $roomCupSetting = $getSetting('room_cup_setting') ?? 0;
+        if (!$roomCup && !$roomCupSetting) return throw new NotFoundHttpException();
 
         return $next($request);
     }
