@@ -46,10 +46,10 @@ class VerifyLeaderCCMiddleWare
         if ($request->has('token')) {
             $token = $request->token;
             $userId = $this->findUserByToken($token);
-            if ($userId) {
+            if (!$userId) {
                 return response()->json([
                     'errorCode' => 10003,
-                    'errorMsg'  => 'Order already exists for this token'
+                    'errorMsg'  => 'user not found'
                 ], 400);
             }
         }
@@ -81,15 +81,9 @@ class VerifyLeaderCCMiddleWare
 
             case 'leader-cc-game/get-user-info':
             case 'leader-cc-game/make-up-orders':
-                LogHelper::info('get-user-info', [
-                    'decoded_token' => 'get-user-info'
-                ]);
                 $requiredParams = ['gameId','uid','token','roomId','sign'];
                 foreach ($requiredParams as $p) {
                     if (!$request->has($p)) {
-                        LogHelper::info('get-user-info', [
-                            'decoded_token' => $p
-                        ]);
                         return response()->json([
                             'errorCode' => 4005,
                             'errorMsg' => 'Missing signature parameters'
@@ -133,8 +127,6 @@ class VerifyLeaderCCMiddleWare
         } catch (\Throwable $e) {
     
             $duration = microtime(true) - $start;
-    
-           
             return response()->json([
                 'errorCode' => 5000,
                 'errorMsg'  => 'Internal server error',
@@ -150,44 +142,16 @@ class VerifyLeaderCCMiddleWare
 
     public function findUserByToken($token): mixed
     {
-        LogHelper::info('Raw token received', [
-            'token' => $token
-        ]);
-    
         $token = urldecode($token);
-    
-        LogHelper::info('Token after urldecode', [
-            'decoded_token' => $token
-        ]);
-    
         if (strpos($token, '|') !== false) {
             [$_, $plainToken] = explode('|', $token, 2);
-    
-            LogHelper::info('Plain token extracted after | split', [
-                'plain_token' => $plainToken
-            ]);
         } else {
             $plainToken = $token;
-    
-            LogHelper::info('Token has no | returning as plain', [
-                'plain_token' => $plainToken
-            ]);
         }
-    
         $personalToken = PersonalAccessToken::findToken($plainToken);
-    
         if (!$personalToken) {
-            LogHelper::info('Token not found in personal_access_tokens', [
-                'plain_token' => $plainToken
-            ]);
             return null;
-        }
-    
-        LogHelper::info('Token matched successfully', [
-            'user_id' => $personalToken->tokenable_id,
-            'plain_token' => $plainToken
-        ]);
-    
+        } 
         return $personalToken->tokenable_id;
     }
     
