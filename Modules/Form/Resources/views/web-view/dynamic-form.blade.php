@@ -1029,9 +1029,28 @@ ease;
         </div>
     </form>
 
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; text-align:center;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+        <i class="fa fa-spinner fa-spin fa-3x"></i>
+        <p>{{ __('Loading...') }}</p>
+    </div>
+</div>
+
+
+
 
 </div>
 <script>
+
+       $(document).ready(function() {
+            $('#dynamicForm').on('submit', function() {
+                // Show the overlay
+                $('#loadingOverlay').show();
+
+                // Disable the submit button to prevent double submit
+                $('#submitBtn').prop('disabled', true);
+            });
+        });
     const translations = {
         members: "{{ __('Members') }}",
         recommended: "{{ __('موصى به') }}",
