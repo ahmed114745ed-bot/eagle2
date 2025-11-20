@@ -367,13 +367,25 @@ class GiftController extends MainController
                 }
             }
         });
+        Admin::style(
+            <<<CSS
+                [lang="en"] .form-horizontal .form-group {
+                    margin-left: -15px;
+                    margin-right: -1500px;
+                }
+
+                [lang="en"] .col-sm-8 {
+                    width: 1000px !important;
+                }
+                CSS
+                        );
         return $form;
     }
 
     public function luckyGiftSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
-            Permission::check('browse-' .'lucky-gift-setting');
+            Permission::check('browse-' . 'lucky-gift-setting');
         }
         $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
         return $content->view('lucky_gift', compact('config'));
