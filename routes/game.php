@@ -30,10 +30,9 @@ Route::prefix('baishun')->middleware('verify.signature')->group(function () {
 
 Route::prefix('leader-cc-game')
     ->withoutMiddleware([\App\Http\Middleware\LogApiRequestResponse::class])
-    ->middleware(['verify.game.signature'])
     ->group(function () {
 
-    Route::post('get-user-info', [LeaderCCgameController::class, 'userInformation']);
-    Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin']);
-    Route::post('make-up-orders', [LeaderCCgameController::class, 'makeUpOrders']);
+    Route::post('get-user-info', [LeaderCCgameController::class, 'userInformation'])  ->middleware('verify.game.userInformation.signature');
+    Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin'])  ->middleware('verify.game.signature');
+    Route::post('make-up-orders', [LeaderCCgameController::class, 'makeUpOrders'])  ->middleware('verify.game.userInformation.signature');
 });

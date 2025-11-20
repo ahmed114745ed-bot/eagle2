@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\Facades\Log;
 
-class VerifyGameCoinSignature
+class VerifyGameLeaderCCUserInformationMiddleWare
 {
     public function handle(Request $request, Closure $next)
     {
@@ -20,22 +20,20 @@ class VerifyGameCoinSignature
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]); */
-        $orderId     = $request->input('orderId');
+        // String sign = md5(gameId + uid + token + roomId + key); => *user information*
+
         $gameId      = $request->input('gameId');
-        $roundId     = $request->input('roundId');
         $uid         = $request->input('uid');
-        $coin        = $request->input('coin');
-        $type        = $request->input('type');
-        $rewardType  = $request->input('rewardType');
-        $winId       = $request->input('winId', '');
         $token       = $request->input('token');
+        $roomId     = $request->input('roomId');
         $sign        = $request->input('sign');
+
         
         $key = config('games.leader_CC_game_key'); 
         
         if (
-            !$orderId || !$gameId || !$roundId || !$uid ||
-            !$coin || !$rewardType || !$type || !$sign || !$token
+            !$roomId || !$gameId  || !$uid ||
+             !$sign || !$token
         ) {
             return response()->json([
                 'errorCode' => 4005,
@@ -44,16 +42,12 @@ class VerifyGameCoinSignature
         }
         
         $rawString = 
-            (string)$orderId
-            . (string)$gameId
-            . (string)$roundId
+             (string)$gameId
             . (string)$uid
-            . (string)$coin
-            . (string)$type
-            . (string)$rewardType
             . (string)$token
-            . (string)$winId
+            . (string)$roomId
             . (string)$key;
+            
         $expectedSign = md5($rawString);
         
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
