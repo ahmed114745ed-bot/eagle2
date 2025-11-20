@@ -40,9 +40,7 @@
             overflow-x: auto;
             
     }
-    .nav-tabs {
-    border-bottom: 1px solid #542222;
-}
+   
     .nav-link.active {
         background-color: white;
         color:var(--primary-color);
