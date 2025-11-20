@@ -367,13 +367,14 @@ class GiftController extends MainController
                 }
             }
         });
+        
         return $form;
     }
 
     public function luckyGiftSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
-            Permission::check('browse-' .'lucky-gift-setting');
+            Permission::check('browse-' . 'lucky-gift-setting');
         }
         $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
         return $content->view('lucky_gift', compact('config'));
