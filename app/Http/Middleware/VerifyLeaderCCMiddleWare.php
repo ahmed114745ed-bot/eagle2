@@ -14,9 +14,14 @@ class VerifyLeaderCCMiddleWare
 {
     public function handle(Request $request, Closure $next)
     {
+        $start = microtime(true);
+
+        try {
+    
         $path = $request->path(); 
         $key = config('games.leader_CC_game_key');
 
+     
         if (!$key) {
             return response()->json([
                 'errorCode' => 4005,
@@ -102,15 +107,45 @@ class VerifyLeaderCCMiddleWare
             ], 400);
         }
 
-        $response = $next($request);
-
-        LogHelper::info('VerifyLeaderCCGameMiddleware Request', [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'body' => $request->all(),
-            'response_body' => method_exists($response,'getContent') ? json_decode($response->getContent(), true) : null,
+      
+    
+            $response = $next($request);
+    
+        } catch (\Throwable $e) {
+    
+            $duration = microtime(true) - $start;
+    
+            LogHelper::error('LeaderCC Middleware Exception', [
+                'url'      => $request->fullUrl(),
+                'method'   => $request->method(),
+                'body'     => $request->all(),
+                'ip'       => $request->ip(),
+                'headers'  => $request->headers->all(),
+                'duration' => $duration,
+                'error' => [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'trace'   => $e->getTraceAsString(),
+                ],
+            ]);
+    
+            return response()->json([
+                'errorCode' => 5000,
+                'errorMsg'  => 'Internal server error',
+                'details'   => $e->getMessage(),
+            ], 500);
+        }
+    
+        $duration = microtime(true) - $start;
+    
+        LogHelper::info('LeaderCC Request Timing', [
+            'url'      => $request->fullUrl(),
+            'method'   => $request->method(),
+            'body'     => $request->all(),
+            'duration' => $duration,
         ]);
-
+    
         return $response;
     }
 
