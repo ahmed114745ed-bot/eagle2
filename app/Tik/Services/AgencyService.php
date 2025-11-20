@@ -433,12 +433,12 @@ class AgencyService
 
     public function create($userId, $request)
     {
-        $checkAgency = $this->agencyRepository->findAgencyByOwnerId($userId, 0);
-        if ($checkAgency)   throw new Exception('لقد قمت بتقديم طلب من قبل ولم يتم اتخاذ اي اجراء فيه!');
+        // $checkAgency = $this->agencyRepository->findAgencyByOwnerId($userId, 0);
+        // if ($checkAgency)   throw new Exception('لقد قمت بتقديم طلب من قبل ولم يتم اتخاذ اي اجراء فيه!');
 
-        $checkUserAgency =  $this->agencyRepository->findAgencyByOwnerId($userId, 1);
+        // $checkUserAgency =  $this->agencyRepository->findAgencyByOwnerId($userId, 1);
 
-        if ($checkUserAgency) throw new Exception('انت تملك وكاله بالفعل');
+        // if ($checkUserAgency) throw new Exception('انت تملك وكاله بالفعل');
 
         if ($request->hasFile('img')) {
             $img = $request->file('img');
