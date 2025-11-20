@@ -20,7 +20,12 @@ class VerifyLeaderCCMiddleWare
     
         $path = $request->path(); 
         $key = config('games.leader_CC_game_key');
-
+        LogHelper::info('LeaderCC Request Timing', [
+            'url'      => $request->fullUrl(),
+            'method'   => $request->method(),
+            'body'     => $request->all(),
+            'path' => $path,
+        ]);
      
         if (!$key) {
             return response()->json([
