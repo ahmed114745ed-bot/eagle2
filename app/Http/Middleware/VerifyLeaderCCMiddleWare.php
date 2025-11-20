@@ -81,9 +81,15 @@ class VerifyLeaderCCMiddleWare
 
             case 'leader-cc-game/get-user-info':
             case 'leader-cc-game/make-up-orders':
+                LogHelper::info('get-user-info', [
+                    'decoded_token' => 'get-user-info'
+                ]);
                 $requiredParams = ['gameId','uid','token','roomId','sign'];
                 foreach ($requiredParams as $p) {
                     if (!$request->has($p)) {
+                        LogHelper::info('get-user-info', [
+                            'decoded_token' => $p
+                        ]);
                         return response()->json([
                             'errorCode' => 4005,
                             'errorMsg' => 'Missing signature parameters'
