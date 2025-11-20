@@ -66,6 +66,23 @@ class VerifyGameCoinSignature
             'expectedSign' => $expectedSign,
             'clientSign' => $sign
         ]);
+
+        LogHelper::info('Sign Calculation Details', [
+    'orderId' => $orderId,
+    'gameId' => $gameId,
+    'roundId' => $roundId,
+    'uid' => $uid,
+    'coin' => $coin,
+    'type' => $type,
+    'rewardType' => $rewardType,
+    'token' => $token,
+    'winId' => $winId,
+    'key' => $key, // تأكد أن الـ key غير فارغ
+    'rawString' => $rawString,
+    'expectedSign' => $expectedSign,
+    'receivedSign' => $sign
+]);
+
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
                 'errorCode' => 10004,
