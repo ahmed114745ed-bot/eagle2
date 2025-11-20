@@ -1216,16 +1216,17 @@ html.ltr .dropdown-menu {
         width: auto;
         order: 2;
     }
-    [dir="rtl"] .form-horizontal .form-group {
-    margin-right: -15px;
-    margin-left: -1500px;
-}
-
-[dir="ltr"] .form-horizontal .form-group {
+    
+   [lang="en"] .form-horizontal .form-group {
     margin-left: -15px;
-    margin-right: 0;
+    margin-right: -1500px;
+    
 }
 
+
+[lang="en"] .col-sm-8 {
+    width: 1000px !important;
+}
 
 
     .box-footer .pull-right {

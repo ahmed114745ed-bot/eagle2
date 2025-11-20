@@ -95,9 +95,6 @@ class StripeController extends Controller
             [$orderId, $trxId, $status] = $this->extractStripeEventData($event);
 
             if (!$trxId && !$orderId) {
-                Log::warning("Ignored Stripe event: Missing IDs", [
-                    'event' => $event->type,
-                ]);
                 return response('Ignored: no IDs', 200);
             }
 
@@ -111,19 +108,9 @@ class StripeController extends Controller
             return response('Webhook Handled', 200);
 
         } catch (SignatureVerificationException $e) {
-            Log::error("Stripe Signature verification failed", [
-                'error'     => $e->getMessage(),
-                'payload'   => $payload,
-                'sigHeader' => $sigHeader,
-            ]);
             return response('Invalid Signature', 400);
 
         } catch (\Exception $e) {
-            Log::error("Stripe Webhook error", [
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-                'payload' => $payload,
-            ]);
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
