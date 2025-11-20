@@ -24,7 +24,7 @@ class VerifyGameCoinSignature
 
         $orderId    = $request->input('orderId');
         $gameId     = $request->input('gameId');
-        $roundId    = $request->input('roundId');
+        $roundId    = $request->input('roomId');
         $uid        = $request->input('uid');
         $coin       = $request->input('coin');
         $type       = $request->input('type');
