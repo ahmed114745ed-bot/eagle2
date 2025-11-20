@@ -580,7 +580,7 @@ class UserController extends Controller
         
         $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
         
-        \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
+      //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
         
         $response['unread_messages_count'] = $unreadMessagesCount;
 

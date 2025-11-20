@@ -45,10 +45,10 @@ class ChatRoom extends Model
     public function getUnreadMessagesAttribute()
     {
         $userId = auth()->id();
-        \Log::info("Unread message for user ".auth()->id(), [
-            'userId' => $userId,
+        // \Log::info("Unread message for user ".auth()->id(), [
+        //     'userId' => $userId,
           
-        ]);
+        // ]);
         return $this->messages()
             ->where('user_id', '<>', $userId)
             ->where('status', '<>', 'seen')

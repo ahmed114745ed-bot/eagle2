@@ -488,10 +488,10 @@ class ChatRoomService
     
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
-            Log::info("user_1_deleted &&  user_2_deleted ", [
+            // Log::info("user_1_deleted &&  user_2_deleted ", [
          
-                'checkRoom'    => $checkRoom,
-            ]);
+            //     'checkRoom'    => $checkRoom,
+            // ]);
             try {
                 Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
             } catch (\Throwable $th) {
@@ -504,10 +504,10 @@ class ChatRoomService
 
             $checkRoom->delete();
         } else {
-            Log::info("checkRoom  ", [
+            // Log::info("checkRoom  ", [
          
-                'checkRoom'    => $checkRoom,
-            ]);
+            //     'checkRoom'    => $checkRoom,
+            // ]);
             ChatMessage::where('chat_room_id', $checkRoom->id)
                 ->chunk(200, function ($messages) use ($user) {
                     foreach ($messages as $msg) {

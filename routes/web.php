@@ -820,11 +820,11 @@ Route::get('/codapay/create-payment', function () {
             ->post($url, $payload);
 
         if ($response->failed()) {
-            Log::error("❌ Codapay Connection Failed", [
-                'status'  => $response->status(),
-                'body'    => $response->body(),
-                'headers' => $response->headers(),
-            ]);
+            // Log::error("❌ Codapay Connection Failed", [
+            //     'status'  => $response->status(),
+            //     'body'    => $response->body(),
+            //     'headers' => $response->headers(),
+            // ]);
 
             return response()->json([
                 'error'   => 'Failed to connect Codapay',
