@@ -48,7 +48,7 @@
     font-size: 12px;
 }
     .nav-tabs{
-        background: var(--box-background-color);
+        background: var(--secondary-color);
     }
     .nav-link.active {
         background-color: var(--primary-color);
