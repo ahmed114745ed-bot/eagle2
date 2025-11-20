@@ -209,7 +209,7 @@ class BdController extends MainController
         });
 
         $grid->column('parent.name', __('Super Admin'))->display(function () {
-            $user = $this->parent?->appUser;
+            $user = $this->parent;
             $name = $user->name ?? '';
 
             if (request()->filled('_export_')) {
@@ -217,8 +217,8 @@ class BdController extends MainController
             }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
+            $uid = $user->id ?? 'غير معروف';
+            $path = $user->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -227,7 +227,7 @@ class BdController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
+            $showUrl = url("admin/superadmin-users/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -242,40 +242,7 @@ class BdController extends MainController
             ";
         });
 
-        $grid->column('createdBy.name', __('created by'))->display(function () {
-            $user = $this->createdBy;
-            $name = $user->name ?? '';
-
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
-
-            $id = $user->id ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
-
+       
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
             return $this->total_agencies;
         });
@@ -309,7 +276,7 @@ class BdController extends MainController
             }
         }
 
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {

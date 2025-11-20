@@ -1342,7 +1342,6 @@ class HomeController extends MainController
                 'data' => $stats
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching stats data: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching statistics data'
