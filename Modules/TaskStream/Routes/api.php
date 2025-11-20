@@ -37,5 +37,6 @@ Route::group([
     'prefix' => 'v1/pk',
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization' ,'update.last.seen']
 ], function (){
-    Route::get('start', [PkSessionController::class, 'start']);
+    Route::post('start', [PkSessionController::class, 'start']);
+    Route::post('close', [PkSessionController::class, 'close']);
 });

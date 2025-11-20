@@ -20,9 +20,9 @@ class CreatePkSessionsTable extends Migration
             $table->string('team_2')->default('0,0');
             $table->boolean('status')->default(0);
             $table->tinyInteger('winner')->nullable();
-            $table->double('team_1_score');
-            $table->double('team_2_score');
-            $table->dateTime('end_at');
+            $table->double('team_1_score')->nullable();
+            $table->double('team_2_score')->nullable();
+            $table->dateTime('ends_at');
             $table->timestamps();
         });
     }

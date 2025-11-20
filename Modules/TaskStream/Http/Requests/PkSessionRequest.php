@@ -7,14 +7,32 @@ use Illuminate\Validation\Rule;
 
 class PkSessionRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
-        //Todo
         return [
             'team_1' => ['required', 'array'],
-            'team_1.*' => ['required', 'integer', Rule::exists('rooms')],
+            'team_1.*' => ['required', 'integer', 'distinct', Rule::exists('rooms', 'id')->where('type', 'live')->where('is_live', 1)],
             'team_2' => ['required', 'array'],
-            'team_2.*' => ['required', 'integer', Rule::exists('rooms')],
+            'team_2.*' => ['required', 'integer', 'distinct' ,Rule::exists('rooms', 'id')->where('type', 'live')->where('is_live', 1)],
+            'duration' => ['required', 'integer']
         ];
+    }
+
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $team1 = $this->input('team_1', []);
+            $team2 = $this->input('team_2', []);
+
+            $duplicates = array_intersect($team1, $team2);
+
+            if (!empty($duplicates)) {
+                $validator->errors()->add(
+                    'team_2',
+                    __('A room cannot appear in both teams: ') . implode(', ', $duplicates)
+                );
+            }
+        });
     }
 }

@@ -4,9 +4,7 @@ namespace Modules\TaskStream\Services;
 
 use App\Helpers\Common;
 use App\Models\Room;
-use App\Repositories\User\UserRepository;
 use Exception;
-use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 
@@ -15,8 +13,6 @@ class TaskStreamValidationService
     public function __construct(
         protected readonly TaskStreamRepository $taskStreamRepository,
         protected readonly TaskStreamRoomRepository $taskStreamRoomRepository,
-        protected readonly TaskStreamInvitationRepository $taskStreamInvitationRepository,
-        protected readonly UserRepository $userRepository,
     )
     {
     }
@@ -61,7 +57,7 @@ class TaskStreamValidationService
     /**
      * @throws Exception
      */
-    protected function validateRoomNotInTask($taskStream, $liveRoomId)
+    protected function validateRoomInTask($taskStream, $liveRoomId)
     {
         $taskStreamRoom = $this->taskStreamRepository->getExistenceTask($taskStream, $liveRoomId);
 

@@ -2,13 +2,29 @@
 
 namespace Modules\TaskStream\Services;
 
+use App\Models\Pk;
 use App\Models\User;
+use App\Repositories\User\UserRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Modules\TaskStream\Entities\PkSession;
+use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
+use Modules\TaskStream\Repositories\TaskStreamRepository;
+use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 
 
 class TaskStreamService extends TaskStreamValidationService
 {
+    public function __construct(
+        protected readonly TaskStreamInvitationRepository $taskStreamInvitationRepository,
+        protected readonly UserRepository $userRepository,
+        TaskStreamRepository $taskStreamRepository,
+        TaskStreamRoomRepository $taskStreamRoomRepository,
+    )
+    {
+        parent::__construct($taskStreamRepository, $taskStreamRoomRepository);
+    }
+
     public function index(): LengthAwarePaginator
     {
         return $this->taskStreamRepository->get();
@@ -73,10 +89,14 @@ class TaskStreamService extends TaskStreamValidationService
 
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
-        $taskStreamRoom = $this->validateRoomNotInTask($taskStream, $liveRoom->id);
+        $taskStreamRoom = $this->validateRoomInTask($taskStream, $liveRoom->id);
 
         if ($taskStream->rooms()->count() === 2) {
             $roomIds = $taskStream->rooms()->pluck('room_id')->toArray();
+            $pk = PkSession::where(['status' => 1, 'task_stream_id' => $taskStreamRoom->task_stream_id])->latest()->first();
+            if ($pk){
+                app(PkSessionService::class)->closeLogic($pk->id, $taskStreamRoom->task_stream_id);
+            }
 
             $this->taskStreamRepository->updateAllRemotes($roomIds);
 
@@ -86,7 +106,6 @@ class TaskStreamService extends TaskStreamValidationService
             $taskStreamRoom->delete();
         }
 
-        //TODO 3.If host is in an active PK → trigger PK leave logic (see §3.3).
         return $taskStream->load('rooms');
     }
 
@@ -106,7 +125,7 @@ class TaskStreamService extends TaskStreamValidationService
         }
 
         if ($taskStream->room_id != $liveRoom->id) {
-            $this->validateRoomNotInTask($taskStream, $liveRoom->id);
+            $this->validateRoomInTask($taskStream, $liveRoom->id);
         }
 
         if ($taskStream->room_id == $liveRoom->id) {

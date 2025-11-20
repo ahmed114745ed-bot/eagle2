@@ -25,9 +25,9 @@ class LiveFriendsResource extends JsonResource
                 'owner_name' => $this->name ?? '',
                 'room_name' => $this->ownerRoom->room_name ?? '',
                 'cover' => $this->ownerRoom->room_cover ?? '',
+                'room_id' => $this->ownerRoom->id ?? null,
                 'room_intro' => $this->ownerRoom->room_intro ?? '',
                 'room_type' => $this->ownerRoom->type ?? '',
-                'room_id' => $this->ownerRoom->id ?? null,
             ] : null,
         ];
     }

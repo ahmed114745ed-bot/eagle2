@@ -2,23 +2,148 @@
 
 namespace Modules\TaskStream\Services;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Models\GiftLog;
+use App\Models\Room;
+use App\Models\User;
+use Carbon\Carbon;
+use DB;
+use Exception;
 use Modules\TaskStream\Repositories\PkSessionRepository;
+use Modules\TaskStream\Repositories\TaskStreamRepository;
+use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 
 class PkSessionService extends TaskStreamValidationService
 {
     public function __construct(
         private readonly PkSessionRepository $pkSessionRepository,
+        TaskStreamRepository $taskStreamRepository,
+        TaskStreamRoomRepository $taskStreamRoomRepository,
     )
     {
+        parent::__construct($taskStreamRepository, $taskStreamRoomRepository);
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function start(): LengthAwarePaginator
+    public function start($data)
     {
         $liveRoom = $this->validateAuthLiveRoom();
-        $taskId = $this->taskStreamRoomRepository->getRoomTask($liveRoom->id);
+        $taskRoom = $this->taskStreamRoomRepository->getRoomTask($liveRoom->id);
+        if (! $taskRoom){
+            throw new Exception(__('You are not in any task.'));
+        }
+        $taskStream = $this->taskStreamRepository->findOrFail($taskRoom->task_stream_id);
+        $allRoomIds = array_merge($data['team_1'], $data['team_2']);
+
+        $count = $this->taskStreamRoomRepository->countRoomsInTask($taskStream->id, $allRoomIds);
+
+        if ($count !== count($allRoomIds)) {
+            throw new Exception(__('One or more rooms do not belong to your task stream.'));
+        }
+
+        $endsAt = Carbon::now()->copy()->addMinutes($data['duration']);
+
+        $mergedData = [
+            'team_1' => implode(',', $data['team_1']),
+            'team_2' => implode(',', $data['team_2']),
+            'task_stream_id' => $taskStream->id,
+            'ends_at' => $endsAt,
+            'status' => 1,
+        ];
+
+        $pk = $this->pkSessionRepository->firstOrCreate($taskStream->id, $endsAt, $mergedData);
+        $pk->duration = $data['duration'];
+        return $pk;
+    }
+
+    public function close($data)
+    {
+        $liveRoom = $this->validateAuthLiveRoom();
+        $taskRoom = $this->taskStreamRoomRepository->getRoomTask($liveRoom->id);
+
+        [$pk, $team1Rooms, $team2Rooms] = $this->closeLogic($data['pk_id'], $taskRoom->task_stream_id);
+
+        $participants = array_merge(
+            $this->buildParticipantArray($team1Rooms, 1, $pk->winner, $pk),
+            $this->buildParticipantArray($team2Rooms, 2, $pk->winner, $pk)
+        );
+
+        $pk->participants_data = $participants;
+        return $pk;
+    }
+
+    public function closeLogic($pkId, $taskStreamId): array
+    {
+        $pk = $this->pkSessionRepository->activePkSession($pkId, $taskStreamId);
+
+        $team1Rooms = explode(',', $pk->team_1);
+        $team2Rooms = explode(',', $pk->team_2);
+
+        DB::transaction(function () use ($pk, $team1Rooms, $team2Rooms) {
+            $team1Score = $this->calculateTeamScore($team1Rooms, $pk);
+            $team2Score = $this->calculateTeamScore($team2Rooms, $pk);
+
+            $winner = match(true) {
+                $team1Score > $team2Score => 1,
+                $team2Score > $team1Score => 2,
+                default => 0,
+            };
+
+            $pk->update([
+                'team_1_score' => $team1Score,
+                'team_2_score' => $team2Score,
+                'winner' => $winner,
+                'status' => 0,
+            ]);
+
+            $this->updateWinStreaks($winner, $team1Rooms, $team2Rooms);
+        });
+
+        return [$pk, $team1Rooms, $team2Rooms];
+    }
+    protected function calculateTeamScore(array $roomIds, $session): float
+    {
+        return GiftLog::whereIn('room_id', $roomIds)
+            ->where('created_at', '>=', $session->created_at)
+            ->where('created_at', '<=', $session->ends_at)
+            ->sum('giftPrice');
+    }
+
+    protected function buildParticipantArray(array $roomIds, int $team, int $winnerTeam, $pk): array
+    {
+        $participants = [];
+
+        foreach ($roomIds as $roomId) {
+            $score = GiftLog::where('room_id', $roomId)
+                ->where('created_at', '>=', $pk->created_at)
+                ->where('created_at', '<=', $pk->ends_at)
+                ->sum('giftPrice');
+
+            $participants[] = [
+                'room_id' => (int) $roomId,
+                'score' => $score,
+                'won' => $team == $winnerTeam,
+            ];
+        }
+
+        return $participants;
+    }
+
+    protected function updateWinStreaks(int $winner, array $team1Rooms, array $team2Rooms): void
+    {
+        $team1Uids = Room::whereIn('id', $team1Rooms)->pluck('uid');
+        $team2Uids = Room::whereIn('id', $team2Rooms)->pluck('uid');
+
+        if ($winner === 0) {
+            return;
+        }
+
+        $winningUids = $winner === 1 ? $team1Uids : $team2Uids;
+        $losingUids  = $winner === 1 ? $team2Uids : $team1Uids;
+
+        User::whereIn('id', $winningUids)->increment('win_streak');
+
+        User::whereIn('id', $losingUids)->update(['win_streak' => 0]);
     }
 }
