@@ -669,7 +669,7 @@ ease;
 
                                     {{-- File --}}
                                     @elseif ($field->field_type === 'file')
-                                    <div class="file-upload" style="position: relative; display: inline-block;">
+                                    {{-- <div class="file-upload" style="position: relative; display: inline-block;">
                                         <input
                                             type="file"
                                             id="idBack"
@@ -686,9 +686,34 @@ ease;
                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
                                         {{ __('upload_card_back') }}
                                         </label>
+                                    </div> --}}
+
+                                    @php
+                                        // generate unique IDs for each input & label
+                                        $inputId = $field->field_name . '_input';
+                                        $labelId = $field->field_name . '_label';
+                                    @endphp
+
+                                    <div class="file-upload" style="position: relative; display: inline-block;">
+                                        <input type="file"
+                                            id="{{ $inputId }}"
+                                            name="{{ $field->field_name }}"
+                                            accept="image/*"
+                                            class="file-input"
+                                            @required($field->is_required)
+                                            onchange="handleFileUpload(this, '{{ $labelId }}')"
+                                            style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; cursor: pointer;"
+                                        >
+
+                                        <label for="{{ $inputId }}"
+                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column"
+                                            id="{{ $labelId }}"
+                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
+                                        {{ __('upload_card_back') }}
+                                        </label>
                                     </div>
 
-                                    <script>
+                                    {{-- <script>
                                     function handleFileUpload(input, labelId) {
                                         const label = document.getElementById(labelId);
                                         if (!input.files || !input.files[0]) return;
@@ -706,6 +731,26 @@ ease;
 
                                         reader.readAsDataURL(file);
                                     }
+                                    </script> --}}
+
+                                    <script>
+                                        function handleFileUpload(input, labelId) {
+                                            const label = document.getElementById(labelId);
+                                            if (!input.files || !input.files[0]) return;
+
+                                            const file = input.files[0];
+                                            const reader = new FileReader();
+
+                                            reader.onload = function(e) {
+                                                label.innerHTML = `
+                                                    <img src="${e.target.result}" alt="Uploaded Image"
+                                                        style="max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 8px;">
+                                                    <div style="font-size: 12px; color: #555;">${file.name}</div>
+                                                `;
+                                            };
+
+                                            reader.readAsDataURL(file);
+                                        }
                                     </script>
 
 
