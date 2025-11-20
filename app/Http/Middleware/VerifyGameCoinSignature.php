@@ -20,7 +20,7 @@ class VerifyGameCoinSignature
         $type       = (integer)$request->input('type');
         $rewardType = (integer)$request->input('rewardType');
         $winId      = $request->input('winId', "");
-        $token      = (string)$request->input('token');
+        $token      = urldecode($request->input('token'));
         $sign       = $request->input('sign');
         $key        = config('games.leader_CC_game_key');
           LogHelper::info('Middleware - All inputs', [
