@@ -42,11 +42,13 @@ class VerifyGameCoinSignature
         $expectedSign = md5($rawString);
 
         if (strtolower($expectedSign) !== strtolower($sign)) {
+            Log::info("inside ");
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail'
             ], 400);
         }
+            Log::info("outside ");
         
         return $next($request);
     }
