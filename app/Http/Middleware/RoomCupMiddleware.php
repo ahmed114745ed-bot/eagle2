@@ -25,8 +25,8 @@ class RoomCupMiddleware
             });
         };
 
-        $roomCup = $getSetting('room_cup');
-        $roomCupSetting = $getSetting('room_cup_setting');
+        $roomCup = $getSetting('room_cup') ?? 0;
+        $roomCupSetting = $getSetting('room_cup_setting') ?? 0;
         if (!$roomCup && !$roomCupSetting) return response()->json(['error' => 'something wrong'], 500);
 
         return $next($request);
