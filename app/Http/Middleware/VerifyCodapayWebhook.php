@@ -34,7 +34,6 @@ class VerifyCodapayWebhook
         ];
 
         if (!in_array($request->ip(), $allowedIps)) {
-            \Log::warning('Unauthorized Codapay callback IP: ' . $request->ip());
             return response()->json(['error' => 'Unauthorized IP'], 403);
         }
 

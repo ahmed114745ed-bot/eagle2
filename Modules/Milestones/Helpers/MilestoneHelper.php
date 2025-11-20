@@ -195,11 +195,12 @@ class MilestoneHelper
     
                 self::revokeRewardFromUser($user, $reward);
             }
-        } else {
-            Log::warning('No rewards found for milestone', [
-                'milestone_slug' => $slug,
-                'user_id' => $user->id ?? null,
-            ]);
-        }   
+        } 
+        // else {
+        //     Log::warning('No rewards found for milestone', [
+        //         'milestone_slug' => $slug,
+        //         'user_id' => $user->id ?? null,
+        //     ]);
+        // }   
      }
 }

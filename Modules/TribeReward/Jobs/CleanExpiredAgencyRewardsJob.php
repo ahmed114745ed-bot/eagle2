@@ -34,7 +34,7 @@ class CleanExpiredAgencyRewardsJob implements ShouldQueue
             info("Cleaned up $deleted expired agency rewards.");
 
         } catch (\Throwable $e) {
-            \Log::error("ERROR in CleanExpiredAgencyRewardsJob: " . $e->getMessage());
+          //  \Log::error("ERROR in CleanExpiredAgencyRewardsJob: " . $e->getMessage());
             throw $e;
         }
     }
