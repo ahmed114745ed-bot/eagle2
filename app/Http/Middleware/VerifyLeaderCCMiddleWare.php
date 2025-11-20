@@ -91,7 +91,7 @@ class VerifyLeaderCCMiddleWare
                     }
                 }
                 $rawString =
-                    $request->gameId .
+                    // $request->gameId .
                     $request->uid .
                     $request->token .
                     $request->roomId .
