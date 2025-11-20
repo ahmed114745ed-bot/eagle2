@@ -79,7 +79,7 @@ class AuthController extends Controller
                 $fields = [
                     'name'          => $request->name,
                     'email'         => $request->email,
-                    'id_token'      => $request->id_token,  
+                    'id_token'      => $request->id_token,
                     'device_token'  => $request->device_token,
                     'lat'           => $request->lat,
                     'long'          => $request->long,
@@ -116,7 +116,7 @@ class AuthController extends Controller
         }
 
         $user->auth_token = $token;
-        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        if ($user->device_token) AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
         return Common::apiResponse(
             true,
@@ -234,22 +234,22 @@ class AuthController extends Controller
         if (empty($data['id_token'])) {
             return Common::apiResponse(false, 'missing id_token', null, 400);
         }
-    
+
         $appleKeys = Http::get('https://appleid.apple.com/auth/keys')->json();
-    
+
         try {
             $decoded = JWT::decode(
                 $data['id_token'],
-                JWK::parseKeySet($appleKeys) 
+                JWK::parseKeySet($appleKeys)
             );
         } catch (\Exception $e) {
             return Common::apiResponse(false, 'invalid apple token', null, 401);
         }
-    
+
         $appleUserId = $decoded->sub;
         $email = $decoded->email ?? $data['email'] ?? null;
         $name  = $data['name'] ?? 'Apple User';
-    
+
         try {
             [$user, $token] = $this->authService->loginWithApple(
                 [
@@ -266,15 +266,15 @@ class AuthController extends Controller
         } catch (\Exception $ex) {
             return Common::apiResponse(false, $ex->getMessage(), null, 400);
         }
-    
+
         $user->auth_token = $token;
-    
+
         event(new DeviceTokenSent($user->id, $user->device_token));
         AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
-    
+
         return Common::apiResponse(true, '', new MyDataResource($user), 200);
     }
-    
+
 
 
 
