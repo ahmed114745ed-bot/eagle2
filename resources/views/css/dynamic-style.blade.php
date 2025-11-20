@@ -1226,7 +1226,7 @@ html.ltr .dropdown-menu {
     width: 1000px;
 } */
 
-html[dir="ltr"] .col-sm-8 {
+[lang="en"] .col-sm-8 {
     width: 1000px !important;
 }
 
