@@ -12,18 +12,30 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-         $orderId    = $request->input('orderId');
-        $gameId     = $request->input('gameId');
-        $roundId    = $request->input('roundId');
-        $uid        = $request->input('uid');
-        $coin       = $request->input('coin');
-        $type       = $request->input('type');
-        $rewardType = $request->input('rewardType');
-        $winId      = $request->input('winId', '');
-        $token      = urldecode($request->input('token'));
+        $orderId    = (string)$request->input('orderId');
+        $gameId     = (string)$request->input('gameId');
+        $roundId    = (string)$request->input('roundId');
+        $uid        = (string)$request->input('uid');
+        $coin       = (integer)$request->input('coin');
+        $type       = (integer)$request->input('type');
+        $rewardType = (integer)$request->input('rewardType');
+        $winId      = $request->input('winId', "");
+        $token      = (string)urldecode($request->input('token'));
         $sign       = $request->input('sign');
         $key        = config('games.leader_CC_game_key');
-        
+          LogHelper::info('Middleware - All inputs', [
+            'orderId' => $orderId,
+            'gameId' => $gameId,
+            'roundId' => $roundId,
+            'roomId' => $request->input('roomId'),
+            'uid' => $uid,
+            'coin' => $coin,
+            'type' => $type,
+            'rewardType' => $rewardType,
+            'winId' => $winId,
+            'token' => $token,
+            'sign' => $sign
+        ]);
         if (
             !$orderId || !$gameId || !$roundId || !$uid ||
             !$coin || !$rewardType || !$type || !$sign || !$token
@@ -40,7 +52,9 @@ class VerifyGameCoinSignature
         ]);
         
         $expectedSign = md5($rawString);
-
+  LogHelper::info('Middleware -expectedSign', [
+            $expectedSign
+    ]);
         if (strtolower($expectedSign) !== strtolower($sign)) {
             Log::info("inside ");
             return response()->json([
