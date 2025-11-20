@@ -49,23 +49,33 @@ class VerifyGameCoinSignature
         }
      // String sign = md5(orderId + gameId + roundId + uid + coin + type + rewardType + token + winId + key); => *change-balance*
 
-        $rawString = 
-            (string)$orderId
-            . (string)$gameId
-            . (string)$roundId
-            . (string)$uid
-            . (string)$coin
-            . (string)$type
-            . (string)$rewardType
-            . (string)$token
-            . (string)$winId
-            . (string)$key;
+        $rawString = implode('', [
+                $orderId, $gameId, $roundId, $uid, $coin, 
+                $type, $rewardType, $token, $winId, $key
+            ]);
         $expectedSign = md5($rawString);
         LogHelper::info('Check signature', [
             'rawString' => $rawString,
             'expectedSign' => $expectedSign,
             'clientSign' => $sign
         ]);
+
+        LogHelper::info('Sign Calculation Details', [
+    'orderId' => $orderId,
+    'gameId' => $gameId,
+    'roundId' => $roundId,
+    'uid' => $uid,
+    'coin' => $coin,
+    'type' => $type,
+    'rewardType' => $rewardType,
+    'token' => $token,
+    'winId' => $winId,
+    'key' => $key, // تأكد أن الـ key غير فارغ
+    'rawString' => $rawString,
+    'expectedSign' => $expectedSign,
+    'receivedSign' => $sign
+]);
+
         if (!hash_equals(strtolower($expectedSign), strtolower($sign))) {
             return response()->json([
                 'errorCode' => 10004,
