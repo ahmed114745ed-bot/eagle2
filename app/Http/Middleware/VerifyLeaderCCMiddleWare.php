@@ -54,15 +54,16 @@ class VerifyLeaderCCMiddleWare
             // }
         }
 
-        LogHelper::info('LeaderCC Request change-balance', [
-            'change-balance'      => 'change-balance',
-           
-        ]);
+
         switch ($path) {
             case 'leader-cc-game/change-balance':
                 $requiredParams = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
                 foreach ($requiredParams as $p) {
                     if (!$request->has($p)) {
+                        LogHelper::info('Missing signature parameters', [
+                            'i'      => $p,
+                           
+                        ]);
                         return response()->json([
                             'errorCode' => 4005,
                             'errorMsg' => 'Missing signature parameters'
