@@ -45,12 +45,13 @@ class VerifyLeaderCCMiddleWare
         }
         if ($request->has('token')) {
             $token = $request->token;
-            if ($this->findUserByToken($token)) {
-                return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'Order already exists for this token'
-                ], 400);
-            }
+            // if ($this->findUserByToken($token)) {
+
+            //     return response()->json([
+            //         'errorCode' => 10003,
+            //         'errorMsg'  => 'Order already exists for this token'
+            //     ], 400);
+            // }
         }
 
         switch ($path) {
