@@ -13,7 +13,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 4m
+        command_timeout: 5m
         script: |
           cd /var/www/5live
           pwd
@@ -29,7 +29,7 @@ jobs:
           fi
  
   run_5live_app:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_5live_hub
     steps:
     - name: print out 5live-app
@@ -69,7 +69,7 @@ jobs:
           fi
  
   run_5live_job:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     needs: run_5live_hub
     steps:
     - name: print out 5live-job
