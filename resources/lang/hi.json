@@ -32,7 +32,9 @@
 "Creator": "निर्माता",
 "max message": "अधिकतम संदेश",
 "group chat setting": "ग्रुप चैट सेटिंग",
-
+"music_gift": "संगीत उपहार",
+"room cup setting": "रूम कप सेटिंग",
+"Enable room cup Feature": "रूम कप फ़ीचर सक्षम करें",
     "Specifies the percentage of the total profit distributed among all admins.": "यह सभी प्रशासकों (एडमिन) के बीच वितरित कुल लाभ का प्रतिशत निर्दिष्ट करता है।",
 "Specifies the percentage of the total profit allocated to the room owner.": "यह कक्ष (रूम) के मालिक को आवंटित कुल लाभ का प्रतिशत निर्दिष्ट करता है।",
 "Admin Profit Percentage (Admin Profit %)": "प्रशासक लाभ प्रतिशत (एडमिन लाभ %)",

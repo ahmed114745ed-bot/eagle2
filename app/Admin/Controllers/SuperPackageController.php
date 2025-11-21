@@ -87,11 +87,7 @@ class SuperPackageController extends MainController
 
 
         $grid->column('members', __('rewards'))->expand(function ($model) {
-            Log::info("=== Expand rewards for model ID: {$model->id} ===");
-
             $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
-                Log::info("Processing reward ID: {$memper->id}, type: {$memper->type}");
-
                 $gifts = '';
                 $path  = '';
 
@@ -99,39 +95,29 @@ class SuperPackageController extends MainController
                     case "ware":
                         $gifts = @$memper->ware->name ?? '';
                         $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
-                        Log::info("Ware gift: {$gifts}, path: {$path}");
                         break;
                     case "vip":
                         $gifts = @$memper->vip->name ?? '';
                         $path  = @$memper->vip->img ?? '';
-                        Log::info("VIP gift: {$gifts}, path: {$path}");
                         break;
                     case "badge":
                         $gifts = @$memper->badge->name ?? '';
                         $path  = @$memper->badge->image ?? '';
-                        Log::info("Badge gift: {$gifts}, path: {$path}");
                         break;
                     case "coin":
                         $gifts = @$memper->target;
                         $path  = 'coin.png';
-                        Log::info("Coins gift: {$gifts}, path: {$path}");
                         break;
                     case "achievement":
                         $value = getDriverUrl() . '/' . @$memper->target;
                         $gifts = "<img src='$value' width='80' height='80'>";
                         $path  = $memper->target;
-                        Log::info("Achievement gift: {$gifts}, path: {$path}, value: {$value}");
                         break;
                 }
 
                 $url = getImagePath($path);
-                Log::info("Resolved image URL: {$url}");
 
                 $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
-
-
-
-                Log::info("Generated image HTML: {$image}");
 
                 return [
                     'id'       => $memper->id,
@@ -143,7 +129,6 @@ class SuperPackageController extends MainController
                 ];
             });
 
-            Log::info("Mapped rewards: " . json_encode($mempers->toArray()));
 
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],

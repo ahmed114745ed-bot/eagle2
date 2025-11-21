@@ -142,8 +142,6 @@ class PayPalService
                 return $link->href;
             }
         }
-
-        \Log::error('PayPal approve link not found', ['order_id' => $orderId, 'status' => $status]);
         throw new \Exception("PayPal approval link not found");
     }
 

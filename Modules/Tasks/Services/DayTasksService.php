@@ -45,7 +45,7 @@ class DayTasksService
         }
         catch(Exception $e)
         {
-            \Log::error('Error fetching day tasks: ' . $e->getMessage());
+           // \Log::error('Error fetching day tasks: ' . $e->getMessage());
             return Common::apiResponse(false, $e->getMessage(),null, 500);
         }
     }

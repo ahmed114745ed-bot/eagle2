@@ -610,7 +610,7 @@ ease;
         </h2>
     </div>
 
-    <form action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
+    <form id="dynamicForm" action="{{ route('form.submit', $template->form_type) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if (!empty($user))
         <input type="hidden" name="user_id" value="{{  $user->id}}">
@@ -669,7 +669,7 @@ ease;
 
                                     {{-- File --}}
                                     @elseif ($field->field_type === 'file')
-                                    <div class="file-upload" style="position: relative; display: inline-block;">
+                                    {{-- <div class="file-upload" style="position: relative; display: inline-block;">
                                         <input
                                             type="file"
                                             id="idBack"
@@ -686,9 +686,34 @@ ease;
                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
                                         {{ __('upload_card_back') }}
                                         </label>
+                                    </div> --}}
+
+                                    @php
+                                        // generate unique IDs for each input & label
+                                        $inputId = $field->field_name . '_input';
+                                        $labelId = $field->field_name . '_label';
+                                    @endphp
+
+                                    <div class="file-upload" style="position: relative; display: inline-block;">
+                                        <input type="file"
+                                            id="{{ $inputId }}"
+                                            name="{{ $field->field_name }}"
+                                            accept="image/*"
+                                            class="file-input"
+                                            @required($field->is_required)
+                                            onchange="handleFileUpload(this, '{{ $labelId }}')"
+                                            style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; cursor: pointer;"
+                                        >
+
+                                        <label for="{{ $inputId }}"
+                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column"
+                                            id="{{ $labelId }}"
+                                             style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
+                                        {{ __('upload_card_back') }}
+                                        </label>
                                     </div>
 
-                                    <script>
+                                    {{-- <script>
                                     function handleFileUpload(input, labelId) {
                                         const label = document.getElementById(labelId);
                                         if (!input.files || !input.files[0]) return;
@@ -706,6 +731,26 @@ ease;
 
                                         reader.readAsDataURL(file);
                                     }
+                                    </script> --}}
+
+                                    <script>
+                                        function handleFileUpload(input, labelId) {
+                                            const label = document.getElementById(labelId);
+                                            if (!input.files || !input.files[0]) return;
+
+                                            const file = input.files[0];
+                                            const reader = new FileReader();
+
+                                            reader.onload = function(e) {
+                                                label.innerHTML = `
+                                                    <img src="${e.target.result}" alt="Uploaded Image"
+                                                        style="max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 8px;">
+                                                    <div style="font-size: 12px; color: #555;">${file.name}</div>
+                                                `;
+                                            };
+
+                                            reader.readAsDataURL(file);
+                                        }
                                     </script>
 
 
@@ -975,18 +1020,35 @@ ease;
 
     @endif
 
+      
 
-
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">
-                <i class="fa fa-paper-plane me-2"></i> {{ __('Submit') }}
-            </button>
-        </div>
+             <div class="text-center mb-5">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fa fa-paper-plane me-2"></i> {{ __('Submit') }}
+                </button>
+            </div>
     </form>
+
+    
+
+</div>
+
+ <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; text-align:center;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+        <i class="fa fa-spinner fa-spin fa-3x"></i>
+        <p>{{ __('Loading...') }}</p>
+    </div>
+</div>
+
+
 
 
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+
+    
+
     const translations = {
         members: "{{ __('Members') }}",
         recommended: "{{ __('موصى به') }}",
@@ -997,6 +1059,19 @@ ease;
     };
 </script>
 <script>
+
+     jQuery(document).ready(function($) {
+        $('#dynamicForm').on('submit', function(e) {
+            // Show overlay immediately
+            jQuery('#loadingOverlay').show();
+
+            // Disable the submit button to prevent multiple clicks
+            jQuery('#submitBtn').prop('disabled', true);
+
+            // Optional: prevent actual submit for testing
+            // e.preventDefault();
+        });
+    });
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.querySelector('.form-container');
     const formId = "{{ $template->id }}";

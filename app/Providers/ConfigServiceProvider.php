@@ -42,8 +42,6 @@ class ConfigServiceProvider extends ServiceProvider
                 Config::set('broadcasting.connections.pusher.secret', $config['app_secret']);
                 Config::set('broadcasting.connections.pusher.app_id', $config['app_id']);
                 Config::set('broadcasting.connections.pusher.options.cluster', $config['app_cluster'] ?? 'mt1');
-            } else {
-                Log::warning('⚠️ Pusher configuration missing or invalid in database.');
             }
 
         } catch (\Throwable $e) {

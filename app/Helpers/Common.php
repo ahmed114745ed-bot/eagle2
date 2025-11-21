@@ -755,7 +755,6 @@ class Common
         $credentialsFilePath = base_path(config("app.fileName"));
 
         if (!file_exists($credentialsFilePath)) {
-            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
             return null;
         }
 
@@ -767,13 +766,11 @@ class Common
             $token = $client->fetchAccessTokenWithAssertion();
 
             if (!isset($token['access_token'])) {
-                Log::error('Access token is missing from Google Client.');
                 return null;
             }
 
             return $token['access_token'];
         } catch (\Throwable $e) {
-            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
             return null;
         }
     }
@@ -1430,8 +1427,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-         Log::info('start sendToZego3');
-
         try {
 
             $client           = new Client();
