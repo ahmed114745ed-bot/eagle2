@@ -15,5 +15,6 @@ class LogHelper
         }
 
         Log::info($logMessage);
+
     }
 }

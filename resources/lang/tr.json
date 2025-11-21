@@ -33,6 +33,10 @@
 "Creator": "Oluşturucu",
 "max message": "Maksimum mesaj",
 "group chat setting": "Grup sohbeti ayarı",
+"music_gift": "Müzik hediyesi",
+"room cup setting": "Oda kupa ayarı",
+"Enable room cup Feature": "Oda kupa özelliğini etkinleştir",
+
 "All Agencies around your region": "Bölgenizin çevresindeki tüm acenteler",
     "Specifies the percentage of the total profit distributed among all admins.": "Tüm yöneticiler arasında dağıtılan toplam kâr yüzdesini belirtir.",
 "Specifies the percentage of the total profit allocated to the room owner.": "Oda sahibine tahsis edilen toplam kâr yüzdesini belirtir.",

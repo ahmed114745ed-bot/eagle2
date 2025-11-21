@@ -256,7 +256,6 @@ class PaytabsController extends Controller
 
     public function return(Request $request)
     {
-        \Log::info("تم الدفع بنجاح للطلب رقم: " . $request->payment_id);
         return response()->json(['message' => 'Callback received'], 200);
     }
 }

@@ -350,7 +350,6 @@ class CustomNotification
 
                 // Save user_official_messages records
                 foreach ($chunk as $user) {
-                    Log::info($user->id);
                     UserOfficialMessage::create([
                         'official_message_id' => $msg->id,
                         'user_id' => $user->id,

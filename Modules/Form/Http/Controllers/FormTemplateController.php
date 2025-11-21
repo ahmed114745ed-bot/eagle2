@@ -148,8 +148,6 @@ class FormTemplateController extends Controller
             admin_error(__('Error'), __('Form Template not found.'));
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error('Form Template Edit Error: ' . $e->getMessage(), ['id' => $id]);
-
             admin_error(__('Unexpected Error'), __('Something went wrong while loading the form template.'));
             return redirect()->back();
         }
@@ -354,7 +352,7 @@ class FormTemplateController extends Controller
         $data = $request->except('_token');
    
         $existingRequest = FormRequest::where('form_template_id', $template->id)
-                            ->where('submitted_by', $request->user_id)
+                            ->where('submitted_by', $request->user_id)->where('status','!=','rejected')
                             ->first();
         if ($existingRequest) {
             return redirect()->route('forms.show.reqs', [
