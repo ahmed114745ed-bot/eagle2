@@ -1027,7 +1027,7 @@
                                     <td class="user-cell">
                                             <div class="user-avatar">
                                                 <a >
-                                                    <img src="{{ getImagePath($bd->avatar) }}" alt="{{ $bd->username ??'' }}">
+                                                    <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}"  alt="{{ $bd->username ?? '' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
@@ -1042,7 +1042,7 @@
                                         <td class="user-cell">
                                             <div class="user-avatar">
                                                 <a href="{{ url($prefix.'/users/'. $bd->appUser?->id ) }}">
-                                                    <img src="{{ getImagePath($bd->appUser?->profile?->avatar) }}" alt="{{ $bd->appUser?->name ??'' }}">
+                                                    <img src="{{$bd->appUser?->profile?->avatar? getImagePath($bd->appUser?->profile?->avatar): $defaultImage }}" alt="{{ $bd->appUser?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
