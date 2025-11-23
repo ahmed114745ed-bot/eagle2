@@ -998,6 +998,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
 
+
+    public function nowRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+    }
     public function myroom()
     {
         return $this->hasOne(Room::class, 'uid', 'id');
