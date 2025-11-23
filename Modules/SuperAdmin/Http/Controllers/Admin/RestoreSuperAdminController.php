@@ -8,6 +8,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Actions\Admin\RestoreSuperAdminAction;
 
@@ -106,7 +107,10 @@ class RestoreSuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country_name', __('Country'))->display(function () {
+            $locale = app()->getLocale(); // get current locale
+            return $locale === 'en' ? $this->country->e_name : $this->country->name;
+        });
         if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('restore'))->display(function () {
                 $superAdmin = SuperAdmin::where('country_id', $this->country_id)->first();
