@@ -2020,6 +2020,8 @@
 "image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)": "الصورة: (jpg, jpeg, png, gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)",
     "Show host": "عرض المضيف",
     "Delete host": "حذف المضيف",
+    "Request under review!":"طلب تحت المراجعه",
+    "something got wrong":"حدث خطأ ما",
     "Edit host": "تعديل المضيف",
     "Browse host": "تصفح المضيفين",
     "Sub Super Admin": "سوبر ادمن",
