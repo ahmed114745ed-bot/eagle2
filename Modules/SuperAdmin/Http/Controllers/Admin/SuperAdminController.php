@@ -113,7 +113,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'creator','createdBy'])
+        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'creator', 'createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -649,6 +649,12 @@ class SuperAdminController extends MainController
         $tab = request()->query('tab', 'agencies');
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
+        if (!$superAdmin) {
+            $superAdmin = SuperAdmin::onlyTrashed()
+                ->select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])
+                ->with('country')
+                ->findOrFail($id);
+        }
 
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
