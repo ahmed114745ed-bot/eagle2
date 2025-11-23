@@ -3607,9 +3607,9 @@
     "Full Form Information": "पूर्ण फॉर्म जानकारी",
     "User Name": "उपयोगकर्ता का नाम",
     "Email": "ईमेल",
-    "max mix stream": "अधिकतम मिक्स स्ट्रीम",
-    "This is the default number of rooms allowed per mix.": "यह प्रति मिक्स अनुमत कमरों की डिफ़ॉल्ट संख्या है।",
 
+    "max task stream": "अधिकतम टास्क स्ट्रीम",
+    "This is the default number of rooms allowed per task.": "यह प्रत्येक टास्क के लिए अनुमत कमरों की डिफ़ॉल्ट संख्या है।",
     "You cannot invite yourself.": "आप स्वयं को आमंत्रित नहीं कर सकते।",
     "You cannot send an invitation while your task is empty. Please join your task first.": "जब आपका कार्य खाली है तब आप निमंत्रण नहीं भेज सकते। कृपया पहले अपने कार्य से जुड़ें।",
     "This user is already part of your task stream.": "यह उपयोगकर्ता पहले से ही आपके टास्क स्ट्रीम का हिस्सा है।",

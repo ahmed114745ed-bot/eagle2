@@ -3979,9 +3979,9 @@
     "Approved": "Onaylandı",
     "Approved Successfully": "Başarıyla Onaylandı",
     "Rejected": "Reddedildi",
-    "max mix stream": "Maksimum karışık yayın",
-    "This is the default number of rooms allowed per mix.": "Bu, her karışım için izin verilen varsayılan oda sayısıdır.",
 
+    "max task stream": "Maksimum görev akışı",
+    "This is the default number of rooms allowed per task.": "Bu, her görev için izin verilen varsayılan oda sayısıdır.",
     "You cannot invite yourself.": "Kendinizi davet edemezsiniz.",
     "You cannot send an invitation while your task is empty. Please join your task first.": "Göreviniz boşken davet gönderemezsiniz. Lütfen önce görevinize katılın.",
     "This user is already part of your task stream.": "Bu kullanıcı zaten görev akışınızın bir parçası.",

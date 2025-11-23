@@ -4517,9 +4517,8 @@
 "Last Updated": "آخر تحديث",
 "Available Actions": "الإجراءات المتاحة",
 
-"max mix stream": "الحد الأقصى للبث المختلط",
-"This is the default number of rooms allowed per mix.": "هذا هو العدد الافتراضي للغرف المسموح بها لكل مزيج.",
-
+"max task stream": "الحد الأقصى لتدفقات المهام",
+"This is the default number of rooms allowed per task.": "هذا هو العدد الافتراضي للغرف المسموح بها لكل مهمة.",
 "You cannot invite yourself.": "لا يمكنك دعوة نفسك.",
 "You cannot send an invitation while your task is empty. Please join your task first.": "لا يمكنك إرسال دعوة بينما مهمتك فارغة. يرجى الانضمام إلى مهمتك أولاً.",
 "This user is already part of your task stream.": "هذا المستخدم هو بالفعل جزء من دفق المهمة الخاص بك.",

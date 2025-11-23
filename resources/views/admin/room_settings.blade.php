@@ -399,11 +399,11 @@
                     <div class="form">
                         @csrf
 
-                        <label>{{ __('max mix stream') }}</label>
+                        <label>{{ __('max task stream') }}</label>
                         <input class="form-control" type="number" min="1" name="max_mix_stream"
                                value="{{ $settings['max_mix_stream'] ?? 4 }}">
                         <small class="form-text text-muted" style="position: relative; top: -15px;">
-                            {{ __('This is the default number of rooms allowed per mix.') }}
+                            {{ __('This is the default number of rooms allowed per task.') }}
                         </small>
                         <br>
                         <button type="submit">{{ __('save') }}</button>
