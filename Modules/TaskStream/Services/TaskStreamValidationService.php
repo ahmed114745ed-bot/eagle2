@@ -116,4 +116,15 @@ class TaskStreamValidationService
 
         Common::sendToZego('SendCustomCommand', $liveRoom->id, $liveRoom->uid, $json);
     }
+
+    /**
+     * @throws Exception
+     */
+    public function checkRoomsIds($allRoomIds, $liveRoomId): void
+    {
+        $existing = Room::whereIn('id', $allRoomIds)->where('type','live')->where('is_live',1)->pluck('id')->toArray();
+        $missing = array_diff($allRoomIds, $existing);
+        if (! empty($missing)) throw new Exception(__('Some rooms are not live or do not exist: ') . implode(',', $missing));
+        if (! in_array($liveRoomId, $allRoomIds)) throw new Exception(__('Host must be part of the teams'));
+    }
 }

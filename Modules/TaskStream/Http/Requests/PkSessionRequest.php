@@ -11,9 +11,9 @@ class PkSessionRequest extends FormRequest
     {
         return [
             'team_1' => ['required', 'array'],
-            'team_1.*' => ['required', 'integer', 'distinct', Rule::exists('rooms', 'id')->where('type', 'live')->where('is_live', 1)],
+            'team_1.*' => ['required', 'integer', 'distinct'],
             'team_2' => ['required', 'array'],
-            'team_2.*' => ['required', 'integer', 'distinct' ,Rule::exists('rooms', 'id')->where('type', 'live')->where('is_live', 1)],
+            'team_2.*' => ['required', 'integer', 'distinct'],
             'duration' => ['required', 'integer']
         ];
     }

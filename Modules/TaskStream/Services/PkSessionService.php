@@ -36,6 +36,8 @@ class PkSessionService extends TaskStreamValidationService
         $taskStream = $this->taskStreamRepository->findOrFail($taskRoom->task_stream_id);
         $allRoomIds = array_merge($data['team_1'], $data['team_2']);
 
+        $this->checkRoomsIds($allRoomIds, $liveRoom->id);
+
         $count = $this->taskStreamRoomRepository->countRoomsInTask($taskStream->id, $allRoomIds);
 
         if ($count !== count($allRoomIds)) {
