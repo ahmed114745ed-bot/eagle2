@@ -182,6 +182,10 @@ class SuperAdminChargeReportController extends MainController
 
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
+              // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
