@@ -209,7 +209,7 @@ class EncorUsersController extends AdminController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("superadmin/superadmin-users/{$user->id}");
+            $showUrl = url("superadmin/superadmin-profile/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
