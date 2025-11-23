@@ -99,19 +99,27 @@ class SuperAdminChargeReportController extends MainController
 
                 // Custom filter for increase/decrease/no change
                 $filter->where(function ($query) {
-                    $value = request('change_type'); // get the selected value
+                    $value = request('changes_type'); // get the selected value
 
                     if ($value === 'increase') {
                         $query->where('amount', '>', 0);
                     } elseif ($value === 'decrease') {
                         $query->where('amount', '<', 0);
                     }
-                }, __('Charge Type'),'change_type')->select([
+                }, __('Charge Type'),'changes_type')->select([
                     'increase'  => __('increase'),
                     'decrease'  => __('decrease'),
                 ]);
             });
+
+             $filter->column(1 / 2, function ($filter) {
+
+                // Custom filter for increase/decrease/no change
+                $filter->equal('charger_id', __('created by'));
+            });
         });
+
+        
 
         Admin::script(
             <<<JS
@@ -149,8 +157,8 @@ class SuperAdminChargeReportController extends MainController
     ');
 
         $grid->model()
-         ->when(request('change_type') =='increase', fn($q) => $q->where('amount', '>', 0))
-          ->when(request('change_type') =='decrease', fn($q) => $q->where('amount', '<', 0))
+         ->when(request('changes_type') =='increase', fn($q) => $q->where('amount', '>', 0))
+          ->when(request('changes_type') =='decrease', fn($q) => $q->where('amount', '<', 0))
             ->where('user_id', '=', request('id'))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
@@ -174,6 +182,10 @@ class SuperAdminChargeReportController extends MainController
 
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
+              // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
