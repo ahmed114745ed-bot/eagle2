@@ -24,7 +24,7 @@ class TaskStreamRoomRepository extends AbstractRepository
 
     public function getArrayTasks()
     {
-        return TaskStreamRoom::pluck('room_id')->toArray();
+        return $this->model->pluck('room_id')->toArray();
     }
 
     public function countRoomsInTask($taskId, array $roomIds): int
