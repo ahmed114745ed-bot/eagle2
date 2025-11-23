@@ -27,6 +27,9 @@ class PkSessionController extends Controller
         return Common::apiResponse(true, '', PkSessionResource::make($result));
     }
 
+    /**
+     * @throws \Exception
+     */
     public function close(Request $request): JsonResponse
     {
         $data = $request->validate([

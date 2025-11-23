@@ -78,6 +78,9 @@ class PkSessionService extends TaskStreamValidationService
         return $pk;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function closeLogic($pkId, $taskStreamId): array
     {
         $pk = $this->pkSessionRepository->activePkSession($pkId, $taskStreamId);
@@ -119,15 +122,17 @@ class PkSessionService extends TaskStreamValidationService
     {
         $participants = [];
 
-        foreach ($roomIds as $roomId) {
-            $score = GiftLog::where('room_id', $roomId)
-                ->where('created_at', '>=', $pk->created_at)
-                ->where('created_at', '<=', $pk->ends_at)
-                ->sum('giftPrice');
+        $scores = GiftLog::whereIn('room_id', $roomIds)
+            ->select('room_id', DB::raw('SUM(giftPrice) as total_score'))
+            ->where('created_at', '>=', $pk->created_at)
+            ->where('created_at', '<=', $pk->ends_at)
+            ->groupBy('room_id')
+            ->pluck('total_score', 'room_id');
 
+        foreach ($roomIds as $roomId) {
             $participants[] = [
                 'room_id' => (int) $roomId,
-                'score' => $score,
+                'score' => $scores[$roomId],
                 'won' => $team == $winnerTeam,
             ];
         }
