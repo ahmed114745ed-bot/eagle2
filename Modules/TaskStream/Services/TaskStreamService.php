@@ -103,6 +103,32 @@ class TaskStreamService extends TaskStreamValidationService
             $taskStream->rooms()->delete();
         } else {
             $this->remoteUpdate($taskStream->room_id, $liveRoom->id, 0);
+            $pk = PkSession::where(['status' => 1, 'task_stream_id' => $taskStreamRoom->task_stream_id])->latest()->first();
+
+            if ($pk) {
+                $team1Rooms = explode(',', $pk->team_1);
+                $team2Rooms = explode(',', $pk->team_2);
+
+                $roomId = $liveRoom->id;
+
+                if (in_array($roomId, $team1Rooms)) {
+                    $team1Rooms = array_diff($team1Rooms, [$roomId]);
+                }
+
+                if (in_array($roomId, $team2Rooms)) {
+                    $team2Rooms = array_diff($team2Rooms, [$roomId]);
+                }
+
+                $pk->update([
+                    'team_1' => implode(',', $team1Rooms),
+                    'team_2' => implode(',', $team2Rooms),
+                ]);
+
+                if (empty($team1Rooms) || empty($team2Rooms)) {
+                    app(PkSessionService::class)->closeLogic($pk->id, $taskStreamRoom->task_stream_id);
+                }
+            }
+
             $taskStreamRoom->delete();
         }
 

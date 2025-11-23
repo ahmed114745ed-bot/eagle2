@@ -52,11 +52,14 @@ class PkSessionService extends TaskStreamValidationService
             'status' => 1,
         ];
 
-        $pk = $this->pkSessionRepository->firstOrCreate($taskStream->id, $endsAt, $mergedData);
+        $pk = $this->pkSessionRepository->firstOrCreate($taskStream->id, $mergedData);
         $pk->duration = $data['duration'];
         return $pk;
     }
 
+    /**
+     * @throws Exception
+     */
     public function close($data)
     {
         $liveRoom = $this->validateAuthLiveRoom();
