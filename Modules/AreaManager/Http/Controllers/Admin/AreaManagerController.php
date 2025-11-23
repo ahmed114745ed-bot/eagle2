@@ -583,7 +583,7 @@ class AreaManagerController extends MainController
             ->with(Common::chargerRelationsQuery())
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'charges_page');
-             $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser','appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+             $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser','country','appUser.country'])->paginate(10, ['*'], 'super_admins_page');
         $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':

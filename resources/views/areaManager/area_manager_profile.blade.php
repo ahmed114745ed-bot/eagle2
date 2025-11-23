@@ -1037,6 +1037,7 @@
                                 <th>#</th>
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('user') }}</th>
+                                 <th>{{ __('country') }}</th>
                                 
                             </tr>
                         </thead>
@@ -1107,6 +1108,31 @@
                                                     <small style="color: #555;">
                                                         ID: {{ $superAdmin->appUser?->uuid ?? 'N/A' }}
                                                     </small>
+                                                </div>
+
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    
+                                                        <img src="{{ getImagePath($superAdmin->country->flag)  }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                   <strong style="display: flex; align-items: center; gap: 6px;">
+                                                        {{ app()->getLocale() === 'ar' 
+                                                            ? ($superAdmin->country?->name ?? $superAdmin->country?->e_name) 
+                                                            : ($superAdmin->country?->e_name ?? $superAdmin->country?->name) }}
+                                                    </strong>
+
+                                                   
                                                 </div>
 
                                             </div>
