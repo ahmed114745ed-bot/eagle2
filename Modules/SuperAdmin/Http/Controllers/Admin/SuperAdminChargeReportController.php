@@ -106,7 +106,7 @@ class SuperAdminChargeReportController extends MainController
                     } elseif ($value === 'decrease') {
                         $query->where('amount', '<', 0);
                     }
-                }, __('Charge Type'))->select([
+                }, __('Charge Type'),'change_type')->select([
                     'increase'  => __('increase'),
                     'decrease'  => __('decrease'),
                 ]);
@@ -149,6 +149,8 @@ class SuperAdminChargeReportController extends MainController
     ');
 
         $grid->model()
+         ->when(request('change_type') =='increase', fn($q) => $q->where('amount', '>', 0))
+          ->when(request('change_type') =='decrease', fn($q) => $q->where('amount', '<', 0))
             ->where('user_id', '=', request('id'))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
