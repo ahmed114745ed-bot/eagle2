@@ -109,7 +109,7 @@ class RestoreSuperAdminController extends MainController
 
         $grid->column('country_name', __('Country'))->display(function () {
             $locale = app()->getLocale(); // get current locale
-            return $locale === 'en' ? $this->country->e_name : $this->country->name;
+            return $locale === 'en' ? ($this->country->e_name ?? $this->country->name) : ($this->country->name ?? $this->country->e_name);
         });
         if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('restore'))->display(function () {
