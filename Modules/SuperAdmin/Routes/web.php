@@ -210,7 +210,7 @@ Route::group(
             ]
         ]);
 
-         Route::get('superadmin-profile/{id}', [SuperAdminController::class,'show']);
+         Route::get('superadmin-profile/{id}', [SuperAdminController::class,'profile']);
 
         Route::resource('rooms', RoomController::class);
         Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
