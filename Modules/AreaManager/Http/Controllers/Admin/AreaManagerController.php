@@ -88,7 +88,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs', 'regionArea','creator'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea', 'creator'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -117,7 +117,7 @@ class AreaManagerController extends MainController
             ";
         });
 
-   
+
         $grid->column('default', __('default'))->display(function () {
             if ($this->default == 1) {
                 return '<span style="color:green;">●</span>';
@@ -150,9 +150,9 @@ class AreaManagerController extends MainController
             ";
         });
 
-         $grid->column('regionArea.name', __('Regions'));
-       
-         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+        $grid->column('regionArea.name', __('Regions'));
+
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
@@ -546,7 +546,7 @@ class AreaManagerController extends MainController
 
         $areaManager = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->findOrFail($id);
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($areaManager->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -555,7 +555,7 @@ class AreaManagerController extends MainController
 
         $agencies = $transactions = $target_history = null;
         $rewards = null;
-        $defaultImage = asset("images/businessman-icon.jpg");
+
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
@@ -583,7 +583,7 @@ class AreaManagerController extends MainController
             ->with(Common::chargerRelationsQuery())
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'charges_page');
-             $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser','country','appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
         $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
@@ -594,7 +594,7 @@ class AreaManagerController extends MainController
                 break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager','defaultImage','prefix','superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
     }
 
     public function profilePreview()
@@ -609,7 +609,7 @@ class AreaManagerController extends MainController
         $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -617,7 +617,8 @@ class AreaManagerController extends MainController
         $superAdmin->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
-
+        $superAdmins = SuperAdmin::where('parent_id', $superAdmin->$superAdmin)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $prefix = dashboardName();
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
