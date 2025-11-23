@@ -95,6 +95,22 @@ class SuperAdminChargeReportController extends MainController
                     $query->whereDate('created_at', '<=', $date);
                 }, __('to_date'), 'to_date')->date();
             });
+            $filter->column(1 / 2, function ($filter) {
+
+                // Custom filter for increase/decrease/no change
+                $filter->where(function ($query) {
+                    $value = request('change_type'); // get the selected value
+
+                    if ($value === 'increase') {
+                        $query->where('amount', '>', 0);
+                    } elseif ($value === 'decrease') {
+                        $query->where('amount', '<', 0);
+                    }
+                }, __('Charge Type'))->select([
+                    'increase'  => __('increase'),
+                    'decrease'  => __('decrease'),
+                ]);
+            });
         });
 
         Admin::script(
@@ -268,7 +284,7 @@ class SuperAdminChargeReportController extends MainController
 
             $grid->tools(function (Grid\Tools $tools) {
                 $idFromRoute = request()->route('id');
-    
+
                 $tools->append(
 
                     (new ChargeSuperAdminHistoryAction())
