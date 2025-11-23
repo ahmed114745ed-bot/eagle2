@@ -933,6 +933,9 @@
 <div class="agency-tabs">
     <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
      <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}" data-target="charge-tab">{{ __('Charge Reports') }}</a>
+     <a href="?tab=superAdmin" class="tab-btn {{ $activeTab == 'superAdmin' ? 'active' : '' }}" data-target="superAdmin-tab">{{ __('country manager') }}</a>
+
+
 </div>
 
 <!-- Loading Overlay -->
@@ -1013,6 +1016,115 @@
                 <div class="empty-table">
                     <i class="fas fa-users-slash"></i>
                     <p>{{ __('No agencies found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
+
+@if($activeTab === 'superAdmin')
+    <div class="tab-content active" id="superAdmin-tab">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('country manager') }}</h3>
+                <span class="badge count-badge">{{ optional($superAdmins)->total() ?? 0 }}</span>
+            </div>
+            @if($superAdmins && $superAdmins->count())
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('user') }}</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($superAdmins as $index => $superAdmin)
+                                <tr>
+                                    <td>{{ $index + 1 + (($superAdmins->currentPage() - 1) * $superAdmins->perPage()) }}</td>
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/superadmin-users/' .$superAdmin->id) }}">
+                                                        <img src="{{ $superAdmin->avatar ? getImagePath($superAdmin->avatar) : $defaultImage }}" 
+                                                            alt="{{ $superAdmin->username ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong>
+                                                        <a href="{{ url($prefix.'/superadmin-users/' .$superAdmin->id) }}" style="display: block;">
+                                                            {{ $superAdmin->username ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $superAdmin->id }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+                                        </td>
+
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/users/' . ($superAdmin->appUser?->id ?? 0)) }}">
+                                                        <img src="{{ $superAdmin->appUser?->profile?->avatar ? getImagePath($superAdmin->appUser->profile->avatar) : $defaultImage }}"
+                                                            alt="{{ $superAdmin->appUser?->name ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong style="display: flex; align-items: center; gap: 6px;">
+                                                        <a href="{{ url($prefix.'/users/' . ($superAdmin->appUser?->id ?? 0)) }}"
+                                                        style="display: flex; align-items: center; gap: 6px;">
+                                                        
+                                                            {{-- Country Flag --}}
+                                                            @if(@$superAdmin->appUser->country->flag)
+                                                                <img src="{{ getImagePath($superAdmin->appUser->country->flag) }}"
+                                                                    alt="flag"
+                                                                    style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                            @endif
+
+                                                            {{-- User Name --}}
+                                                            {{ $superAdmin->appUser?->name ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $superAdmin->appUser?->uuid ?? 'N/A' }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+                                        </td>
+
+
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ $superAdmins->appends(['tab' => 'superAdmin'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="empty-table">
+                    <i class="fas fa-users-slash"></i>
+                    <p>{{ __('No country manager found') }}</p>
                 </div>
             @endif
         </div>

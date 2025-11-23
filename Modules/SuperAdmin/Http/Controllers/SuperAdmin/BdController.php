@@ -127,7 +127,7 @@ class BdController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("superadmin/usersBd/{$this->id}");
+            $showUrl = url("superadmin/profile/{$this->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>

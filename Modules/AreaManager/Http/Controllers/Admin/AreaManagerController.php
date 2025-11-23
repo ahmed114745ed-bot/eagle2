@@ -555,6 +555,7 @@ class AreaManagerController extends MainController
 
         $agencies = $transactions = $target_history = null;
         $rewards = null;
+        $defaultImage = asset("images/businessman-icon.jpg");
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
@@ -582,6 +583,8 @@ class AreaManagerController extends MainController
             ->with(Common::chargerRelationsQuery())
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'charges_page');
+             $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser','appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
                 $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
@@ -591,7 +594,7 @@ class AreaManagerController extends MainController
                 break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
+        return view('areaManager.area_manager_profile', compact('areaManager','defaultImage','prefix','superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
     }
 
     public function profilePreview()

@@ -1082,14 +1082,24 @@
 
                                                 <!-- Name + ID -->
                                                 <div class="user-info" style="line-height: 1.2;">
-                                                    <strong>
-                                                        <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}" style="display: block;">
+                                                    <strong style="display: flex; align-items: center; gap: 6px;">
+                                                        <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}"
+                                                        style="display: flex; align-items: center; gap: 6px;">
+                                                        
+                                                            {{-- Country Flag --}}
+                                                            @if(@$bd->appUser->country->flag)
+                                                                <img src="{{ getImagePath($bd->appUser->country->flag) }}"
+                                                                    alt="flag"
+                                                                    style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                            @endif
+
+                                                            {{-- User Name --}}
                                                             {{ $bd->appUser?->name ?? '' }}
                                                         </a>
                                                     </strong>
 
                                                     <small style="color: #555;">
-                                                        ID: {{ $bd->appUser?->id ?? 'N/A' }}
+                                                        ID: {{ $bd->appUser?->uuid ?? 'N/A' }}
                                                     </small>
                                                 </div>
 
