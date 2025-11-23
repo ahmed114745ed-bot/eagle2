@@ -2,24 +2,26 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
-use App\Enums\Charges\UserTypeEnum;
-use App\Admin\Controllers\MainController;
-use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Charge;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use App\Models\ChargeInvoice;
-use Encore\Admin\Widgets\Table;
+use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
+use App\Models\ChargeInvoice;
 use Encore\Admin\Widgets\Box;
-
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Column;
+use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
+
+use App\Enums\Charges\UserTypeEnum;
+use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Actions\Admin\SuperAdminChargeAction;
+use Modules\SuperAdmin\Actions\Admin\ChargeSuperAdminHistoryAction;
 
 class SuperAdminChargeReportController extends MainController
 {
@@ -79,24 +81,24 @@ class SuperAdminChargeReportController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $date = UserCommon::arabicToEnglishNumbers($this->input);
                     $query->whereDate('created_at', '>=', $date);
                 }, __('from_date'), 'from_date')->date();
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $date = UserCommon::arabicToEnglishNumbers($this->input);
 
-                    $query->whereDate('created_at', '<=',$date);
-
+                    $query->whereDate('created_at', '<=', $date);
                 }, __('to_date'), 'to_date')->date();
             });
         });
 
-        Admin::script(<<<JS
+        Admin::script(
+            <<<JS
             $(document).ready(function() {
                 $('.form-control[id$="_date"]').datetimepicker({
                     format: 'YYYY-MM-DD'
@@ -137,10 +139,9 @@ class SuperAdminChargeReportController extends MainController
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash")
                 ->orWhere('charger_type', UserTypeEnum::AREA_MANAGER);
-
         } else {
             $grid->model()->where('charger_type', "!=", "dash")
-                ->orWhere('charger_type','!=', UserTypeEnum::AREA_MANAGER);
+                ->orWhere('charger_type', '!=', UserTypeEnum::AREA_MANAGER);
         }
 
 
@@ -229,10 +230,11 @@ class SuperAdminChargeReportController extends MainController
             $reason = ChargeInvoice::where('charge_id', $this->id)->first();
 
             if (!$reason) {
-                return "<table class='table'><tr><td>".__('No reasons available')."</td><td>-</td></tr></table>";
+                return "<table class='table'><tr><td>" . __('No reasons available') . "</td><td>-</td></tr></table>";
             }
 
-            Admin::style(<<<CSS
+            Admin::style(
+                <<<CSS
                 .modal-reason-table td {
                     max-width: 300px;
                     word-wrap: break-word;
@@ -246,21 +248,35 @@ class SuperAdminChargeReportController extends MainController
             $imgHtml = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail' />";
 
             $html = "<table class='table modal-reason-table'>";
-            $html .= "<tr><td>".__('Reason')."</td><td>" . htmlspecialchars(
-                    app()->getLocale() === 'en'
-                        ? ($reason->reason_en ?? $reason->reason_ar)
-                        : ($reason->reason_ar ?? $reason->reason_en)
-                ) . "</td></tr>";
-            $html .= "<tr><td>".__('Invoice')."</td><td>" . $imgHtml . "</td></tr>";
+            $html .= "<tr><td>" . __('Reason') . "</td><td>" . htmlspecialchars(
+                app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en)
+            ) . "</td></tr>";
+            $html .= "<tr><td>" . __('Invoice') . "</td><td>" . $imgHtml . "</td></tr>";
             $html .= "</table>";
 
             return $html;
         });
 
         $grid->column('created_at', __('shipping date'));
+
+
+
         $grid->disableRowSelector();
+        if (Admin::user()->can('add-switch-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('history-switch-' . $this->permission_name)) {
 
+            $grid->tools(function (Grid\Tools $tools) {
+                $idFromRoute = request()->route('id');
+    
+                $tools->append(
 
+                    (new ChargeSuperAdminHistoryAction())
+                        ->setUserId($idFromRoute ?? null) // $this->id might not work in tools, see note below
+                        ->render()
+                );
+            });
+        }
         return $grid;
     }
 
