@@ -648,9 +648,9 @@ class SuperAdminController extends MainController
     {
         $tab = request()->query('tab', 'agencies');
 
-        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
+        $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->find($id);
         if (!$superAdmin) {
-            $superAdmin = SuperAdmin::onlyTrashed()
+            $superAdmin = SuperAdmin::withTrashed()
                 ->select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])
                 ->with('country')
                 ->findOrFail($id);
