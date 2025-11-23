@@ -59,11 +59,11 @@ class Admin extends Administrator
             $agencies = Agency::where('agency_manger_id', $appId)->get();
             $config = Config::where('name', 'system_default_manger')->first();
 
-            $user = User::where('uuid', $config->value)->first();
+            $user = User::where('uuid', $config?->value)->first();
             $agenciesId = [];
             foreach ($agencies as $agency) {
                 $agenciesId[] = $agency->id;
-                $agency->agency_manger_id = $user->id;
+                $agency->agency_manger_id = $user?->id;
                 $agency->save();
             }
             $agencyIds = implode(',', $agenciesId);
