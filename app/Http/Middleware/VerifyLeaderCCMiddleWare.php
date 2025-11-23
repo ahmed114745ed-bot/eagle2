@@ -43,16 +43,16 @@ class VerifyLeaderCCMiddleWare
                 ], 400);
             }
         }
-        if ($request->has('token')) {
-            $token = $request->token;
-            $userId = $this->findUserByToken($token);
-            if (!$userId) {
-                return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'user not found'
-                ], 400);
-            }
-        }
+        // if ($request->has('token')) {
+        //     $token = $request->token;
+        //     $userId = $this->findUserByToken($token);
+        //     if (!$userId) {
+        //         return response()->json([
+        //             'errorCode' => 10003,
+        //             'errorMsg'  => 'user not found'
+        //         ], 400);
+        //     }
+        // }
 
 
         switch ($path) {
@@ -115,10 +115,10 @@ class VerifyLeaderCCMiddleWare
                 'sign'      => $request->input('sign'),
              
             ]);
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg' => 'Verify signature fail'
-            ], 400);
+            // return response()->json([
+            //     'errorCode' => 10004,
+            //     'errorMsg' => 'Verify signature fail'
+            // ], 400);
         }
 
       

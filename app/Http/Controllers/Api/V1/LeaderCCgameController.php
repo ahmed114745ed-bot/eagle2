@@ -90,9 +90,6 @@ class LeaderCCgameController extends Controller
                 return $this->json(4005, 'Invalid type');
             }
 
-            if (Cache::has("order_{$request->orderId}")) {
-                return $this->json(10003, 'Order already exists');
-            }
 
             return DB::transaction(function () use ($request, $type) {
 
