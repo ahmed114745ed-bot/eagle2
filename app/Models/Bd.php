@@ -19,7 +19,7 @@ class Bd extends Model
     protected $guarded = [];
 
     protected $attributes = [
-        'type' => 'bd',
+        'admin_users.type' => 'bd',
     ];
 
     public function appUser()

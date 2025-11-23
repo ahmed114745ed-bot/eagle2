@@ -232,7 +232,6 @@ if (!function_exists('incrementMonthlyDiamond')) {
                 'monthly_diamond_received' => $value,
             ]);
         }
-
     }
 }
 
@@ -603,7 +602,7 @@ if (!function_exists('handleShowImageWithTypes')) {
     }
 }
 
- 
+
 
 if (!function_exists('userType')) {
     function userType($type)
@@ -812,6 +811,18 @@ if (!function_exists('superadmin_url')) {
         return url($base . '/' . trim($path, '/'), $parameters, $secure);
     }
 }
+if (!function_exists('dashboardName')) {
+    function dashboardName()
+    {
+        if (request()->is('superadmin/*')) {
+            return 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            return 'areamanager';
+        } else {
+            return 'admin';
+        }
+    }
+}
 
 if (!function_exists('areaManager_url')) {
     function areaManager_url($path = '', $parameters = [], $secure = null)
@@ -947,8 +958,6 @@ if (!function_exists('bd_url')) {
 
 
             return $percentage;
-
-
         }
     }
 }
@@ -1029,7 +1038,8 @@ if (!function_exists('respond_and_continue')) {
 
 
 if (!function_exists('isValidTimezone')) {
-    function isValidTimezone($tz) {
+    function isValidTimezone($tz)
+    {
         $abbrs = \DateTimeZone::listAbbreviations();
         foreach ($abbrs as $abbreviation => $zones) {
             if (strcasecmp($abbreviation, $tz) === 0) {
@@ -1039,4 +1049,3 @@ if (!function_exists('isValidTimezone')) {
         return false;
     }
 }
-
