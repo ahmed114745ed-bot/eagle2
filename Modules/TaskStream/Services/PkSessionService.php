@@ -61,6 +61,7 @@ class PkSessionService extends TaskStreamValidationService
 
     /**
      * @throws Exception
+     * @throws \Throwable
      */
     public function close($data)
     {
