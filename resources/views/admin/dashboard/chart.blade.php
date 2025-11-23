@@ -1,11 +1,13 @@
 {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> --}}
+    @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-<div style="margin-bottom: 15px;">
-    <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
-        <input type="month" name="date" id="date-filter" value="{{ request('date') }}" style="padding: 5px;">
-        <button type="submit" style="padding: 6px 12px; cursor: pointer;">{{ __('admin.filter') }}</button>
-    </form>
-</div>
+            <div style="margin-bottom: 15px;">
+                <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
+                    <input type="month" name="date" id="date-filter" value="{{ request('date') }}" style="padding: 5px;">
+                    <button type="submit" style="padding: 6px 12px; cursor: pointer;">{{ __('admin.filter') }}</button>
+                </form>
+            </div>
+    @endif
 <style>
 .card {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

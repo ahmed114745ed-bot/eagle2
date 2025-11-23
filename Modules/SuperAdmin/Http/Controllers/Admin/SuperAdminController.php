@@ -680,6 +680,8 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
+        $bds = Bd::where('parent_id', $id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -691,7 +693,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
     }
 
     public function profilePreview()
@@ -707,7 +709,7 @@ class SuperAdminController extends MainController
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->whereIn('country_id', $countryID)->firstOrFail();
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -729,14 +731,23 @@ class SuperAdminController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-
+        $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        
+        $types = ['vip', 'badge', 'ware'];
+        $type = request()->get('type', 'vip');
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+            case 'rewards':
+
+
+                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
                 break;
         }
+        $prefix = dashboardName();
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage','agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
+    
     }
 
     protected function detail($id)
