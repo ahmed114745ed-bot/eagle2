@@ -1024,7 +1024,7 @@
                             @foreach($bds as $index => $bd)
                                 <tr>
                                     <td>{{ $index + 1 + (($bds->currentPage() - 1) * $bds->perPage()) }}</td>
-                                    <td class="user-cell">
+                                    {{-- <td class="user-cell">
                                             <div class="user-avatar">
                                                 <a >
                                                     <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}"  alt="{{ $bd->username ?? '' }}">
@@ -1037,22 +1037,65 @@
                                                     </a>
                                                 </strong>
                                             </div>
+                                        </td> --}}
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}">
+                                                        <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}" 
+                                                            alt="{{ $bd->username ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong>
+                                                        <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}" style="display: block;">
+                                                            {{ $bd->username ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $bd->id }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
                                         </td>
 
-                                        <td class="user-cell">
-                                            <div class="user-avatar">
-                                                <a href="{{ url($prefix.'/users/'. $bd->appUser?->id ) }}">
-                                                    <img src="{{$bd->appUser?->profile?->avatar? getImagePath($bd->appUser?->profile?->avatar): $defaultImage }}" alt="{{ $bd->appUser?->name ??'' }}">
-                                                </a>
-                                            </div>
-                                            <div class="user-info">
-                                                <strong>
-                                                    <a href="{{ url($prefix.'/users/'.$bd->appUser?->id) }}">
-                                                        {{ $bd->appUser?->name ??'' }}
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}">
+                                                        <img src="{{ $bd->appUser?->profile?->avatar ? getImagePath($bd->appUser->profile->avatar) : $defaultImage }}"
+                                                            alt="{{ $bd->appUser?->name ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
                                                     </a>
-                                                </strong>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong>
+                                                        <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}" style="display: block;">
+                                                            {{ $bd->appUser?->name ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $bd->appUser?->id ?? 'N/A' }}
+                                                    </small>
+                                                </div>
+
                                             </div>
                                         </td>
+
 
                                 </tr>
                             @endforeach
