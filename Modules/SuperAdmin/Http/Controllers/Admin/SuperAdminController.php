@@ -656,7 +656,7 @@ class SuperAdminController extends MainController
                 ->findOrFail($id);
         }
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -680,6 +680,8 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
+        $bds = Bd::where('parent_id', $id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -691,7 +693,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage','agencies', 'totalCharges', 'totalSpent', 'prefix','type', 'types', 'rewards', 'bds'));
     }
 
     public function profilePreview()
