@@ -190,6 +190,8 @@
                                 value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
+                                 <small class="form-text text-muted">{{ __('App owner profit') }}</small>
+       
                         </div>
 
                         <div class="form-group">
@@ -201,6 +203,7 @@
                                 value="{{ $config['owner_lucky_gift'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter  value') }}"  required/>
+                                <small class="form-text text-muted">{{ __('owner gift') }}</small>
                         </div>
 
                         
