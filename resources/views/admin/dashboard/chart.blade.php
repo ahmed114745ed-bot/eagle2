@@ -40,6 +40,7 @@ ul.list-unstyled {
     font-weight: bold;
 }
 </style>
+    @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
 <div class="card cardHome" style="margin-bottom: 15px;">
     <div class="row">
@@ -73,16 +74,19 @@ ul.list-unstyled {
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <div id="payment-alert-container"></div>
-            <!-- Add a button here -->
-            <button type="button" class="btn btn-primary mt-3" onclick="window.location.href='admin/payment-with-method';">
-                {{ __('admin.pay') }}
-            </button>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div id="payment-alert-container"></div>
+                <!-- Add a button here -->
+                <button type="button" class="btn btn-primary mt-3" onclick="window.location.href='admin/payment-with-method';">
+                    {{ __('admin.pay') }}
+                </button>
+            </div>
         </div>
-    </div>
+    
 </div>
+@endif
 
 <h3 style="margin:10px 0;">👤 {{ __('Users') }}</h3>
 <div class="col-md-12">
