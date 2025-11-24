@@ -153,7 +153,7 @@ class Kernel extends ConsoleKernel
         })
             ->everyMinute()
             ->timezone(getTimezone())
-            ->withoutOverlapping()
+            // ->withoutOverlapping()
             ->runInBackground();
     }
 
