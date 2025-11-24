@@ -62,9 +62,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'dashboard',
                         'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
+                        'additional' => ['pay-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
+                            PermissionType::ADMIN->value => ['browse','pay-switch'],
                             PermissionType::SUPER_ADMIN->value => ['browse'],
                             PermissionType::AREA_MANAGER->value => ['browse'],
                         ],

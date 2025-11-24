@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Helpers\Common;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\GameWallet;
 use App\Http\Controllers\Controller;
@@ -34,7 +37,7 @@ class LeaderCCgameController extends Controller
                 'line' => $e->getLine()
             ]);
 
-            return $this->json(500, 'Server error');
+            return $this->json(500, 'Server error'.$e->getMessage());
         }
     }
 
@@ -75,11 +78,8 @@ class LeaderCCgameController extends Controller
         return $this->safe(function () use ($request) {
 
             $required = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
-            foreach ($required as $r) {
-                if (!$request->$r && $request->$r !== "0") {
-                    return $this->json(4005, 'Invalid params');
-                }
-            }
+            $missing = array_filter($required, fn($r) => !$request->filled($r) && $request->input($r) !== "0");
+            if ($missing) return $this->json(4005, 'Invalid params');
 
             if ($err = $this->checkWallet($request)) {
                 return $err;
@@ -90,13 +90,15 @@ class LeaderCCgameController extends Controller
                 return $this->json(4005, 'Invalid type');
             }
 
-            if (Cache::has("order_{$request->orderId}")) {
-                return $this->json(10003, 'Order already exists');
-            }
 
             return DB::transaction(function () use ($request, $type) {
 
-                $user = User::lockForUpdate()->find($request->uid);
+                $user = User::lockForUpdate()->with([
+                                                    'profile:id,user_id,avatar', 
+                                                    'nowGame:id,image',
+                                                     'nowRoom:id,uid'
+                                                    ])->find($request->uid);
+
                 if (!$user) return $this->json(4005, 'User not found');
 
                 $coin = abs((int)$request->coin);
@@ -124,6 +126,26 @@ class LeaderCCgameController extends Controller
 
                 dispatch(new \App\Jobs\GameWalletJop($type == 1 ? -$coin : $coin));
 
+                if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
+                        
+                    $roomId = $user->nowRoom?->id;
+
+                    $d = [
+                        "messageContent" => [
+                            "message" => "SBG",
+                            "event" => "baishun.game.event",
+                            'uImage'  => $user->profile?->avatar ?? 0,
+                            'uName'   => $user->name ?? '',
+                            'uId'     => $user->id ?? 0,
+                            'coins'   => numToStringNew((int) $request->currency_diff),
+                            "gImage"  => @$user->nowGame?->image
+                        ]
+                    ];
+        
+                    $json = json_encode($d);
+                    dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id,  $roomId, false), 'heavyProcessing');
+                }
+        
                 return $this->json(0, 'success', [
                     'coins' => $user->di
                 ]);

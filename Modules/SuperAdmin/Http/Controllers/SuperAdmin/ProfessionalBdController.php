@@ -142,7 +142,7 @@ class ProfessionalBdController extends MainController
             ->display(function ($enable) {
                 return $enable;
             })->sortable();
-       
+
 
         $grid->column('app_id', __('user'))->display(function ($name) {
             $user = $this->appUser;
@@ -195,7 +195,31 @@ class ProfessionalBdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'))->sortable();
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+            $image = $flag ? handleShowImageWithTypes($this->id, $flag, 40, 40) : '';
+
+            return <<<HTML
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <img src="$image" alt="flag" width="20" height="20" style="border-radius:4px;">
+                    <span>$name</span>
+                </div>
+            HTML;
+        });
+
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
