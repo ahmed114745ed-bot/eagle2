@@ -198,7 +198,7 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("areaManager/area-manager-users/{$info['id']}");
+                $showUrl = url("areaManager/sub-area-manager-users/profile/{$info['id']}");
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
