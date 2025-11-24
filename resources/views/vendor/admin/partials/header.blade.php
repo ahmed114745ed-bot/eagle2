@@ -249,7 +249,7 @@
 
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
                 $areaManagerCountries = $authAdmin->countriesQuery()
-                    ->select(['id', 'name', 'flag'])
+                    ->select(['id', 'name','e_name', 'flag'])
                     ->get();
             } else {
                 $areaManagerCountries = collect();
