@@ -998,6 +998,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
 
+
+    public function nowRoom()
+    {
+        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+    }
     public function myroom()
     {
         return $this->hasOne(Room::class, 'uid', 'id');
@@ -1900,76 +1905,156 @@ class User extends Authenticatable
             });
     }
 
+    // protected static function boot()
+    // {
+    //     parent::boot();
+
+    //     self::saving(function ($model) {
+    //         if (request()->has('is_frozen')) {
+
+    //             if ($model->agency) {
+    //                 $model->agency->update(['is_frozen' => request()->is_frozen]);
+    //             }
+    //             request()->request->remove('is_frozen');
+    //         }
+    //         if (request()->has('charge_agency')) {
+    //             if (request('charge_agency') === 1) {
+    //                 ChargeAgency::firstOrCreate([
+    //                     'agency_id' => $model->agency_id,
+    //                 ]);
+    //             } else {
+    //                 ChargeAgency::where('agency_id', $model->agency_id)->delete();
+    //             }
+    //         }
+
+    //         $originalProfile = $model->profile;
+    //         $newAvatar = request()->input('photo'); 
+    //         if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+
+    //             $newCount = $model->profile_count + 1;
+    //             $model->profile_count = $newCount;
+
+    //             $file = request('photo');
+    //             if ($file instanceof UploadedFile) {
+
+    //                 $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+    //                 Storage::delete($model->profile->avatar);
+    //             }
+    //             if ($model->profile) {
+    //                 $model->profile->avatar = $url ?? '';
+    //             }
+    //         } else {
+    //             if ($model->profile) {
+    //                 $model->profile->avatar = $model->profile->avatar;
+    //             }
+    //         }
+    //         unset($model->photo);
+    //         unset($model->original_uuid);
+    //     });
+
+    //     self::updating(function ($user) {
+    //         // Check if coins increased
+    //         $originalCoins = $user->getOriginal('di');
+    //         $newCoins = $user->di;
+
+    //         if ($newCoins > $originalCoins) {
+    //             $user->new_gift = true;
+    //         }
+    //         if ($user->agency_id) {
+    //             clearAgencyCache($user->agency_id);
+    //         }
+
+    //         static::deleted(function ($user) {
+    //             if ($user->agency_id) {
+    //                 clearAgencyCache($user->agency_id);
+    //             }
+    //         });
+    //         // Handle profile.avatar update
+
+    //     });
+    // }
     protected static function boot()
     {
         parent::boot();
 
-        self::saving(function ($model) {
-            if (request()->has('is_frozen')) {
-
-                if ($model->agency) {
-                    $model->agency->update(['is_frozen' => request()->is_frozen]);
-                }
-                request()->request->remove('is_frozen');
-            }
-            if (request()->has('charge_agency')) {
-                if (request('charge_agency') === 1) {
-                    // لو مش موجود، أضيف
-                    ChargeAgency::firstOrCreate([
-                        'agency_id' => $model->agency_id,
-                    ]);
-                } else {
-                    // لو السويتش = 0، أمسح السطر لو موجود
-                    ChargeAgency::where('agency_id', $model->agency_id)->delete();
-                }
-            }
-
-            $originalProfile = $model->profile;
-            $newAvatar = request()->input('photo'); // still okay if tightly coupled
-            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-
-                $newCount = $model->profile_count + 1;
-                $model->profile_count = $newCount;
-
-                $file = request('photo');
-                if ($file instanceof UploadedFile) {
-
-                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
-                    Storage::delete($model->profile->avatar);
-                }
-                if ($model->profile) {
-                    $model->profile->avatar = $url ?? '';
-                }
-            } else {
-                if ($model->profile) {
-                    $model->profile->avatar = $model->profile->avatar;
-                }
-            }
-            unset($model->photo);
-            unset($model->original_uuid);
+        static::saving(function (User $user) {
+            self::handleAgencyFreeze($user);
+            self::handleChargeAgency($user);
+            self::handleProfilePhoto($user);
+            unset($user->photo, $user->original_uuid);
         });
 
-        self::updating(function ($user) {
-            // Check if coins increased
-            $originalCoins = $user->getOriginal('di');
-            $newCoins = $user->di;
-
-            if ($newCoins > $originalCoins) {
+        static::updating(function (User $user) {
+            if ($user->di > $user->getOriginal('di')) {
                 $user->new_gift = true;
             }
             if ($user->agency_id) {
                 clearAgencyCache($user->agency_id);
             }
+        });
 
-            static::deleted(function ($user) {
-                if ($user->agency_id) {
-                    clearAgencyCache($user->agency_id);
-                }
-            });
-            // Handle profile.avatar update
-
+        static::deleted(function (User $user) {
+            if ($user->agency_id) {
+                clearAgencyCache($user->agency_id);
+            }
         });
     }
+
+    protected static function handleAgencyFreeze(User $user)
+    {
+        if (!request()->filled('is_frozen') || !$user->agency_id) {
+            return;
+        }
+
+        $new = request('is_frozen');
+
+        if ($user->agency && $user->agency->is_frozen != $new) {
+            $user->agency->update(['is_frozen' => $new]);
+        }
+
+        request()->request->remove('is_frozen');
+    }
+
+    protected static function handleChargeAgency(User $user)
+    {
+        if (!request()->has('charge_agency') || !$user->agency_id) {
+            return;
+        }
+
+        $charge = (int) request('charge_agency') === 1;
+
+        if ($charge) {
+            ChargeAgency::firstOrCreate(['agency_id' => $user->agency_id]);
+        } else {
+            ChargeAgency::where('agency_id', $user->agency_id)->delete();
+        }
+    }
+
+    protected static function handleProfilePhoto(User $user)
+    {
+        $file = request()->file('photo');
+
+        if (!$file instanceof \Illuminate\Http\UploadedFile) {
+            return;
+        }
+
+        $profile = $user->profile()->first();
+        if (!$profile) {
+            return;
+        }
+
+        $newCount = $user->profile_count + 1;
+        $user->profile_count = $newCount;
+
+        $url = Common::uploadProfileUser('profile', $file, $profile->id, $newCount);
+
+    if ($profile->avatar && Storage::exists($profile->avatar)) {
+        Storage::delete($profile->avatar);
+    }
+
+    $profile->update(['avatar' => $url]);
+    }
+
     public function blockedUsers()
     {
         return $this->hasMany(BlackList::class, 'user_id');

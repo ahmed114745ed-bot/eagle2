@@ -6,6 +6,7 @@ use App\Models\Language;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 
 class Localization
 {
@@ -19,22 +20,19 @@ class Localization
     public function handle(Request $request, Closure $next)
     {
 
-
-        $langCode = $request->header('X-localization', 'en');
-
-        $language = Language::where('code', $langCode)->where('is_enabled', true)->first();
-
-        if ($language) {
-            app()->setLocale($language->code);
-        }
-
-
-
-        // // Check header request and determine localizaton
-        // $local = ($request->hasHeader('X-localization')) ? $request->header('X-localization') : 'en';
-        // // set laravel localization
-        // app()->setLocale($local);
-        // // continue request
-        return $next($request);
+            $langCode = $request->header('X-localization', 'en');
+        
+            $language = Cache::rememberForever("language_enabled_{$langCode}", function () use ($langCode) {
+                return Language::where('code', $langCode)
+                    ->where('is_enabled', true)
+                    ->first();
+            });
+        
+            if ($language) {
+                app()->setLocale($language->code);
+            }
+        
+            return $next($request);
+        
     }
 }

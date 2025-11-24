@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AppFeature;
+use Illuminate\Support\Facades\Cache;
 use Nette\Schema\ValidationException;
 
 class AppFeatureService
@@ -10,12 +11,15 @@ class AppFeatureService
 
     public static function isEnable($slug)
     {
-        $appFeature = AppFeature::where("slug",$slug)->first();
-        if ($appFeature != null && $appFeature->status == 0) {
-            return false;
-        }
-        return true;
+        return Cache::rememberForever("app_feature_status_{$slug}", function () use ($slug) {
+            $feature = AppFeature::where('slug', $slug)->first();
+            if ($feature && $feature->status == 0) {
+                return false;
+            }
+            return true;
+        });
     }
+    
     //UserTargetAchieveJob
     public function validateStatusEnable($slug)
     {

@@ -383,6 +383,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
