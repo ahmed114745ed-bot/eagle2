@@ -248,6 +248,7 @@
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
+
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
                 $areaManagerCountries = $authAdmin->countriesQuery()
                     ->select(['id', 'name','e_name', 'flag'])
