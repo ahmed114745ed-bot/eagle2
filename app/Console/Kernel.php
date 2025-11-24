@@ -175,8 +175,7 @@ class Kernel extends ConsoleKernel
         $time     =  '00:00';
 
         $command = $schedule->command('roomcup:calculate-rewards')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/calculate-rewards-roomcup'));
+                            ->timezone(getTimezone());
 
         match ($type) {
             'daily'   => $command->dailyAt($time),
