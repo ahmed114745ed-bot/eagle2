@@ -34,7 +34,6 @@ class WalletStatisticService
 
             case 3:
                 $list = MomentUserGift::selectRaw('user_id, moment_id,gift_id, SUM(num) as total')
-                    ->where('moment_id', $userId)
                     ->whereHas('moment', function ($q) use ($userId) {
                         $q->where('user_id', $userId);
                     })
