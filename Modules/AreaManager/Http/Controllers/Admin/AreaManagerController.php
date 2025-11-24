@@ -71,6 +71,14 @@ class AreaManagerController extends MainController
             ->title(__($this->title))
             ->body($this->profilePreview());
     }
+
+    public function showProfile($id, Content $content)
+    {
+        return  $content
+            ->title(__($this->title))
+            ->body($this->profile($id));
+    }
+
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
