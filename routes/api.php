@@ -534,6 +534,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start games
             Route::prefix('all-games1')->group(function () {
                 Route::get('/', [AllGameController::class, 'index']);
+                Route::get('/v2/out-of-room', [AllGameController::class, 'outRoom']);
+                Route::get('/v2/in-room', [AllGameController::class, 'inRoom']);
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
