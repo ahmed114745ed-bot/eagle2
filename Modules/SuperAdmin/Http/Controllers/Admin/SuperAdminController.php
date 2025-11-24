@@ -241,7 +241,26 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function ($name) {
+            if (!$name) return '-';
+
+            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
+            $path =    @$this->country?->flag ?? '';
+
+            $url = getImagePath($path);
+
+            // Check if the image exists
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            // Return an image with a WhatsApp link
+            return "
+            <div style='display: flex; flex-direction: column; align-items: start;'>
+                <span>{$name}</span>
+                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
+            </div>
+        ";
+        });
 
         //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
         //            return $this->agencies_count;
