@@ -253,16 +253,16 @@ class SuperAdminController extends MainController
 
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
-            if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
-                $countries = $authAdmin->countriesQuery()
-                    ->doesntHave('superAdmin')
-                    ->orWhere('id', $value)
-                    ->get(['id', 'name', 'e_name']);
-                foreach ($countries as $country) {
-                    $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
-                }
-                return $ops;
+        if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+            $countries = $authAdmin->countriesQuery()
+                ->doesntHave('superAdmin')
+                ->orWhere('id', $value)
+                ->get(['id', 'name', 'e_name']);
+            foreach ($countries as $country) {
+                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
+            return $ops;
+        }
         })->required();
 
 
