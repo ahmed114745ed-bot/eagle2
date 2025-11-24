@@ -201,7 +201,7 @@ class ChargeController extends MainController
                 $showUrl = url("areaManager/area-manager-users/{$info['id']}");
 
                 return "
-                        <a href='#' style='text-decoration: none; color: inherit;'>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
                                 <div>
@@ -271,7 +271,7 @@ class ChargeController extends MainController
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
                  $showUrl = url("areaManager/area-manager-users/profile/{$info['id']}");
                 return "
-                        <a href='#' style='text-decoration: none; color: inherit;'>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
                                 <div>
