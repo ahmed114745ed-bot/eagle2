@@ -245,13 +245,9 @@
                 $countries = \App\Models\Country::select(['id', 'name', 'e_name','flag'])->get();
             }
 
-//            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            if(auth()->user()->type == 'area-manager'){
-                $authAdmin = auth()->user();
-            } else {
-                $authId = auth()->user()->parent_id;
-                $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
-            }
+            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+
 
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
                 $areaManagerCountries = $authAdmin->countriesQuery()
