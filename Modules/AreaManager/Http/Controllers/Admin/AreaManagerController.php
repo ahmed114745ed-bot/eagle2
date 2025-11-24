@@ -548,6 +548,7 @@ class AreaManagerController extends MainController
 
     JS;
     }
+    
     public function profile($id)
     {
         $tab = request()->query('tab', 'agencies');
