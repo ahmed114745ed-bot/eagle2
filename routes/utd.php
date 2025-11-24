@@ -517,6 +517,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete-ware', [VipController::class, 'deleteWare']);
     });
     Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
+    Route::post('/update-room-boom', [SettingController::class, 'updateRoomBoom']);
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic
