@@ -107,7 +107,7 @@ class SuperAdminController extends MainController
     {
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
-       
+
         $grid->model()->with(['appUser.packs','creator'])
             // ->where('parent_id', auth()->id())
             ->whereIn('country_id',  $countries)
@@ -225,13 +225,13 @@ class SuperAdminController extends MainController
         $form->select('country_id', trans('country'))->options(function ($value) {
             $ops       = [null => __('no country')];
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            
+
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
         if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
             $countries = $authAdmin->countriesQuery()
-                ->doesntHave('superAdmin') 
-                ->orWhere('id', $value)    
+                ->doesntHave('superAdmin')
+                ->orWhere('id', $value)
                 ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;

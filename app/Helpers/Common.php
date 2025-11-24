@@ -1931,7 +1931,7 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
-    
+
             case 'user':
                 $user = $resource->senderUser;
                 $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
@@ -2352,7 +2352,6 @@ class Common
 
     public static function areaCountries(): array
     {
-
         $adminId = session('area_manager_id') ?? auth()->id();
 
         $authAdmin = AreaManager::find($adminId)
@@ -2361,7 +2360,7 @@ class Common
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if ($sessionCountryId) {
             return (array)$sessionCountryId;
@@ -2370,37 +2369,29 @@ class Common
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
-
-
-
 
         return [];
-    
     }
 
     public static function areaCountriesV2($adminId): array
     {
-
-
         $authAdmin = AreaManager::find($adminId)
                     ?? SubAreaManager::find($adminId);
 
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if ($sessionCountryId) {
             return (array)$sessionCountryId;
         }
-    
+
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
+
         return [];
-    
     }
 
 
