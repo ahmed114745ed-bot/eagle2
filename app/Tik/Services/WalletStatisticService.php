@@ -19,34 +19,34 @@ class WalletStatisticService
 
     public function diamondsStatistic($userId, $type, $startDate, $endDate, $perPage, $page)
     {
-        $list = [];
-        switch ($type) {
+        $list = collect(); // default empty collection
+        $resourceClass = AudioGiftsListResource::class; // default resource
 
+        switch ($type) {
             case 1:
                 $list = $this->GiftLogRepository->listGiftReceiveLive($userId, $startDate, $endDate, $perPage, $page);
-                $resource = AudioGiftsListResource::collection($list);
                 break;
 
             case 2:
                 $list = $this->GiftLogRepository->listGiftReceiveAudio($userId, $startDate, $endDate, $perPage, $page);
-                $resource = AudioGiftsListResource::collection($list);
                 break;
 
             case 3:
-                $list = MomentUserGift::selectRaw('user_id, moment_id,gift_id, SUM(num) as total')
+                $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
                     ->whereHas('moment', function ($q) use ($userId) {
                         $q->where('user_id', $userId);
                     })
                     ->groupBy('user_id', 'moment_id', 'gift_id')
-                    ->with('user', 'gift')
+                    ->with(['user', 'gift'])
                     ->paginate($perPage, ['*'], 'page', $page);
-                $resource = MomentGiftResource::collection($list);
 
+                $resourceClass = MomentGiftResource::class;
                 break;
         }
 
-        return [
+        $resource = $resourceClass::collection($list);
 
+        return [
             'total_diamonds' => $list->sum('total'),
             'list' => $resource,
         ];
