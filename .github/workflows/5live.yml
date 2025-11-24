@@ -29,7 +29,7 @@ jobs:
           fi
  
   run_5live_app:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on:  ubuntu-latest #[self-hosted]
     needs: run_5live_hub
     steps:
     - name: print out 5live-app
