@@ -241,25 +241,29 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'))->display(function ($name) {
-            if (!$name) return '-';
+        $grid->column('country.name', __('country'))->display(function () {
 
-            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
-            $path =    @$this->country?->flag ?? '';
+            $country = $this->country;
 
-            $url = getImagePath($path);
+            if (!$country) {
+                return '-';
+            }
 
-            // Check if the image exists
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
 
-            // Return an image with a WhatsApp link
-            return "
-            <div style='display: flex; flex-direction: column; align-items: start;'>
-                <span>{$name}</span>
-                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
-            </div>
-        ";
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
         });
 
         //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
@@ -751,7 +755,7 @@ class SuperAdminController extends MainController
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
         $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
-        
+
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
         switch ($tab) {
@@ -765,8 +769,7 @@ class SuperAdminController extends MainController
         }
         $prefix = dashboardName();
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage','agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
-    
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
     }
 
     protected function detail($id)

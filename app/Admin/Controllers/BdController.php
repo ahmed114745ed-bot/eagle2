@@ -277,16 +277,15 @@ class BdController extends MainController
 
             // Get flag image URL
             $flag = $country->flag ? getImagePath($country->flag) : null;
-            $image = $flag ? handleShowImageWithTypes($this->id, $flag, 40, 40) : '';
+
 
             return <<<HTML
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <img src="$image" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
                         <span>$name</span>
                     </div>
                 HTML;
         });
-
 
 
 
@@ -767,14 +766,14 @@ class BdController extends MainController
 
             // Get flag image URL
             $flag = $country->flag ? getImagePath($country->flag) : null;
-            $image = $flag ? handleShowImageWithTypes($this->id, $flag, 40, 40) : '';
+
 
             return <<<HTML
-            <div style="display:flex; align-items:center; gap:8px;">
-                <img src="$image" alt="flag" width="20" height="20" style="border-radius:4px;">
-                <span>$name</span>
-            </div>
-        HTML;
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
         });
 
 
