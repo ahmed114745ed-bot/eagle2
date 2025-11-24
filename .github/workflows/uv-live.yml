@@ -4,7 +4,7 @@ on:
     branches: ["uv-live"]
 jobs:
   run_uv-live_hub:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: ubuntu-latest #[self-hosted]
     steps:
     - name: print out uv-live
       uses: appleboy/ssh-action@v1.2.1
