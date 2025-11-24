@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\AreaManager\Http\Controllers;
+
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
@@ -107,8 +108,8 @@ class SuperAdminController extends MainController
     {
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
-       
-        $grid->model()->with(['appUser.packs','creator'])
+
+        $grid->model()->with(['appUser.packs', 'creator', 'country'])
             // ->where('parent_id', auth()->id())
             ->whereIn('country_id',  $countries)
             ->orderByDesc('id');
@@ -181,7 +182,31 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
@@ -225,19 +250,19 @@ class SuperAdminController extends MainController
         $form->select('country_id', trans('country'))->options(function ($value) {
             $ops       = [null => __('no country')];
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            
+
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
-        if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
-            $countries = $authAdmin->countriesQuery()
-                ->doesntHave('superAdmin') 
-                ->orWhere('id', $value)    
-                ->get(['id', 'name', 'e_name']);
-            foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+                $countries = $authAdmin->countriesQuery()
+                    ->doesntHave('superAdmin')
+                    ->orWhere('id', $value)
+                    ->get(['id', 'name', 'e_name']);
+                foreach ($countries as $country) {
+                    $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+                }
+                return $ops;
             }
-            return $ops;
-        }
         })->required();
 
 
@@ -454,7 +479,7 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
-                $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
 
         switch ($tab) {
             case 'agencies':
@@ -466,8 +491,8 @@ class SuperAdminController extends MainController
                 $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
                 break;
         }
-       $prefix = dashboardName();
-        return view('superadmin::super_admin_profile', compact('superAdmin','defaultImage','prefix','bds','agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        $prefix = dashboardName();
+        return view('superadmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'prefix', 'bds', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()
