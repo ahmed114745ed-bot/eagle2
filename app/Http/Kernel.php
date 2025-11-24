@@ -98,7 +98,7 @@ class Kernel extends HttpKernel
         'verify.gamecoin.signature' => \App\Http\Middleware\VerifyGameCoinSignature::class,
         'verify.game.userInformation.signature' => \App\Http\Middleware\VerifyGameLeaderCCUserInformationMiddleWare::class,
         'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
-        
+
         // 'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
 //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
@@ -119,6 +119,7 @@ class Kernel extends HttpKernel
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
+        'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
 

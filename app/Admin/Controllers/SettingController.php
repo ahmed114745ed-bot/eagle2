@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Timezone;
 use App\Models\BrandImage;
 use App\Models\PaymentCoin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
@@ -121,12 +122,26 @@ class SettingController extends MainController
                     'key' => 'room_cup',
                     'value' => $request->value
                 ]);
-                
+
             }
             Cache::put('room_cup', $request->value);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateRoomBoom(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'room_boom'], [
+                'key' => 'room_boom',
+                'value' => $request->value
+            ]);
+            Cache::put('room_boom', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }

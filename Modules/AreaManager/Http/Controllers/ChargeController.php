@@ -40,7 +40,7 @@ class ChargeController extends MainController
     public function index(Content $content): Content
     {
 
- 
+
         $user = Auth::user();
         $authUser = auth()->user();
 
@@ -70,7 +70,7 @@ class ChargeController extends MainController
             ->header(trans('Charges'))
             ->description(trans('Charges'));
 
-        
+
             $content->row(function ($row) use ($finalSalary) {
                 $row->column(12, view('admin.grid.area_manager.wallet', [
                     'finalSalary' => $finalSalary
@@ -94,7 +94,7 @@ class ChargeController extends MainController
                     truncateAndTrim($totalSpent, 2)
                 ));
             });
-        
+
 
         $content->row(function ($row) {
             $row->column(12, $this->grid());
@@ -108,7 +108,7 @@ class ChargeController extends MainController
         $authUser = auth()->user();
         $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
         $grid->model()
-            ->with(['receiverUser', 'receiveragency', 'subAreaManager', 'areaManager'])
+            ->with(['receiveragency', 'subAreaManager', 'areaManager', 'receiverSuperAdmin', 'receiverSubAreaManager'])
             ->where(function ($query) use ($authUser, $authId) {
                 $query->where('charger_id', $authUser->id)
                     ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
@@ -198,10 +198,10 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("areaManager/area-manager-users/{$info['id']}");
+                $showUrl = url("areaManager/sub-area-manager-users/profile/{$info['id']}");
 
                 return "
-                        <a href='#' style='text-decoration: none; color: inherit;'>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
                                 <div>
@@ -269,9 +269,9 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-
+                 $showUrl = url("areaManager/area-manager-users/profile/{$info['id']}");
                 return "
-                        <a href='#' style='text-decoration: none; color: inherit;'>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
                                 <div>

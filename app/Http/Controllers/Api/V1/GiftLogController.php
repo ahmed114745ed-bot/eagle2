@@ -288,7 +288,7 @@ class GiftLogController extends Controller
         }
 
         try {
-            $message = $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
+            $message = $this->giftLogService->sendprovideGift($request, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(false, $e->getMessage());
         }
@@ -417,7 +417,7 @@ class GiftLogController extends Controller
         }
         return Common::apiResponse(1, __('api_responses.success'), $data);
     }
-    
+
 
     // public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     // {

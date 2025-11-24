@@ -10,6 +10,7 @@ return new class extends Migration
     public function up(): void
     {
    
+        
 
         DB::statement("
             CREATE OR REPLACE VIEW coin_game_users_merged AS
