@@ -255,7 +255,7 @@
 
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
                 $areaManagerCountries = $authAdmin->countriesQuery()
-                    ->select(['id', 'name', 'flag'])
+                    ->select(['id', 'name','e_name', 'flag'])
                     ->get();
             } else {
                 $areaManagerCountries = collect();
@@ -307,7 +307,7 @@
                             value="{{ $currentCountry->id }}"
                             data-flag="{{ getImagePath($currentCountry->flag) }}"
                             {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
+                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
                         </option>
                     @endforeach
                 </select>
