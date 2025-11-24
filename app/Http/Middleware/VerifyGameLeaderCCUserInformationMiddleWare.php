@@ -36,7 +36,7 @@ class VerifyGameLeaderCCUserInformationMiddleWare
             return response()->json([
                 'errorCode' => 4005,
                 'errorMsg'  => 'Missing signature parameters'
-            ], 400);
+            ], 200);
         }
         
         $rawString = 
@@ -52,7 +52,7 @@ class VerifyGameLeaderCCUserInformationMiddleWare
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg'  => 'Verify signature fail'
-            ], 400);
+            ], 200);
         }
         
         return $next($request);

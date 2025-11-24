@@ -14,7 +14,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
-use App\Models\SuperAdminReward;
+
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 
 class SuperAdminController extends MainController
@@ -429,7 +430,7 @@ class SuperAdminController extends MainController
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -453,6 +454,8 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
+                $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -463,8 +466,8 @@ class SuperAdminController extends MainController
                 $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
                 break;
         }
-
-        return view('superadmin::super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+       $prefix = dashboardName();
+        return view('superadmin::super_admin_profile', compact('superAdmin','defaultImage','prefix','bds','agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()
