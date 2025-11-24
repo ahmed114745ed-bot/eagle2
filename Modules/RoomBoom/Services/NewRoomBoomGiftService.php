@@ -54,7 +54,7 @@ class NewRoomBoomGiftService
         });
     }
 
-    private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice){
+    public function getOrCreateTotalRoomGift($roomId, $todayStart){
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
             ->where('created_at', '>=', $todayStart)
             ->lockForUpdate()

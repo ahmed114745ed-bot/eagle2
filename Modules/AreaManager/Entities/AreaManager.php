@@ -17,7 +17,7 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class AreaManager extends Authenticatable
 {
-    use HasFactory, SoftDeletes,CreatedByTrait;
+    use HasFactory, SoftDeletes, CreatedByTrait;
 
     protected $table = 'admin_users';
 
@@ -111,7 +111,8 @@ class AreaManager extends Authenticatable
     public function flag()
     {
 
-        $countries = Country::where('area_manager_id', $this->id)->get();
+        $region = Region::where('manager_id', $this->parent_id)->with('countries')->first();
+        $countries = $region->countries;
 
         $html = '<div class="user-type-badges">';
         foreach ($countries as $country) {

@@ -28,7 +28,7 @@ class CreatorService
         } else {
             $creator = $creatorModelOrIdOrArray;
         }
-           
+
         if (!$creator) return __('No creator');
 
         $uid =  $creator->id;
@@ -40,7 +40,7 @@ class CreatorService
         $url = $url ?: asset('images/businessman-icon.jpg');
         // \Log::info('URL: ' . $url);
         // \Log::info('AvatarPath: ' . $creator?->avatar);
-    
+
 
         $image = "<img src='{$url}' alt='{$name}' style='width:50px;height:50px;border-radius:50%;object-fit:cover;'>";
 
@@ -54,6 +54,58 @@ class CreatorService
         return <<<HTML
         <a href="{$showUrl}" style="display:flex;align-items:center;gap:10px;padding:5px;text-decoration:none;color:inherit;">
             {$image}
+            <div>
+                <strong style="font-size:16px;">{$name}</strong><br>
+                <span style="font-size:13px;">{$uidHtml}</span>
+            </div>
+        </a>
+        HTML;
+    }
+
+    public function showV2($creatorInput, bool $showUid = true, ?string $showUrl = null): string
+    {
+        if (!$creatorInput) {
+            return __('No creator');
+        }
+
+        if ($creatorInput instanceof AdminUser) {
+            $creator = $creatorInput;
+        } elseif (is_numeric($creatorInput)) {
+            $creator = $this->creator ?? null;
+        } elseif (is_array($creatorInput)) {
+            $creator = (object) $creatorInput;
+        } else {
+            return __('No creator');
+        }
+
+        if (empty($creator->id)) {
+            return __('No creator');
+        }
+
+        $uid = $creator->id;
+        $name = e($creator->username ?? 'Unknown');
+        $avatarUrl = getImagePath($creator->avatar) ?: asset('images/businessman-icon.jpg');
+
+        $imageHtml = <<<HTML
+        <img src="{$avatarUrl}" alt="{$name}"
+             style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+        HTML;
+
+        $showUrl = $showUrl ?: $this->creatorUrl($uid);
+
+        $uidHtml = $showUid
+            ? <<<HTML
+            UID: <span id="uid-{$uid}">{$uid}</span>
+            <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$uid}')"
+                style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
+                title="Copy UID">📝</button>
+        HTML
+        : '';
+
+        return <<<HTML
+        <a href="{$showUrl}"
+           style="display:flex;align-items:center;gap:10px;padding:5px;text-decoration:none;color:inherit;">
+            {$imageHtml}
             <div>
                 <strong style="font-size:16px;">{$name}</strong><br>
                 <span style="font-size:13px;">{$uidHtml}</span>

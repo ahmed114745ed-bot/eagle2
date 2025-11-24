@@ -48,7 +48,7 @@ class GiftLogRepository extends AbstractRepository
             ->orderByRaw("exp desc")
             ->paginate($perPage, ['*'], 'page', $page);
     }
-    
+
 
     public function getSumOfReceiverObtain($userId)
     {
@@ -146,5 +146,44 @@ class GiftLogRepository extends AbstractRepository
                 $formattedEndDate = Carbon::parse($endDate)->endOfDay();
                 $q->whereBetween('created_at', [$formattedStartDate, $formattedEndDate]);
             })->groupBy('giftId', 'sender_id', 'receiver_id')->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function listGiftReceiveLive($userId, $startDate = null, $endDate = null, $perPage, $page)
+    {
+        $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
+        $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
+
+        return $this->model->query()
+            ->where('receiver_id', $userId)
+            ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
+                $q->whereBetween('created_at', [$start, $end]);
+            })
+            ->whereHas('room', function ($q) {
+                $q->where('type', 'live');
+            })
+            ->selectRaw('sender_id, room_id,giftId,SUM(giftNum * giftPrice) AS total')
+            ->groupBy('sender_id', 'room_id', 'giftId')
+            ->with(['room', 'sender', 'gift'])
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+    public function listGiftReceiveAudio($userId, $startDate = null, $endDate = null, $perPage, $page)
+    {
+        $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
+        $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
+
+        return $this->model->query()
+            ->where('receiver_id', $userId)
+            ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
+                $q->whereBetween('created_at', [$start, $end]);
+            })
+            ->whereHas('room', function ($q) {
+                $q->where('type', 'audio');
+            })
+            ->selectRaw('sender_id, room_id,giftId,SUM(giftNum * giftPrice) AS total')
+            ->groupBy('sender_id', 'room_id', 'giftId')
+            ->with(['room', 'sender', 'gift'])
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 }

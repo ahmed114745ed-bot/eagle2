@@ -241,7 +241,30 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
 
         //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
         //            return $this->agencies_count;
@@ -732,7 +755,7 @@ class SuperAdminController extends MainController
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
         $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
-        
+
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
         switch ($tab) {
@@ -746,8 +769,7 @@ class SuperAdminController extends MainController
         }
         $prefix = dashboardName();
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage','agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
-    
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
     }
 
     protected function detail($id)

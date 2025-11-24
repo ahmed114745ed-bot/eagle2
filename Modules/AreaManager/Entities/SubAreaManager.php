@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubAreaManager extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes,CreatedByTrait;
+    use TimestampsWithTimezone, SoftDeletes, CreatedByTrait;
 
     protected $table = 'admin_users';
 
@@ -50,7 +50,7 @@ class SubAreaManager extends Model
     public function countriesQuery()
     {
         $managerId = $this->parent_id ?: $this->id;
-    
+
         return Country::whereHas('regions', function ($q) use ($managerId) {
             $q->where('manager_id', $managerId);
         });
@@ -78,5 +78,29 @@ class SubAreaManager extends Model
     public function creator()
     {
         return $this->belongsTo(AdminUser::class, 'created_by');
+    }
+
+
+    public function flag()
+    {
+
+        $region = Region::where('manager_id', $this->id)->with('countries')->first();
+        $countries = $region->countries;
+
+        $html = '<div class="user-type-badges">';
+        foreach ($countries as $country) {
+            $url = getImagePath($country->flag);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($country->id, $url, 30, 30, 4);
+                // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
     }
 }

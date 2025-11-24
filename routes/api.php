@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\V1\MusicController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
+use App\Http\Controllers\Api\V2\WalletController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -533,6 +534,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start games
             Route::prefix('all-games1')->group(function () {
                 Route::get('/', [AllGameController::class, 'index']);
+                Route::get('/v2/out-of-room', [AllGameController::class, 'outRoom']);
+                Route::get('/v2/in-room', [AllGameController::class, 'inRoom']);
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
@@ -583,7 +586,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
-
+            Route::prefix('wallet')->group(function () {
+                Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
+            });
 
 
             Route::prefix('banners')->group(function () {
