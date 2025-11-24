@@ -96,12 +96,12 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries(): (array)session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $superAdmin = [];
-       
+
         if ($countryID) {
-           
+
             $superAdmin = SuperAdmin::select(['id', 'country_id'])->whereIn('country_id', $countryID)->first();
         }
 
@@ -111,7 +111,7 @@ class BdController extends MainController
                 $query->where('parent_id', @$superAdmin->id);
             })
 
-            ->with(['bdSalaries', 'appUser.packs','creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
+            ->with(['bdSalaries', 'appUser.packs', 'creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -242,7 +242,7 @@ class BdController extends MainController
             ";
         });
 
-       
+
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
             return $this->total_agencies;
         });
@@ -262,28 +262,34 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-       $grid->column('country.name', __('country'))->display(function ($name) {
-            if (!$name) return '-';
+        $grid->column('country.name', __('country'))->display(function () {
 
-            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
-            $path =    @$this->country?->flag ?? '';
+            $country = $this->country;
 
-            $url = getImagePath($path);
+            if (!$country) {
+                return '-';
+            }
 
-            // Check if the image exists
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+            $image = $flag ? handleShowImageWithTypes($this->id, $flag, 40, 40) : '';
 
-            // Return an image with a WhatsApp link
-            return "
-            <div style='display: flex; flex-direction: column; align-items: start;'>
-                <span>{$name}</span>
-                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
-            </div>
-        ";
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$image" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
         });
 
-        
+
+
+
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
                 ->display(function () {
@@ -746,26 +752,31 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-       $grid->column('country.name', __('country'))->display(function ($name) {
-            if (!$name) return '-';
+        $grid->column('country.name', __('country'))->display(function () {
 
-            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
-            $path =    @$this->country?->flag ?? '';
+            $country = $this->country;
 
-            $url = getImagePath($path);
+            if (!$country) {
+                return '-';
+            }
 
-            // Check if the image exists
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+            $image = $flag ? handleShowImageWithTypes($this->id, $flag, 40, 40) : '';
 
-            // Return an image with a WhatsApp link
-            return "
-            <div style='display: flex; flex-direction: column; align-items: start;'>
-                <span>{$name}</span>
-                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
+            return <<<HTML
+            <div style="display:flex; align-items:center; gap:8px;">
+                <img src="$image" alt="flag" width="20" height="20" style="border-radius:4px;">
+                <span>$name</span>
             </div>
-        ";
+        HTML;
         });
+
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
@@ -782,7 +793,7 @@ class BdController extends MainController
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
             $carbonDate->locale($locale);
-            return $carbonDate->translatedFormat('d F Y H:i'); 
+            return $carbonDate->translatedFormat('d F Y H:i');
         });
 
         $permission = $this->permission_name;
