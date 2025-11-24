@@ -48,6 +48,8 @@ class EnterRoomCollection extends JsonResource
             "room_cover"          => $this->room_cover, // room cover
             "room_background"     => $this->final_room_image, // room background
             "owner_image"         => $owner->avatar ?: '', // owner image
+            'owner_task_room_id'  => $this->taskStream?->id,
+            'current_task_room_id'=> $this->taskStreamRoom?->task_stream_id,
             "giftPrice"           => $this->session_string ?: '', // gift price
             "password_status"     => !($this->room_pass == ""), // room password state
             "admins"              => explode(',', $this->room_admin ?? ''), // room admins

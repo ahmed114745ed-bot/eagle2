@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\TaskStream\Entities\TaskStream;
+use Modules\TaskStream\Entities\TaskStreamRoom;
 use Modules\Vip\Entities\Vip;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\LuckyBox\Entities\BoxUse;
@@ -78,6 +81,16 @@ class Room extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
+    }
+
+    public function taskStream()
+    {
+        return $this->hasOne(TaskStream::class);
+    }
+
+    public function taskStreamRoom()
+    {
+        return $this->hasOne(TaskStreamRoom::class);
     }
 
     public function game()
