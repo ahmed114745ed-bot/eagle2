@@ -5,16 +5,19 @@ namespace App\Tik\Services;
 
 use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
+use App\Helpers\CacheHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
 use App\Tik\DTO\ReceiverGiftDTO;
+use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
@@ -26,6 +29,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Illuminate\Support\Facades\Log;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
@@ -177,7 +181,23 @@ class GiftLogService
             $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
 //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
-            (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
+
+            $settings = CacheHelper::cacheSettings();
+            /** @var Collection $rememberForever*/
+            if (gettype($settings) !== 'array'){
+                $settings = $settings->pluck('value', 'key')->toArray();
+            }
+
+            if ($settings['room_boom']){
+                (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
+            } else {
+                $tz = getTimezone();
+                $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+
+                $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+
+                $totalRoomGift->increment('current_total', $totalPrice);
+            }
 
             foreach ($receivedUsers as $receivedUser) {
                 $updateUserWhenSendGift->update($price, $receivedUser);
