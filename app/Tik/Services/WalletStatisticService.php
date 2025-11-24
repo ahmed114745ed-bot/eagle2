@@ -39,7 +39,7 @@ class WalletStatisticService
                     })
                     ->groupBy('user_id', 'moment_id', 'gift_id')
                     ->with('user', 'gift')
-                    ->get();
+                    ->paginate($perPage, ['*'], 'page', $page);
                 $resource = MomentGiftResource::collection($list);
 
                 break;
