@@ -108,7 +108,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
        
-        $grid->model()->with(['appUser.packs','creator'])
+        $grid->model()->with(['appUser.packs','creator','country'])
             // ->where('parent_id', auth()->id())
             ->whereIn('country_id',  $countries)
             ->orderByDesc('id');
