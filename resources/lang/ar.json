@@ -2016,9 +2016,14 @@
 "music_gift": "هدية موسيقية",
 "room cup setting": "إعداد كأس الغرفة",
 "Enable room cup Feature": "تمكين ميزة كأس الغرفة",
+"Pay switch dashboard":" شحن الالعاب",
 "image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)": "الصورة: (jpg, jpeg, png, gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)",
     "Show host": "عرض المضيف",
     "Delete host": "حذف المضيف",
+    "Request under review!":"طلب تحت المراجعه",
+    "something got wrong":"حدث خطأ ما",
+    "App owner profit":"المكسب الخاص صاحب التطبيق",
+    "owner gift":"مالك الهديه",
     "Edit host": "تعديل المضيف",
     "Browse host": "تصفح المضيفين",
     "Sub Super Admin": "سوبر ادمن",
@@ -2308,7 +2313,7 @@
     "Search": "ابحث",
     "Moment id": "رقم اللحظة",
     "room-vips": "نخبة الغرفة",
-   
+
     "UserTarget": "التارجت المحقق",
     "userTarget": "التارجت المحقق",
     "Report_user": "الإبلاغ عن المستخدم",
@@ -4530,6 +4535,23 @@
 "Created At": "تاريخ الإنشاء",
 "Last Updated": "آخر تحديث",
 "Available Actions": "الإجراءات المتاحة",
+
+"max task stream": "الحد الأقصى لتدفقات المهام",
+"This is the default number of rooms allowed per task.": "هذا هو العدد الافتراضي للغرف المسموح بها لكل مهمة.",
+"You cannot invite yourself.": "لا يمكنك دعوة نفسك.",
+"You cannot send an invitation while your task is empty. Please join your task first.": "لا يمكنك إرسال دعوة بينما مهمتك فارغة. يرجى الانضمام إلى مهمتك أولاً.",
+"This user is already part of your task stream.": "هذا المستخدم هو بالفعل جزء من دفق المهمة الخاص بك.",
+"This user already has a pending invitation.": "هذا المستخدم لديه بالفعل دعوة معلقة.",
+"No pending invitation found for this task.": "لم يتم العثور على دعوة معلقة لهذه المهمة.",
+"This room is not live in current time": "هذه الغرفة غير نشطة في الوقت الحالي.",
+"You cannot join your own task stream while there is nobody.": "لا يمكنك الانضمام إلى دفق المهمة الخاص بك أثناء عدم وجود أحد.",
+"You dont have live room or not live": "ليس لديك غرفة بث مباشرة أو أنك غير متصل.",
+"Your room is not part of this task stream.": "غرفتك ليست جزءًا من دفق المهمة هذا.",
+"This room is already part of another task stream.": "هذه الغرفة هي بالفعل جزء من دفق مهمة آخر.",
+"This task stream has reached the maximum number of rooms allowed.": "لقد وصل دفق المهمة هذا إلى الحد الأقصى المسموح به من الغرف.",
+"You are not in any task.": "أنت لست في أي مهمة.",
+"One or more rooms do not belong to your task stream.": "إحدى أو أكثر من الغرف لا تنتمي إلى دفق المهمة الخاص بك.",
+
 "Delete Request": "حذف الطلب",
 "You can delete this request only while pending.": "يمكنك حذف الطلب فقط أثناء كونه معلقًا.",
 "Cannot Edit": "لا يمكن التعديل",
@@ -4545,7 +4567,7 @@
 
 
 
-    
+
 
 
 
