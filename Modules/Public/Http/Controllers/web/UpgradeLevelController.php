@@ -48,7 +48,7 @@ class UpgradeLevelController extends MainController
         
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            Cache::put ($key,$data);
+            Cache::put($key, $value);
         }
         return redirect()->back()->with('message', __('dashboard.update'));
 

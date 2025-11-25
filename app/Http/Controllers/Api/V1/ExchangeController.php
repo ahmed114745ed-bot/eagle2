@@ -25,6 +25,18 @@ class ExchangeController extends Controller
         return Common::apiResponse(1, $user->monthly_diamond_received, $list, 200);
     }
 
+    public function exchangeSettingNumber(Request $request)
+    {
+        $user = $request->user();
+        $list = $this->exchangeService->exchangeSetting();
+        $data = [
+            'exchange_coin_percentage' => (int)$list ?? 0,
+            'usr_diamond' => $user->monthly_diamond_received
+        ];
+        /** @var User $user */
+        return Common::apiResponse(1, $user->monthly_diamond_received, $data, 200);
+    }
+
     public function exchangeSave(Request $request)
     {
         $user = $request->user();
@@ -59,9 +71,9 @@ class ExchangeController extends Controller
         return Common::apiResponse(1, 'ok', $data, 200);
     }
 
-    public function UserExchangeLogs($id,Request $request)
+    public function UserExchangeLogs($id, Request $request)
     {
-        
+
         $type = $request->type ?: 0;
         $data = $this->exchangeService->getExchangeLog($id, $type);
         return Common::apiResponse(1, 'ok', $data, 200);
