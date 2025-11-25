@@ -305,7 +305,8 @@ class PayPalService
             ]);
         }
 
-        LogHelper::info($eventType, $request->all());
+        Log::channel('payPal')->info($eventType, $request->all());
+//        LogHelper::info($eventType, $request->all());
 
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
