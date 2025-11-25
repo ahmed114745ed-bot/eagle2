@@ -2,8 +2,9 @@
 
 namespace App\Tik\Services;
 
-use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Models\Setting;
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\ExchangeRepository;
 use App\Tik\Repositories\ExchangeLogRepository;
@@ -20,6 +21,14 @@ class ExchangeService
     public function index($type)
     {
         return $this->exchangeRepository->getByType($type);
+    }
+
+    public function exchangeSetting()
+    {
+        return   \Cache::rememberForever('exchange_coin_percentage', function () {
+            $setting = Setting::where('key', 'exchange_coin_percentage')->first();
+            return $setting?->value ?? 0;
+        });
     }
 
     public function create($user, $exchangeId)
