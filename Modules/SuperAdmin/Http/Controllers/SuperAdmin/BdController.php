@@ -59,7 +59,7 @@ class BdController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('BD'))
             ->body($this->profile($id)));
     }
@@ -73,7 +73,7 @@ class BdController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('BD'))
             ->body($this->form()->edit($id)));
     }
@@ -98,9 +98,9 @@ class BdController extends MainController
         $grid = new Grid(new Bd());
         $grid->model()->where('parent_id', $authId)
             ->where('country_id', $authSuperAdmin->country_id)
-            
+
             ->where('admin_users.type', 'bd')
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -127,7 +127,7 @@ class BdController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("superadmin/usersBd/{$this->id}");
+            $showUrl = url("superadmin/profile/{$this->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -144,11 +144,10 @@ class BdController extends MainController
 
 
         $grid->column('default', trans('default_status'))
-        ->switch(Common::getSwitchStates())
-        ->display(function ($enable) {
+            ->switch(Common::getSwitchStates())
+            ->display(function ($enable) {
                 return $enable;
-
-        })->sortable();
+            })->sortable();
 
         $grid->column('app_id', __('user'))->display(function ($name) {
             $user = $this->appUser;
@@ -235,7 +234,30 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
@@ -306,8 +328,8 @@ class BdController extends MainController
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
 
-//            $form->switch('default', __('set_as_default'))
-//                ->help(__('make_bd_default'));
+            //            $form->switch('default', __('set_as_default'))
+            //                ->help(__('make_bd_default'));
         }
 
         $user = auth()->user();

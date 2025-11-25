@@ -3,14 +3,11 @@
 namespace App\Console;
 
 use App\Models\Setting;
-use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Cache;
 use Modules\CP\Console\WeeklyCpWinnerConsole;
-use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
-use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
-use Illuminate\Support\Facades\Storage;
+use Modules\TaskStream\Jobs\PkSessionJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -132,6 +129,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->runInBackground();
+
         $schedule->command('coin-game:aggregate')
         ->dailyAt('07:00')
         ->timezone(getTimezone())
@@ -140,17 +138,24 @@ class Kernel extends ConsoleKernel
 
         $this->scheduleRoomCupRewards($schedule);
 
-    
+
         $schedule->command('users:update-offline')
             ->everyThirtyMinutes()
-            ->timezone(getTimezone()) 
+            ->timezone(getTimezone())
             ->withoutOverlapping()
             ->runInBackground();
-        
+
 
         // $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
 
-
+        $schedule->call(function () {
+            dispatch(new PkSessionJob());
+        })
+            ->name('pk-session-job')
+            ->everyMinute()
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/pk_session_job.log'));
     }
 
     protected function commands(): void
@@ -166,21 +171,21 @@ class Kernel extends ConsoleKernel
         if (empty($settings['enabled'])) {
             return;
         }
-    
+
         $type     = $settings['type'] ?? 'daily';
         $time     =  '00:00';
-    
+
         $command = $schedule->command('roomcup:calculate-rewards')
                             ->timezone(getTimezone());
-    
+
         match ($type) {
             'daily'   => $command->dailyAt($time),
-            'weekly'  => $command->weeklyOn(1, $time),   
+            'weekly'  => $command->weeklyOn(1, $time),
             'monthly' => $command->monthlyOn(1, $time),
             default   => $command->dailyAt($time),
         };
     }
-    
+
     private function getRoomCupSettings(): array
     {
 
@@ -190,32 +195,32 @@ class Kernel extends ConsoleKernel
             'type'             => 'daily',
             'time'             => '00:00',
         ];
-    
+
         $settings = [];
-    
+
         foreach ($default as $key => $defaultValue) {
             $cacheKey = 'roomcup_' . $key;
-    
+
             $value = Cache::get($cacheKey);
-    
+
             if ($value === null) {
                 $setting = Setting::where('key', $cacheKey)->first();
                 $value = $setting ? $setting->value : $defaultValue;
-    
+
                 Cache::put($cacheKey, $value, now()->addDays(30));
             }
-    
+
             if ($key === 'enabled') {
                 $value = (bool) $value;
             } elseif ($key === 'interval_minutes') {
                 $value = (int) $value;
             }
-    
+
             $settings[$key] = $value;
         }
-    
+
         return $settings;
   }
-    
+
 
 }

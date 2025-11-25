@@ -32,5 +32,6 @@
     "RoomCup": true,
     "AreaManager": true,
     "Form": true,
-    "SuperAdmin": true
+    "SuperAdmin": true,
+    "TaskStream": true
 }

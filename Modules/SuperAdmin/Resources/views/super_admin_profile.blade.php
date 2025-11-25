@@ -912,6 +912,7 @@
 <div class="agency-tabs">
     <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
     <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>
+     <a href="?tab=bds" class="tab-btn {{ $activeTab === 'bds' ? 'active' : '' }}">{{ __('bds') }}</a>
 
 
 
@@ -947,13 +948,13 @@
                                     <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
                                     <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href=" {{ url('admin/agencies/profile/' .$agency->id) }}">
+                                                <a href=" {{ url($prefix.'/agencies/profile/' .$agency->id) }}">
                                                     <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{url('admin/agencies/profile/' .$agency->id) }}">
+                                                    <a href="{{url($prefix.'/agencies/profile/' .$agency->id) }}">
                                                         {{ $agency->name ??'' }}
                                                     </a>
                                                 </strong>
@@ -962,13 +963,13 @@
 
                                         <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url('admin/users/'. $agency->owner?->id ) }}">
+                                                <a href="{{ url($prefix.'/users/'. $agency->owner?->id ) }}">
                                                     <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{ url('admin/users/'.$agency->owner?->id) }}">
+                                                    <a href="{{ url($prefix.'/users/'.$agency->owner?->id) }}">
                                                         {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
@@ -995,6 +996,129 @@
                 <div class="empty-table">
                     <i class="fas fa-users-slash"></i>
                     <p>{{ __('No agencies found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
+
+@if($activeTab === 'bds')
+    <div class="tab-content active" id="bds-tab">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('Bds') }}</h3>
+                <span class="badge count-badge">{{ optional($bds)->total() ?? 0 }}</span>
+            </div>
+            @if($bds && $bds->count())
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('user') }}</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($bds as $index => $bd)
+                                <tr>
+                                    <td>{{ $index + 1 + (($bds->currentPage() - 1) * $bds->perPage()) }}</td>
+                                    {{-- <td class="user-cell">
+                                            <div class="user-avatar">
+                                                <a >
+                                                    <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}"  alt="{{ $bd->username ?? '' }}">
+                                                </a>
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>
+                                                    <a href="{{url($prefix.'/usersBd/' .$bd->id) }}">
+                                                        {{ $bd->username ??'' }}
+                                                    </a>
+                                                </strong>
+                                            </div>
+                                        </td> --}}
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}">
+                                                        <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}" 
+                                                            alt="{{ $bd->username ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong>
+                                                        <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}" style="display: block;">
+                                                            {{ $bd->username ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $bd->id }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+                                        </td>
+
+
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}">
+                                                        <img src="{{ $bd->appUser?->profile?->avatar ? getImagePath($bd->appUser->profile->avatar) : $defaultImage }}"
+                                                            alt="{{ $bd->appUser?->name ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
+
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong style="display: flex; align-items: center; gap: 6px;">
+                                                        <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}"
+                                                        style="display: flex; align-items: center; gap: 6px;">
+                                                        
+                                                            {{-- Country Flag --}}
+                                                            @if(@$bd->appUser->country->flag)
+                                                                <img src="{{ getImagePath($bd->appUser->country->flag) }}"
+                                                                    alt="flag"
+                                                                    style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                            @endif
+
+                                                            {{-- User Name --}}
+                                                            {{ $bd->appUser?->name ?? '' }}
+                                                        </a>
+                                                    </strong>
+
+                                                    <small style="color: #555;">
+                                                        ID: {{ $bd->appUser?->uuid ?? 'N/A' }}
+                                                    </small>
+                                                </div>
+
+                                            </div>
+                                        </td>
+
+
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ $bds->appends(['tab' => 'bds'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="empty-table">
+                    <i class="fas fa-users-slash"></i>
+                    <p>{{ __('No bds found') }}</p>
                 </div>
             @endif
         </div>

@@ -99,7 +99,7 @@ class BdController extends MainController
         //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -140,7 +140,7 @@ class BdController extends MainController
                 </div>
             ";
         });
-        
+
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
@@ -192,7 +192,30 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
@@ -223,8 +246,8 @@ class BdController extends MainController
         });
 
         $grid->disableRowSelector();
-         $grid->disableExport();
-         $this->extendGrid($grid);
+        $grid->disableExport();
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -275,7 +298,7 @@ class BdController extends MainController
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
             $countries = $authAdmin->countriesQuery()
-            ->get(['id', 'name', 'e_name']);
+                ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }

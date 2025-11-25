@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
 use Illuminate\Queue\SerializesModels;
 
-class BannerEvent implements ShouldBroadcastNow
+class BannerEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

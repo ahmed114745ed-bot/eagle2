@@ -204,6 +204,7 @@ Route::group(
         Route::resource('reset-salary', ResetUserSalaryController::class);
         Route::get('user-charge-history/{User_id}', [UserChargeHistoryController::class, 'indexCharge']);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
+        Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
         Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
