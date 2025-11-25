@@ -40,6 +40,9 @@ class PusherController extends Controller
         return response()->json(['status' => 'Webhook received']);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function chatRoomListener(Request $request)
     {
         $payload = $request->all();
