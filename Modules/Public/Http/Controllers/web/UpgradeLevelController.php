@@ -3,11 +3,13 @@
 namespace Modules\Public\Http\Controllers\web;
 
 use App\Models\Config;
-use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
-use App\Services\LevelService;
-use Database\Seeders\config as SeedersConfig;
 use Illuminate\Http\Request;
+use App\Services\LevelService;
+use Illuminate\Support\Facades\Cache;
+use App\Admin\Controllers\MainController;
+use App\Models\Setting;
+use Database\Seeders\config as SeedersConfig;
 
 class UpgradeLevelController extends MainController
 {
@@ -34,6 +36,19 @@ class UpgradeLevelController extends MainController
             if (in_array($key, $Keys)) {
                 \Cache::forget('exp_percentages');
             }
+        }
+        return redirect()->back()->with('message', __('dashboard.update'));
+
+    }
+
+    public function exchange(Request $request)
+    {
+
+        $data = $request->except('_token','test_calco');
+        
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Cache::put($key, $value);
         }
         return redirect()->back()->with('message', __('dashboard.update'));
 

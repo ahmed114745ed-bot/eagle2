@@ -82,7 +82,9 @@ class TaskStreamController extends Controller
 
         $this->taskStreamService->sendInvitation($data);
 
-        return Common::apiResponse(true, __('sent successfully'));
+        return Common::apiResponse(true, __('sent successfully'), [
+            'invitee_user_id' => $data['invitee_user_id'],
+        ]);
     }
 
     /**
