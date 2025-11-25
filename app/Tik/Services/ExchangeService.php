@@ -72,39 +72,44 @@ class ExchangeService
         return true;
     }
 
-    // public function create2($user, $diamonds)
-    // {
-    //     if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
+    public function createExchange($user, $diamonds, $exValue)
+    {
+        if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
 
+        if (!ctype_digit($exValue)) throw new \Exception(__('you should exchange number of diamond'));
 
-    //     $data = [
-    //         'user_id' => $user->id,
-    //         'diamonds' => $diamonds,
-    //         'value' => $ex->value,
-    //         'type' => 0,
-    //         'operation_no' => rand(11111111, 99999999),
-    //     ];
+        $setting = Common::getSettingValue('exchange_coin_percentage') ?? 1;
+        $exchangeCoin = (int)(($setting / 100) * $diamonds);
 
-    //     $this->exchangeLogRepository->create($data);
-    //     $user->exchange_diamonds -= $diamonds;
+        if (!is_int($exchangeCoin)) throw new \Exception(__('you should exchange number of diamond'));
+        $data = [
+            'user_id' => $user->id,
+            'diamonds' => $diamonds,
+            'value' => $exValue,
+            'type' => 0,
+            'operation_no' => rand(11111111, 99999999),
+        ];
 
-    //     if ($user->exchange_diamonds <= 0) {
-    //         $user->exchange_diamonds = 0;
-    //     }
+        $this->exchangeLogRepository->create($data);
+        $user->exchange_diamonds -= $diamonds;
 
-    //     $amountBefore =  $user->di;
-    //     UserCoinLogHelper::logByType(
-    //         $user->id,
-    //         $ex->value,
-    //         $amountBefore,
-    //         UserCoinLogType::EXCHANGE,
-    //     );
+        if ($user->exchange_diamonds <= 0) {
+            $user->exchange_diamonds = 0;
+        }
 
-    //     $user->di += $ex->value;
+        $amountBefore =  $user->di;
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $exValue,
+            $amountBefore,
+            UserCoinLogType::EXCHANGE,
+        );
 
-    //     $user->save();
-    //     return true;
-    // }
+        $user->di += $exValue;
+
+        $user->save();
+        return true;
+    }
 
     public function getExchangeLog($userId, $type)
     {
