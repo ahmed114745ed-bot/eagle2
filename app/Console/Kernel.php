@@ -151,10 +151,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             dispatch(new PkSessionJob());
         })
+            ->name('pk-session-job')
             ->everyMinute()
             ->timezone(getTimezone())
             ->withoutOverlapping()
-            ->runInBackground();
+            ->appendOutputTo(storage_path('logs/pk_session_job.log'));
     }
 
     protected function commands(): void

@@ -50,6 +50,7 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
+         $chargeTabType = request()->get('type', 'Experience');
 
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -58,6 +59,7 @@ class SettingController extends MainController
             ->description('   ')
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
+                'chargeTabType',
                 'pusher_app_key',
                 'pusher_app_id',
                 'pusher_app_cluster',

@@ -430,7 +430,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('exchange')->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
+                Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
+                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 
@@ -534,6 +536,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start games
             Route::prefix('all-games1')->group(function () {
                 Route::get('/', [AllGameController::class, 'index']);
+                Route::get('/v2/out-of-room', [AllGameController::class, 'outRoom']);
+                Route::get('/v2/in-room', [AllGameController::class, 'inRoom']);
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
