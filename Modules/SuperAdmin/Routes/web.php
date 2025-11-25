@@ -12,6 +12,7 @@ use Modules\SuperAdmin\Http\Controllers\Admin\SuperadminBannerRequestController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeReportController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminCountryController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdminNotificationController;
 
 
 
@@ -210,6 +211,8 @@ Route::group(
             ]
         ]);
 
+         Route::get('superadmin-profile/{id}', [SuperAdminController::class,'profile']);
+
         Route::resource('rooms', RoomController::class);
         Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
 
@@ -236,10 +239,10 @@ Route::group(
         ->name('banner.resend');
 
         Route::prefix('notifications')->group(function () {
-            Route::get('count', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'count']);
-            Route::get('list', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'list']);
-            Route::post('mark-as-read/{id}', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAsRead']);
-            Route::post('mark-all-read', [App\Http\Controllers\Dashboard\Notification\SuperAdminNotificationController::class, 'markAllRead']);
+            Route::get('count', [SuperAdminNotificationController::class, 'count']);
+            Route::get('list', [SuperAdminNotificationController::class, 'list']);
+            Route::post('mark-as-read/{id}', [SuperAdminNotificationController::class, 'markAsRead']);
+            Route::post('mark-all-read', [SuperAdminNotificationController::class, 'markAllRead']);
             Route::get('grid', [ NotificationController::class, 'index'])->name('notifications.grid');
         });
 

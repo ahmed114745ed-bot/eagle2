@@ -163,7 +163,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            // ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',

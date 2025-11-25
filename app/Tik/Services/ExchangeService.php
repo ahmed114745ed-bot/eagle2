@@ -2,8 +2,9 @@
 
 namespace App\Tik\Services;
 
-use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Models\Setting;
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\ExchangeRepository;
 use App\Tik\Repositories\ExchangeLogRepository;
@@ -14,8 +15,7 @@ class ExchangeService
     public function __construct(
         private  readonly ExchangeRepository $exchangeRepository,
         private readonly ExchangeLogRepository $exchangeLogRepository
-    ) {
-    }
+    ) {}
 
 
     public function index($type)
@@ -23,12 +23,20 @@ class ExchangeService
         return $this->exchangeRepository->getByType($type);
     }
 
+    public function exchangeSetting()
+    {
+        return   \Cache::rememberForever('exchange_coin_percentage', function () {
+            $setting = Setting::where('key', 'exchange_coin_percentage')->first();
+            return $setting?->value ?? 0;
+        });
+    }
+
     public function create($user, $exchangeId)
     {
         $ex = $this->exchangeRepository->findById($exchangeId);
 
         if (!$ex) throw new \Exception('not found');
-        if ($user->type_user != 0 ) throw new \Exception('not allowed');
+        if ($user->type_user != 0) throw new \Exception('not allowed');
         if ($user->exchange_diamonds < $ex->diamonds) throw new \Exception('balance low');
 
 
@@ -47,7 +55,7 @@ class ExchangeService
             $user->exchange_diamonds = 0;
         }
         if ($ex->type == 0) {
-            
+
             $amountBefore =  $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
@@ -60,6 +68,46 @@ class ExchangeService
         } elseif ($ex->type == 1) {
             $user->gold +=  $ex->value;
         }
+        $user->save();
+        return true;
+    }
+
+    public function createExchange($user, $diamonds, $exValue)
+    {
+        if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
+        //  if (!ctype_digit($exValue)) throw new \Exception(__('you should exchange number of diamond'));
+
+        $setting = Common::getSettingValue('exchange_coin_percentage') ?? 1;
+        $exchangeCoin = (($setting / 100) * $diamonds);
+        if (floor($exchangeCoin) != $exchangeCoin) throw new \Exception(__('you should exchange number of diamond'));
+
+        $exchangeCoin = (int) $exchangeCoin;
+        if (ctype_digit($exValue) != $exchangeCoin) throw new \Exception(__('calculus not true'));
+        $data = [
+            'user_id' => $user->id,
+            'diamonds' => $diamonds,
+            'value' => $exValue,
+            'type' => 0,
+            'operation_no' => rand(11111111, 99999999),
+        ];
+
+        $this->exchangeLogRepository->create($data);
+        $user->exchange_diamonds -= $diamonds;
+
+        if ($user->exchange_diamonds <= 0) {
+            $user->exchange_diamonds = 0;
+        }
+
+        $amountBefore =  $user->di;
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $exValue,
+            $amountBefore,
+            UserCoinLogType::EXCHANGE,
+        );
+
+        $user->di += $exValue;
+
         $user->save();
         return true;
     }
@@ -100,6 +148,4 @@ class ExchangeService
     {
         return $this->exchangeRepository->findOrFail($id);
     }
-
-
 }

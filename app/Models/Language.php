@@ -13,11 +13,11 @@ class Language extends Model
 
     protected $fillable = ['name', 'code', 'direction', 'is_enabled'];
 
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 
-        self::saved(function () {
+        static::saved(function () {
             Cache::put(
                 'languages',
                 self::where('is_enabled', true)
@@ -26,8 +26,40 @@ class Language extends Model
             );
         });
 
-        self::deleted(function () {
-            Cache::forget('languages');
+        static::deleted(function () {
+            Cache::put(
+                'languages',
+                self::where('is_enabled', true)
+                    ->pluck('name', 'code')
+                    ->toArray()
+            );
         });
     }
+
+    public static function getEnabledLanguages(): array
+    {
+        return Cache::rememberForever('languages', function () {
+            return self::where('is_enabled', true)
+                ->pluck('name', 'code')
+                ->toArray();
+        });
+    }
+
+    // public static function boot()
+    // {
+    //     parent::boot();
+
+    //     self::saved(function () {
+    //         Cache::put(
+    //             'languages',
+    //             self::where('is_enabled', true)
+    //                 ->pluck('name', 'code')
+    //                 ->toArray()
+    //         );
+    //     });
+
+    //     self::deleted(function () {
+    //         Cache::forget('languages');
+    //     });
+    // }
 }

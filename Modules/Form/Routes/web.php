@@ -17,7 +17,7 @@ Route::get('/host-agency/search', [FormTemplateController::class, 'search'])
 
 
     Route::get('/forms', [FormTemplateController::class, 'showByType'])->name('forms.showByType');
-    Route::post('/forms/{type}', [FormTemplateController::class, 'storeSubmission'])->name('form.submit');
+    Route::post('/forms/create/{type}', [FormTemplateController::class, 'storeSubmission'])->name('form.submit');
     Route::get('/form-translations', [FormTemplateController::class, 'getTranslations']);
     Route::get('/check-field-name', [FormTemplateController::class, 'checkName'])->name('fields.checkName');
     Route::prefix('forms')->name('forms.')->group(function () {

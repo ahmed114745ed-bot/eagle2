@@ -5,10 +5,12 @@ namespace Modules\SuperAdmin\Http\Controllers\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Facades\Admin;
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Actions\Admin\RestoreSuperAdminAction;
 
 class RestoreSuperAdminController extends MainController
 {
@@ -105,11 +107,14 @@ class RestoreSuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country_name', __('Country'))->display(function () {
+            $locale = app()->getLocale(); // get current locale
+            return $locale === 'en' ? (@$this->country->e_name ?? @$this->country->name) : (@$this->country->name ?? @$this->country->e_name);
+        });
         if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('restore'))->display(function () {
                 $superAdmin = SuperAdmin::where('country_id', $this->country_id)->first();
-                return  $superAdmin ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>' : (new \App\Admin\Actions\RestoreSuperAdminAction($this->id))->render();
+                return  $superAdmin ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>' : (new RestoreSuperAdminAction($this->id))->render();
             });
         }
 
