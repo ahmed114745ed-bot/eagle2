@@ -9,6 +9,35 @@ use Modules\Vip\Entities\Vip;
 @endphp
 <style>
 
+    .inner-settings-menu {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.inner-settings-menu button {
+    padding: 10px 20px;
+    background: var(--secondary-color);
+    color: black;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.inner-settings-menu button.active {
+    background: var(--primary-color);
+    color: black;
+}
+
+.settings-section {
+    display: none;
+}
+
+.settings-section.active {
+    display: block;
+}
+
+
 /* General colorpicker dropdown styling */
 .colorpicker {
     min-width: 220px;
@@ -1494,307 +1523,399 @@ use Modules\Vip\Entities\Vip;
 
 
             <div id="workSettings" class="settings-section">
-                @php
-                $oldExpData=cache('exp_percentages');
-                @endphp
-                <div class="form">
-                    <label class="d-block">{{ __('Experience settings:') }}</label>
+             
+                <div class="box-body">
 
-                    <div class="row mt-4">
-                        <!-- Wealth Fields -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card exp-card-cont p-3 shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('wealth') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="wealth_exp" class="form-label">{{ __('wealth') }}</label>
-                                                    <input type="text" id="wealth_exp" name="exp_sender_percentage"
-                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
-                                                        class="form-control">
-                                                    <span class="form-text text-muted">1 coin = X EXP</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @php
-                                            $sender = Vip::where('type',2)->count();
-                                        @endphp
-                                        @if ($sender == 0)
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                </div>
-                                            </div>
-                                        @endif
-                                      <div class="col-md-12">
-                                      <div class="form-group">
-                                 <label for="wealth_gift_price">{{ __('gift price') }}</label>
-                                            <input type="text" id="wealth_gift_price" name="test_calco"
-                                                placeholder="{{  __('wealth_gift_price') }}"
-                                                style="width: auto; display: inline-block;"
-                                                value="{{ $settings['wealth_gift_price'] ?? '' }}"
-                                                class="form-control" >
-                                            <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                        </div>
+                        <div class="inner-settings-menu">
+                            @php $chargeTabType = request()->get('type', 'Experience'); @endphp
 
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                const expInput = document.getElementById('wealth_exp');
-                                                const giftPriceInput = document.getElementById('wealth_gift_price');
-                                                const resultSpan = document.getElementById('exp_result');
+                            <button onclick="changeInnerTab('Experience')" 
+                                    class="{{ $chargeTabType == 'Experience' ? 'active' : '' }}">
+                                {{ __('Experience settings') }}
+                            </button>
 
-                                                function updateExpResult() {
-                                                    const expRate = parseFloat(expInput.value);
-                                                    const giftPrice = parseFloat(giftPriceInput.value);
-
-                                                    if (!isNaN(expRate) && !isNaN(giftPrice)) {
-                                                        const totalExp = expRate * giftPrice;
-                                                        resultSpan.textContent = `= ${totalExp} EXP`;
-                                                    } else {
-                                                        resultSpan.textContent = '';
-                                                    }
-                                                }
-
-                                                expInput.addEventListener('input', updateExpResult);
-                                                giftPriceInput.addEventListener('input', updateExpResult);
-
-                                                // حساب أولي عند تحميل الصفحة
-                                                updateExpResult();
-                                            });
-                                        </script>
-
-                                        </div>
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                            <button onclick="changeInnerTab('coin')" 
+                                    class="{{ $chargeTabType == 'coin' ? 'active' : '' }}">
+                                {{ __('coin exchange') }}
+                            </button>
                         </div>
 
+                        @php
+                        $oldExpData=cache('exp_percentages');
+                        @endphp
+                      
+                        <div id="Experience_tab" class="inner-tab-content" style="display:none;">
+                            <div class="form">
+                                <label class="d-block">{{ __('Experience settings:') }}</label>
 
-
-                        <!-- Attraction Fields -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card p-3 exp-card-cont shadow" style="">
-                                    <div class="card-header exp-card  d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('attraction') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                <label for="attraction_exp" class="form-label">{{ __('attraction') }}</label>
-                                                <input type="text" id="attraction_exp" name="exp_received_percentage"
-                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
-                                                    class="form-control">
-                                                <span class="form-text text-muted">1 Diamond = X EXP</span>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="attraction_gift_price">{{ __('gift price') }}</label>
-                                                <input type="text" id="attraction_gift_price" name="test_calco"
-                                                    placeholder="{{  __('attraction_gift_price') }}"
-                                                    style="width: auto; display: inline-block;"
-                                                    value="{{ $settings['attraction_gift_price'] ?? '' }}"
-                                                    class="form-control" >
-                                                <span id="attraction_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                            </div>
-                                        </div>
-                                        @php
-                                            $receiver = Vip::where('type',1)->count();
-                                        @endphp
-                                        @if ($receiver == 0)
-                                            <div class="col-md-12">
+                                <div class="row mt-4">
+                                    <!-- Wealth Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card exp-card-cont p-3 shadow" style="">
+                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                                    <h4 class="m-0">{{ __('wealth') }}</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                        <div class="form-group">
+                                                                <label for="wealth_exp" class="form-label">{{ __('wealth') }}</label>
+                                                                <input type="text" id="wealth_exp" name="exp_sender_percentage"
+                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
+                                                                    class="form-control">
+                                                                <span class="form-text text-muted">1 coin = X EXP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $sender = Vip::where('type',2)->count();
+                                                    @endphp
+                                                    @if ($sender == 0)
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                            <label for="wealth_gift_price">{{ __('gift price') }}</label>
+                                                        <input type="text" id="wealth_gift_price" name="test_calco"
+                                                            placeholder="{{  __('wealth_gift_price') }}"
+                                                            style="width: auto; display: inline-block;"
+                                                            value="{{ $settings['wealth_gift_price'] ?? '' }}"
+                                                            class="form-control" >
+                                                        <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                    </div>
+
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                            const expInput = document.getElementById('wealth_exp');
+                                                            const giftPriceInput = document.getElementById('wealth_gift_price');
+                                                            const resultSpan = document.getElementById('exp_result');
+
+                                                            function updateExpResult() {
+                                                                const expRate = parseFloat(expInput.value);
+                                                                const giftPrice = parseFloat(giftPriceInput.value);
+
+                                                                if (!isNaN(expRate) && !isNaN(giftPrice)) {
+                                                                    const totalExp = expRate * giftPrice;
+                                                                    resultSpan.textContent = `= ${totalExp} EXP`;
+                                                                } else {
+                                                                    resultSpan.textContent = '';
+                                                                }
+                                                            }
+
+                                                            expInput.addEventListener('input', updateExpResult);
+                                                            giftPriceInput.addEventListener('input', updateExpResult);
+
+                                                            // حساب أولي عند تحميل الصفحة
+                                                            updateExpResult();
+                                                        });
+                                                    </script>
+
+                                                    </div>
+                                                    <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        @endif
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
+                                        </form>
+                                    </div>
+
+
+
+                                    <!-- Attraction Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card p-3 exp-card-cont shadow" style="">
+                                                <div class="card-header exp-card  d-flex justify-content-between align-items-center">
+                                                    <h4 class="m-0">{{ __('attraction') }}</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                        <div class="form-group">
+                                                            <label for="attraction_exp" class="form-label">{{ __('attraction') }}</label>
+                                                            <input type="text" id="attraction_exp" name="exp_received_percentage"
+                                                                placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
+                                                                class="form-control">
+                                                            <span class="form-text text-muted">1 Diamond = X EXP</span>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="attraction_gift_price">{{ __('gift price') }}</label>
+                                                            <input type="text" id="attraction_gift_price" name="test_calco"
+                                                                placeholder="{{  __('attraction_gift_price') }}"
+                                                                style="width: auto; display: inline-block;"
+                                                                value="{{ $settings['attraction_gift_price'] ?? '' }}"
+                                                                class="form-control" >
+                                                            <span id="attraction_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $receiver = Vip::where('type',1)->count();
+                                                    @endphp
+                                                    @if ($receiver == 0)
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+
+
+                                    <!-- Charge Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card exp-card-cont p-3 shadow" style="">
+                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                                    <h4 class="m-0">{{ __('charge') }}</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                            <div class="form-group">
+                                                                <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
+                                                                <input type="text" id="charge_exp" name="exp_charge_percentage"
+                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
+                                                                    class="form-control">
+                                                                <span class="form-text text-muted">1 coin = EXP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="charge_gift_price">{{ __('coins') }}</label>
+                                                            <input type="text" id="charge_gift_price" name="test_calco"
+                                                                placeholder="{{  __('charge_gift_price') }}"
+                                                                style="width: auto; display: inline-block;"
+                                                                value="{{ $settings['charge_gift_price'] ?? '' }}"
+                                                                class="form-control">
+                                                            <span id="charge_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    @php
+                                                        $charger = Vip::where('type',5)->count();
+                                                    @endphp
+                                                    @if ($charger == 0)
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+
+
+                                    <!-- Rooms Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card p-3 exp-card-cont shadow" style="">
+                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                                    <h4 class="m-0">{{ __('Rooms') }}</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                        <div class="form-group">
+                                                                <label for="rooms_exp" class="form-label">{{ __('Rooms') }}</label>
+                                                                <input type="text" id="rooms_exp" name="exp_room_percentage"
+                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
+                                                                    class="form-control">
+                                                                <span class="form-text text-muted">1 Diamond = EXP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="rooms_gift_price">{{ __('gift price') }}</label>
+                                                            <input type="text" id="rooms_gift_price" name="test_calco"
+                                                                placeholder="{{  __('rooms_gift_price') }}"
+                                                                style="width: auto; display: inline-block;"
+                                                                value="{{ $settings['rooms_gift_price'] ?? '' }}"
+                                                                class="form-control" >
+                                                            <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $rooms = Vip::where('type',4)->count();
+                                                    @endphp
+                                                    @if ($rooms == 0)
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+
+
+                                    <!-- cp Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card p-3 exp-card-cont shadow" style="">
+                                                <div class="card-header  exp-card d-flex justify-content-between align-items-center">
+                                                    <h4 class="m-0">{{ __('cp') }}</h4>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                        <div class="form-group">
+                                                                <label for="cp_exp" class="form-label">{{ __('cp') }}</label>
+                                                                <input type="text" id="cp_exp" name="exp_cp_percentage"
+                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
+                                                                    class="form-control">
+                                                                <span class="form-text text-muted">1 coin = EXP</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="cp_gift_price">{{ __('gift price') }}</label>
+                                                            <input type="text" id="cp_gift_price" name="test_calco"
+                                                                placeholder="cp_gift_price"
+                                                                style="width: auto; display: inline-block;"
+                                                                value="{{ $settings['cp_gift_price'] ?? '' }}"
+                                                                class="form-control" >
+                                                            <span id="cp_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    @php
+                                                        $cp = Vip::where('type',3)->count();
+                                                    @endphp
+                                                    @if ($cp == 0)
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                            </form>
+
+                            </div>
                         </div>
+                        
+                        <div id="coin_tab" class="inner-tab-content" style="display:none;">
+                            <div class="form">
+
+                                <div class="row mt-4">
+                                    <!-- Wealth Fields -->
+                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                        <form action="{{ route('admin.exchange-coins') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="card exp-card-cont p-3 shadow" style="">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group d-flex align-items-center">
+                                                        <div class="form-group">
+                                                                <label for="coin_exp" class="form-label">{{ __('diamond') }}</label>
+                                                                <input type="text" id="coin_exp" name="exchange_coin_percentage"
+                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $settings['exchange_coin_percentage'] ?? '' }}"
+                                                                    class="form-control">
+                                                                <span class="form-text text-muted">1 diamond = X coin</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            
 
 
-
-                        <!-- Charge Fields -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card exp-card-cont p-3 shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('charge') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                                <div class="form-group">
-                                                    <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
-                                                    <input type="text" id="charge_exp" name="exp_charge_percentage"
-                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                                        class="form-control">
-                                                    <span class="form-text text-muted">1 coin = EXP</span>
+                                                <div class="col-md-12">
+                                                    <div class="form-group coin-calculator">
+                                                        <label>{{ __('diamond') }}</label>
+                                                        <input type="text" class="user_coin_input form-control" placeholder="Enter value">
+                                                        <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
+                                                        <span class="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="charge_gift_price">{{ __('coins') }}</label>
-                                                <input type="text" id="charge_gift_price" name="test_calco"
-                                                    placeholder="{{  __('charge_gift_price') }}"
-                                                    style="width: auto; display: inline-block;"
-                                                    value="{{ $settings['charge_gift_price'] ?? '' }}"
-                                                    class="form-control">
-                                                <span id="charge_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                            </div>
-                                        </div>
 
-                                        @php
-                                            $charger = Vip::where('type',5)->count();
-                                        @endphp
-                                        @if ($charger == 0)
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                </div>
+                                                <script>
+                                                document.addEventListener('DOMContentLoaded', function () {
+                                                    document.querySelectorAll('.coin-calculator').forEach(container => {
+                                                        const userInput = container.querySelector('.user_coin_input');
+                                                        const exchangeRateInput = container.querySelector('.exchange_rate');
+                                                        const resultSpan = container.querySelector('.exp_result');
+
+                                                        function updateResult() {
+                                                            const userValue = parseFloat(userInput.value);
+                                                            const exchangeRate = parseFloat(exchangeRateInput.value);
+
+                                                            resultSpan.textContent = (!isNaN(userValue) && !isNaN(exchangeRate))
+                                                                ? `= ${userValue * exchangeRate} coin`
+                                                                : '';
+                                                        }
+
+                                                        userInput.addEventListener('input', updateResult);
+                                                        updateResult();
+                                                    });
+                                                });
+                                                </script>
+                                            <div class="col-12 d-flex gap-3 mt-3">
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Save') }}</button>
+                                                    </div>
                                             </div>
-                                        @endif
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
+                                        </form>
                                     </div>
+
+
                                 </div>
-                            </form>
+
+                            </div>
                         </div>
-
-
-
-                        <!-- Rooms Fields -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card p-3 exp-card-cont shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('Rooms') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="rooms_exp" class="form-label">{{ __('Rooms') }}</label>
-                                                    <input type="text" id="rooms_exp" name="exp_room_percentage"
-                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
-                                                        class="form-control">
-                                                    <span class="form-text text-muted">1 Diamond = EXP</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="rooms_gift_price">{{ __('gift price') }}</label>
-                                                <input type="text" id="rooms_gift_price" name="test_calco"
-                                                    placeholder="{{  __('rooms_gift_price') }}"
-                                                    style="width: auto; display: inline-block;"
-                                                    value="{{ $settings['rooms_gift_price'] ?? '' }}"
-                                                    class="form-control" >
-                                                <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                            </div>
-                                        </div>
-                                        @php
-                                            $rooms = Vip::where('type',4)->count();
-                                        @endphp
-                                        @if ($rooms == 0)
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                </div>
-                                            </div>
-                                        @endif
-
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-
-
-                        <!-- cp Fields -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card p-3 exp-card-cont shadow" style="">
-                                    <div class="card-header  exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('cp') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="cp_exp" class="form-label">{{ __('cp') }}</label>
-                                                    <input type="text" id="cp_exp" name="exp_cp_percentage"
-                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
-                                                        class="form-control">
-                                                    <span class="form-text text-muted">1 coin = EXP</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="cp_gift_price">{{ __('gift price') }}</label>
-                                                <input type="text" id="cp_gift_price" name="test_calco"
-                                                    placeholder="cp_gift_price"
-                                                    style="width: auto; display: inline-block;"
-                                                    value="{{ $settings['cp_gift_price'] ?? '' }}"
-                                                    class="form-control" >
-                                                <span id="cp_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                            </div>
-                                        </div>
-
-                                        @php
-                                            $cp = Vip::where('type',3)->count();
-                                        @endphp
-                                        @if ($cp == 0)
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                </div>
-                                            </div>
-                                        @endif
-
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                        
 
                 </div>
             </div>
@@ -4348,47 +4469,140 @@ use Modules\Vip\Entities\Vip;
                     }
                 }
 
-                document.addEventListener("DOMContentLoaded", function() {
-                    // Function to get query parameter by name
-                    function getQueryParam(name) {
-                        const urlParams = new URLSearchParams(window.location.search);
-                        return urlParams.get(name);
-                    }
+                // document.addEventListener("DOMContentLoaded", function() {
+                //     // Function to get query parameter by name
+                //     function getQueryParam(name) {
+                //         const urlParams = new URLSearchParams(window.location.search);
+                //         return urlParams.get(name);
+                //     }
 
-                    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                    const activeTab = getQueryParam("firsttab") || "brandSettings";
+                //     // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+                //     const activeTab = getQueryParam("firsttab") || "brandSettings";
 
-                    // Show the selected tab
-                    showSection(activeTab);
-                });
+                //     // Show the selected tab
+                //     showSection(activeTab);
+                // });
 
-                function showSection(sectionId) {
-                    // Remove active class from all sections
-                    document.querySelectorAll('.settings-section').forEach(section => {
-                        section.classList.remove('active');
-                    });
+                // document.addEventListener("DOMContentLoaded", function() {
+                //     function getQueryParam(name) {
+                //         const urlParams = new URLSearchParams(window.location.search);
+                //         return urlParams.get(name);
+                //     }
 
-                    // Add active class to the selected section
-                    document.getElementById(sectionId).classList.add('active');
+                //     const activeTab = getQueryParam("firsttab") || "brandSettings";
+                //     showSection(activeTab);
 
-                    // Reset button styles
-                    document.querySelectorAll('.settings-menu button').forEach(button => {
-                        button.style.backgroundColor = '';
-                        button.style.color = '';
-                    });
+                //     // NEW: Activate inner tabs inside workSettings
+                //     if (activeTab === "workSettings") {
+                //         const type = getQueryParam("type") || "Experience";
 
-                    // Highlight the active button
-                    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                    if (activeButton) {
-                        activeButton.style.backgroundColor = 'var(--primary-color)';
-                        activeButton.style.color = 'var(--text-secondary-color)';
-                    }
+                //         // Activate the correct nav item
+                //         document.querySelectorAll('#workSettings .nav-link').forEach(el => {
+                //             el.classList.remove("active");
+                //         });
 
-                    // Update the URL with the selected tab without reloading
-                    const url = new URL(window.location);
-                    url.searchParams.set("firsttab", sectionId);
-                    window.history.pushState({}, "", url);
-                }
+                //         const activeInner = document.querySelector(`#workSettings .nav-link[href*="type=${type}"]`);
+                //         if (activeInner) {
+                //             activeInner.classList.add("active");
+                //         }
+                //     }
+                // });
+
+
+                // function showSection(sectionId) {
+                //     // Remove active class from all sections
+                //     document.querySelectorAll('.settings-section').forEach(section => {
+                //         section.classList.remove('active');
+                //     });
+
+                //     // Add active class to the selected section
+                //     document.getElementById(sectionId).classList.add('active');
+
+                //     // Reset button styles
+                //     document.querySelectorAll('.settings-menu button').forEach(button => {
+                //         button.style.backgroundColor = '';
+                //         button.style.color = '';
+                //     });
+
+                //     // Highlight the active button
+                //     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                //     if (activeButton) {
+                //         activeButton.style.backgroundColor = 'var(--primary-color)';
+                //         activeButton.style.color = 'var(--text-secondary-color)';
+                //     }
+
+                //     // Update the URL with the selected tab without reloading
+                //     const url = new URL(window.location);
+                //     url.searchParams.set("firsttab", sectionId);
+                //     window.history.pushState({}, "", url);
+                // }
+
+                document.addEventListener("DOMContentLoaded", function () {
+
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Which outer section is open?
+    const activeTab = getQueryParam("firsttab") || "brandSettings";
+    showSection(activeTab);
+
+    // Auto-open inner tabs if workSettings is loaded
+    if (activeTab === "workSettings") {
+        const type = getQueryParam("type") || "Experience";
+        showInnerContent(type);
+
+        // Make button active
+        document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+        if (correctBtn) correctBtn.classList.add("active");
+    }
+});
+
+
+function showSection(sectionId) {
+    document.querySelectorAll('.settings-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    document.getElementById(sectionId).classList.add('active');
+
+    const url = new URL(window.location);
+    url.searchParams.set("firsttab", sectionId);
+    window.history.pushState({}, "", url);
+}
+
+
+function changeInnerTab(type) {
+    const url = new URL(window.location);
+    url.searchParams.set("firsttab", "workSettings");
+    url.searchParams.set("type", type);
+    window.history.pushState({}, "", url);
+
+    // Update button active class
+    document.querySelectorAll(".inner-settings-menu button").forEach(btn =>
+        btn.classList.remove("active")
+    );
+    document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`)
+        ?.classList.add("active");
+
+    showInnerContent(type);
+}
+
+
+function showInnerContent(type) {
+    document.querySelectorAll(".inner-tab-content").forEach(content => {
+        content.style.display = "none";
+    });
+
+    const section = document.getElementById(type + "_tab");
+    if (section) section.style.display = "block";
+}
+
 
 
                 function openFullScreen(imgElement) {
