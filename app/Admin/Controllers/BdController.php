@@ -96,12 +96,12 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries(): (array)session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $superAdmin = [];
-       
+
         if ($countryID) {
-           
+
             $superAdmin = SuperAdmin::select(['id', 'country_id'])->whereIn('country_id', $countryID)->first();
         }
 
@@ -111,7 +111,7 @@ class BdController extends MainController
                 $query->where('parent_id', @$superAdmin->id);
             })
 
-            ->with(['bdSalaries', 'appUser.packs','creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
+            ->with(['bdSalaries', 'appUser.packs', 'creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -209,7 +209,7 @@ class BdController extends MainController
         });
 
         $grid->column('parent.name', __('Super Admin'))->display(function () {
-            $user = $this->parent?->appUser;
+            $user = $this->parent;
             $name = $user->name ?? '';
 
             if (request()->filled('_export_')) {
@@ -217,8 +217,8 @@ class BdController extends MainController
             }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
+            $uid = $user->id ?? 'غير معروف';
+            $path = $user->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -227,7 +227,7 @@ class BdController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
+            $showUrl = url("admin/superadmin-users/{$user->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -242,39 +242,6 @@ class BdController extends MainController
             ";
         });
 
-        $grid->column('createdBy.name', __('created by'))->display(function () {
-            $user = $this->createdBy;
-            $name = $user->name ?? '';
-
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
-
-            $id = $user->id ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
 
         $grid->column('agencies_count', __('Agencies Count'))->display(function () {
             return $this->total_agencies;
@@ -295,9 +262,33 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
 
-        
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+
+
+
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
                 ->display(function () {
@@ -309,7 +300,7 @@ class BdController extends MainController
             }
         }
 
-        $grid->column('created_by', 'Creator')->display(function ($creatorId) {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
@@ -760,7 +751,31 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))
@@ -777,7 +792,7 @@ class BdController extends MainController
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
             $carbonDate->locale($locale);
-            return $carbonDate->translatedFormat('d F Y H:i'); 
+            return $carbonDate->translatedFormat('d F Y H:i');
         });
 
         $permission = $this->permission_name;

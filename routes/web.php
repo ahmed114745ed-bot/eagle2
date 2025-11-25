@@ -820,11 +820,11 @@ Route::get('/codapay/create-payment', function () {
             ->post($url, $payload);
 
         if ($response->failed()) {
-            Log::error("❌ Codapay Connection Failed", [
-                'status'  => $response->status(),
-                'body'    => $response->body(),
-                'headers' => $response->headers(),
-            ]);
+            // Log::error("❌ Codapay Connection Failed", [
+            //     'status'  => $response->status(),
+            //     'body'    => $response->body(),
+            //     'headers' => $response->headers(),
+            // ]);
 
             return response()->json([
                 'error'   => 'Failed to connect Codapay',
@@ -861,8 +861,6 @@ Route::get('/codapay/create-payment', function () {
             'result'  => $result,
         ]);
     } catch (\Throwable $e) {
-        Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
-
         return response()->json([
             'error'   => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),
@@ -972,3 +970,14 @@ Route::get('/manifest.json', function () {
         "display" => "standalone",
     ]);
 })->name('manifest.json');
+
+Route::get('/run-roomcup-rewards', function () {
+    Artisan::call('roomcup:calculate-rewards');
+
+    $output = Artisan::output();
+
+    return response()->json([
+        'message' => 'RoomCup rewards calculation executed successfully!',
+        'output'  => $output,
+    ]);
+});

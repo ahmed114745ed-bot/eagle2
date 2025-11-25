@@ -50,7 +50,7 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-        
+
         Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
@@ -105,6 +105,9 @@ Route::group(
     ],
     function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('area-manager-users/profile/{id}', [AdminAreaManagerController::class, 'showProfile']);
+        Route::get('sub-area-manager-users/profile/{id}', [AdminUserController::class, 'showProfile']);
+
         Route::resource('superadmin-users', SuperAdminController::class);
         Route::get('superadmin-users-profile/{id}', [SuperAdminController::class, 'profile']);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');

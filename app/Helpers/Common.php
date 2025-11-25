@@ -755,7 +755,6 @@ class Common
         $credentialsFilePath = base_path(config("app.fileName"));
 
         if (!file_exists($credentialsFilePath)) {
-            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
             return null;
         }
 
@@ -767,13 +766,11 @@ class Common
             $token = $client->fetchAccessTokenWithAssertion();
 
             if (!isset($token['access_token'])) {
-                Log::error('Access token is missing from Google Client.');
                 return null;
             }
 
             return $token['access_token'];
         } catch (\Throwable $e) {
-            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
             return null;
         }
     }
@@ -1430,8 +1427,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-         Log::info('start sendToZego3');
-
         try {
 
             $client           = new Client();
@@ -1936,7 +1931,7 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
-    
+
             case 'user':
                 $user = $resource->senderUser;
                 $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
@@ -2357,7 +2352,6 @@ class Common
 
     public static function areaCountries(): array
     {
-
         $adminId = session('area_manager_id') ?? auth()->id();
 
         $authAdmin = AreaManager::find($adminId)
@@ -2366,7 +2360,7 @@ class Common
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if ($sessionCountryId) {
             return (array)$sessionCountryId;
@@ -2375,37 +2369,29 @@ class Common
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
-
-
-
 
         return [];
-    
     }
 
     public static function areaCountriesV2($adminId): array
     {
-
-
         $authAdmin = AreaManager::find($adminId)
                     ?? SubAreaManager::find($adminId);
 
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if ($sessionCountryId) {
             return (array)$sessionCountryId;
         }
-    
+
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
+
         return [];
-    
     }
 
 

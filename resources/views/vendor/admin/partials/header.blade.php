@@ -228,8 +228,9 @@
             $areaManagers = \Modules\AreaManager\Entities\AreaManager::select(['id','name','username','avatar'])->get();
             $selectAreaManagerId = session('area_manager_id') ?? request('area_manager_id');
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
-            $country   = \App\Models\Country::find(Admin::user()->country_id);
-
+            if (Admin::user()->type == 'superadmin'){
+                $country  = \App\Models\Country::find(Admin::user()->country_id);
+            }
 //            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
 
             $countries = collect();
@@ -237,19 +238,26 @@
                 $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
                 if ($areaManager && method_exists($areaManager, 'countries')) {
                     $countries = $areaManager->countriesQuery()
-                        ->select(['id', 'name', 'flag'])
+                        ->select(['id', 'name', 'e_name','flag'])
                         ->get();
                 }
             } else {
-                $countries = \App\Models\Country::select(['id', 'name', 'flag'])->get();
+                $countries = \App\Models\Country::select(['id', 'name', 'e_name','flag'])->get();
             }
 
-            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+//            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+//            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+
+            if(auth()->user()->type == 'area-manager'){
+                $authAdmin = auth()->user();
+            } else {
+                $authId = auth()->user()->parent_id;
+                $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+            }
 
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
                 $areaManagerCountries = $authAdmin->countriesQuery()
-                    ->select(['id', 'name', 'flag'])
+                    ->select(['id', 'name','e_name', 'flag'])
                     ->get();
             } else {
                 $areaManagerCountries = collect();
@@ -260,6 +268,7 @@
 
             $selectedAreaManagerCountryId = session('area_manager_country_id') ?? request('area_manager_country_id') ?? Admin::user()->country_id;
             $selectedAreaManagerCountry   = $areaManagerCountries->firstWhere('id', (int) $selectedAreaManagerCountryId);
+
         @endphp
 
         @if (request()->is('admin*'))
@@ -284,7 +293,7 @@
                             value="{{ $currentCountry->id }}"
                             data-flag="{{ getImagePath($currentCountry->flag) }}"
                             {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
+                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
                         </option>
                     @endforeach
                 </select>
@@ -300,7 +309,7 @@
                             value="{{ $currentCountry->id }}"
                             data-flag="{{ getImagePath($currentCountry->flag) }}"
                             {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{ $currentCountry->name }}
+                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
                         </option>
                     @endforeach
                 </select>
@@ -465,7 +474,7 @@
             }
 
             // if ($.pjax) {
-          
+
             //     setTimeout(() => {
             //         $.pjax({url: url.toString(), container: '#pjax-container'});
             //     }, 1);

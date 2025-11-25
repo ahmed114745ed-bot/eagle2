@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Hash;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class Bd extends Model
@@ -19,7 +20,7 @@ class Bd extends Model
     protected $guarded = [];
 
     protected $attributes = [
-        'type' => 'bd',
+        'admin_users.type' => 'bd',
     ];
 
     public function appUser()
@@ -78,28 +79,44 @@ class Bd extends Model
 
     protected static function booted(): void
     {
-        // scope يجيب بس ال BD
         self::addGlobalScope('bdOnly', function (Builder $builder) {
             $builder->where('type', 'bd');
         });
 
-        // عند الحذف
         self::deleting(function (Bd $bd) {
-            // نجيب الافتراضي الآخر لنفس السوبر ادمن
             $defaultBd = self::where('default', 1)
                 ->where('parent_id', $bd->parent_id)
                 ->where('id', '!=', $bd->id)
                 ->first();
 
-            if ($defaultBd) {
-                // ننقل الوكالات لل BD الافتراضي
+                if (!$defaultBd) {
+                    $superAdmin = $bd->parent; 
+                    $country = Country::find($superAdmin->country_id);
+                    if (!$country) {
+                        throw new Exception('Country not found for super admin.');
+                    }
+        
+                    $countryName = $country->e_name;
+        
+                    $newBdId = DB::table('admin_users')->insertGetId([
+                        'parent_id'  => $superAdmin->id,
+                        'username'   => 'bd' . $countryName . 'default',
+                        'name'       => 'bd' . $countryName . 'default',
+                        'password'   => Hash::make('bd' . $countryName . 'default'),
+                        'default'    => 1,
+                        'country_id' => $superAdmin->country_id,
+                        'type'       => 'bd',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+        
+                   
+                    $defaultBd = self::find($newBdId);
+                }
+
                 Agency::where('bd_id', $bd->id)
                     ->update(['bd_id' => $defaultBd->id]);
-            } else {
-                throw new Exception('لا يوجد BD افتراضي آخر لنقل الوكالات إليه.');
-            }
 
-            // نفصل علاقة المستخدم لو مرتبطة
             $userApp = User::find($bd->app_id);
             if ($userApp) {
                 $userApp->is_bd = 0;
@@ -130,7 +147,6 @@ class Bd extends Model
 
         self::updating(function (Bd $model) {
             if ($model->default) {
-                // نخلي الافتراضي واحد بس لنفس السوبر
                 static::where('parent_id', $model->parent_id)
                     ->where('id', '!=', $model->id)
                     ->update(['default' => 0]);
@@ -141,7 +157,6 @@ class Bd extends Model
                 })->update(['bd_id' => $model->id]);
             }
 
-            // لو غيرنا app_id → نفضي القديم
             if ($model->isDirty('app_id')) {
                 $oldAppId = $model->getOriginal('app_id');
                 if ($oldAppId) {

@@ -48,6 +48,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes()
     {
         Route::middleware('web')
+            ->middleware('room.boom')
             ->namespace($this->moduleNamespace)
             ->group(module_path('RoomBoom', '/Routes/web.php'));
     }

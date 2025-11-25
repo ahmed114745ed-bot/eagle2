@@ -132,17 +132,17 @@ class OfficialMessageController extends MainController
     {
         $countriesIds = Common::areaCountriesV2(Auth::id());
         $countries = Country::selectRaw('concat(name, " - ", e_name) as name, id')->when(!empty($countriesIds), function ($q) use ($countriesIds) {
-                $q->whereIn('id', $countriesIds);
-            })
-    ->pluck('name', 'id')
-    ->toArray();
+            $q->whereIn('id', $countriesIds);
+        })
+            ->pluck('name', 'id')
+            ->toArray();
         $form->select('feature', trans('feature'))->options([
             'agency'   => __('agency'),
             'family' => __('family'),
             'users'   => __('users'),
             'bds'  => __('BDs'),
             'shipping_agency'  => __('shipping agency')
-        ])->when('agency', function (Form $form)use($countries) {
+        ])->when('agency', function (Form $form) use ($countries) {
             $form->select('sub_feature', __('type'))->options([
                 'area_country' => __('All Agencies around your region'),
                 'country' => __('All Agencies in Country'),
@@ -154,10 +154,10 @@ class OfficialMessageController extends MainController
                     'admin' => __('admins'),
                     'members'   => __('members'),
                 ])->default('owner');
-            })->when('country', function (Form $form) use($countries) {
+            })->when('country', function (Form $form) use ($countries) {
                 $form->select('feature_ids', __('country'))
                     ->options($countries);
-                   // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
             });
         })->when('family', function (Form $form) {
             $form->belongsToMany('feature_ids', Families::class, trans('families'));
@@ -166,17 +166,17 @@ class OfficialMessageController extends MainController
                 'admin' => __('admins'),
                 'members'   => __('members'),
             ])->default('owner');
-        })->when('users', function (Form $form) use($countries) {
+        })->when('users', function (Form $form) use ($countries) {
             $form->select('sub_feature', __('type'))->options([
                 'area_country' => __('Users around your regions'),
                 'country' => __('Users in Specific Country'),
                 'logout'   => __('Logged Out Users'),
-            ])->when('country', function (Form $form) use($countries) {
+            ])->when('country', function (Form $form) use ($countries) {
                 $form->select('feature_ids', __('country'))
                     ->options($countries);
-                    // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
             });
-        })->when('bds', function (Form $form) use($countries){
+        })->when('bds', function (Form $form) use ($countries) {
             $form->select('sub_feature', __('type'))->options([
                 'area_country' => __('bds around your regions'),
                 'ids'   => __('bds'),
@@ -184,25 +184,25 @@ class OfficialMessageController extends MainController
 
             ])->when('ids', function (Form $form) {
                 $form->belongsToMany('Bds_id', Bds::class, trans('Bds'));
-            })->when('country', function (Form $form) use($countries){
+            })->when('country', function (Form $form) use ($countries) {
                 $form->select('feature_ids', __('country'))
                     ->options($countries);
-                    //->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+                //->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
             });
-        })->when('shipping_agency', function (Form $form) use($countries) {
+        })->when('shipping_agency', function (Form $form) use ($countries) {
             $form->select('sub_feature', __('type'))->options([
                 'ids'   => __('Specific shipping Agency by ID'),
                 'area_country' => __('shipping agency around your regions'),
                 'country' => __('Shipping Agencies in Specific Country'),
-            ])->when('ids', function (Form $form)use($countries) {
+            ])->when('ids', function (Form $form) use ($countries) {
                 $form->belongsToMany('shipping_agency_ids', ShippingAgencies::class, trans('agencies'));
                 $form->select('member_title', trans('member'))->options([
                     'owner'   => __('owner'),
                 ])->default('owner');
-            })->when('country', function (Form $form) use($countries){
+            })->when('country', function (Form $form) use ($countries) {
                 $form->select('feature_ids', __('country'))
                     ->options($countries);
-                   // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
+                // ->ajax('/api/search/countries?areaManagerId=' . Auth::id(), 'id', 'name');
             });
         });
 

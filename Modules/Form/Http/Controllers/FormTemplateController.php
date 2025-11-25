@@ -148,8 +148,6 @@ class FormTemplateController extends Controller
             admin_error(__('Error'), __('Form Template not found.'));
             return redirect()->back();
         } catch (\Exception $e) {
-            \Log::error('Form Template Edit Error: ' . $e->getMessage(), ['id' => $id]);
-
             admin_error(__('Unexpected Error'), __('Something went wrong while loading the form template.'));
             return redirect()->back();
         }
@@ -179,15 +177,15 @@ class FormTemplateController extends Controller
                 }
             }
         }
-    
+
         $existingNames = FormField::whereHas('section', function ($q) use ($formTemplate) {
             $q->where('form_template_id', $formTemplate->id);
         })
             ->pluck('field_name')
             ->toArray();
-    
+
         $duplicatesInDb = array_intersect($allFieldNames, $existingNames);
-    
+
         if (!empty($duplicatesInDb)) {
             $duplicateList = implode(', ', $duplicatesInDb);
             return back()->withErrors(['duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"])->withInput();
@@ -211,7 +209,7 @@ class FormTemplateController extends Controller
                     'title' => $sectionData['title'],
                     'section_order' => $sectionData['order'],
                     'is_visible' => true,
-                    'can_not_delete' =>$sectionData['can_not_delete']
+                    'can_not_delete' => $sectionData['can_not_delete']
                 ]);
 
                 // Create fields for this section
@@ -342,7 +340,6 @@ class FormTemplateController extends Controller
             ->firstOrFail();
 
         return view('Form::web-view.dynamic-form', compact('template', 'locale', 'linkToken', 'user'));
-
     }
 
 
@@ -350,27 +347,27 @@ class FormTemplateController extends Controller
     public function storeSubmission(Request $request, string $type)
     {
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
-    
+
         $data = $request->except('_token');
-   
+
         $existingRequest = FormRequest::where('form_template_id', $template->id)
-                            ->where('submitted_by', $request->user_id)
-                            ->first();
+            ->where('submitted_by', $request->user_id)->where('status', '!=', 'rejected')
+            ->first();
         if ($existingRequest) {
             return redirect()->route('forms.show.reqs', [
                 'id' => $existingRequest->id,
                 'token' => $request->token,
                 'lang' => $request->lang,
                 'user_id' => $request->user_id,
-            ]);      
-          }
+            ]);
+        }
 
         $data = $this->processFiles($data);
-    
+
         $fields = $request->fields ?? [];
 
-     
-    
+
+
         $save = FormRequest::create([
             'form_template_id' => $template->id,
             'submitted_by' => $request->user_id,
@@ -382,14 +379,23 @@ class FormTemplateController extends Controller
             'country' => $request->country_id,
             'created_at' => now(),
         ]);
-    
-    
+        if (!$save) {
+            return response()->json([
+                'success' => false,
+                'message' => __('something got wrong'),
+
+            ], 400);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => __('Form submitted successfully!'),
+            'message' => __('Request under review!'),
+            'data' => [
+                'order_id' => $save->id,
+            ]
         ], 200);
     }
-    
+
 
     protected function processFiles($input)
     {
@@ -402,7 +408,7 @@ class FormTemplateController extends Controller
         }
         return $input;
     }
-    
+
 
     public function getTranslations(Request $request)
     {
@@ -452,49 +458,49 @@ class FormTemplateController extends Controller
             ->get();
 
         $results = $bds->map(function ($bd) {
-            
-        $topAgencies = Agency::where('bd_id', $bd->id)
-            ->withCount('members')
-            ->orderByDesc('members_count')
-            ->limit(3)
-            ->get(['img','name', 'members_count'])
-            ->map(function ($agency) {
-                $defaultAgencyImage = asset("images/agency-placeholder.jpg");
-                $agencyImage = getImagePath($agency->img) ?? $defaultAgencyImage;
-        
-                if (!isImageExists($agencyImage)) {
-                    $agencyImage = $defaultAgencyImage;
-                }
-        
-                return [
-                    'name' => $agency->name,
-                    'members_count' => $agency->members_count,
-                    'image' => $agencyImage,
-                ];
-            });
-        
-        
-        $createdAt = Carbon::parse($bd->created_at);
-        $now = now();
-        $diffInYears = $createdAt->diffInYears($now);
-        $diffInMonths = $createdAt->diffInMonths($now);
-        $diffInDays = $createdAt->diffInDays($now);
-    
-        if ($diffInYears >= 1) {
-            $since = __('Works since :value years', ['value' => $diffInYears]);
-        } elseif ($diffInMonths >= 1) {
-            $since = __('Works since :value months', ['value' => $diffInMonths]);
-        } else {
-            $since = __('Works since :value days', ['value' => $diffInDays]);
-        }
-        
+
+            $topAgencies = Agency::where('bd_id', $bd->id)
+                ->withCount('members')
+                ->orderByDesc('members_count')
+                ->limit(3)
+                ->get(['img', 'name', 'members_count'])
+                ->map(function ($agency) {
+                    $defaultAgencyImage = asset("images/agency-placeholder.jpg");
+                    $agencyImage = getImagePath($agency->img) ?? $defaultAgencyImage;
+
+                    if (!isImageExists($agencyImage)) {
+                        $agencyImage = $defaultAgencyImage;
+                    }
+
+                    return [
+                        'name' => $agency->name,
+                        'members_count' => $agency->members_count,
+                        'image' => $agencyImage,
+                    ];
+                });
+
+
+            $createdAt = Carbon::parse($bd->created_at);
+            $now = now();
+            $diffInYears = $createdAt->diffInYears($now);
+            $diffInMonths = $createdAt->diffInMonths($now);
+            $diffInDays = $createdAt->diffInDays($now);
+
+            if ($diffInYears >= 1) {
+                $since = __('Works since :value years', ['value' => $diffInYears]);
+            } elseif ($diffInMonths >= 1) {
+                $since = __('Works since :value months', ['value' => $diffInMonths]);
+            } else {
+                $since = __('Works since :value days', ['value' => $diffInDays]);
+            }
+
             $defaultImage = asset("images/businessman-icon.jpg");
-            $bdAvatar = getImagePath( $bd->avatar) ?? $defaultImage;
+            $bdAvatar = getImagePath($bd->avatar) ?? $defaultImage;
 
             if (!isImageExists($bdAvatar)) {
                 $bdAvatar = $defaultImage;
             }
-        
+
             return [
                 'id' => $bd->id,
                 'name' => $bd->username,
@@ -502,7 +508,7 @@ class FormTemplateController extends Controller
                 'image' => $bdAvatar,
                 'country' => $bd->country?->name,
                 'is_default' => $bd->default,
-                'bio' =>__('form_bd_bio'),
+                'bio' => __('form_bd_bio'),
                 'years' => $since,
                 'top_agencies' => $topAgencies,
             ];
@@ -514,7 +520,7 @@ class FormTemplateController extends Controller
 
     public function checkName(Request $request)
     {
-        $name = trim($request->get('name'));  
+        $name = trim($request->get('name'));
 
         if (!$name) {
             return response()->json([
@@ -523,7 +529,7 @@ class FormTemplateController extends Controller
             ]);
         }
 
-        $exists = FormField::where('field_name', $name)->exists(); 
+        $exists = FormField::where('field_name', $name)->exists();
 
         return response()->json([
             'status' => true,
@@ -535,7 +541,7 @@ class FormTemplateController extends Controller
     public function showReqs($id)
     {
         $formRequest = FormRequest::with('template')->findOrFail($id);
-    
+
         $token = request('token');
         $lang = request('lang');
         $user_id = request('user_id');
@@ -545,12 +551,12 @@ class FormTemplateController extends Controller
         return view('Form::forms.show_request', compact('formRequest', 'token', 'lang', 'user_id'));
     }
 
-    public function destroyReqs($id,Request $request)
+    public function destroyReqs($id, Request $request)
     {
-        
+
 
         $linkToken = $request->token;
-        $defaultLang = $request->lang ;
+        $defaultLang = $request->lang;
         if (empty($linkToken)) {
             return response()->view('Form::forms.invalid', [
                 'message' => 'Access denied. Please provide a valid token.',
@@ -571,13 +577,10 @@ class FormTemplateController extends Controller
                 'message' => 'User not found for this token.',
             ], 403);
         }
-     
+
         $formRequest = FormRequest::with('template')->findOrFail($id);
         $type = $formRequest->template->form_type;
         $formRequest->delete();
-        return redirect()->to(route('forms.showByType') ."?type={$type}&token={$linkToken}&lang={$defaultLang}");
-
-    
+        return redirect()->to(route('forms.showByType') . "?type={$type}&token={$linkToken}&lang={$defaultLang}");
     }
-
 }

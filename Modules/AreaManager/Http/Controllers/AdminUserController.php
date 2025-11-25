@@ -6,8 +6,13 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agent;
 use App\Models\Agency;
+use App\Models\Charge;
+use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Enums\Charges\UserTypeEnum;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\AreaManager\Http\Controllers\EncorUsersController;
 
@@ -115,5 +120,71 @@ class AdminUserController extends EncorUsersController
             return $ops2;
         })->ajax('/api/search/users-subsuperadmin', 'id', 'name')->rules('required');
         return $form;
+    }
+
+    public function showProfile($id, Content $content)
+    {
+        return  $content
+            ->title(__($this->title))
+            ->body($this->profile($id));
+    }
+
+
+
+    public function profile($id)
+    {
+        $tab = request()->query('tab', 'agencies');
+
+        $areaManager = SubAreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->findOrFail($id);
+
+        $defaultImage = asset("images/businessman-icon.jpg");
+        $imageUrl = getImagePath($areaManager->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $areaManager->display_image = $imageUrl;
+
+        $agencies = $transactions = $target_history = null;
+        $rewards = null;
+
+        $totals = Charge::selectRaw("
+            SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
+            SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
+        ", [
+            UserTypeEnum::AREA_MANAGER,
+            $areaManager->id,
+            UserTypeEnum::AREA_MANAGER,
+            $areaManager->id
+        ])
+            ->first();
+
+        $totalCharges = $totals->total_charges;
+        $totalSpent   = $totals->total_spent;
+
+        $chargeTabType = request()->get('type', 'receiver');
+
+
+        $charges = Charge::query()
+            ->when($chargeTabType == 'receiver', function ($q) use ($id) {
+                $q->where('user_id', $id)->where('user_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->when($chargeTabType == 'charger', function ($q) use ($id) {
+                $q->where('charger_id', $id)->where('charger_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->with(Common::chargerRelationsQuery())
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'charges_page');
+        $superAdmins = SuperAdmin::where('parent_id', $areaManager->parent_id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $prefix = dashboardName();
+        switch ($tab) {
+            case 'agencies':
+                $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
+                break;
+            case 'charge':
+
+                break;
+        }
+
+        return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
     }
 }
