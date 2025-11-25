@@ -1547,7 +1547,8 @@ use Modules\Vip\Entities\Vip;
                                                     class="custom-payment-radio libraryRealTime"
                                                     name="is_{{ $coin->type }}_active" value="1"
                                                     {{ $coin->status == 1 && @$settings['is_' . $coin->type . '_active'] == '1' ? 'checked' : '' }}
-                                                    {{ $coin->status == 0 ? 'disabled' : '' }}>
+                                                    {{-- {{ $coin->status == 0 ? 'disabled' : '' }} --}}
+                                                    >
                                                 <label for="{{ $coin->type }}Radio" class="switch"></label>
                                             </div>
                                         </div>
