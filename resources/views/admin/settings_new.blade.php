@@ -1873,46 +1873,33 @@ use Modules\Vip\Entities\Vip;
 
 
                                                 <div class="col-md-12">
-
-                                                    <div class="form-group">
-                                                        <label for="user_coin_input">{{ __('diamond') }}</label>
-
-                                                        <!-- User input field (value to multiply) -->
-                                                        <input type="text" id="user_coin_input" name="user_coin_input"
-                                                            placeholder="Enter value"
-                                                            style="width: auto; display: inline-block;"
-                                                            class="form-control">
-
-                                                        <!-- Hidden exchange value from backend -->
-                                                        <input type="hidden" id="exchange_rate"
-                                                            value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
-
-                                                        <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                                    <div class="form-group coin-calculator">
+                                                        <label>{{ __('diamond') }}</label>
+                                                        <input type="text" class="user_coin_input form-control" placeholder="Enter value">
+                                                        <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
+                                                        <span class="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                                     </div>
-
                                                 </div>
 
                                                 <script>
                                                 document.addEventListener('DOMContentLoaded', function () {
-                                                    const userInput   = document.getElementById('user_coin_input');
-                                                    const exchangeRateInput = document.getElementById('exchange_rate');
-                                                    const resultSpan  = document.getElementById('exp_result');
+                                                    document.querySelectorAll('.coin-calculator').forEach(container => {
+                                                        const userInput = container.querySelector('.user_coin_input');
+                                                        const exchangeRateInput = container.querySelector('.exchange_rate');
+                                                        const resultSpan = container.querySelector('.exp_result');
 
-                                                    function updateResult() {
-                                                        const userValue = parseFloat(userInput.value);
-                                                        const exchangeRate = parseFloat(exchangeRateInput.value);
+                                                        function updateResult() {
+                                                            const userValue = parseFloat(userInput.value);
+                                                            const exchangeRate = parseFloat(exchangeRateInput.value);
 
-                                                        if (!isNaN(userValue) && !isNaN(exchangeRate)) {
-                                                            const result = userValue * exchangeRate;
-                                                            resultSpan.textContent = `= ${result} coin`;
-                                                        } else {
-                                                            resultSpan.textContent = '';
+                                                            resultSpan.textContent = (!isNaN(userValue) && !isNaN(exchangeRate))
+                                                                ? `= ${userValue * exchangeRate} coin`
+                                                                : '';
                                                         }
-                                                    }
 
-                                                    userInput.addEventListener('input', updateResult);
-
-                                                    updateResult(); // initial load
+                                                        userInput.addEventListener('input', updateResult);
+                                                        updateResult();
+                                                    });
                                                 });
                                                 </script>
                                             <div class="col-12 d-flex gap-3 mt-3">
