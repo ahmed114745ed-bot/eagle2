@@ -18,7 +18,7 @@ use Modules\Vip\Entities\Vip;
 .inner-settings-menu button {
     padding: 10px 20px;
     background: var(--secondary-color);
-    color: var(--text-primary-color);
+    color: black;
     border: none;
     border-radius: 6px;
     cursor: pointer;
