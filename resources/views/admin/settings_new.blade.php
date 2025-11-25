@@ -26,7 +26,7 @@ use Modules\Vip\Entities\Vip;
 
 .inner-settings-menu button.active {
     background: var(--primary-color);
-    color: var(--text-secondary-color);
+    color: black;
 }
 
 .settings-section {
