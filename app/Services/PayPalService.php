@@ -298,6 +298,7 @@ class PayPalService
         }
 
         if (! $coinLog){
+            info('Failed');
             return response()->json([
                 'status'  => 'ignored',
                 'trx'     =>  $paypalId,
