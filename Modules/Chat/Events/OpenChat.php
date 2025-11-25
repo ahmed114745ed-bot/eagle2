@@ -26,10 +26,18 @@ class OpenChat implements ShouldBroadcast
 
     public function broadcastOn() :array
     {
-        return ['user-'.$this->user2->id ,
-            $this->isConversation ? 'conversation-' . $this->check_room->id : null,
-//            'conversation-'.$this->check_room->id
+        if ($this->isConversation) {
+            return [
+                'user-' . $this->user2->id,
+                'conversation-' . $this->check_room->id,
+            ];
+        }
+
+        return [
+            'user-' . $this->user2->id,
         ];
+
+//        return ['user-'.$this->user2->id ,'conversation-'.$this->check_room->id];
     }
 
     public function broadcastAs()
