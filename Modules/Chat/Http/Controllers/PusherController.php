@@ -11,11 +11,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\Chat\Http\Services\PusherService;
+use Modules\Chat\Http\Services\ChatRoomService;
+use Modules\Chat\Events\Chat;
+use Modules\Chat\Http\Resources\ChatRoomPusherV2Resource;
 
 class PusherController extends Controller
 {
 
-    public function __construct(public PusherService $pusherService)
+    public function __construct(public PusherService $pusherService, public ChatRoomService $chatRoomService)
     {
 
     }
@@ -37,6 +40,9 @@ class PusherController extends Controller
         return response()->json(['status' => 'Webhook received']);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function chatRoomListener(Request $request)
     {
         $payload = $request->all();
@@ -68,6 +74,18 @@ class PusherController extends Controller
                                 ->where('user_id', $user->id)
                                 ->where('created_at', '>', $eventTimeFormatted)
                                 ->update(['status' => 'received']);
+
+                            $checkRoom = $this->chatRoomService->getCreateChatRoomId($roomId);
+                            if ($checkRoom) {
+                                $user2 = $this->chatRoomService->getUserInChatRoom($checkRoom, $user);
+
+                                $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+
+                                if ($user2) {
+                                    $roomResourceData = (new ChatRoomPusherV2Resource($checkRoom))->toResponse($request)->getData()->data;
+                                    event(new Chat($roomResourceData, $user2));
+                                }
+                            }
                         }
                         break;
 
@@ -92,6 +110,26 @@ class PusherController extends Controller
                                 ->where('user_id', $user->id)
                                 ->where('created_at', '>', $eventTimeFormatted)
                                 ->update(['status' => 'received']);
+
+                            $checkRoom = $this->chatRoomService->getCreateChatRoomId($roomId);
+                            if ($checkRoom) {
+                                $user2 = $this->chatRoomService->getUserInChatRoom($checkRoom, $user);
+
+                                try {
+                                    $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+                                } catch (\Throwable $e) {
+                                    Log::warning('handleChatOpenEvent failed in Pusher webhook: ' . $e->getMessage());
+                                }
+
+                                if ($user2) {
+                                    try {
+                                        $roomResourceData = (new ChatRoomPusherV2Resource($checkRoom))->toResponse($request)->getData()->data;
+                                        event(new Chat($roomResourceData, $user2));
+                                    } catch (\Throwable $e) {
+                                        Log::warning('Sending Chat event failed in Pusher webhook: ' . $e->getMessage());
+                                    }
+                                }
+                            }
                         }
                         break;
                 }
