@@ -45,9 +45,7 @@ trait WinLuckyGift
             ]
         ];
         $json  = json_encode($d);
-        AllOpeningRoomsZegoRequest::dispatch($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true )
-        ->onQueue('heavyProcessing');
-    
+        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json,  $zigoData['user_id'], $zigoData['room_id']), 'heavyProcessing');
     }
 
     public function sendToZegoLuckyGiftV2($zigoData)
@@ -80,7 +78,7 @@ trait WinLuckyGift
             ]
         ];
         $json  = json_encode($d);
-        if($zigoData['percentage'] >= 5 && $zigoData['percentage'] <= 1000){
+        if($zigoData['percentage'] >= 250 && $zigoData['percentage'] <= 1000){
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['user_id'], $zigoData['room_id'], isExceptRoom: true ), 'heavyProcessing');
         }
       
