@@ -76,19 +76,11 @@ class PusherController extends Controller
                             if ($checkRoom) {
                                 $user2 = $this->chatRoomService->getUserInChatRoom($checkRoom, $user);
 
-                                try {
-                                    $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
-                                } catch (\Throwable $e) {
-                                    Log::warning('handleChatOpenEvent failed in Pusher webhook: ' . $e->getMessage());
-                                }
+                                $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
 
                                 if ($user2) {
-                                    try {
-                                        $roomResourceData = (new ChatRoomPusherV2Resource($checkRoom))->toResponse($request)->getData()->data;
-                                        event(new Chat($roomResourceData, $user2));
-                                    } catch (\Throwable $e) {
-                                        Log::warning('Sending Chat event failed in Pusher webhook: ' . $e->getMessage());
-                                    }
+                                    $roomResourceData = (new ChatRoomPusherV2Resource($checkRoom))->toResponse($request)->getData()->data;
+                                    event(new Chat($roomResourceData, $user2));
                                 }
                             }
                         }
