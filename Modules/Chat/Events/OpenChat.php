@@ -15,18 +15,21 @@ class OpenChat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $chat , $user2 ,  $check_room ;
-    public function __construct($chat , $user2 ,  $check_room )
+    public $chat, $user2, $check_room, $isConversation;
+    public function __construct($chat, $user2, $check_room, $isConversation = true)
     {
         $this->chat = $chat;
         $this->user2 = $user2;
-        $this->check_room  =  $check_room ;
-
+        $this->check_room = $check_room ;
+        $this->isConversation = $isConversation ;
     }
 
     public function broadcastOn() :array
     {
-        return ['user-'.$this->user2->id ,'conversation-'.$this->check_room->id ];
+        return ['user-'.$this->user2->id ,
+            $this->isConversation ? 'conversation-' . $this->check_room->id : null,
+//            'conversation-'.$this->check_room->id
+        ];
     }
 
     public function broadcastAs()
