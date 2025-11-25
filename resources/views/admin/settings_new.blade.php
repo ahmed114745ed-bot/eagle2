@@ -1893,7 +1893,7 @@ use Modules\Vip\Entities\Vip;
                                                             const exchangeRate = parseFloat(exchangeRateInput.value);
 
                                                             resultSpan.textContent = (!isNaN(userValue) && !isNaN(exchangeRate))
-                                                                ? `= ${userValue * exchangeRate} coin`
+                                                                ? `= ${(exchangeRate /100) * userValue } coin`
                                                                 : '';
                                                         }
 
