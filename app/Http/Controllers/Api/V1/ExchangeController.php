@@ -38,6 +38,19 @@ class ExchangeController extends Controller
         }
     }
 
+    public function exchangeCoin(Request $request)
+    {
+        $user = $request->user();
+
+        try {
+            $this->exchangeService->create($user, $request->item_id);
+            return Common::apiResponse(1, $user->total_diamond_received, ['diamond' => $user->total_diamond_received, 'coins' => $user->di], 200);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function exchangeLogs(Request $request)
     {
         $user = $request->user();

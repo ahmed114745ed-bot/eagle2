@@ -431,6 +431,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('exchange')->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
+                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 

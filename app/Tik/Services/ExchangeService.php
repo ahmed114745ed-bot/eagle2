@@ -14,8 +14,7 @@ class ExchangeService
     public function __construct(
         private  readonly ExchangeRepository $exchangeRepository,
         private readonly ExchangeLogRepository $exchangeLogRepository
-    ) {
-    }
+    ) {}
 
 
     public function index($type)
@@ -28,7 +27,7 @@ class ExchangeService
         $ex = $this->exchangeRepository->findById($exchangeId);
 
         if (!$ex) throw new \Exception('not found');
-        if ($user->type_user != 0 ) throw new \Exception('not allowed');
+        if ($user->type_user != 0) throw new \Exception('not allowed');
         if ($user->exchange_diamonds < $ex->diamonds) throw new \Exception('balance low');
 
 
@@ -47,7 +46,7 @@ class ExchangeService
             $user->exchange_diamonds = 0;
         }
         if ($ex->type == 0) {
-            
+
             $amountBefore =  $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
@@ -63,6 +62,40 @@ class ExchangeService
         $user->save();
         return true;
     }
+
+    // public function create2($user, $diamonds)
+    // {
+    //     if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
+
+
+    //     $data = [
+    //         'user_id' => $user->id,
+    //         'diamonds' => $diamonds,
+    //         'value' => $ex->value,
+    //         'type' => 0,
+    //         'operation_no' => rand(11111111, 99999999),
+    //     ];
+
+    //     $this->exchangeLogRepository->create($data);
+    //     $user->exchange_diamonds -= $diamonds;
+
+    //     if ($user->exchange_diamonds <= 0) {
+    //         $user->exchange_diamonds = 0;
+    //     }
+
+    //     $amountBefore =  $user->di;
+    //     UserCoinLogHelper::logByType(
+    //         $user->id,
+    //         $ex->value,
+    //         $amountBefore,
+    //         UserCoinLogType::EXCHANGE,
+    //     );
+
+    //     $user->di += $ex->value;
+
+    //     $user->save();
+    //     return true;
+    // }
 
     public function getExchangeLog($userId, $type)
     {
@@ -100,6 +133,4 @@ class ExchangeService
     {
         return $this->exchangeRepository->findOrFail($id);
     }
-
-
 }
