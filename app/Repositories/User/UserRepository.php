@@ -209,7 +209,7 @@ class UserRepository extends Repository
         $areaManager = AreaManager::find($areaManagerId);
         if (!$areaManager)  $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
-      
+
         $countries =$areaManager->countriesQuery()->pluck('id')->toArray();
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
             ->where(function ($query) use ($key) {
@@ -544,20 +544,20 @@ class UserRepository extends Repository
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
             'shippingAgency:id,app_owner_id,name,img',
-            'chatRoomsAsUser' => function ($q) use ($authUserId) {
-                $q->where('user_id2', $authUserId)
-                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                        $query->where('user_id', '<>', $authUserId)
-                            ->where('status', '<>', 'seen');
-                    }]);
-            },
-            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
-                $q->where('user_id', $authUserId)
-                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                        $query->where('user_id', '<>', $authUserId)
-                            ->where('status', '<>', 'seen');
-                    }]);
-            },
+//            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+//                $q->where('user_id2', $authUserId)
+//                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+//                        $query->where('user_id', '<>', $authUserId)
+//                            ->where('status', '<>', 'seen');
+//                    }]);
+//            },
+//            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+//                $q->where('user_id', $authUserId)
+//                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+//                        $query->where('user_id', '<>', $authUserId)
+//                            ->where('status', '<>', 'seen');
+//                    }]);
+//            },
         ])
             ->find($userId);
     }
