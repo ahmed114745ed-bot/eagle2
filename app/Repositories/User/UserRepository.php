@@ -530,7 +530,7 @@ class UserRepository extends Repository
 
     public function getUserWithMedals($userId)
     {
-        $authUserId = auth()->id();
+//        $authUserId = auth()->id();
         return User::with([
             'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
                 ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))

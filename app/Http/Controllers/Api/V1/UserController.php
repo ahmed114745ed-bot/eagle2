@@ -556,24 +556,22 @@ class UserController extends Controller
             }
         );
 
-
+        $authUserId = auth()->id();
         $user = User::with([
-            'chatRoomsAsUser' => function ($q) use ($id) {
-                $q->withCount([
-                    'messages as unread_messages' => function ($q2) use ($id) {
-                        $q2->where('status', '<>', 'seen')
-                           ->where('user_id', '<>', $id);
-                    }
-                ]);
+            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
             },
-            'chatRoomsAsUser2' => function ($q) use ($id) {
-                $q->withCount([
-                    'messages as unread_messages' => function ($q2) use ($id) {
-                        $q2->where('status', '<>', 'seen')
-                           ->where('user_id', '<>', $id);
-                    }
-                ]);
-            }
+            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
         ])->find($id);
 
         $chatRoom = $user->chatRoomsAsUser->first() ?? $user->chatRoomsAsUser2->first() ?? null;
