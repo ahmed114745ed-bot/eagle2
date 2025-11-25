@@ -970,3 +970,14 @@ Route::get('/manifest.json', function () {
         "display" => "standalone",
     ]);
 })->name('manifest.json');
+
+Route::get('/run-roomcup-rewards', function () {
+    Artisan::call('roomcup:calculate-rewards');
+
+    $output = Artisan::output();
+
+    return response()->json([
+        'message' => 'RoomCup rewards calculation executed successfully!',
+        'output'  => $output,
+    ]);
+});
