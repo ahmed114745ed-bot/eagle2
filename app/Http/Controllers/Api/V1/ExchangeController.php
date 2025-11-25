@@ -53,9 +53,9 @@ class ExchangeController extends Controller
     public function exchangeCoin(Request $request)
     {
         $user = $request->user();
-
+        if (!$request->diamonds && !$request->exchange) return Common::apiResponse(0, 'missing param', null, 422);
         try {
-            $this->exchangeService->create($user, $request->item_id);
+            $this->exchangeService->createExchange($user, $request->diamonds, $request->exchange);
             return Common::apiResponse(1, $user->total_diamond_received, ['diamond' => $user->total_diamond_received, 'coins' => $user->di], 200);
         } catch (\Exception $exception) {
 
