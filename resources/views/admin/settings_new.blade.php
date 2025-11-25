@@ -4469,129 +4469,127 @@ use Modules\Vip\Entities\Vip;
                     }
                 }
 
-                // document.addEventListener("DOMContentLoaded", function() {
-                //     // Function to get query parameter by name
-                //     function getQueryParam(name) {
-                //         const urlParams = new URLSearchParams(window.location.search);
-                //         return urlParams.get(name);
-                //     }
+                // document.addEventListener("DOMContentLoaded", function () {
 
-                //     // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                //     const activeTab = getQueryParam("firsttab") || "brandSettings";
+                //         function getQueryParam(name) {
+                //             const urlParams = new URLSearchParams(window.location.search);
+                //             return urlParams.get(name);
+                //         }
 
-                //     // Show the selected tab
-                //     showSection(activeTab);
-                // });
+                //         // Which outer section is open?
+                //         const activeTab = getQueryParam("firsttab") || "brandSettings";
+                //         showSection(activeTab);
 
-                // document.addEventListener("DOMContentLoaded", function() {
-                //     function getQueryParam(name) {
-                //         const urlParams = new URLSearchParams(window.location.search);
-                //         return urlParams.get(name);
-                //     }
+                //         // Auto-open inner tabs if workSettings is loaded
+                //         if (activeTab === "workSettings") {
+                //             const type = getQueryParam("type") || "Experience";
+                //             showInnerContent(type);
 
-                //     const activeTab = getQueryParam("firsttab") || "brandSettings";
-                //     showSection(activeTab);
+                //             // Make button active
+                //             document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+                //                 btn.classList.remove("active");
+                //             });
 
-                //     // NEW: Activate inner tabs inside workSettings
-                //     if (activeTab === "workSettings") {
-                //         const type = getQueryParam("type") || "Experience";
+                //             const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+                //             if (correctBtn) correctBtn.classList.add("active");
+                //         }
+                //     });
 
-                //         // Activate the correct nav item
-                //         document.querySelectorAll('#workSettings .nav-link').forEach(el => {
-                //             el.classList.remove("active");
+
+                //     function showSection(sectionId) {
+                //         document.querySelectorAll('.settings-section').forEach(section => {
+                //             section.classList.remove('active');
                 //         });
 
-                //         const activeInner = document.querySelector(`#workSettings .nav-link[href*="type=${type}"]`);
-                //         if (activeInner) {
-                //             activeInner.classList.add("active");
-                //         }
-                //     }
-                // });
+                //         document.getElementById(sectionId).classList.add('active');
 
-
-                // function showSection(sectionId) {
-                //     // Remove active class from all sections
-                //     document.querySelectorAll('.settings-section').forEach(section => {
-                //         section.classList.remove('active');
-                //     });
-
-                //     // Add active class to the selected section
-                //     document.getElementById(sectionId).classList.add('active');
-
-                //     // Reset button styles
-                //     document.querySelectorAll('.settings-menu button').forEach(button => {
-                //         button.style.backgroundColor = '';
-                //         button.style.color = '';
-                //     });
-
-                //     // Highlight the active button
-                //     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                //     if (activeButton) {
-                //         activeButton.style.backgroundColor = 'var(--primary-color)';
-                //         activeButton.style.color = 'var(--text-secondary-color)';
+                //         const url = new URL(window.location);
+                //         url.searchParams.set("firsttab", sectionId);
+                //         window.history.pushState({}, "", url);
                 //     }
 
-                //     // Update the URL with the selected tab without reloading
-                //     const url = new URL(window.location);
-                //     url.searchParams.set("firsttab", sectionId);
-                //     window.history.pushState({}, "", url);
-                // }
 
                 document.addEventListener("DOMContentLoaded", function () {
 
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
+                    function getQueryParam(name) {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get(name);
+                    }
 
-    // Which outer section is open?
-    const activeTab = getQueryParam("firsttab") || "brandSettings";
-    showSection(activeTab);
+                    // Which outer section is open?
+                    const activeTab = getQueryParam("firsttab") || "brandSettings";
+                    showSection(activeTab);
 
-    // Auto-open inner tabs if workSettings is loaded
-    if (activeTab === "workSettings") {
-        const type = getQueryParam("type") || "Experience";
-        showInnerContent(type);
+                    // Auto-open inner tabs if workSettings is loaded
+                    if (activeTab === "workSettings") {
+                        const type = getQueryParam("type") || "Experience";
+                        showInnerContent(type);
 
-        // Make button active
-        document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
-            btn.classList.remove("active");
-        });
+                        // Make button active
+                        document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+                            btn.classList.remove("active");
+                        });
 
-        const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
-        if (correctBtn) correctBtn.classList.add("active");
-    }
-});
+                        const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+                        if (correctBtn) correctBtn.classList.add("active");
+                    }
+
+                    // Add click listeners to outer tabs
+                    document.querySelectorAll(".settings-menu button").forEach(btn => {
+                        btn.addEventListener("click", function () {
+                            const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+
+                            // Update URL query param
+                            const url = new URL(window.location);
+                            url.searchParams.set("firsttab", sectionId);
+                            window.history.pushState({}, "", url);
+
+                            // Reload page
+                            window.location.reload();
+                        });
+                    });
+
+                    // Add click listeners to inner tabs (optional)
+                    document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+                        btn.addEventListener("click", function () {
+                            const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+
+                            const url = new URL(window.location);
+                            url.searchParams.set("type", type);
+                            window.history.pushState({}, "", url);
+
+                            // Reload page
+                            window.location.reload();
+                        });
+                    });
+                });
+
+                function showSection(sectionId) {
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+
+                    const section = document.getElementById(sectionId);
+                    if (section) section.classList.add('active');
+                }
 
 
-function showSection(sectionId) {
-    document.querySelectorAll('.settings-section').forEach(section => {
-        section.classList.remove('active');
-    });
 
-    document.getElementById(sectionId).classList.add('active');
+                    function changeInnerTab(type) {
+                        const url = new URL(window.location);
+                        url.searchParams.set("firsttab", "workSettings");
+                        url.searchParams.set("type", type);
+                        window.history.pushState({}, "", url);
 
-    const url = new URL(window.location);
-    url.searchParams.set("firsttab", sectionId);
-    window.history.pushState({}, "", url);
-}
+                        // Update button active class
+                        document.querySelectorAll(".inner-settings-menu button").forEach(btn =>
+                            btn.classList.remove("active")
+                        );
+                        document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`)
+                            ?.classList.add("active");
 
-
-function changeInnerTab(type) {
-    const url = new URL(window.location);
-    url.searchParams.set("firsttab", "workSettings");
-    url.searchParams.set("type", type);
-    window.history.pushState({}, "", url);
-
-    // Update button active class
-    document.querySelectorAll(".inner-settings-menu button").forEach(btn =>
-        btn.classList.remove("active")
-    );
-    document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`)
-        ?.classList.add("active");
-
-    showInnerContent(type);
-}
+                        showInnerContent(type);
+                    }
 
 
 function showInnerContent(type) {
