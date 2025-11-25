@@ -345,7 +345,7 @@ class UserController extends Controller
     public function subSuperAdminUsers(Request $request)
     {
         $key = $request->q;
-        
+
         $page = $request->get('page', 1);
         $users = $this->userService->subSuperAdminUsers($key, $page);
 
@@ -555,7 +555,7 @@ class UserController extends Controller
                 return (new UserResource($user))->toArray(request());
             }
         );
-    
+
 
         $user = User::with([
             'chatRoomsAsUser' => function ($q) use ($id) {
@@ -575,13 +575,14 @@ class UserController extends Controller
                 ]);
             }
         ])->find($id);
-        
+
         $chatRoom = $user->chatRoomsAsUser->first() ?? $user->chatRoomsAsUser2->first() ?? null;
-        
+
         $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
-        
+
       //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
-        
+
+        $response['chat_id'] = $chatRoom->id ?? null;
         $response['unread_messages_count'] = $unreadMessagesCount;
 
         return Common::apiResponse(true, '', $response, 200);
