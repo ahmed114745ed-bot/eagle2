@@ -417,7 +417,7 @@ class GiftLogController extends Controller
         }
         return Common::apiResponse(1, __('api_responses.success'), $data);
     }
-    
+
 
     // public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     // {

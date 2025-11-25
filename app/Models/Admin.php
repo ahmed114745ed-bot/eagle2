@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Modules\AreaManager\Entities\Region;
 
 class Admin extends Administrator
 {
@@ -47,6 +49,18 @@ class Admin extends Administrator
     public function per()
     {
         return $this->hasMany(Agency::class, 'agency_manger_id');
+    }
+
+    public function countriesQuery()
+    {
+        return Country::whereHas('regions', function ($q) {
+            $q->where('manager_id', $this->id);
+        });
+    }
+
+    public function regions(): HasMany
+    {
+        return $this->hasMany(Region::class, 'manager_id');
     }
 
     protected static function boot()

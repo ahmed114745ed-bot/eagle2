@@ -99,7 +99,7 @@ class BdController extends MainController
         //dd($countries);
         $grid->model()
             ->whereIn('country_id', $countries)
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile','creator'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'creator'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -140,7 +140,7 @@ class BdController extends MainController
                 </div>
             ";
         });
-        
+
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
@@ -192,25 +192,29 @@ class BdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'))->display(function ($name) {
-            if (!$name) return '-';
+        $grid->column('country.name', __('country'))->display(function () {
 
-            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
-            $path =    @$this->country?->flag ?? '';
+            $country = $this->country;
 
-            $url = getImagePath($path);
+            if (!$country) {
+                return '-';
+            }
 
-            // Check if the image exists
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
 
-            // Return an image with a WhatsApp link
-            return "
-            <div style='display: flex; flex-direction: column; align-items: start;'>
-                <span>{$name}</span>
-                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
-            </div>
-        ";
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
         });
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
@@ -242,8 +246,8 @@ class BdController extends MainController
         });
 
         $grid->disableRowSelector();
-         $grid->disableExport();
-         $this->extendGrid($grid);
+        $grid->disableExport();
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -294,7 +298,7 @@ class BdController extends MainController
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
             $countries = $authAdmin->countriesQuery()
-            ->get(['id', 'name', 'e_name']);
+                ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }

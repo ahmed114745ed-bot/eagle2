@@ -20,6 +20,9 @@
     "Operation log": "سجل العمليات",
    "regular users":"المستخدمين العاديين",
    "hosts":"المضيفين",
+   "Experience settings": "إعدادات الخبرة",
+"coin exchange": "تبادل العملات",
+
    "created by":"انشئ بواسطه",
    "type admin": "نوع المسؤول",
 "country manager": "مدير الدولة",
@@ -2020,6 +2023,7 @@
 "image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)": "الصورة: (jpg, jpeg, png, gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)",
     "Show host": "عرض المضيف",
     "Delete host": "حذف المضيف",
+    "you should exchange number of diamond":"يجب عليك تغير عدد الألماس",
     "Request under review!":"طلب تحت المراجعه",
     "something got wrong":"حدث خطأ ما",
     "App owner profit":"المكسب الخاص صاحب التطبيق",

@@ -45,7 +45,7 @@ class ChatMessagesController extends Controller
 
     public function store(ChatStoreRequest $request)
     {
-        
+
         $user = $request->user();
 
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
@@ -141,7 +141,7 @@ class ChatMessagesController extends Controller
             // return $user2;
             event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
-            event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom));
+            event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom, false));
         } catch (\Throwable $e) {
         }
 

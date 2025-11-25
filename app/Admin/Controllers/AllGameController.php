@@ -182,6 +182,7 @@ class AllGameController extends MainController
             ]
         );
         $form->url('mini_url', __('Mini Url'));
+        $form->url('hd_url', __('Mini hd Url'));
         $form->image('image', __('Image'));
         $form->text('hight_image', __('hight_image'));
         $form->switch('is_enable', __('enable'));

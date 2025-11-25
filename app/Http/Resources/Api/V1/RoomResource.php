@@ -45,6 +45,8 @@ class RoomResource extends JsonResource
             'room_id' => (string)($this->id ?: 0),
             'owner_special_id'          => $this->owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => $this->owner?->color_image,
+            'owner_task_room_id' => $this->whenLoaded('taskStream', fn() => $this->taskStream?->id),
+            'current_task_room_id' => $this->whenLoaded('taskStreamRoom', fn() => $this->taskStreamRoom?->task_stream_id),
             'chat_id' => $chatRoom->id ?? null,
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
             'name' => $this->room_name ?: '',
