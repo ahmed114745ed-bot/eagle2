@@ -155,8 +155,9 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->timezone(getTimezone())
             ->withoutOverlapping()
-            ->runInBackground()
-            ->appendOutputTo(storage_path('logs/pk_session_job.log'));
+            ->appendOutputTo(storage_path('logs/pk_session_job.log'))
+            ->runInBackground();
+
     }
 
     protected function commands(): void
