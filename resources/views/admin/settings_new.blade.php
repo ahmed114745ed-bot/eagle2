@@ -1539,13 +1539,16 @@ use Modules\Vip\Entities\Vip;
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
                                             <div class="d-flex align-items-center">
-                                                <input type="hidden" name="is_{{ $coin->type }}_active"
+                                               <input type="hidden" name="is_{{ $coin->type }}_active"
                                                     value="0">
+                                                    <input type="hidden" name="payment_getaway_id"
+                                                    value={{ $coin->id }}>
                                                 <input type="checkbox" id="{{ $coin->type }}Radio"
                                                     class="custom-payment-radio libraryRealTime"
                                                     name="is_{{ $coin->type }}_active" value="1"
                                                     {{ $coin->status == 1 && @$settings['is_' . $coin->type . '_active'] == '1' ? 'checked' : '' }}
-                                                    {{ $coin->status == 0 ? 'disabled' : '' }}>
+                                                    {{-- {{ $coin->status == 0 ? 'disabled' : '' }} --}}
+                                                    >
                                                 <label for="{{ $coin->type }}Radio" class="switch"></label>
                                             </div>
                                         </div>
