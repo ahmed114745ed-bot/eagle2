@@ -1539,8 +1539,10 @@ use Modules\Vip\Entities\Vip;
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
                                             <div class="d-flex align-items-center">
-                                                <input type="hidden" name="is_{{ $coin->type }}_active"
+                                               <input type="hidden" name="is_{{ $coin->type }}_active"
                                                     value="0">
+                                                    <input type="hidden" name="payment_getaway_id"
+                                                    value={{ $coin->id }}>
                                                 <input type="checkbox" id="{{ $coin->type }}Radio"
                                                     class="custom-payment-radio libraryRealTime"
                                                     name="is_{{ $coin->type }}_active" value="1"
