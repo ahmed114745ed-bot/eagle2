@@ -75,13 +75,13 @@ class ExchangeService
     public function createExchange($user, $diamonds, $exValue)
     {
         if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
-
         if (!ctype_digit($exValue)) throw new \Exception(__('you should exchange number of diamond'));
 
         $setting = Common::getSettingValue('exchange_coin_percentage') ?? 1;
-        $exchangeCoin = (int)(($setting / 100) * $diamonds);
+        $exchangeCoin = (($setting / 100) * $diamonds);
+        if (floor($exchangeCoin) != $exchangeCoin) throw new \Exception(__('you should exchange number of diamond'));
 
-        if (!is_int($exchangeCoin)) throw new \Exception(__('you should exchange number of diamond'));
+        $exchangeCoin = (int) $exchangeCoin;
         $data = [
             'user_id' => $user->id,
             'diamonds' => $diamonds,
