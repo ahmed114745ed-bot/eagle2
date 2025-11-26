@@ -70,7 +70,7 @@ class PusherController extends Controller
 
                             ChatMessage::where('chat_room_id', $roomId)
                                 ->where('user_id', $user->id)
-                                ->where('created_at', '>', $eventTimeFormatted)
+                                ->where('created_at', '>=', $eventTimeFormatted)
                                 ->update(['status' => 'received']);
 
                             $checkRoom = $this->chatRoomService->getCreateChatRoomId($roomId);
