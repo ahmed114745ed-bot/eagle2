@@ -168,6 +168,14 @@ class PermissionTypeSeeder extends Seeder
                             PermissionType::ADMIN->value => ['browse', 'details-switch'],
                         ],
                     ],
+                    [
+                        'key' => 'game-settings',
+                        'except' => ['create', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'edit'],
+                        ],
+                    ],
                 ],
             ],
             [

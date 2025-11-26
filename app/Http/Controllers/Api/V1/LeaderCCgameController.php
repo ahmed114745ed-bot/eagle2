@@ -126,12 +126,8 @@ class LeaderCCgameController extends Controller
 
                 dispatch(new \App\Jobs\GameWalletJop($type == 1 ? -$coin : $coin));
 
-                info('type', [$type]);
-                info('currency_diff', [(int) $request->currency_diff]);
-                info('game_map_win_coins', [Common::getConfig('game_map_win_coins')]);
-//                if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
-                if ($type == 2) {
-
+                $gameMapWinCoins = Common::getConfig('game_map_win_coins') ?? 10000;
+                if ($type == 2 && $coin >= $gameMapWinCoins) {
                     $roomId = $user->nowRoom?->id;
 
                     $d = [
@@ -147,7 +143,6 @@ class LeaderCCgameController extends Controller
                         ]
                     ];
 
-                    Log::info(numToStringNew($coin));
                     $json = json_encode($d);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id,  $roomId, false), 'heavyProcessing');
                 }
