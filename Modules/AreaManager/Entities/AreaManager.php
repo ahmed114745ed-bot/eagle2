@@ -110,8 +110,8 @@ class AreaManager extends Authenticatable
     }
     public function flag()
     {
-
-        $region = Region::where('manager_id', $this->parent_id)->with('countries')->first();
+        $managerId = $this->parent_id ?? $this->id;
+        $region = Region::where('manager_id', $managerId)->with('countries')->first();
         $countries = $region->countries;
 
         $html = '<div class="user-type-badges">';
