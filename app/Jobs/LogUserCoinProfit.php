@@ -5,10 +5,11 @@ namespace App\Jobs;
 use App\Helpers\Common;
 use App\Models\UserCoinLog;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class LogUserCoinProfit implements ShouldQueue
 {
@@ -22,6 +23,7 @@ class LogUserCoinProfit implements ShouldQueue
     protected $subType;
     protected $itemName;
     protected $createdAt;
+    protected $featureType;
 
     public function __construct(
         int $userId,
@@ -31,7 +33,8 @@ class LogUserCoinProfit implements ShouldQueue
         string $type,
         string $subType,
         ?string $itemName = '',
-        $createdAt = null
+        $createdAt = null,
+        ?string $featureType = '',
     ) {
         $this->userId = $userId;
         $this->amountBefore = $amountBefore;
@@ -41,10 +44,13 @@ class LogUserCoinProfit implements ShouldQueue
         $this->subType = $subType;
         $this->itemName = $itemName;
         $this->createdAt = $createdAt ?? now();
+        $this->featureType = $featureType;
     }
 
     public function handle()
     {
+
+        Log::info($this->featureType);
         UserCoinLog::create([
             'user_id'       => $this->userId,
             'type'          => $this->type,
@@ -55,7 +61,7 @@ class LogUserCoinProfit implements ShouldQueue
             'item_name'     => $this->itemName,
             'from_date'     => $this->createdAt,
             'to_date'       => $this->createdAt,
+            'feature_type' => $this->featureType,
         ]);
-    
     }
 }

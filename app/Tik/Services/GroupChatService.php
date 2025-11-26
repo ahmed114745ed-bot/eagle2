@@ -4,7 +4,9 @@ namespace App\Tik\Services;
 
 
 use App\Helpers\Common;
+use App\Enums\UserCoinLogType;
 use Modules\Reals\Entities\Real;
+use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GroupChatRepository;
 
@@ -26,6 +28,13 @@ class GroupChatService
 
     public function create($user, $request, $costGroupChat)
     {
+
+        UserCoinLogHelper::logByType(
+                    $user->id,
+                    -abs($costGroupChat),
+                    $user->di,
+                    UserCoinLogType::GROUP_CHAT,
+                );
         $this->userRepository->decrementUserCoins($user, $costGroupChat);
         //add image to group chat
         $image = null;

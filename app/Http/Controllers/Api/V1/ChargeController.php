@@ -34,30 +34,7 @@ class ChargeController extends Controller
     }
 
 
-    public function charge_co_for_owner(Request $request)
-    {
-        //done
-        $user = $request->user();
-        $count = $request->amount;
-        $userUuid = $request->id;
-        //        if ($user->charge_status == 0) {
-        //            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        //        }
-        if ($count < 0 || !is_numeric($count)) {
-            return Common::apiResponse(0, 'this value not allow', 422);
-        }
-        if (!$userUuid || !$count) {
-            return Common::apiResponse(0, __('api_responses.missing_params'), 404);
-        }
-        try {
-            $this->chargeService->chargeCoinsFromOwner($count, $user->id, $userUuid);
-        } catch (Exception $e) {
-            return Common::apiResponse(0, $e->getMessage(), 422);
-        }
-
-
-        return Common::apiResponse(true, 'Your recharge was successful');
-    }
+    
 
 
     public function chargeTo(Request $request)

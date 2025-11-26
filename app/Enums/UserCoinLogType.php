@@ -37,6 +37,8 @@ enum UserCoinLogType: string
     case SUPER_ADMIN_REWARD = 'super_admin_reward';
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
+    case GROUP_CHAT = 'group_chat';
+    
     public function meta(): array
     {
         return match ($this) {
@@ -206,7 +208,11 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
 
-
+            self::GROUP_CHAT => [
+                'sub_type' => 'group_chat',
+                'item_name' => 'group_chat',
+                'queue_job' => null,
+            ],
         };
     }
 }

@@ -16,7 +16,8 @@ class UserCoinLogHelper
         float $helperAmount = 0,
         ?string $fromDate = null,
         ?string $toDate = null,
-        ?string $userType = null
+        ?string $userType = null,
+        ?string $featureType = null,
     ): void {
         $meta = $type->meta();
 
@@ -31,9 +32,11 @@ class UserCoinLogHelper
             'from_date'     => $fromDate ?? now(),
             'to_date'       => $toDate ?? now(),
             'user_type'     => $userType,
+            'feature_type'  =>$featureType,
         ];
 
         if ($meta['queue_job']) {
+           
             $jobClass = $meta['queue_job'];
             dispatch(new $jobClass(
                 $userId,
@@ -43,7 +46,8 @@ class UserCoinLogHelper
                 $type->value,
                 $meta['sub_type'],
                 $itemNameOverride ?? $meta['item_name'],
-                $fromDate ?? now()
+                $fromDate ?? now(),
+                $featureType,
             ))->onQueue('log_user_coin');
         } else {
             UserCoinLog::create($logData);

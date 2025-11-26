@@ -55,38 +55,13 @@ class SpecialIdController extends Controller
         try {
             DB::beginTransaction();
 
-            // if ($pack) {
-            //     if ($pack->expire == 0) {
-            //         return Common::apiResponse(false, 'you already have this item permanently', null, 405);
-            //     }
-
-            //     if (!is_null($pack->expire) && $pack->expire > now()->timestamp) {
-            //         if ($ware->expire == 0) {
-            //             return Common::apiResponse(false, 'you already have this item in your pack', null, 405);
-            //         }
-
-            //         // Extend expire
-            //         $pack->expire = now()->addDays($ware->expire)->timestamp;
-            //     } elseif (is_null($pack->expire)) {
-            //         if ($ware->expire == 0) {
-            //             return Common::apiResponse(false, 'you already have this item in your pack', null, 405);
-            //         }
-
-            //         // Add more days
-            //         $pack->days += $ware->expire;
-            //     } else {
-            //         // expired => remove
-            //         $pack->delete();
-            //         $pack = null;
-            //     }
-
-            //     if ($pack) {
-            //         $pack->price += $total_price;
-            //         $pack->save();
-            //     }
-            // }
-
-            // If no pack, create new
+            UserCoinLogHelper::logByType(
+                    $user->id,
+                    $total_price,
+                    $user->di,
+                    UserCoinLogType::PACK,
+                    $ware->name
+                );
             
                 $pack = Pack::create([
                     'user_id'       => $user->id,

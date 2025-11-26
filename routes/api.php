@@ -233,7 +233,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
                 Route::get('/extra-data', [RoomController::class, 'extraDataRoom']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
                 Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
                 Route::post('/{id}/edit', [EnteranceController::class, 'update']);

@@ -80,10 +80,9 @@ class GiftLogService
             }
 
             // Get Room Data
-            if (isset($ownerId)){
+            if (isset($ownerId)) {
                 $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,	room_name,room_cover,play_num,hot,room_pass,session,microphone,charizma_status,type');
-
-            }else{
+            } else {
                 $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,room_cover,	room_name,hot,room_pass,session,microphone,charizma_status,type');
                 $ownerId = $room?->uid;
             }
@@ -104,13 +103,14 @@ class GiftLogService
             $sendPrice = (int)($totalPrice);
             if ($type !== 'bag') {
                 $amountBefore = $user->di;
-
+                $featureType = $room->type == 'audio' ? 'room audio' : 'room live';
                 UserCoinLogHelper::logByType(
                     $user->id,
                     -abs($sendPrice),
                     $amountBefore,
                     UserCoinLogType::GIFT,
-                    $gift?->name
+                    $gift?->name,
+                    featureType: $featureType
                 );
 
                 $updateUserWhenSendGift->send($sendPrice, $user);
@@ -128,13 +128,12 @@ class GiftLogService
 
             if (is_array($receiversIds) && count($receiversIds) > 1) {
                 $to_id = $receiversIds[0];
-                $to ="";
-                if($room->type == "audio"){
+                $to = "";
+                if ($room->type == "audio") {
                     $to    = 'الغرفة';
-                }else{
+                } else {
                     $to    = __('live');
                 }
-
             } else {
                 $to_id = $receiversIds[0];
                 $to    = @$receivedUsers->first()->name;
@@ -154,7 +153,6 @@ class GiftLogService
                     $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     // dd($cpIds);
                 } catch (\Exception $e) {
-
                 }
             }
 
@@ -175,17 +173,17 @@ class GiftLogService
 
             $price = ceil($realPrice);
 
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, isPlay: 0, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
-//            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
+            //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
             $settings = CacheHelper::cacheSettings();
             /** @var Collection $rememberForever*/
-            if (gettype($settings) !== 'array'){
+            if (gettype($settings) !== 'array') {
                 $settings = $settings->pluck('value', 'key')->toArray();
             }
 
             $roomBoomSettings = $settings['room_boom'] ?? 1;
-            if ($roomBoomSettings){
+            if ($roomBoomSettings) {
                 (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
             } else {
                 $tz = getTimezone();
@@ -237,7 +235,7 @@ class GiftLogService
 
 
 
-                $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
+            $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
 
 
 
@@ -249,9 +247,7 @@ class GiftLogService
                     $gift_data = $this->giftEvent($gift, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $number);
                     event(new GiftBannerEvent($gift_data));
                 } catch (\Exception $e) {
-
                 }
-
             }
 
             return $message;
@@ -356,7 +352,6 @@ class GiftLogService
                     $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     // dd($cpIds);
                 } catch (\Exception $e) {
-
                 }
             }
 
@@ -375,7 +370,7 @@ class GiftLogService
 
             $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-//            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
+            //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
             (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
 
             foreach ($receivedUsers as $receivedUser) {
@@ -508,7 +503,7 @@ class GiftLogService
     public function giftEvent($gift, $user, $totalPrice, $receivedUser, $receiversIds, $room, $number)
     {
 
-        $receiverGiftDTO = (count($receiversIds) > 1)? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromUser($receivedUser);
+        $receiverGiftDTO = (count($receiversIds) > 1) ? ReceiverGiftDTO::fromRoom($room) : ReceiverGiftDTO::fromUser($receivedUser);
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
             'gift_img'          => $gift->img,
@@ -538,7 +533,7 @@ class GiftLogService
             's_name'            => @$user->name ?? '',
             's_sender_level'    => @$user->total_sender_level,
             's_receiver_level'  => @$user->total_received_level,
-            'r_vip_level'       => $receiverGiftDTO->vipLevel ,
+            'r_vip_level'       => $receiverGiftDTO->vipLevel,
             'r_name'            => $receiverGiftDTO->name ?? '',
             'r_image'           => $receiverGiftDTO->avatar ?? '',
             'r_sender_level'    => $receiverGiftDTO->senderLevel,
