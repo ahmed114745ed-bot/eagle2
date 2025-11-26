@@ -143,6 +143,7 @@ class LeaderCCgameController extends Controller
                         ]
                     ];
 
+                    Log::info(numToStringNew($coin));
                     $json = json_encode($d);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id,  $roomId, false), 'heavyProcessing');
                 }
