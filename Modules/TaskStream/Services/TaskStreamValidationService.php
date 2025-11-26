@@ -5,8 +5,10 @@ namespace Modules\TaskStream\Services;
 use App\Helpers\Common;
 use App\Models\Room;
 use Exception;
+use Illuminate\Http\Response;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class TaskStreamValidationService
 {
@@ -25,14 +27,14 @@ class TaskStreamValidationService
         $liveRoom = Room::where(['id' => $taskRoomId, 'type' => 'live', 'is_live' => 1])->first();
 
         if (! $liveRoom){
-            throw new Exception(__('This room is not live in current time'));
+            throw new Exception(__('This room is not live in current time'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if ($liveRoom->uid === auth()->id()) {
             $taskStream = $this->taskStreamRepository->findByRoomId($liveRoom->id);
 
             if ($taskStream && $taskStream->rooms()->count() === 0) {
-                throw new Exception(__('You cannot join your own task stream while there is nobody.'));
+                throw new Exception(__('You cannot join your own task stream while there is nobody.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
@@ -48,7 +50,7 @@ class TaskStreamValidationService
         $liveRoom = $user->ownerRoom()->where('type', 'live')->where('is_live', 1)->first();
 
         if (! $liveRoom){
-            throw new Exception(__('You dont have live room or not live'));
+            throw new Exception(__('You dont have live room or not live'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $liveRoom;
@@ -62,7 +64,7 @@ class TaskStreamValidationService
         $taskStreamRoom = $this->taskStreamRepository->getExistenceTask($taskStream, $liveRoomId);
 
         if (!$taskStreamRoom) {
-            throw new Exception(__('Your room is not part of this task stream.'));
+            throw new Exception(__('Your room is not part of this task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $taskStreamRoom;
@@ -76,7 +78,7 @@ class TaskStreamValidationService
         $alreadyInTask = $this->taskStreamRoomRepository->checkExistenceTask($taskStreamId, $liveRoomId);
 
         if ($alreadyInTask) {
-            throw new Exception(__('This room is already part of another task stream.'));
+            throw new Exception(__('This room is already part of another task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -88,7 +90,7 @@ class TaskStreamValidationService
         $limit = Common::getConfig('max_task_stream') ?? 4;
 
         if ($taskStream->rooms()->count() >= $limit) {
-            throw new Exception(__('This task stream has reached the maximum number of rooms allowed.'));
+            throw new Exception(__('This task stream has reached the maximum number of rooms allowed.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -124,7 +126,7 @@ class TaskStreamValidationService
     {
         $existing = Room::whereIn('id', $allRoomIds)->where('type','live')->where('is_live',1)->pluck('id')->toArray();
         $missing = array_diff($allRoomIds, $existing);
-        if (! empty($missing)) throw new Exception(__('Some rooms are not live or do not exist: ') . implode(',', $missing));
-        if (! in_array($liveRoomId, $allRoomIds)) throw new Exception(__('Host must be part of the teams'));
+        if (! empty($missing)) throw new Exception(__('Some rooms are not live or do not exist: ') . implode(',', $missing), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        if (! in_array($liveRoomId, $allRoomIds)) throw new Exception(__('Host must be part of the teams'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

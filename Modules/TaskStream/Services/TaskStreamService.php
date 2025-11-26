@@ -2,7 +2,6 @@
 
 namespace Modules\TaskStream\Services;
 
-use App\Models\Pk;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
 use Exception;
@@ -11,6 +10,7 @@ use Modules\TaskStream\Entities\PkSession;
 use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 
 class TaskStreamService extends TaskStreamValidationService
@@ -147,7 +147,7 @@ class TaskStreamService extends TaskStreamValidationService
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
         if ($inviteeUserId == $authUser->id) {
-            throw new Exception(__('You cannot invite yourself.'));
+            throw new Exception(__('You cannot invite yourself.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if ($taskStream->room_id != $liveRoom->id) {
@@ -160,7 +160,7 @@ class TaskStreamService extends TaskStreamValidationService
             $ownerRoomExists = $this->taskStreamRepository->getExistenceTask($taskStream, $taskStream->room_id);
 
             if (! $ownerRoomExists && $roomsCount > 0) {
-                throw new Exception(__('You cannot send an invitation while your task is empty. Please join your task first.'));
+                throw new Exception(__('You cannot send an invitation while your task is empty. Please join your task first.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
@@ -172,7 +172,7 @@ class TaskStreamService extends TaskStreamValidationService
             $isInviteeInTask = $this->taskStreamRepository->getExistenceTask($taskStream, $inviteeLiveRoom->id);
 
             if ($isInviteeInTask) {
-                throw new Exception(__('This user is already part of your task stream.'));
+                throw new Exception(__('This user is already part of your task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             $this->validateRoomInAnotherTask($taskStream->id, $inviteeLiveRoom->id);
@@ -181,7 +181,7 @@ class TaskStreamService extends TaskStreamValidationService
         $existing = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $inviteeUserId);
 
         if ($existing) {
-            throw new Exception(__('This user already has a pending invitation.'));
+            throw new Exception(__('This user already has a pending invitation.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $this->taskStreamInvitationRepository->createInvitation($taskStream->id, $authUser->id, $inviteeUserId);
@@ -201,7 +201,7 @@ class TaskStreamService extends TaskStreamValidationService
         $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
 
         if (! $invitation) {
-            throw new Exception(__('No pending invitation found for this task.'));
+            throw new Exception(__('No pending invitation found for this task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if ($status === 'accept') {
