@@ -126,6 +126,9 @@ class LeaderCCgameController extends Controller
 
                 dispatch(new \App\Jobs\GameWalletJop($type == 1 ? -$coin : $coin));
 
+                info($type);
+                info($request->currency_diff);
+                info(Common::getConfig('game_map_win_coins'));
                 if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
 
                     $roomId = $user->nowRoom?->id;
