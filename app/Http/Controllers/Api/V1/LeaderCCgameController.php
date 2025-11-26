@@ -129,7 +129,7 @@ class LeaderCCgameController extends Controller
                 info('type', [$type]);
                 info('currency_diff', [(int) $request->currency_diff]);
                 info('game_map_win_coins', [Common::getConfig('game_map_win_coins')]);
-                if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
+//                if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
 
                     $roomId = $user->nowRoom?->id;
 
@@ -149,7 +149,7 @@ class LeaderCCgameController extends Controller
                     Log::info(numToStringNew($coin));
                     $json = json_encode($d);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id,  $roomId, false), 'heavyProcessing');
-                }
+//                }
 
                 return $this->json(0, 'success', [
                     'coins' => $user->di
