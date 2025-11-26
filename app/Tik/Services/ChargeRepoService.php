@@ -143,32 +143,7 @@ class ChargeRepoService
         }
     }
 
-    public function sendMoney(User $sender, $receiverUuid, $count)
-    {
-
-        $agency = $this->shippingAgencyRepository->findAgencyByOwnerId($sender->id, 1);
-        if (! $agency || $agency->status === 0) {
-            throw new Exception(__('api_responses.canNotCharge'));
-        }
-
-        if ($agency->is_frozen === 1) {
-            throw new Exception(__('api_responses.frozen_agency'));
-        }
-
-        $userReceiver = $this->userRepository->searchUser($receiverUuid);
-        if (! $userReceiver) {
-            throw new Exception('this user not found');
-        }
-
-        $this->userRepository->decrementUserCoins($sender, $count);
-        // $percentage = Common::getConf("one_usd_value_in_coins") ?? 1;4
-        $percentage = Common::getCoinsValue('user_coins');
-
-        $usd = $count / $percentage;
-        $this->charge($sender, $userReceiver, 'agency', $count, $usd);
-
-        return $userReceiver;
-    }
+  
 
     public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null, $searchKey = null)
     {

@@ -548,7 +548,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end questions
 
             Route::prefix('agencies')->middleware(['appFeatureEnable:agencies'])->group(function () {
-                Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
                 Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);

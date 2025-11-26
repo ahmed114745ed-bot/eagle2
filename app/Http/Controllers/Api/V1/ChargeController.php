@@ -234,45 +234,6 @@ class ChargeController extends Controller
     }
 
 
-
-    public function sendMoneyFoeHost(Request $request)
-    {
-        //done
-        //        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
-        //        if ($stop_all_charge == 1) {
-        //            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        //        }
-
-        $user = $request->user();
-
-        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
-
-        Common::checkUserAgencyFrozen($user);
-
-        $count = $request->amount;
-        $userUuid = $request->user_id;
-
-        if ($count < 0 || !is_numeric($count)) {
-            return Common::apiResponse(0, 'this value not allow', 422);
-        }
-
-        if ($user->di < $count) {
-            return Common::apiResponse(0, 'balance not enough');
-        }
-
-        try {
-            $userReceiver = $this->chargeService->sendMoney($user, $userUuid, $count);
-            if ($userReceiver instanceof User) {
-                (new UserAchievementService())->insertCharging($userReceiver, $count);
-            }
-            UserCommon::UserEarnedInvitation($userReceiver->id, $count);
-            $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
-            return Common::apiResponse(1, 'your recharge was successful', $data, 200);
-        } catch (Exception $e) {
-            return Common::apiResponse(0, $e->getMessage());
-        }
-    }
-
     public function chargeCoForUsersHistory(Request $request)
     {
         $userId = $request->user()->id;
