@@ -54,14 +54,6 @@ class SpecialIdController extends Controller
 
         try {
             DB::beginTransaction();
-
-            UserCoinLogHelper::logByType(
-                    $user->id,
-                    $total_price,
-                    $user->di,
-                    UserCoinLogType::PACK,
-                    $ware->name
-                );
             
                 $pack = Pack::create([
                     'user_id'       => $user->id,
