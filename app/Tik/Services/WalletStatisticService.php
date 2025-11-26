@@ -8,12 +8,14 @@ use App\Http\Resources\MomentGiftResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
 use App\Http\Resources\AudioGiftsListResource;
+use App\Tik\Repositories\UserCoinLogRepository;
 
 
 class WalletStatisticService
 {
     public function __construct(
-        private readonly GiftLogRepository $GiftLogRepository,
+        private readonly GiftLogRepository $giftLogRepository,
+        private readonly UserCoinLogRepository $userCoinLogRepository
     ) {}
 
 
@@ -24,11 +26,11 @@ class WalletStatisticService
 
         switch ($type) {
             case 1:
-                $list = $this->GiftLogRepository->listGiftReceiveLive($userId, $startDate, $endDate, $perPage, $page);
+                $list = $this->giftLogRepository->listGiftReceiveLive($userId, $startDate, $endDate, $perPage, $page);
                 break;
 
             case 2:
-                $list = $this->GiftLogRepository->listGiftReceiveAudio($userId, $startDate, $endDate, $perPage, $page);
+                $list = $this->giftLogRepository->listGiftReceiveAudio($userId, $startDate, $endDate, $perPage, $page);
                 break;
 
             case 3:
@@ -50,5 +52,10 @@ class WalletStatisticService
             'total_diamonds' => $list->sum('total'),
             'list' => $resource,
         ];
+    }
+
+    public function history($userId, $type,$startDate, $endDate, $page, $perPage)
+    {
+        return $this->userCoinLogRepository->index($userId, $type, $startDate, $endDate,$page, $perPage);
     }
 }

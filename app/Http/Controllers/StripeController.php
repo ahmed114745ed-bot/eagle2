@@ -238,7 +238,8 @@ class StripeController extends Controller
             $user->id,
             $coinLog->obtained_coins,
             $amountBefore,
-            UserCoinLogType::PAYMENT
+            UserCoinLogType::PAYMENT,
+            featureType:'stripe'
         );
     
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);

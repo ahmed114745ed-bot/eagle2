@@ -104,6 +104,7 @@ class ExchangeService
             $exValue,
             $amountBefore,
             UserCoinLogType::EXCHANGE,
+            featureType: -abs($diamonds),
         );
 
         $user->di += $exValue;

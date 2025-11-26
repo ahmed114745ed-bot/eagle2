@@ -2,20 +2,12 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use Carbon\Carbon;
-use App\Models\Pack;
-use App\Models\Ware;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Tik\Services\MallService;
-use Modules\Vip\Entities\UserVip;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\WareResource;
-use App\Http\Resources\WareResourceAll;
-use App\Http\Resources\WarePaddingResource;
-use App\Http\Resources\BestWareSaleResource;
+use App\Http\Resources\UserCoinLogResource;;
+
 use App\Tik\Services\WalletStatisticService;
-use Modules\Public\Http\Services\UserCounterServices;
 
 
 class WalletController extends Controller
@@ -27,5 +19,12 @@ class WalletController extends Controller
         $user = $request->user();
         $data = $this->walletStatisticService->diamondsStatistic($user->id, $request->type, $request->startDate, $request->endDate, $request->perPage, $request->page);
         return Common::apiResponse(true, '', $data, 200, null, 'list');
+    }
+
+    public function history(Request $request)
+    {
+        $user = $request->user();
+        $data = $this->walletStatisticService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
+        return Common::apiResponse(true, '', UserCoinLogResource::collection($data), 200);
     }
 }

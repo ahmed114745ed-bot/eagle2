@@ -39,9 +39,10 @@ trait PaymentTrait
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
-                 $coins->coin,
+                $coins->coin,
                 $amountBefore,
                 UserCoinLogType::PAYMENT,
+                featureType: $type,
             );
 
             $user->di += $coins->coin;
@@ -67,7 +68,7 @@ trait PaymentTrait
     {
 
         info('in trait');
-        if ($method === 'paypal'){
+        if ($method === 'paypal') {
             info('in paypal');
             $coinLog = $this->findCoinLogTrx($orderId, $method);
         } else {
@@ -113,7 +114,7 @@ trait PaymentTrait
     {
         $coinLog->update(['status' => 1]);
 
-        if ($newTrx){
+        if ($newTrx) {
             $coinLog->update(['trx' => $newTrx]);
         }
 
@@ -135,7 +136,6 @@ trait PaymentTrait
         if ($owner instanceof ShippingAgency) {
             return $this->processAgencyPayment($owner, $coinLog);
         }
-
     }
 
     private function processUserPayment(User $user, CoinLog $coinLog): void
@@ -153,7 +153,6 @@ trait PaymentTrait
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
 
         (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
-
     }
 
     private function processAgencyPayment(ShippingAgency $agency, CoinLog $coinLog): void
@@ -185,6 +184,4 @@ trait PaymentTrait
             'message' => 'Transaction completed successfully.',
         ]);
     }
-
-
 }

@@ -431,7 +431,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
                 Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
+                Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 
@@ -588,6 +588,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('wallet')->group(function () {
                 Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
+                Route::get('history', [WalletController::class, 'history']);
             });
 
 
