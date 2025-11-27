@@ -11,6 +11,7 @@
 |
 */
 
+use Modules\Wallet\Http\Controllers\WalletFieldController;
 use Modules\Wallet\Http\Controllers\WalletTemplateController;
 
 Route::group(
@@ -28,13 +29,13 @@ Route::group(
         Route::resource('wallet-templates', WalletTemplateController::class);
 
         Route::prefix('wallet-fields/{wallet_template_id}')->group(function () {
-            Route::get('/', [WalletTemplateController::class, 'index'])->name('wallet-fields.index');
-            Route::get('/create', [WalletTemplateController::class, 'create'])->name('wallet-fields.create');
-            Route::post('/', [WalletTemplateController::class, 'store'])->name('wallet-fields.store');
-            Route::get('/{id}', [WalletTemplateController::class, 'show'])->where('id', '[0-9]+')->name('wallet-fields.show');
-            Route::get('/{id}/edit', [WalletTemplateController::class, 'edit'])->where('id', '[0-9]+')->name('wallet-fields.edit');
-            Route::put('/{id}', [WalletTemplateController::class, 'update'])->where('id', '[0-9]+')->name('wallet-fields.update');
-            Route::delete('/{id}', [WalletTemplateController::class, 'destroy'])->where('id', '[0-9]+')->name('wallet-fields.destroy');
+            Route::get('/', [WalletFieldController::class, 'index'])->name('wallet-fields.index');
+            Route::get('/create', [WalletFieldController::class, 'create'])->name('wallet-fields.create');
+            Route::post('/', [WalletFieldController::class, 'store'])->name('wallet-fields.store');
+            Route::get('/{id}', [WalletFieldController::class, 'show'])->where('id', '[0-9]+')->name('wallet-fields.show');
+            Route::get('/{id}/edit', [WalletFieldController::class, 'edit'])->where('id', '[0-9]+')->name('wallet-fields.edit');
+            Route::put('/{id}', [WalletFieldController::class, 'update'])->where('id', '[0-9]+')->name('wallet-fields.update');
+            Route::delete('/{id}', [WalletFieldController::class, 'destroy'])->where('id', '[0-9]+')->name('wallet-fields.destroy');
         });
     }
 );

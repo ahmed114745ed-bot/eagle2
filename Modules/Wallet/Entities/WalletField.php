@@ -5,7 +5,7 @@ namespace Modules\Wallet\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
-class WalletFields extends Model
+class WalletField extends Model
 {
     use HasTranslations;
 
