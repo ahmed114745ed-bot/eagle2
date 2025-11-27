@@ -5,7 +5,9 @@ namespace App\Tik\Services;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Enums\UserCoinLogType;
+use App\Enums\UserDiamondLogType;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserDiamondLogHelper;
 use App\Tik\Repositories\ExchangeRepository;
 use App\Tik\Repositories\ExchangeLogRepository;
 
@@ -49,6 +51,14 @@ class ExchangeService
         ];
 
         $this->exchangeLogRepository->create($data);
+        UserDiamondLogHelper::logByType(
+            $user->id,
+            -abs($ex->diamonds),
+            $user->exchange_diamonds,
+            UserDiamondLogType::EXCHANGE,
+            $user->id,
+            $ex->value
+        );
         $user->exchange_diamonds -= $ex->diamonds;
 
         if ($user->exchange_diamonds <= 0) {
@@ -63,6 +73,8 @@ class ExchangeService
                 $amountBefore,
                 UserCoinLogType::EXCHANGE,
             );
+
+
 
             $user->di += $ex->value;
         } elseif ($ex->type == 1) {
@@ -92,6 +104,15 @@ class ExchangeService
         ];
 
         $this->exchangeLogRepository->create($data);
+        UserDiamondLogHelper::logByType(
+            $user->id,
+            -abs($diamonds),
+            $user->exchange_diamonds,
+            UserDiamondLogType::EXCHANGE,
+            $user->id,
+            $exValue
+        );
+
         $user->exchange_diamonds -= $diamonds;
 
         if ($user->exchange_diamonds <= 0) {
@@ -106,6 +127,7 @@ class ExchangeService
             UserCoinLogType::EXCHANGE,
             featureType: -abs($diamonds),
         );
+
 
         $user->di += $exValue;
 

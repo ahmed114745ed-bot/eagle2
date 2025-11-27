@@ -8,10 +8,12 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use Illuminate\Http\Request;
+use App\Enums\UserDiamondLogType;
 use Illuminate\Routing\Controller;
 use App\Facades\CustomNotification;
-use Modules\Moment\Entities\Moment;
 
+use Modules\Moment\Entities\Moment;
+use App\Helpers\UserDiamondLogHelper;
 use App\Exceptions\NotInfMoneyException;
 use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
@@ -110,6 +112,16 @@ class MomentUserGiftsController extends Controller
         $this->sendGift($number, $moment_id, $gift, $user, $receivedUsers);
         $price = $number * $gift->price;
         $updateUserWhenSendGift->update($price, $receivedUsers);
+        
+        UserDiamondLogHelper::logByType(
+            $receivedUsers->id,
+            $price,
+            $receivedUsers->monthly_diamond_received,
+            UserDiamondLogType::MOMENT,
+            $user->id,
+
+
+        );
 
         return Common::apiResponse(1, "  {$number} x ارسل هدية  " . " قيمتها {$gift->price} " . " الى {$to}");
     }
@@ -201,11 +213,11 @@ class MomentUserGiftsController extends Controller
 
     public function userGift($id)
     {
-       $momentsGift = MomentUserGift::selectRaw('user_id, moment_id, SUM(num) as num')
-        ->where('moment_id', $id)
-        ->groupBy('user_id', 'moment_id')
-        ->with('user')
-        ->get();
+        $momentsGift = MomentUserGift::selectRaw('user_id, moment_id, SUM(num) as num')
+            ->where('moment_id', $id)
+            ->groupBy('user_id', 'moment_id')
+            ->with('user')
+            ->get();
 
         return Common::apiResponse(1, 'successful', MomentGiftUserResource::collection($momentsGift), 200);
     }

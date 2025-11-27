@@ -15,8 +15,10 @@ use App\Models\AppFeature;
 use App\Models\FamilyRank;
 use App\Models\FamilyLevel;
 use App\Enums\UserCoinLogType;
+use App\Enums\UserDiamondLogType;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\UserDiamondLogHelper;
 use App\Classes\Enums\NotificationType;
 use App\Services\RoomCalculationService;
 use Illuminate\Database\Eloquent\Collection;
@@ -52,14 +54,18 @@ class SendGiftService
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
             if ($type !== 'bag') {
-                $featureType = $room->type == 'audio' ? 'room audio' : 'room live';
-                UserCoinLogHelper::logByType(
+                $featureType = $room->type === 'audio'
+                    ? UserDiamondLogType::GIFT_ROOM_AUDIO
+                    : UserDiamondLogType::GIFT_ROOM_LIVE;
+
+                UserDiamondLogHelper::logByType(
                     $receivedUser->id,
                     $totalPrice,
-                    $receivedUser->di,
-                    UserCoinLogType::GIFT,
-                    $gift?->name,
-                    featureType: $featureType
+                    $receivedUser->monthly_diamond_received,
+                    $featureType,
+                    $senderUser->id,
+
+
                 );
             }
             $cpId = @$cpIds[$receivedUser->id] ?? null;
