@@ -10,5 +10,5 @@ class WalletTemplate extends Model
     use HasTranslations;
 
     public $translatable = ['title'];
-    protected $fillable = ['title', 'type'];
+    protected $fillable = ['title', 'type', 'minimum', 'transfer_fee'];
 }
