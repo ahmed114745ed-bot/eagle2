@@ -10,6 +10,7 @@ class WalletDatabaseSeeder extends Seeder
     {
         $this->call([
             DigitalWalletTemplateSeeder::class,
+            OtherWalletTemplateSeeder::class,
             BankAccountTemplateSeeder::class
         ]);
     }

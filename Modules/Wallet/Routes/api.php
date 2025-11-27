@@ -18,3 +18,7 @@ Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLate
     Route::post('make_transfer', [WalletController::class, 'makeTransaction']);
     Route::get('/transactions', [WalletController::class, 'getWalletTransactions']);
 });
+
+Route::group(['prefix' => 'wallet-templates', 'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan']], function (){
+    Route::post('getTemplate', [WalletController::class, 'getTemplate']);
+});

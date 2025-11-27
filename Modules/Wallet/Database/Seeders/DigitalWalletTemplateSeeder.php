@@ -81,23 +81,6 @@ class DigitalWalletTemplateSeeder extends Seeder
                     'is_required' => 1,
                     'order' => 1,
                 ],
-                [
-                    'title' => [
-                        'ar' => 'المبلغ',
-                        'en' => 'Amount',
-                        'tr' => 'Tutar',
-                        'hi' => 'राशि',
-                    ],
-                    'placeholder' => [
-                        'ar' => '0',
-                        'en' => '0',
-                        'tr' => '0',
-                        'hi' => '0',
-                    ],
-                    'type' => 'number',
-                    'is_required' => 1,
-                    'order' => 2,
-                ],
             ];
 
             foreach ($fields as $field) {

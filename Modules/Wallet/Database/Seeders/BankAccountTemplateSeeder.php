@@ -12,10 +12,10 @@ class BankAccountTemplateSeeder extends Seeder
     {
         $walletData = [
             'title' => [
-                'ar' => 'البنك الأهلي المصري',
-                'en' => 'National Bank of Egypt',
-                'tr' => 'Mısır Ulusal Bankası',
-                'hi' => 'नेशनल बैंक ऑफ इजिप्ट',
+                'ar' => 'بيانات بنكية',
+                'en' => 'Bank Information',
+                'tr' => 'Banka Bilgileri',
+                'hi' => 'बैंक जानकारी',
             ],
             'type' => 'bank_account',
             'minimum' => 50.00,
@@ -78,23 +78,6 @@ class BankAccountTemplateSeeder extends Seeder
                 'type' => 'text',
                 'is_required' => 1,
                 'order' => 3,
-            ],
-            [
-                'title' => [
-                    'ar' => 'المبلغ',
-                    'en' => 'Amount',
-                    'tr' => 'Tutar',
-                    'hi' => 'राशि',
-                ],
-                'placeholder' => [
-                    'ar' => 'أدخل المبلغ',
-                    'en' => 'Enter amount',
-                    'tr' => 'Tutar girin',
-                    'hi' => 'राशि दर्ज करें',
-                ],
-                'type' => 'number',
-                'is_required' => 1,
-                'order' => 4,
             ],
         ];
 
