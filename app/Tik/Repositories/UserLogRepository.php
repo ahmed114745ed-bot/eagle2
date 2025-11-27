@@ -3,15 +3,16 @@
 namespace App\Tik\Repositories;
 
 use Carbon\Carbon;
-use App\Models\TimeLog;
-use App\Models\UserCoinLog;
 
-class UserCoinLogRepository extends AbstractRepository
+use App\Models\AllUserLog;
+
+
+class UserLogRepository extends AbstractRepository
 {
 
     public function __construct()
     {
-        parent::__construct(new UserCoinLog());
+        parent::__construct(new AllUserLog());
     }
 
 
@@ -23,18 +24,10 @@ class UserCoinLogRepository extends AbstractRepository
         return $this->model
             ->where('user_id', $userId)
             ->when($type == 'coin', function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNotIn('type', ['exchange'])
-                        ->orWhere(function ($q) {
-                            $q->where('sub_type', 'gift_logs')
-                                ->where('amount', '>', 0);
-                        });
-                });
+                $q->where('feature_type', 'coin');
             })
             ->when($type == 'diamonds', function ($q) {
-                $q->where(function ($q) {
-                    $q->whereIn('type', ['exchange', 'gift_logs']);
-                });
+                $q->where('feature_type', 'diamond');
             })
             ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
                 $q->whereBetween('created_at', [$start, $end]);

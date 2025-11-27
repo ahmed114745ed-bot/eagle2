@@ -15,11 +15,12 @@ class UserCoinLogResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this?->id,
+            'feature_type' => $this->feature_type,
             'type' => $this->type,
-            'amount' => $this->type == 'exchange' ? (int)$this->feature_type : $this->amount,
-            'item_name' => $this->item_name,
-            'feature_type' => $this->type == 'exchange' ? $this->amount : ($this->whenHas('feature_type') ?: ''),
+            'amount' =>  $this->amount,
+            'item_name' => __($this->type),
+            'get_by'    => @$this->user->name ?? '',
+            'coin' => $this->when(!is_null($this->coin), $this->coin),
             'created_at' => $this->created_at,
         ];
     }

@@ -6,16 +6,17 @@ use App\Helpers\Common;
 use App\Tik\Repositories\WareRepository;
 use App\Http\Resources\MomentGiftResource;
 use App\Tik\Repositories\GiftLogRepository;
+use App\Tik\Repositories\UserLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
 use App\Http\Resources\AudioGiftsListResource;
-use App\Tik\Repositories\UserCoinLogRepository;
+
 
 
 class WalletStatisticService
 {
     public function __construct(
         private readonly GiftLogRepository $giftLogRepository,
-        private readonly UserCoinLogRepository $userCoinLogRepository
+        private readonly UserLogRepository $userCoinLogRepository
     ) {}
 
 
