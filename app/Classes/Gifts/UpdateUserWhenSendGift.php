@@ -2,17 +2,19 @@
 
 namespace App\Classes\Gifts;
 
-use App\Classes\Enums\NotificationType;
-use App\Exceptions\NotInfMoneyException;
-use App\Jobs\IncreaseDiamondJob;
-use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
 use Mockery\Exception;
-use Modules\Vip\Entities\Vip;
 use App\Models\UserGift;
-use Illuminate\Support\Facades\Config;
+use Modules\Vip\Entities\Vip;
+use App\Enums\UserCoinLogType;
+use App\Jobs\IncreaseDiamondJob;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
+use App\Classes\Enums\NotificationType;
+use App\Exceptions\NotInfMoneyException;
+use App\Jobs\SendCustomOfficialMessageToUser;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
 
@@ -140,7 +142,12 @@ class UpdateUserWhenSendGift
      */
     public function send(int $totalCoins, User $senderUser)
     {
-
+        UserCoinLogHelper::logByType(
+            $senderUser->id,
+            -abs($totalCoins),
+            $senderUser->di,
+            UserCoinLogType::MOMENT,
+        );
         $affected = User::where('id', $senderUser->id)
             ->where('di', '>=', $totalCoins)
             ->update([

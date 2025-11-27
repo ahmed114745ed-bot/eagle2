@@ -29,6 +29,8 @@ enum UserCoinLogType: string
     case VIP = 'vip';
     case PACK = 'packs';
     case GIFT = 'gifts';
+    case GIFT_ROOM_AUDIO = 'gift room audio';
+    case GIFT_ROOM_LIVE = 'gift_room_live';
     case RETURN_CHAGE = 'return_charge';
     case CREATE_ROOM = 'create_room';
     case INVITATION_CODE = 'invitation_code';
@@ -38,7 +40,8 @@ enum UserCoinLogType: string
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
     case GROUP_CHAT = 'group_chat';
-    
+    case MOMENT = 'moment';
+
     public function meta(): array
     {
         return match ($this) {
@@ -55,6 +58,12 @@ enum UserCoinLogType: string
             self::APP_CHARGE => [
                 'sub_type' => 'charges',
                 'item_name' => 'app_charges',
+                'queue_job' => null,
+            ],
+
+            self::MOMENT => [
+                'sub_type' => 'moment',
+                'item_name' => 'moment',
                 'queue_job' => null,
             ],
 
@@ -168,6 +177,16 @@ enum UserCoinLogType: string
             self::GIFT => [
                 'sub_type' => 'gift_logs',
                 'item_name' => 'gift',
+                'queue_job' => \App\Jobs\LogUserCoinProfit::class,
+            ],
+            self::GIFT_ROOM_AUDIO => [
+                'sub_type' => 'gift_logs',
+                'item_name' => 'gift room ',
+                'queue_job' => \App\Jobs\LogUserCoinProfit::class,
+            ],
+            self::GIFT_ROOM_LIVE => [
+                'sub_type' => 'gift_logs',
+                'item_name' => 'gift room live',
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
             self::RETURN_CHAGE => [
