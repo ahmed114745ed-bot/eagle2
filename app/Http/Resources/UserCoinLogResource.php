@@ -15,8 +15,31 @@ class UserCoinLogResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        [$title, $description] = $this->getTitleAndDescription();
+
+        return [
+            'feature_type' => $this->feature_type,
+            'type' => $this->type,
+            'amount' => $this->amount,
+            'title' => $title,
+            'description' => $description,
+            'negative_sign' => $this->amount < 0,
+            'created_at' => Carbon::parse($this->created_at)
+                ->locale(app()->getLocale()) // Arabic or English
+                ->translatedFormat('d F Y - h:i A'),
+        ];
+    }
+
+    /**
+     * Build title and description based on the log type.
+     *
+     * @return array{0:string,1:string}
+     */
+    private function getTitleAndDescription(): array
+    {
         $title = '';
         $description = '';
+
         switch ($this->type) {
             case 'payment':
                 $title = __('buy') . '' . $this->amount . ' ' . _('coin');
@@ -29,17 +52,17 @@ class UserCoinLogResource extends JsonResource
 
             case 'exchanges_diamonds':
                 $title = __($this->type);
-                $description = __('diamond'). abs($this->amount) . ' ' .
-                   ' ← ' .  __('coin').abs($this->coin) ;
+                $description = __('diamond') . abs($this->amount) . ' ' .
+                    ' ← ' .  __('coin') . abs($this->coin);
                 break;
 
             case 'gift_room_audio':
-                $title = __($this->type);
-                $description = __('from user') . ' ' . $this->user->name;
-                break;
             case 'gift_room_live':
                 $title = __($this->type);
-                $description = __('from user') . ' ' . $this->user->name;
+                $userName = $this->user->name ?? null;
+                $description = $userName ? __('from user') . ' ' . $userName : '';
+                break;
+
             case 'moment':
                 $title = __($this->type);
                 $description = __('your moment');
@@ -50,16 +73,7 @@ class UserCoinLogResource extends JsonResource
                 $description = __($this->type);
                 break;
         }
-        return [
-            'feature_type' => $this->feature_type,
-            'type' => $this->type,
-            'amount' =>  $this->amount,
-            'title' => $title,
-            'description' => $description,
-            'negative_sign' => $this->amount < 0 ? true : false,
-            'created_at' => Carbon::parse($this->created_at)
-                ->locale(app()->getLocale()) // Arabic or English
-                ->translatedFormat('d F Y - h:i A'),
-        ];
+
+        return [$title, $description];
     }
 }
