@@ -247,7 +247,7 @@
     </div>
 
     <div class="settings-content">
-        <div id="brandSettings" class="settings-section active">
+        <div id="brandSettings" class="settings-section">
 
             <h3> {{  __('Brand settings')}}</h3>
 
@@ -462,42 +462,34 @@
         <!-- كود JavaScript -->
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                // Function to get query parameter by name
                 function getQueryParam(name) {
                     const urlParams = new URLSearchParams(window.location.search);
                     return urlParams.get(name);
                 }
 
-                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
                 const activeTab = getQueryParam("firsttab") || "brandSettings";
 
-                // Show the selected tab
                 showSection(activeTab);
             });
 
             function showSection(sectionId) {
-                // Remove active class from all sections
                 document.querySelectorAll('.settings-section').forEach(section => {
                     section.classList.remove('active');
                 });
 
-                // Add active class to the selected section
                 document.getElementById(sectionId).classList.add('active');
 
-                // Reset button styles
                 document.querySelectorAll('.settings-menu button').forEach(button => {
                     button.style.backgroundColor = '';
                     button.style.color = '';
                 });
 
-                // Highlight the active button
                 const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
                 if (activeButton) {
-                    activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-secondary-color)';
+                    activeButton.style.backgroundColor = '#ff9800';
+                    activeButton.style.color = 'white';
                 }
 
-                // Update the URL with the selected tab without reloading
                 const url = new URL(window.location);
                 url.searchParams.set("firsttab", sectionId);
                 window.history.pushState({}, "", url);
