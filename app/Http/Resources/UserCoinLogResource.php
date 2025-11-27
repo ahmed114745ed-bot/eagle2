@@ -59,7 +59,7 @@ class UserCoinLogResource extends JsonResource
             case 'gift_room_audio':
             case 'gift_room_live':
                 $title = __($this->type);
-                $userName = $this->user->name ?? null;
+                $userName = $this->user->name ?? '';
                 $description = $userName ? __('from user') . ' ' . $userName : '';
                 break;
 
