@@ -26,6 +26,7 @@
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
 
 @endphp
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 /* Add this CSS to your stylesheet */
 .radio-options-container {
@@ -230,6 +231,43 @@
         width: 200px;
 
     }
+
+    /* Responsive CSS */
+@media (max-width: 768px) {
+    .radio-options-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-input {
+        width: 14px;
+        height: 14px;
+    }
+
+    .settings-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .settings-content {
+        width: 100%;
+        padding: 10px;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
 </style>
 </head>
 
