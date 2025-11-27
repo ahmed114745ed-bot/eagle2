@@ -1341,4 +1341,10 @@ html.ltr .dropdown-menu {
             width: 1160px !important;
         }
     }
+
+    @media (max-width: 1400px) {
+        .content {
+            width: 1340px !important;
+        }
+    }
 </style>
