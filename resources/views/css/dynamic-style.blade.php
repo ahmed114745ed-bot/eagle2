@@ -35,7 +35,7 @@
     /*.ltr label {*/
     /*    margin: 0 !important;*/
     /*}*/
-/* 
+/*
     .ltr .fields-group .form-group{
 
        display: flex !important;
@@ -1216,11 +1216,11 @@ html.ltr .dropdown-menu {
         width: auto;
         order: 2;
     }
-    
+
    /* [lang="en"] .form-horizontal .form-group {
     margin-left: -15px;
     margin-right: -1500px;
-    
+
 }
 /* .col-sm-8 {
     width: 1000px;
@@ -1334,5 +1334,11 @@ html.ltr .dropdown-menu {
 
     #go-superadmin i {
         font-size: 15px;
+    }
+
+    @media (max-width: 1200px) {
+        .content {
+            width: 1160px !important;
+        }
     }
 </style>
