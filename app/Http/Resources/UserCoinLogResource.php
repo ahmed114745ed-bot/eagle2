@@ -29,7 +29,8 @@ class UserCoinLogResource extends JsonResource
 
             case 'exchanges_diamonds':
                 $title = __($this->type);
-                $description = abs($this->amount) . ' ' . __('diamonds') . '-> ' . $this->coin . ' ' . __('coin');
+                $description = __('diamond'). abs($this->amount) . ' ' .
+                   ' ← ' .  __('coin').abs($this->coin) ;
                 break;
 
             case 'gift_room_audio':
