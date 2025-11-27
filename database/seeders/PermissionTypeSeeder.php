@@ -1103,6 +1103,21 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
+            [
+                'name' => 'wallet fields',
+                'sort' => 41,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 41],
+                ],
+                'permissions' => [
+                    ['key' => 'wallet-template', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'wallet-fields', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ],
         ];
 
 

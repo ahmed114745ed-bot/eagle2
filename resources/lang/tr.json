@@ -296,6 +296,8 @@
     "Edit Bds": "BD düzenle",
     "Game Settings": "Oyun Ayarları",
     "game map win coins": "Oyun haritası kazanç jetonları",
+    "Browse game settings": "Oyun ayarlarını görüntüle",
+    "Edit game settings": "Oyun ayarlarını düzenle",
     "Delete Bds": "BD sil",
     "Show Bds": "BD göster",
     "Browse agency": "Ajansları göz at",
@@ -4034,6 +4036,17 @@
     "shipping_agency": "Nakliye Acentesi",
     "bd_form": "BD Formu",
     "host_agency": "Ev Sahibi Acentesi",
+    "Wallet Template": "Cüzdan Şablonu",
+    "Wallet Templates": "Cüzdan Şablonları",
+    "Wallet Fields": "Cüzdan Alanları",
+    "Create Wallet Fields": "Cüzdan Alanları Oluştur",
+    "Edit Wallet Fields": "Cüzdan Alanlarını Düzenle",
+    "Digital Wallet": "Dijital Cüzdan",
+    "Bank Account": "Banka Hesabı",
+    "Placeholder": "Yer tutucu",
+    "Order": "Sıra",
+    "email": "E-posta",
+    "Bank Account ": "Banka Hesabı",
     "upload_card_back": "📷 Kartın arka yüzünü yüklemek için tıklayın"
 
 

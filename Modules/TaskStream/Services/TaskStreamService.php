@@ -2,9 +2,9 @@
 
 namespace Modules\TaskStream\Services;
 
+use App\Exceptions\CValidationException;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
-use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\TaskStream\Entities\PkSession;
 use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
@@ -31,7 +31,7 @@ class TaskStreamService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function store()
     {
@@ -45,7 +45,7 @@ class TaskStreamService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function getIntoTask($taskStream)
     {
@@ -71,7 +71,7 @@ class TaskStreamService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function join($data)
     {
@@ -81,7 +81,7 @@ class TaskStreamService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function leave($data)
     {
@@ -136,9 +136,9 @@ class TaskStreamService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
-    public function sendInvitation(array $data): true
+    public function sendInvitation(array $data)
     {
         $authUser = auth()->user();
         $liveRoom = $this->validateAuthLiveRoom();
@@ -147,7 +147,7 @@ class TaskStreamService extends TaskStreamValidationService
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
         if ($inviteeUserId == $authUser->id) {
-            throw new Exception(__('You cannot invite yourself.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            throw new CValidationException(__('You cannot invite yourself.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if ($taskStream->room_id != $liveRoom->id) {
@@ -160,7 +160,7 @@ class TaskStreamService extends TaskStreamValidationService
             $ownerRoomExists = $this->taskStreamRepository->getExistenceTask($taskStream, $taskStream->room_id);
 
             if (! $ownerRoomExists && $roomsCount > 0) {
-                throw new Exception(__('You cannot send an invitation while your task is empty. Please join your task first.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+                throw new CValidationException(__('You cannot send an invitation while your task is empty. Please join your task first.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
@@ -172,7 +172,7 @@ class TaskStreamService extends TaskStreamValidationService
             $isInviteeInTask = $this->taskStreamRepository->getExistenceTask($taskStream, $inviteeLiveRoom->id);
 
             if ($isInviteeInTask) {
-                throw new Exception(__('This user is already part of your task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+                throw new CValidationException(__('This user is already part of your task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             $this->validateRoomInAnotherTask($taskStream->id, $inviteeLiveRoom->id);
@@ -181,16 +181,16 @@ class TaskStreamService extends TaskStreamValidationService
         $existing = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $inviteeUserId);
 
         if ($existing) {
-            throw new Exception(__('This user already has a pending invitation.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            throw new CValidationException(__('This user already has a pending invitation.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $this->taskStreamInvitationRepository->createInvitation($taskStream->id, $authUser->id, $inviteeUserId);
 
-        return true;
+        return $inviteeLiveRoom->id;
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function respondInvitation(array $data)
     {
@@ -201,7 +201,7 @@ class TaskStreamService extends TaskStreamValidationService
         $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
 
         if (! $invitation) {
-            throw new Exception(__('No pending invitation found for this task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            throw new CValidationException(__('No pending invitation found for this task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if ($status === 'accept') {
