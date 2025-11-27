@@ -3,6 +3,7 @@
 namespace Modules\Wallet\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
 
 class WalletTemplate extends Model
@@ -11,4 +12,9 @@ class WalletTemplate extends Model
 
     public $translatable = ['title'];
     protected $fillable = ['title', 'type', 'minimum', 'transfer_fee'];
+
+    public function fields(): HasMany
+    {
+        return $this->hasMany(WalletField::class, 'wallet_template_id');
+    }
 }

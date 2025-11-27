@@ -7,9 +7,11 @@ use App\Http\Resources\TransactionResource;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
 use Modules\Wallet\Http\Requests\MakeTransferRequest;
 use Modules\Wallet\Services\WalletService;
+use Modules\Wallet\Transformers\WalletTemplateResource;
 
 class WalletController extends Controller
 {
@@ -33,9 +35,19 @@ class WalletController extends Controller
         return Common::apiResponse(1, 'success', TransactionResource::collection( $result), 201);
     }
 
-    public function getTemplate()
+    public function getTemplate(Request $request): JsonResponse|AnonymousResourceCollection
     {
+        $type = $request->query('type');
 
+        if (!$type) {
+            return response()->json([
+                'message' => 'The "type" parameter is required.',
+            ], 422);
+        }
+
+        $result = $this->walletService->getTemplate($type);
+
+        return WalletTemplateResource::collection($result);
     }
 }
 
