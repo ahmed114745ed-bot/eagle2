@@ -62,6 +62,14 @@ class WalletTemplateController extends MainController
             'bank_account' => __('Bank Account'),
         ]);
 
+        $grid->column('minimum', __('Minimum'))->display(function ($value) {
+            return number_format($value, 2);
+        });
+
+        $grid->column('transfer_fee', __('Transfer Fee'))->display(function ($value) {
+            return number_format($value, 2);
+        });
+
         if (Admin::user()->can('browse-wallet-fields') || Admin::user()->can('*')) {
             $grid->column(__('Procedures'))->display(function () {
                 $url = url('admin/wallet-fields/'.$this->id);
@@ -100,6 +108,14 @@ class WalletTemplateController extends MainController
                 : __('Bank Account');
         });
 
+        $show->field('minimum', __('Minimum'))->as(function ($value) {
+            return number_format($value, 2);
+        });
+
+        $show->field('transfer_fee', __('Transfer Fee'))->as(function ($value) {
+            return number_format($value, 2);
+        });
+
         $show->field('created_at', __('Created At'))->as(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
@@ -124,9 +140,18 @@ class WalletTemplateController extends MainController
         $form->select('type', __('Type'))
             ->options([
                 'digital_wallet' => __('Digital Wallet'),
-                'bank_account' => __(' Bank Account'),
+                'bank_account' => __('Bank Account'),
             ])
-            ->rules('required|in:digital_wallet,bank_account');
+            ->rules('required|in:digital_wallet,bank_account')
+            ->when('bank_account', function (Form $form) {
+                $form->decimal('transfer_fee', __('Transfer Fee'))
+                    ->default(0.00)
+                    ->rules('required|numeric|min:0');
+            });
+
+        $form->decimal('minimum', __('Minimum'))
+            ->default(0.00)
+            ->rules('required|numeric|min:0');
 
         Admin::script('
             $(".collapse.in").removeClass("in"); // Bootstrap 3
