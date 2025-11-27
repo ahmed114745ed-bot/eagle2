@@ -42,7 +42,13 @@
 
     "room_cup": "Oda kupası",
     "group_chat": "Grup sohbeti",
-    "exchanges_diamonds": "Elmas değişimi",
+     "from user": "Kullanıcıdan",
+    "your moment": "Senin anın",
+    "through": "Vasıtasıyla",
+    "buy": "Satın al",
+    "exchanges_diamonds": "Coin’lere Dönüştür",
+       
+
     "gift_room_audio": "Sesli oda hediyesi",
     "gift_room_live": "Canlı oda hediyesi",
 

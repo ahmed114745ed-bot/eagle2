@@ -45,10 +45,13 @@
 
     "room_cup": "كأس الغرفة",
     "group_chat": "الدردشة الجماعية",
-    "exchanges_diamonds": "استبدال الماس",
+    "exchanges_diamonds": "تحويل  الى عملات",
     "gift_room_audio": "هدية الغرفة الصوتية",
     "gift_room_live": "هدية الغرفة الحية",
-
+"from user": "من المستخدم",
+    "your moment": "لحظتك",
+    "through": "عبر",
+    "buy": "شراء",
 
 
    "created by":"انشئ بواسطه",

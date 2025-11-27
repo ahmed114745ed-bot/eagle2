@@ -26,7 +26,8 @@ return new class extends Migration
                 get_by_id,
                 created_at,
                 updated_at,
-                'diamond' AS feature_type
+                'diamond' AS feature_type,
+                 null AS feature
             FROM user_diamond_logs
 
             UNION ALL
@@ -43,7 +44,8 @@ return new class extends Migration
                 NULL AS get_by_id,
                 created_at,
                 updated_at,
-                'coin' AS feature_type
+                'coin' AS feature_type,
+                feature_type AS feature
             FROM user_coin_logs;
         ");
     }
