@@ -22,6 +22,7 @@ class OnlineResource extends JsonResource
             'is_follow'            => $this->is_follow, // user data  ----
             'is_friend'            => $this->isFriends(),
             'chat_id' => $chatRoom->id ?? null,
+            'deleted_at' => $this->deleted_at ?? '',
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
     }

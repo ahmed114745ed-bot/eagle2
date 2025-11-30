@@ -20,7 +20,7 @@ class Bd extends Model
     protected $guarded = [];
 
     protected $attributes = [
-        'admin_users.type' => 'bd',
+        'type' => 'bd',
     ];
 
     public function appUser()
@@ -90,14 +90,14 @@ class Bd extends Model
                 ->first();
 
                 if (!$defaultBd) {
-                    $superAdmin = $bd->parent; 
+                    $superAdmin = $bd->parent;
                     $country = Country::find($superAdmin->country_id);
                     if (!$country) {
                         throw new Exception('Country not found for super admin.');
                     }
-        
+
                     $countryName = $country->e_name;
-        
+
                     $newBdId = DB::table('admin_users')->insertGetId([
                         'parent_id'  => $superAdmin->id,
                         'username'   => 'bd' . $countryName . 'default',
@@ -109,8 +109,8 @@ class Bd extends Model
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-        
-                   
+
+
                     $defaultBd = self::find($newBdId);
                 }
 

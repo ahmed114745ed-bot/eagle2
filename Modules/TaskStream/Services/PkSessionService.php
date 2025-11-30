@@ -2,15 +2,16 @@
 
 namespace Modules\TaskStream\Services;
 
+use App\Exceptions\CValidationException;
 use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
-use Exception;
 use Modules\TaskStream\Repositories\PkSessionRepository;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class PkSessionService extends TaskStreamValidationService
 {
@@ -24,14 +25,14 @@ class PkSessionService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      */
     public function start($data)
     {
         $liveRoom = $this->validateAuthLiveRoom();
         $taskRoom = $this->taskStreamRoomRepository->getRoomTask($liveRoom->id);
         if (! $taskRoom){
-            throw new Exception(__('You are not in any task.'));
+            throw new CValidationException(__('You are not in any task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
         $taskStream = $this->taskStreamRepository->findOrFail($taskRoom->task_stream_id);
         $allRoomIds = array_merge($data['team_1'], $data['team_2']);
@@ -41,7 +42,7 @@ class PkSessionService extends TaskStreamValidationService
         $count = $this->taskStreamRoomRepository->countRoomsInTask($taskStream->id, $allRoomIds);
 
         if ($count !== count($allRoomIds)) {
-            throw new Exception(__('One or more rooms do not belong to your task stream.'));
+            throw new CValidationException(__('One or more rooms do not belong to your task stream.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $endsAt = Carbon::now()->copy()->addMinutes($data['duration']);
@@ -60,7 +61,7 @@ class PkSessionService extends TaskStreamValidationService
     }
 
     /**
-     * @throws Exception
+     * @throws CValidationException
      * @throws \Throwable
      */
     public function close($data)

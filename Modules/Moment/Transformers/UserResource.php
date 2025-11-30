@@ -63,6 +63,7 @@ class UserResource extends JsonResource
             'special_color'    => @$this->color_id ?? '',
             'user_types' => $this->user_types,
             'chat_id' => $chatRoom->id ?? null,
+            'deleted_at' => $this->deleted_at,
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
     }
