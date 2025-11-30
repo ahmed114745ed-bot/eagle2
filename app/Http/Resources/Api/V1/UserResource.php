@@ -32,6 +32,7 @@ class UserResource extends JsonResource
              'special_id'           => $this->specialId?->ware?->id ?? 0,
              'notification_id'      => $this->notification_id ?: '',
              'name'                 => $this->name ?: "user #{$this->uuid}",
+             'deleted_at'           => $this->deleted_at,
              'nick_name'            => $this->nick_name,
              'number_of_fans'       => $this->number_of_fans,
              'number_of_followings' => $this->number_of_followings,

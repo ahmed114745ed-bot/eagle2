@@ -400,8 +400,8 @@ class ChatRoomService
     {
         // Get the second user in the chat room
         return $checkRoom->user_id == $user->id
-            ? User::find($checkRoom->user_id2)
-            : User::find($checkRoom->user_id);
+            ? User::withTrashed()->find($checkRoom->user_id2)
+            : User::withTrashed()->find($checkRoom->user_id);
     }
 
     public function handleChatOpenEvent($checkRoom, $user, $user2)
@@ -425,6 +425,7 @@ class ChatRoomService
             'room_owner_id' => $user2?->now_room_uid,
             'owner' => [
                 'uuid' => $user2->uuid ?? 0,
+                'deleted_at' => $user2?->deleted_at,
             ],
             'has_password' => $room && $room->room_pass ? true : false,
             'room' => [
@@ -455,7 +456,7 @@ class ChatRoomService
 
     public function deleteChatRoom($user, $userId2)
     {
-    
+
 
         $checkRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
             $query->where(function ($q) use ($user, $userId2) {
@@ -485,11 +486,11 @@ class ChatRoomService
         } else {
             $checkRoom->update(['user_2_deleted' => now()]);
         }
-    
+
 
         if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
             // Log::info("user_1_deleted &&  user_2_deleted ", [
-         
+
             //     'checkRoom'    => $checkRoom,
             // ]);
             try {
@@ -505,7 +506,7 @@ class ChatRoomService
             $checkRoom->delete();
         } else {
             // Log::info("checkRoom  ", [
-         
+
             //     'checkRoom'    => $checkRoom,
             // ]);
             ChatMessage::where('chat_room_id', $checkRoom->id)

@@ -179,7 +179,10 @@ $('#totop').on('click', function (e) {
     $.admin.loadScripts = function(arr) {
         var _arr = $.map(arr, function(src) {
 
-            if ($.inArray(src, $.admin.loadedScripts)) {
+            // if ($.inArray(src, $.admin.loadedScripts)) {
+            //     return;
+            // }
+            if ($.inArray(src, $.admin.loadedScripts) !== -1) {
                 return;
             }
 
