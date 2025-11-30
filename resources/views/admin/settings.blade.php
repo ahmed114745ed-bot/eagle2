@@ -26,6 +26,7 @@
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
 
 @endphp
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 /* Add this CSS to your stylesheet */
 .radio-options-container {
@@ -230,6 +231,43 @@
         width: 200px;
 
     }
+
+    /* Responsive CSS */
+@media (max-width: 768px) {
+    .radio-options-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-input {
+        width: 14px;
+        height: 14px;
+    }
+
+    .settings-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .settings-content {
+        width: 100%;
+        padding: 10px;
+    }
+
+    form {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
 </style>
 </head>
 
@@ -247,7 +285,7 @@
     </div>
 
     <div class="settings-content">
-        <div id="brandSettings" class="settings-section active">
+        <div id="brandSettings" class="settings-section">
 
             <h3> {{  __('Brand settings')}}</h3>
 
@@ -459,92 +497,51 @@
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
         </div>
-        <!-- كود JavaScript -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // Function to get query parameter by name
-                function getQueryParam(name) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    return urlParams.get(name);
-                }
-
-                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                const activeTab = getQueryParam("firsttab") || "brandSettings";
-
-                // Show the selected tab
-                showSection(activeTab);
-            });
-
-            function showSection(sectionId) {
-                // Remove active class from all sections
-                document.querySelectorAll('.settings-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-
-                // Add active class to the selected section
-                document.getElementById(sectionId).classList.add('active');
-
-                // Reset button styles
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = '';
-                    button.style.color = '';
-                });
-
-                // Highlight the active button
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                if (activeButton) {
-                    activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-secondary-color)';
-                }
-
-                // Update the URL with the selected tab without reloading
-                const url = new URL(window.location);
-                url.searchParams.set("firsttab", sectionId);
-                window.history.pushState({}, "", url);
-            }
-
-
-            function openFullScreen(imgElement) {
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("fullImage");
-
-                modal.style.display = "block";
-                modalImg.src = imgElement.src;
-            }
-
-    function closeFullScreen() {
-        document.getElementById("imageModal").style.display = "none";
+ <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // === الكود الأول: إدارة التبويبات ===
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
     }
 
+    const activeTab = getQueryParam("firsttab") || "brandSettings";
+    console.log("Active Tab on Load:", activeTab);
 
-    function toggleBackgroundInput() {
-        var type = document.getElementById("background_type").value;
-        document.getElementById("background_color_group").style.display = (type === "color") ? "block" : "none";
-        document.getElementById("background_image_group").style.display = (type === "image") ? "block" : "none";
+    showSection(activeTab);
 
-        updateBackgroundValue();
-    }
+    function showSection(sectionId) {
+        console.log("Switching to Section:", sectionId);
 
-    function updateBackgroundValue() {
-        var type = document.getElementById("background_type").value;
-        var hiddenInput = document.getElementById("app_background");
+        document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+        });
 
-        if (type === "color") {
-            hiddenInput.value = document.getElementById("background_color").value;
-        } else if (type === "image") {
-            var fileInput = document.getElementById("background_image");
-            if (fileInput.files.length > 0) {
-                hiddenInput.value = fileInput.files[0].name; // حفظ اسم الملف فقط
-            } else {
-                hiddenInput.value = "";
-            }
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        } else {
+            console.warn("Section not found:", sectionId);
         }
-    }
-    </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Updated selector to match your new class
+        document.querySelectorAll('.settings-menu button').forEach(button => {
+            button.style.backgroundColor = '';
+            button.style.color = '';
+        });
+
+        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+        if (activeButton) {
+            activeButton.style.backgroundColor = '#ff9800';
+            activeButton.style.color = 'white';
+        }
+
+        const url = new URL(window.location);
+        url.searchParams.set("firsttab", sectionId);
+        console.log("Updated URL:", url.toString());
+        window.history.pushState({}, "", url);
+    }
+
+    // === الكود الثاني: إعدادات Real Time ===
     const radioButtons = document.querySelectorAll('.radio-input');
     const fieldsContainers = {
         '0': document.getElementById('agora-fields'),
@@ -555,52 +552,85 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleFields() {
         const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-        // Hide all fields first
         Object.values(fieldsContainers).forEach(container => {
             container.style.display = 'none';
         });
 
-        // Show the selected one
         if (fieldsContainers[selectedValue]) {
             fieldsContainers[selectedValue].style.display = 'flex';
         }
     }
 
-    // Add event listeners to radio buttons
     radioButtons.forEach(radio => {
         radio.addEventListener('change', toggleFields);
     });
-
-    // Initialize the fields visibility
     toggleFields();
-});
 
-  document.addEventListener("DOMContentLoaded", function () {
-        let resetButton = document.getElementById('resetColors');
+    // === الكود الثالث: إعادة تعيين الألوان ===
+    let resetButton = document.getElementById('resetColors');
+    if (resetButton) {
+        resetButton.addEventListener('click', function() {
+            let colorInputs = {
+                'primary_color': "#FF9428",
+                'secondary_color': "#1A1A1A",
+                'text_primary_color': "#fdf8f8",
+                'text_secondary_color': "#c1b9b9",
+                'box_background_color': "#222222",
+                'table_background_color': "#c88213"
+            };
 
-        if (resetButton) {
-            resetButton.addEventListener('click', function () {
-                let colorInputs = {
-                    'primary_color': "#FF9428",
-                    'secondary_color': "#1A1A1A",
-                    'text_primary_color': "#fdf8f8",
-                    'text_secondary_color': "#c1b9b9",
-                    'box_background_color': "#222222",
-                    'table_background_color': "#c88213"
-                };
-
-                Object.keys(colorInputs).forEach(id => {
-                    let input = document.getElementById(id);
-                    if (input) {
-                        input.value = colorInputs[id];
-                    }
-                });
-
-                // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
-                document.getElementById('themeSettingsForm').submit();
+            Object.keys(colorInputs).forEach(id => {
+                let input = document.getElementById(id);
+                if (input) {
+                    input.value = colorInputs[id];
+                }
             });
+
+            document.getElementById('themeSettingsForm').submit();
+        });
+    }
+
+    // === الدوال الأخرى ===
+    function openFullScreen(imgElement) {
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("fullImage");
+        modal.style.display = "block";
+        modalImg.src = imgElement.src;
+    }
+
+    function closeFullScreen() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+
+    function toggleBackgroundInput() {
+        var type = document.getElementById("background_type").value;
+        document.getElementById("background_color_group").style.display = (type === "color") ? "block" : "none";
+        document.getElementById("background_image_group").style.display = (type === "image") ? "block" : "none";
+        updateBackgroundValue();
+    }
+
+    function updateBackgroundValue() {
+        var type = document.getElementById("background_type").value;
+        var hiddenInput = document.getElementById("app_background");
+        if (type === "color") {
+            hiddenInput.value = document.getElementById("background_color").value;
+        } else if (type === "image") {
+            var fileInput = document.getElementById("background_image");
+            if (fileInput.files.length > 0) {
+                hiddenInput.value = fileInput.files[0].name;
+            } else {
+                hiddenInput.value = "";
+            }
         }
-    });
+    }
+
+    // اجعل الدوال متاحة globally إذا كنت تحتاجها في HTML
+    window.openFullScreen = openFullScreen;
+    window.closeFullScreen = closeFullScreen;
+    window.toggleBackgroundInput = toggleBackgroundInput;
+    window.updateBackgroundValue = updateBackgroundValue;
+    window.showSection = showSection;
+});
 </script>
 
     </div>

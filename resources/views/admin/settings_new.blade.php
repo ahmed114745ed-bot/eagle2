@@ -797,9 +797,9 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"></i>
                                     </span>
 
-                                    <input 
-                                        type="text" 
-                                        id="secondary_color" 
+                                    <input
+                                        type="text"
+                                        id="secondary_color"
                                         name="secondary_color"
                                         class="form-control"
                                         value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
@@ -842,7 +842,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
 
-                        
+
 
                         {{-- <div class="col-md-6">
                             <div class="form-group">
@@ -863,7 +863,7 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['text_secondary_color'] ?? '#808080' }};"></i>
                                     </span>
 
-                                    <input 
+                                    <input
                                         type="text"
                                         id="text_secondary_color"
                                         name="text_secondary_color"
@@ -876,7 +876,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
 
-                    
+
                     </div>
 
                     <div class="form row">
@@ -914,7 +914,7 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6">
                             <div class="form-group" id="brand_background_color_group"
                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
-                                
+
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
 
                                 <div class="input-group colorpicker-element">
@@ -922,7 +922,7 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"></i>
                                     </span>
 
-                                    <input 
+                                    <input
                                         type="text"
                                         id="box_background_color"
                                         name="box_background_color"
@@ -1522,508 +1522,6 @@ use Modules\Vip\Entities\Vip;
             </div>
 
 
-            <div id="workSettings" class="settings-section">
-             
-                <div class="box-body">
-
-                        <div class="inner-settings-menu">
-                            @php $chargeTabType = request()->get('type', 'Experience'); @endphp
-
-                            <button onclick="changeInnerTab('Experience')" 
-                                    class="{{ $chargeTabType == 'Experience' ? 'active' : '' }}">
-                                {{ __('Experience settings') }}
-                            </button>
-
-                            <button onclick="changeInnerTab('coin')" 
-                                    class="{{ $chargeTabType == 'coin' ? 'active' : '' }}">
-                                {{ __('coin exchange') }}
-                            </button>
-                        </div>
-
-                        @php
-                        $oldExpData=cache('exp_percentages');
-                        @endphp
-                      
-                        <div id="Experience_tab" class="inner-tab-content" style="display:none;">
-                            <div class="form">
-                                <label class="d-block">{{ __('Experience settings:') }}</label>
-
-                                <div class="row mt-4">
-                                    <!-- Wealth Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card exp-card-cont p-3 shadow" style="">
-                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                                    <h4 class="m-0">{{ __('wealth') }}</h4>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                        <div class="form-group">
-                                                                <label for="wealth_exp" class="form-label">{{ __('wealth') }}</label>
-                                                                <input type="text" id="wealth_exp" name="exp_sender_percentage"
-                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
-                                                                    class="form-control">
-                                                                <span class="form-text text-muted">1 coin = X EXP</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    @php
-                                                        $sender = Vip::where('type',2)->count();
-                                                    @endphp
-                                                    @if ($sender == 0)
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                <div class="col-md-12">
-                                                <div class="form-group">
-                                            <label for="wealth_gift_price">{{ __('gift price') }}</label>
-                                                        <input type="text" id="wealth_gift_price" name="test_calco"
-                                                            placeholder="{{  __('wealth_gift_price') }}"
-                                                            style="width: auto; display: inline-block;"
-                                                            value="{{ $settings['wealth_gift_price'] ?? '' }}"
-                                                            class="form-control" >
-                                                        <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                    </div>
-
-                                                    <script>
-                                                        document.addEventListener('DOMContentLoaded', function () {
-                                                            const expInput = document.getElementById('wealth_exp');
-                                                            const giftPriceInput = document.getElementById('wealth_gift_price');
-                                                            const resultSpan = document.getElementById('exp_result');
-
-                                                            function updateExpResult() {
-                                                                const expRate = parseFloat(expInput.value);
-                                                                const giftPrice = parseFloat(giftPriceInput.value);
-
-                                                                if (!isNaN(expRate) && !isNaN(giftPrice)) {
-                                                                    const totalExp = expRate * giftPrice;
-                                                                    resultSpan.textContent = `= ${totalExp} EXP`;
-                                                                } else {
-                                                                    resultSpan.textContent = '';
-                                                                }
-                                                            }
-
-                                                            expInput.addEventListener('input', updateExpResult);
-                                                            giftPriceInput.addEventListener('input', updateExpResult);
-
-                                                            // حساب أولي عند تحميل الصفحة
-                                                            updateExpResult();
-                                                        });
-                                                    </script>
-
-                                                    </div>
-                                                    <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-
-
-
-                                    <!-- Attraction Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card p-3 exp-card-cont shadow" style="">
-                                                <div class="card-header exp-card  d-flex justify-content-between align-items-center">
-                                                    <h4 class="m-0">{{ __('attraction') }}</h4>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                        <div class="form-group">
-                                                            <label for="attraction_exp" class="form-label">{{ __('attraction') }}</label>
-                                                            <input type="text" id="attraction_exp" name="exp_received_percentage"
-                                                                placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
-                                                                class="form-control">
-                                                            <span class="form-text text-muted">1 Diamond = X EXP</span>
-                                                        </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="attraction_gift_price">{{ __('gift price') }}</label>
-                                                            <input type="text" id="attraction_gift_price" name="test_calco"
-                                                                placeholder="{{  __('attraction_gift_price') }}"
-                                                                style="width: auto; display: inline-block;"
-                                                                value="{{ $settings['attraction_gift_price'] ?? '' }}"
-                                                                class="form-control" >
-                                                            <span id="attraction_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                        </div>
-                                                    </div>
-                                                    @php
-                                                        $receiver = Vip::where('type',1)->count();
-                                                    @endphp
-                                                    @if ($receiver == 0)
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                    <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-
-
-
-                                    <!-- Charge Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card exp-card-cont p-3 shadow" style="">
-                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                                    <h4 class="m-0">{{ __('charge') }}</h4>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                            <div class="form-group">
-                                                                <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
-                                                                <input type="text" id="charge_exp" name="exp_charge_percentage"
-                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                                                    class="form-control">
-                                                                <span class="form-text text-muted">1 coin = EXP</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="charge_gift_price">{{ __('coins') }}</label>
-                                                            <input type="text" id="charge_gift_price" name="test_calco"
-                                                                placeholder="{{  __('charge_gift_price') }}"
-                                                                style="width: auto; display: inline-block;"
-                                                                value="{{ $settings['charge_gift_price'] ?? '' }}"
-                                                                class="form-control">
-                                                            <span id="charge_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                        </div>
-                                                    </div>
-
-                                                    @php
-                                                        $charger = Vip::where('type',5)->count();
-                                                    @endphp
-                                                    @if ($charger == 0)
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                    <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-
-
-
-                                    <!-- Rooms Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card p-3 exp-card-cont shadow" style="">
-                                                <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                                    <h4 class="m-0">{{ __('Rooms') }}</h4>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                        <div class="form-group">
-                                                                <label for="rooms_exp" class="form-label">{{ __('Rooms') }}</label>
-                                                                <input type="text" id="rooms_exp" name="exp_room_percentage"
-                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
-                                                                    class="form-control">
-                                                                <span class="form-text text-muted">1 Diamond = EXP</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="rooms_gift_price">{{ __('gift price') }}</label>
-                                                            <input type="text" id="rooms_gift_price" name="test_calco"
-                                                                placeholder="{{  __('rooms_gift_price') }}"
-                                                                style="width: auto; display: inline-block;"
-                                                                value="{{ $settings['rooms_gift_price'] ?? '' }}"
-                                                                class="form-control" >
-                                                            <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                        </div>
-                                                    </div>
-                                                    @php
-                                                        $rooms = Vip::where('type',4)->count();
-                                                    @endphp
-                                                    @if ($rooms == 0)
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-
-                                                    <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-
-
-
-                                    <!-- cp Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.ovip-config') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card p-3 exp-card-cont shadow" style="">
-                                                <div class="card-header  exp-card d-flex justify-content-between align-items-center">
-                                                    <h4 class="m-0">{{ __('cp') }}</h4>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                        <div class="form-group">
-                                                                <label for="cp_exp" class="form-label">{{ __('cp') }}</label>
-                                                                <input type="text" id="cp_exp" name="exp_cp_percentage"
-                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
-                                                                    class="form-control">
-                                                                <span class="form-text text-muted">1 coin = EXP</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <label for="cp_gift_price">{{ __('gift price') }}</label>
-                                                            <input type="text" id="cp_gift_price" name="test_calco"
-                                                                placeholder="cp_gift_price"
-                                                                style="width: auto; display: inline-block;"
-                                                                value="{{ $settings['cp_gift_price'] ?? '' }}"
-                                                                class="form-control" >
-                                                            <span id="cp_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                        </div>
-                                                    </div>
-
-                                                    @php
-                                                        $cp = Vip::where('type',3)->count();
-                                                    @endphp
-                                                    @if ($cp == 0)
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <a href="/admin/vips">{{  __('Go to Settings') }}</a>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-
-                                                    <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        
-                        <div id="coin_tab" class="inner-tab-content" style="display:none;">
-                            <div class="form">
-
-                                <div class="row mt-4">
-                                    <!-- Wealth Fields -->
-                                    <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                        <form action="{{ route('admin.exchange-coins') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="card exp-card-cont p-3 shadow" style="">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group d-flex align-items-center">
-                                                        <div class="form-group">
-                                                                <label for="coin_exp" class="form-label">{{ __('diamond') }}</label>
-                                                                <input type="text" id="coin_exp" name="exchange_coin_percentage"
-                                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $settings['exchange_coin_percentage'] ?? '' }}"
-                                                                    class="form-control">
-                                                                <span class="form-text text-muted">1 diamond = X coin</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                            
-
-
-                                                <div class="col-md-12">
-                                                    <div class="form-group coin-calculator">
-                                                        <label>{{ __('diamond') }}</label>
-                                                        <input type="text" class="user_coin_input form-control" placeholder="Enter value">
-                                                        <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
-                                                        <span class="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
-                                                    </div>
-                                                </div>
-
-                                                <script>
-                                                document.addEventListener('DOMContentLoaded', function () {
-                                                    document.querySelectorAll('.coin-calculator').forEach(container => {
-                                                        const userInput = container.querySelector('.user_coin_input');
-                                                        const exchangeRateInput = container.querySelector('.exchange_rate');
-                                                        const resultSpan = container.querySelector('.exp_result');
-
-                                                        function updateResult() {
-                                                            const userValue = parseFloat(userInput.value);
-                                                            const exchangeRate = parseFloat(exchangeRateInput.value);
-
-                                                            resultSpan.textContent = (!isNaN(userValue) && !isNaN(exchangeRate))
-                                                                ? `= ${(exchangeRate /100) * userValue } coin`
-                                                                : '';
-                                                        }
-
-                                                        userInput.addEventListener('input', updateResult);
-                                                        updateResult();
-                                                    });
-                                                });
-                                                </script>
-                                            <div class="col-12 d-flex gap-3 mt-3">
-                                                        <button type="submit"
-                                                            class="btn btn-primary">{{ __('Save') }}</button>
-                                                    </div>
-                                            </div>
-                                        </form>
-                                    </div>
-
-
-                                </div>
-
-                            </div>
-                        </div>
-                        
-
-                </div>
-            </div>
-
-
-            <div id="mobileLinks" class="settings-section">
-                <div class="form">
-
-
-                    <div class="row mt-4">
-                        <!-- android link -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card exp-card-cont p-3 shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('Android link') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
-                                                    <input type="text"  name="android_link" value="{{ $settings['android_link'] ?? ''}}"
-                                                        class="form-control">
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-
-
-                        <!-- ios link -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                               <div class="card exp-card-cont p-3 shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('ios link') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
-                                                    <input type="text"  name="ios_link" value="{{ $settings['ios_link'] ?? ''}}"
-                                                        class="form-control">
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-
-
-                        <!-- huawei  link -->
-                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="card exp-card-cont p-3 shadow" style="">
-                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('huawei link') }}</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
-                                                    <input type="text"  name="huawei_link" value="{{ $settings['huawei_link'] ?? ''}}"
-                                                        class="form-control">
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 d-flex gap-3 mt-3">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ __('Save') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
 
             <div id="paymentCredentialSettings" class="settings-section">
 
@@ -2037,22 +1535,20 @@ use Modules\Vip\Entities\Vip;
                                 <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card payment-card p-3 shadow">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
-{{--                                            @if (!$coin->status)--}}
-{{--                                                <div class="ribbon-banner-card">--}}
-{{--                                                    <span>{{ __('soon') }}</span>--}}
-{{--                                                </div>--}}
-{{--                                            @endif--}}
                                             <div class="d-flex align-items-center">
-                                                <input type="hidden" name="is_{{ $coin->type }}_active"
+                                               <input type="hidden" name="is_{{ $coin->type }}_active"
                                                     value="0">
+                                                    <input type="hidden" name="payment_getaway_id"
+                                                    value={{ $coin->id }}>
                                                 <input type="checkbox" id="{{ $coin->type }}Radio"
                                                     class="custom-payment-radio libraryRealTime"
                                                     name="is_{{ $coin->type }}_active" value="1"
                                                     {{ $coin->status == 1 && @$settings['is_' . $coin->type . '_active'] == '1' ? 'checked' : '' }}
-                                                    {{ $coin->status == 0 ? 'disabled' : '' }}>
+                                                    {{-- {{ $coin->status == 0 ? 'disabled' : '' }} --}}
+                                                    >
                                                 <label for="{{ $coin->type }}Radio" class="switch"></label>
                                             </div>
                                         </div>
@@ -2317,16 +1813,7 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>--}}
-{{--                                                        <input type="text" id="apple_redirect_uri"--}}
-{{--                                                            name="apple_redirect_uri" placeholder="apple_redirect_uri"--}}
-{{--                                                            value="{{ $settings['apple_redirect_uri'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
+
 
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -2342,18 +1829,7 @@ use Modules\Vip\Entities\Vip;
                                                             class="form-control">
                                                     </div>
                                                 </div>
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="apple_webhook_url" name="apple_webhook_url"--}}
-{{--                                                                       placeholder="apple_webhook_url"--}}
-{{--                                                                       value="{{ $settings['apple_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" readonly>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
+
                                                 @endif
                                             @if ($coin->type == 'google_pay')
                                                 <div class="col-md-6">
@@ -2675,657 +2151,6 @@ use Modules\Vip\Entities\Vip;
                                                         </div>
                                                 @endif
 
-{{--                                            @if ($coin->type == 'huawei_pay')--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label--}}
-{{--                                                                for="huawei_pay_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
-{{--                                                            <input type="text" id="huawei_pay_merchant_id"--}}
-{{--                                                                   name="huawei_pay_merchant_id" placeholder="merchant_id"--}}
-{{--                                                                   value="{{ $settings['huawei_pay_merchant_id'] ?? '' }}"--}}
-{{--                                                                   class="form-control" required>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="huawei_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="huawei_pay_webhook_url" name="huawei_pay_webhook_url"--}}
-{{--                                                                       placeholder="huawei_pay_webhook_url"--}}
-{{--                                                                       value="{{ $settings['huawei_pay_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="huawei_pay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'mada')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="mada_access_token">{{ __('admin.access_token') }}:</label>--}}
-{{--                                                        <input type="text" id="mada_access_token"--}}
-{{--                                                            name="mada_access_token" placeholder="mada_access_token"--}}
-{{--                                                            value="{{ $settings['mada_access_token'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="mada_public_key">{{ __('admin.public_key') }}:</label>--}}
-{{--                                                        <input type="text" id="mada_public_key"--}}
-{{--                                                            name="mada_public_key" placeholder="mada_public_key"--}}
-{{--                                                            value="{{ $settings['mada_public_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="mada_payment_address"--}}
-{{--                                                            name="mada_payment_address"--}}
-{{--                                                            placeholder="mada_payment_address"--}}
-{{--                                                            value="{{ $settings['mada_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="mada_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="mada_webhook_url" name="mada_webhook_url"--}}
-{{--                                                                       placeholder="mada_webhook_url"--}}
-{{--                                                                       value="{{ $settings['mada_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="mada_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'liq_pay')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="liqpay_public_key">{{ __('admin.public_key') }}:</label>--}}
-{{--                                                        <input type="text" id="liqpay_public_key"--}}
-{{--                                                            name="liqpay_public_key" placeholder="liqpay_public_key"--}}
-{{--                                                            value="{{ $settings['liqpay_public_key'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="liqpay_private_key">{{ __('admin.private_key') }}:</label>--}}
-{{--                                                        <input type="text" id="liqpay_private_key"--}}
-{{--                                                            name="liqpay_private_key" placeholder="liqpay_private_key"--}}
-{{--                                                            value="{{ $settings['liqpay_private_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="liqpay_payment_address"--}}
-{{--                                                            name="liqpay_payment_address"--}}
-{{--                                                            placeholder="liqpay_payment_address"--}}
-{{--                                                            value="{{ $settings['liqpay_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="liqpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="liqpay_webhook_url" name="liqpay_webhook_url"--}}
-{{--                                                                       placeholder="liqpay_webhook_url"--}}
-{{--                                                                       value="{{ $settings['liqpay_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="liqpay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'paytm')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paytm_merchant_key">{{ __('admin.merchant_key') }}:</label>--}}
-{{--                                                        <input type="text" id="paytm_merchant_key"--}}
-{{--                                                            name="paytm_merchant_key" placeholder="paytm_merchant_key"--}}
-{{--                                                            value="{{ $settings['paytm_merchant_key'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paytm_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
-{{--                                                        <input type="text" id="paytm_merchant_id"--}}
-{{--                                                            name="paytm_merchant_id" placeholder="paytm_merchant_id"--}}
-{{--                                                            value="{{ $settings['paytm_merchant_id'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paytm_merchant_website_link">{{ __('admin.merchant_website_link') }}:</label>--}}
-{{--                                                        <input type="text" id="paytm_merchant_website_link"--}}
-{{--                                                            name="paytm_merchant_website_link"--}}
-{{--                                                            placeholder="paytm_merchant_website_link"--}}
-{{--                                                            value="{{ $settings['paytm_merchant_website_link'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="paytm_payment_address"--}}
-{{--                                                            name="paytm_payment_address"--}}
-{{--                                                            placeholder="paytm_payment_address"--}}
-{{--                                                            value="{{ $settings['paytm_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="paytm_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="paytm_webhook_url" name="paytm_webhook_url"--}}
-{{--                                                                       placeholder="paytm_webhook_url"--}}
-{{--                                                                       value="{{ $settings['paytm_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="paytm_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'bkash')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label for="profile_id">{{ __('admin.appkey') }}:</label>--}}
-{{--                                                        <input type="text" id="bkash_appkey"--}}
-{{--                                                            name="bkash_appkey" placeholder="bkash_appkey"--}}
-{{--                                                            value="{{ $settings['bkash_appkey'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="bkash_app_secret">{{ __('admin.app_secret') }}:</label>--}}
-{{--                                                        <input type="text" id="bkash_app_secret"--}}
-{{--                                                            name="bkash_app_secret" placeholder="bkash_app_secret"--}}
-{{--                                                            value="{{ $settings['bkash_app_secret'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="bkash_username">{{ __('admin.username') }}:</label>--}}
-{{--                                                        <input type="text" id="bkash_username"--}}
-{{--                                                            name="bkash_username" placeholder="bkash_username"--}}
-{{--                                                            value="{{ $settings['bkash_username'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="bkash_password">{{ __('admin.password') }}:</label>--}}
-{{--                                                        <input type="text" id="bkash_password"--}}
-{{--                                                            name="bkash_password" placeholder="bkash_password"--}}
-{{--                                                            value="{{ $settings['bkash_password'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="bkash_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="bkash_payment_address"--}}
-{{--                                                            name="bkash_payment_address"--}}
-{{--                                                            placeholder="bkash_payment_address"--}}
-{{--                                                            value="{{ $settings['bkash_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="bkash_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="bkash_webhook_url" name="bkash_webhook_url"--}}
-{{--                                                                       placeholder="bkash_webhook_url"--}}
-{{--                                                                       value="{{ $settings['bkash_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="bkash_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'razor_pay')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label for="api_key">{{ __('admin.api_key') }}:</label>--}}
-{{--                                                        <input type="text" id="razorpay_api_key"--}}
-{{--                                                            name="razorpay_api_key" placeholder="razorpay_api_key"--}}
-{{--                                                            value="{{ $settings['razorpay_api_key'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="razorpay_api_secret">{{ __('admin.api_secret') }}:</label>--}}
-{{--                                                        <input type="text" id="razorpay_api_secret"--}}
-{{--                                                            name="razorpay_api_secret"--}}
-{{--                                                            placeholder="razorpay_api_secret"--}}
-{{--                                                            value="{{ $settings['razorpay_api_secret'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="razorpay_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="razorpay_payment_address"--}}
-{{--                                                            name="razorpay_payment_address"--}}
-{{--                                                            placeholder="razorpay_payment_address"--}}
-{{--                                                            value="{{ $settings['razorpay_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="razorpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="razorpay_webhook_url" name="razorpay_webhook_url"--}}
-{{--                                                                       placeholder="razorpay_webhook_url"--}}
-{{--                                                                       value="{{ $settings['razorpay_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="razorpay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'senang_pay')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="api_key">{{ __('admin.callback_url') }}:</label>--}}
-{{--                                                        <input type="text" id="senangpay_callback_url"--}}
-{{--                                                            name="senangpay_callback_url"--}}
-{{--                                                            placeholder="senangpay_callback_url"--}}
-{{--                                                            value="{{ $settings['senangpay_callback_url'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="senangpay_secret_key">{{ __('admin.secret_key') }}:</label>--}}
-{{--                                                        <input type="text" id="senangpay_secret_key"--}}
-{{--                                                            name="senangpay_secret_key"--}}
-{{--                                                            placeholder="senangpay_secret_key"--}}
-{{--                                                            value="{{ $settings['senangpay_secret_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="senangpay_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
-{{--                                                        <input type="text" id="senangpay_merchant_id"--}}
-{{--                                                            name="senangpay_merchant_id"--}}
-{{--                                                            placeholder="senangpay_merchant_id"--}}
-{{--                                                            value="{{ $settings['senangpay_merchant_id'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="senangpay_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="senangpay_payment_address"--}}
-{{--                                                            name="senangpay_payment_address"--}}
-{{--                                                            placeholder="senangpay_payment_address"--}}
-{{--                                                            value="{{ $settings['senangpay_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="senangpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="senangpay_webhook_url" name="senangpay_webhook_url"--}}
-{{--                                                                       placeholder="senangpay_webhook_url"--}}
-{{--                                                                       value="{{ $settings['senangpay_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="senangpay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'paymob_accept')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="callback_url">{{ __('admin.callback_url') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_callback_url"--}}
-{{--                                                            name="paymob_accept_callback_url"--}}
-{{--                                                            placeholder="paymob_accept_callback_url"--}}
-{{--                                                            value="{{ $settings['paymob_accept_callback_url'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paymob_accept_api_key">{{ __('admin.api_key') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_api_key"--}}
-{{--                                                            name="paymob_accept_api_key"--}}
-{{--                                                            placeholder="paymob_accept_api_key"--}}
-{{--                                                            value="{{ $settings['paymob_accept_api_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paymob_accept_iframe_id">{{ __('admin.iframe_id') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_iframe_id"--}}
-{{--                                                            name="paymob_accept_iframe_id"--}}
-{{--                                                            placeholder="paymob_accept_iframe_id"--}}
-{{--                                                            value="{{ $settings['paymob_accept_iframe_id'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paymob_accept_integration_id">{{ __('admin.integration_id') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_integration_id"--}}
-{{--                                                            name="paymob_accept_integration_id"--}}
-{{--                                                            placeholder="paymob_accept_integration_id"--}}
-{{--                                                            value="{{ $settings['paymob_accept_integration_id'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paymob_accept_hmac">{{ __('admin.hmac') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_hmac"--}}
-{{--                                                            name="paymob_accept_hmac"--}}
-{{--                                                            placeholder="paymob_accept_hmac"--}}
-{{--                                                            value="{{ $settings['paymob_accept_hmac'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paymob_accept_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="paymob_accept_payment_address"--}}
-{{--                                                            name="paymob_accept_payment_address"--}}
-{{--                                                            placeholder="paymob_accept_payment_address"--}}
-{{--                                                            value="{{ $settings['paymob_accept_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="paymob_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="paymob_webhook_url" name="paymob_webhook_url"--}}
-{{--                                                                       placeholder="paymob_webhook_url"--}}
-{{--                                                                       value="{{ $settings['paymob_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="paymob_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'flutter_wave')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="secret_key">{{ __('admin.secret_key') }}:</label>--}}
-{{--                                                        <input type="text" id="flutterwave_secret_key"--}}
-{{--                                                            name="flutterwave_secret_key"--}}
-{{--                                                            placeholder="flutterwave_secret_key"--}}
-{{--                                                            value="{{ $settings['flutterwave_secret_key'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="flutterwave_public_key">{{ __('admin.public_key') }}:</label>--}}
-{{--                                                        <input type="text" id="flutterwave_public_key"--}}
-{{--                                                            name="flutterwave_public_key"--}}
-{{--                                                            placeholder="flutterwave_public_key"--}}
-{{--                                                            value="{{ $settings['flutterwave_public_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="flutterwave_hash">{{ __('admin.hash') }}:</label>--}}
-{{--                                                        <input type="text" id="flutterwave_hash"--}}
-{{--                                                            name="flutterwave_hash" placeholder="flutterwave_hash"--}}
-{{--                                                            value="{{ $settings['flutterwave_hash'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="flutterwave_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="flutterwave_payment_address"--}}
-{{--                                                            name="flutterwave_payment_address"--}}
-{{--                                                            placeholder="flutterwave_payment_address"--}}
-{{--                                                            value="{{ $settings['flutterwave_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="flutterwave_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="flutterwave_webhook_url" name="flutterwave_webhook_url"--}}
-{{--                                                                       placeholder="flutterwave_webhook_url"--}}
-{{--                                                                       value="{{ $settings['flutterwave_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="flutterwave_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'pay_stack')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="public key">{{ __('admin.public_key') }}:</label>--}}
-{{--                                                        <input type="text" id="paystack_public_key"--}}
-{{--                                                            name="paystack_public_key"--}}
-{{--                                                            placeholder="paystack_public_key"--}}
-{{--                                                            value="{{ $settings['paystack_public_key'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paystack_secret_key">{{ __('admin.secret_key') }}:</label>--}}
-{{--                                                        <input type="text" id="paystack_secret_key"--}}
-{{--                                                            name="paystack_secret_key"--}}
-{{--                                                            placeholder="paystack_secret_key"--}}
-{{--                                                            value="{{ $settings['paystack_secret_key'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="merchant_email">{{ __('admin.merchant_email') }}:</label>--}}
-{{--                                                        <input type="text" id="paystack_merchant_email"--}}
-{{--                                                            name="paystack_merchant_email"--}}
-{{--                                                            placeholder="paystack_merchant_email"--}}
-{{--                                                            value="{{ $settings['paystack_merchant_email'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="return_url">{{ __('admin.return_url') }}:</label>--}}
-{{--                                                        <input type="text" id="paystack_return_url"--}}
-{{--                                                            name="paystack_return_url"--}}
-{{--                                                            placeholder="paystack_return_url"--}}
-{{--                                                            value="{{ $settings['paystack_return_url'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paystack_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="paystack_payment_address"--}}
-{{--                                                            name="paystack_payment_address"--}}
-{{--                                                            placeholder="paystack_payment_address"--}}
-{{--                                                            value="{{ $settings['paystack_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="paystack_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="paystack_webhook_url" name="paystack_webhook_url"--}}
-{{--                                                                       placeholder="paystack_webhook_url"--}}
-{{--                                                                       value="{{ $settings['paystack_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="paystack_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'ssl_commerz')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label for="store id">{{ __('admin.store_id') }}:</label>--}}
-{{--                                                        <input type="text" id="sslcommerz_store_id"--}}
-{{--                                                            name="sslcommerz_store_id"--}}
-{{--                                                            placeholder="sslcommerz_store_id"--}}
-{{--                                                            value="{{ $settings['sslcommerz_store_id'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="store_password">{{ __('admin.store_password') }}:</label>--}}
-{{--                                                        <input type="text" id="sslcommerz_store_password"--}}
-{{--                                                            name="sslcommerz_store_password"--}}
-{{--                                                            placeholder="sslcommerz_store_password"--}}
-{{--                                                            value="{{ $settings['sslcommerz_store_password'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="sslcommerz_payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="sslcommerz_payment_address"--}}
-{{--                                                            name="sslcommerz_payment_address"--}}
-{{--                                                            placeholder="sslcommerz_payment_address"--}}
-{{--                                                            value="{{ $settings['sslcommerz_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="sslcommerz_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="sslcommerz_webhook_url" name="sslcommerz_webhook_url"--}}
-{{--                                                                       placeholder="sslcommerz_webhook_url"--}}
-{{--                                                                       value="{{ $settings['sslcommerz_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="sslcommerz_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                                @if ($coin->type == 'zinipay')--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="store id">{{ __('admin.api_key') }}:</label>--}}
-{{--                                                            <input type="text" id="zinipay_api_key"--}}
-{{--                                                                   name="zinipay_api_key"--}}
-{{--                                                                   placeholder="zinipay_api_key"--}}
-{{--                                                                   value="{{ $settings['zinipay_api_key'] ?? '' }}"--}}
-{{--                                                                   class="form-control">--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label--}}
-{{--                                                                for="store_password">{{ __('admin.url') }}:</label>--}}
-{{--                                                            <input type="text" id="zinipay_url"--}}
-{{--                                                                   name="zinipay_url"--}}
-{{--                                                                   placeholder="zinipay_url"--}}
-{{--                                                                   value="{{ $settings['zinipay_url'] ?? '' }}"--}}
-{{--                                                                   class="form-control" required>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="zinipay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="zinipay_webhook_url" name="zinipay_webhook_url"--}}
-{{--                                                                       placeholder="zinipay_webhook_url"--}}
-{{--                                                                       value="{{ $settings['zinipay_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="zinipay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-                                            {{--                                                @foreach ($coin->settings as $setting) --}}
-                                            {{--                                                    <div class="col-md-6"> --}}
-                                            {{--                                                        <div class="form-group"> --}}
-                                            {{--                                                            <label for="{{ $setting->key }}"> --}}
-                                            {{--                                                                {{ __('admin.'.$setting->key) }} --}}
-                                            {{--                                                            </label> --}}
-                                            {{--                                                            @if ($setting->input_type == 'input') --}}
-                                            {{--                                                                <input type="text" --}}
-                                            {{--                                                                       id="{{ $setting->key }}" --}}
-                                            {{--                                                                       name="{{ $setting->key }}" --}}
-                                            {{--                                                                       placeholder="{{ $setting->key }}" --}}
-                                            {{--                                                                       value="{{ $settings[$setting->key] ?? $setting->value ?? '' }}" --}}
-                                            {{--                                                                       class="form-control" --}}
-                                            {{--                                                                       required> --}}
-                                            {{--                                                            @elseif($setting->input_type == 'file') --}}
-                                            {{--                                                                <input type="file" --}}
-                                            {{--                                                                       id="{{ $setting->key }}" --}}
-                                            {{--                                                                       name="{{ $setting->key }}" --}}
-                                            {{--                                                                       class="form-control" --}}
-                                            {{--                                                                       required> --}}
-                                            {{--                                                            @endif --}}
-                                            {{--                                                        </div> --}}
-                                            {{--                                                    </div> --}}
-                                            {{--                                                @endforeach --}}
                                         </div>
                                         <button type="submit"
                                             class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
@@ -3334,548 +2159,578 @@ use Modules\Vip\Entities\Vip;
                             </div>
                         @endforeach
 
-                        {{--                            <!-- Fawry Fields --> --}}
-                        {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.fawry') }}</h4> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_fawry_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="fawryRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_fawry_active" --}}
-                        {{--                                                value="1" --}}
-                        {{--                                                {{ @$settings['is_fawry_active'] == '1' ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="fawryRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $fawryImageFound = false; --}}
-                        {{--                                        @endphp --}}
 
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'fawry') --}}
-                        {{--                                            <img src="{{ asset('images/fawry.jpeg') }}" --}}
-                        {{--                                            alt="Fawry Payment" --}}
-                        {{--                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-
-                        {{--                                                @php --}}
-                        {{--                                                    $fawryImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$fawryImageFound) --}}
-                        {{--                                            <img src="{{ asset('images/dollar.jpg') }}" --}}
-                        {{--                                                 alt="Fawry Payment" --}}
-                        {{--                                                 class="img-fluid"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label> --}}
-                        {{--                                                <input type="text" id="fawry_secret" --}}
-                        {{--                                                       name="fawry_secret" placeholder="secret" --}}
-                        {{--                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label> --}}
-                        {{--                                                <input type="text" id="fawry_merchant_code" name="fawry_merchant_code" --}}
-                        {{--                                                       placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="fawry_utd_url" name="fawry_utd_url" --}}
-                        {{--                                                       placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="fawry_return_url">{{ __('admin.return_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="fawry_return_url" name="fawry_return_url" --}}
-                        {{--                                                       placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="fawry_url">{{ __('admin.fawry_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="fawry_url" name="fawry_url" --}}
-                        {{--                                                       placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
-
-                        {{--                            <!-- skyPay Fields --> --}}
-                        {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.skyPay') }}</h4> --}}
-                        {{--                                        <div class="ribbon-banner-card"> --}}
-                        {{--                                            <span>{{ __('soon') }}</span> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_skyPay_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="skyPayRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_skyPay_active" --}}
-                        {{--                                                value="1" {{ @$settings['is_skyPay_active'] ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="skyPayRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $skypayImageFound = false; --}}
-                        {{--                                        @endphp --}}
-
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'sky pay') --}}
-                        {{--                                                <img src="{{ asset('images/paysky.png') }}" --}}
-                        {{--                                                     alt="Skypay Payment" --}}
-                        {{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                                @php --}}
-                        {{--                                                    $skypayImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$skypayImageFound) --}}
-                        {{--                                        <img src="{{ asset('images/paysky.png') }}" --}}
-                        {{--                                        alt="Skypay Payment" --}}
-                        {{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="paysky_base_url">{{ __('admin.base_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="paysky_base_url" --}}
-                        {{--                                                       name="paysky_base_url" placeholder="base_url" --}}
-                        {{--                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="paysky_merchant_id" name="paysky_merchant_id" --}}
-                        {{--                                                       placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="paysky_terminal_id" name="paysky_terminal_id" --}}
-                        {{--                                                       placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="paysky_api_key">{{ __('admin.api_key') }}:</label> --}}
-                        {{--                                                <input type="text" id="paysky_api_key" name="paysky_api_key" --}}
-                        {{--                                                       placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
-
-                        {{--                            <!-- stripe Fields --> --}}
-                        {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.stripe') }}</h4> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_stripe_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="stripeRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_stripe_active" --}}
-                        {{--                                                value="1" {{ @$settings['is_stripe_active'] ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="stripeRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $stripeImageFound = false; --}}
-                        {{--                                        @endphp --}}
-
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'stripe') --}}
-                        {{--                                                <img src="{{ asset('images/stripe.png') }}" --}}
-                        {{--                                                     alt="Stripe Payment" --}}
-                        {{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                                @php --}}
-                        {{--                                                    $stripeImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$stripeImageFound) --}}
-                        {{--                                        <img src="{{ asset('images/stripe.png') }}" --}}
-                        {{--                                        alt="Stripe Payment" --}}
-                        {{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label> --}}
-                        {{--                                                <input type="text" id="stripe_test_secret_key" --}}
-                        {{--                                                       name="stripe_test_secret_key" placeholder="test_secret_key" --}}
-                        {{--                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="stripe_success_url">{{ __('admin.success_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="stripe_success_url" name="stripe_success_url" --}}
-                        {{--                                                       placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="stripe_cancel_url" name="stripe_cancel_url" --}}
-                        {{--                                                       placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="stripe_currency">{{ __('admin.currency') }}:</label> --}}
-                        {{--                                                <input type="text" id="stripe_currency" name="stripe_currency" --}}
-                        {{--                                                       placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label> --}}
-                        {{--                                                <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret" --}}
-                        {{--                                                       placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
-
-                        {{--                            <!-- opay Fields --> --}}
-                        {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.opay') }}</h4> --}}
-                        {{--                                        <div class="ribbon-banner-card"> --}}
-                        {{--                                            <span>{{ __('soon') }}</span> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_opay_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="opayRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_opay_active" --}}
-                        {{--                                                value="1" --}}
-                        {{--                                                {{ @$settings['is_opay_active'] == '1' ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="opayRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $opayImageFound = false; --}}
-                        {{--                                        @endphp --}}
-
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'opay') --}}
-                        {{--                                                <img src="{{ asset('images/opay.png') }}" --}}
-                        {{--                                                     alt="Opay Payment" --}}
-                        {{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                                @php --}}
-                        {{--                                                    $opayImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$opayImageFound) --}}
-                        {{--                                        <img src="{{ asset('images/opay.png') }}" --}}
-                        {{--                                        alt="Opay Payment" --}}
-                        {{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="opay_currency">{{ __('admin.currency') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_currency" name="opay_currency" --}}
-                        {{--                                                       placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="opay_secret_key">{{ __('admin.server_secret') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_secret_key" name="opay_secret_key" --}}
-                        {{--                                                    placeholder="server_secret" --}}
-                        {{--                                                    value="{{ $settings['opay_secret_key'] ?? '' }}" --}}
-                        {{--                                                    class="form-control"> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_public_key">{{ __('admin.public_key') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_public_key" --}}
-                        {{--                                                       name="opay_public_key" placeholder="public_key" --}}
-                        {{--                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_merchant_id" --}}
-                        {{--                                                       name="opay_merchant_id" placeholder="merchant_id" --}}
-                        {{--                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_country_code">{{ __('admin.country_code') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_country_code" --}}
-                        {{--                                                       name="country_code" placeholder="server_secret" --}}
-                        {{--                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="opay_base_url" --}}
-                        {{--                                                       name="opay_base_url" placeholder="base_url" --}}
-                        {{--                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
-
-                        {{--                            <!-- Cash free Fields --> --}}
-                        {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.cashfree') }}</h4> --}}
-                        {{--                                        <div class="ribbon-banner-card"> --}}
-                        {{--                                            <span>{{ __('soon') }}</span> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_cashfree_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="cashfreeRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_cashfree_active" --}}
-                        {{--                                                value="1" --}}
-                        {{--                                                {{ @$settings['is_cashfree_active'] == '1' ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="cashfreeRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $cashfreeImageFound = false; --}}
-                        {{--                                        @endphp --}}
-
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'cashfree') --}}
-                        {{--                                                <img src="{{ asset('images/cashfree.png') }}" --}}
-                        {{--                                                     alt="Opay Payment" --}}
-                        {{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                                @php --}}
-                        {{--                                                    $cashfreeImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$cashfreeImageFound) --}}
-                        {{--                                        <img src="{{ asset('images/cashfree.png') }}" --}}
-                        {{--                                        alt="Cahsfree Payment" --}}
-                        {{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="cashfree_currency">{{ __('admin.currency') }}:</label> --}}
-                        {{--                                                <input type="text" id="cashfree_currency" name="cashfree_currency" --}}
-                        {{--                                                       placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="opay_secret_key">{{ __('admin.app_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="cashfree_app_id" name="cashfree_app_id" --}}
-                        {{--                                                    placeholder="cashfree_app_id" --}}
-                        {{--                                                    value="{{ $settings['cashfree_app_id'] ?? '' }}" --}}
-                        {{--                                                    class="form-control"> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-
-
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_country_code">{{ __('admin.secret_key') }}:</label> --}}
-                        {{--                                                <input type="text" id="cashfree_secret_key" --}}
-                        {{--                                                       name="cashfree_secret_key" placeholder="cashfree_secret_key" --}}
-                        {{--                                                       value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label> --}}
-                        {{--                                                <input type="text" id="cashfree_base_url" --}}
-                        {{--                                                       name="cashfree_base_url" placeholder="base_url" --}}
-                        {{--                                                       value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
-
-                        {{--                             <!-- Apple Pay Fields --> --}}
-                        {{--                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;"> --}}
-                        {{--                                <form action="{{ route('admin.app.settings.update') }}" method="POST"> --}}
-                        {{--                                    @csrf --}}
-                        {{--                                <div class="card p-3 shadow" style="height: 495px;"> --}}
-                        {{--                                    <div class="card-header d-flex justify-content-between align-items-center"> --}}
-                        {{--                                        <h4 class="m-0">{{ __('admin.applepay') }}</h4> --}}
-                        {{--                                        <div class="d-flex align-items-center"> --}}
-                        {{--                                            <input type="hidden" name="is_applepay_active" value="0"> --}}
-                        {{--                                            <input type="checkbox" id="applepayRadio" --}}
-                        {{--                                                class="custom-payment-radio libraryRealTime" name="is_applepay_active" --}}
-                        {{--                                                value="1" --}}
-                        {{--                                                {{ @$settings['is_applepay_active'] == '1' ? 'checked' : '' }}> --}}
-                        {{--                                            <label for="applepayRadio" class="switch"></label> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="text-center my-3"> --}}
-                        {{--                                        @php --}}
-                        {{--                                            $applepayImageFound = false; --}}
-                        {{--                                        @endphp --}}
-
-                        {{--                                        @foreach ($paymentCoins as $coin) --}}
-                        {{--                                            @if ($coin->title == 'applepay') --}}
-                        {{--                                                <img src="{{ asset('images/applepay.jpg') }}" --}}
-                        {{--                                                     alt="apple Payment" --}}
-                        {{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                                @php --}}
-                        {{--                                                    $applepayImageFound = true; --}}
-                        {{--                                                @endphp --}}
-                        {{--                                            @endif --}}
-                        {{--                                        @endforeach --}}
-
-                        {{--                                        @if (!$applepayImageFound) --}}
-                        {{--                                        <img src="{{ asset('images/applepay.jpg') }}" --}}
-                        {{--                                        alt="apple Payment" --}}
-                        {{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;"> --}}
-                        {{--                                        @endif --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <div class="row"> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="apple_team_id" name="apple_team_id" --}}
-                        {{--                                                       placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}" --}}
-                        {{--                                                       class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label for="apple_key_id">{{ __('admin.app_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="apple_key_id" name="apple_key_id" --}}
-                        {{--                                                    placeholder="apple_key_id" --}}
-                        {{--                                                    value="{{ $settings['apple_key_id'] ?? '' }}" --}}
-                        {{--                                                    class="form-control"> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-
-
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="apple_client_id">{{ __('admin.apple_client_id') }}:</label> --}}
-                        {{--                                                <input type="text" id="apple_client_id" --}}
-                        {{--                                                       name="apple_client_id" placeholder="apple_client_id" --}}
-                        {{--                                                       value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label> --}}
-                        {{--                                                <input type="text" id="apple_redirect_uri" --}}
-                        {{--                                                       name="apple_redirect_uri" placeholder="apple_redirect_uri" --}}
-                        {{--                                                       value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-
-                        {{--                                        <div class="col-md-6"> --}}
-                        {{--                                            <div class="form-group"> --}}
-                        {{--                                                <label --}}
-                        {{--                                                    for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label> --}}
-                        {{--                                                    <input type="file" id="apple_service_file" --}}
-                        {{--                                                    name="apple_service_file" placeholder="apple_service_file" --}}
-                        {{--                                                     class="form-control" required> --}}
-
-                        {{--                                                    <input type="text" id="apple_service_file" disabled --}}
-                        {{--                                                       name="apple_service_file" placeholder="apple_service_file" --}}
-                        {{--                                                       value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control"> --}}
-                        {{--                                            </div> --}}
-                        {{--                                        </div> --}}
-                        {{--                                    </div> --}}
-                        {{--                                    <button type="submit" --}}
-                        {{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button> --}}
-                        {{--                                </div> --}}
-                        {{--                                </form> --}}
-                        {{--                            </div> --}}
                     </div>
                 </div>
             </div>
+            <div id="workSettings" class="settings-section">
+
+                <div class="box-body">
+
+                    <!-- Inner Tabs -->
+                    <div class="inner-settings-menu">
+                        @php $chargeTabType = request()->get('type', 'Experience'); @endphp
+
+                        <button onclick="changeInnerTab('Experience')"
+                                class="{{ $chargeTabType == 'Experience' ? 'active' : '' }}">
+                            {{ __('Experience settings') }}
+                        </button>
+
+                        <button onclick="changeInnerTab('coin')"
+                                class="{{ $chargeTabType == 'coin' ? 'active' : '' }}">
+                            {{ __('coin exchange') }}
+                        </button>
+                    </div>
+
+                    @php
+                        $oldExpData = cache('exp_percentages');
+                    @endphp
+
+
+                    <!-- EXPERIENCE TAB -->
+                    <div id="Experience_tab" class="inner-tab-content" style="display:none;">
+                        <div class="form">
+                            <label class="d-block">{{ __('Experience settings:') }}</label>
+
+                            <div class="row mt-4">
+
+                                <!-- Wealth -->
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+
+                                        <div class="card exp-card-cont p-3 shadow">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __('wealth') }}</h4>
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="wealth_exp">{{ __('wealth') }}</label>
+                                                        <input type="text" id="wealth_exp" name="exp_sender_percentage"
+                                                            value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
+                                                            placeholder="{{ __('Enter Exp') }}"
+                                                            class="form-control">
+                                                        <span class="form-text text-muted">1 coin = X EXP</span>
+                                                    </div>
+                                                </div>
+
+                                                @php $sender = Vip::where('type',2)->count(); @endphp
+                                                @if ($sender == 0)
+                                                    <div class="col-md-12">
+                                                        <a href="/admin/vips">{{ __('Go to Settings') }}</a>
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="wealth_gift_price">{{ __('gift price') }}</label>
+                                                        <input type="text" id="wealth_gift_price" name="test_calco"
+                                                            value="{{ $settings['wealth_gift_price'] ?? '' }}"
+                                                            placeholder="{{ __('wealth_gift_price') }}"
+                                                            class="form-control">
+                                                        <span id="exp_result" class="fw-bold ms-2"></span>
+                                                    </div>
+                                                </div>
+
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function () {
+                                                        const expInput = document.getElementById('wealth_exp');
+                                                        const giftPriceInput = document.getElementById('wealth_gift_price');
+                                                        const resultSpan = document.getElementById('exp_result');
+
+                                                        function updateExpResult() {
+                                                            const expRate = parseFloat(expInput.value);
+                                                            const giftPrice = parseFloat(giftPriceInput.value);
+
+                                                            if (!isNaN(expRate) && !isNaN(giftPrice)) {
+                                                                resultSpan.textContent = `= ${expRate * giftPrice} EXP`;
+                                                            } else {
+                                                                resultSpan.textContent = '';
+                                                            }
+                                                        }
+
+                                                        expInput.addEventListener('input', updateExpResult);
+                                                        giftPriceInput.addEventListener('input', updateExpResult);
+                                                        updateExpResult();
+                                                    });
+                                                </script>
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                                <!-- Attraction -->
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+
+                                        <div class="card p-3 shadow">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __('attraction') }}</h4>
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <label for="attraction_exp">{{ __('attraction') }}</label>
+                                                    <input type="text" id="attraction_exp" name="exp_received_percentage"
+                                                        value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
+                                                        placeholder="{{ __('Enter Exp') }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 Diamond = X EXP</span>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <label>{{ __('gift price') }}</label>
+                                                    <input type="text" id="attraction_gift_price" name="test_calco"
+                                                        value="{{ $settings['attraction_gift_price'] ?? '' }}"
+                                                        placeholder="{{ __('attraction_gift_price') }}"
+                                                        class="form-control">
+                                                    <span id="attraction_exp_result" class="fw-bold ms-2"></span>
+                                                </div>
+
+                                                @php $receiver = Vip::where('type',1)->count(); @endphp
+                                                @if ($receiver == 0)
+                                                    <div class="col-md-12">
+                                                        <a href="/admin/vips">{{ __('Go to Settings') }}</a>
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                                <!-- Charge -->
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                                        @csrf
+
+                                        <div class="card p-3 shadow">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __('charge') }}</h4>
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <label for="charge_exp">{{ __('charge') }}</label>
+                                                    <input type="text" id="charge_exp" name="exp_charge_percentage"
+                                                        value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
+                                                        placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <label for="charge_gift_price">{{ __('coins') }}</label>
+                                                    <input type="text" id="charge_gift_price" name="test_calco"
+                                                        value="{{ $settings['charge_gift_price'] ?? '' }}"
+                                                        placeholder="{{ __('charge_gift_price') }}"
+                                                        class="form-control">
+                                                    <span id="charge_exp_result" class="fw-bold ms-2"></span>
+                                                </div>
+
+                                                @php $charger = Vip::where('type',5)->count(); @endphp
+                                                @if ($charger == 0)
+                                                    <div class="col-md-12">
+                                                        <a href="/admin/vips">{{ __('Go to Settings') }}</a>
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+
+
+                                <!-- Rooms -->
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                                        @csrf
+
+                                        <div class="card p-3 shadow">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __('Rooms') }}</h4>
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <label for="rooms_exp">{{ __('Rooms') }}</label>
+                                                    <input type="text" id="rooms_exp" name="exp_room_percentage"
+                                                        value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
+                                                        placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <label>{{ __('gift price') }}</label>
+                                                    <input type="text" id="rooms_gift_price" name="test_calco"
+                                                        value="{{ $settings['rooms_gift_price'] ?? '' }}"
+                                                        placeholder="{{ __('rooms_gift_price') }}"
+                                                        class="form-control">
+                                                    <span id="rooms_exp_result" class="fw-bold ms-2"></span>
+                                                </div>
+
+                                                @php $rooms = Vip::where('type',4)->count(); @endphp
+                                                @if ($rooms == 0)
+                                                    <div class="col-md-12">
+                                                        <a href="/admin/vips">{{ __('Go to Settings') }}</a>
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+
+
+                                <!-- CP -->
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                                        @csrf
+
+                                        <div class="card p-3 shadow">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __('cp') }}</h4>
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <label for="cp_exp">{{ __('cp') }}</label>
+                                                    <input type="text" id="cp_exp" name="exp_cp_percentage"
+                                                        value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
+                                                        placeholder="{{ __('Enter Exp') }}"
+                                                        class="form-control">
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <label>{{ __('gift price') }}</label>
+                                                    <input type="text" id="cp_gift_price" name="test_calco"
+                                                        value="{{ $settings['cp_gift_price'] ?? '' }}"
+                                                        placeholder="cp_gift_price"
+                                                        class="form-control">
+                                                    <span id="cp_exp_result" class="fw-bold ms-2"></span>
+                                                </div>
+
+                                                @php $cp = Vip::where('type',3)->count(); @endphp
+                                                @if ($cp == 0)
+                                                    <div class="col-md-12">
+                                                        <a href="/admin/vips">{{ __('Go to Settings') }}</a>
+                                                    </div>
+                                                @endif
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- COIN TAB -->
+                    <div id="coin_tab" class="inner-tab-content" style="display:none;">
+                        <div class="form">
+
+                            <div class="row mt-4">
+
+                                <div class="col-md-6 mb-3" style="margin-top:40px;">
+                                    <form action="{{ route('admin.exchange-coins') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+
+                                        <div class="card p-3 shadow">
+
+                                            <div class="row">
+
+                                                <div class="col-md-12">
+                                                    <label for="coin_exp">{{ __('diamond') }}</label>
+                                                    <input type="text" id="coin_exp" name="exchange_coin_percentage"
+                                                        value="{{ $settings['exchange_coin_percentage'] ?? '' }}"
+                                                        placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                                    <span class="form-text text-muted">1 diamond = X coin</span>
+                                                </div>
+
+                                                <div class="col-md-12 coin-calculator mt-3">
+                                                    <label>{{ __('diamond') }}</label>
+                                                    <input type="text" class="user_coin_input form-control" placeholder="Enter value">
+                                                    <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
+                                                    <span class="exp_result fw-bold ms-2"></span>
+                                                </div>
+
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function () {
+                                                        document.querySelectorAll('.coin-calculator').forEach(container => {
+                                                            const userInput = container.querySelector('.user_coin_input');
+                                                            const rate = container.querySelector('.exchange_rate');
+                                                            const resultSpan = container.querySelector('.exp_result');
+
+                                                            function calc() {
+                                                                const val = parseFloat(userInput.value);
+                                                                const rateX = parseFloat(rate.value);
+
+                                                                if (!isNaN(val) && !isNaN(rateX)) {
+                                                                    resultSpan.textContent = `= ${(rateX / 100) * val} coin`;
+                                                                } else {
+                                                                    resultSpan.textContent = '';
+                                                                }
+                                                            }
+
+                                                            userInput.addEventListener('input', calc);
+                                                            calc();
+                                                        });
+                                                    });
+                                                </script>
+
+                                                <div class="col-12 d-flex gap-3 mt-3">
+                                                    <button class="btn btn-primary">{{ __('Save') }}</button>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            {{-- <div id="mobileLinks" class="settings-section">
+                <div class="form">
+
+
+                    <div class="row mt-4">
+                        <!-- android link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('Android link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="android_link" value="{{ $settings['android_link'] ?? ''}}"
+                                                        class="form-control">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- ios link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                               <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('ios link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="ios_link" value="{{ $settings['ios_link'] ?? ''}}"
+                                                        class="form-control">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- huawei  link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('huawei link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="huawei_link" value="{{ $settings['huawei_link'] ?? ''}}"
+                                                        class="form-control">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div> --}}
+
+            <div id="mobileLinks" class="settings-section">
+                <div class="form">
+                    <div class="row mt-4">
+
+                        <!-- Android Link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('Android link') }}</h4>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="form-label">{{ __('link') }}</label>
+                                                <input type="text" name="android_link"
+                                                    value="{{ $settings['android_link'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- iOS Link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('ios link') }}</h4>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="form-label">{{ __('link') }}</label>
+                                                <input type="text" name="ios_link"
+                                                    value="{{ $settings['ios_link'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Huawei Link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('huawei link') }}</h4>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="form-label">{{ __('link') }}</label>
+                                                <input type="text" name="huawei_link"
+                                                    value="{{ $settings['huawei_link'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
 
 
             <div id="appSettings" class="settings-section">
@@ -4922,17 +3777,17 @@ function showInnerContent(type) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.min.js"></script>
 <script>
 
-    
+
 
     // $('.colorpicker-element').colorpicker();
 
      $('.colorpicker-element').colorpicker({
-       
+
         align: 'left',     // Align dropdown to the right (for English dashboard)
         horizontal: true    // Show horizontal sliders
     });
 
-    
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
