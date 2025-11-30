@@ -482,4 +482,16 @@ class Agency extends Model
     {
         return $this->belongsTo(AdminUser::class, 'created_by');
     }
+
+
+    public function ownerUserId(): ?int
+    {
+        return $this->app_owner_id ?? null;
+    }
+
+    public function bdUserId(): ?int
+    {
+        return $this->bd_id ?? null;
+    }
+
 }
