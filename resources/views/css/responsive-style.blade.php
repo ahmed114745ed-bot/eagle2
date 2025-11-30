@@ -57,7 +57,7 @@
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
             position: relative;
-            /*right: 0 !important;*/
+            left: 0 !important;
         }
 
         .rtl .content-wrapper,
