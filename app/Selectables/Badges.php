@@ -25,8 +25,8 @@ class Badges extends Selectable
 
         $this->filter(function (Filter $filter) {
             $filter->expand();
-            $filter->like('name', 'name');
-            $filter->equal('priority', 'Priority');
+            $filter->like('name', __('name'));
+            $filter->equal('priority', __('Priority'));
         });
     }
 }

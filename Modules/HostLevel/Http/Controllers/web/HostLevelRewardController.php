@@ -129,7 +129,7 @@ class HostLevelRewardController extends MainController
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/host-levels');
-            $back = __(' back');
+            $back = __('back');
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
