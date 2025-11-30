@@ -56,7 +56,7 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: absolute;
+            position: relative;
             right: 0 !important;
         }
 
