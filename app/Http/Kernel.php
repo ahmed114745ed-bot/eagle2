@@ -122,6 +122,7 @@ class Kernel extends HttpKernel
         'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
+        'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
 
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,

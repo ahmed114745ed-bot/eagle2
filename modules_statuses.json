@@ -34,5 +34,6 @@
     "Form": true,
     "SuperAdmin": true,
     "TaskStream": true,
-    "UsersWallet": true
+    "UsersWallet": true,
+    "HostLevel": true
 }

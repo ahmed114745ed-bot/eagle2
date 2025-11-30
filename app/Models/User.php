@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
 use Modules\CP\Entities\Cp;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\Vip\Entities\Vip;
 use App\Traits\User\UserLevel;
 use Modules\Vip\Entities\OVip;
@@ -34,10 +33,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Entities\AdditionalInfo;
+use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
@@ -1767,20 +1768,20 @@ class User extends Authenticatable
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
 
-    
+
     public function hasHostAgency()
     {
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
-    
+
     public function hasShippingAgencyV2()
     {
-        return $this->hasOne(Agency::class, 'app_owner_id'); 
+        return $this->hasOne(Agency::class, 'app_owner_id');
     }
-    
+
     public function hasFamily()
     {
-        return $this->belongsTo(Family::class, 'family_id'); 
+        return $this->belongsTo(Family::class, 'family_id');
     }
     public function bdSalaries()
     {
@@ -2049,11 +2050,11 @@ class User extends Authenticatable
 
         $url = Common::uploadProfileUser('profile', $file, $profile->id, $newCount);
 
-    if ($profile->avatar && Storage::exists($profile->avatar)) {
-        Storage::delete($profile->avatar);
-    }
+        if ($profile->avatar && Storage::exists($profile->avatar)) {
+            Storage::delete($profile->avatar);
+        }
 
-    $profile->update(['avatar' => $url]);
+        $profile->update(['avatar' => $url]);
     }
 
     public function blockedUsers()
@@ -2309,8 +2310,35 @@ class User extends Authenticatable
     {
         return $this->hasMany(RoomVisitor::class, 'user_id');
     }
-    public function liveTimes() {
+    public function liveTimes()
+    {
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+    public function hostLevelWinner()
+    {
+        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id');
+    }
+
+    
+    public function hostLevelWinnerByLevelAndEvent($hostLevelId)
+    {
+        $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
+        return $this->hostLevelWinner()
+            ->where('host_level_id', $hostLevelId)
+            ->filterByEventType($eventType) ->exists();
+    }
+
+    public function lastHostLevelWinner()
+    {
+        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at'); 
+    }
+
+    /**
+     * Optionally, filter by event type
+     */
+    public function lastHostLevelWinnerByEvent($eventType)
+    {
+        return $this->lastHostLevelWinner()->filterByEventType($eventType);
+    }
 }
