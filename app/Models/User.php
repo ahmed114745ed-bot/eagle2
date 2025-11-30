@@ -41,6 +41,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Modules\UsersWallet\Entities\UserWallet;
 
 /**
  * @method static withoutAppends()
@@ -2312,4 +2313,8 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+    public function userWallet()
+    {
+        return $this->hasOne(UserWallet::class);
+    }
 }

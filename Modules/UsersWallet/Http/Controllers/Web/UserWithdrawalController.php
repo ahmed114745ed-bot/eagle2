@@ -1,0 +1,327 @@
+<?php
+
+namespace Modules\UsersWallet\Http\Controllers\Web;
+
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Models\User;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Modules\UsersWallet\Entities\UserWithdrawal;
+
+class UserWithdrawalController extends MainController
+{
+    public $permission_name = 'user-withdrawal';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__('User Withdrawals'))
+            ->body($this->grid()));
+    }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(__('User Withdrawal'))
+            ->body($this->detail($id)));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__('Edit Withdrawal'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__('New Withdrawal'))
+            ->body($this->form()));
+    }
+
+   
+    protected function grid()
+{
+    $grid = new Grid(new UserWithdrawal());
+    $grid->model()->orderBy('id','desc');
+    $grid->column('id', __('ID'))->sortable();
+
+ 
+    $grid->column('user_id', __('User'))->display(function ($name) {
+        $user = $this->user;
+        if (! $user) {
+            return __('No User');
+        }
+
+        return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+    });
+
+    $grid->column('amount', __('Amount'))->display(function ($value) {
+        return number_format($value, 2);
+    });
+
+    $grid->column('status', __('Status'))->using([
+        'pending' => __('Pending'),
+        'approved' => __('Approved'),
+        'rejected' => __('Rejected'),
+    ]);
+
+    $grid->column('created_at', __('Created At'))->display(function ($value) {
+        return Carbon::parse($value)->format('Y-m-d H:i');
+    });
+
+   
+    $grid->column('actions', __('Actions'))->display(function () {
+
+        $approveUrl = route('admin.withdrawals.approve', $this->id);
+        $rejectUrl  = route('admin.withdrawals.reject', $this->id);
+
+        if ($this->status === 'approved') {
+            return '<span class="text-success">' . __('Approved') . '</span>';
+        }
+
+        if ($this->status === 'rejected') {
+            return '<span class="text-danger">' . __('Rejected') . '</span>';
+        }
+
+        $approveText = __('Approved');
+        $rejectText  = __('Reject');
+
+        return <<<HTML
+            <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">
+                ✔ {$approveText}
+            </button>
+
+            <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">
+                ✖ {$rejectText}
+            </button>
+        HTML;
+    })->width(160);
+
+
+    Admin::script("
+            document.addEventListener('DOMContentLoaded', function () {
+
+                function sendRequest(url) {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': LA.token,
+                            'Accept': 'application/json',
+                        },
+                    }).then(res => res.json());
+                }
+
+                function handleAction(button, actionType) {
+
+                    button.addEventListener('click', function(e){
+                        e.preventDefault();
+
+                        const messages = {
+                            approve: {
+                                title: 'هل أنت متأكد من الموافقة على هذا السحب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#28a745'
+                            },
+                            reject: {
+                                title: 'هل تريد رفض طلب السحب؟',
+                                confirm: 'رفض',
+                                cancel: 'إلغاء',
+                                color: '#dc3545'
+                            },
+                            success: {
+                                ar: 'تمت العملية بنجاح!',
+                                en: 'Action completed successfully!',
+                            },
+                            error: {
+                                ar: 'حدث خطأ أثناء العملية',
+                                en: 'An error occurred!',
+                            }
+                        };
+
+                        const locale = document.documentElement.lang || 'ar';
+
+                        Swal.fire({
+                            title: messages[actionType].title,
+                            type: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: messages[actionType].confirm,
+                            cancelButtonText: messages[actionType].cancel,
+                            confirmButtonColor: messages[actionType].color,
+                            cancelButtonColor: '#6c757d',
+                        }).then((result) => {
+
+                            if(result.value){
+                                const url = button.dataset.url;
+                                sendRequest(url).then(res => {
+                                    if(res.success){
+                                        Swal.fire({
+                                            title: res.message || messages.success[locale],
+                                            type: 'success',
+                                            timer: 1800,
+                                            showConfirmButton: false
+                                        });
+
+                                        button.closest('tr').remove();
+                                    } else {
+                                        Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                    }
+                                }).catch(() => {
+                                    Swal.fire('خطأ', messages.error[locale], 'error');
+                                });
+                            }
+                        });
+                    });
+                }
+
+                document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+                document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+            });
+            ");
+
+    $grid->disableCreateButton();
+    return $grid;
+}
+
+
+protected function detail($id)
+{
+    $show = new Show(UserWithdrawal::findOrFail($id));
+
+    $show->field('id', __('ID'));
+
+    $show->field('user_id', __('User'))->as(function ($userId) {
+        $user = User::find($userId);
+        return $user ? $user->uuid . '_' . $user->name : '-';
+    });
+
+    $show->field('amount', __('Amount'))->as(function ($value) {
+        return number_format($value, 2);
+    });
+
+    $show->field('status', __('Status'))->as(function ($status) {
+        return match($status) {
+            'pending' => __('Pending'),
+            'approved' => __('Approved'),
+            'rejected' => __('Rejected'),
+            default => $status,
+        };
+    });
+
+    $show->html(__('Fields'), function ($model) {
+
+        $meta = $model->meta;
+
+        if (!$meta || !is_array($meta)) {
+            return '<p>-</p>';
+        }
+
+        $html = '<table class="table table-bordered" style="width:100%;">';
+        $html .= '<thead><tr><th style="width:30%">' . __('Field') . '</th><th>' . __('Value') . '</th></tr></thead><tbody>';
+
+        foreach ($meta as $key => $value) {
+
+            if (is_array($value)) {
+                $valueFormatted =
+                    '<pre style="white-space:pre-wrap;">' .
+                    e(json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) .
+                    '</pre>';
+            } else {
+                $valueFormatted = e($value);
+            }
+
+            $html .= sprintf(
+                '<tr><td><strong>%s</strong></td><td>%s</td></tr>',
+                e($key),
+                $valueFormatted
+            );
+        }
+
+        $html .= '</tbody></table>';
+
+        return $html;
+    });
+
+    $show->field('created_at', __('Created At'))->as(function ($value) {
+        return Carbon::parse($value)->format('Y-m-d H:i');
+    });
+
+    return $show;
+}
+
+    
+    protected function form()
+    {
+        $form = new Form(new UserWithdrawal());
+
+        $form->select('user_id', __('User'))
+            ->options(User::all()->pluck('name', 'id'))
+            ->rules('required');
+
+        $form->decimal('amount', __('Amount'))
+            ->rules('required|numeric|min:1')
+            ->default(0);
+
+        // الحقول الديناميكية
+        $form->textarea('meta', __('Meta (JSON)'))
+            ->placeholder(json_encode(['account_number' => '', 'bank_name' => '']))
+            ->rules('nullable|json');
+
+        $form->select('status', __('Status'))
+            ->options([
+                'pending' => __('Pending'),
+                'approved' => __('Approved'),
+                'rejected' => __('Rejected'),
+            ])
+            ->default('pending');
+
+        return $form;
+    }
+
+
+    public function approve($id)
+    {
+        $withdrawal = UserWithdrawal::findOrFail($id);
+        $wallet = $withdrawal->user->userWallet;
+
+        if ($withdrawal->status != 'pending') {
+            return response()->json(['message' => 'العملية تمت مسبقاً'], 400);
+        }
+
+        $wallet->balance -= $withdrawal->amount;
+        $wallet->pending_amount -= $withdrawal->amount;
+        $wallet->save();
+
+        $withdrawal->status = 'approved';
+        $withdrawal->save();
+
+        return response()->json([ 'success'=> true ,'message' => 'تمت الموافقة على السحب بنجاح']);
+    }
+
+    public function reject($id)
+    {
+        $withdrawal = UserWithdrawal::findOrFail($id);
+        $wallet = $withdrawal->user->userWallet;
+
+        if ($withdrawal->status != 'pending') {
+            return response()->json(['message' => 'العملية تمت مسبقاً'], 400);
+        }
+
+        $wallet->pending_amount -= $withdrawal->amount;
+        $wallet->save();
+
+        $withdrawal->status = 'rejected';
+        $withdrawal->save();
+
+        return response()->json(['success'=> true ,'message' => 'تم رفض الطلب وإزالة المبلغ من المعلّق']);
+    }
+
+
+}

@@ -58,6 +58,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -95,6 +96,11 @@ class AppServiceProvider extends ServiceProvider
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
+        if (!Str::hasMacro('unescape')) {
+            Str::macro('unescape', function ($value) {
+                return htmlspecialchars_decode($value, ENT_QUOTES);
+            });
+        }
     }
 
     public function dashboardAdminConfig(): void

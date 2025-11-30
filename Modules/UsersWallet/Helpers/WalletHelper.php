@@ -6,6 +6,7 @@ use Exception;
 use Modules\UsersWallet\Entities\UserWallet;
 use Modules\UsersWallet\Entities\WalletLog;
 use App\Models\Agency;
+use Modules\UsersWallet\Entities\UserWithdrawal;
 
 class WalletHelper
 {
@@ -69,4 +70,31 @@ class WalletHelper
             'after_amount' => $wallet->balance,
         ]);
     }
+
+
+    public static function createWithdrawal($userId, $amount, array $meta = [])
+    {
+        $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
+    
+        $currentBalance = $wallet->balance;
+        $currentPending  = $wallet->pending_amount;
+    
+        $available = $currentBalance - $currentPending;
+    
+        if ($available < $amount) {
+            throw new \Exception('الرصيد غير كافٍ لإجراء السحب.');
+        }
+    
+        $wallet->pending_amount += $amount;
+        $wallet->save();
+    
+        return UserWithdrawal::create([
+            'user_id' => $userId,
+            'amount'  => $amount,
+            'status'  => 'pending',
+            'meta'    => $meta,
+        ]);
+    }
+    
+
 }
