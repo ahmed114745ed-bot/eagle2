@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskStreamInvitation implements ShouldBroadcast
+class TaskStreamRespondInvitation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -28,7 +28,7 @@ class TaskStreamInvitation implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'task.stream.invitation';
+        return 'task.stream.respond.invitation';
     }
 
 
