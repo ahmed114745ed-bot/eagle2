@@ -94,8 +94,7 @@ class HostLevelController extends MainController
         $grid = new Grid(new HostLevel());
 
         $grid->column('id', __('Id'));
-        $grid->column('img', __('Img'));
-        $grid->column('level', __('Level'))->display(function ($path) {
+        $grid->column('img', __('Img'))->display(function ($path) {
             /** @var Ware $this */
             $defaultImage = asset("images/image.png");
             $url = getImagePath($path) ?? $defaultImage;
@@ -104,6 +103,7 @@ class HostLevelController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('level', __('Level'));
 
         $grid->column('diamonds', __('diamonds'))->display(function ($usd) {
 
