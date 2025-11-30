@@ -151,6 +151,7 @@
         display: flex;
         border-bottom: 1px solid #444;
         margin-bottom: 20px;
+        overflow-x: auto;
     }
 
     .tab-button {
@@ -445,8 +446,8 @@
                 {{-- <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button> --}}
 
                 <!-- <button onclick="showSection('targets_table')">{{ __('Targets') }}</button> -->
-                <button 
-                    onclick="showSection('targets_table')" 
+                <button
+                    onclick="showSection('targets_table')"
                     class="{{ $tab == 'targets_table' ? 'active' : '' }}">
                     {{ __('Targets') }}
                 </button>
@@ -636,7 +637,7 @@
                 @endforeach
             </div>
 
-            
+
 
             <div id="targets_table" class="settings-section">
                 <h3>{{ __('Targets table') }}</h3>
@@ -654,7 +655,7 @@
 
         <script>
 
-            
+
             function previewImage(input, previewId) {
                 const preview = document.getElementById(previewId);
                 const file = input.files[0];

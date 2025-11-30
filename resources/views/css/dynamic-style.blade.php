@@ -1234,4 +1234,13 @@ html.ltr .dropdown-menu {
     .payment-card {
         height: 580px;
     }
+
+    #area-Manager-select,
+    #country-select {
+        width: 190px !important;
+    }
+
+    .select2-container {
+        width: 190px !important;
+    }
 </style>
