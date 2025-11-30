@@ -1,0 +1,43 @@
+<?php
+
+namespace Modules\TaskStream\Events;
+
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TaskStreamInvitation implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $targetUserId;
+    public $data;
+
+    public function __construct($targetUserId, $data)
+    {
+        $this->targetUserId = $targetUserId;
+        $this->data = $data;
+    }
+
+    public function broadcastOn(): PrivateChannel
+    {
+        return new PrivateChannel('user.' . $this->targetUserId);
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'task.stream.invitation';
+    }
+
+
+    public function broadcastWith(): array
+    {
+        return [
+            'user_id' => $this->data['user_id'],
+            'user_name' => $this->data['user_name'],
+            'room_id' => $this->data['room_id'],
+        ];
+    }
+}

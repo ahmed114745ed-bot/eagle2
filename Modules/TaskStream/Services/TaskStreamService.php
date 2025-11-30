@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Repositories\User\UserRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\TaskStream\Entities\PkSession;
+use Modules\TaskStream\Events\TaskStreamInvitation;
 use Modules\TaskStream\Repositories\TaskStreamInvitationRepository;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
@@ -185,6 +186,10 @@ class TaskStreamService extends TaskStreamValidationService
         }
 
         $this->taskStreamInvitationRepository->createInvitation($taskStream->id, $authUser->id, $inviteeUserId);
+
+        $invitationData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id];
+
+        event(new TaskStreamInvitation($inviteeUserId, $invitationData));
 
         return $inviteeLiveRoom->id;
     }
