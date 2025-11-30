@@ -11,6 +11,7 @@ use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Services\BdAgencyHostSallaryService;
 use Modules\UsersWallet\Helpers\WalletHelper;
+use App\Jobs\UpdateUserWalletBalances;
 
 class UserSallaryObserver
 {
@@ -34,7 +35,6 @@ class UserSallaryObserver
         $this->updateOrCreateAgencySallary($userSalary);
         $this->updateBdHostSallary($userSalary,$originalDbValue);
 
-
         $newData = [
             'sallary' => $userSalary->sallary,
             'agency_sallary' => $userSalary->agency_sallary,
@@ -47,13 +47,13 @@ class UserSallaryObserver
             'dB' => $originalDbValue ?? 0,
         ];
         
-        WalletHelper::addAllBalancesByDiffs(
+        UpdateUserWalletBalances::dispatch(
             $userSalary->user_id,
             $newData,
             $oldData,
             $userSalary->user_agency_id,
             'sallary_update'
-        );
+        )->onQueue('wallet');
     }
 
     public function updating(UserSallary $userSalary)
@@ -69,7 +69,6 @@ class UserSallaryObserver
         $this->updateBdHostSallary($userSalary, $originalDbValue);
 
 
-
         $newData = [
             'sallary' => $userSalary->sallary,
             'agency_sallary' => $userSalary->agency_sallary,
@@ -82,13 +81,14 @@ class UserSallaryObserver
             'dB' => $originalDbValue ?? 0,
         ];
         
-        WalletHelper::addAllBalancesByDiffs(
+        UpdateUserWalletBalances::dispatch(
             $userSalary->user_id,
             $newData,
             $oldData,
             $userSalary->user_agency_id,
             'sallary_update'
-        );
+        )->onQueue('wallet');
+        
 
     }
 
