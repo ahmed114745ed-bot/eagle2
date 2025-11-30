@@ -27,7 +27,7 @@ class ReactMessageEvent implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return ['conversation-'.$this->check_room->id];
+        return ["user-$this->user2", 'conversation-'.$this->check_room->id];
     }
 
     public function broadcastAs()

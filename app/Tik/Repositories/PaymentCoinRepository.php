@@ -15,9 +15,9 @@ class PaymentCoinRepository extends AbstractRepository
     public function index($type = 'user')
     {
         return $this->model->with('coins')
-                           ->where('package_type',$type)
-                           ->where('status',true)
-                           ->get();
+            ->where('package_type', $type)
+            ->where('status', true)
+            ->get();
     }
 
     public function findById($paymentCoinId)
