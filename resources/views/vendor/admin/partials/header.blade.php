@@ -273,7 +273,7 @@
 
         @if (request()->is('admin*'))
             <a class="nav-item select-country">
-                <select id="area-Manager-select" class="form-control" style="width:190px;">
+                <select id="area-Manager-select" class="form-control">
                     <option value="">{{ __('Select area manager') }}</option>
                     @foreach($areaManagers as $areaManager)
                         <option
@@ -286,7 +286,7 @@
                 </select>
             </a>
             <a class="nav-item select-country">
-                <select id="country-select" class="form-control" style="width:190px;">
+                <select id="country-select" class="form-control">
                     <option value="">{{ __('Select Country...') }}</option>
                     @foreach($countries as $currentCountry)
                         <option
@@ -302,7 +302,7 @@
 
         @if (request()->is('areaManager*'))
             <a class="nav-item select-country">
-                <select id="country-select" class="form-control" style="width:190px;">
+                <select id="country-select" class="form-control">
                     <option value="">{{ __('Select Country...') }}</option>
                     @foreach($areaManagerCountries as $currentCountry)
                         <option

@@ -14,10 +14,7 @@ class PaymentCoinRepository extends AbstractRepository
 
     public function index($type = 'user')
     {
-        return $this->model
-            ->with(['coins' => function ($q) {
-                $q->select('*');
-            }])
+        return $this->model->with('coins')
             ->where('package_type', $type)
             ->where('status', true)
             ->get();
