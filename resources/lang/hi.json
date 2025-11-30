@@ -28,6 +28,8 @@
 "you do not meet the diamond requirement to pick this host level": "इस होस्ट लेवल को चुनने के लिए आप डायमंड आवश्यकता पूरी नहीं करते",
 "coin exchange": "कॉइन एक्सचेंज",
     "charge-reports": "चार्ज रिपोर्ट",
+    "Create Rule": "नियम बनाएं",
+"Edit Rule": "नियम संपादित करें",
     "type admin": "प्रकार प्रशासक",
     "Show superadmin": "देश प्रबंधक दिखाएँ",
     "bdsDescription": "दिखाए गए BD क्षेत्र प्रबंधक के देश से संबंधित हैं",

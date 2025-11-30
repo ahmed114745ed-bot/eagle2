@@ -66,6 +66,8 @@
 "you have already picked this host level before": "bu sunucu seviyesini daha önce seçtiniz",
 "host level not found": "sunucu seviyesi bulunamadı",
 "you do not meet the diamond requirement to pick this host level": "bu sunucu seviyesini seçmek için elmas gereksinimini karşılamıyorsunuz",
+"Create Rule": "Kural Oluştur",
+"Edit Rule": "Kuralı Düzenle",
     "History switch charge to superadmin": "Yükleme Geçmişi",
     "can not delete default area admin": "Varsayılan bölge yöneticisi silinemez",
     "Active Users": "Aktif Kullanıcılar",
