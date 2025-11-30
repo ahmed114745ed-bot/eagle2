@@ -15,6 +15,7 @@ class CreateHostLevelsTable extends Migration
     {
         Schema::create('host_levels', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->string('img');
             $table->bigInteger('level');
             $table->timestamps();

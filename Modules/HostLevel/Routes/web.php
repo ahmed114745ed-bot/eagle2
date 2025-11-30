@@ -2,6 +2,7 @@
 
 use Modules\HostLevel\Http\Controllers\web\HostLevelController;
 use Modules\HostLevel\Http\Controllers\web\HostLevelRewardController;
+use Modules\HostLevel\Http\Controllers\web\HostLevelSettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,11 +32,13 @@ Route::group(
     ],
     function () {
        Route::resource('host-levels', HostLevelController::class);
+       Route::resource('host-level-settings', HostLevelSettingController::class);
+        Route::post('host-level-settings/save', [HostLevelSettingController::class, 'save'])->name('host-level-settings.save');
 
        Route::prefix('host-level-reward/{host_level_id}')->group(function () {
-            Route::get('/', [HostLevelRewardController::class, 'index']);
-            Route::get('/{level}/create', [HostLevelRewardController::class, 'create']);
-            Route::post('/{level}', [HostLevelRewardController::class, 'store']);
+            Route::get('/', [HostLevelRewardController::class, 'index']);  
+            Route::get('/create', [HostLevelRewardController::class, 'create']);
+            Route::post('/', [HostLevelRewardController::class, 'store']);
             Route::get('/{id}', [HostLevelRewardController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [HostLevelRewardController::class, 'edit'])->where('id', '[0-9]+');
             Route::put('/{id}', [HostLevelRewardController::class, 'update'])->where('id', '[0-9]+');

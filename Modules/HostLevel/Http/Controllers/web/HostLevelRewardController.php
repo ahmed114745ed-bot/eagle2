@@ -2,12 +2,14 @@
 
 namespace Modules\HostLevel\Http\Controllers\web;
 
+use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Selectables\OVips;
 use App\Selectables\Wares;
 use App\Selectables\Badges;
+use Modules\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
@@ -21,7 +23,7 @@ class HostLevelRewardController extends MainController
      *
      * @var string
      */
-    protected $title = 'HostLevelReward';
+    protected $title = 'Host level reward';
     public $permission_name = 'host_level_reward';
 
     public function index(Content $content)
@@ -183,7 +185,6 @@ class HostLevelRewardController extends MainController
 
         $form->hidden('host_level_id')->value(request('host_level_id'));
 
-        $form->number('host_level_id', __('Host level id'));
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),

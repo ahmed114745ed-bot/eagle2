@@ -8,6 +8,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Layout\Column;
 use App\Admin\Controllers\MainController;
 use Modules\HostLevel\Entities\HostLevel;
 
@@ -18,7 +21,7 @@ class HostLevelController extends MainController
      *
      * @var string
      */
-    protected $title = 'HostLevel';
+    protected $title = 'Host level';
     public $permission_name = 'host_level';
 
 
@@ -26,7 +29,24 @@ class HostLevelController extends MainController
     {
         return parent::index($content
             ->title(trans($this->title))
-            ->body($this->grid()));
+             ->row(function (Row $row) {
+
+                   
+
+                    $row->column(12, function (Column $column) {
+                        $column->row($this->grid2());
+                        $column->row($this->grid());
+                    });
+                }));
+           // ->body($this->grid()));
+    }
+
+    protected function grid2()
+    {
+        $form = new Box();
+        $form->view('hostlevel::generalRole');
+
+        return $form;
     }
 
     /**
@@ -121,9 +141,9 @@ class HostLevelController extends MainController
     protected function form()
     {
         $form = new Form(new HostLevel());
-
+        $form->text('name', __('name'));
         $form->image('img', __('Img'));
-        $form->number('level', __('Level'));
+       $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
 
         return $form;
     }
