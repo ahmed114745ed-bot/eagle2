@@ -214,6 +214,10 @@ class TaskStreamService extends TaskStreamValidationService
 
             $invitation->update(['status' => 'accepted']);
 
+            $liveRoom = $this->validateAuthLiveRoom();
+            $invitationResponseData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id, 'status' => 'accepted'];
+            event(new TaskStreamInvitation($invitation->inviter_user_id, $invitationResponseData));
+
             return $result;
         }
 
