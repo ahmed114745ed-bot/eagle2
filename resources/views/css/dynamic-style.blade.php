@@ -1260,8 +1260,4 @@ html.ltr .dropdown-menu {
     body {
         overflow-x: auto !important;
     }
-
-    .wrapper {
-        min-width: max-content;
-    }
 </style>
