@@ -38,6 +38,7 @@ class TaskStreamInvitation implements ShouldBroadcast
             'user_id' => $this->data['user_id'],
             'user_name' => $this->data['user_name'],
             'room_id' => $this->data['room_id'],
+            'task_stream_id' => $this->data['task_stream_id'],
         ];
     }
 }
