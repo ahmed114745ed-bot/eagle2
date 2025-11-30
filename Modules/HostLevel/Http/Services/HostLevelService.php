@@ -99,20 +99,6 @@ class HostLevelService
         }
     }
 
-    public function userHostLevels($userId)
-    {
-        $diamonds = $this->computeDiamonds($userId);
-
-        if (!$diamonds) return [];
-
-        $hostLevels = HostLevel::with('rewards')
-            ->where('diamonds', '<=', $diamonds)
-            ->orderBy('level', 'asc')
-            ->get();
-
-        return $hostLevels;
-    }
-
 
     public function nextLevel($user)
     {
@@ -125,7 +111,9 @@ class HostLevelService
         } else {
             $nextLevel = HostLevel::orderBy('level', 'asc')->first();
         }
+
         $diamonds = $this->computeDiamonds($user->id);
+
         if ($nextLevel  && $lastPick) {
             $remaining = $nextLevel->diamonds - $diamonds;
             $exactlyValue    = @$nextLevel->diamonds;
@@ -152,13 +140,21 @@ class HostLevelService
             $progress  = 1;
             $remaining = 0;
         }
+        $hostLevels = HostLevel::with('rewards')
+            ->where('diamonds', '<=', $diamonds)
+            ->orderBy('level', 'asc')
+            ->get();
 
         return [
-            'next_level' => $nextLevel->level ?? 0,
-            'next_level_image' => $nextLevel->img ?? '',
-            'diamonds' => $diamonds,
-            'remaining' => $remaining < 0 ? 0 : $remaining,
-            'progress' => $progress,
+            'next' => [
+                'next_level' => $nextLevel->level ?? 0,
+                'next_level_image' => $nextLevel->img ?? '',
+                'diamonds' => $diamonds,
+                'remaining' => $remaining < 0 ? 0 : $remaining,
+                'progress' => $progress,
+            ],
+
+            'levels' => $hostLevels,
         ];
     }
 
@@ -167,13 +163,13 @@ class HostLevelService
         return Common::getSettingValue('host_level_type') ?? 'daily';
     }
 
-    private function computeDiamonds($userId): float
+    private function computeDiamonds($userId)
     {
         $eventType = $this->getEventType();
 
         return  GiftLog::where('receiver_id', $userId)
             ->filterByEventType($eventType)
-            ->selectRaw('COALESCE(SUM(giftNum * giftPrice), 0) as total_diamond')
+            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
             ->value('total_diamond');
     }
 }
