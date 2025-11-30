@@ -797,9 +797,9 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"></i>
                                     </span>
 
-                                    <input 
-                                        type="text" 
-                                        id="secondary_color" 
+                                    <input
+                                        type="text"
+                                        id="secondary_color"
                                         name="secondary_color"
                                         class="form-control"
                                         value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
@@ -842,7 +842,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
 
-                        
+
 
                         {{-- <div class="col-md-6">
                             <div class="form-group">
@@ -863,7 +863,7 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['text_secondary_color'] ?? '#808080' }};"></i>
                                     </span>
 
-                                    <input 
+                                    <input
                                         type="text"
                                         id="text_secondary_color"
                                         name="text_secondary_color"
@@ -876,7 +876,7 @@ use Modules\Vip\Entities\Vip;
                         </div>
 
 
-                    
+
                     </div>
 
                     <div class="form row">
@@ -914,7 +914,7 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6">
                             <div class="form-group" id="brand_background_color_group"
                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
-                                
+
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
 
                                 <div class="input-group colorpicker-element">
@@ -922,7 +922,7 @@ use Modules\Vip\Entities\Vip;
                                         <i style="background-color: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"></i>
                                     </span>
 
-                                    <input 
+                                    <input
                                         type="text"
                                         id="box_background_color"
                                         name="box_background_color"
@@ -1522,7 +1522,7 @@ use Modules\Vip\Entities\Vip;
             </div>
 
 
-            
+
             <div id="paymentCredentialSettings" class="settings-section">
 
                 <div class="form">
@@ -1535,17 +1535,20 @@ use Modules\Vip\Entities\Vip;
                                 <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card payment-card p-3 shadow">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
                                             <div class="d-flex align-items-center">
-                                                <input type="hidden" name="is_{{ $coin->type }}_active"
+                                               <input type="hidden" name="is_{{ $coin->type }}_active"
                                                     value="0">
+                                                    <input type="hidden" name="payment_getaway_id"
+                                                    value={{ $coin->id }}>
                                                 <input type="checkbox" id="{{ $coin->type }}Radio"
                                                     class="custom-payment-radio libraryRealTime"
                                                     name="is_{{ $coin->type }}_active" value="1"
                                                     {{ $coin->status == 1 && @$settings['is_' . $coin->type . '_active'] == '1' ? 'checked' : '' }}
-                                                    {{ $coin->status == 0 ? 'disabled' : '' }}>
+                                                    {{-- {{ $coin->status == 0 ? 'disabled' : '' }} --}}
+                                                    >
                                                 <label for="{{ $coin->type }}Radio" class="switch"></label>
                                             </div>
                                         </div>
@@ -2156,10 +2159,10 @@ use Modules\Vip\Entities\Vip;
                             </div>
                         @endforeach
 
-                      
+
                     </div>
                 </div>
-            </div> 
+            </div>
             <div id="workSettings" class="settings-section">
 
                 <div class="box-body">
@@ -2724,9 +2727,9 @@ use Modules\Vip\Entities\Vip;
 
 
 
-           
 
-   
+
+
 
 
 
@@ -3774,17 +3777,17 @@ function showInnerContent(type) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.min.js"></script>
 <script>
 
-    
+
 
     // $('.colorpicker-element').colorpicker();
 
      $('.colorpicker-element').colorpicker({
-       
+
         align: 'left',     // Align dropdown to the right (for English dashboard)
         horizontal: true    // Show horizontal sliders
     });
 
-    
+
 
 
 document.addEventListener("DOMContentLoaded", function() {

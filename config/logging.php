@@ -137,6 +137,11 @@ return [
             'path' => storage_path('logs/roomCup.log'),
             'level' => 'info',
         ],
+        'payPal' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/paypal.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];
