@@ -29,16 +29,16 @@ class HostLevelController extends MainController
     {
         return parent::index($content
             ->title(trans($this->title))
-             ->row(function (Row $row) {
+            ->row(function (Row $row) {
 
-                   
 
-                    $row->column(12, function (Column $column) {
-                        $column->row($this->grid2());
-                        $column->row($this->grid());
-                    });
-                }));
-           // ->body($this->grid()));
+
+                $row->column(12, function (Column $column) {
+                    $column->row($this->grid2());
+                    $column->row($this->grid());
+                });
+            }));
+        // ->body($this->grid()));
     }
 
     protected function grid2()
@@ -95,21 +95,29 @@ class HostLevelController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('img', __('Img'));
-        $grid->column('level', __('Level'));
-        if (Admin::user()->can('browse-' . 'host_level_reward') || Admin::user()->can('*')) {
-                $grid->column(__('procedures'))->display(function () {
-
-                    if (request()->filled('_export_')) {
-                        return '';
-                    }
-                    $url1 = url('admin/host-level-reward/' . $this->id);
-                    $gifts = __('gifts');
-                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
-
-                    return $button1;
-                });
+        $grid->column('level', __('Level'))->display(function ($path) {
+            /** @var Ware $this */
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
             }
-            $this->extendGrid($grid);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        if (Admin::user()->can('browse-' . 'host_level_reward') || Admin::user()->can('*')) {
+            $grid->column(__('procedures'))->display(function () {
+
+                if (request()->filled('_export_')) {
+                    return '';
+                }
+                $url1 = url('admin/host-level-reward/' . $this->id);
+                $gifts = __('gifts');
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
+
+                return $button1;
+            });
+        }
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -143,7 +151,7 @@ class HostLevelController extends MainController
         $form = new Form(new HostLevel());
         $form->text('name', __('name'));
         $form->image('img', __('Img'));
-       $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
+        $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
 
         return $form;
     }
