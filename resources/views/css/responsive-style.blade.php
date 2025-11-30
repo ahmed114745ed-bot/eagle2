@@ -7,15 +7,26 @@
         .payment-card {
             height: 795px;
         }
+
+        .wrapper {
+            min-width: max-content;
+        }
     }
 
     @media (max-width: 1200px) {
         .content {
             width: 1160px !important;
         }
+
+        .wrapper {
+            min-width: max-content;
+        }
     }
 
     @media (max-width: 992px) {
+        .wrapper {
+            min-width: max-content;
+        }
     }
 
     @media (max-width: 768px) {
@@ -25,6 +36,10 @@
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
             float: none; !important;
+        }
+
+        .wrapper {
+            min-width: max-content;
         }
 
         .nprogress-custom-parent {
@@ -117,6 +132,10 @@
 
         .box-footer .pull-right {
             order: 2;
+        }
+
+        .wrapper {
+            min-width: max-content;
         }
     }
 </style>
