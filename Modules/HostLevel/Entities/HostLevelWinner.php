@@ -13,4 +13,9 @@ class HostLevelWinner extends Model
 {
     use HasFactory, TimestampsWithTimezone, HostLevelTrait;
     protected $guarded = [];
+
+    public function hostLevel()
+    {
+        return $this->belongsTo(HostLevel::class, 'host_level_id', 'id');
+    }
 }

@@ -35,17 +35,13 @@ class HostLevelService
 
         $userId = $user->id;
 
-        $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
+        $eventType = $this->getEventType();
 
         $checkPick = HostLevelWinner::where('user_id', $userId)->where('host_level_id', $HistLevelId)->filterByEventType($eventType)->first();
         if ($checkPick) throw new \Exception(__('you have already picked this host level before'));
         $hostLevel = $this->hostLevel($HistLevelId);
         if (!$hostLevel) throw new \Exception(__('host level not found'));
-        $diamonds = GiftLog::where('receiver_id', $userId)
-            ->filterByEventType($eventType)
-            ->selectRaw('SUM(giftNum * giftPrice) AS total_diamond')
-            ->value('total_diamond');
-
+        $diamonds = $this->computeDiamonds($userId);
         if (!$diamonds || ($diamonds < $hostLevel->diamonds_required)) {
             throw new \Exception(__('you do not meet the diamond requirement to pick this host level'));
         }
@@ -101,5 +97,83 @@ class HostLevelService
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
             }
         }
+    }
+
+    public function userHostLevels($userId)
+    {
+        $diamonds = $this->computeDiamonds($userId);
+
+        if (!$diamonds) throw new \Exception(__('you have not received any diamonds yet'));
+
+        $hostLevels = HostLevel::with('rewards')
+            ->where('diamonds', '<=', $diamonds)
+            ->orderBy('level', 'asc')
+            ->get();
+
+        return $hostLevels;
+    }
+
+
+    public function nextLevel($user)
+    {
+        $eventType = $this->getEventType();
+        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
+        if ($lastPick && $lastPick->hostLevel) {
+            $nextLevel = HostLevel::where('level', '>', $lastPick->hostLevel->level)
+                ->orderBy('level', 'asc')
+                ->first();
+        } else {
+            $nextLevel = HostLevel::orderBy('level', 'asc')->first();
+        }
+        $diamonds = $this->computeDiamonds($user->id);
+        if ($nextLevel  && $lastPick) {
+            $remaining = $nextLevel->diamonds - $diamonds;
+            $exactlyValue    = @$nextLevel->diamonds;
+            $progressNext    = $nextLevel->diamonds - $lastPick->diamonds;
+            $progressCurrent = $diamonds - $lastPick->diamonds;
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } elseif ($lastPick) {
+
+            $exactlyValue    = @$nextLevel->diamonds;
+            $progressNext    = @$nextLevel->diamonds - $lastPick->diamonds;
+            $progressCurrent = $diamonds - $lastPick->diamonds;
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
+            $progress  = 1;
+            $remaining = 0;
+        } else {
+            $progress  = 1;
+            $remaining = 0;
+        }
+
+        return [
+            'next_level' => $nextLevel->level ?? 0,
+            'next_level_image' => $nextLevel->img ?? '',
+            'diamonds' => $diamonds,
+            'remaining' => $remaining < 0 ? 0 : $remaining,
+            'progress' => $progress,
+        ];
+    }
+
+    private function getEventType(): string
+    {
+        return Common::getSettingValue('host_level_type') ?? 'daily';
+    }
+
+    private function computeDiamonds($userId): float
+    {
+        $eventType = $this->getEventType();
+
+        return (float) (GiftLog::where('receiver_id', $userId)
+            ->filterByEventType($eventType)
+            ->selectRaw('SUM(giftNum * giftPrice) AS total_diamond')
+            ->value('total_diamond') ?? 0);
     }
 }
