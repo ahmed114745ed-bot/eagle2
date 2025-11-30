@@ -552,6 +552,8 @@ class RoomRepository extends AbstractRepository
                 'owner.profile',
                 'owner.medals.achievementLevel.achievement',
                 'boxUse',
+                'taskStream',
+                'taskStreamRoom'
             ])
             ->withCount('roomVisitors')
             ->orderByDesc('pin')

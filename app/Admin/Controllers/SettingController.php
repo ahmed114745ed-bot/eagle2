@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Timezone;
 use App\Models\BrandImage;
 use App\Models\PaymentCoin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
@@ -49,15 +50,17 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
+         $chargeTabType = request()->get('type', 'Experience');
 
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         $zego_token = Common::getConf('zego_token');
         return parent::index($content
             ->header(__('Settings'))
-            ->description('')
+            ->description('   ')
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
+                'chargeTabType',
                 'pusher_app_key',
                 'pusher_app_id',
                 'zego_token',
@@ -123,12 +126,26 @@ class SettingController extends MainController
                     'key' => 'room_cup',
                     'value' => $request->value
                 ]);
-                
+
             }
             Cache::put('room_cup', $request->value);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateRoomBoom(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'room_boom'], [
+                'key' => 'room_boom',
+                'value' => $request->value
+            ]);
+            Cache::put('room_boom', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }

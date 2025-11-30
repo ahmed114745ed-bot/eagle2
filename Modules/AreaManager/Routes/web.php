@@ -14,15 +14,14 @@ use Modules\AreaManager\Http\Controllers\WalletController;
 use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
-
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
-use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
 use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
+use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +35,7 @@ use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController
 */
 
 /*============================= DASHBOARD ROUTE THAT SPECIAL owner DASH ==============================*/
+
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -50,8 +50,8 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-       
- Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
+
+        Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
             Route::get('/{id}', [AreaManagerChargeReportController::class, 'index']);
@@ -105,7 +105,11 @@ Route::group(
     ],
     function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('area-manager-users/profile/{id}', [AdminAreaManagerController::class, 'showProfile']);
+        Route::get('sub-area-manager-users/profile/{id}', [AdminUserController::class, 'showProfile']);
+
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::get('superadmin-users-profile/{id}', [SuperAdminController::class, 'profile']);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::resource('/bd-salaries', BdSalariesController::class);
         Route::resource('user-Bds', BdController::class);
@@ -137,7 +141,7 @@ Route::group(
 
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
-        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
+        Route::get('/charges', [ChargeController::class, 'index']);
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');
@@ -148,6 +152,29 @@ Route::group(
         Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
         Route::get('/sub-area-managers', [ChargeController::class, 'subAreaManagers'])->name('sub.admins');
+
+        Route::prefix('statistics')->name('statistics.')->group(function () {
+            Route::get('top-users-data', [HomeController::class, 'topUsersData']);
+            Route::get('comparison-user-signup', [HomeController::class, 'comparisonUserSignUp']);
+            Route::get('distribution-rooms', [HomeController::class, 'distributionRooms']);
+            Route::get('top-room-gifts', [HomeController::class, 'topRoomGifts']);
+            Route::get('active-rooms', [HomeController::class, 'averageActiveRooms']);
+            Route::get('agency-target', [HomeController::class, 'agencyTarget']);
+            Route::get('top-sender', [HomeController::class, 'topSender']);
+            Route::get('top-receiver', [HomeController::class, 'topReceiver']);
+            Route::get('comparison-agencies-target', [HomeController::class, 'comparisonAgencyTarget']);
+            Route::get('room-stats', [HomeController::class, 'roomStats']);
+            Route::get('agency-stats', [HomeController::class, 'getStats']);
+            Route::get('bd-stats', [HomeController::class, 'getBdStats']);
+            Route::get('balance-data', [HomeController::class, 'getBalanceData']);
+            Route::get('stats-data', [HomeController::class, 'getStatsData']);
+            Route::get('top-followers', [HomeController::class, 'getTopFollowers']);
+            Route::get('game-summary', [HomeController::class, 'gameSummary']);
+            Route::get('peak-hours', [HomeController::class, 'peakHours'])->name('owner.peak-hours');
+            Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('owner.rooms-activity');
+            Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
+            Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
+        });
     }
 );
 
@@ -156,4 +183,3 @@ Route::prefix('areaManager')->name('areaManager.')->group(function () {
 });
 
 /*============================= End DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
-

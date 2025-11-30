@@ -1,4 +1,4 @@
-{
+  {
     "Id": "Id",
     "ID": "ID",
     "Name": "Name",
@@ -15,7 +15,15 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
-        "charge system":" charges",
+    "Pay switch dashboard":"charge games",
+    "TargetDiamond":"This represents the goal amount of diamonds the room needs to achieve (e.g., 1,000,000).Once this target is reached, it may trigger certain rewards or unlock new features.",
+"ConditionGroeth":"Define the minimum number of visitors required for the room to gain more visibility or unlock new benefits.You can customize this condition based on room performance.",
+"NumberSeats":"Indicates how many admins are currently assigned to this room.When the room achieves its diamond target, more admin seats can be unlocked.(Hint: If a room starts with 4 admins and hits the target, it can increase to 5 admins.",
+"ProfitsTargetTotal":"The total profit in coins generated from the room’s performance.This value will later be divided among the room owner and admins based on their profit percentages.",
+"Show superadmin": "Show  Country Manager",
+"bdsDescription" : "BDs displayed belong to the Area Manager's country",
+"professionalBdsDescription": "User BDs displayed belong to the Area Manager's country",
+"member": "عضو",    
     "SuperAdmin Charge":"charges",
     "Charge To Superadmin":"charges",
     "Browse charge to superadmin":"Browse charges ",
@@ -102,6 +110,7 @@
     "registered successfully": "Registered Successfully",
     "required": "Required",
     "exists": "Exists",
+    "Live Rooms": "Live Broadcast",
     "delete user parent": "delete Users",
      "edit user parent": "edit users",
     "show user parent": "show users",
@@ -1488,11 +1497,12 @@
 "shipping_agency": "Shipping Agency",
 "bd_form": "BD Form",
 "host_agency": "Host Agency",
-"update_start":"Data processing has started, and the modification will be applied once completed",
-"confirm_title": "Are you sure?",
-"confirm_text": "By confirming, all current salaries for this target will be closed, achieved diamonds will be calculated for users, and a new salary cycle for the current month will begin with the remaining diamonds after deduction. This action cannot be undone.",
-"confirm_button": "Confirm",
-"cancel_button": "Cancel"
+"area name":"Area Name",
+"upload_card_back": "📷 Click to upload ",
+"Browse live rooms": "Browse live broadcasts",
+"Show live rooms": "Show live broadcasts"
+
+
 
 
 

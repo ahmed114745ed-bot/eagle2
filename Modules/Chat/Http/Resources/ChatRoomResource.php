@@ -29,16 +29,17 @@ class ChatRoomResource extends JsonResource
             'user_id'             => @$user2->id,
             'name'                => @$user2->name,
             'img'                 => @$user2->profile->avatar,
+            'deleted_at'          => @$user2->deleted_at,
             'in_room'             => @$user2?->now_room_uid ? true : false,
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
-            'last_message' => @new ChatMessageResource(
+            'last_message' => @new ChatMessageV2Resource(
                 $this->messages
-                    ->filter(function ($msg) {
-                        return is_null($msg->user_1_deleted)
-                            || (!is_null($msg->user_1_deleted) && !is_null($msg->user_2_deleted));
-                    })
+                    // ->filter(function ($msg) {
+                    //     return is_null($msg->user_1_deleted)
+                    //         || (!is_null($msg->user_1_deleted) && !is_null($msg->user_2_deleted));
+                    // })
                     ->sortByDesc('id')
                     ->first()
             ),

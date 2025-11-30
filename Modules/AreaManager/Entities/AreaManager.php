@@ -2,6 +2,8 @@
 
 namespace Modules\AreaManager\Entities;
 
+use App\Models\AdminUser;
+use App\Traits\CreatedByTrait;
 use Exception;
 use App\Models\User;
 use App\Models\Agency;
@@ -11,10 +13,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class AreaManager extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, CreatedByTrait;
 
     protected $table = 'admin_users';
 
@@ -31,6 +34,13 @@ class AreaManager extends Authenticatable
             $builder->where('type', 'area-manager');
         });
 
+        parent::boot();
+
+        static::saving(function ($model) {
+            if (isset($model->area_name)) {
+                unset($model->area_name);
+            }
+        });
 
         static::deleting(function ($manager) {
 
@@ -64,8 +74,69 @@ class AreaManager extends Authenticatable
         return $this->hasManyThrough(Agency::class, Country::class, 'area_manager_id', 'country_id', 'id', 'id');
     }
 
+    // public function countries()
+    // {
+    //     return $this->hasMany(Country::class, 'area_manager_id');
+    // }
+
+    public function regions()
+    {
+        return $this->hasMany(Region::class, 'manager_id');
+    }
+
+    public function regionArea()
+    {
+        return $this->hasOne(Region::class, 'manager_id');
+    }
+
+
     public function countries()
     {
-        return $this->hasMany(Country::class, 'area_manager_id');
+        return $this->belongsToMany(
+            Country::class,
+            'region_countries',
+            'region_id',
+            'country_id'
+        )->join('regions', 'region_countries.region_id', '=', 'regions.id')
+            ->where('regions.manager_id', $this->id)
+            ->select('countries.*');
+    }
+
+    public function countriesQuery()
+    {
+        return Country::whereHas('regions', function ($q) {
+            $q->where('manager_id', $this->id);
+        });
+    }
+    public function flag()
+    {
+        $managerId = $this->parent_id ?? $this->id;
+        $region = Region::where('manager_id', $managerId)->with('countries')->first();
+        $countries = $region->countries;
+
+        $html = '<div class="user-type-badges">';
+        foreach ($countries as $country) {
+            $url = getImagePath($country->flag);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($country->id, $url, 30, 30, 4);
+                // '<img src="' . e( $url) . '" alt="' . e($country->name) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'manager_id', 'id');
+    }
+    public function creator()
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 }

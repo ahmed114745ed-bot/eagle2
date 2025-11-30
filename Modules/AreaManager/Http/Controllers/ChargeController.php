@@ -17,6 +17,8 @@ use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
 
 
@@ -37,14 +39,16 @@ class ChargeController extends MainController
      */
     public function index(Content $content): Content
     {
+
+
         $user = Auth::user();
         $authUser = auth()->user();
 
-        if ($authUser->type == 'area-manager'){
+        if ($authUser->type == 'area-manager') {
             $authId = auth()->id();
             $type = UserTypeEnum::AREA_MANAGER;
         } else {
-            $authId = $authUser->parent_id;
+            $authId = $authUser->id;
             $type = UserTypeEnum::SUB_AREA_MANAGER;
         }
 
@@ -52,55 +56,237 @@ class ChargeController extends MainController
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
         ", [
-            $type, $authId,
-            $type, $authId
-        ])
-            ->first();
+            $type,
+            $authId,
+            $type,
+            $authId
+        ])->first();
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
 
         $finalSalary = $user->di;
-        return $content
+        $content = $content
             ->header(trans('Charges'))
-            ->description(trans('Charges'))
+            ->description(trans('Charges'));
 
-            ->row(function ($row) use ($finalSalary) {
-                $row->column(12, view('admin.grid.area_manager.wallet', ['finalSalary' => $finalSalary]));
-            })
-            ->row(function (Row $row) use ($totalCharges, $totalSpent ) {
-                $row->column(6, new InfoBox(__('total charges'), 'money', 'green', '', truncateAndTrim($totalCharges ,2) . ' 💰' ));
-                $row->column(6, new InfoBox(__('total spent'), 'money', 'red', 'charges', truncateAndTrim($totalSpent,2)));
-            })
-            ->row(function ($row) {
-                $row->column(12, $this->grid());
+
+            $content->row(function ($row) use ($finalSalary) {
+                $row->column(12, view('admin.grid.area_manager.wallet', [
+                    'finalSalary' => $finalSalary
+                ]));
             });
+
+            $content->row(function (Row $row) use ($totalCharges, $totalSpent) {
+                $row->column(6, new InfoBox(
+                    __('total charges'),
+                    'money',
+                    'green',
+                    '',
+                    truncateAndTrim($totalCharges, 2) . ' 💰'
+                ));
+
+                $row->column(6, new InfoBox(
+                    __('total spent'),
+                    'money',
+                    'red',
+                    'charges',
+                    truncateAndTrim($totalSpent, 2)
+                ));
+            });
+
+
+        $content->row(function ($row) {
+            $row->column(12, $this->grid());
+        });
+
+        return $content;
     }
     protected function grid()
     {
         $grid = new Grid(new Charge());
         $authUser = auth()->user();
-        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-
+        $authId = session('area_manager_id') ?? (auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id);
         $grid->model()
-            ->where('charger_type', UserTypeEnum::AREA_MANAGER)
-            ->orWhere('charger_type', UserTypeEnum::SUB_AREA_MANAGER)
-            ->with('receiverUser', 'receiveragency')
-            ->where(function ($q) use ($authUser, $authId) {
-                $q->where('charger_id', $authUser->id);
-
-                $subAreaManagers = SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray();
-                $q->orWhereIn('charger_id', $subAreaManagers);
+            ->with(['receiveragency', 'subAreaManager', 'areaManager', 'receiverSuperAdmin', 'receiverSubAreaManager'])
+            ->where(function ($query) use ($authUser, $authId) {
+                $query->where('charger_id', $authUser->id)
+                    ->orWhereIn('charger_id', SubAreaManager::where('parent_id', $authId)->pluck('id')->toArray());
             })
-            ->orderBy('id', 'desc');
+            ->whereIn('charger_type', [
+                UserTypeEnum::AREA_MANAGER,
+                UserTypeEnum::SUB_AREA_MANAGER,
+            ])
+            ->orderByDesc('id');
 
-        $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) use ($authId, $authUser) {
             $filter->expand();
 
-            $filter->equal('user_id', __('Agency'))->select(
-                ShippingAgency::where('country_id', Auth::user()->country_id)->pluck('name', 'id')->toArray()
-            );
+            $filter->where(function ($query) {
+                if ($this->input) {
+                    $query->where('user_type', 'agency')
+                        ->where('user_id', $this->input);
+                }
+            }, __('Agency'))->select(ShippingAgency::pluck('name', 'id')->toArray());
+            if ($authUser->type == 'area-manager') {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->where('charger_id', $this->input);
+                    }
+                }, __('created by'))->select(
+                    // Combine SubAreaManagers and AreaManager themselves
+                    SubAreaManager::where('parent_id', $authId)->pluck('name', 'id')
+                        ->merge(AreaManager::where('id', $authId)->pluck('name', 'id'))
+                        ->toArray()
+                );
+            }
+
+
+            $filter->where(function ($query) {
+                if ($this->input) {
+                    $query->where('user_type', 'sub_area_manager')
+                        ->where('user_id', $this->input);
+                }
+            }, __('Sub area manager'))->select(SubAreaManager::pluck('name', 'id')->toArray());
+
+            $filter->where(function ($query) {
+                if ($this->input) {
+                    $query->where('user_type', 'superadmin')
+                        ->where('user_id', $this->input);
+                }
+            }, __('Super Admin'))->select(SuperAdmin::pluck('name', 'id')->toArray());
         });
+
+        $grid->column('user_id', __('receiver'))->display(function () {
+            $info = Common::getReceiverInfo($this);
+
+            if ($info['type'] == 'agency') {
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $cacheKey = "agency_image_{$info['uuid']}";
+                $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
+                    $path = $info['image'];
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
+                    if (!isImageExists($url)) $url = $defaultImage;
+                    return handleShowImageWithTypes($info['uuid'], $url, 40, 40, 0);
+                });
+                $profileUrl = '';
+                if (!empty($info['uuid'])) {
+                    $profileUrl = url('areaManager/profile-shipping-agency/' . $info['uuid']);
+                }
+                return "
+                        <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='font-size: smaller;'>ID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+            }
+
+            if ($info['type'] == 'sub_area_manager') {
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($info['image']) ?? $defaultImage;
+                if (!isImageExists($url)) $url = $defaultImage;
+
+                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                $showUrl = url("areaManager/sub-area-manager-users/profile/{$info['id']}");
+
+                return "
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+            }
+
+            if ($info['type'] == 'super_admin') {
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($info['image']) ?? $defaultImage;
+                if (!isImageExists($url)) $url = $defaultImage;
+
+                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                $showUrl = url("areaManager/superadmin-users-profile/{$info['id']}");
+
+                return "
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+            }
+            return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
+        });
+
+        $grid->column('user_type', __('User Type'))->display(function ($value) {
+            switch ($value) {
+                case UserTypeEnum::AGENCY:
+                    return "<span class='badge bg-primary'>" . __('Agency') . "</span>";
+                case UserTypeEnum::SUB_AREA_MANAGER:
+                    return "<span class='badge bg-success'>" . __('Sub area manager') . "</span>";
+                case UserTypeEnum::SUPER_ADMIN:
+                    return "<span class='badge bg-success'>" . __('Super Admin') . "</span>";
+                default:
+                    return "<span class='badge bg-secondary'>" . __('Unknown') . "</span>";
+            }
+        });
+
+        $grid->column('created_at', __('created_at'))->display(function ($value) {
+            return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
+        });
+        if ($authUser->type == 'area-manager') {
+            $grid->column('charger_id', __('created by'))->display(function () {
+                $info = Common::getChargerInfo($this);
+
+
+
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($info['image']) ?? $defaultImage;
+                if (!isImageExists($url)) $url = $defaultImage;
+
+                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                 $showUrl = url("areaManager/area-manager-users/profile/{$info['id']}");
+                return "
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+
+
+                return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
+            });
+        }
+
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -116,75 +302,11 @@ class ChargeController extends MainController
             ";
         });
 
-        $grid->column('user_id', __('receiver'))->display(function () {
-            $info = Common::getReceiverInfo($this);
-
-            if ($info['type'] === 'agency') {
-                if (request()->filled('_export_')) {
-                    return $info['name'];
-                }
-                $cacheKey = "agency_image_{$info['uuid']}";
-                $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
-                    $path = $info['image'];
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
-                    if (!isImageExists($url)) $url = $defaultImage;
-                    return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                });
-                $profileUrl ='';
-                if (!empty($info['uuid'])) {
-                $profileUrl = route('superadmin.agency.profile', ['id' => $info['uuid']]);
-                }
-                return "
-                        <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                            <div style='display: flex; align-items: center; gap: 10px;'>
-                                {$image}
-                                <div>
-                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
-                                    <span style='font-size: smaller;'>ID: {$info['uuid']}</span>
-                                </div>
-                            </div>
-                        </a>
-                    ";
-            }
-
-            if ($info['type'] === 'user') {
-                if (request()->filled('_export_')) {
-                    return $info['name'];
-                }
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($info['image']) ?? $defaultImage;
-                if (!isImageExists($url)) $url = $defaultImage;
-
-                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("superadmin/users/profile/{$info['id']}");
-
-                return "
-                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                            <div style='display: flex; align-items: center; gap: 10px;'>
-                                {$image}
-                                <div>
-                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
-                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
-                                </div>
-                            </div>
-                        </a>
-                    ";
-            }
-
-            return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
-        });
-
-
-        $grid->column('created_at', __('created_at'))->display(function ($value) {
-            return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
-        });
-
         $grid->column('usd', __('usd'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin, 2) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
@@ -248,7 +370,8 @@ class ChargeController extends MainController
         return $form;
     }
 
-    public function subAreaManagers(Request $request){
+    public function subAreaManagers(Request $request)
+    {
         $key = $request->q;
         $page = $request->get('page', 1);
         $perPage = 10;

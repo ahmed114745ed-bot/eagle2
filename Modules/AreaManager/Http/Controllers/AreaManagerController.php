@@ -5,6 +5,7 @@ namespace Modules\AreaManager\Http\Controllers;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\AreaManager\Entities\AreaManager;
 
 class AreaManagerController extends Controller
 {
@@ -12,68 +13,18 @@ class AreaManagerController extends Controller
      * Display a listing of the resource.
      * @return Renderable
      */
-    public function index()
+    public function areaManger(Request $request)
     {
-        return view('areamanager::index');
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('areamanager::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('areamanager::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('areamanager::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $perPage = 10;
+        $admin = AreaManager::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('username', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+        return response()->json($admin);
     }
 }

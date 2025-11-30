@@ -3,6 +3,8 @@
 namespace Modules\AreaManager\Http\Controllers;
 
 use App\Models\Bd;
+use App\Models\GameChargeHistory;
+use App\Models\GameWallet;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
@@ -15,6 +17,7 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
@@ -31,8 +34,22 @@ class HomeController extends MainController
 {
     public $permission_name = 'dashboard';
 
+    public function countries(): array
+    {
+        return Common::areaCountries();
+    }
+
     public function index(Content $content)
     {
+        return parent::index(
+            $content
+                ->title(__('Home'))
+                ->description(__('General Statistics'))
+                ->row(function (Row $row) {
+                    $row->column(12, view('admin.dashboard.chart'));
+                })
+        );
+
         $countries = Common::areaCountries();
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $superAdmins = SuperAdmin::where('parent_id', $authId)->pluck('id')->toArray();
@@ -646,16 +663,25 @@ class HomeController extends MainController
             }));
     }
 
-
-    public function peakHours(Request $request)
+    public function getTopFollowers(Request $request): JsonResponse
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $topUsersByFollowers = User::withCount('followers')
+            ->with('packs', 'profile')
+            ->whereIn('country_id', $this->countries())
+            ->orderByDesc('followers_count')
+            ->take(10)
+            ->get();
 
+        return response()->json($topUsersByFollowers);
+    }
+
+    public function peakHours(Request $request): JsonResponse
+    {
         $period = $request->get('period', 'day');
 
         $query = DB::table('live_times')
             ->join('users', 'live_times.uid', '=', 'users.id')
-            ->whereIn('users.country_id', $countries);
+            ->whereIn('users.country_id', $this->countries());
 
         if ($period === 'day') {
             $query->selectRaw("FROM_UNIXTIME(live_times.start_time, '%H') as label, COUNT(*) as total")
@@ -681,9 +707,9 @@ class HomeController extends MainController
         ]);
     }
 
-    public function onlineStats()
+    public function onlineStats(): JsonResponse
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = $this->countries();
 
         $online  = User::whereIn('country_id', $countries)->where('online', 1)->count();
         $offline = User::whereIn('country_id', $countries)->where('online', 0)->count();
@@ -694,10 +720,10 @@ class HomeController extends MainController
             'offline' => $offline,
         ]);
     }
-    public function roomsActivity(Request $request)
+    public function roomsActivity(Request $request): JsonResponse
     {
         $period = $request->get('period', 'day');
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = $this->countries();
 
         if ($period === 'day') {
             // last 7 days
@@ -795,10 +821,35 @@ class HomeController extends MainController
         ]);
     }
 
-
-    public function topUsersVisits(Request $request)
+    public function topUsersData(Request $request): JsonResponse
     {
-        $countries = Country::where('area_manager_id', auth()->id())->pluck('id')->toArray();
+        $countries = $this->countries();
+
+        $topUsers = LiveTime::query()
+            ->whereHas('user', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);
+            })
+            ->selectRaw('uid, SUM(hours) as total_hours, COUNT(DISTINCT DATE(created_at)) as active_days')
+            ->groupBy('uid')
+            ->havingRaw('SUM(hours) >= 1')
+            ->orderByDesc('total_hours')
+            ->take(10)
+            ->get();
+
+        $labels = User::whereIn('id', $topUsers->pluck('uid'))
+            ->pluck('name');
+
+        $data = $topUsers->pluck('total_hours');
+
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data
+        ]);
+    }
+
+    public function topUsersVisits(Request $request): JsonResponse
+    {
+        $countries = $this->countries();
 
         $topUsers = User::select('id', 'name')
             ->withCount(['liveTimes as total_hours' => function ($q) {
@@ -815,5 +866,486 @@ class HomeController extends MainController
             'labels' => $topUsers->pluck('name'),
             'data'   => $topUsers->pluck('total_hours')
         ]);
+    }
+
+    protected function comparisonUserSignUp(): JsonResponse
+    {
+        $currMonth = now()->month;
+        $prevMonth = now()->subMonth()->month;
+        $countries = $this->countries();
+
+        $signups = User::whereIn('country_id', $countries)
+            ->selectRaw("
+                YEAR(created_at) as year,
+                MONTH(created_at) as month,
+                FLOOR((DAY(created_at)-1)/7)+1 as week_of_month,
+                COUNT(*) as total
+            ")
+            ->whereIn(DB::raw('MONTH(created_at)'), [$currMonth, $prevMonth])
+            ->groupBy('year', 'month', 'week_of_month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->orderBy('week_of_month')
+            ->get();
+
+        $labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+
+        $dataCurrent = [];
+        $dataPrevious = [];
+
+        foreach (range(1, 4) as $week) {
+            $dataCurrent[]  = $signups->where('month', $currMonth)->where('week_of_month', $week)->sum('total');
+            $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
+        }
+
+        $currMonthName = Carbon::create()->month($currMonth)->translatedFormat('F');
+        $prevMonthName = Carbon::create()->month($prevMonth)->translatedFormat('F');
+
+        return response()->json([
+            'labels'       => $labels,
+            'dataCurrent'  => $dataCurrent,
+            'dataPrevious' => $dataPrevious,
+            'currentMonth'  => $currMonthName,
+            'previousMonth' => $prevMonthName,
+        ]);
+    }
+
+    protected function distributionRooms(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $roomsWithPk = Room::whereHas('owner', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })
+            ->has('lastPk')
+            ->count();
+
+        $audioRooms = Room::whereHas('owner', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })
+            ->where('type', 'audio')
+            ->count();
+
+        $liveRooms = Room::whereHas('owner', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })
+            ->where('type', 'live')
+            ->count();
+
+        $inactiveRooms = Room::whereHas('owner', fn($q) => $q->whereIn('country_id', $countries))
+            ->whereDoesntHave('roomVisitors')
+            ->count();
+
+        $roomStats = [
+            __('Rooms with PK')  => $roomsWithPk,
+            __('Audio Rooms')    => $audioRooms,
+            __('Live Rooms')     => $liveRooms,
+            __('Inactive Rooms') => $inactiveRooms,
+        ];
+
+        return response()->json([
+            'labels' => array_keys($roomStats),
+            'data'   => array_values($roomStats),
+        ]);
+    }
+
+    protected function topRoomGifts(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $topGiftedRooms = Room::whereHas('owner', fn($q) => $q->whereIn('country_id', $countries))
+            ->with('owner')
+            ->withSum('gifts', 'giftPrice')
+            ->orderByDesc('gifts_sum_gift_price')
+            ->take(10)
+            ->get()
+            ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
+
+        $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
+        $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function averageActiveRooms(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $avgSessionRooms = \DB::table('rooms')
+            ->join('users', 'rooms.uid', '=', 'users.id')
+            ->join('live_times', 'users.id', '=', 'live_times.uid')
+            ->whereIn('users.country_id', $countries)
+            ->select(
+                'rooms.id',
+                'users.name as room_name',
+                \DB::raw('AVG(
+                    COALESCE(live_times.hours,
+                        TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(live_times.start_time), FROM_UNIXTIME(live_times.end_time)) / 3600
+                    )
+                ) as avg_duration')
+            )
+            ->groupBy('rooms.id', 'users.name')
+            ->orderByDesc('avg_duration')
+            ->limit(10)
+            ->get();
+
+        $labels = $avgSessionRooms->pluck('room_name');
+        $data   = $avgSessionRooms->pluck('avg_duration');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function agencyTarget(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $topAgenciesByTargets = UserTarget::whereHas('agency', fn($q) => $q->whereIn('country_id', $countries))
+            ->where('agency_obtain', '>', 0)
+            ->selectRaw('agency_id, COUNT(*) as total_achieved')
+            ->groupBy('agency_id')
+            ->orderByDesc('total_achieved')
+            ->with('agency:id,name')
+            ->take(10)
+            ->get();
+
+        $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
+        $data   = $topAgenciesByTargets->pluck('total_achieved');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function topSender(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $topSenders = GiftLog::whereHas(
+            'sender',
+            fn($q) =>
+            $q->whereIn('country_id', $countries)
+                ->whereHas('agency', fn($a) => $a->whereIn('country_id', $countries))
+        )
+            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+            ->groupBy('sender_id')
+            ->orderByDesc('total_sent')
+            ->take(10)
+            ->with('sender:id,name')
+            ->get()
+            ->filter(fn($s) => $s->total_sent > 0);
+
+        $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
+        $data   = $topSenders->pluck('total_sent');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function topReceiver(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $topReceivers = GiftLog::whereHas(
+            'receiver',
+            fn($q) =>
+            $q->whereIn('country_id', $countries)
+                ->whereHas('agency', fn($a) => $a->whereIn('country_id', $countries))
+        )
+            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+            ->groupBy('receiver_id')
+            ->orderByDesc('total_received')
+            ->take(10)
+            ->with('receiver:id,name')
+            ->get()
+            ->filter(fn($s) => $s->total_received > 0);
+
+        $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
+        $data   = $topReceivers->pluck('total_received');
+        return response()->json([
+            'labels' => $labels,
+            'data'   => $data,
+        ]);
+    }
+
+    protected function comparisonAgencyTarget(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $achievedAgencies = Agency::whereIn('country_id', $countries)
+            ->whereHas('userTarget', function ($q) {
+                $q->where('agency_obtain', '>', 0);
+            })
+            ->count();
+
+        $notAchievedAgencies = Agency::whereIn('country_id', $countries)->count() - $achievedAgencies;
+
+        return response()->json([
+            'achieved'    => $achievedAgencies,
+            'notAchieved' => $notAchievedAgencies,
+        ]);
+    }
+
+    public function roomStats(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $roomCounts = Room::whereHas('owner.country', function ($q) use ($countries) {
+            $q->whereIn('id', $countries);
+        })
+            ->whereHas('roomVisitors')
+            ->selectRaw("type, COUNT(*) as total")
+            ->groupBy('type')
+            ->pluck('total', 'type');
+
+        $liveRooms = Room::whereHas('owner', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })
+            ->where('type', 'live')
+            ->selectRaw('is_live, COUNT(*) as total')
+            ->groupBy('is_live')
+            ->pluck('total', 'is_live');
+
+        $liveRoomsTrue = $liveRooms[1] ?? 0;
+        $liveRoomsFalse = $liveRooms[0] ?? 0;
+        return response()->json([
+            'audio'         => $roomCounts['audio'] ?? 0,
+            'live'          => $roomCounts['live'] ?? 0,
+            'active'        => $liveRoomsTrue,
+            'inactive'      =>  $liveRoomsFalse,
+        ]);
+    }
+
+    public function getStats(): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $agencyCount = Agency::whereIn('country_id', $countries)->count();
+
+        $user_salaries = UserSallary::query()
+            ->whereHas('user', function ($q) use ($countries) {
+                $q->where('agency_id', '!=', 0)
+                    ->whereIn('country_id', $countries)
+                    ->whereHas('agency', fn($a) => $a->whereIn('country_id', $countries));
+            })
+            ->sum(DB::raw('sallary - cut_amount'));
+
+        $agency_salaries = AgencySallary::query()->whereHas('agency', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })->sum(DB::raw('sallary - cut_amount'));
+
+        $activeAgencies = Agency::whereIn('country_id', $countries)
+            ->whereHas('agencySalaries', fn($q) => $q->where('month', now()->month)
+                ->where('year', now()->year))
+            ->count();
+
+        $newAgenciesToday = Agency::whereIn('country_id', $countries)->whereDate('created_at', today())->count();
+
+        $newAgenciesMonth = Agency::whereIn('country_id', $countries)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $avgAgencyWallet = Agency::whereIn('country_id', $countries)->avg('coins');
+
+        $totalMembers = User::whereIn('country_id', $countries)
+            ->where('agency_id', '!=', 0)
+            ->whereHas('agency', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);
+            })
+            ->count();
+        $avgMembersPerAgency = $agencyCount > 0 ? $totalMembers / $agencyCount : 0;
+
+        $pendingJoins = Agency::whereIn('country_id', $countries)
+            ->whereHas('joinRequests', fn($q) => $q->where('status', 1))
+            ->count();
+
+        $diamondsAchieved = UserSallary::whereHas('user', fn($q) => $q->where('country_id', $countries))
+            ->whereHas('agency', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);
+            })
+            ->sum('achieved_diamond');
+
+        return response()->json([
+            'agencyCount' => $agencyCount,
+            'user_salaries' => round($user_salaries),
+            'agency_salaries' => round($agency_salaries),
+            'activeAgencies' => $activeAgencies,
+            'newAgenciesToday' => $newAgenciesToday,
+            'newAgenciesMonth' => $newAgenciesMonth,
+            'avgAgencyWallet' => round($avgAgencyWallet),
+            'totalMembers' => $totalMembers,
+            'avgMembersPerAgency' => $avgMembersPerAgency,
+            'pendingJoins' => $pendingJoins,
+            'diamondsAchieved' => $diamondsAchieved,
+        ]);
+    }
+
+    public function getBdStats(): JsonResponse
+    {
+        $countries = $this->countries();
+        $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
+        $superAdmins = SuperAdmin::where('parent_id', $authId)->pluck('id')->toArray();
+
+        $bdCount = Bd::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)->count();
+
+        $totalSalaries = BD::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)
+            ->withSum('salaries', 'salary')
+            ->withSum('salaries', 'cut_amount')
+            ->withCount('agencies')
+            ->get();
+
+        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
+        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
+        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
+
+        return response()->json([
+            'bdCount' => $bdCount,
+            'totalBDSalary' => round($totalBDSalary),
+            'totalBDCut' => round($totalBDCut),
+            'averageAgenciesPerBD' => round($averageAgenciesPerBD, 2),
+        ]);
+    }
+
+    //TODO need to be filtered
+    public function getBalanceData(Request $request)
+    {
+        try {
+            $date = $request->get("date");
+
+            $balanceQuery = GameWallet::query();
+            $balanceDollarQuery = GameChargeHistory::query();
+
+            if ($date != null) {
+                $year = substr($date, 0, 4);
+                $month = substr($date, 5, 2);
+                $balanceQuery->whereMonth("created_at", $month)->whereYear("created_at", $year);
+                $balanceDollarQuery->whereMonth("created_at", $month)->whereYear("created_at", $year);
+            } else {
+                $balanceQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+                $balanceDollarQuery->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+            }
+
+            $balance = $balanceQuery->first();
+            $balanceDollar = $balanceDollarQuery->sum("value");
+            $allBalance = $balance->balance ?? 0;
+            $availableBalance = $balance ? $balance->balance - $balance->used : 0;
+
+            $used = $balance->used ?? 0;
+            $available = $availableBalance ?? 0;
+
+            $chartData = [$used, $available];
+            $usePercentage = ($allBalance > 0) ? (($used / $allBalance) * 100) : 0;
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'allBalance' => $allBalance,
+                    'availableBalance' => $available,
+                    'balanceDollar' => $balanceDollar,
+                    'used' => $used,
+                    'usePercentage' => $usePercentage,
+                    'chartData' => $chartData,
+                    'showPaymentAlert' => (($used > 0) && ($usePercentage <= 90)) ? 1 : 0,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching balance data'
+            ], 500);
+        }
+    }
+
+    public function gameSummary(Request $request): JsonResponse
+    {
+        $countries = $this->countries();
+
+        $game = CoinGameUserDailyAggregated::query()->whereHas('user', function ($q) use ($countries) {
+            $q->whereIn('country_id', $countries);
+        })->selectRaw("
+            SUM(total_played) as total_played,
+            SUM(total_loss) as total_loss,
+            SUM(total_win) as total_win,
+            SUM(total_loss - total_win) as app_profit
+        ")->first();
+
+        return response()->json([
+            'total_played' => $game->total_played ?? 0,
+            'total_loss' => $game->total_loss ?? 0,
+            'total_win' => $game->total_win ?? 0,
+            'app_profit' => $game->app_profit ?? 0,
+        ]);
+    }
+
+    public function getStatsData(Request $request): JsonResponse
+    {
+        try {
+            $countries = $this->countries();
+
+            $userBaseQuery = User::whereIn('country_id', $countries);
+
+            $stats = [
+                'usersCount' => $userBaseQuery->count(),
+                'newSignUpsToday' => $userBaseQuery->whereDate('created_at', today())->count(),
+                'newSignUpsThisWeek' => $userBaseQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'newSignUpsThisMonth' => $userBaseQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+                'onlineUser' => $userBaseQuery->where('online', 1)->count(),
+            ];
+
+            $peakHours = LiveTime::whereHas('user', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);;
+            })
+                ->selectRaw("FROM_UNIXTIME(start_time, '%H') as hour, COUNT(*) as total_sessions, SUM(hours) as total_duration")
+                ->whereRaw("DATE(FROM_UNIXTIME(start_time)) = CURDATE()")
+                ->groupBy('hour')
+                ->orderByDesc('total_sessions')
+                ->limit(1)
+                ->first();
+
+            if ($peakHours) {
+                $time = Carbon::createFromTime($peakHours->hour);
+                $time->locale(app()->getLocale());
+                $stats['peakHour'] = $time->isoFormat('h A') . ' • ' . $peakHours->total_sessions . ' ' . __('Users');
+            } else {
+                $stats['peakHour'] = '0';
+            }
+
+            $chatMessageQuery = ChatMessage::whereHas('user', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);;
+            });
+
+            $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
+            $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)->count();
+
+            $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
+            $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
+
+            $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
+                ->distinct('chat_room_id')->count('chat_room_id');
+
+            $stats['avgConversationDuration'] = ChatMessage::whereHas('user', function ($q) use ($countries) {
+                $q->whereIn('country_id', $countries);;
+            })
+                ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+                ->groupBy('chat_room_id')
+                ->pluck('duration')
+                ->avg() ?? 0;
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching statistics data'
+            ], 500);
+        }
     }
 }

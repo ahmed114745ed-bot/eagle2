@@ -1,17 +1,6 @@
 <?php
 
-use App\Admin\Controllers\AdminManagerSelectController;
-use App\Admin\Controllers\AdminNotification;
-use App\Admin\Controllers\AreaManagerChargeController;
-use App\Admin\Controllers\AreaManagerChargeReportController;
-use App\Admin\Controllers\AreaManagerController;
-use App\Admin\Controllers\AllStatisticController;
-use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\SuperadminBannerHistoryController;
-use App\Admin\Controllers\SuperadminBannerRequestController;
-use App\Admin\Controllers\SuperAdminHomeCarouselController;
-use App\Admin\Controllers\SuperAdminStatisticController;
-use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
+use App\Admin\Controllers\GameSettingsController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 
@@ -55,6 +44,7 @@ use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
+use App\Admin\Controllers\SuperRoleController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
@@ -119,6 +109,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SuperAdminChargeReportController;
@@ -212,6 +203,7 @@ Route::group(
         Route::resource('reset-salary', ResetUserSalaryController::class);
         Route::get('user-charge-history/{User_id}', [UserChargeHistoryController::class, 'indexCharge']);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
+        Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
         Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
@@ -250,20 +242,14 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        // Route::resource('auth/roles', 'RoleControllerNew');
+
         Route::resource('auth/roles', RoleControllerNew::class);
-        // Route::resource('roles', 'RoleControllerNew');
+        Route::get('super-roles', [SuperRoleController::class,'index']);
+        Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
+
 
         Route::resource('auth/rolesTest', 'RoleController');
-        // Route::prefix('auth/rolesTest')->group(function () {
-        //     Route::get('/', [RoleControllerNew::class, 'index']);
-        //     Route::get('/create', [RoleControllerNew::class, 'create']);
-        //     Route::post('/', [RoleControllerNew::class, 'store']);
-        //     Route::get('/{id}', [RoleControllerNew::class, 'show']);
-        //     Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
-        //     Route::put('/{id}', [RoleControllerNew::class, 'update']);
-        //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
-        // });
+
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
 
         Route::resource('auth/permissions', PermissionController::class);
@@ -318,6 +304,7 @@ Route::group(
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
+        Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
@@ -367,6 +354,7 @@ Route::group(
         Route::resource('payment-coins', PaymentCoinController::class);
         Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
+        Route::get('/area-manager-charges-reports', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [
@@ -711,6 +699,7 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
+        Route::get('professional-bd', [BdController::class ,'professionalBd']);
 
 
          Route::post('/set-preview-area-manager', function () {

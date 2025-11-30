@@ -1,12 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\CodapayService;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
+use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -35,6 +34,7 @@ use App\Http\Controllers\Api\V1\MusicController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
+use App\Http\Controllers\Api\V2\WalletController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -59,8 +59,10 @@ use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
+use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
@@ -119,6 +121,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
         Route::get('users2', [UserController::class, 'search2'])->name('users2');
+        Route::get('owner-rooms', [UserController::class, 'searchOwnerRoomWithPage'])->name('owner-rooms');
         Route::get('users7', [UserController::class, 'usersAudioRoom'])->name('users7');
         Route::get('users8', [UserController::class, 'usersLiveRoom'])->name('users8');
         Route::get('users-bd', [UserController::class, 'user_bd'])->name('users-bd');
@@ -128,6 +131,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-subsuperadmin', [UserController::class, 'subSuperAdminUsers'])->name('users-subsupeadmin');
         Route::get('users-areamanager', [UserController::class, 'subAreaManager'])->name('users-areamanager');
         Route::get('users-superadmin2', [UserController::class, 'superAdminUsers2'])->name('users-superadmin2');
+        Route::get('area-manager', [AreaManagerController::class, 'areaManger'])->name('area-manager');
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
@@ -139,6 +143,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
+        Route::get('regions', [CountryController::class, 'searchRegions'])->name('regions');
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
         Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
@@ -379,6 +384,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
@@ -424,7 +430,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('exchange')->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
+                Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
+                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 
@@ -528,6 +536,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start games
             Route::prefix('all-games1')->group(function () {
                 Route::get('/', [AllGameController::class, 'index']);
+                Route::get('/v2/out-of-room', [AllGameController::class, 'outRoom']);
+                Route::get('/v2/in-room', [AllGameController::class, 'inRoom']);
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
@@ -578,7 +588,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
-
+            Route::prefix('wallet')->group(function () {
+                Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
+            });
 
 
             Route::prefix('banners')->group(function () {

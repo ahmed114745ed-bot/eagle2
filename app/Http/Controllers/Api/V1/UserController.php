@@ -249,6 +249,15 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function searchOwnerRoomWithPage(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchOwnerRoomWithPage($key, $page);
+
+        return response()->json($users);
+    }
+
     public function usersAudioRoom(Request $request)
     {
         $key = $request->q;
@@ -336,7 +345,7 @@ class UserController extends Controller
     public function subSuperAdminUsers(Request $request)
     {
         $key = $request->q;
-        
+
         $page = $request->get('page', 1);
         $users = $this->userService->subSuperAdminUsers($key, $page);
 
@@ -537,7 +546,8 @@ class UserController extends Controller
 
         $cacheKey = "user_response_{$id}";
 
-        $response = \Cache::remember(
+        $response =
+         \Cache::remember(
             $cacheKey,
             now()->addMinutes(30),
             function () use ($id) {
@@ -545,6 +555,33 @@ class UserController extends Controller
                 return (new UserResource($user))->toArray(request());
             }
         );
+
+        $authUserId = auth()->id();
+        $user = User::with([
+            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+                $q->where('user_id2', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                        $query->where('user_id', '<>', $authUserId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+        ])->find($id);
+
+        $chatRoom = $user->chatRoomsAsUser->first() ?? $user->chatRoomsAsUser2->first() ?? null;
+
+        $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
+
+      //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
+
+        $response['chat_id'] = $chatRoom->id ?? null;
+        $response['unread_messages_count'] = $unreadMessagesCount;
 
         return Common::apiResponse(true, '', $response, 200);
     }

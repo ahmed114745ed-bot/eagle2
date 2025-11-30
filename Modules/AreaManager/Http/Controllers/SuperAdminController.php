@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\AreaManager\Http\Controllers;
+
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
@@ -14,7 +15,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
-use App\Models\SuperAdminReward;
+
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 
 class SuperAdminController extends MainController
@@ -106,12 +108,10 @@ class SuperAdminController extends MainController
     {
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
-        \Log::info( $countries);
-        $grid->model()->with(['appUser.packs'])
+
+        $grid->model()->with(['appUser.packs', 'creator', 'country'])
             // ->where('parent_id', auth()->id())
-            ->when($countries, function ($q) use ($countries) {
-                $q->whereIn('country_id',  $countries);
-            })
+            ->whereIn('country_id',  $countries)
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -182,8 +182,35 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
 
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+//            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+            return app(\App\Admin\Services\CreatorService::class)->show($this->creator);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
@@ -213,6 +240,7 @@ class SuperAdminController extends MainController
         $form = new Form(new SuperAdmin());
         $this->disableFormTools($form);
 
+        $form->hidden('created_by')->default(auth()->id());
         $form->text('name', __('name'));
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
@@ -223,11 +251,19 @@ class SuperAdminController extends MainController
         $form->select('country_id', trans('country'))->options(function ($value) {
             $ops       = [null => __('no country')];
             $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
-            $countries = Country::where('area_manager_id', $authId)->doesntHave('superAdmin')->orWhere('id', $value)->get();
+
+            $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+
+        if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+            $countries = $authAdmin->countriesQuery()
+                ->doesntHave('superAdmin')
+                ->orWhere('id', $value)
+                ->get(['id', 'name', 'e_name']);
             foreach ($countries as $country) {
                 $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
             }
             return $ops;
+        }
         })->required();
 
 
@@ -256,8 +292,9 @@ class SuperAdminController extends MainController
 
         $user = auth()->user();
         $form->hidden('type', __('Type'))->value('superadmin');
-        $form->hidden('parent_id', __('Super Admin'))->value(auth()->id());
         //        $form->hidden('transfer_salary', __('transfer_salary'));
+        $authId = auth()->user()->type == 'superadmin' ? $user->id : $user->parent_id;
+        $form->hidden('parent_id', __('Super Admin'))->value($authId);
 
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
@@ -419,7 +456,7 @@ class SuperAdminController extends MainController
 
         $superAdmin = SuperAdmin::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->with('country')->findOrFail($id);
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -443,6 +480,8 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
+        $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -453,8 +492,8 @@ class SuperAdminController extends MainController
                 $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
                 break;
         }
-
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
+        $prefix = dashboardName();
+        return view('superadmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'prefix', 'bds', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types', 'rewards'));
     }
 
     public function profilePreview()

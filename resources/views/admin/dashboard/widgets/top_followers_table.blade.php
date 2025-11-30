@@ -7,13 +7,13 @@
         <h4 class="mb-0"><i class="fa fa-users me-2"></i> {{ __('Top Followers') }}</h4>
     </div>
 
-    <div class="box-body p-0">
+    {{-- <div class="box-body p-0"> --}}
 {{--        <div id="top-followers-loading" class="text-center py-3">--}}
 {{--            <i class="fa fa-spinner fa-spin fa-2x"></i>--}}
 {{--            <p>{{ __('Loading...') }}</p>--}}
 {{--        </div>--}}
 
-        <div class="table-responsive d-none" id="top-followers-table-wrapper">
+        {{-- <div class="table-responsive d-none" id="top-followers-table-wrapper">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                 <tr>
@@ -26,10 +26,39 @@
             </table>
         </div>
     </div>
+</div> --}}
+
+<div class="box-body p-0">
+
+    <div id="top-followers-loading" class="text-center py-3">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+        <p>{{ __('Loading...') }}</p>
+    </div>
+
+    <div class="table-responsive d-none" id="top-followers-table-wrapper">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th class="text-center" style="width: 60px;">#</th>
+                <th class="text-center">{{ __('User') }}</th>
+                <th class="text-center">{{ __('Followers Count') }}</th>
+            </tr>
+            </thead>
+            <tbody id="top-followers-body"></tbody>
+        </table>
+    </div>
+
 </div>
 
+
 @php
-    $prefix = request()->is('superadmin*') ? 'superadmin' : 'admin';
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
 @endphp
 
 <script>
@@ -65,3 +94,18 @@
             });
     });
 </script>
+
+<style>
+    .avatar-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .avatar-cell img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>

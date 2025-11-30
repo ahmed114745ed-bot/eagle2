@@ -171,6 +171,25 @@ class ConfigController extends Controller
         return Redirect::back();
     }
 
+
+    public function UpdateConfigsGroupChat(Request $request)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_config_name);
+        }
+
+        foreach ($request->except('_token') as $key => $value) {
+            if (!is_null($value)) {
+                Config::updateOrCreate(['name' => $key], ['value' => $value]);
+
+                Cache::forget($key);
+                Cache::forever($key, $value);
+            }
+        }
+         admin_success('Saved Successfully');
+        return Redirect::back();
+    }
+
     public function updateConfigAgoraZego(Request $request)
     {
         Cache::forget('pusher_config');

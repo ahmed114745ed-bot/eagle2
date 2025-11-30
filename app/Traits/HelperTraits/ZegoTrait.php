@@ -57,7 +57,7 @@ Trait ZegoTrait
         return null;
     }
     public static function sendToZego($Action,$RoomId,$FromUserId,$MessageContent,$IsTest = 'false'){
-        Log::info('start sendToZego');
+
         $url = 'https://rtc-api.zego.im';
         $AppId = self::zegoData ('zego_app_id');
         $SignatureNonce = self::getSignatureNonce ();
@@ -81,10 +81,6 @@ Trait ZegoTrait
 
         ];
         try {
-            Log::channel('charisma')->info('Charisma sendToZego sent successfully', [
-                'roomId' => $RoomId,
-                'userIds' => $FromUserId,
-            ]);
         
            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
     

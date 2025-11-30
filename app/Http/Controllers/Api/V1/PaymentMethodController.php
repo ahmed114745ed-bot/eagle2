@@ -124,6 +124,7 @@ class PaymentMethodController extends Controller
             if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
                     'status' => false,
+                    'pending' => false,
                     'trx' => null,
                     'message' => 'Missing required parameters: merchantRefNumber or statusCode.',
                 ]);
@@ -134,6 +135,7 @@ class PaymentMethodController extends Controller
             if (! $purchaseProduct) {
                 return response()->json([
                     'status' => false,
+                    'pending' => false,
                     'trx' => $query['merchantRefNumber'],
                     'message' => 'Transaction not found.',
                 ]);
@@ -162,6 +164,7 @@ class PaymentMethodController extends Controller
 
                 return response()->json([
                     'status' => true,
+                    'pending' => true,
                     'trx' => $query['merchantRefNumber'],
                     'message' => 'pending',
                 ]);
@@ -169,12 +172,14 @@ class PaymentMethodController extends Controller
 
             return response()->json([
                 'status' => $query['statusCode'] == 200,
+                'pending' => false,
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
         } catch (Throwable $e) {
             return response()->json([
                 'status' => false,
+                'pending' => false,
                 'trx' => null,
                 'message' => 'An error occurred: ' . $e->getMessage(),
             ]);

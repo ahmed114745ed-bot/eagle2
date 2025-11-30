@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AreaManager\Http\Controllers\Admin; 
+namespace Modules\AreaManager\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Models\Charge;
@@ -19,11 +19,14 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\Region;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use App\Helpers\Common;
 
 class AreaManagerController extends MainController
 {
@@ -68,6 +71,14 @@ class AreaManagerController extends MainController
             ->title(__($this->title))
             ->body($this->profilePreview());
     }
+
+    public function showProfile($id, Content $content)
+    {
+        return  $content
+            ->title(__($this->title))
+            ->body($this->profile($id));
+    }
+
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
@@ -85,7 +96,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea', 'creator'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -99,7 +110,7 @@ class AreaManagerController extends MainController
             $url = getImagePath($this->avatar) ?? asset("images/businessman-icon.jpg");
             if (!isImageExists($url)) $url = asset("images/businessman-icon.jpg");
             $image = handleShowImageWithTypes($id, $url, 40, 40);
-            $showUrl = url("admin/area-managers/{$id}");
+            $showUrl = url("admin/area-manager-users/{$id}");
 
             return "
                 <div style='display:flex; align-items:center; gap:10px;'>
@@ -113,6 +124,7 @@ class AreaManagerController extends MainController
                 </div>
             ";
         });
+
 
         $grid->column('default', __('default'))->display(function () {
             if ($this->default == 1) {
@@ -146,6 +158,11 @@ class AreaManagerController extends MainController
             ";
         });
 
+        $grid->column('regionArea.name', __('Regions'));
+
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date)->locale(App::getLocale());
             return $carbonDate->translatedFormat('d F Y H:i');
@@ -262,6 +279,16 @@ class AreaManagerController extends MainController
 
         $this->addPhoneFields($form);
 
+        $form->text('area_name', __('area name'))
+            ->default(function ($form) {
+                if ($form->isEditing()) {
+                    $areaManager = $form->model();
+                    $regionName = Region::where('manager_id', $areaManager->id)->value('name');
+                    return $regionName;
+                }
+                return null;
+            });
+
         $this->addMapField($form, $id);
 
         $form->hidden('type')->value('area-manager');
@@ -307,6 +334,7 @@ class AreaManagerController extends MainController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
+            $form->ignore(['area_name']);
         });
 
         $form->saved(function (Form $form) {
@@ -319,18 +347,54 @@ class AreaManagerController extends MainController
             }
             $userId = $form->model()->id;
 
-            Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
+            // Country::where('area_manager_id', $userId)->update(['area_manager_id' => null]);
 
             $coveredCountries = request('covered_countries');
-            if ($coveredCountries) {
-                $countries = json_decode($coveredCountries, true);
-                if (is_array($countries) && count($countries) > 0) {
-                    $countryIds = array_column($countries, 'id');
-                    Country::whereIn('id', $countryIds)->update(['area_manager_id' => $userId]);
+            $areaName  =  request('area_name');
+            $area = Region::updateOrCreate(
+                ['manager_id' => $form->model()->id],
+                ['name' => $areaName]
+            );
+            $defaultManager = AreaManager::where('default', 1)->first();
+            if ($defaultManager) {
+                $defaultRegion = Region::firstOrCreate([
+                    'manager_id' => $defaultManager->id,
+                    'name' => 'Default Region for Default Manager',
+                ]);
+            }
 
-                    SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $userId]);
+            $oldCountryIds = RegionCountry::where('region_id', $area->id)
+                ->pluck('country_id')
+                ->toArray();
+
+            RegionCountry::where('region_id', $area->id)->delete();
+
+            if (!empty($oldCountryIds) && isset($defaultRegion)) {
+                foreach ($oldCountryIds as $countryId) {
+                    RegionCountry::firstOrCreate([
+                        'region_id' => $defaultRegion->id,
+                        'country_id' => $countryId,
+                    ]);
                 }
             }
+
+            $countries = json_decode($coveredCountries, true);
+            $countryIds = array_column($countries, 'id');
+            RegionCountry::where('region_id', $area->id)->delete();
+            RegionCountry::whereIn('country_id', $countryIds)->delete();
+
+            if (is_array($countries) && count($countries) > 0) {
+                foreach ($countries as $country) {
+
+                    RegionCountry::create([
+                        'region_id' => $area->id,
+                        'country_id' => $country['id']
+                    ]);
+                }
+
+                SuperAdmin::whereIn('country_id', $countryIds)->update(['parent_id' => $form->model()->id]);
+            }
+
 
             $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
             if ($role && $userId) {
@@ -355,8 +419,13 @@ class AreaManagerController extends MainController
 
     protected function addMapField(Form $form, $id = null)
     {
-        $countries = \App\Models\Country::select(['id', 'e_name as name', 'iso as iso2', 'area_manager_id'])
-            ->with(['areaManager:id,default'])
+
+        $countries = Country::select([
+            'id',
+            'e_name as name',
+            'iso as iso2',
+        ])
+            ->with('regions.manager')
             ->get();
 
         $countriesJson = $countries->toJson();
@@ -366,16 +435,17 @@ class AreaManagerController extends MainController
 
         if ($form->isEditing()) {
             $currentAreaManagerId = $id;
-            $selectedCountries = \App\Models\Country::where('area_manager_id', $currentAreaManagerId)
-                ->pluck('iso')
-                ->toArray();
+            $area = Region::where('manager_id', $currentAreaManagerId)->first();
+            if ($area) {
+                $selectedCountries = $area->countries()->pluck('iso')->toArray();
+            }
         }
         $selectedCountriesJson = json_encode($selectedCountries);
 
         $form->html(view('admin.partials.country_map', [
             'countriesJson' => $countriesJson,
             'selectedCountriesJson' => $selectedCountriesJson,
-            'currentAreaManagerId' => $currentAreaManagerId
+            'currentAreaManagerId' => $currentAreaManagerId,
         ])->render());
     }
 
@@ -478,13 +548,14 @@ class AreaManagerController extends MainController
 
     JS;
     }
+    
     public function profile($id)
     {
         $tab = request()->query('tab', 'agencies');
 
         $areaManager = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'di', 'default', 'country_id'])->findOrFail($id);
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($areaManager->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -493,6 +564,7 @@ class AreaManagerController extends MainController
 
         $agencies = $transactions = $target_history = null;
         $rewards = null;
+
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
@@ -506,18 +578,32 @@ class AreaManagerController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-        $types = ['vip', 'badge', 'ware'];
-        $type = request()->get('type', 'vip');
+
+        $chargeTabType = request()->get('type', 'receiver');
+
+
+        $charges = Charge::query()
+            ->when($chargeTabType == 'receiver', function ($q) use ($id) {
+                $q->where('user_id', $id)->where('user_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->when($chargeTabType == 'charger', function ($q) use ($id) {
+                $q->where('charger_id', $id)->where('charger_type', UserTypeEnum::AREA_MANAGER);
+            })
+            ->with(Common::chargerRelationsQuery())
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'charges_page');
+        $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
                 $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
                 break;
-                //            case 'rewards':
-                //                $rewards = SuperAdminReward::where('super_admin_id', $areaManager->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                //                break;
+            case 'charge':
+
+                break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager', 'agencies', 'totalCharges', 'totalSpent', 'type', 'types'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
     }
 
     public function profilePreview()
@@ -532,7 +618,7 @@ class AreaManagerController extends MainController
         $superAdmin = AreaManager::select(['id', 'name', 'app_id', 'avatar', 'username', 'default', 'country_id'])
             ->with('country')->where('country_id', $countryID)->firstOrFail();
 
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($superAdmin->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
@@ -540,7 +626,8 @@ class AreaManagerController extends MainController
         $superAdmin->display_image = $imageUrl;
 
         $agencies = $transactions = $target_history = null;
-
+        $superAdmins = SuperAdmin::where('parent_id', $superAdmin->$superAdmin)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
+        $prefix = dashboardName();
         $totals = Charge::selectRaw("
             SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
             SUM(CASE WHEN charger_type = ? AND charger_id = ? THEN amount ELSE 0 END) as total_spent
@@ -615,7 +702,7 @@ class AreaManagerController extends MainController
         Admin::script($this->mapJs());
     }
 
-   
+
 
     protected function mapJs0()
     {
@@ -835,6 +922,4 @@ class AreaManagerController extends MainController
         });
     JS;
     }
-
-    
 }

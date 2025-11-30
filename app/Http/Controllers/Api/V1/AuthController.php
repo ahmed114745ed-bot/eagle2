@@ -19,7 +19,7 @@ use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use Google_Client;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
 use Google\Client as GoogleClient;
-
+use Firebase\JWT\JWK;
 
 class AuthController extends Controller
 {
@@ -68,19 +68,28 @@ class AuthController extends Controller
 
         switch ($request['type']) {
             case 'phone_pass':
-                $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token'],'uuid'=> $request['uuid']];
+                $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
-                $fields = ['name' => $request->name, 'apple_id' => $request->apple_id, 'device_token' => @$request['device_token'], 'email' => @$request->email, 'user_id', @$request['user_id'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = [
+                    'name'          => $request->name,
+                    'email'         => $request->email,
+                    'id_token'      => $request->id_token,
+                    'device_token'  => $request->device_token,
+                    'lat'           => $request->lat,
+                    'long'          => $request->long,
+                    'iso'           => $request->iso,
+                    'uuid'          => $request->uuid,
+                ];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithApple($fields);
             case 'huawei':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'],'uuid'=> $request['uuid']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithHuawei($fields);
 
@@ -107,7 +116,7 @@ class AuthController extends Controller
         }
 
         $user->auth_token = $token;
-        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        if ($user->device_token) AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
         return Common::apiResponse(
             true,
@@ -161,62 +170,112 @@ class AuthController extends Controller
 
 
 
+    // protected function loginWithApple($data)
+    // {
+    //     $fields = $data;
+    //     $unique_id = $data['apple_id'];
+    //     if (!$unique_id)  return Common::apiResponse(0, 'missing app id', null, 400);
+    //     $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
+    //     $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+    //     $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
+    //     $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
+    //     $iat = strtotime('now');
+    //     $exp = strtotime('+60days');
+    //     $keyContent = file_get_contents(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+    //     // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+
+
+    //     $token = JWT::encode([
+    //         'iss' => $teamId,
+    //         'iat' => $iat,
+    //         'exp' => $exp,
+    //         'aud' => 'https://appleid.apple.com',
+    //         'sub' => $clientId,
+    //     ], $keyContent, 'ES256', $keyId);
+
+    //     try {
+    //         $res = Http::asForm()->post('https://appleid.apple.com/auth/token', [
+    //             'grant_type' => 'authorization_code',
+    //             'code' => $unique_id,
+    //             'redirect_uri' => $redirectUri,
+    //             'client_id' => $clientId,
+    //             'client_secret' => $token,
+    //         ]);
+    //     \App\Helpers\LogHelper::info('response apple', $res->json());
+    //         if ($res->successful()) {
+    //             $claims = explode('.', $res['id_token'])[1];
+    //             $data = json_decode(base64_decode($claims), true);
+    //         } else {
+    //             return      Common::apiResponse(0, 'data not full', null, 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
+    //     }
+
+    //     try {
+    //         [$user, $token] = $this->authService->loginWithApple($data, $unique_id);
+    //     } catch (\Exception $exception) {
+
+    //         return Common::apiResponse(0, $exception->getMessage(), null, 400);
+    //     }
+    //     // if (!$this->canLogin($user)) {
+    //     //     return Common::apiResponse(false, 'you are blocked', [], 408);
+    //     // }
+
+    //     $user->auth_token = $token;
+    //     event(new DeviceTokenSent($user->id, $user->device_token));
+    //     AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+
+    //     return Common::apiResponse(true, '', new MyDataResource($user), 200);
+    // }
+
     protected function loginWithApple($data)
     {
-        $fields = $data;
-        $unique_id = $data['apple_id'];
-        $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
-        $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
-        $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
-        $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
-        $iat = strtotime('now');
-        $exp = strtotime('+60days');
-        $keyContent = file_get_contents(public_path('files/AuthKey_BKD3JLV6HY.p8'));
-        // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+        if (empty($data['id_token'])) {
+            return Common::apiResponse(false, 'missing id_token', null, 400);
+        }
 
-
-        $token = JWT::encode([
-            'iss' => $teamId,
-            'iat' => $iat,
-            'exp' => $exp,
-            'aud' => 'https://appleid.apple.com',
-            'sub' => $clientId,
-        ], $keyContent, 'ES256', $keyId);
+        $appleKeys = Http::get('https://appleid.apple.com/auth/keys')->json();
 
         try {
-            $res = Http::asForm()->post('https://appleid.apple.com/auth/token', [
-                'grant_type' => 'authorization_code',
-                'code' => $unique_id,
-                'redirect_uri' => $redirectUri,
-                'client_id' => $clientId,
-                'client_secret' => $token,
-            ]);
-            if ($res->successful()) {
-                $claims = explode('.', $res['id_token'])[1];
-                $data = json_decode(base64_decode($claims), true);
-            } else {
-               // return      Common::apiResponse(0, 'data not full', null, 400);
-            }
+            $decoded = JWT::decode(
+                $data['id_token'],
+                JWK::parseKeySet($appleKeys)
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
+            return Common::apiResponse(false, 'invalid apple token', null, 401);
         }
+
+        $appleUserId = $decoded->sub;
+        $email = $decoded->email ?? $data['email'] ?? null;
+        $name  = $data['name'] ?? 'Apple User';
 
         try {
-            [$user, $token] = $this->authService->loginWithApple($data, $unique_id);
-        } catch (\Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            [$user, $token] = $this->authService->loginWithApple(
+                [
+                    'email' => $email,
+                    'name'  => $name,
+                    'lat'   => $data['lat'] ?? null,
+                    'long'  => $data['long'] ?? null,
+                    'iso'   => $data['iso'] ?? null,
+                    'uuid'  => $data['uuid'] ?? null,
+                    'device_token' => $data['device_token'] ?? null,
+                ],
+                $appleUserId
+            );
+        } catch (\Exception $ex) {
+            return Common::apiResponse(false, $ex->getMessage(), null, 400);
         }
-        // if (!$this->canLogin($user)) {
-        //     return Common::apiResponse(false, 'you are blocked', [], 408);
-        // }
 
         $user->auth_token = $token;
+
         event(new DeviceTokenSent($user->id, $user->device_token));
         AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
         return Common::apiResponse(true, '', new MyDataResource($user), 200);
     }
+
+
 
 
     protected function loginWithHuawei($data)

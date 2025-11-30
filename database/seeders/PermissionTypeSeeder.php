@@ -62,9 +62,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'dashboard',
                         'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
+                        'additional' => ['pay-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
+                            PermissionType::ADMIN->value => ['browse','pay-switch'],
                             PermissionType::SUPER_ADMIN->value => ['browse'],
                             PermissionType::AREA_MANAGER->value => ['browse'],
                         ],
@@ -81,11 +81,11 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     [
                         'key' => 'superadmin',
-                        'except' => ['show'],
+                        'except' => [],
                         'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete','show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create','show'],
 
                         ],
                     ],
@@ -166,6 +166,14 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['details-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'details-switch'],
+                        ],
+                    ],
+                    [
+                        'key' => 'game-settings',
+                        'except' => ['create', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'edit'],
                         ],
                     ],
                 ],
@@ -386,10 +394,10 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'splash', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'official-messages', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                        PermissionType::SUPER_ADMIN->value => $defaultMethods,
-                        PermissionType::AREA_MANAGER->value => $defaultMethods,
+                    ['key' => 'official-messages', 'except' => ['edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['create', 'browse', 'delete', 'show'],
+                        PermissionType::SUPER_ADMIN->value => ['create', 'browse', 'delete', 'show'],
+                        PermissionType::AREA_MANAGER->value => ['create', 'browse', 'delete', 'show'],
                     ],],
                     ['key' => 'advertising-space', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -859,7 +867,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'country', 'except' => ['show','create'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
@@ -1019,11 +1027,11 @@ class PermissionTypeSeeder extends Seeder
                 'permissions' => [
                     [
                         'key' => 'Bds',
-                        'except' => [],
+                        'except' => ['delete'],
                         'additional' => ['delete-switch', 'choose-switch', 'stop-salary-switch'],
                         'types' => [
-                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'delete', 'show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'delete', 'show'],
+                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
 
 
                         ],
@@ -1074,7 +1082,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'host', 'except' => ['create'], 'additional' => [], 'types' => [
                         PermissionType::SUPER_ADMIN->value => ['browse', 'edit', 'delete', 'show',],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'edit', 'delete', 'show',],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'edit',  'show',],
                     ],],
 
                 ],
@@ -1093,6 +1101,21 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::SUPER_ADMIN->value => ['browse', 'dedicate-switch'],
                     ],],
 
+                ],
+            ],
+            [
+                'name' => 'wallet fields',
+                'sort' => 41,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 41],
+                ],
+                'permissions' => [
+                    ['key' => 'wallet-template', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'wallet-fields', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                 ],
             ],
         ];

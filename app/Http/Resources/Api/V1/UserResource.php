@@ -20,6 +20,8 @@ class UserResource extends JsonResource
          $packsByType = $this->packs->groupBy('type');
          if ($this->relationLoaded('chatRoomsAsUser') || $this->relationLoaded('chatRoomsAsUser2')) {
              $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
+             $data['chat_id'] = $chatRoom?->id;
+             $data['unread_messages_count'] = $chatRoom?->unread_messages ?? 0;
          }
 
          $data = [
@@ -30,6 +32,7 @@ class UserResource extends JsonResource
              'special_id'           => $this->specialId?->ware?->id ?? 0,
              'notification_id'      => $this->notification_id ?: '',
              'name'                 => $this->name ?: "user #{$this->uuid}",
+             'deleted_at'           => $this->deleted_at,
              'nick_name'            => $this->nick_name,
              'number_of_fans'       => $this->number_of_fans,
              'number_of_followings' => $this->number_of_followings,
@@ -87,10 +90,11 @@ class UserResource extends JsonResource
              'user_types'           => $this->user_types,
              'shipping_agency'      => $this->formatShippingAgency(),
              'has_anti_ban'         => $this->getPackWithType(15),
-             'chat_id' => $chatRoom->id ?? null,
-             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
          ];
+        //  \Log::info("Unread message for user ".auth()->id(), [
+        //     '$chatRoom->unread_messages' => $chatRoom->unread_messages,
 
+        // ]);
          if (in_array($this->is_mic, ['0', '1'])) {
              $data['is_mic'] = $this->is_mic;
          }

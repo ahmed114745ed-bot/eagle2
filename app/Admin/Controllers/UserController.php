@@ -156,15 +156,15 @@ class UserController extends MainController
 
     protected function grid()
     {
-        $countryID = session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
 
         // Optimize eager loading
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id','transfer_salary', 'is_bd'])
+            // ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -194,9 +194,11 @@ class UserController extends MainController
         }
 
         if (request()->messages == 'month') {
-            $grid->model()->whereHas('chatMessages', fn($q) =>
-            $q->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
+            $grid->model()->whereHas(
+                'chatMessages',
+                fn($q) =>
+                $q->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
             );
         }
 
@@ -210,7 +212,7 @@ class UserController extends MainController
 
         if (request()->agencyMembers == 1) {
             $grid->model()->where('agency_id', '!=', 0)
-                ->whereHas('agency', function ($q) use ($countryID){
+                ->whereHas('agency', function ($q) use ($countryID) {
                     $q->where('country_id', $countryID);
                 });
         }
