@@ -2,8 +2,8 @@
 
 namespace Modules\TaskStream\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -21,9 +21,9 @@ class TaskStreamRespondInvitation implements ShouldBroadcast
         $this->data = $data;
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn(): Channel
     {
-        return new PrivateChannel('user-' . $this->targetUserId);
+        return new Channel('user-' . $this->targetUserId);
     }
 
     public function broadcastAs(): string
