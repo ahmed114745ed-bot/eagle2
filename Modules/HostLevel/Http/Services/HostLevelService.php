@@ -171,9 +171,9 @@ class HostLevelService
     {
         $eventType = $this->getEventType();
 
-        return (float) (GiftLog::where('receiver_id', $userId)
-            ->filterByEventType($eventType)
+        return  GiftLog::where('receiver_id', $userId)
             ->selectRaw('SUM(giftNum * giftPrice) AS total_diamond')
-            ->value('total_diamond') ?? 0);
+            ->filterByEventType($eventType)
+            ->value('total_diamond') ?? 0;
     }
 }

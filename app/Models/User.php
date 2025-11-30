@@ -2325,7 +2325,7 @@ class User extends Authenticatable
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
         return $this->hostLevelWinner()
             ->where('host_level_id', $hostLevelId)
-            ->filterByEventType($eventType);
+            ->filterByEventType($eventType) ->exists();
     }
 
     public function lastHostLevelWinner()
