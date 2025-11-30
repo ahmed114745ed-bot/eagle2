@@ -91,6 +91,14 @@
             width: calc(100% - 444px);
         }
 
+        .rtl .select-country {
+            transition: margin-right 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        .rtl .select-country.select-country-rtl {
+            margin-right: 177px !important;
+        }
+
         .sidebar-open .content-wrapper {
             margin-right: 250px;
         }
