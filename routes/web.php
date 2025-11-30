@@ -48,6 +48,7 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Admin\Controllers\AppearChargerAgencyController;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
@@ -304,6 +305,7 @@ Route::group(
 
         Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
         Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
+        Route::post('update-configs-group-chat', [ConfigController::class, 'UpdateConfigsGroupChat'])->name('update-configs-group-chat');
         Route::post('upload-badges-setting', [ConfigController::class, 'uploadBadges'])->name('upload.badges');
         Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');
         Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
@@ -818,11 +820,11 @@ Route::get('/codapay/create-payment', function () {
             ->post($url, $payload);
 
         if ($response->failed()) {
-            Log::error("❌ Codapay Connection Failed", [
-                'status'  => $response->status(),
-                'body'    => $response->body(),
-                'headers' => $response->headers(),
-            ]);
+            // Log::error("❌ Codapay Connection Failed", [
+            //     'status'  => $response->status(),
+            //     'body'    => $response->body(),
+            //     'headers' => $response->headers(),
+            // ]);
 
             return response()->json([
                 'error'   => 'Failed to connect Codapay',
@@ -859,8 +861,6 @@ Route::get('/codapay/create-payment', function () {
             'result'  => $result,
         ]);
     } catch (\Throwable $e) {
-        Log::error("💥 Codapay Exception", ['error' => $e->getMessage()]);
-
         return response()->json([
             'error'   => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),
@@ -970,3 +970,14 @@ Route::get('/manifest.json', function () {
         "display" => "standalone",
     ]);
 })->name('manifest.json');
+
+Route::get('/run-roomcup-rewards', function () {
+    Artisan::call('roomcup:calculate-rewards');
+
+    $output = Artisan::output();
+
+    return response()->json([
+        'message' => 'RoomCup rewards calculation executed successfully!',
+        'output'  => $output,
+    ]);
+});

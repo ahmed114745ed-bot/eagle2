@@ -100,7 +100,7 @@
     }
     .transferForm{
         height: 100%;
-        padding: 70px 9px 14px 16px;
+        padding: 25px 9px 14px 16px;
     }
     .transferForm .form-group{
         width: 70%;
@@ -172,6 +172,10 @@
     border-radius: 8px;
     font-weight: 600;
     margin-left: 10px;
+}
+
+.transferForm .actions {
+    margin: 10px 73px 4px 3px;
 }
 
 .btn-success {
@@ -305,8 +309,16 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <div class="form-group position-relative">
             <label for="target_id_search">{{ __('receiver') }}</label>
             <select id="target_id" name="target_id" class="form-control" style="width: 100%;" required></select>
-
         </div>
+
+        <div class="form-group">
+            <label for="charge_type">{{ __('Charge by') }}</label>
+            <select id="charge_type" name="charge_type" class="form-control" required onchange="updateChargeInputLabel()">
+                <option value="dollar">{{ __('Dollar') }}💲</option>
+                <option value="coins">{{ __('Coins') }}🪙</option>
+            </select>
+        </div>
+
         @php
                 $rate = App\Helpers\Common::getCoinsValue('shipping_coins');
                 $areaManagerRate = App\Helpers\Common::getCoinsValue('zones_coins');
@@ -348,7 +360,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998;"></div>
 
 {{-- JS --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/vendor/laravel-admin/AdminLTE/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -366,17 +379,40 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     function updateConvertedAmount() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         const targetType = document.getElementById('target_type').value;
-        const rate = RATES[targetType] || 1; // default fallback
-
-        const result = amount * rate;
+        const chargeType = document.getElementById('charge_type').value;
+        const rate = RATES[targetType] || 1; // fallback rate
         const output = document.getElementById('convertedAmount');
 
         if (amount > 0 && targetType) {
             output.style.display = 'block';
-            output.textContent = `= ${result.toFixed(2)} 🪙 (${rate} coins per $1)`;
+
+            if (chargeType === 'dollar') {
+                const result = amount * rate;
+                output.textContent = `= ${result.toFixed(2)} 🪙 (${rate} coins per $1)`;
+            } else {
+                const result = amount / rate;
+                output.textContent = `≈ ${result.toFixed(2)} 💲 (1 coin = ${(1 / rate).toFixed(4)} $)`;
+            }
         } else {
             output.style.display = 'none';
         }
+    }
+
+    function updateChargeInputLabel() {
+        const type = document.getElementById('charge_type').value;
+        const amountLabel = document.querySelector('label[for="amount"]');
+        const hint = document.querySelector('.form-text');
+        document.getElementById('convertedAmount').style.display = 'none';
+
+        if (type === 'dollar') {
+            amountLabel.innerHTML = "{{ __('enter_amount') }} 💲";
+            hint.textContent = "{{ __('Now charge by dollar') }}";
+        } else {
+            amountLabel.innerHTML = "{{ __('enter_amount') }} 🪙";
+            hint.textContent = "{{ __('Now charge by coins') }}";
+        }
+
+        document.getElementById('amount').value = '';
     }
 
     function openChargeModal() {
@@ -434,11 +470,7 @@ function initSelect2(targetType = null) {
         dropdownParent: $('#chargeModal'),
         placeholder: placeholderText,
         allowClear: true,
-        language: {
-            noResults: function() {
-                return "{{ __('not_in_same_country') }}";
-            }
-        },
+       
         ajax: {
             url: ajaxUrl,
             dataType: 'json',

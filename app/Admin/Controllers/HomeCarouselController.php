@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -225,8 +226,8 @@ class HomeCarouselController extends MainController
             'event'  => __('Events')
         ])->when('room', function (Form $form) {
             $form->select('owner_id', __('Owner'))
-                ->options('/api/search/users2')
-                ->ajax('/api/search/users2', 'id', 'name');
+                ->options($this->ownerOptions())
+                ->ajax('/api/search/owner-rooms', 'id', 'name');
         })->when('link', function (Form $form) {
             $form->url('url', trans('url'))->rules('nullable|url');
         })->when('event', function (Form $form) {
@@ -239,6 +240,17 @@ class HomeCarouselController extends MainController
                 'weekly_cp'    => __('weekly_cp'),
             ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
         });
+    }
+
+    protected function ownerOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (User::where('id', $value)->whereHas('ownerAudioRoom')->get() as $user) {
+                $ops[$user->id] =  $user->id . '_' . $user->name;
+            }
+            return $ops;
+        };
     }
 
 

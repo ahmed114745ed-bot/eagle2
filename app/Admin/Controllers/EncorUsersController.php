@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -169,20 +170,31 @@ class EncorUsersController extends AdminController
     {
         $permission_name = $this->permission_name;
 
-//        $userModel = config('admin.database.users_model');
+        //        $userModel = config('admin.database.users_model');
+        $areaManagerId = request('area_manager_id');
+
+        if ($areaManagerId) {
+            session(['area_manager_id' => $areaManagerId]);
+        }
+
+        if (request()->has('clear_area_manager')) {
+            session()->forget('area_manager_id');
+            $areaManagerId = null;
+        }
+
+        $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new \App\Models\Admin());
+     //   $countryID = empty((array)session('filter_country_id'));
 
-        $grid->model()->where(function ($q) {
-            $q->where('type', '!=', 'bd')
-                ->where('type', '!=', 'superadmin')
-                ->orWhereNull('type');
-        })
+        $grid->model()->when(empty($roleAuthId), fn($q) => $q->where('type', null))
             ->where('is_preview', 0)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
             });
-
+        if ($roleAuthId) {
+            $grid->model()->where('parent_id', $roleAuthId);
+        }
         $grid->column('id', 'ID')->sortable();
         $grid->column('username', trans('admin.username'));
         $grid->column('name', trans('admin.name'));
@@ -321,24 +333,24 @@ class EncorUsersController extends AdminController
         $connection = config('admin.database.connection');
 
         $form->display('id', 'ID');
-   
+
         $form->text('username', trans('admin.username'))
-        ->rules(function ($form) use ($connection, $userTable) {
-            $table = "{$connection}.{$userTable}";
-    
-            $rules = ['required'];
-    
-            $uniqueRule = Rule::unique($table, 'username');
-    
-            if (! $form->isCreating()) {
-                $id = $form->model()?->id ?? null;
-                $uniqueRule->ignore($id);
-            }
-    
-            $rules[] = $uniqueRule;
-    
-            return $rules;
-        });
+            ->rules(function ($form) use ($connection, $userTable) {
+                $table = "{$connection}.{$userTable}";
+
+                $rules = ['required'];
+
+                $uniqueRule = Rule::unique($table, 'username');
+
+                if (! $form->isCreating()) {
+                    $id = $form->model()?->id ?? null;
+                    $uniqueRule->ignore($id);
+                }
+
+                $rules[] = $uniqueRule;
+
+                return $rules;
+            });
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
@@ -350,7 +362,7 @@ class EncorUsersController extends AdminController
 
         $form->ignore(['password_confirmation']);
 
-        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->pluck('name', 'id'));
+        $form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::where('type', 'admin')->get()->pluck('name', 'id'));
         // $form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));

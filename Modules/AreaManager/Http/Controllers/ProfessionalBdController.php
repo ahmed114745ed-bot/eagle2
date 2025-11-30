@@ -42,7 +42,7 @@ class ProfessionalBdController extends MainController
     {
         return (new Box(
             title: __('admin.description'),
-            content: view('admin.grid.bd.description'),
+            content: view('admin.grid.bd.dbProfessionalDescription'),
         ));
     }
 
@@ -94,6 +94,9 @@ class ProfessionalBdController extends MainController
         $countriesIds = Common::areaCountries($authSuperAdmin->id);
         $grid->model()
             ->whereNotIn('country_id', $countriesIds)
+            ->whereHas('appUser', function ($query) use ($countriesIds) {
+                $query->whereIn('country_id', $countriesIds);
+            })
             ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -217,7 +220,30 @@ class ProfessionalBdController extends MainController
             return truncateAndTrim($this->bd_salaries_sum_cut_amount ?? 0, 2);
         });
 
-        $grid->column('country.name', __('country'));
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
 
         if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $col = $grid->column('transfer_salary', __("transfer_salary"))

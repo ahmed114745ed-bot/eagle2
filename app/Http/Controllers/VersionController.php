@@ -26,6 +26,8 @@ class VersionController extends Controller
         $authorizationHeader = $request->header('Authorization');
         $token               = $this->getTokenFromHeader($authorizationHeader);
         [$isAuth, $user] = $this->isAuth($token);
+        $settings = $this->getSettingsArray();
+        $appUrl = '';
         if ($user) {
             try {
                 if ($request->OS == 'Android' && $user->android_version != $version) {
@@ -33,12 +35,21 @@ class VersionController extends Controller
                 } else if ($request->OS == 'IOS' && $user->ios_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['ios_version' => intval($version)]);
                 } else if ($request->OS == 'Huawei' && $user->huawei_version != $version) {
-                    DB::table('users')->where('id', $user->id)->update(['huawei_version' => intval($version)]);
+                    DB::table('users')->where('id', $user->id)->update(['huawei_version' => intval($version)]);   
                 }
             } catch (\Exception $e) {
             }
             //            $user->update(['android_version' => $version]);
         }
+
+        $links = [
+            'Android' => $settings['android_link'] ?? null,
+            'IOS'     => $settings['ios_link'] ?? null,
+            'Huawei'  => $settings['huawei_link'] ?? null,
+        ];
+
+        $appUrl = $links[$request->OS] ?? null;
+
         $isBan          = $this->haveBan(@$user->uuid);
         $isGiftUpdated  = $this->isUpdated('gifts_update_at', @$request->gift_time);
         $isIntroUpdated = $this->isUpdated('intro_updated_at', @$request->intro_time);
@@ -51,13 +62,13 @@ class VersionController extends Controller
         $isColorSettingUpdated = $this->isUpdated('color_setting_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
-        $settings = $this->getSettingsArray();
+
 
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
         $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
-       
-       $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
+
+        $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
        
         $data = [
             'is_auth'         => $isAuth && !$isBan,
@@ -88,7 +99,9 @@ class VersionController extends Controller
             'live_status'    => (bool) ($settings['live_status'] ?? true),
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),
             'default_room_background'    => $default_background ?? '',
-            
+            'is_show_room_activity' => ($settings['room_cup'] ?? 0) == 1 || ($settings['room_cup_setting'] ?? 0) == 1,
+            'app_url' => @$appUrl,
+
         ];
 
         //update current version for user
@@ -186,7 +199,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool

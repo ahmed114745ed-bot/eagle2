@@ -659,6 +659,24 @@
     border-top: 1px solid #eee;
      background: var(--secondary-color);
 }
+.nav-pills {
+            display: inline-flex;
+            padding: 10px 0;
+        }
+
+        .nav-pills li {
+            display: inline-block;
+        }
+
+
+        .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+            border-top-color: var(--primary-color);
+        }
+
+        .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+            color: #fff;
+            background-color: var(--primary-color);
+        }
 
 
 
@@ -844,14 +862,17 @@
                 <span class="meta-label">{{ __("salary") }}:</span>
                 <span class="meta-value">{{ $areaManager->di }}</span>
             </div>
+        </div>
+            
+
+        <div class="agency-meta">
             <div class="meta-item">
-                <span class="meta-label">{{ __("country") }}:</span>
-                 <img src="{{ getImagePath(@$areaManager->country->flag) }}"
-                     class="flag-image"
-                     alt="flag Image"
-                     title="{{ app()->getLocale() === 'ar' ? @$areaManager->country->name : @$areaManager->country->e_name }}">
+                <span class="meta-label">{{__('country')}}:</span>
+                            
+                {!! @$areaManager->flag() !!}
             </div>
         </div>
+        
     </div>
 
 
@@ -911,7 +932,10 @@
 
 <div class="agency-tabs">
     <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
-{{--    <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>--}}
+     <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}" data-target="charge-tab">{{ __('Charge Reports') }}</a>
+     <a href="?tab=superAdmin" class="tab-btn {{ $activeTab == 'superAdmin' ? 'active' : '' }}" data-target="superAdmin-tab">{{ __('country manager') }}</a>
+
+
 </div>
 
 <!-- Loading Overlay -->
@@ -998,292 +1022,231 @@
     </div>
 @endif
 
-{{--@if($activeTab === 'rewards')--}}
-{{--    <div class="tab-content active" id="rewards-tab">--}}
-{{--        <div class="card">--}}
-{{--            <div class="card-header">--}}
-{{--                <h3>{{ __('rewards') }}</h3>--}}
-{{--                <span class="badge count-badge">{{ optional($rewards)->total() ?? 0 }}</span>--}}
-{{--            </div>--}}
+@if($activeTab === 'superAdmin')
+    <div class="tab-content active" id="superAdmin-tab">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('country manager') }}</h3>
+                <span class="badge count-badge">{{ optional($superAdmins)->total() ?? 0 }}</span>
+            </div>
+            @if($superAdmins && $superAdmins->count())
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('user') }}</th>
+                                 <th>{{ __('country') }}</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($superAdmins as $index => $superAdmin)
+                                <tr>
+                                    <td>{{ $index + 1 + (($superAdmins->currentPage() - 1) * $superAdmins->perPage()) }}</td>
 
-{{--            <div class="box-body">--}}
-{{--                <div class="nav-scroll-container {{ app()->getLocale() == 'ar' ? 'nav-right' : 'nav-left' }}">--}}
-{{--                    <ul class="nav nav-pills">--}}
-{{--                        @foreach($types as $name)--}}
-{{--                            <li class="{{ $type == $name ? 'active' : '' }}">--}}
-{{--                                <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}" class="charge_action">--}}
-{{--                                    {{ __($name) }}--}}
-{{--                                </a>--}}
-{{--                            </li>--}}
-{{--                        @endforeach--}}
-{{--                    </ul>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--            @if($rewards && $rewards->count())--}}
-{{--                <div class="table-responsive">--}}
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/superadmin-users/' .$superAdmin->id) }}">
+                                                        <img src="{{ $superAdmin->avatar ? getImagePath($superAdmin->avatar) : $defaultImage }}" 
+                                                            alt="{{ $superAdmin->username ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
 
-{{--                    <table class="data-table">--}}
-{{--                        <thead>--}}
-{{--                            <tr>--}}
-{{--                                <th>#</th>--}}
-{{--                                <th>{{ __('Name') }}</th>--}}
-{{--                                <th>{{ __('image') }}</th>--}}
-{{--                                <th>{{ __('count') }}</th>--}}
-{{--                            </tr>--}}
-{{--                        </thead>--}}
-{{--                        <tbody>--}}
-{{--                            @foreach($rewards as $index => $reward)--}}
-{{--                                @php--}}
-{{--                                    $name = '';--}}
-{{--                                    $image = '';--}}
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong>
+                                                        <a href="{{ url($prefix.'/superadmin-users/' .$superAdmin->id) }}" style="display: block;">
+                                                            {{ $superAdmin->username ?? '' }}
+                                                        </a>
+                                                    </strong>
 
-{{--                                    if (request('type') == 'ware') {--}}
-{{--                                        $name = @$reward->ware->name ?? '';--}}
-{{--                                        $image = @$reward->ware->image ?? '';--}}
-{{--                                    } elseif (request('type') == 'vip') {--}}
-{{--                                        $name = @$reward->vip->name ?? '';--}}
-{{--                                        $image = @$reward->vip->image ?? '';--}}
-{{--                                    } elseif (request('type') == 'badge') {--}}
-{{--                                        $name = @$reward->badge->name ?? '';--}}
-{{--                                        $image = @$reward->badge->image ?? '';--}}
-{{--                                    }--}}
-{{--                                @endphp--}}
+                                                    <small style="color: #555;">
+                                                        ID: {{ $superAdmin->id }}
+                                                    </small>
+                                                </div>
 
-{{--                                <tr>--}}
-{{--                                    <td>{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>--}}
-{{--                                    <td>{{ $name }}</td>--}}
-{{--                                    <td>--}}
-{{--                                        @if($image)--}}
-{{--                                            <img src="{{ getImagePath($image) }}" alt="Image" width="40" height="40">--}}
-{{--                                        @endif--}}
-{{--                                    </td>--}}
-{{--                                    <td>{{ $reward->no_reward }}</td>--}}
-{{--                                </tr>--}}
-{{--                            @endforeach--}}
-{{--                        </tbody>--}}
-{{--                    </table>--}}
-{{--                </div>--}}
-{{--                <div class="pagination-wrapper">--}}
-{{--                    {{ $rewards->appends(['tab' => 'rewards'])->links('vendor.pagination.default') }}--}}
-{{--                </div>--}}
-{{--            @else--}}
-{{--                <div class="empty-table">--}}
-{{--                    <i class="fas fa-users-slash"></i>--}}
-{{--                    <p>{{ __('No reward found') }}</p>--}}
-{{--                </div>--}}
-{{--            @endif--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--@endif--}}
+                                            </div>
+                                        </td>
 
-{{--@if($activeTab === 'transactions')--}}
 
-{{--<div class="tab-content active" id="members-tab">--}}
-{{--        <div class="card">--}}
-{{--            <div class="card-header">--}}
-{{--                <h3>{{ __('transactions') }}</h3>--}}
-{{--                <span class="badge count-badge">{{ optional($transactions)->total() ?? 0 }}</span>--}}
-{{--            </div>--}}
-{{--<!-- Charges Tab -->--}}
-{{--@if($transactions && $transactions->count())--}}
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                
+                                                <!-- Avatar -->
+                                                <div class="user-avatar">
+                                                    <a href="{{ url($prefix.'/users/' . ($superAdmin->appUser?->id ?? 0)) }}">
+                                                        <img src="{{ $superAdmin->appUser?->profile?->avatar ? getImagePath($superAdmin->appUser->profile->avatar) : $defaultImage }}"
+                                                            alt="{{ $superAdmin->appUser?->name ?? '' }}"
+                                                            style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                    </a>
+                                                </div>
 
-{{--    <div class="table-responsive">--}}
-{{--        <table class="data-table" id="charge">--}}
-{{--            <thead>--}}
-{{--                <tr>--}}
-{{--                    <th>#</th>--}}
-{{--                    <!-- <th>{{ __('Name') }}</th> -->--}}
-{{--                    <th>{{ __('receiver') }}</th>--}}
-{{--                    <th>{{ __('usd') }}</th>--}}
-{{--                    <th>{{ __('amount') }}</th>--}}
-{{--                    <th>{{ __('Created') }}</th>--}}
-{{--                </tr>--}}
-{{--            </thead>--}}
-{{--            <tbody>--}}
-{{--                @foreach($transactions as $index => $charge)--}}
-{{--                    @php--}}
-{{--                        // تحديد المستخدم (charger) مع التحقق من وجوده--}}
-{{--                        $user = null;--}}
-{{--                        $userImage = null;--}}
-{{--                        $userName = 'N/A';--}}
-{{--                        $userUrl = '#';--}}
+                                                <!-- Name + ID -->
+                                                <div class="user-info" style="line-height: 1.2;">
+                                                    <strong style="display: flex; align-items: center; gap: 6px;">
+                                                        <a href="{{ url($prefix.'/users/' . ($superAdmin->appUser?->id ?? 0)) }}"
+                                                        style="display: flex; align-items: center; gap: 6px;">
+                                                        
+                                                            {{-- Country Flag --}}
+                                                            @if(@$superAdmin->appUser->country->flag)
+                                                                <img src="{{ getImagePath($superAdmin->appUser->country->flag) }}"
+                                                                    alt="flag"
+                                                                    style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                            @endif
 
-{{--                        if ($charge->charger_type === 'dash' && $charge->user_type === 'dash') {--}}
-{{--                            $user = $charge->admin;--}}
-{{--                        } else {--}}
-{{--                            $user = $charge->sender;--}}
-{{--                        }--}}
+                                                            {{-- User Name --}}
+                                                            {{ $superAdmin->appUser?->name ?? '' }}
+                                                        </a>
+                                                    </strong>
 
-{{--                        if ($user) {--}}
-{{--                            $userImage = $user->avatar ?? ($user->profile->avatar ?? null);--}}
-{{--                            $userName = $user->name ?? 'N/A';--}}
+                                                    <small style="color: #555;">
+                                                        ID: {{ $superAdmin->appUser?->uuid ?? 'N/A' }}
+                                                    </small>
+                                                </div>
 
-{{--                            if ($charge->charger_type === 'dash' && $charge->user_type === 'dash') {--}}
-{{--                                $userUrl = url("admin/admins/{$user->id}");--}}
-{{--                            } else {--}}
-{{--                                $userUrl = url("admin/users/{$user->id}");--}}
-{{--                            }--}}
-{{--                        }--}}
+                                            </div>
+                                        </td>
 
-{{--                        // تحديد المستلم (receiver) مع التحقق من وجوده--}}
-{{--                        $receiverHtml = '';--}}
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+    
+                                                {{-- Country Flag --}}
+                                                @if($superAdmin->country?->flag)
+                                                    <div class="user-avatar">
+                                                        <img src="{{ getImagePath($superAdmin->country->flag) }}"
+                                                            alt="{{ $superAdmin->country?->name ?? 'flag' }}"
+                                                            style="width: 25px; height: 16px; object-fit: cover; border-radius: 2px;">
+                                                    </div>
+                                                @endif
 
-{{--                        if ($charge->receiveragency) {--}}
-{{--                            $agency = $charge->receiveragency;--}}
-{{--                            if ($agency) {--}}
-{{--                                $cacheKey = "agency_image_{$agency->id}";--}}
-{{--                                $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {--}}
-{{--                                    $path = @$agency->img;--}}
-{{--                                    $defaultImage = asset("images/icon-agency.jpg");--}}
-{{--                                    $url = getImagePath($path) ?? $defaultImage;--}}
-{{--                                    if (!isImageExists($url)) $url = $defaultImage;--}}
-{{--                                    return handleShowImageWithTypes($agency->id, $url, 40, 40);--}}
-{{--                                });--}}
-{{--                               $name = $agency->name ?? '';--}}
-{{--                                $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);--}}
-{{--                                $receiverHtml = "--}}
-{{--                                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>--}}
-{{--                                        <div style='display: flex; align-items: center; gap: 10px;'>--}}
-{{--                                            {$image}--}}
-{{--                                            <div style='display: flex; flex-direction: column;'>--}}
-{{--                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>--}}
-{{--                                                <span style='font-size: smaller;'>ID: {$agency->id}</span>--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    </a>--}}
-{{--                                ";--}}
-{{--                            }--}}
-{{--                        } else {--}}
-{{--                            $receiverUser = null;--}}
-{{--                            if ($charge->user_id) {--}}
-{{--                                $receiverUser = \App\Models\User::find($charge->user_id);--}}
-{{--                            }--}}
+                                                {{-- Country Name (according to language) --}}
+                                                <strong>
+                                                    {{ app()->getLocale() === 'ar' 
+                                                        ? ($superAdmin->country?->name ?? '') 
+                                                        : ($superAdmin->country?->e_name ?? '') }}
+                                                </strong>
 
-{{--                            if ($receiverUser) {--}}
-{{--                                $path = $receiverUser->profile?->avatar ?? null;--}}
-{{--                                $defaultImage = asset("images/businessman-icon.jpg");--}}
-{{--                                $url = getImagePath($path) ?? $defaultImage;--}}
-{{--                                if (!isImageExists($url)) $url = $defaultImage;--}}
-{{--                                $image = handleShowImageWithTypes($receiverUser->id, $url, 40, 40);--}}
-{{--                                $showUrl = url("admin/users/{$receiverUser->id}");--}}
-{{--                                $name =$receiverUser->name ??'';--}}
-{{--                                $receiverHtml = "--}}
-{{--                                    <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>--}}
-{{--                                        <div style='display: flex; align-items: center; gap: 10px;'>--}}
-{{--                                            {$image}--}}
-{{--                                            <div>--}}
-{{--                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span><br>--}}
-{{--                                                <span style='color: #aaa; font-size: smaller;'>UUID: {$receiverUser->uuid}</span>--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    </a>--}}
-{{--                                ";--}}
-{{--                            } else {--}}
-{{--                                $receiverHtml = '<span class="text-danger">' . __('Unknown') . '</span>';--}}
-{{--                            }--}}
-{{--                        }--}}
-{{--                    @endphp--}}
-{{--                    <tr>--}}
-{{--                        <td>{{ $transactions->firstItem() + $index }}</td>--}}
-{{--                        <!-- <td>--}}
-{{--                            <a href="{{ $userUrl }}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">--}}
-{{--                                <img src="{{ getImagePath($userImage) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%;">--}}
-{{--                                <span>{{ $userName }}</span>--}}
-{{--                            </a>--}}
-{{--                        </td> -->--}}
-{{--                        <td>{!! $receiverHtml !!}</td>--}}
-{{--                        <td>{{ number_format($charge->usd ?? 0, 2) }}</td>--}}
-{{--                        <td>{{ number_format($charge->amount ?? 0, 2) }}</td>--}}
-{{--                        <td>{{ $charge->created_at }}</td>--}}
-{{--                    </tr>--}}
-{{--                @endforeach--}}
-{{--            </tbody>--}}
-{{--        </table>--}}
-{{--    </div>--}}
-{{--    <div class="pagination-wrapper">--}}
-{{--        {{ $transactions->appends(['tab' => 'transactions'])->links('vendor.pagination.default') }}--}}
-{{--    </div>--}}
-{{--@else--}}
-{{--    <!-- <div class="empty-table">--}}
-{{--        <i class="fas fa-info-circle"></i>--}}
-{{--        <p>{{ __('No transactions found') }}</p>--}}
-{{--    </div> -->--}}
-{{--@endif--}}
-{{--</div>--}}
-{{--</div>--}}
-{{--@endif--}}
+                                            </div>
+                                        </td>
 
-{{--@if($activeTab === 'target_history')--}}
-{{--<div class="tab-content active" id="target-history-tab">--}}
-{{--    <div class="card">--}}
-{{--        <div class="card-header d-flex justify-content-between align-items-center">--}}
-{{--            <h4 class="card-title">{{ __('Target History') }}</h4>--}}
 
-{{--            <form method="GET" class="form-inline">--}}
-{{--                <input type="hidden" name="tab" value="target_history">--}}
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ $superAdmins->appends(['tab' => 'superAdmin'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="empty-table">
+                    <i class="fas fa-users-slash"></i>
+                    <p>{{ __('No country manager found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
 
-{{--                <select name="month" class="form-control mr-2">--}}
-{{--                    @foreach(range(1,12) as $m)--}}
-{{--                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>--}}
-{{--                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}--}}
-{{--                        </option>--}}
-{{--                    @endforeach--}}
-{{--                </select>--}}
+@if($activeTab == 'charge')
+    <div class="tab-content active" id="charge-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ __('Charge Reports') }}</h4>
+            </div>
 
-{{--                <select name="year" class="form-control mr-2">--}}
-{{--                    @foreach(range(now()->year-5, now()->year) as $y)--}}
-{{--                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>--}}
-{{--                            {{ $y }}--}}
-{{--                        </option>--}}
-{{--                    @endforeach--}}
-{{--                </select>--}}
+            <div class="box-body">
+                <div class="nav-scroll-container">
+                    <ul class="nav nav-pills">
 
-{{--                <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>--}}
-{{--            </form>--}}
-{{--        </div>--}}
+                        <li class="{{ $chargeTabType == 'receiver' ? 'active' : '' }}">
+                            <a class="nav-link @if($chargeTabType == 'receiver') active @endif"
+                               href="?tab=charge&type=receiver"
+                               role="tab">
+                                {{ __('Receiver') }}
+                            </a>
+                        </li>
+                        <li class="{{ $chargeTabType == 'charger' ? 'active' : '' }}">
+                            <a class="nav-link @if($chargeTabType == 'charger') active @endif"
+                               href="?tab=charge&type=charger"
+                               role="tab">
+                                {{ __('Charger') }}
+                            </a>
+                        </li>
 
-{{--        @if($target_history && $target_history->count())--}}
-{{--            <div class="table-responsive">--}}
-{{--                <table class="data-table">--}}
-{{--                    <thead>--}}
-{{--                        <tr>--}}
-{{--                            <th>#</th>--}}
-{{--                            <th>{{ __('Agency ID') }}</th>--}}
-{{--                            <th>{{ __('Amount') }}</th>--}}
-{{--                            <th>{{ __('Month') }}</th>--}}
-{{--                            <th>{{ __('Year') }}</th>--}}
-{{--                            <th>{{ __('Is Paid') }}</th>--}}
-{{--                            <th>{{ __('Created At') }}</th>--}}
-{{--                        </tr>--}}
-{{--                    </thead>--}}
-{{--                    <tbody>--}}
-{{--                        @foreach($target_history as $index => $item)--}}
-{{--                            <tr>--}}
-{{--                                <td>{{ $target_history->firstItem() + $index }}</td>--}}
-{{--                                <td>{{ $item->agency_id }}</td>--}}
-{{--                                <td>{{  truncateAndTrim( $item->amount)  }}</td>--}}
-{{--                                <td>{{ $item->month }}</td>--}}
-{{--                                <td>{{ $item->year }}</td>--}}
-{{--                                <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>--}}
-{{--                                <td>{{ $item->created_at }}</td>--}}
-{{--                            </tr>--}}
-{{--                        @endforeach--}}
-{{--                    </tbody>--}}
-{{--                </table>--}}
-{{--            </div>--}}
+                    </ul>
+                </div>
 
-{{--            <div class="pagination-wrapper">--}}
-{{--                {{ $target_history->appends(request()->except('page'))->links('vendor.pagination.default') }}--}}
-{{--            </div>--}}
-{{--        @else--}}
-{{--            <div class="empty-table">--}}
-{{--                <i class="fas fa-calendar-times"></i>--}}
-{{--                <p>{{ __('No target history found') }}</p>--}}
-{{--            </div>--}}
-{{--        @endif--}}
-{{--    </div>--}}
-{{--</div>--}}
-{{--@endif--}}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>
+                                @if($chargeTabType == 'receiver')
+                                    {{ __('Charger') }}
+                                @else
+                                    {{ __('Receiver') }}
+                                @endif
+                            </th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('usd') }}</th>
+                            <th>{{ __('Created at') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($charges as $index => $charge)
+                            @php
+                                if($chargeTabType == 'receiver') {
+                                    $userCharges = \App\Helpers\Common::getChargerInfo($charge);
+                                  } else {
+                                    $userCharges = \App\Helpers\Common::getReceiverInfo($charge);
+                                  }
+                                  $name = $userCharges['name'] ?? '-';
+                                  $uid = $userCharges['uuid'] ?? '-';
+                                  $type = $userCharges['type'] ?? '-';
+                                  $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
+                            @endphp
+                            <tr>
+                                <td>{{ @$charge->id ?? 0 }}</td>
+                                <td>
+                                    <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ getImagePath( $image) }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                </td>
+                                <td>{{ $type }} </td>
+                                <td>{{ $charge->amount }} </td>
+                                <td>{{ $formattedUsd = number_format((float)$charge->usd, 2) }}</td>
+                                <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            {{-- Pagination --}}
+            @if($charges instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="pagination-container mt-3">
+                    {{ $charges->appends([
+                        'tab' => 'charge',
+                    ])->links('vendor.pagination.bootstrap-4') }}
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
 
 </div>
 

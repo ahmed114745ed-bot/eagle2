@@ -1,12 +1,13 @@
 <?php
 
-namespace Database\Seeders;
+namespace Modules\AreaManager\Database\Seeders;
 
 use App\Models\Country;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Modules\AreaManager\Entities\AreaManager;
+use Modules\AreaManager\Entities\Region;
 
 class AreaManagerSeeder extends Seeder
 {
@@ -20,11 +21,14 @@ class AreaManagerSeeder extends Seeder
             'default' => 1,
             
         ]);
+        $defaultRegion = Region::firstOrCreate(
+            ['name' => 'Default Region for Default Manager', 'manager_id' => $manager->id]
+        );
 
-        $countries = Country::all();
-        foreach ($countries as $country) {
-            $country->area_manager_id = $manager->id;
-            $country->save();
+        $countriesWithoutRegion = Country::whereDoesntHave('regions')->get();
+
+        foreach ($countriesWithoutRegion as $country) {
+            $country->regions()->attach($defaultRegion->id);
         }
     }
 }

@@ -55,15 +55,23 @@ function initWorldMap() {
         const iso = country.iso2.toUpperCase();
         countryMap[iso] = country;
 
-        if (country.area_manager_id === currentAreaManagerId && currentAreaManagerId != null) {
-            regionColors[iso] = '#4CAF50';
+        const firstRegion = country.regions?.[0];
+        const manager = firstRegion?.manager;
+
+        console.log(country);
+        console.log('mkkk');
+        console.log(manager);
+
+        if (manager?.id === currentAreaManagerId && currentAreaManagerId != null) {
+            regionColors[iso] = '#4CAF50'; 
             myCountries.push(iso);
-        } else if (country.area_manager_id && (!country.area_manager || country.area_manager.default !== 1)) {
-            regionColors[iso] = '#B0BEC5';
+        } else if (manager?.id && manager?.default !== 1) {
+            regionColors[iso] = '#B0BEC5'; 
         } else {
             regionColors[iso] = '#e0e0e0';
         }
     });
+
 
     $('#world-map').empty();
 
@@ -97,17 +105,27 @@ function initWorldMap() {
                 normalizeFunction: 'polynomial'
             }]
         },
+        
         onRegionClick: function(e, code) {
             const mapObj = $('#world-map').vectorMap('get', 'mapObject');
             const iso = code.toUpperCase();
             const country = countryMap[iso];
 
-            if (
-                country &&
-                country.area_manager_id &&
-                country.area_manager_id !== currentAreaManagerId &&
-                (!country.area_manager || country.area_manager.default !== 1)
-            ) {
+            if (!country) return;
+
+            let managerId = null;
+            let isDefaultManager = false;
+
+            if (country.regions && country.regions.length) {
+                const region = country.regions.find(r => r.manager && r.manager.id === currentAreaManagerId)
+                            || country.regions[0]; // إذا لم يوجد، خذ أول منطقة
+                if (region.manager) {
+                    managerId = region.manager.id;
+                    isDefaultManager = region.manager.default === 1;
+                }
+            }
+
+            if (managerId && managerId !== currentAreaManagerId && !isDefaultManager) {
                 e.preventDefault();
                 if (typeof toastr !== 'undefined') toastr.warning('❌ لا يمكن تحديد هذه الدولة لأنها تابعة لمدير آخر.');
                 return;
@@ -121,12 +139,11 @@ function initWorldMap() {
                 mapObj.clearSelectedRegions();
                 mapObj.setSelectedRegions(selectedRegions);
 
-                if (country && country.area_manager_id === currentAreaManagerId) {
+                if (managerId === currentAreaManagerId) {
                     mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' });
                 } else {
                     mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' });
                 }
-
             } else {
                 selectedRegions.push(code);
                 mapObj.setSelectedRegions(selectedRegions);
@@ -137,15 +154,21 @@ function initWorldMap() {
             updateCountryList(mapObj);
         },
         onRegionTipShow: function(e, el, code) {
+      
+            
             const c = countryMap[code.toUpperCase()];
+
             if (c) {
+                const firstRegion = c.regions[0];
+                const manager = firstRegion?.manager; 
+
                 let text = `<strong>${c.name}</strong>`;
 
-                if (c.area_manager_id === currentAreaManagerId) {
+                if (manager?.id === currentAreaManagerId) {
                     text += `<br><small style="color:#4CAF50;font-weight:bold;">✅ تابعة لك بالفعل</small>`;
-                } else if (c.area_manager_id && (!c.area_manager || c.area_manager.default !== 1)) {
+                } else if (manager?.id && manager?.default !== 1) {
                     text += `<br><small style="color:red;">❌ تابعة لمدير آخر</small>`;
-                } else if (c.area_manager && c.area_manager.default === 1) {
+                } else if (manager?.default === 1) {
                     text += `<br><small style="color:#2196F3;">📍 تابعة للمدير الافتراضي - يمكن اختيارها</small>`;
                 } else {
                     text += `<br><small style="color:#666;">📍 متاحة للتحديد</small>`;
@@ -180,27 +203,71 @@ function initWorldMap() {
     }
 
     function updateCountryList(mapObj) {
-        const selected = mapObj.getSelectedRegions();
-        const html = selected.map(code => {
-            const c = countryMap[code];
-            if (!c) return '';
-            const badgeColor = (c.area_manager_id === currentAreaManagerId) ? 'badge-success' : 'badge-primary';
-            return `<span class="badge ${badgeColor} m-1" style="cursor:pointer;" onclick="removeCountry('${code}')">${c.name} <i class='fa fa-times'></i></span>`;
-        }).join('');
-        $('#selected-countries-list').html(html || '<span class="text-muted">لم يتم اختيار دول بعد</span>');
-    }
+    const selected = mapObj.getSelectedRegions();
+    const html = selected.map(code => {
+        const c = countryMap[code];
+        if (!c) return '';
+
+        let managerId = null;
+        let isDefaultManager = false;
+
+        if (c.regions && c.regions.length) {
+            const region = c.regions.find(r => r.manager && r.manager.id === currentAreaManagerId)
+                         || c.regions[0];
+
+            if (region && region.manager) {
+                managerId = region.manager.id;
+                isDefaultManager = region.manager.default === 1;
+            }
+        }
+
+        let badgeColor = 'badge-secondary';
+        if (managerId === currentAreaManagerId) {
+            badgeColor = 'badge-success'; 
+        } else if (isDefaultManager) {
+            badgeColor = 'badge-info'; 
+        } else {
+            badgeColor = 'badge-primary'; 
+        }
+
+        return `
+            <span class="badge ${badgeColor} m-1" style="cursor:pointer;" onclick="removeCountry('${code}')">
+                ${c.name} <i class="fa fa-times"></i>
+            </span>
+        `;
+    }).join('');
+
+    $('#selected-countries-list').html(html || '<span class="text-muted">لم يتم اختيار دول بعد</span>');
+}
+
 
     window.removeCountry = function(code) {
         const mapObj = $('#world-map').vectorMap('get', 'mapObject');
         const iso = code.toUpperCase();
         const country = countryMap[iso];
 
-        mapObj.setSelectedRegions(mapObj.getSelectedRegions().filter(c => c !== code));
+        const updatedRegions = mapObj.getSelectedRegions().filter(c => c !== code);
+        mapObj.setSelectedRegions(updatedRegions);
 
-        if (country && country.area_manager_id === currentAreaManagerId) {
-            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' });
+        let managerId = null;
+        let isDefaultManager = false;
+
+        if (country && country.regions && country.regions.length) {
+            const region = country.regions.find(r => r.manager && r.manager.id === currentAreaManagerId)
+                        || country.regions[0]; 
+
+            if (region && region.manager) {
+                managerId = region.manager.id;
+                isDefaultManager = region.manager.default === 1;
+            }
+        }
+
+        if (managerId === currentAreaManagerId) {
+            mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' }); 
+        } else if (isDefaultManager) {
+            mapObj.series.regions[0].setValues({ [iso]: '#2196F3' }); 
         } else {
-            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' });
+            mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' }); 
         }
 
         updateSelectedCountries(mapObj);
@@ -213,23 +280,38 @@ function initWorldMap() {
 
         selectedRegions.forEach(iso => {
             const country = countryMap[iso];
-            if (country) {
-                if (country.area_manager_id === currentAreaManagerId) {
-                    mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' });
-                } else {
-                    mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' });
+            if (!country) return;
+
+            let managerId = null;
+            let isDefaultManager = false;
+
+            if (country.regions && country.regions.length) {
+                const region = country.regions.find(r => r.manager && r.manager.id === currentAreaManagerId)
+                            || country.regions[0];
+
+                if (region && region.manager) {
+                    managerId = region.manager.id;
+                    isDefaultManager = region.manager.default === 1;
                 }
+            }
+
+            if (managerId === currentAreaManagerId) {
+                mapObj.series.regions[0].setValues({ [iso]: '#4CAF50' }); 
+            } else if (isDefaultManager) {
+                mapObj.series.regions[0].setValues({ [iso]: '#2196F3' }); 
+            } else {
+                mapObj.series.regions[0].setValues({ [iso]: '#e0e0e0' }); 
             }
         });
 
         mapObj.clearSelectedRegions();
         updateSelectedCountries(mapObj);
         updateCountryList(mapObj);
+
         console.log('🗑️ تم إلغاء تحديد جميع الدول');
     };
 }
 
-// تحميل الخريطة عند فتح الصفحة أو عند إعادة تحميل PJAX أو عند فتح الفورم
 function reloadMapWhenFormOpens() {
     $('#world-map').empty();
     if (typeof $.fn.vectorMap === 'undefined') {

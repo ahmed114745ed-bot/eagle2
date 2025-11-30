@@ -11,7 +11,7 @@
         :root {
             /* Enhanced color scheme */
             --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};     
-            --secondary-color:{{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            --secondary-color:{{ data_get($settings, 'app_primary_color', '#ffffff') }};
             --accent-color: #06b6d4;
             --dark-bg: #0f0f23;
             --text-color: #1a1a2e;
@@ -959,7 +959,7 @@
 
         /* Stats Section */
         .stats {
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get($settings, 'app_primary_color', '#ffffff') }};
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             padding: 80px 8%;
             color: white;

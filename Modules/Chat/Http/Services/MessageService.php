@@ -178,11 +178,11 @@ class MessageService
 
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
-        \Log::info('updateMessageStatus: ', ['user2' =>  $user2->id]);
+        // \Log::info('updateMessageStatus: ', ['user2' =>  $user2->id]);
 
         if ($user2->online == 1) {
             $condition = ($user2->current_room_chat == $chatRoom->id);
-            \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
+            // \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
 
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);

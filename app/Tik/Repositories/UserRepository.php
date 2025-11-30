@@ -536,11 +536,29 @@ class UserRepository extends AbstractRepository
         return $this->model->whereNotNull('game_id')->with(['profile:id,user_id,avatar'])->where('online', 1)->with('nowGame')->paginate(10);
     }
 
-    public function friends(): LengthAwarePaginator
+    public function friends($tasks): LengthAwarePaginator
     {
         $user = $this->model->where('id', auth()->id())->firstOrFail();
 
-        return $user->friends()->where('online', 1)->paginate(request('per_page'));
+        return $user->friends()
+            ->where('online', 1)
+            ->whereHas('ownerRoom', function ($query) use ($tasks){
+                $query->where('type', 'live')
+                    ->where('is_live', 1)
+                    ->when(!empty($tasks), function ($q) use ($tasks) {
+                        $q->whereNotIn('id', $tasks);
+                    });
+            })
+            ->with([
+                'profile:id,user_id,avatar',
+                'ware',
+                'UserVip',
+                'packs',
+                'ownerRoom' => function ($query) {
+                $query->where('type', 'live')->where('is_live', 1);
+            }
+            ])
+            ->paginate(request('per_page'));
     }
 
     public function online()
@@ -587,5 +605,9 @@ class UserRepository extends AbstractRepository
             now()->addMinutes(10),
             fn() => $this->model->where('id', $id)->exists()
         );
+    }
+    public function emailExists(string $email): bool
+    {
+        return $this->model->where('email', $email)->exists();
     }
 }

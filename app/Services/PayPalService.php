@@ -24,8 +24,8 @@ class PayPalService
     $clientId = config('paypal.client_id');
     $clientSecret = config('paypal.client_secret');
 //    $environment = new ProductionEnvironment($clientId, $clientSecret);
-    $environment = new SandboxEnvironment($clientId, $clientSecret);
-    $this->client = new PayPalHttpClient($environment);
+//    $environment = new SandboxEnvironment($clientId, $clientSecret);
+//    $this->client = new PayPalHttpClient($environment);
 }
 
    public static function redirectUrl()
@@ -142,8 +142,6 @@ class PayPalService
                 return $link->href;
             }
         }
-
-        \Log::error('PayPal approve link not found', ['order_id' => $orderId, 'status' => $status]);
         throw new \Exception("PayPal approval link not found");
     }
 
@@ -291,10 +289,16 @@ class PayPalService
         $resource = $request->get('resource');
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
         $paypalId   = $resource['id'] ?? null;
+        $trx = $resource['supplementary_data']['related_ids']['order_id'] ?? null;
 
-        $coinLog = CoinLog::where('trx', $paypalId)->first();
+        if ($trx){
+            $coinLog = CoinLog::where('trx', $trx)->first();
+        } else {
+            $coinLog = CoinLog::where('trx', $paypalId)->first();
+        }
 
         if (! $coinLog){
+            info('Failed');
             return response()->json([
                 'status'  => 'ignored',
                 'trx'     =>  $paypalId,
@@ -302,12 +306,11 @@ class PayPalService
             ]);
         }
 
+        Log::channel('payPal')->info($eventType, $request->all());
+//        LogHelper::info($eventType, $request->all());
 
-        LogHelper::info($eventType, $request->all());
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
-
-         
                 return response()->json([
                     'status'  => true,
                     'trx'     =>  $paypalId,
@@ -315,39 +318,33 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.PENDING':
-            
-                $coinLog->update(['status' => PaymentStatus::PENDING, 'trx' => $paypalId]);
+                $coinLog->update(['status' => PaymentStatus::PENDING, 'trx' => $trx]);
                 return response()->json([
                     'status'  => true,
-                    'trx'     => $paypalId,
+                    'trx'     => $trx,
                     'message' => 'Transaction pending',
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
-           
-                return $this->webhookPayment($paypalId, method: 'paypal');
+                return $this->webhookPayment($trx, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
-            
-                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
-
+                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $trx]);
                 return response()->json([
                     'status'  => false,
-                    'trx'     =>  $paypalId,
+                    'trx'     =>  $trx,
                     'message' => 'Transaction denied.',
                 ]);
 
             case 'PAYMENT.CAPTURE.DECLINED':
-             
-                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
+                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $trx]);
                 return response()->json([
                     'status'  => false,
-                    'trx'     => $paypalId,
+                    'trx'     => $trx,
                     'message' => 'Transaction declined.',
                 ]);
 
             default:
-          
                 $coinLog->update(['trx' => $paypalId]);
                 return response()->json([
                     'status'  => 'ignored',

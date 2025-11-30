@@ -160,6 +160,11 @@ class Charge extends Model
         return $this->belongsTo(AreaManager::class, 'charger_id');
     }
 
+    public function subAreaManager(): BelongsTo
+    {
+        return $this->belongsTo(SubAreaManager::class, 'charger_id');
+    }
+
     public function bd()
     {
         return $this->belongsTo(Bd::class, 'charger_id');

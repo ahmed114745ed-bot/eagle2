@@ -53,7 +53,12 @@ class HomeController extends  MainController
             ->where('country_id', $countryID)
             ->orderByDesc('followers_count')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                $avatar = $user->profile?->avatar;
+                $user->avatar_url = $avatar ? getImagePath($avatar) : asset('images/businessman-icon.jpg');
+                return $user;
+            });
 
         return response()->json($topUsersByFollowers);
     }
@@ -729,7 +734,7 @@ class HomeController extends  MainController
                 'data' => $stats
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching stats data: ' . $e->getMessage());
+           // \Log::error('Error fetching stats data: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching statistics data'

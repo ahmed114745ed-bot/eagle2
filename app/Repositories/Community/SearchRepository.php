@@ -275,6 +275,20 @@ class SearchRepository implements SearchRepositoryInterface
             'packs' => function ($query) {
                 $query->whereIn('type', [4, 18]);
             },
+            'chatRoomsAsUser' => function ($q) use ($userId) {
+                $q->where('user_id2', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
+            'chatRoomsAsUser2' => function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                    ->withCount(['messages as unread_messages_count' => function ($query) use ($userId) {
+                        $query->where('user_id', '<>', $userId)
+                            ->where('status', '<>', 'seen');
+                    }]);
+            },
             'profile',
             'UserVip'
         ])

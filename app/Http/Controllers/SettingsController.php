@@ -190,7 +190,6 @@ class SettingsController extends Controller
 
         if ($request->has('timezone') || $request->has('week_start') || $request->has('week_end')) {
             TimeHelper::clearCache();
-
         }
 
         // Process and save settings
@@ -240,6 +239,14 @@ class SettingsController extends Controller
             // }
 
         }
+        
+        if ($request->payment_getaway_id) {
+            $paymentGetaway = PaymentCoin::find($request->payment_getaway_id);
+            $key = "is_{$paymentGetaway->type}_active";
+          
+            $paymentGetaway->status = $request->$key;
+            $paymentGetaway->save();
+        }
 
 
         if ($request->has('user_coins')) {
@@ -270,6 +277,7 @@ class SettingsController extends Controller
             $cacheKey = "percentage_{$key}";
             Cache::put($cacheKey, $value);
         }
+
 
         return back();
     }

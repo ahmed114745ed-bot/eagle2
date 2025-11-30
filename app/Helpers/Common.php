@@ -755,7 +755,6 @@ class Common
         $credentialsFilePath = base_path(config("app.fileName"));
 
         if (!file_exists($credentialsFilePath)) {
-            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
             return null;
         }
 
@@ -767,13 +766,11 @@ class Common
             $token = $client->fetchAccessTokenWithAssertion();
 
             if (!isset($token['access_token'])) {
-                Log::error('Access token is missing from Google Client.');
                 return null;
             }
 
             return $token['access_token'];
         } catch (\Throwable $e) {
-            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
             return null;
         }
     }
@@ -1430,8 +1427,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-         Log::info('start sendToZego3');
-
         try {
 
             $client           = new Client();
@@ -1838,9 +1833,15 @@ class Common
         return $date->setTimezone($timezone);
     }
 
-
     public static function getChargerInfo($resource)
     {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
         switch ($resource->charger_type) {
             case 'dash':
                 $admin = $resource->admin;
@@ -1916,6 +1917,21 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
+
+                case UserTypeEnum::SUB_AREA_MANAGER:
+                $subAreaManager = $resource->subAreaManager;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix ."/auth/users/{$subAreaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
             case 'user':
                 $user = $resource->senderUser;
                 $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
@@ -1949,8 +1965,148 @@ class Common
     }
 
 
+    // public static function getReceiverInfo($resource)
+    // {
+
+    //     if (request()->is('superadmin/*')) {
+    //         $prefix = 'superadmin';
+    //     } elseif (request()->is('areamanager/*')) {
+    //         $prefix = 'areamanager';
+    //     } else {
+    //         $prefix = 'admin';
+    //     }
+    //     switch ($resource->user_type) {
+    //         case 'dash':
+    //             $admin = $resource->admin;
+    //             return [
+    //                 'name' => $admin->name ?? '',
+    //                 'image' => $admin->avatar ?? '',
+    //                 'uuid' => $admin->id ?? '',
+    //                 'id' => $admin->id ?? '',
+    //                 'type' => 'dash',
+    //                 'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+    //                 'image_color' => null,
+    //                 'id_image' => '',
+    //                 'colored_name' => '',
+    //             ];
+
+    //         case UserTypeEnum::AREA_MANAGER:
+    //             $areaManager = $resource->areaManager;
+    //             return [
+    //                 'name' => $areaManager->name ?? '',
+    //                 'image' => $areaManager->avatar ?? '',
+    //                 'uuid' => $areaManager->id ?? '',
+    //                 'id' => $areaManager->id ?? '',
+    //                 'type' => 'dash',
+    //                 'url' => $areaManager ? url($prefix ."/auth/users/{$areaManager->id}") : '#',
+    //                 'image_color' => null,
+    //                 'id_image' => '',
+    //                 'colored_name' => '',
+    //             ];
+
+    //             case UserTypeEnum::SUB_AREA_MANAGER:
+    //             $subAreaManager = $resource->subAreaManager;
+    //             return [
+    //                 'name' => $subAreaManager->name ?? '',
+    //                 'image' => $subAreaManager->avatar ?? '',
+    //                 'uuid' => $subAreaManager->id ?? '',
+    //                 'id' => $subAreaManager->id ?? '',
+    //                 'type' => 'dash',
+    //                 'url' => $subAreaManager ? url($prefix ."/auth/users/{$subAreaManager->id}") : '#',
+    //                 'image_color' => null,
+    //                 'id_image' => '',
+    //                 'colored_name' => '',
+    //             ];
+
+    //         case 'agency':
+    //             $agency = $resource->senderShippingAgency;
+    //             $owner = $agency->owner ?? null;
+
+    //             return [
+    //                 'name' => $agency->name ?? '',
+    //                 'image' => $agency->img ?? '',
+    //                 'uuid' => $agency->id ?? '',
+    //                 'id' => $agency->id ?? '',
+    //                 'type' => 'agency',
+    //                 'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+    //                 'image_color' => $owner->color_image ?? null,
+    //                 'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' =>  '',
+    //             ];
+
+    //         case 'host_agency':
+    //             $agency = $resource->senderAgency;
+    //             $owner = $agency->owner ?? null;
+    //             $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
+    //             return [
+    //                 'name' => $agency->name ?? '',
+    //                 'image' => $agency->img ?? '',
+    //                 'uuid' => $agency->id ?? '',
+    //                 'id' => $agency->id ?? '',
+    //                 'type' => 'host_agency',
+    //                 'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+    //                 'image_color' => $owner->color_image ?? null,
+    //                 'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+    //             ];
+
+    //         case 'bd':
+    //             $bd = $resource->bd;
+    //             return [
+    //                 'name' => $bd->username ?? '',
+    //                 'image' => $bd->avatar ?? '',
+    //                 'uuid' => $bd->id ?? '',
+    //                 'id' => $bd->id ?? '',
+    //                 'type' => 'bd',
+    //                 'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+    //                 'image_color' => null,
+    //                 'id_image' => '',
+    //                 'colored_name' => '',
+    //             ];
+    //         case 'user':
+    //             $user = $resource->senderUser;
+    //             $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
+
+    //             return [
+    //                 'name' => $user->name ?? '',
+    //                 'image' => $user->profile->avatar ?? '',
+    //                 'uuid' => $user->uuid ?? '',
+    //                 'id' => $user->id ?? '',
+    //                 'type' => 'user',
+    //                 'url' => $user ? url("admin/users/{$user->id}") : '#',
+    //                 'image_color' => $user->color_image ?? null,
+    //                 'id_image' => $user?->specialId?->ware?->show_img ?? '',
+    //                 'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+    //             ];
+
+    //         default:
+    //             return [
+    //                 'name' => '',
+    //                 'image' => '',
+    //                 'uuid' => '',
+    //                 'id' => '',
+    //                 'type' => '',
+    //                 'type_name' => '',
+    //                 'url' => '#',
+    //                 'image_color' => null,
+    //                 'id_image' => '',
+    //                 'colored_name' => '',
+    //             ];
+    //     }
+    // }
+
+
     public static function getReceiverInfo($resource)
     {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1959,7 +2115,7 @@ class Common
                     'uuid' => $resource->receiveragency->id ?? '',
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
-                    'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1971,8 +2127,8 @@ class Common
                     'image' => $resource->receiverSubAreaManager->img ?? '',
                     'uuid' => $resource->receiverSubAreaManager->id ?? '',
                     'id' => $resource->receiverSubAreaManager->id ?? '',
-                    'type' => 'agency',
-                    'url' => $resource->receiverSubAreaManager ? url("admin/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+                    'type' => 'sub_area_manager',
+                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
                     'image_color'          => @$resource->receiverSubAreaManager->owner->color_image,
                     'id_image'             => @$resource->receiverSubAreaManager->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1984,8 +2140,8 @@ class Common
                     'image' => $resource->receiverSuperAdmin->img ?? '',
                     'uuid' => $resource->receiverSuperAdmin->id ?? '',
                     'id' => $resource->receiverSuperAdmin->id ?? '',
-                    'type' => 'agency',
-                    'url' => $resource->receiverSuperAdmin ? url("admin/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                    'type' => 'super_admin',
+                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
                     'image_color'          => @$resource->receiverSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -1997,7 +2153,7 @@ class Common
                     'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
                     'id' => $resource->receiverSubSuperAdmin->id ?? '',
                     'type' => 'sub_super_admin',
-                    'url' => $resource->receiverSubSuperAdmin ? url("superadmin/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
                     'image_color'          => @$resource->receiverSubSuperAdmin->owner->color_image,
                     'id_image'             => @$resource->receiverSubSuperAdmin->owner->specialId?->ware?->show_img ?? '',
                     'colored_name' =>  '',
@@ -2011,7 +2167,7 @@ class Common
                     'image' => $resource->receiver->profile->avatar ?? '',
                     'uuid' => $resource->receiver->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receiver ? url("admin/users/{$resource->receiver->id}") : '#',
+                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
                     'image_color'          => @$resource->receiver->color_image,
                     'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
@@ -2196,27 +2352,47 @@ class Common
 
     public static function areaCountries(): array
     {
-        $adminId = session('area_manager_id') ?? auth()->user()->id;
+        $adminId = session('area_manager_id') ?? auth()->id();
 
-        $authAdmin = AreaManager::with('countries')->find($adminId);
-
-        if (!$authAdmin) {
-            $authAdmin = SubAreaManager::with('countries')->find($adminId);
-        }
+        $authAdmin = AreaManager::find($adminId)
+                    ?? SubAreaManager::find($adminId);
 
         if (!$authAdmin) {
             return [];
         }
 
-        $countryID = session('area_manager_country_id');
-
-        if ($countryID) {
-            return (array)$countryID;
+        $sessionCountryId = session('area_manager_country_id');
+        if ($sessionCountryId) {
+            return (array)$sessionCountryId;
         }
 
-        return @$authAdmin->countries->pluck('id')->toArray() ?? [];
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+
+        return [];
     }
 
+    public static function areaCountriesV2($adminId): array
+    {
+        $authAdmin = AreaManager::find($adminId)
+                    ?? SubAreaManager::find($adminId);
+
+        if (!$authAdmin) {
+            return [];
+        }
+
+        $sessionCountryId = session('area_manager_country_id');
+        if ($sessionCountryId) {
+            return (array)$sessionCountryId;
+        }
+
+        if (method_exists($authAdmin, 'countriesQuery')) {
+            return $authAdmin->countriesQuery()->pluck('id')->toArray();
+        }
+
+        return [];
+    }
 
 
     public static function getRoleAuthId($userId)
