@@ -1234,4 +1234,34 @@ html.ltr .dropdown-menu {
     .payment-card {
         height: 580px;
     }
+
+    #area-Manager-select,
+    #country-select {
+        width: 190px !important;
+    }
+
+    .select2-container {
+        width: 190px !important;
+    }
+
+    /*.settings-section {*/
+    /*    overflow-x: auto;*/
+    /*    overflow-y: auto;*/
+    /*}*/
+
+    /*.settings-section table {*/
+    /*    width: 100%;*/
+    /*}*/
+
+    html {
+        overflow-x: auto !important;
+    }
+
+    body {
+        overflow-x: auto !important;
+    }
+
+    .wrapper {
+        min-width: max-content;
+    }
 </style>

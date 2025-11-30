@@ -1,29 +1,28 @@
 <style>
-    @media (max-width: 576px) {
-        .box-footer {
-            flex-direction: column;
-            align-items: center;
+    @media (max-width: 1400px) {
+        .content {
+            width: 1340px !important;
         }
 
-        .pagination-info,
-        .box-footer .pull-right {
-            width: fit-content;
-            display: flex;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .pagination-info {
-            order: 1;
-            margin-bottom: 10px;
-        }
-
-        .box-footer .pull-right {
-            order: 2;
+        .payment-card {
+            height: 795px;
         }
     }
 
+    @media (max-width: 1200px) {
+        .content {
+            width: 1160px !important;
+        }
+    }
+
+    @media (max-width: 992px) {
+    }
+
     @media (max-width: 768px) {
+        .content {
+            width: 100% !important;
+        }
+
         .rtl .box-body .fields-group [class*="col-md-12"] {
             float: none; !important;
         }
@@ -57,8 +56,8 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: absolute;
-            right: 0 !important;
+            position: relative;
+            left: 0 !important;
         }
 
         .rtl .content-wrapper,
@@ -86,24 +85,38 @@
             flex: 0 0 100%;
             width: 50%;
         }
-    }
 
-    @media (max-width: 992px) {
-    }
+        #area-Manager-select,
+        #country-select {
+            width: 150px !important;
+        }
 
-    @media (max-width: 1200px) {
-        .content {
-            width: 1160px !important;
+        .select2-container {
+            width: 150px !important;
         }
     }
 
-    @media (max-width: 1400px) {
-        .content {
-            width: 1340px !important;
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
         }
 
-        .payment-card {
-            height: 795px;
+        .pagination-info,
+        .box-footer .pull-right {
+            width: fit-content;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
         }
     }
 </style>
