@@ -8,6 +8,11 @@
         display: flex;
     }
 
+    /* Allow scrolling when page is zoomed */
+    html, body {
+        overflow: auto;
+    }
+
     /* القائمة الجانبية */
     .settings-sidebar {
         width: 250px;
@@ -85,6 +90,8 @@
 
     .all-page {
         display: inline-flex;
+        /* allow the container to grow beyond viewport so browser shows scrollbars */
+        min-width: max-content;
     }
 
     .wrapper {

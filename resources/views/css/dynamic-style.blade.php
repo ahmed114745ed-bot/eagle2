@@ -1243,4 +1243,26 @@ html.ltr .dropdown-menu {
     .select2-container {
         width: 190px !important;
     }
+
+    /*.settings-section {*/
+    /*    overflow-x: auto;*/
+    /*    overflow-y: auto;*/
+    /*}*/
+
+    /*.settings-section table {*/
+    /*    width: 100%;*/
+    /*}*/
+
+    html {
+        overflow-x: auto !important;
+    }
+
+    body {
+        overflow-x: auto !important;
+        min-width: 1200px;
+    }
+
+    .wrapper {
+        min-width: max-content;
+    }
 </style>
