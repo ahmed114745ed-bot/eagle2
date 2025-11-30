@@ -27,6 +27,12 @@
         .wrapper {
             min-width: max-content;
         }
+
+        .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+            position: relative;
+            left: 0 !important;
+        }
+
     }
 
     @media (max-width: 768px) {
@@ -144,6 +150,11 @@
 
         .wrapper {
             min-width: max-content;
+        }
+
+        .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+            position: relative;
+            left: 0 !important;
         }
     }
 </style>
