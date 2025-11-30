@@ -103,7 +103,7 @@ class HostLevelService
     {
         $diamonds = $this->computeDiamonds($userId);
 
-        if (!$diamonds) throw new \Exception(__('you have not received any diamonds yet'));
+        if (!$diamonds) return [];
 
         $hostLevels = HostLevel::with('rewards')
             ->where('diamonds', '<=', $diamonds)
@@ -172,8 +172,8 @@ class HostLevelService
         $eventType = $this->getEventType();
 
         return  GiftLog::where('receiver_id', $userId)
-            ->selectRaw('SUM(giftNum * giftPrice) AS total_diamond')
             ->filterByEventType($eventType)
-            ->value('total_diamond') ?? 0;
+            ->selectRaw('COALESCE(SUM(giftNum * giftPrice), 0) as total_diamond')
+            ->value('total_diamond');
     }
 }
