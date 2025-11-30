@@ -23,7 +23,7 @@ class TaskStreamInvitation implements ShouldBroadcast
 
     public function broadcastOn(): PrivateChannel
     {
-        return new PrivateChannel('user.' . $this->targetUserId);
+        return new PrivateChannel('user-' . $this->targetUserId);
     }
 
     public function broadcastAs(): string

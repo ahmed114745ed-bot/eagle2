@@ -29,8 +29,12 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative;
+            position: relative !important;
             left: 0 !important;
+        }
+
+        .navbar-custom-menu>.navbar-nav>li {
+            position: relative !important;
         }
 
     }
@@ -77,7 +81,7 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative;
+            position: relative !important;
             left: 0 !important;
         }
 
@@ -153,7 +157,7 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative;
+            position: relative !important;
             left: 0 !important;
         }
     }
