@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\UsersWallet\Http\Controllers\UsersWalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/userswallet', function (Request $request) {
-    return $request->user();
+
+Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'localization']], function (){
+    Route::post('/withdraw', [UsersWalletController::class, 'requestWithdrawal'])->middleware('auth:sanctum');
+
 });
+

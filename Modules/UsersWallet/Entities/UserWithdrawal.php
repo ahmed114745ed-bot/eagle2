@@ -1,24 +1,21 @@
 <?php
-
 namespace Modules\UsersWallet\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserWallet extends Model
+class UserWithdrawal extends Model
 {
-
-    protected $table = 'users_wallets';
     protected $fillable = [
         'user_id',
-        'balance',
-        'cut_amount',
-        'pending_amount',
+        'amount',
+        'status',
+        'meta'
     ];
 
-    public function logs()
-    {
-        return $this->hasMany(WalletLog::class);
-    }
+    protected $casts = [
+        'meta' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);

@@ -42,6 +42,7 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Modules\UsersWallet\Entities\UserWallet;
 
 /**
  * @method static withoutAppends()
@@ -2340,5 +2341,9 @@ class User extends Authenticatable
     public function lastHostLevelWinnerByEvent($eventType)
     {
         return $this->lastHostLevelWinner()->filterByEventType($eventType);
+    }
+    public function userWallet()
+    {
+        return $this->hasOne(UserWallet::class);
     }
 }

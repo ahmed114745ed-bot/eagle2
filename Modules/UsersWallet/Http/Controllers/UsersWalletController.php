@@ -2,78 +2,38 @@
 
 namespace Modules\UsersWallet\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-
+use Modules\UsersWallet\Entities\UserWithdrawal;
+use Modules\UsersWallet\Helpers\WalletHelper;
 class UsersWalletController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
-    {
-        return view('userswallet::index');
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    
+    public function requestWithdrawal(Request $request)
     {
-        return view('userswallet::create');
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'meta'   => 'nullable|array', 
+        ]);
+    
+        $userId = auth()->id();
+    
+        try {
+            $withdrawal = WalletHelper::createWithdrawal($userId, $request->amount, $request->meta ?? []);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء طلب السحب بنجاح، حالته: معلق',
+                'data' => $withdrawal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('userswallet::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('userswallet::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    
 }
