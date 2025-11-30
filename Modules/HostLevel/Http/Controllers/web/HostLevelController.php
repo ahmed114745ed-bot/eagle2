@@ -104,6 +104,17 @@ class HostLevelController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+
+        $grid->column('diamonds', __('diamonds'))->display(function ($usd) {
+
+            $image = asset('images/diamond.jpg'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        
         if (Admin::user()->can('browse-' . 'host_level_reward') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
 
@@ -135,6 +146,7 @@ class HostLevelController extends MainController
         $show->field('id', __('Id'));
         $show->field('img', __('Img'));
         $show->field('level', __('Level'));
+        $show->field('diamonds', __('diamonds'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -152,6 +164,7 @@ class HostLevelController extends MainController
         $form->text('name', __('name'));
         $form->image('img', __('Img'));
         $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
+        $form->number('diamonds', __('diamonds'));
 
         return $form;
     }

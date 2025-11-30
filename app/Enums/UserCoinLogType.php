@@ -37,6 +37,8 @@ enum UserCoinLogType: string
     case SUPER_ADMIN_REWARD = 'super_admin_reward';
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
+    case HOST_LEVEL = 'host_level';
+
     public function meta(): array
     {
         return match ($this) {
@@ -132,6 +134,12 @@ enum UserCoinLogType: string
                 'item_name' => 'rewards',
                 'queue_job' => null,
             ],
+
+            self::HOST_LEVEL => [
+                'sub_type' => 'host_levels',
+                'item_name' => 'rewards',
+                'queue_job' => null,
+            ],
             self::LUCK_BOX => [
                 'sub_type' => 'lucky_boxs',
                 'item_name' => 'lucky_box',
@@ -205,8 +213,6 @@ enum UserCoinLogType: string
                 'item_name' => 'room_cup',
                 'queue_job' => null,
             ],
-
-
         };
     }
 }

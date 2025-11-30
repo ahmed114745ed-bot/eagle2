@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\HostLevel\Http\Controllers\api\HostLevelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,11 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/hostlevel', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum', 'update.last.seen'])->group(function () {
+
+   
+    Route::middleware([])->prefix('host-level')->group(function () {
+        Route::get('/', [HostLevelController::class, 'hostLevel']);
+        Route::post('pick', [HostLevelController::class, 'pick']);
+    });
 });
