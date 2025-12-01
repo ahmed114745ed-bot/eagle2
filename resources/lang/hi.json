@@ -41,8 +41,8 @@
 "Delete host level reward": "होस्ट स्तर इनाम हटाएँ",
 "Edit host level reward": "होस्ट स्तर इनाम संपादित करें",
 "Show host level reward": "होस्ट स्तर इनाम दिखाएँ",
+"Diamonds must be greater than to previous level (:level) diamonds (:diamonds)": "डायमंड पिछले स्तर (:level) के डायमंड (:diamonds) से अधिक होना चाहिए",
 
-    "Diamonds must be greater than or equal to previous level :level diamonds :diamonds": "डायमंड पिछले स्तर :level के डायमंड :diamonds से अधिक या बराबर होना चाहिए",
 "you do not meet the diamond requirement to pick this host level": "इस होस्ट लेवल को चुनने के लिए आप डायमंड आवश्यकता पूरी नहीं करते",
 "coin exchange": "कॉइन एक्सचेंज",
     "charge-reports": "चार्ज रिपोर्ट",

@@ -79,7 +79,8 @@
 "Delete host level reward": "Host seviyesi ödülünü sil",
 "Edit host level reward": "Host seviyesi ödülünü düzenle",
 "Show host level reward": "Host seviyesi ödülünü göster",
-    "Diamonds must be greater than or equal to previous level :level diamonds :diamonds": "Elmas değeri önceki seviye (:level) elmas (:diamonds) değerinden büyük veya eşit olmalıdır",
+"Diamonds must be greater than to previous level (:level) diamonds (:diamonds)": "Elmas değeri önceki seviye (:level) elmas (:diamonds) değerinden büyük olmalıdır", 
+
 "you have already picked this host level before": "bu sunucu seviyesini daha önce seçtiniz",
 "host level not found": "sunucu seviyesi bulunamadı",
 "you do not meet the diamond requirement to pick this host level": "bu sunucu seviyesini seçmek için elmas gereksinimini karşılamıyorsunuz",
