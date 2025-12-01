@@ -127,6 +127,7 @@ class GiftLoadTestService
             'gift_receive' => $giftReceive,
             'sent_gifts' => $totalSentGifts,
             'failed_gifts' => $summary['failed'] * $data['num'],
+            'num' =>  $data['num'],
         ];
     }
 }
