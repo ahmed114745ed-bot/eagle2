@@ -164,7 +164,7 @@ class HostLevelController extends MainController
     {
         $form = new Form(new HostLevel());
         $form->text('name', __('name'));
-        // $form->image('img', __('Img'))->required();
+        $form->image('img', __('Img'))->required();
         $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
         $form->number('diamonds', __('diamonds'))->required();
 
