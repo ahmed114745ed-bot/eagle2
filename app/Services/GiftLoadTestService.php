@@ -112,8 +112,10 @@ class GiftLoadTestService
         $expectedSender = $beforeSender - ($giftValue * $totalSentGifts);
         $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
 
+
         $afterSender = $sender->fresh()->di;
-        $afterReceiver = $receiver->fresh()->monthly_diamond_received;
+        $receiver2 = User::findOrFail($data['toUid']);
+        $afterReceiver = $receiver2->monthly_diamond_received;
 
         return [
             'summary' => $summary,
