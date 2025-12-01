@@ -9,7 +9,8 @@
         }
 
         .wrapper {
-            min-width: max-content;
+            /*min-width: max-content;*/
+            overflow: auto !important;
         }
     }
 
@@ -19,13 +20,15 @@
         }
 
         .wrapper {
-            min-width: max-content;
+            /*min-width: max-content;*/
+            overflow: auto !important;
         }
     }
 
     @media (max-width: 992px) {
         .wrapper {
-            min-width: max-content;
+            /*min-width: max-content;*/
+            overflow: auto !important;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
@@ -48,7 +51,8 @@
         }
 
         .wrapper {
-            min-width: max-content;
+            /*min-width: max-content;*/
+            overflow: auto !important;
         }
 
         .nprogress-custom-parent {
@@ -151,7 +155,8 @@
         }
 
         .wrapper {
-            min-width: max-content;
+            /*min-width: max-content;*/
+            overflow: auto !important;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
