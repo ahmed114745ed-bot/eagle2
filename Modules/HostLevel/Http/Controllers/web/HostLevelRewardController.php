@@ -24,7 +24,7 @@ class HostLevelRewardController extends MainController
      * @var string
      */
     protected $title = 'Host level reward';
-    public $permission_name = 'host_level_reward';
+    public $permission_name = 'host-level-reward';
 
     public function index(Content $content)
     {
