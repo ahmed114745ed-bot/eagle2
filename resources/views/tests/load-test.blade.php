@@ -94,7 +94,7 @@ pre { background:#222; color:#0f0; padding:15px; border-radius:8px; white-space:
                 <td>{{ $before_sender }}</td>
                 <td>{{ $expected_sender }}</td>
                 <td>{{ $after_sender }}</td>
-                <td>{{ $diff_sender }}</td>
+                <td>{{ $expected_sender - $after_sender }}</td>
             </tr>
         </table>
 
@@ -110,7 +110,7 @@ pre { background:#222; color:#0f0; padding:15px; border-radius:8px; white-space:
                 <td>{{ $before_receiver }}</td>
                 <td>{{ $expected_receiver }}</td>
                 <td>{{ $after_receiver }}</td>
-                <td>{{ $diff_receiver }}</td>
+                <td>{{ $expected_receiver - $after_receiver }}</td>
             </tr>
         </table>
 
