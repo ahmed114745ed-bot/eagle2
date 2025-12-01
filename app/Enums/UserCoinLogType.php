@@ -35,8 +35,10 @@ enum UserCoinLogType: string
     case ROOM_BOOM = 'room_boom';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
     case SUPER_ADMIN_REWARD = 'super_admin_reward';
+    case REMAINING_DIAMONDS = 'remaining_diamonds';
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
+
     public function meta(): array
     {
         return match ($this) {
@@ -206,7 +208,11 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
 
-
+            self::REMAINING_DIAMONDS => [
+                'sub_type' => 'remaining_diamonds',
+                'item_name' => 'remaining_diamonds',
+                'queue_job' => null,
+            ],
         };
     }
 }
