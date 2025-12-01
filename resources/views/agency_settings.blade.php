@@ -28,6 +28,10 @@
         color: var(--primary-color);
     }
 
+    .wrapper {
+        min-width: max-content !important;
+    }
+
     .settings-menu button {
         display: block;
         width: 100%;
@@ -398,7 +402,7 @@
     }
 
     .settings-sidebar {
-        width: 100%;
+        /*width: 100%;*/
         padding: 10px;
         box-shadow: none;
         position: relative;
@@ -408,11 +412,11 @@
         margin-bottom: 10px;
     }
 
-    .settings-menu {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
+    /*.settings-menu {*/
+    /*    display: flex;*/
+    /*    flex-wrap: wrap;*/
+    /*    gap: 5px;*/
+    /*}*/
 
     .settings-menu button {
         flex: 1 1 45%;

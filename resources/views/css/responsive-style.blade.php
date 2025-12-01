@@ -9,8 +9,7 @@
         }
 
         .wrapper {
-            /*min-width: max-content;*/
-            overflow: auto !important;
+            min-width: auto;
         }
     }
 
@@ -20,15 +19,13 @@
         }
 
         .wrapper {
-            /*min-width: max-content;*/
-            overflow: auto !important;
+            min-width: auto;
         }
     }
 
     @media (max-width: 992px) {
         .wrapper {
-            /*min-width: max-content;*/
-            overflow: auto !important;
+            min-width: auto;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
@@ -51,8 +48,7 @@
         }
 
         .wrapper {
-            /*min-width: max-content;*/
-            overflow: auto !important;
+            min-width: auto;
         }
 
         .nprogress-custom-parent {
@@ -155,8 +151,7 @@
         }
 
         .wrapper {
-            /*min-width: max-content;*/
-            overflow: auto !important;
+            min-width: auto;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
