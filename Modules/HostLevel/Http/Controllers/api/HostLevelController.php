@@ -48,7 +48,7 @@ class HostLevelController extends Controller
     public function userHostLevels(Request $request)
     {
         $user = $request->user();
-        $dataList = $this->hostLevelService->userHostLevels($user);
+       
         $dataUserLevel = $this->hostLevelService->nextLevel($user);
 
         $data = [
@@ -56,8 +56,8 @@ class HostLevelController extends Controller
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',
             ],
-           'level' => $dataUserLevel,
-            'host_levels' => UserHostLevelResource::collection($dataList),
+           'level' => $dataUserLevel['next'],
+            'host_levels' => UserHostLevelResource::collection($dataUserLevel['levels']),
         ];
 
         return Common::apiResponse(true, '', $data, 200,);

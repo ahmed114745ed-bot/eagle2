@@ -22,7 +22,7 @@ class HostLevelController extends MainController
      * @var string
      */
     protected $title = 'Host level';
-    public $permission_name = 'host_level';
+    public $permission_name = 'host-level';
 
 
     public function index(Content $content)
@@ -93,6 +93,7 @@ class HostLevelController extends MainController
     {
         $grid = new Grid(new HostLevel());
 
+        $grid->model()->orderBy('level', 'asc');
         $grid->column('id', __('Id'));
         $grid->column('img', __('Img'))->display(function ($path) {
             /** @var Ware $this */
@@ -114,7 +115,7 @@ class HostLevelController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        
+
         if (Admin::user()->can('browse-' . 'host_level_reward') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
 
@@ -162,10 +163,31 @@ class HostLevelController extends MainController
     {
         $form = new Form(new HostLevel());
         $form->text('name', __('name'));
-        $form->image('img', __('Img'));
+        $form->image('img', __('Img'))->required();
         $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
         $form->number('diamonds', __('diamonds'));
 
+
+        $form->saving(function (Form $form) {
+
+            $level = $form->level;
+            $diamonds = $form->diamonds;
+
+            // Get previous level (< this one)
+            $previous = HostLevel::where('level', '<', $level)
+                ->when($form->model()->id, function ($q) use ($form) {
+                    return $q->where('id', '!=', $form->model()->id);
+                })
+                ->orderBy('level', 'desc')
+                ->first();
+
+            throw new \Exception(
+                __("Diamonds must be greater than or equal to previous level (:level) diamonds (:diamonds)", [
+                    'level'    => $previous->level,
+                    'diamonds' => $previous->diamonds,
+                ])
+            );
+        });
         return $form;
     }
 }
