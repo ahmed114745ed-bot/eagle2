@@ -20,17 +20,17 @@ class GiftLoadTestService
      */
     public function run(array $data)
     {
-        // *** Fetch sender data from the API using token ***
+        // جلب بيانات المرسل
         $response = Http::withToken($data['token'])
                         ->get($data['url'] . '/api/my-data');
 
         if ($response->failed()) {
-            throw new \Exception("Token invalid — unable to fetch sender data");
+            throw new \Exception("Token غير صالح أو لا يمكن جلب بيانات المرسل");
         }
 
         $senderData = $response->json('data');
         if (!isset($senderData['id'])) {
-            throw new \Exception("Sender ID not found in /my-data response");
+            throw new \Exception("لم يتم العثور على ID المرسل");
         }
 
         $sender = User::findOrFail($senderData['id']);
@@ -38,13 +38,13 @@ class GiftLoadTestService
         $gift = Gift::findOrFail($data['id']);
 
         $giftValue = $gift->price;
-        $giftReceive =  $gift->price;
+        $giftReceive = $gift->price;
 
-        // *** Wallet balances before sending ***
+        // أرصدة قبل الإرسال
         $beforeSender = $sender->di;
         $beforeReceiver = $receiver->monthly_diamond_received;
 
-        // *** Initialize HTTP client ***
+        // تهيئة Client
         $client = new Client([
             'base_uri' => $data['url'],
             'timeout'  => 10,
@@ -69,23 +69,28 @@ class GiftLoadTestService
             ]);
         }
 
-        // *** Wait for all requests to finish ***
         $results = Utils::settle($promises)->wait();
 
-        // *** Summary ***
+        // ملخص النتائج
         $summary = [
             'success' => 0,
             'failed' => 0,
             'errors' => []
         ];
 
+        $totalSentGifts = 0; // العدد الفعلي للهدايا المرسلة
+
         foreach ($results as $index => $res) {
             if ($res['state'] === 'fulfilled') {
                 $body = json_decode($res['value']->getBody(), true);
                 $isSuccess = !empty($body['success']);
 
-                $summary['success'] += $isSuccess ? 1 : 0;
-                $summary['failed'] += $isSuccess ? 0 : 1;
+                if ($isSuccess) {
+                    $summary['success']++;
+                    $totalSentGifts += $data['num'];
+                } else {
+                    $summary['failed']++;
+                }
 
                 $summary['errors'][] = [
                     'index' => $index,
@@ -103,13 +108,9 @@ class GiftLoadTestService
             }
         }
 
-        // *** Calculations ***
-        $sentGifts = $summary['success'] * $data['num'];
-
-        $failedGifts = $summary['failed'] * $data['num'];
-
-        $expectedSender = $beforeSender - ($giftValue * $sentGifts);
-        $expectedReceiver = $beforeReceiver + ($giftReceive * $sentGifts);
+        // حساب الرصيد المتوقع بعد الإرسال
+        $expectedSender = $beforeSender - ($giftValue * $totalSentGifts);
+        $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
 
         $afterSender = $sender->fresh()->di;
         $afterReceiver = $receiver->fresh()->monthly_diamond_received;
@@ -124,8 +125,8 @@ class GiftLoadTestService
             'expected_receiver' => $expectedReceiver,
             'gift_value' => $giftValue,
             'gift_receive' => $giftReceive,
-            'sent_gifts' => $sentGifts,
-            'failed_gifts' => $failedGifts,
+            'sent_gifts' => $totalSentGifts,
+            'failed_gifts' => $summary['failed'] * $data['num'],
         ];
     }
 }
