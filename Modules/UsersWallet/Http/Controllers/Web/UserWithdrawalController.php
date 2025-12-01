@@ -12,6 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\UsersWallet\Entities\UserWithdrawal;
+use Modules\Wallet\Entities\WalletField;
 
 class UserWithdrawalController extends MainController
 {
@@ -187,24 +188,24 @@ class UserWithdrawalController extends MainController
             ");
 
     $grid->disableCreateButton();
+    $grid->disableActions();
     return $grid;
 }
 
-
 protected function detail($id)
 {
-    $show = new Show(UserWithdrawal::findOrFail($id));
+    $withdrawal = UserWithdrawal::findOrFail($id);
+
+    $show = new \Encore\Admin\Show($withdrawal);
 
     $show->field('id', __('ID'));
 
     $show->field('user_id', __('User'))->as(function ($userId) {
-        $user = User::find($userId);
+        $user = \App\Models\User::find($userId);
         return $user ? $user->uuid . '_' . $user->name : '-';
     });
 
-    $show->field('amount', __('Amount'))->as(function ($value) {
-        return number_format($value, 2);
-    });
+    $show->field('amount', __('Amount'))->as(fn($v) => number_format($v, 2));
 
     $show->field('status', __('Status'))->as(function ($status) {
         return match($status) {
@@ -215,31 +216,67 @@ protected function detail($id)
         };
     });
 
-    $show->html(__('Fields'), function ($model) {
+    $show->field('meta', __('Fields'))->unescape()->as(function () use ($withdrawal) {
 
-        $meta = $model->meta;
+        $meta = $withdrawal->meta;
+
+        if (is_string($meta)) {
+            $decoded = json_decode($meta, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $meta = $decoded;
+            }
+        }
 
         if (!$meta || !is_array($meta)) {
             return '<p>-</p>';
         }
 
+        $fieldIds = array_keys($meta);
+        $fields = WalletField::whereIn('id', $fieldIds)->get()->keyBy('id');
+
+        $locale = app()->getLocale();
+
         $html = '<table class="table table-bordered" style="width:100%;">';
         $html .= '<thead><tr><th style="width:30%">' . __('Field') . '</th><th>' . __('Value') . '</th></tr></thead><tbody>';
 
-        foreach ($meta as $key => $value) {
+        foreach ($meta as $fieldId => $value) {
 
-            if (is_array($value)) {
-                $valueFormatted =
-                    '<pre style="white-space:pre-wrap;">' .
-                    e(json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) .
-                    '</pre>';
+            $field = $fields->get($fieldId);
+
+            $title = $fieldId;
+            if ($field) {
+                $rawTitle = $field->title;
+
+                if (is_string($rawTitle)) {
+                    $decodedTitle = json_decode($rawTitle, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decodedTitle)) {
+                        $rawTitle = $decodedTitle;
+                    }
+                }
+
+                if (is_array($rawTitle)) {
+                    $title = $rawTitle[$locale] ?? $rawTitle['en'] ?? $fieldId;
+                } else {
+                    $title = $rawTitle ?: $fieldId;
+                }
+            }
+
+            if (is_string($value)) {
+                $maybe = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($maybe)) {
+                    $valueFormatted = '<pre style="white-space:pre-wrap;">' . e(json_encode($maybe, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . '</pre>';
+                } else {
+                    $valueFormatted = e($value);
+                }
+            } elseif (is_array($value)) {
+                $valueFormatted = '<pre style="white-space:pre-wrap;">' . e(json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . '</pre>';
             } else {
-                $valueFormatted = e($value);
+                $valueFormatted = e((string) $value);
             }
 
             $html .= sprintf(
                 '<tr><td><strong>%s</strong></td><td>%s</td></tr>',
-                e($key),
+                e($title),
                 $valueFormatted
             );
         }
@@ -249,8 +286,8 @@ protected function detail($id)
         return $html;
     });
 
-    $show->field('created_at', __('Created At'))->as(function ($value) {
-        return Carbon::parse($value)->format('Y-m-d H:i');
+    $show->field('created_at', __('Created At'))->as(function ($v) {
+        return Carbon::parse($v)->format('Y-m-d H:i');
     });
 
     return $show;
