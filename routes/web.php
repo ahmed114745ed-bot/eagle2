@@ -983,6 +983,21 @@ Route::get('/run-roomcup-rewards', function () {
     ]);
 });
 
+Route::get('/fix-pack-expire', function () {
+    $packs = \App\Models\Pack::where('is_used', 1)
+        ->whereNull('expire')
+        ->get(['id', 'days']);
+
+    foreach ($packs as $pack) {
+        if (!empty($pack->days)) {
+            $pack->expire = Carbon::now()->addDays($pack->days)->timestamp;
+            $pack->save();
+        }
+    }
+
+    return 'done';
+});
+
 Route::get('/users-without-admin', function () {
     $types = [
         'bd' => 'is_bd',
