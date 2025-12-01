@@ -1057,3 +1057,4 @@ Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])-
 
 Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
 Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
+Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');
