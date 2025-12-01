@@ -8,6 +8,7 @@ use App\Models\GiftLog;
 use App\Models\UserSallary;
 use App\Enums\UserCoinLogType;
 use Illuminate\Console\Command;
+use App\Models\RemainingDiamond;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -55,13 +56,19 @@ class ResetUserMonthlyDiamond extends Command
                 : 0;
 
             foreach ($userSalaries as $userSalary) {
+
                 $user = $userSalary->user;
                 $diamonds = $userSalary->remaining_diamond ?? 0;
 
                 if (!$user || $diamonds <= 0) {
                     continue;
                 }
-
+                $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)->whereMonth('created_at', $dt->month)
+                    ->whereYear('created_at', $dt->year)
+                    ->first();
+                if ($remainingDiamonds) {
+                    continue;
+                }
                 if ($setting === 'coins') {
                     $this->processCoins($user, $diamonds, $exchangePercentage);
                 }
@@ -94,6 +101,13 @@ class ResetUserMonthlyDiamond extends Command
 
         $user->di += $exchangeCoin;
         $user->save();
+
+        RemainingDiamond::create([
+            'user_id' => $user->id,
+            'amount' => $exchangeCoin,
+            'type' => 'coins',
+            'remaining' => $diamonds,
+        ]);
     }
 
     /**
@@ -122,6 +136,13 @@ class ResetUserMonthlyDiamond extends Command
             'giftNum' => 1,
             'sender_id' => 0,
             'receiver_id' => $user->id,
+        ]);
+
+        RemainingDiamond::create([
+            'user_id' => $user->id,
+            'amount' => $diamonds,
+            'type' => 'diamonds',
+            'remaining' => $diamonds,
         ]);
     }
 }

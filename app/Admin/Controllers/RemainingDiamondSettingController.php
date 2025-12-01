@@ -20,12 +20,12 @@ class RemainingDiamondSettingController extends MainController
     {
         $settings = $this->getSettings();
 
-        return $content
+        return parent::index($content
             ->title(__('remaining diamonds settings'))
             ->body(view('remainingDiamondSetting', [
                 'settings' => $settings,
                 'saveUrl'  => $this->saveUrl(),
-            ]));
+            ])));
     }
 
     private function saveUrl()

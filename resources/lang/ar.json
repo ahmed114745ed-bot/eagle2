@@ -4018,6 +4018,8 @@
     "The special video for this level, displayed after completion. Each level has its own unique video.": "الفيديو الخاص المخصص لهذا المستوى، والذي يتم عرضه بعد إكمال المستوى. كل مستوى له فيديو مميز خاص به.",
   "filters.yes": "نعم",
   "Live-rooms":"الغرف المباشرة",
+  "remaining diamonds":"الألماس المتبقي",
+  "Remaining Diamonds History":"سجل الألماس المتبقي",
  "exchange to": "تحويل إلى",
 "Do not make any thing": "لا تفعل أي شيء",
 "remaining diamonds settings": "إعدادات الألماس المتبقي",

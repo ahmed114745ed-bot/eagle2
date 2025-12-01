@@ -115,6 +115,7 @@ use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\RemainingDiamondHistoryController;
 use App\Admin\Controllers\RemainingDiamondSettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
@@ -675,6 +676,7 @@ Route::group(
         Route::resource('notification-templates', NotificationsTemplatesController::class);
         Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::resource('remaining-diamonds', RemainingDiamondHistoryController::class);
         Route::get('remaining-diamond-settings', [RemainingDiamondSettingController::class,'index']);
         Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
