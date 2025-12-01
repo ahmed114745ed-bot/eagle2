@@ -9,7 +9,7 @@
         }
 
         .wrapper {
-            min-width: auto;
+            min-width: max-content;
         }
     }
 
@@ -19,13 +19,13 @@
         }
 
         .wrapper {
-            min-width: auto;
+            min-width: max-content;
         }
     }
 
     @media (max-width: 992px) {
         .wrapper {
-            min-width: auto;
+            min-width: max-content;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
@@ -48,7 +48,7 @@
         }
 
         .wrapper {
-            min-width: auto;
+            min-width: max-content;
         }
 
         .nprogress-custom-parent {
@@ -151,7 +151,7 @@
         }
 
         .wrapper {
-            min-width: auto;
+            min-width: max-content;
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {

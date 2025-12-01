@@ -28,10 +28,6 @@
         color: var(--primary-color);
     }
 
-    .wrapper {
-        min-width: max-content !important;
-    }
-
     .settings-menu button {
         display: block;
         width: 100%;
