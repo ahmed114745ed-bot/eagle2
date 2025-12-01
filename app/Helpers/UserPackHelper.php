@@ -21,18 +21,6 @@ class UserPackHelper
         $ware = self::getFrameWare($user);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
     }
-       public static function getFrameImageV2(User $user) : string
-    {
-        $ware = self::getFrameWare($user);
-            Log::info('getFrameImageV2 called', [
-                'user_id' => $user->id,
-                'ware_id' => $ware?->id,
-                'show_img' => $ware?->show_img,
-                'img2' => $ware?->img2,
-            ]);
-
-        return $ware?->show_img ?? ($ware?->img2 ?? '');
-    }
 
     public static function getFrameId(User $user) : string
     {
@@ -167,20 +155,10 @@ class UserPackHelper
      */
     public static function getWare(User $user, int $type)
     {
-            Log::info('getFrameImageV2  getWare called', [
-                    'user_id' => $user->id,
-                    'type' => $type,
-                ]);
-
-        $ware = self::getPacks($user)
+        return self::getPacks($user)
             ->where('type', $type)
             ->where('is_used', true)
             ->first()?->ware;
-
-    Log::info('getFrameImageV2  ware called', [
-                    'ware' => $ware,
-                ]);
-             return $ware;   
     }
 
     /**
