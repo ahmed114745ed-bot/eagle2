@@ -984,20 +984,25 @@ Route::get('/run-roomcup-rewards', function () {
 });
 
 Route::get('/fix-pack-expire', function () {
-    $packs = \App\Models\Pack::where('is_used', 1)
+    \Log::info('Starting fix-pack-expire job');
+    
+    $updatedCount = 0;
+    
+    \App\Models\Pack::where('is_used', 1)
         ->whereNull('expire')
-        ->get(['id', 'days']);
-
-    foreach ($packs as $pack) {
-        if ($pack->days >= 0) {
-            $pack->expire = $pack->days == 0 ? 0 : Carbon::now()->addDays($pack->days)->timestamp;
-            $pack->save();
-        }
-    }
-
-    return 'done';
+        ->where('days', '>', 0)
+        ->chunk(200, function ($packs) use (&$updatedCount) {
+            foreach ($packs as $pack) {
+                $pack->expire = Carbon::now()->addDays($pack->days)->timestamp;
+                $pack->save();
+                $updatedCount++;
+            }
+        });
+    
+    \Log::info("Updated {$updatedCount} packs");
+    
+    return "Updated {$updatedCount} packs";
 });
-
 Route::get('/users-without-admin', function () {
     $types = [
         'bd' => 'is_bd',
