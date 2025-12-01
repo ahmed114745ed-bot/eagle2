@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Column;
 use App\Admin\Controllers\MainController;
+use Illuminate\Support\MessageBag;
 use Modules\HostLevel\Entities\HostLevel;
 
 class HostLevelController extends MainController
@@ -165,13 +166,14 @@ class HostLevelController extends MainController
         $form->text('name', __('name'));
         $form->image('img', __('Img'))->required();
         $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
-        $form->number('diamonds', __('diamonds'));
+        $form->number('diamonds', __('diamonds'))->required();
 
 
         $form->saving(function (Form $form) {
 
             $level = $form->level;
             $diamonds = $form->diamonds;
+
 
             // Get previous level (< this one)
             $previous = HostLevel::where('level', '<', $level)
@@ -180,13 +182,17 @@ class HostLevelController extends MainController
                 })
                 ->orderBy('level', 'desc')
                 ->first();
+            if ($previous && ($diamonds <= $previous->diamonds)) {
+                $error = new MessageBag([
+                    'title'   => 'Forbidden',
+                    'message' => __("Diamonds must be greater than previous level (:level) diamonds (:diamonds)", [
+                        'level'    => $previous->level,
+                        'diamonds' => $previous->diamonds,
+                    ]),
+                ]);
 
-            throw new \Exception(
-                __("Diamonds must be greater than or equal to previous level (:level) diamonds (:diamonds)", [
-                    'level'    => $previous->level,
-                    'diamonds' => $previous->diamonds,
-                ])
-            );
+                return redirect()->back()->with(compact('error'));
+            }
         });
         return $form;
     }

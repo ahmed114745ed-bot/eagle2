@@ -4017,7 +4017,7 @@
 "Delete host level": "حذف مستوى المضيف",
 "Edit host level": "تعديل مستوى المضيف",
 "Show host level": "عرض مستوى المضيف",
-"Diamonds must be greater than or equal to previous level :level diamonds :diamonds": "يجب أن تكون قيمة الألماس أكبر من أو تساوي مستوى السابق :level بقيمة ألماس :diamonds",
+"Diamonds must be greater than to previous level (:level) diamonds (:diamonds)": "يجب أن تكون قيمة الألماس أكبر من مستوى السابق :level بقيمة ألماس :diamonds",
 
 "Host Level Reward": "مكافأة مستوى المضيف",
 "Browse host level reward": "استعراض مكافآت مستوى المضيف",
