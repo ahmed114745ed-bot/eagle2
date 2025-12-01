@@ -192,7 +192,11 @@ class TaskStreamService extends TaskStreamValidationService
 
         event(new TaskStreamInvitation($inviteeUserId, $invitationData));
 
-        return $inviteeLiveRoom->id;
+        return [
+            'room_id' => $inviteeLiveRoom->id,
+            'user_name' => $invitee->name,
+            'user_image' => $invitee->profile->avatar,
+        ];
     }
 
     /**
