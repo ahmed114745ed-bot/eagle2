@@ -114,8 +114,12 @@ class GiftLoadTestService
 
 
         $afterSender = $sender->fresh()->di;
-        $receiver2 = User::findOrFail($data['toUid']);
-        $afterReceiver = $receiver2->monthly_diamond_received;
+     foreach ($results as $index => $res) {
+             usleep(200000); 
+            $receiver2 = User::findOrFail($data['toUid']);
+            $afterReceiver = $receiver2->monthly_diamond_received;
+        }
+
 
         return [
             'summary' => $summary,
@@ -125,9 +129,9 @@ class GiftLoadTestService
             'before_receiver' => $beforeReceiver,
             'after_receiver' => $afterReceiver,
             'expected_receiver' => $expectedReceiver,
-            'gift_value' => $giftValue,
-            'gift_receive' => $giftReceive,
-            'sent_gifts' => $totalSentGifts,
+            'gift_value' => $giftValue * $data['count'] ,
+            'gift_receive' => $giftReceive * $data['count'] ,
+            'sent_gifts' => $totalSentGifts * $data['count'],
             'failed_gifts' => $summary['failed'] * $data['num'],
             'num_per_request' => $data['num'],
         ];
