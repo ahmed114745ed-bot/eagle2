@@ -128,7 +128,7 @@ class MyDataResource extends JsonResource
             'firebase_uuid' => (string)@$this->firebase_uuid ?: '',
 
             //'manger' => new MangerTypeResource(@$this->manager),
-            'frame' => UserPackHelper::getFrameImage($this->resource),
+            'frame' => UserPackHelper::getFrameImageV2($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
 
             'intro' => UserPackHelper::getIntroFile($this->resource),

@@ -21,6 +21,11 @@ class UserPackHelper
         $ware = self::getFrameWare($user);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
     }
+       public static function getFrameImageV2(User $user) : string
+    {
+        $ware = self::getFrameWare($user);
+        return $ware?->show_img ?? ($ware?->img2 ?? '');
+    }
 
     public static function getFrameId(User $user) : string
     {
