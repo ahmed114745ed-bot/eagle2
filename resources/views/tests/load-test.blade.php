@@ -23,7 +23,7 @@ pre { background:#222; color:#0f0; padding:15px; border-radius:8px; white-space:
 
             <div class="mb-3">
                 <label>رابط API</label>
-                <input type="text" name="url" class="form-control" placeholder="https://eagle.utdsoftware.com" required>
+                <input type="text" name="url" class="form-control" placeholder="https://eagle.utdsoftware.com" value="https://eagle.utdsoftware.com" required>
             </div>
 
             <div class="row">
