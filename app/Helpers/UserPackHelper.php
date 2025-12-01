@@ -19,6 +19,7 @@ class UserPackHelper
     public static function getFrameImage(User $user) : string
     {
         $ware = self::getFrameWare($user);
+        LogHelper::info('frame ware',[$ware]);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
     }
 
