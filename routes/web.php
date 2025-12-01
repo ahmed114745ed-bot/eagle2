@@ -989,7 +989,7 @@ Route::get('/fix-pack-expire', function () {
         ->get(['id', 'days']);
 
     foreach ($packs as $pack) {
-        if (!empty($pack->days)) {
+        if ($pack->days >= 0) {
             $pack->expire = $pack->days == 0 ? 0 : Carbon::now()->addDays($pack->days)->timestamp;
             $pack->save();
         }
