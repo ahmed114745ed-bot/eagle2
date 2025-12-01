@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TestDiamondController;
+use App\Http\Controllers\TestsController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
@@ -1035,5 +1035,10 @@ Route::get('/users-without-admin/reset', function () {
     return response()->json($result);
 });
 
-Route::get('/diamond-discrepancy', [TestDiamondController::class, 'discrepancyView'])
-    ->name('diamond.discrepancy');
+Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
+// Route::get('/send-gift-test', function () {
+//     return view('tests.load-test');
+// });
+
+Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
+Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
