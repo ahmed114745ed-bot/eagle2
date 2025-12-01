@@ -1,0 +1,5 @@
+- [x] Redesign the layout of resources/views/admin/dashboard/chart.blade.php with modern dark theme
+- [x] Update CSS styles for cards, tables, and overall appearance
+- [x] Improve mobile responsiveness
+- [x] Add subtle animations and hover effects
+- [x] Ensure all existing functionality remains intact
