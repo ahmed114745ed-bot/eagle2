@@ -167,10 +167,20 @@ class UserPackHelper
      */
     public static function getWare(User $user, int $type)
     {
-        return self::getPacks($user)
+            Log::info('getFrameImageV2  getWare called', [
+                    'user_id' => $user->id,
+                    'type' => $type,
+                ]);
+
+        $ware = self::getPacks($user)
             ->where('type', $type)
             ->where('is_used', true)
             ->first()?->ware;
+
+    Log::info('getFrameImageV2  ware called', [
+                    'ware' => $ware,
+                ]);
+             return $ware;   
     }
 
     /**
