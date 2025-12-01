@@ -23,6 +23,18 @@ class AllGameController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function inRoom()
+    {
+        $data = $this->allGameService->getInRoom();
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function outRoom()
+    {
+        $data = $this->allGameService->getOutRoom();
+        return Common::apiResponse(1, '', $data);
+    }
+
     public function updateGame(Request $request)
     {
         $result = $this->allGameService->updateGame($request->game_id, $request->user());
@@ -41,14 +53,14 @@ class AllGameController extends Controller
             'name' => 'nullable|string|max:255',
             'name_en' => 'nullable|string|max:255',
             'url' => 'required|url',
-            'mini_url' =>'required|url',
-            'type' =>'required|integer',
+            'mini_url' => 'required|url',
+            'type' => 'required|integer',
             'is_enable' => 'nullable|boolean',
-            'custom_id' =>'nullable',
+            'custom_id' => 'nullable',
             'hight_image' => 'nullable|string',
             'in_room'    => 'nullable|integer',
             'hight' => 'nullable|string',
-             'image'=>'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
@@ -62,14 +74,14 @@ class AllGameController extends Controller
             'name' => 'nullable|string|max:255',
             'name_en' => 'nullable|string|max:255',
             'url' => 'required|url',
-            'mini_url' =>'required|url',
-            'type' =>'required|integer',
+            'mini_url' => 'required|url',
+            'type' => 'required|integer',
             'is_enable' => 'nullable|boolean',
-            'custom_id' =>'nullable',
+            'custom_id' => 'nullable',
             'hight_image' => 'nullable|string',
             'in_room'    => 'nullable|integer',
             'hight' => 'nullable|string',
-             'image'=>'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'game_id' => 'required|integer|exists:all_games,id',
         ]);
         if ($validator->fails()) {

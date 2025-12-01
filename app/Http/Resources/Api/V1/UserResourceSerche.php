@@ -86,6 +86,7 @@ class UserResourceSerche extends JsonResource
             'image_color'          => @$this->color_image,
             'frame' => $frame,
             'chat_id' => $chatRoom->id ?? null,
+            'deleted_at' => $this->deleted_at,
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
         ];
         return $data;

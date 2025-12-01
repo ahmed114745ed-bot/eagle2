@@ -24,7 +24,7 @@ class RoomBoomMiddleware
             });
         };
 
-        $roomBoom = $getSetting('room_boom') ?? 0;
+        $roomBoom = $getSetting('room_boom') ?? 1;
         if (!$roomBoom) abort(403, __('Not Found'));
 
         return $next($request);

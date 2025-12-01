@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\GameSettingsController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 
@@ -204,6 +205,7 @@ Route::group(
         Route::resource('reset-salary', ResetUserSalaryController::class);
         Route::get('user-charge-history/{User_id}', [UserChargeHistoryController::class, 'indexCharge']);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
+        Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
         Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
@@ -242,14 +244,14 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        
+
         Route::resource('auth/roles', RoleControllerNew::class);
         Route::get('super-roles', [SuperRoleController::class,'index']);
         Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
-       
+
 
         Route::resource('auth/rolesTest', 'RoleController');
-        
+
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
 
         Route::resource('auth/permissions', PermissionController::class);
@@ -304,6 +306,7 @@ Route::group(
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
+        Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {

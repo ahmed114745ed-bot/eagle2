@@ -970,3 +970,41 @@ Route::get('/manifest.json', function () {
         "display" => "standalone",
     ]);
 })->name('manifest.json');
+
+Route::get('/run-roomcup-rewards', function () {
+    Artisan::call('roomcup:calculate-rewards');
+
+    $output = Artisan::output();
+
+    return response()->json([
+        'message' => 'RoomCup rewards calculation executed successfully!',
+        'output'  => $output,
+    ]);
+});
+
+Route::get('/bd-users-without-bd-admin', function () {
+    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
+
+    $users = \App\Models\User::where('is_bd', 1)
+        ->whereNotIn('id', $bdAdminAppIds)
+        ->get();
+
+    return response()->json([
+        'count' => $users->count(),
+        'users' => $users
+    ]);
+});
+
+Route::get('/bd-users-without-bd-admin/reset', function () {
+    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
+
+    $affectedRows = \App\Models\User::where('is_bd', 1)
+        ->whereNotIn('id', $bdAdminAppIds)
+        ->update(['is_bd' => 0]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'BD status reset successfully',
+        'affected_rows' => $affectedRows
+    ]);
+});

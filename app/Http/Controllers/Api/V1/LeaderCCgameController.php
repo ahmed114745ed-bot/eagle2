@@ -94,7 +94,7 @@ class LeaderCCgameController extends Controller
             return DB::transaction(function () use ($request, $type) {
 
                 $user = User::lockForUpdate()->with([
-                                                    'profile:id,user_id,avatar', 
+                                                    'profile:id,user_id,avatar',
                                                     'nowGame:id,image',
                                                      'nowRoom:id,uid'
                                                     ])->find($request->uid);
@@ -126,8 +126,8 @@ class LeaderCCgameController extends Controller
 
                 dispatch(new \App\Jobs\GameWalletJop($type == 1 ? -$coin : $coin));
 
-                if ($type == 2 && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
-                        
+                $gameMapWinCoins = Common::getConfig('game_map_win_coins') ?? 10000;
+                if ($type == 2 && $coin >= $gameMapWinCoins) {
                     $roomId = $user->nowRoom?->id;
 
                     $d = [
@@ -137,15 +137,16 @@ class LeaderCCgameController extends Controller
                             'uImage'  => $user->profile?->avatar ?? 0,
                             'uName'   => $user->name ?? '',
                             'uId'     => $user->id ?? 0,
-                            'coins'   => numToStringNew((int) $request->currency_diff),
+                            'coins'   => numToStringNew($coin),
+//                            'coins'   => numToStringNew((int) $request->currency_diff),
                             "gImage"  => @$user->nowGame?->image
                         ]
                     ];
-        
+
                     $json = json_encode($d);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id,  $roomId, false), 'heavyProcessing');
                 }
-        
+
                 return $this->json(0, 'success', [
                     'coins' => $user->di
                 ]);

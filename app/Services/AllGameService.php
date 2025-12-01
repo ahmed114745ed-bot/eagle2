@@ -8,6 +8,7 @@ use App\Models\GameChargeHistory;
 use App\Http\Resources\AllGameResource;
 use App\Repositories\AllGameRepository;
 use App\Repositories\User\UserRepository;
+use App\Http\Resources\AllGameInRoomResource;
 
 class AllGameService
 {
@@ -39,6 +40,44 @@ class AllGameService
         ];
         return [
             'full' => $fullGames,
+            'mini' => $miniGames,
+            'credentials'  => $key,
+        ];
+    }
+
+    public function getOutRoom()
+    {
+        // Fetch full games
+        $allGames = $this->allGameRepository->getAllEnabledGames();
+        \request()->type = 0;
+        $fullGames = AllGameResource::collection($allGames)->toArray(request());
+
+
+        $key = [
+            "baishun_channel" => config('app.baishun_channel') ?? '',
+            "baishun_app_id" => config('app.baishun_app_id') ?? '',
+            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 201),
+        ];
+        return [
+            'full' => $fullGames,
+
+            'credentials'  => $key,
+        ];
+    }
+
+    public function getInRoom()
+    {
+        // Fetch mini games
+        $miniGames = $this->allGameRepository->getAllEnabledMiniGames();
+        \request()->type = 1;
+        $miniGames = AllGameInRoomResource::collection($miniGames)->toArray(request());
+
+        $key = [
+            "baishun_channel" => config('app.baishun_channel') ?? '',
+            "baishun_app_id" => config('app.baishun_app_id') ?? '',
+            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 201),
+        ];
+        return [
             'mini' => $miniGames,
             'credentials'  => $key,
         ];

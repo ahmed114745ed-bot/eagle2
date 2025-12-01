@@ -80,9 +80,12 @@ class TaskStreamController extends Controller
             'invitee_user_id' => ['required', 'integer', Rule::exists('users', 'id')],
         ]);
 
-        $this->taskStreamService->sendInvitation($data);
+        $result = $this->taskStreamService->sendInvitation($data);
 
-        return Common::apiResponse(true, __('sent successfully'));
+        return Common::apiResponse(true, __('sent successfully'), [
+            'invitee_user_id' => $data['invitee_user_id'],
+            'invitee_room_id' => $result,
+        ]);
     }
 
     /**
