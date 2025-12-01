@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestDiamondController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
@@ -1008,3 +1009,8 @@ Route::get('/bd-users-without-bd-admin/reset', function () {
         'affected_rows' => $affectedRows
     ]);
 });
+
+
+
+Route::get('/diamond-discrepancy', [TestDiamondController::class, 'discrepancyView'])
+    ->name('diamond.discrepancy');
