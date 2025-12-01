@@ -78,6 +78,7 @@ class TaskStreamController extends Controller
         $data = $request->validate([
             'task_stream_id' => ['required', 'integer', Rule::exists('task_streams', 'id')],
             'invitee_user_id' => ['required', 'integer', Rule::exists('users', 'id')],
+            'battle_data' => ['sometimes', 'array'],
         ]);
 
         $result = $this->taskStreamService->sendInvitation($data);
