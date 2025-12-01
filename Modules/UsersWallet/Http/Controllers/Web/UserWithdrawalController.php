@@ -188,8 +188,13 @@ class UserWithdrawalController extends MainController
             ");
 
     $grid->disableCreateButton();
-    $grid->disableActions();
-    return $grid;
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();    
+            $actions->disableDelete();  
+        });
+        
+        
+        return $grid;
 }
 
 protected function detail($id)
