@@ -126,7 +126,7 @@ pre { background:#222; color:#0f0; padding:15px; border-radius:8px; white-space:
                 <tr>
                     <td>{{ $error['index'] }}</td>
                     <td class="{{ $error['status'] == 'SUCCESS' ? 'success' : 'fail' }}">{{ $error['status'] }}</td>
-                    <td>{{ $error['status'] == 'SUCCESS' ? $data['num'] : 0 }}</td>
+                    <td>{{ $error['status'] == 'SUCCESS' ? @$num_per_request: 0 }}</td>
                     <td>
                         <pre>{{ json_encode($error['response'] ?? $error['error'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
                     </td>
