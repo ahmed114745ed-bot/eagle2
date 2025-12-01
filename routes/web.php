@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestsController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
@@ -982,29 +983,78 @@ Route::get('/run-roomcup-rewards', function () {
     ]);
 });
 
-Route::get('/bd-users-without-bd-admin', function () {
-    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
+Route::get('/fix-pack-expire', function () {
+    $packs = \App\Models\Pack::where('is_used', 1)
+        ->whereNull('expire')
+        ->get(['id', 'days']);
 
-    $users = \App\Models\User::where('is_bd', 1)
-        ->whereNotIn('id', $bdAdminAppIds)
-        ->get();
+    foreach ($packs as $pack) {
+        if (!empty($pack->days)) {
+            $pack->expire = Carbon::now()->addDays($pack->days)->timestamp;
+            $pack->save();
+        }
+    }
 
-    return response()->json([
-        'count' => $users->count(),
-        'users' => $users
-    ]);
+    return 'done';
 });
 
-Route::get('/bd-users-without-bd-admin/reset', function () {
-    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
+Route::get('/users-without-admin', function () {
+    $types = [
+        'bd' => 'is_bd',
+        'superadmin' => 'is_super_admin',
+        'area-manager' => 'is_area_manager',
+    ];
 
-    $affectedRows = \App\Models\User::where('is_bd', 1)
-        ->whereNotIn('id', $bdAdminAppIds)
-        ->update(['is_bd' => 0]);
+    $counts = [];
+    $lists = [];
 
-    return response()->json([
-        'success' => true,
-        'message' => 'BD status reset successfully',
-        'affected_rows' => $affectedRows
-    ]);
+    foreach ($types as $type => $flag) {
+        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
+
+        $users = User::where($flag, 1)
+            ->select('id')
+            ->whereNotIn('id', $adminAppIds)
+            ->get();
+
+        $counts["{$type}_count"] = $users->count();
+        $lists["{$type}_users"] = $users;
+    }
+
+    $response = array_merge($counts, $lists);
+
+    return response()->json($response);
 });
+
+Route::get('/users-without-admin/reset', function () {
+    $types = [
+        'bd' => 'is_bd',
+        'superadmin' => 'is_super_admin',
+        'area-manager' => 'is_area_manager',
+    ];
+
+    $result = [];
+
+    foreach ($types as $type => $flag) {
+        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
+
+        $affectedRows = User::where($flag, 1)
+            ->whereNotIn('id', $adminAppIds)
+            ->update([$flag => 0]);
+
+        $result["{$type}_affected_rows"] = $affectedRows;
+    }
+
+    $result['success'] = true;
+    $result['message'] = 'Statuses reset successfully';
+
+    return response()->json($result);
+});
+
+Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
+// Route::get('/send-gift-test', function () {
+//     return view('tests.load-test');
+// });
+
+Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
+Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
+Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');

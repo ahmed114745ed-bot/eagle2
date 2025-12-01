@@ -188,11 +188,15 @@ class TaskStreamService extends TaskStreamValidationService
 
         $this->taskStreamInvitationRepository->createInvitation($taskStream->id, $authUser->id, $inviteeUserId);
 
-        $invitationData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id];
+        $invitationData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id, 'battle_data' => @$data['battle_data']];
 
         event(new TaskStreamInvitation($inviteeUserId, $invitationData));
 
-        return $inviteeLiveRoom->id;
+        return [
+            'room_id' => $inviteeLiveRoom->id,
+            'user_name' => $invitee->name,
+            'user_image' => $invitee->profile->avatar,
+        ];
     }
 
     /**

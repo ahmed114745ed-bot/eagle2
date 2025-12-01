@@ -19,6 +19,7 @@ class UserPackHelper
     public static function getFrameImage(User $user) : string
     {
         $ware = self::getFrameWare($user);
+        LogHelper::info('frame ware',['ware1' => $ware,'ware2' =>$ware?->img2 ?? ($ware?->img1 ?? '')]);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
     }
 
@@ -26,6 +27,12 @@ class UserPackHelper
     {
         $ware = self::getFrameWare($user);
         return $ware?->id ?? 0;
+    }
+
+    public static function getFrameType(User $user) : string
+    {
+        $ware = self::getFrameWare($user);
+        return $ware?->image_type ?? '';
     }
 
     public static function getProfileFrameId(User $user) : string
