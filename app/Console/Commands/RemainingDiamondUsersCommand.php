@@ -70,11 +70,11 @@ class ResetUserMonthlyDiamond extends Command
                     continue;
                 }
                 if ($setting === 'coins') {
-                    $this->processCoins($user, $diamonds, $exchangePercentage);
+                    $this->processCoins($user, $diamonds, $exchangePercentage, $month, $year);
                 }
 
                 if ($setting === 'diamonds') {
-                    $this->processDiamonds($user, $diamonds, $dt);
+                    $this->processDiamonds($user, $diamonds, $dt, $month, $year);
                 }
             }
 
@@ -87,7 +87,7 @@ class ResetUserMonthlyDiamond extends Command
     /**
      * Process remaining diamonds as coins
      */
-    private function processCoins($user, int $diamonds, float $exchangePercentage)
+    private function processCoins($user, int $diamonds, float $exchangePercentage, $month, $year)
     {
         $exchangeCoin = floor(($exchangePercentage / 100) * $diamonds);
         $amountBefore = $user->di;
@@ -107,22 +107,21 @@ class ResetUserMonthlyDiamond extends Command
             'amount' => $exchangeCoin,
             'type' => 'coins',
             'remaining' => $diamonds,
+            'month' => $month,
+            'year' => $year,
         ]);
     }
 
     /**
      * Process remaining diamonds as diamonds
      */
-    private function processDiamonds($user, int $diamonds, Carbon $dt)
+    private function processDiamonds($user, int $diamonds, Carbon $dt, $month, $year)
     {
         $monthDiamondReceive = MonthlyDiamondReceive::firstOrNew(
             [
                 'user_id' => $user->id,
                 'month'   => $dt->month,
                 'year'    => $dt->year,
-            ],
-            [
-                'monthly_diamond_received' => 0
             ]
         );
 
@@ -143,6 +142,8 @@ class ResetUserMonthlyDiamond extends Command
             'amount' => $diamonds,
             'type' => 'diamonds',
             'remaining' => $diamonds,
+            'month' => $month,
+            'year' => $year,
         ]);
     }
 }

@@ -48,6 +48,31 @@ class RemainingDiamondHistoryController extends MainController
             $filter->column('1/2', function ($filter) {
                 $filter->equal('type', __('type'))->select(['diamonds' => __('diamonds'), 'coins' => __('coins')]);
             });
+            $filter->column('1/2', function ($filter) {
+                $filter->equal('month', __('Month'))->select([
+                    1 => __('January'),
+                    2 => __('February'),
+                    3 => __('March'),
+                    4 => __('April'),
+                    5 => __('May'),
+                    6 => __('June'),
+                    7 => __('July'),
+                    8 => __('August'),
+                    9 => __('September'),
+                    10 => __('October'),
+                    11 => __('November'),
+                    12 => __('December'),
+                ]);
+            });
+
+            $filter->column('1/2', function ($filter) {
+                $currentYear = now()->year;
+                $years = [];
+                for ($i = $currentYear; $i >= $currentYear - 10; $i--) {
+                    $years[$i] = $i;
+                }
+                $filter->equal('year', __('Year'))->select($years);
+            });
         });
 
         $grid->column('id', __('Id'));
@@ -79,7 +104,11 @@ class RemainingDiamondHistoryController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('Created at'))->display(function ($usd) {
+
+
+            return $this->month . '/' . $this->year;
+        });;
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableExport();
