@@ -1108,12 +1108,5 @@ Route::get('/run-lucky-gift-unit-test', function () {
     $output = $process->getOutput() . $process->getErrorOutput();
 
     return response('<pre>'.e($output).'</pre>');
-
-    return response(
-        '<pre>' . e(Artisan::output()) . '</pre>'
-    );
 });
 
-Route::get('/testt', function () {
-    return 'test';
-});
