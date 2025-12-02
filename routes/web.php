@@ -1050,11 +1050,19 @@ Route::get('/users-without-admin/reset', function () {
     return response()->json($result);
 });
 
+/**
+ * 
+ * tests
+ * 
+ */
 Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
-// Route::get('/send-gift-test', function () {
-//     return view('tests.load-test');
-// });
 
 Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
 Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
 Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');
+
+
+
+Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
+Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
+Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
