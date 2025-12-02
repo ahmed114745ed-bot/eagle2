@@ -1053,9 +1053,9 @@ Route::get('/users-without-admin/reset', function () {
 });
 
 /**
- * 
+ *
  * tests
- * 
+ *
  */
 Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
 
@@ -1094,4 +1094,14 @@ $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
         'output'       => $process->getOutput(),
         'error_output' => $process->getErrorOutput(),
     ]);
+});
+
+Route::get('/run-lucky-gift-unit-test', function () {
+    Artisan::call('test', [
+        '--filter' => 'SendLuckyGift2FeatureTest',
+    ]);
+
+    return response(
+        '<pre>' . e(Artisan::output()) . '</pre>'
+    );
 });
