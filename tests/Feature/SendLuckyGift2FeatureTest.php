@@ -89,6 +89,7 @@ class SendLuckyGift2FeatureTest extends TestCase
             ])->postJson('/api/gifts/send-lucky-gift-combo', [
                 'id' => (int) $gift->id,
                 'toUid' => (int) $receiver->id,
+                'room_id' => 1000000,
                 'num' => 1,
             ]);
 
@@ -106,7 +107,6 @@ class SendLuckyGift2FeatureTest extends TestCase
 
             $responseData = $response->json();
             LogHelper::info('Lucky Gift Monthly response', $responseData ?? []);
-            dd($responseData);
             // التحقق من الرد
             $response->assertStatus(200)
                      ->assertJson([
