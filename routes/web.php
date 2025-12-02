@@ -411,6 +411,7 @@ Route::get('/clear-admin-error', function () {
 });
 
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
+Route::get('/admin/super-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.super.logout');
 Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
