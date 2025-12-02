@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Helpers\LogHelper;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
@@ -1067,3 +1068,30 @@ Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test'
 Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
 Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
 Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
+
+
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+Route::get('/run-lucky-gift-test', function () {
+    LogHelper::info("starting lucky gift test...");
+    Artisan::call('cache:clear');
+$phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
+
+    $process = new Process([
+        $phpunitPath,
+        '--filter=SendLuckyGift2FeatureTest',
+        'tests/Feature/SendLuckyGift2FeatureTest.php'
+    ]);
+
+    $process->setWorkingDirectory(base_path()); // قاعدة مهمة جداً
+    $process->setTimeout(300);
+    $process->run();
+
+    return response()->json([
+        'exit_code'    => $process->getExitCode(),
+        'output'       => $process->getOutput(),
+        'error_output' => $process->getErrorOutput(),
+    ]);
+});

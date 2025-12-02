@@ -201,6 +201,7 @@ class RankingRepository
             ->when($role != 'roomId', function ($query) use ($role) {
                 return $query->where('ranker_type', User::class)->with([
                     'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+                     ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'))
                 ]);
             })
 

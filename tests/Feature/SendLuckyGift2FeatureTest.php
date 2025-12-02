@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Helpers\LogHelper;
+use App\Models\Room;
 use Tests\TestCase;
 use Mockery;
 use App\Models\User;
@@ -23,6 +24,9 @@ class SendLuckyGift2FeatureTest extends TestCase
 
     public function test_send_lucky_gift_monthly_report()
     {
+
+                Log::info(' start test_send_lucky_gift_monthly_report', []);
+
         // 1. تفعيل عرض الأخطاء
         $this->withoutExceptionHandling();
         
@@ -40,14 +44,15 @@ class SendLuckyGift2FeatureTest extends TestCase
         settings()->set('stop_luckyGift', 0);
 
         // إنشاء مستخدمين
-        $sender = User::factory()->create([ 'di' => 500]);
+        $user = User::factory()->create([ 'di' => 500]);
         $receiver = User::factory()->create([ 'di' => 300]);
 
         // إنشاء هدية ثابتة
          $gift = Gift::where('type',6)->first();
 
-        $senderBefore = $sender->coins;
-        $receiverBefore = $receiver->coins;
+        $room = Room::where('type','audio')->first();
+        $senderBefore = $user->di;
+        $receiverBefore = $receiver->di;
 
         $giftCost = $gift->price;
         $receiverGain = 50;
@@ -76,10 +81,10 @@ class SendLuckyGift2FeatureTest extends TestCase
         $this->app->instance(UpdateUserWhenSendGift::class, $mockUpdate);
 
         // إرسال الطلب مع التحقق من التوثيق
-        $token = $sender->createToken('test-token')->plainTextToken;
+        $token = $user->createToken('test-token')->plainTextToken;
         
-        Log::info('Sender ID:', ['id' => $sender->id]);
-        Log::info('Receiver ID:', ['id' => $receiver->id]);
+        Log::info('Sender ID:', ['id' => $user->id]);
+        Log::info('Receiver ID:', ['id' => $user->id]);
         Log::info('Gift ID:', ['id' => $gift->id]);
 
         try {
@@ -88,14 +93,13 @@ class SendLuckyGift2FeatureTest extends TestCase
                 'Accept' => 'application/json',
             ])->postJson('/api/gifts/send-lucky-gift-combo', [
                 'id' => (int) $gift->id,
-                'toUid' => (int) $receiver->id,
+                'toUid' => (int) $user->id,
+                'room_id' => $room->id,
                 'num' => 1,
             ]);
 
-            // عرض الاستعلامات التي تم تنفيذها
             Log::info('Database Queries:', DB::getQueryLog());
             
-            // عرض تفاصيل الرد
             Log::info('Response Status:', ['status' => $response->status()]);
             Log::info('Response Headers:', $response->headers->all());
             
@@ -106,7 +110,6 @@ class SendLuckyGift2FeatureTest extends TestCase
 
             $responseData = $response->json();
             LogHelper::info('Lucky Gift Monthly response', $responseData ?? []);
-            dd($responseData);
             // التحقق من الرد
             $response->assertStatus(200)
                      ->assertJson([
@@ -125,14 +128,14 @@ class SendLuckyGift2FeatureTest extends TestCase
         }
 
         // تحديث الرصيد بعد الهدية
-        $sender->refresh();
+        $user->refresh();
         $receiver->refresh();
 
         $expectedSender = $senderBefore - $giftCost;
         $expectedReceiver = $receiverBefore + $receiverGain;
 
-        $this->assertEquals($expectedSender, $sender->coins, 
-            "Sender coins mismatch. Expected: {$expectedSender}, Actual: {$sender->coins}");
+        $this->assertEquals($expectedSender, $user->coins, 
+            "Sender coins mismatch. Expected: {$expectedSender}, Actual: {$user->coins}");
 
         // تسجيل / تحديث diamonds الشهرية
         $month = now()->month;
@@ -160,10 +163,9 @@ class SendLuckyGift2FeatureTest extends TestCase
         $this->assertEquals($receiverGain, $monthly->monthly_diamond_received,
             "Monthly diamond received mismatch. Expected: {$receiverGain}, Actual: {$monthly->monthly_diamond_received}");
 
-        // تقرير شهري
         $report = [
             'sender_before' => $senderBefore,
-            'sender_after' => $sender->coins,
+            'sender_after' => $user->coins,
             'receiver_before' => $receiverBefore,
             'receiver_after' => $receiver->coins,
             'monthly_received' => $monthly->monthly_diamond_received,
