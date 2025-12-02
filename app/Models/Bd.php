@@ -91,27 +91,31 @@ class Bd extends Model
 
                 if (!$defaultBd) {
                     $superAdmin = $bd->parent;
-                    $country = Country::find($superAdmin->country_id);
-                    if (!$country) {
-                        throw new Exception('Country not found for super admin.');
+                    if (! $superAdmin){
+                        $defaultSuperAdmin = SuperAdmin::where('default', 1)->where('country_id', 0)->first();
+                        $defaultBd = self::where('parent_id', $defaultSuperAdmin->id)->where('default', 1)->where('country_id', 0)->first();
+                    } else {
+                        $country = Country::find($superAdmin->country_id);
+                        if (!$country) {
+                            throw new Exception('Country not found for super admin.');
+                        }
+
+                        $countryName = $country->e_name;
+
+                        $newBdId = DB::table('admin_users')->insertGetId([
+                            'parent_id'  => $superAdmin->id,
+                            'username'   => 'bd' . $countryName . 'default',
+                            'name'       => 'bd' . $countryName . 'default',
+                            'password'   => Hash::make('bd' . $countryName . 'default'),
+                            'default'    => 1,
+                            'country_id' => $superAdmin->country_id,
+                            'type'       => 'bd',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+
+                        $defaultBd = self::find($newBdId);
                     }
-
-                    $countryName = $country->e_name;
-
-                    $newBdId = DB::table('admin_users')->insertGetId([
-                        'parent_id'  => $superAdmin->id,
-                        'username'   => 'bd' . $countryName . 'default',
-                        'name'       => 'bd' . $countryName . 'default',
-                        'password'   => Hash::make('bd' . $countryName . 'default'),
-                        'default'    => 1,
-                        'country_id' => $superAdmin->country_id,
-                        'type'       => 'bd',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-
-
-                    $defaultBd = self::find($newBdId);
                 }
 
                 Agency::where('bd_id', $bd->id)

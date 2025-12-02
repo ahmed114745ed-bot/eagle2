@@ -77,7 +77,3 @@ Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
         'name' => $user->name,
     ];
 });
-
-Broadcast::channel('user.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
-});

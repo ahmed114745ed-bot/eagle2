@@ -19,6 +19,10 @@
     "Select area manager": "Bölge yöneticisini seç",
 "go to the preview": "Önizlemeye git",
 "Superadmin": "Süper Yönetici",
+"exchange to": "Şuna değiştir",
+"Do not make any thing": "Hiçbir şey yapma",
+"remaining diamonds settings": "Kalan elmas ayarları",
+
 "area":"bölge",
 "Experience settings": "Deneyim ayarları",
 "coin exchange": "Coin değişimi",
@@ -108,6 +112,8 @@
     "Dedicate Badges": "Rozetleri tahsis et",
     "Browse dedicate badges": "Tahsis edilmiş rozetleri görüntüle",
     "Dedicate switch dedicate badges": "Rozet tahsis et veya değiştir",
+    "remaining diamonds": "kalan elmaslar",
+"Remaining Diamonds History": "kalan elmasların geçmişi",
 
     "Roles Reward": "Rol Ödülü",
     "Browse roles reward": "Rol ödüllerini görüntüle",

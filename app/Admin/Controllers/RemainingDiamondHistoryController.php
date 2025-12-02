@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Models\RemainingDiamond;
+
+
+use Encore\Admin\Grid;
+use App\Admin\Services\UserService;
+use Encore\Admin\Layout\Content;
+
+class RemainingDiamondHistoryController extends MainController
+{
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'Remaining Diamonds History';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans($this->title))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new RemainingDiamond());
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $query->whereHas('user', function ($subQuery) {
+                        $subQuery->where('uuid', 'like', "%{$this->input}%");
+                    });
+                }, __('UUID'))->placeholder(__('search for host by UUID'));
+            });
+            $filter->column('1/2', function ($filter) {
+                $filter->equal('type', __('type'))->select(['diamonds' => __('diamonds'), 'coins' => __('coins')]);
+            });
+        });
+
+        $grid->column('id', __('Id'));
+        $grid->column('name', __('Name'))
+            ->display(function ($name) {
+
+                $user = $this->user;
+                if (! $user) {
+                    return __('No User');
+                }
+                return app(UserService::class)->adminUserAvatar($user);
+            });
+        $grid->column('amount', __('Amount'))->display(function ($usd) {
+
+            $image = $this->type == "diamonds" ? asset('images/diamond.jpg') : asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('type', __('Type'));
+        $grid->column('remaining', __('remaining diamonds'))->display(function ($usd) {
+
+            $image = asset('images/diamond.jpg'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('created_at', __('Created at'));
+        $grid->disableCreateButton();
+        $grid->disableRowSelector();
+        $grid->disableExport();
+        $grid->disableActions();
+        return $grid;
+    }
+}
