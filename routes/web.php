@@ -1074,18 +1074,19 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
-    $command = ['php', 'artisan', 'test', '--filter=SendLuckyGift2FeatureTest'];
+    $projectPath = base_path(); 
+
+    $command = [$projectPath . '/artisan', 'test', '--filter=SendLuckyGift2FeatureTest'];
 
     $process = new Process($command);
-    $process->setTimeout(300); // 5 دقائق كحد أقصى
+    $process->setWorkingDirectory($projectPath); 
+    $process->setTimeout(300);
 
     try {
         $process->mustRun();
-
         $output = $process->getOutput();
-
         return "<pre style='white-space: pre-wrap;'>{$output}</pre>";
     } catch (ProcessFailedException $exception) {
-        return "<pre style='color:red;'>Test failed:\n" . $exception->getMessage() . "</pre>";
+        return "<pre style='color:red;'>Test failed:\n" . $exception->getMessage() . "\n" . $exception->getProcess()->getErrorOutput() . "</pre>";
     }
 });
