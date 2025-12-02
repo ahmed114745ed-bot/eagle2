@@ -24,6 +24,9 @@ class SendLuckyGift2FeatureTest extends TestCase
 
     public function test_send_lucky_gift_monthly_report()
     {
+
+                Log::info(' start test_send_lucky_gift_monthly_report', []);
+
         // 1. تفعيل عرض الأخطاء
         $this->withoutExceptionHandling();
         

@@ -1076,7 +1076,6 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 Route::get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
     
-    // تشغيل PHPUnit مباشرة
     $process = new Process([
         './vendor/bin/phpunit',
         '--filter=SendLuckyGift2FeatureTest',
