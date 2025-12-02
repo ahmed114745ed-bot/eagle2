@@ -96,7 +96,10 @@
 
     .wrapper {
         width: 100%;
+    }
 
+    .wrapper {
+        min-width: max-content;
     }
 
     .settings-content {
