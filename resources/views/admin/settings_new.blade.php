@@ -569,6 +569,22 @@ use Modules\Vip\Entities\Vip;
     }
 }
 
+    @media (max-width: 576px) {
+    }
+    @media (max-width: 768px) {
+    }
+    @media (max-width: 992px) {
+    }
+    @media (max-width: 1200px) {
+    }
+    @media (max-width: 1400px) {
+        .form-control {
+            width: 170px !important;
+        }
+        .rtl .copy-button {
+            right: 75px;
+        }
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
@@ -2725,14 +2741,6 @@ use Modules\Vip\Entities\Vip;
                 </div>
             </div>
 
-
-
-
-
-
-
-
-
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App Settings') }}</h3>
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
@@ -2954,6 +2962,14 @@ use Modules\Vip\Entities\Vip;
                                         placeholder="اختر لون"
                                     >
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
+                                <input type="hidden" name="is_new_theme_enabled" value="0">
+                                <input type="checkbox" name="is_new_theme_enabled" value="1" data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
                             </div>
                         </div>
 
