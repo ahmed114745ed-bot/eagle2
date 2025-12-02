@@ -188,11 +188,15 @@ class TaskStreamService extends TaskStreamValidationService
 
         $this->taskStreamInvitationRepository->createInvitation($taskStream->id, $authUser->id, $inviteeUserId);
 
-        $invitationData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id];
+        $invitationData = ['user_id' => $authUser->id, 'user_name' => $authUser->name ?? '', 'room_id' => $liveRoom->id, 'task_stream_id' => $taskStream->id, 'battle_data' => @$data['battle_data']];
 
         event(new TaskStreamInvitation($inviteeUserId, $invitationData));
 
-        return $inviteeLiveRoom->id;
+        return [
+            'room_id' => $inviteeLiveRoom->id,
+            'user_name' => $invitee->name,
+            'user_image' => $invitee->profile->avatar,
+        ];
     }
 
     /**
@@ -204,8 +208,12 @@ class TaskStreamService extends TaskStreamValidationService
         $status = $data['status'];
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
-        $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
+      if ($this->taskStreamInvitationRepository->hasRecentAcceptedInvitation($taskStream->id)) {
+            throw new CValidationException(__('This task invitation has just been accepted by another user.'), ResponseAlias::HTTP_CONFLICT);
+        }
 
+        $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
+      
         if (! $invitation) {
             throw new CValidationException(__('No pending invitation found for this task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
