@@ -140,97 +140,115 @@ class GiftLoadTestService
 
      public function luckyRun(array $data)
     {
-        $response = Http::withToken($data['token'])
-                        ->get($data['url'] . '/api/my-data');
 
-        if ($response->failed()) {
-            throw new \Exception("Token غير صالح أو لا يمكن جلب بيانات المرسل");
-        }
+     $appPercentage  = getGiftPercentage('app_wallet_lucky_gift') / 10;
+    $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
+    $hostPercentage  = getGiftPercentage('host_lucky_gift') / 10;
 
-        $senderData = $response->json('data');
-        if (!isset($senderData['id'])) {
-            throw new \Exception("لم يتم العثور على ID المرسل");
-        }
+    // جلب بيانات المرسل
+    $response = Http::withToken($data['token'])
+                    ->get($data['url'] . '/api/my-data');
 
-        $sender = User::findOrFail($senderData['id']);
-        $receiver = User::findOrFail($data['toUid']);
-        $gift = Gift::findOrFail($data['id']);
+    if ($response->failed()) {
+        throw new \Exception("Token غير صالح أو لا يمكن جلب بيانات المرسل");
+    }
 
-        $giftValue = $gift->price;
-        $giftReceive = $gift->price;
+    $senderData = $response->json('data');
+    if (!isset($senderData['id'])) {
+        throw new \Exception("لم يتم العثور على ID المرسل");
+    }
 
-        $beforeSender = $sender->di;
-        $beforeReceiver = $receiver->monthly_diamond_received;
+    $sender = User::findOrFail($senderData['id']);
+    $receiver = User::findOrFail($data['toUid']);
+    $gift = Gift::findOrFail($data['id']);
 
-        $client = new Client([
-            'base_uri' => $data['url'],
-            'timeout'  => 10,
-            'verify'   => false,
+    $giftValue = $gift->price;
+    $giftReceive = $gift->price;
+
+    $beforeSender = $sender->di;
+    $beforeReceiver = $receiver->monthly_diamond_received;
+
+    // إعداد العميل للطلبات المتزامنة
+    $client = new Client([
+        'base_uri' => $data['url'],
+        'timeout'  => 10,
+        'verify'   => false,
+    ]);
+
+    $promises = [];
+    for ($i = 1; $i <= $data['count']; $i++) {
+        $promises[$i] = $client->postAsync('/api/gifts/send-lucky-gift-combo', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $data['token'],
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'id' => $data['id'],
+                'owner_id' => $data['owner_id'],
+                'toUid' => $data['toUid'],
+                'num' => $data['num']
+            ]
         ]);
+    }
 
-        $promises = [];
+    $results = Utils::settle($promises)->wait();
 
-        for ($i = 1; $i <= $data['count']; $i++) {
-            $promises[$i] = $client->postAsync('/api/gifts/send-lucky-gift-combo', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $data['token'],
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json'
-                ],
-                'json' => [
-                    'id' => $data['id'],
-                    'owner_id' => $data['owner_id'],
-                    'toUid' => $data['toUid'],
-                    'num' => $data['num']
-                ]
-            ]);
-        }
+    $summary = [
+        'success' => 0,
+        'failed' => 0,
+        'errors' => []
+    ];
 
-        $results = Utils::settle($promises)->wait();
+    $totalSentGifts = 0;
+    $totalWins       = 0;
+    $totalAppShare   = 0;
+    $totalRoomrShare = 0;
+    $totalHostShare  = 0;
 
-        $summary = [
-            'success' => 0,
-            'failed' => 0,
-            'errors' => []
-        ];
+    foreach ($results as $index => $res) {
+        if ($res['state'] === 'fulfilled') {
+            $body = json_decode($res['value']->getBody(), true);
+            $isSuccess = !empty($body['success']);
 
-        $totalSentGifts = 0;
+            if ($isSuccess) {
+                $summary['success']++;
+                $totalSentGifts += $data['num'];
 
-        foreach ($results as $index => $res) {
-            if ($res['state'] === 'fulfilled') {
-                $body = json_decode($res['value']->getBody(), true);
-                $isSuccess = !empty($body['success']);
+                // حساب المكتسبات والنسب لكل كومبو
+                foreach ($body['data']['combo'] as $combo) {
+                    $winCoins = $combo['data']['win_coins'] ?? 0;
 
-                if ($isSuccess) {
-                    $summary['success']++;
-                    $totalSentGifts += $data['num'];
-                    // $wins += array_sum(array_map(fn($c) => $c['data']['win_coins'] ?? 0, $res['data']['combo']));
-
-                } else {
-                    $summary['failed']++;
+                    $totalWins       += $winCoins;
+                    $totalAppShare   += $winCoins * $appPercentage;
+                    $totalRoomrShare += $winCoins * $roomrPercentage;
+                    $totalHostShare  += $winCoins * $hostPercentage;
                 }
-
-                $summary['errors'][] = [
-                    'index' => $index,
-                    'status' => $isSuccess ? 'SUCCESS' : 'FAILED',
-                    'response' => $body
-                ];
-
             } else {
                 $summary['failed']++;
-                $summary['errors'][] = [
-                    'index' => $index,
-                    'status' => 'FAILED',
-                    'error' => $res['reason']->getMessage()
-                ];
             }
+
+            $summary['errors'][] = [
+                'index' => $index,
+                'status' => $isSuccess ? 'SUCCESS' : 'FAILED',
+                'response' => $body
+            ];
+
+        } else {
+            $summary['failed']++;
+            $summary['errors'][] = [
+                'index' => $index,
+                'status' => 'FAILED',
+                'error' => $res['reason']->getMessage()
+            ];
         }
+    }
 
-        $expectedSender = $beforeSender - ($giftValue * $totalSentGifts);
-        $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
+    $expectedSender   = $beforeSender - ($giftValue * $totalSentGifts) + $totalWins;
+    $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
 
+    $afterSender = $sender->fresh()->di + $totalWins;
 
-        $afterSender = $sender->fresh()->di ;
      foreach ($results as $index => $res) {
              usleep(800000); 
             $receiver2 = User::findOrFail($data['toUid']);
@@ -239,18 +257,24 @@ class GiftLoadTestService
 
 
         return [
-            'summary' => $summary,
-            'before_sender' => $beforeSender,
-            'after_sender' => $afterSender,
-            'expected_sender' => $expectedSender,
-            'before_receiver' => $beforeReceiver,
-            'after_receiver' => $afterReceiver,
-            'expected_receiver' => $expectedReceiver,
-            'gift_value' => $giftValue * $data['count'] ,
-            'gift_receive' => $giftReceive * $data['count'] ,
-            'sent_gifts' => $totalSentGifts * $data['count'],
-            'failed_gifts' => $summary['failed'] * $data['num'],
-            'num_per_request' => $data['num'],
+                'summary' => $summary,
+                'before_sender' => $beforeSender,
+                'after_sender' => $afterSender,
+                'expected_sender' => $expectedSender,
+                'before_receiver' => $beforeReceiver,
+                'after_receiver' => $afterReceiver,
+                'expected_receiver' => $expectedReceiver,
+                'gift_value' => $giftValue * $data['count'],
+                'gift_receive' => $giftReceive * $data['count'],
+                'sent_gifts' => $totalSentGifts * $data['num'],
+                'failed_gifts' => $summary['failed'] * $data['num'],
+                'num_per_request' => $data['num'],
+                'total_wins' => $totalWins,
+                'total_app_share' => $totalAppShare,
+                'total_roomr_share' => $totalRoomrShare,
+                'total_host_share' => $totalHostShare,
         ];
     }
 }
+
+
