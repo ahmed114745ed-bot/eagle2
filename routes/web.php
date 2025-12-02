@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Helpers\LogHelper;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
@@ -1074,6 +1075,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
+    LogHelper::info("starting lucky gift test...");
     Artisan::call('cache:clear');
     
     $process = new Process([
