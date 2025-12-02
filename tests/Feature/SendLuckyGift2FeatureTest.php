@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Helpers\LogHelper;
 use Tests\TestCase;
 use Mockery;
 use App\Models\User;
@@ -66,7 +67,7 @@ class SendLuckyGift2FeatureTest extends TestCase
                      'toUid' => $receiver->id,
                      'num' => 1,
                  ]);
-        \Log::info('Lucky Gift Monthly response', $response->json());
+        LogHelper::info('Lucky Gift Monthly response', $response->json());
 
         $response->assertStatus(200)
                  ->assertJson(['success' => true]);
