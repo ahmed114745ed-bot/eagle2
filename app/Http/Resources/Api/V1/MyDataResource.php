@@ -130,6 +130,7 @@ class MyDataResource extends JsonResource
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),
+            'frame_type' => UserPackHelper::getFrameType($this->resource),
 
             'intro' => UserPackHelper::getIntroFile($this->resource),
             'intro_type' => UserPackHelper::getIntroType($this->resource),

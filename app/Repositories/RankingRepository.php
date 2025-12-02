@@ -201,6 +201,7 @@ class RankingRepository
             ->when($role != 'roomId', function ($query) use ($role) {
                 return $query->where('ranker_type', User::class)->with([
                     'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+                     ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'))
                 ]);
             })
 
@@ -230,7 +231,7 @@ class RankingRepository
 
     public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
     {
-        $query = GiftRanking::query()
+        $query = GiftRanking::query()->whereHas('ranker')
             ->with([
                 'ranker' => function ($q) use ($role) {
                     $q->with([
@@ -244,6 +245,7 @@ class RankingRepository
             ->where('ranker_type', User::class)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
+             $this->applyDateFiltersV2($query, 1);
 
         return $query->limit($limit)->get();
     }

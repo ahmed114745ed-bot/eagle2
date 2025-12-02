@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestsController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
@@ -49,6 +50,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Helpers\LogHelper;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
@@ -410,6 +412,7 @@ Route::get('/clear-admin-error', function () {
 });
 
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
+Route::get('/admin/super-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.super.logout');
 Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
@@ -982,29 +985,127 @@ Route::get('/run-roomcup-rewards', function () {
     ]);
 });
 
-Route::get('/bd-users-without-bd-admin', function () {
-    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
+Route::get('/fix-pack-expire', function () {
+    $packs = \App\Models\Pack::where('is_used', 1)
+        ->whereNull('expire')
+        ->get(['id', 'days']);
 
-    $users = \App\Models\User::where('is_bd', 1)
-        ->whereNotIn('id', $bdAdminAppIds)
-        ->get();
+    foreach ($packs as $pack) {
+        if ($pack->days >= 0) {
+            $pack->expire = $pack->days == 0 ? 0 : Carbon::now()->addDays($pack->days)->timestamp;
+            $pack->save();
+        }
+    }
+
+    return 'done';
+});
+
+Route::get('/users-without-admin', function () {
+    $types = [
+        'bd' => 'is_bd',
+        'superadmin' => 'is_super_admin',
+        'area-manager' => 'is_area_manager',
+    ];
+
+    $counts = [];
+    $lists = [];
+
+    foreach ($types as $type => $flag) {
+        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
+
+        $users = User::where($flag, 1)
+            ->select('id')
+            ->whereNotIn('id', $adminAppIds)
+            ->get();
+
+        $counts["{$type}_count"] = $users->count();
+        $lists["{$type}_users"] = $users;
+    }
+
+    $response = array_merge($counts, $lists);
+
+    return response()->json($response);
+});
+
+Route::get('/users-without-admin/reset', function () {
+    $types = [
+        'bd' => 'is_bd',
+        'superadmin' => 'is_super_admin',
+        'area-manager' => 'is_area_manager',
+    ];
+
+    $result = [];
+
+    foreach ($types as $type => $flag) {
+        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
+
+        $affectedRows = User::where($flag, 1)
+            ->whereNotIn('id', $adminAppIds)
+            ->update([$flag => 0]);
+
+        $result["{$type}_affected_rows"] = $affectedRows;
+    }
+
+    $result['success'] = true;
+    $result['message'] = 'Statuses reset successfully';
+
+    return response()->json($result);
+});
+
+/**
+ *
+ * tests
+ *
+ */
+Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
+
+Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
+Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
+Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');
+
+
+
+Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
+Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
+Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
+
+
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+Route::get('/run-lucky-gift-test', function () {
+    LogHelper::info("starting lucky gift test...");
+    Artisan::call('cache:clear');
+$phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
+
+    $process = new Process([
+        $phpunitPath,
+        '--filter=SendLuckyGift2FeatureTest',
+        'tests/Feature/SendLuckyGift2FeatureTest.php'
+    ]);
+
+    $process->setWorkingDirectory(base_path()); // قاعدة مهمة جداً
+    $process->setTimeout(300);
+    $process->run();
 
     return response()->json([
-        'count' => $users->count(),
-        'users' => $users
+        'exit_code'    => $process->getExitCode(),
+        'output'       => $process->getOutput(),
+        'error_output' => $process->getErrorOutput(),
     ]);
 });
 
-Route::get('/bd-users-without-bd-admin/reset', function () {
-    $bdAdminAppIds = \App\Models\Admin::where('type', 'bd')->pluck('app_id');
-
-    $affectedRows = \App\Models\User::where('is_bd', 1)
-        ->whereNotIn('id', $bdAdminAppIds)
-        ->update(['is_bd' => 0]);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'BD status reset successfully',
-        'affected_rows' => $affectedRows
+Route::get('/run-lucky-gift-unit-test', function () {
+    Artisan::call('test', [
+        '--filter' => 'SendLuckyGift2FeatureTest',
     ]);
+
+    return response(
+        '<pre>' . e(Artisan::output()) . '</pre>'
+    );
+});
+
+Route::get('/testt', function () {
+    return 'test';
 });

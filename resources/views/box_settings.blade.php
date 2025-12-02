@@ -145,6 +145,26 @@
         width: 200px;
 
     }
+
+    @media (max-width: 576px) {
+    }
+    @media (max-width: 768px) {
+        .all-page {
+            display: block;
+        }
+        .settings-content {
+            width: 100%;
+        }
+        .form {
+            width: auto;
+        }
+    }
+    @media (max-width: 992px) {
+    }
+    @media (max-width: 1200px) {
+    }
+    @media (max-width: 1400px) {
+    }
 </style>
 </head>
 
@@ -167,36 +187,36 @@
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
                             <label for="app_wallet_lucky_box">{{ __('application wallet percentage from the super box') }}</label>
-                            <input type="number" 
-                                id="app_wallet_lucky_box" 
-                                name="app_wallet_lucky_box" 
-                                min="1" 
-                                value="{{ $config['app_wallet_lucky_box'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="app_wallet_lucky_box"
+                                name="app_wallet_lucky_box"
+                                min="1"
+                                value="{{ $config['app_wallet_lucky_box'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter the wallet lucky box value') }}" />
                         </div>
 
                         <!-- Normal Box Duration -->
                         <div class="form-group">
                             <label for="normal_box_duration">{{ __('Time period until the normal box expires') }}</label>
-                            <input type="number" 
-                                id="normal_box_duration" 
-                                name="normal_box_duration" 
-                                min="1" 
-                                value="{{ $config['normal_box_duration'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="normal_box_duration"
+                                name="normal_box_duration"
+                                min="1"
+                                value="{{ $config['normal_box_duration'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter duration in minutes') }}" />
                             <span class="help-block">{{ __('duration in hours') }}</span>
                         </div>
 
                         {{-- <div class="form-group">
                             <label for="lucky_box_percentage">{{ __('lucky box percentage') }}</label>
-                            <input type="number" 
-                                id="lucky_box_percentage" 
-                                name="lucky_box_percentage" 
-                                min="1" 
-                                value="{{ $config['lucky_box_percentage'] ?? 20 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="lucky_box_percentage"
+                                name="lucky_box_percentage"
+                                min="1"
+                                value="{{ $config['lucky_box_percentage'] ?? 20 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter lucky box percentage') }}" />
                         </div> --}}
 

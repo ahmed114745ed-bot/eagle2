@@ -495,6 +495,8 @@ class UserCommon
             $arr['using']     = 1;
             $arr['is_read']   = 1;
             $arr['days']      = $expir;
+            $arr['expire']   = $expir ? time() + ($expir * 86400) : 0;
+
             $arr['receive_type']      = $receiveType;
 
 
