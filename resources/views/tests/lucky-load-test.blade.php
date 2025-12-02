@@ -62,81 +62,99 @@ pre { background:#222; color:#0f0; padding:15px; border-radius:8px; white-space:
         </form>
     </div>
 
-    @if(isset($summary))
-    <div class="card mt-4">
-        <h3>📊 نتائج الاختبار</h3>
-        <p class="success">✔️ الطلبات الناجحة: {{ $summary['success'] }}</p>
-        <p class="fail">❌ الطلبات الفاشلة: {{ $summary['failed'] }}</p>
+@if(isset($summary))
+<div class="card mt-4">
+    <h3>📊 نتائج الاختبار</h3>
+    <p class="success">✔️ الطلبات الناجحة: {{ $summary['success'] }}</p>
+    <p class="fail">❌ الطلبات الفاشلة: {{ $summary['failed'] }}</p>
 
-        <hr>
+    <hr>
 
-        <h3>💰 رصيد المرسل</h3>
-        <table class="table table-bordered">
+    <h3>💰 رصيد المرسل</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>قبل</th>
+            <th>المتوقع بعد</th>
+            <th>الفعلي بعد</th>
+            <th>الفرق</th>
+            <th>المكتسب (Win Coins)</th>
+        </tr>
+        <tr>
+            <td>{{ $before_sender }}</td>
+            <td>{{ $expected_sender }}</td>
+            <td>{{ $after_sender }}</td>
+            <td>{{ $expected_sender - $after_sender }}</td>
+            <td>{{ $total_wins ?? 0 }}</td>
+        </tr>
+    </table>
+
+    <h3>💰 رصيد المستلم</h3>
+    <table class="table table-bordered">
+        <tr>
+            <th>قبل</th>
+            <th>المتوقع بعد</th>
+            <th>الفعلي بعد</th>
+            <th>الفرق</th>
+        </tr>
+        <tr>
+            <td>{{ $before_receiver }}</td>
+            <td>{{ $expected_receiver }}</td>
+            <td>{{ $after_receiver }}</td>
+            <td>{{ $expected_receiver - $after_receiver }}</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h4>🎯 نصيب الأطراف من المكاسب</h4>
+    <table class="table table-bordered">
+        <tr>
+            <th>التطبيق</th>
+            <th>صاحب الغرفة</th>
+            <th>المضيف</th>
+        </tr>
+        <tr>
+            <td>{{ $total_app_share ?? 0 }}</td>
+            <td>{{ $total_roomr_share ?? 0 }}</td>
+            <td>{{ $total_host_share ?? 0 }}</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h4>🎁 معلومات الهدية</h4>
+    <p>قيمة الخصم من المرسل: <b>{{ $gift_value }}</b></p>
+    <p>قيمة الربح للمستلم: <b>{{ $gift_receive }}</b></p>
+    <p>عدد الهدايا المرسلة فعلياً: <b>{{ $sent_gifts }}</b></p>
+
+    <hr>
+
+    <h4>📋 تفاصيل كل طلب</h4>
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <th>قبل</th>
-                <th>المتوقع بعد</th>
-                <th>الفعلي بعد</th>
-                <th>الفرق</th>
+                <th>رقم الطلب</th>
+                <th>الحالة</th>
+                <th>عدد الهدايا</th>
+                <th>التفاصيل</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach($summary['errors'] as $error)
             <tr>
-                <td>{{ $before_sender }}</td>
-                <td>{{ $expected_sender }}</td>
-                <td>{{ $after_sender }}</td>
-                <td>{{ $expected_sender - $after_sender }}</td>
+                <td>{{ $error['index'] }}</td>
+                <td class="{{ $error['status'] == 'SUCCESS' ? 'success' : 'fail' }}">{{ $error['status'] }}</td>
+                <td>{{ $error['status'] == 'SUCCESS' ? $num_per_request ?? 0 : 0 }}</td>
+                <td>
+                    <pre>{{ json_encode($error['response'] ?? $error['error'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                </td>
             </tr>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endif
 
-        <h3>💰 رصيد المستلم</h3>
-        <table class="table table-bordered">
-            <tr>
-                <th>قبل</th>
-                <th>المتوقع بعد</th>
-                <th>الفعلي بعد</th>
-                <th>الفرق</th>
-            </tr>
-            <tr>
-                <td>{{ $before_receiver }}</td>
-                <td>{{ $expected_receiver }}</td>
-                <td>{{ $after_receiver }}</td>
-                <td>{{ $expected_receiver - $after_receiver }}</td>
-            </tr>
-        </table>
-
-        <hr>
-
-        <h4>🎁 معلومات الهدية</h4>
-        <p>قيمة الخصم من المرسل: <b>{{ $gift_value }}</b></p>
-        <p>قيمة الربح للمستلم: <b>{{ $gift_receive }}</b></p>
-        <p>عدد الهدايا المرسلة فعلياً: <b>{{ $sent_gifts }}</b></p>
-
-        <hr>
-
-        <h4>📋 تفاصيل كل طلب</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>رقم الطلب</th>
-                    <th>الحالة</th>
-                    <th>عدد الهدايا</th>
-                    <th>التفاصيل</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($summary['errors'] as $error)
-                <tr>
-                    <td>{{ $error['index'] }}</td>
-                    <td class="{{ $error['status'] == 'SUCCESS' ? 'success' : 'fail' }}">{{ $error['status'] }}</td>
-                    <td>{{ $error['status'] == 'SUCCESS' ? @$num_per_request: 0 }}</td>
-                    <td>
-                        <pre>{{ json_encode($error['response'] ?? $error['error'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-    </div>
-    @endif
 
 </div>
 </body>
