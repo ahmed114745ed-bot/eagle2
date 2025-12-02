@@ -204,6 +204,8 @@ class GiftLoadTestService
                 if ($isSuccess) {
                     $summary['success']++;
                     $totalSentGifts += $data['num'];
+                    $wins += array_sum(array_map(fn($c) => $c['data']['win_coins'] ?? 0, $res['data']['combo']));
+
                 } else {
                     $summary['failed']++;
                 }
@@ -228,9 +230,9 @@ class GiftLoadTestService
         $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
 
 
-        $afterSender = $sender->fresh()->di;
+        $afterSender = $sender->fresh()->di + $wins;
      foreach ($results as $index => $res) {
-             usleep(200000); 
+             usleep(800000); 
             $receiver2 = User::findOrFail($data['toUid']);
             $afterReceiver = $receiver2->monthly_diamond_received;
         }
