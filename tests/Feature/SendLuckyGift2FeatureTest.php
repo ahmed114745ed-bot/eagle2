@@ -40,30 +40,11 @@ class SendLuckyGift2FeatureTest extends TestCase
         settings()->set('stop_luckyGift', 0);
 
         // إنشاء مستخدمين
-        $sender = User::factory()->create([
-            'coins' => 500, 
-            'di' => 500,
-            'email_verified_at' => now() // إذا كان هناك شرط للتحقق من البريد
-        ]);
-        
-        $receiver = User::factory()->create([
-            'coins' => 200, 
-            'di' => 300,
-            'email_verified_at' => now()
-        ]);
+        $sender = User::factory()->create([ 'di' => 500]);
+        $receiver = User::factory()->create([ 'di' => 300]);
 
-        // تأكد من وجود هدية
-        if (!Gift::count()) {
-            $gift = Gift::factory()->create([
-                'price' => 100,
-                'type' => 'lucky', // أو أي نوع مناسب
-                'is_active' => true
-            ]);
-        } else {
-            $gift = Gift::first();
-        }
-
-        Log::info('Gift used for test:', ['gift_id' => $gift->id, 'price' => $gift->price]);
+        // إنشاء هدية ثابتة
+         $gift = Gift::where('type',6)->first();
 
         $senderBefore = $sender->coins;
         $receiverBefore = $receiver->coins;
