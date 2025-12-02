@@ -569,6 +569,22 @@ use Modules\Vip\Entities\Vip;
     }
 }
 
+    @media (max-width: 576px) {
+    }
+    @media (max-width: 768px) {
+    }
+    @media (max-width: 992px) {
+    }
+    @media (max-width: 1200px) {
+    }
+    @media (max-width: 1400px) {
+        .form-control {
+            width: 170px !important;
+        }
+        .rtl .copy-button {
+            right: 75px;
+        }
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
