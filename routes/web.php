@@ -1077,19 +1077,21 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 Route::get('/run-lucky-gift-test', function () {
     LogHelper::info("starting lucky gift test...");
     Artisan::call('cache:clear');
-    
+     $phpunitPath = base_path('vendor/bin/phpunit');
+
     $process = new Process([
-        './vendor/bin/phpunit',
+        $phpunitPath,
         '--filter=SendLuckyGift2FeatureTest',
         'tests/Feature/SendLuckyGift2FeatureTest.php'
     ]);
-    
-    $process->setTimeout(300); // 5 دقائق timeout
+
+    $process->setWorkingDirectory(base_path()); // قاعدة مهمة جداً
+    $process->setTimeout(300);
     $process->run();
-    
+
     return response()->json([
-        'exit_code' => $process->getExitCode(),
-        'output' => $process->getOutput(),
+        'exit_code'    => $process->getExitCode(),
+        'output'       => $process->getOutput(),
         'error_output' => $process->getErrorOutput(),
     ]);
 });
