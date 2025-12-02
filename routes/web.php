@@ -1074,32 +1074,21 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
-
-    // Artisan::call('cache:clear');
-
-    // $exitCode = Artisan::call('test', [
-    //     '--filter' => 'SendLuckyGift2FeatureTest'
-    // ]);
-
-    // $output = Artisan::output();
-
-    // Log::info('Lucky Gift Test Output', ['output' => $output]);
-
-    // return response()->json([
-    //     'exit_code' => $exitCode,
-    //     'output' => $output,
-    // ]);
-
-       $phpUnit = base_path('vendor/bin/phpunit');
-    $testFilter = 'tests/Feature/SendLuckyGift2FeatureTest.php';
-
-    // تشغيل الاختبار
-    $output = [];
-    $exitCode = null;
-    exec("$phpUnit $testFilter", $output, $exitCode);
-
+    Artisan::call('cache:clear');
+    
+    // تشغيل PHPUnit مباشرة
+    $process = new Process([
+        './vendor/bin/phpunit',
+        '--filter=SendLuckyGift2FeatureTest',
+        'tests/Feature/SendLuckyGift2FeatureTest.php'
+    ]);
+    
+    $process->setTimeout(300); // 5 دقائق timeout
+    $process->run();
+    
     return response()->json([
-        'exit_code' => $exitCode,
-        'output' => $output,
+        'exit_code' => $process->getExitCode(),
+        'output' => $process->getOutput(),
+        'error_output' => $process->getErrorOutput(),
     ]);
 });
