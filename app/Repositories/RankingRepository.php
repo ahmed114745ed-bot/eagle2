@@ -230,7 +230,7 @@ class RankingRepository
 
     public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
     {
-        $query = GiftRanking::query()
+        $query = GiftRanking::query()->whereHas('ranker')
             ->with([
                 'ranker' => function ($q) use ($role) {
                     $q->with([
@@ -244,6 +244,7 @@ class RankingRepository
             ->where('ranker_type', User::class)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
+             $this->applyDateFiltersV2($query, 1);
 
         return $query->limit($limit)->get();
     }
