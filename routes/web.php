@@ -1105,3 +1105,7 @@ Route::get('/run-lucky-gift-unit-test', function () {
         '<pre>' . e(Artisan::output()) . '</pre>'
     );
 });
+
+Route::get('/testt', function () {
+    return 'test';
+});
