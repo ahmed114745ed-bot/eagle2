@@ -353,7 +353,7 @@ class SuperAdminController extends MainController
             });
 
             $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.superadmin.logout');
+                $logoutUrl = route('admin.super.logout');
                 $loginText = __('login');
                 $areaManagerUrl = url('/superadmin/login');
 
