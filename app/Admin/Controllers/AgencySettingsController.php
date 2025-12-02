@@ -28,7 +28,7 @@ class AgencySettingsController extends MainController
         }
 
         $tab = request('firsttab');
-       
+
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
         // $moments =  settings()->get('moments');

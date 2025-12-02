@@ -173,6 +173,19 @@ class AppSitiingCOnfigController extends MainController
             input:checked + .slider:before {
                 transform: translateX(26px);
             }
+            @media (max-width: 576px) {
+            }
+            @media (max-width: 768px) {
+                .form-row {
+                    display: block;
+                }
+            }
+            @media (max-width: 992px) {
+            }
+            @media (max-width: 1200px) {
+            }
+            @media (max-width: 1400px) {
+            }
         </style>';
 
         // Platform Settings
