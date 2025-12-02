@@ -253,10 +253,11 @@ class GiftLoadTestService
     $totalRoomrShare = $totalPrice * $roomrPercentage;
     $totalHostShare  = $totalPrice * $hostPercentage;
 
-    $afterSender = $sender->fresh()->di + $totalWins;
+ 
 
      foreach ($results as $index => $res) {
              usleep(800000); 
+            $afterSender = $sender->fresh()->di + $totalWins;
             $receiver2 = User::findOrFail($data['toUid']);
             $afterReceiver = $receiver2->monthly_diamond_received;
         }
