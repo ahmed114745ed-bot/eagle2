@@ -2741,14 +2741,6 @@ use Modules\Vip\Entities\Vip;
                 </div>
             </div>
 
-
-
-
-
-
-
-
-
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App Settings') }}</h3>
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
@@ -2970,6 +2962,14 @@ use Modules\Vip\Entities\Vip;
                                         placeholder="اختر لون"
                                     >
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
+                                <input type="hidden" name="is_new_theme_enabled" value="0">
+                                <input type="checkbox" name="is_new_theme_enabled" value="1" data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
                             </div>
                         </div>
 
