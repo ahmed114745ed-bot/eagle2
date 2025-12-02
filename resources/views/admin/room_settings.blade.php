@@ -225,9 +225,9 @@
         color: #888;
         font-style: italic;
     }
+
     @media (max-width: 576px) {
     }
-
     @media (max-width: 768px) {
         .all-page {
             display: block;
@@ -235,18 +235,14 @@
         .settings-content {
             width: 100%;
         }
-
         .form-control {
             width: auto;
         }
     }
-
     @media (max-width: 992px) {
     }
-
     @media (max-width: 1200px) {
     }
-
     @media (max-width: 1400px) {
     }
 </style>
