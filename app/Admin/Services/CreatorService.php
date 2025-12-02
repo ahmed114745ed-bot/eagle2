@@ -116,6 +116,6 @@ class CreatorService
 
     protected function creatorUrl(int $id): string
     {
-        return url("admin/users/{$id}");
+        return url("admin/auth/users/{$id}");
     }
 }
