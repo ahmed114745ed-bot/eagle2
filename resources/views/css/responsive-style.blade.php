@@ -87,9 +87,16 @@
         .rtl .select-country-rtl {
             transition: margin-right 0.3s ease-in-out, width 0.3s ease-in-out;
         }
-
         .rtl .select-country-rtl {
             margin-right: 230px !important;
+            top: -20px;
+            position: relative;
+        }
+        .ltr .select-country-rtl {
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+        .ltr .select-country-rtl {
+            margin-left: 230px !important;
             top: -20px;
             position: relative;
         }
