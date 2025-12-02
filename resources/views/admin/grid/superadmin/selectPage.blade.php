@@ -83,6 +83,41 @@
         content: attr(data-label-on);
         color: #28a745;
     }
+
+    .superadmin-form {
+        padding: 20px 86px;
+        border: 2px;
+        border-radius: 30px;
+        width: 50%;
+        margin: 10px auto 88px;
+    }
+
+    .superadmin-info-box {
+        width: 50%;
+        margin: 20px auto;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 576px) {
+    }
+    @media (max-width: 768px) {
+        .superadmin-form {
+            width: 100%;
+        }
+        .superadmin-info-box {
+            width: 100%;
+        }
+        .rtl .bck-bt {
+            width: 20%;
+        }
+    }
+    @media (max-width: 992px) {
+    }
+    @media (max-width: 1200px) {
+    }
+    @media (max-width: 1400px) {
+    }
 </style>
 
 <!-- *** ***************************************************************************************************** -->
@@ -90,7 +125,7 @@
     <a href="{{ route('admin.usersBd.index') }}" class="btn btn-secondary mt-3">{{ __('back') }}</a>
 </div>
 
-<div style="width: 50%; margin: 20px auto; padding: 10px;  border-radius: 10px;">
+<div class="superadmin-info-box">
     <p>
         &#9432;
         {{ __('default_current_superadmin') }}:
@@ -100,13 +135,7 @@
     </p>
 </div>
 
-<form action="{{ route('admin.make-superadmin-default') }}" method="POST" style="
-    padding: 20px 86px;
-    border: 2px;
-    border-radius: 30px;
-    width: 50%;
-    margin: 10px auto 88px;
-    ">
+<form action="{{ route('admin.make-superadmin-default') }}" method="POST" class="superadmin-form">
     @csrf
     <div class="form-group">
         <label for="superadmin_id">{{ __('select_default_superadmin') }}:</label>

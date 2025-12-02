@@ -36,4 +36,15 @@ class TaskStreamInvitationRepository extends AbstractRepository
             ->where('created_at', '>=', $subMinute)
             ->latest()->first();
     }
+
+    public function hasRecentAcceptedInvitation($taskStreamId): bool
+    {
+        $tz = getTimezone();
+        $recentTime = Carbon::now($tz)->subMinute();
+        return $this->model
+                    ->where('task_stream_id', $taskStreamId)
+                    ->where('status', 'accepted')
+                    ->where('updated_at', '>=', $recentTime)
+                    ->exists();
+    }
 }
