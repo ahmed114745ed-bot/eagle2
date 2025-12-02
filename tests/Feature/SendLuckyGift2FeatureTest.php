@@ -29,10 +29,10 @@ class SendLuckyGift2FeatureTest extends TestCase
 
         // 1. تفعيل عرض الأخطاء
         $this->withoutExceptionHandling();
-        
+
         // 2. تفعيل query log لرؤية الاستعلامات
         DB::enableQueryLog();
-        
+
         // 3. إيقاف middleware مؤقتاً
         $this->withoutMiddleware([
             \App\Http\Middleware\CheckCpu::class,
@@ -82,7 +82,7 @@ class SendLuckyGift2FeatureTest extends TestCase
 
         // إرسال الطلب مع التحقق من التوثيق
         $token = $user->createToken('test-token')->plainTextToken;
-        
+
         Log::info('Sender ID:', ['id' => $user->id]);
         Log::info('Receiver ID:', ['id' => $user->id]);
         Log::info('Gift ID:', ['id' => $gift->id]);
@@ -99,10 +99,10 @@ class SendLuckyGift2FeatureTest extends TestCase
             ]);
 
             Log::info('Database Queries:', DB::getQueryLog());
-            
+
             Log::info('Response Status:', ['status' => $response->status()]);
             Log::info('Response Headers:', $response->headers->all());
-            
+
             if ($response->status() !== 200) {
                 Log::error('Response Content:', ['content' => $response->getContent()]);
                 Log::error('Response JSON:', ['json' => $response->json() ?? 'No JSON']);
@@ -134,7 +134,7 @@ class SendLuckyGift2FeatureTest extends TestCase
         $expectedSender = $senderBefore - $giftCost;
         $expectedReceiver = $receiverBefore + $receiverGain;
 
-        $this->assertEquals($expectedSender, $user->coins, 
+        $this->assertEquals($expectedSender, $user->coins,
             "Sender coins mismatch. Expected: {$expectedSender}, Actual: {$user->coins}");
 
         // تسجيل / تحديث diamonds الشهرية
@@ -143,12 +143,12 @@ class SendLuckyGift2FeatureTest extends TestCase
 
         $monthly = MonthlyDiamondReceive::firstOrCreate(
             [
-                'user_id' => $receiver->id, 
-                'month' => $month, 
+                'user_id' => $receiver->id,
+                'month' => $month,
                 'year' => $year
             ],
             [
-                'monthly_diamond_received' => 0, 
+                'monthly_diamond_received' => 0,
                 'old_diamond' => $receiverBefore
             ]
         );
@@ -159,7 +159,7 @@ class SendLuckyGift2FeatureTest extends TestCase
 
         $this->assertEquals($receiverBefore + $receiverGain, $receiver->coins,
             "Receiver coins mismatch. Expected: " . ($receiverBefore + $receiverGain) . ", Actual: {$receiver->coins}");
-        
+
         $this->assertEquals($receiverGain, $monthly->monthly_diamond_received,
             "Monthly diamond received mismatch. Expected: {$receiverGain}, Actual: {$monthly->monthly_diamond_received}");
 
