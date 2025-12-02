@@ -141,7 +141,7 @@ class GiftLoadTestService
      public function luckyRun(array $data)
     {
 
-     $appPercentage  = getGiftPercentage('app_wallet_lucky_gift') / 10;
+    $appPercentage  = getGiftPercentage('app_wallet_lucky_gift') / 10;
     $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
     $hostPercentage  = getGiftPercentage('host_lucky_gift') / 10;
 
@@ -220,9 +220,9 @@ class GiftLoadTestService
                     $winCoins = $combo['data']['win_coins'] ?? 0;
 
                     $totalWins       += $winCoins;
-                    $totalAppShare   += $winCoins * $appPercentage;
-                    $totalRoomrShare += $winCoins * $roomrPercentage;
-                    $totalHostShare  += $winCoins * $hostPercentage;
+                    // $totalAppShare   += $winCoins * $appPercentage;
+                    // $totalRoomrShare += $winCoins * $roomrPercentage;
+                    // $totalHostShare  += $winCoins * $hostPercentage;
                 }
             } else {
                 $summary['failed']++;
@@ -245,7 +245,13 @@ class GiftLoadTestService
     }
 
     $expectedSender   = $beforeSender - ($giftValue * $totalSentGifts) + $totalWins;
-    $expectedReceiver = $beforeReceiver + ($giftReceive * $totalSentGifts);
+    $hostGain = $giftValue * $totalSentGifts * $hostPercentage;
+    $expectedReceiver = $beforeReceiver + $hostGain;
+    $totalPrice =$giftValue * $totalSentGifts;
+
+    $totalAppShare   = $totalPrice * $appPercentage;
+    $totalRoomrShare = $totalPrice * $roomrPercentage;
+    $totalHostShare  = $totalPrice * $hostPercentage;
 
     $afterSender = $sender->fresh()->di + $totalWins;
 
