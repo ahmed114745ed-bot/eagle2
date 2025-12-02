@@ -16,6 +16,7 @@ class RemainingDiamondHistoryController extends MainController
      *
      * @var string
      */
+     public $permission_name = 'remaining-diamonds-history';
     protected $title = 'Remaining Diamonds History';
 
     public function index(Content $content)
@@ -85,6 +86,17 @@ class RemainingDiamondHistoryController extends MainController
                 }
                 return app(UserService::class)->adminUserAvatar($user);
             });
+
+            $grid->column('remaining', __('remaining diamonds'))->display(function ($usd) {
+
+            $image = asset('images/diamond.jpg'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+         $grid->column('type', __('convert to'));
         $grid->column('amount', __('Amount'))->display(function ($usd) {
 
             $image = $this->type == "diamonds" ? asset('images/diamond.jpg') : asset('images/coin.png'); // تأكد من أن الصورة موجودة
@@ -94,21 +106,14 @@ class RemainingDiamondHistoryController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('type', __('Type'));
-        $grid->column('remaining', __('remaining diamonds'))->display(function ($usd) {
-
-            $image = asset('images/diamond.jpg'); // تأكد من أن الصورة موجودة
-
-            return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>{$usd}</span>
-                        <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        });
-        $grid->column('created_at', __('Created at'))->display(function ($usd) {
+       
+        
+        $grid->column('remaining_at', __('remaining in month'))->display(function ($usd) {
 
 
             return $this->month . '/' . $this->year;
-        });;
+        });
+        $grid->column('created_at', __('taken at'));
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableExport();
