@@ -1097,9 +1097,17 @@ $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 });
 
 Route::get('/run-lucky-gift-unit-test', function () {
-    Artisan::call('test', [
-        '--filter' => 'SendLuckyGift2FeatureTest',
-    ]);
+    $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
+        ' --filter SendLuckyGift2FeatureTest';
+
+    $process = Process::fromShellCommandline($command, base_path());
+    $process->setTimeout(300);
+
+    $process->run();
+
+    $output = $process->getOutput() . $process->getErrorOutput();
+
+    return response('<pre>'.e($output).'</pre>');
 
     return response(
         '<pre>' . e(Artisan::output()) . '</pre>'
