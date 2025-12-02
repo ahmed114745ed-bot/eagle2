@@ -1074,19 +1074,23 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
-    $projectPath = base_path(); 
 
-    $command = [$projectPath . '/artisan', 'test', '--filter=SendLuckyGift2FeatureTest'];
+    // 1. مسح الكاش أولاً (اختياري)
+    Artisan::call('cache:clear');
 
-    $process = new Process($command);
-    $process->setWorkingDirectory($projectPath); 
-    $process->setTimeout(300);
+    // 2. تشغيل اختبار محدد
+    $exitCode = Artisan::call('test', [
+        '--filter' => 'SendLuckyGift2FeatureTest'
+    ]);
 
-    try {
-        $process->mustRun();
-        $output = $process->getOutput();
-        return "<pre style='white-space: pre-wrap;'>{$output}</pre>";
-    } catch (ProcessFailedException $exception) {
-        return "<pre style='color:red;'>Test failed:\n" . $exception->getMessage() . "\n" . $exception->getProcess()->getErrorOutput() . "</pre>";
-    }
+    // 3. عرض ناتج الاختبار
+    $output = Artisan::output();
+
+    // تسجيل النتيجة في اللوج (اختياري)
+    Log::info('Lucky Gift Test Output', ['output' => $output]);
+
+    return response()->json([
+        'exit_code' => $exitCode,
+        'output' => $output,
+    ]);
 });
