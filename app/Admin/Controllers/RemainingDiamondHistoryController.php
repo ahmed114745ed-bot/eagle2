@@ -16,6 +16,7 @@ class RemainingDiamondHistoryController extends MainController
      *
      * @var string
      */
+     public $permission_name = 'remaining-diamonds-history';
     protected $title = 'Remaining Diamonds History';
 
     public function index(Content $content)
