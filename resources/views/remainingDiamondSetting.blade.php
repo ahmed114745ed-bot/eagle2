@@ -18,6 +18,7 @@
                         <option value="diamonds" {{ $settings['remaining_diamonds']=='diamonds' ? 'selected' : '' }}>{{ __('diamonds') }}</option>
                     </select>
                 </div>
+                 <span class="help-block">{{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}</span>
 
 
                 <!-- Save Button -->
