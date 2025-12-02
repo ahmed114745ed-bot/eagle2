@@ -1067,3 +1067,25 @@ Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test'
 Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
 Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
 Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
+
+
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+Route::get('/run-lucky-gift-test', function () {
+    $command = ['php', 'artisan', 'test', '--filter=SendLuckyGift2FeatureTest'];
+
+    $process = new Process($command);
+    $process->setTimeout(300); // 5 دقائق كحد أقصى
+
+    try {
+        $process->mustRun();
+
+        $output = $process->getOutput();
+
+        return "<pre style='white-space: pre-wrap;'>{$output}</pre>";
+    } catch (ProcessFailedException $exception) {
+        return "<pre style='color:red;'>Test failed:\n" . $exception->getMessage() . "</pre>";
+    }
+});
