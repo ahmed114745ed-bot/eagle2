@@ -91,8 +91,8 @@ return [
     'send_Family'                      => ' :name طلب الاندمام الى عائله',
     'request_agency'                  => '  :name يريد الاندمام الى الوكاله :agency_name',
 
-    'target' => 'Congrats! you achieve new target in :agency your salary now is :salary',
-    'sender_level'        => 'Congratulations you reach sender level :level',
+    'target' => 'Congrats! :user you achieve new target in :agency agency your salary now is :salary',
+    'sender_level'        => 'Congratulations :user you reach sender level :level',
     'receiver_level'      => 'Congratulations you reach receiver level :level',
     'family_level_up' => 'Congrats! your family :name level up to :level',
     'account' => "الحساب",
