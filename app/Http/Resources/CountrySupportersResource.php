@@ -16,7 +16,8 @@ class CountrySupportersResource extends JsonResource
     {
         return [
             'id' => @$this->id ?? 0,
-            'name' => (app()->getLocale() == 'ar' ? (@$this->name ?: '') : (@$this?->e_name ?? '')),
+            'name' => __("countries.{$this->e_name}"),
+//            'name' => (app()->getLocale() == 'ar' ? (@$this->name ?: '') : (@$this?->e_name ?? '')),
             'flag' => @$this->flag ?: '',
             'lang' => @$this->language ?: '',
             'phone_code' => @$this->phone_code ?: '',
