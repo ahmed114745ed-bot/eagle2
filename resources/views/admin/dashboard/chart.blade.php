@@ -1,4 +1,5 @@
 {{-- Ultra-Modern Glassmorphism Dashboard --}}
+{{-- eslint-disable --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -501,77 +502,15 @@ body {
 </style>
 
 <div class="dashboard-container">
-    @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
-    <div class="filter-form-premium fade-in-up">
-        <form method="GET" action="{{ url()->current() }}" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-calendar-alt" style="color: var(--accent-primary);"></i>
-                <input type="month" name="date" id="date-filter" value="{{ request('date') }}">
-            </div>
-            <button type="submit" class="btn-premium">
-                <i class="fas fa-filter"></i> {{ __('admin.filter') }}
-            </button>
-        </form>
-    </div>
-    @endif
-
-    @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
-    <div class="glass-card balance-card-premium fade-in-up" style="--stagger: 1">
-        <div class="card-header-glass">
-            <i class="fas fa-wallet"></i> {{ __('admin.balance') }} & {{ __('admin.game_recharge_rate') }}
-        </div>
-        <div class="card-body-glass">
-            <div class="row">
-                <!-- Left content with table -->
-                <div class="col-md-6 d-flex align-items-center justify-content-center">
-                    <table class="table balance-table-premium" id="balance-table">
-                        <tbody>
-                            <tr>
-                                <th><i class="fas fa-coins"></i> {{ __('admin.balance') }}</th>
-                                <td id="all-balance">0</td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-check-circle"></i> {{ __('admin.availableBalance') }}</th>
-                                <td id="available-balance">0</td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-dollar-sign"></i> {{ __('admin.balance') }} $</th>
-                                <td id="balance-dollar">0</td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-minus-circle"></i> {{ __('admin.used') }}</th>
-                                <td id="used-balance">0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Right content with chart -->
-                <div class="col-md-6 chart-container-premium">
-                    <canvas id="myChart"></canvas>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <div id="payment-alert-container"></div>
-                    <button type="button" class="btn-premium mt-3" onclick="window.location.href='admin/payment-with-method';">
-                        <i class="fas fa-credit-card"></i> {{ __('admin.pay') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <div class="col-md-12 fade-in-up" style="--stagger: 2">
-        @include('admin.dashboard.stats')
-    </div>
-
-    <div class="tabs-container fade-in-up" style="--stagger: 3">
+    <div class="tabs-container fade-in-up" style="--stagger: 1">
         <ul class="nav nav-tabs nav-tabs-glass" id="statsTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-chart-line"></i> {{ __('Overview') }}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">
                     <i class="fas fa-users"></i> {{ __('Users') }}
                 </button>
             </li>
@@ -598,7 +537,76 @@ body {
         </ul>
 
         <div class="tab-content tab-content-glass" id="statsTabContent">
-            <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                <div class="filter-form-premium fade-in-up">
+                    <form method="GET" action="{{ url()->current() }}" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-calendar-alt" style="color: var(--accent-primary);"></i>
+                            <input type="month" name="date" id="date-filter" value="{{ request('date') }}">
+                        </div>
+                        <button type="submit" class="btn-premium">
+                            <i class="fas fa-filter"></i> {{ __('admin.filter') }}
+                        </button>
+                    </form>
+                </div>
+                @endif
+
+                @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                <div class="glass-card balance-card-premium fade-in-up" style="--stagger: 1">
+                    <div class="card-header-glass">
+                        <i class="fas fa-wallet"></i> {{ __('admin.balance') }} & {{ __('admin.game_recharge_rate') }}
+                    </div>
+                    <div class="card-body-glass">
+                        <div class="row">
+                            <!-- Left content with table -->
+                            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                                <table class="table balance-table-premium" id="balance-table">
+                                    <tbody>
+                                        <tr>
+                                            <th><i class="fas fa-coins"></i> {{ __('admin.balance') }}</th>
+                                            <td id="all-balance">0</td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="fas fa-check-circle"></i> {{ __('admin.availableBalance') }}</th>
+                                            <td id="available-balance">0</td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="fas fa-dollar-sign"></i> {{ __('admin.balance') }} $</th>
+                                            <td id="balance-dollar">0</td>
+                                        </tr>
+                                        <tr>
+                                            <th><i class="fas fa-minus-circle"></i> {{ __('admin.used') }}</th>
+                                            <td id="used-balance">0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Right content with chart -->
+                            <div class="col-md-6 chart-container-premium">
+                                <canvas id="myChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div id="payment-alert-container"></div>
+                                <button type="button" class="btn-premium mt-3" onclick="window.location.href='admin/payment-with-method';">
+                                    <i class="fas fa-credit-card"></i> {{ __('admin.pay') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+{{--                <div class="col-md-12 fade-in-up" style="--stagger: 2">--}}
+{{--                </div>--}}
+            </div>
+
+            <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+                <div class="col-md-12 mb-4">@include('admin.dashboard.stats')</div>
                 <div class="stats-masonry">
                     <div class="widget-card-premium">@include('admin.dashboard.widgets.users_chart')</div>
                     <div class="widget-card-premium">@include('admin.dashboard.widgets.top_users_visits_chart')</div>
@@ -648,13 +656,24 @@ body {
     } else {
         $prefix = 'admin';
     }
+
+    $chartLabels = [__('admin.used'), __('admin.availableBalance')];
+    $chartLabel = __('admin.data_distribution');
+    $chartTitle = __('admin.game_recharge_rate');
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// المتغير العام للـ Chart
+var chartLabels = @json($chartLabels);
+var chartLabel = @json($chartLabel);
+var chartTitle = @json($chartTitle);
+</script>
+
+<script>
+// المتغير العام للـ Chartf
 var myChart = null;
 
 // دالة لإنشاء أو تحديث الـ Chart
@@ -669,9 +688,9 @@ function createOrUpdateChart(chartData, usePercentage) {
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['{{ __('admin.used') }}', '{{ __('admin.availableBalance') }}'],
+            labels: chartLabels,
             datasets: [{
-                label: '{{ __('admin.data_distribution') }}',
+                label: chartLabel,
                 data: chartData,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -693,7 +712,7 @@ function createOrUpdateChart(chartData, usePercentage) {
                 },
                 title: {
                     display: true,
-                    text: '{{ __('admin.game_recharge_rate') }} - ' + usePercentage.toFixed(2) + '%'
+                    text: chartTitle + ' - ' + usePercentage.toFixed(2) + '%'
                 },
                 tooltip: {
                     callbacks: {
