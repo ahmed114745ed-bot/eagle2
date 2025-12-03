@@ -140,11 +140,12 @@ class HostLevelService
             $progress  = 1;
             $remaining = 0;
         }
+         dd($hostLevels);
         $hostLevels = HostLevel::with('rewards')
             ->where('diamonds', '<=', $diamonds)
             ->orderBy('level', 'asc')
             ->get();
-       dd($hostLevels);
+      
         return [
             'next' => [
                 'next_level' => $nextLevel->level ?? 0,
