@@ -57,9 +57,7 @@ class HostLevelSettingController extends MainController
             if ($key === 'enabled') {
                 $value = (bool) $value;
             } 
-            // elseif (in_array($key, ['day', 'interval'])) {
-            //     $value = (int) $value;
-            // }
+
     
             $settings[$key] = $value;
         }

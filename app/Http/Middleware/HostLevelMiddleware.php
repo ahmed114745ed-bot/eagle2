@@ -18,7 +18,7 @@ class HostLevelMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $getSetting = function ($key, $default = 0) {
+        $getSetting = function ($key, $default = 1) {
             return \Cache::rememberForever($key, function () use ($key, $default) {
                 return Setting::where('key', $key)->value('value') ?? $default;
             });
