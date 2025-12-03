@@ -46,7 +46,7 @@ class ResetUserMonthlyDiamond extends Command
             $month = $previous->month;
             $year  = $previous->year;
 
-            $userSalaries = UserSallary::where(['month' => $month, 'year' => $year])
+            $userSalaries = UserSallary::where(['month' => $month, 'year' => $year, 'is_finished' => 0])
                 ->with('user')
                 ->get();
 

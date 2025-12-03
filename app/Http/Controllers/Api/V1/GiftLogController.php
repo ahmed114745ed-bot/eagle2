@@ -741,7 +741,7 @@ class GiftLogController extends Controller
 
     public function increaseMonthlyDiamond()
     {
-        $userSalaries  = UserSallary::where(['month' => 11, 'year' => 2025])->get();
+        $userSalaries  = UserSallary::where(['month' => 11, 'year' => 2025, 'is_finished' => 0])->get();
         foreach ($userSalaries as $userSalary) {
             $user = $userSalary->user;
             $diamonds = $userSalary->remaining_diamond ?? 0;
