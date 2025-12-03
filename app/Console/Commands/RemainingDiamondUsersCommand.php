@@ -17,7 +17,7 @@ use App\Models\MonthlyDiamondReceive;
 use App\Traits\Salaries\UserSalaryTrait;
 
 
-class ResetUserMonthlyDiamond extends Command
+class RemainingDiamondUsersCommand extends Command
 {
     use UserSalaryTrait;
 
