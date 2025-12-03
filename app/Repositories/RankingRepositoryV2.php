@@ -298,7 +298,10 @@ class RankingRepositoryV2
             3 => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
             default => [null, null],
         };
-    
+            \Log::info('Filtering dates', [
+            'start' => $start->toDateTimeString(),
+            'end' => $end->toDateTimeString(),
+        ]);
         if ($start && $end) {
               \Log::info('Filtering dates', [
             'start' => $start->toDateTimeString(),
