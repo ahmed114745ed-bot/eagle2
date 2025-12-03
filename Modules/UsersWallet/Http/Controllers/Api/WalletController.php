@@ -25,6 +25,12 @@ class WalletController extends Controller
         return Common::apiResponse(true, '', $data, 200, null, 'list');
     }
 
+       public function history(Request $request)
+    {
+        $user = $request->user();
+        $data = $this->walletService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
+        return Common::apiResponse(true, '', UserCoinLogResource::collection($data), 200);
+    }
 
     public function getWalletTransactions(Request $request)
     {

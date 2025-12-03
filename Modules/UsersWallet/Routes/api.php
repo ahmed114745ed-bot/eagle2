@@ -22,6 +22,7 @@ Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLate
     Route::get('/getTemplate', [WalletController::class, 'getTemplate']);
     Route::get('/transactions', [WalletController::class, 'getWalletTransactions']);
     Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
+    Route::get('history', [WalletController::class, 'history']);
 
 });
 

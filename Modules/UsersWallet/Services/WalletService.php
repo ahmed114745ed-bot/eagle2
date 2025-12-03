@@ -21,7 +21,7 @@ class WalletService
 {
     protected $walletRepo;
 
-    public function __construct(WalletRepositoryInterface $walletRepo ,private readonly GiftLogRepository $GiftLogRepository,)
+    public function __construct(WalletRepositoryInterface $walletRepo ,private readonly GiftLogRepository $GiftLogRepository,private readonly UserLogRepository $userCoinLogRepository)
     {
         $this->walletRepo = $walletRepo;
     }
@@ -131,5 +131,10 @@ class WalletService
             'total_diamonds' => $list->sum('total'),
             'list' => $resource,
         ];
+    }
+
+       public function history($userId, $type,$startDate, $endDate, $page, $perPage)
+    {
+        return $this->userCoinLogRepository->index($userId, $type, $startDate, $endDate,$page, $perPage);
     }
 }
