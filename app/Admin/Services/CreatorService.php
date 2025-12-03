@@ -126,6 +126,6 @@ class CreatorService
         } elseif ($type === 'sub_area_manager') {
             return url($prefix . "/auth-users/{$id}");
         }
-        return url($prefix . "/users/{$id}");
+        return url($prefix . "/auth/users/{$id}");
     }
 }
