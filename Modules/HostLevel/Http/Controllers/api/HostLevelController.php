@@ -18,13 +18,20 @@ class HostLevelController extends Controller
 
     public function hostLevel()
     {
-
+        $user = request()->user();
         $data = $this->hostLevelService->hostLevelIndex();
         $rule = $this->hostLevelService->roles();
         $field = "desc_" . app()->getLocale();
+        $eventType =  Common::getSettingValue('host_level_type') ?? 'daily';
+        $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
         $data = [
             'levels' => HostLevelResource::collection($data),
             'roles' => $rule != null ? $rule->$field : "",
+            'user' => [
+                'name' => $user->name ?? '',
+                'image' => $user->profile->avatar ?? '',
+                'level' => $lastPickLevel->hostLevel->level ?? 0
+            ],
         ];
         return Common::apiResponse(true, '', $data, 200, '', 'levels');
     }
@@ -48,7 +55,7 @@ class HostLevelController extends Controller
     public function userHostLevels(Request $request)
     {
         $user = $request->user();
-       
+
         $dataUserLevel = $this->hostLevelService->nextLevel($user);
 
         $data = [
@@ -56,7 +63,7 @@ class HostLevelController extends Controller
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',
             ],
-           'level' => $dataUserLevel['next'],
+            'level' => $dataUserLevel['next'],
             'host_levels' => UserHostLevelResource::collection($dataUserLevel['levels']),
         ];
 
