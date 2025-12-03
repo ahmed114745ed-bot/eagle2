@@ -140,15 +140,16 @@ class HostLevelService
             $progress  = 1;
             $remaining = 0;
         }
-        
+
         $hostLevels = HostLevel::with('rewards')
             ->where('diamonds', '<=', $diamonds)
             ->orderBy('level', 'asc')
             ->get();
-      
+
         return [
             'next' => [
                 'next_level' => $nextLevel->level ?? 0,
+                'current_level' => $lastPick->hostLevel->level ?? 0,
                 'next_level_image' => $nextLevel->img ?? '',
                 'diamonds' => $diamonds,
                 'remaining' => $remaining < 0 ? 0 : $remaining,
