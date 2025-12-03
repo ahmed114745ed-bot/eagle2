@@ -12,7 +12,7 @@
                 <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
                     <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
                     <div class="d-flex align-items-center">
-                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable Room Cup Feature') }}</label>
+                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable host level') }}</label>
                         <label class="switch mb-0">
                             <input type="checkbox" name="enabled" id="enabled" {{ $settings['enabled'] ? 'checked' : '' }}>
                             <span class="slider round"></span>

@@ -524,7 +524,7 @@ class AgencyController extends MainController
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
               $id = $creatorId;
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId,showUrl: admin_url("auth/users/{$id}"));
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---
         $permission = $this->permission_name;

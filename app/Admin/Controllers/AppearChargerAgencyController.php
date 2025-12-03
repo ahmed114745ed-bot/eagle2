@@ -344,7 +344,7 @@ class AppearChargerAgencyController extends MainController
         $permission = $this->permission_name;
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             $id = $creatorId;
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId, showUrl: admin_url("auth/users/{$id}"));
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
