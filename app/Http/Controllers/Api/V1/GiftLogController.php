@@ -742,48 +742,55 @@ class GiftLogController extends Controller
 
     public function increaseMonthlyDiamond()
     {
-        $userSalaries  = UserSallary::where([
+        UserSallary::where([
             'month' => 11,
             'year' => 2025,
             'is_finished' => 0
-        ])->get();
+        ])
+            ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
 
-        foreach ($userSalaries as $userSalary) {
+                foreach ($userSalaries as $userSalary) {
 
-            try {
+                    try {
+                        $user = $userSalary->user;
+                        $diamonds = $userSalary->remaining_diamond ?? 0;
 
-                $user = $userSalary->user;
-                $diamonds = $userSalary->remaining_diamond ?? 0;
+                        // Skip if no user OR no diamonds
+                        if (!$user || $diamonds <= 0) {
+                            continue;
+                        }
+                        $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->first();
+                        if ($remainingDiamonds) {
+                            continue;
+                        }
 
-                // If no user or no diamonds → LOG ONLY FOR USER 580
-                if (!$user || $diamonds <= 0) {
-                    continue;
+                        // Normal processing
+                        $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+                    } catch (\Throwable $e) {
+
+                        \Log::error("Monthly diamond add ERROR for user_id = {$userSalary->user_id}", [
+                            'error' => $e->getMessage()
+                        ]);
+
+                        // Special log for user 580
+                        if ($userSalary->user_id == 580) {
+                            \Log::error("User 580 ERROR DETAILS", [
+                                'diamonds' => $userSalary->remaining_diamond,
+                                'exception' => $e->getMessage()
+                            ]);
+                        }
+                    }
                 }
-
-                // Normal processing
-                $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
-            } catch (\Throwable $e) {
-
-                // Log any crash
-                \Log::error("Monthly diamond add ERROR for user_id = {$userSalary->user_id}", [
-                    'error' => $e->getMessage()
-                ]);
-
-                // Extra special logging if user 580 triggers an error
-                if ($userSalary->user_id == 580) {
-                    \Log::error("User 580 ERROR DETAILS", [
-                        'diamonds' => $userSalary->remaining_diamond,
-                        'exception' => $e->getMessage()
-                    ]);
-                }
-            }
-        }
+            });
 
         return response()->json([
             'status' => 'success',
             'message' => 'All diamonds processed.'
         ]);
     }
+
 
 
     private function processDiamonds($user, int $diamonds, Carbon $dt, $month, $year)

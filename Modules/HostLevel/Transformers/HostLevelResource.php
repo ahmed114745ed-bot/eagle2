@@ -14,8 +14,9 @@ class HostLevelResource extends JsonResource
     public function toArray($request)
     {
         $user = request()->user();
-        $diamonds = $this->computeDiamonds($user->id);
+        $diamonds = $request->userDiamonds ?? 0;
         $remaining = $this->diamonds - $diamonds;
+        
         return [
             'id' => $this->id,
             'diamond' => $this->diamonds,
@@ -28,18 +29,5 @@ class HostLevelResource extends JsonResource
         ];
     }
 
-    private function computeDiamonds($userId)
-    {
-        $eventType = $this->getEventType();
-
-        return  GiftLog::where('receiver_id', $userId)
-            ->filterByEventType($eventType)
-            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
-            ->value('total_diamond');
-    }
-
-    private function getEventType(): string
-    {
-        return Common::getSettingValue('host_level_type') ?? 'daily';
-    }
+   
 }

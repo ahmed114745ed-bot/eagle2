@@ -29,6 +29,23 @@ class HostLevelService
         return GeneralRole::where('type', 'host_level')->first();
     }
 
+    public function userInfoLevel($user)
+    {
+        $eventType = $this->getEventType();
+        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
+        if ($lastPick && $lastPick->hostLevel) {
+            $nextLevel = HostLevel::where('level', '>', $lastPick->hostLevel->level)
+                ->orderBy('level', 'asc')
+                ->first();
+        } else {
+            $nextLevel = HostLevel::orderBy('level', 'asc')->first();
+        }
+        $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
+
+        $diamonds = $this->computeDiamonds($user->id) ?? 0;
+        return [$diamonds, $nextLevel->level ?? 0, $lastPickLevel->hostLevel->level ?? 0];
+    }
+
 
     public function pickHostLevel($user, $HistLevelId)
     {
