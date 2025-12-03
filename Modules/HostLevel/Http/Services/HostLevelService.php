@@ -21,7 +21,7 @@ class HostLevelService
 
     public function hostLevelIndex()
     {
-        return HostLevel::with('rewards')->orderBy('level', 'asc')->paginate(15);
+        return HostLevel::with('rewards')->orderBy('level', 'asc')->get();
     }
 
     public function roles()
