@@ -282,7 +282,11 @@ class RankingRepositoryV2
         $timezone = Common::timeZone();
         $now = Carbon::now($timezone);
     
-       
+          \Log::info('ApplyDateFilters called', [
+        'type' => $type,
+        'current_time' => $now->toDateTimeString(),
+        'timezone' => $timezone,
+    ]);
     
         [$start, $end] = match ($type) {
             0 => [$now->copy()->startOfHour(), $now->copy()->endOfHour()],
@@ -296,6 +300,10 @@ class RankingRepositoryV2
         };
     
         if ($start && $end) {
+              \Log::info('Filtering dates', [
+            'start' => $start->toDateTimeString(),
+            'end' => $end->toDateTimeString(),
+        ]);
             $query->whereBetween('created_at', [$start, $end]);
         }
     }
