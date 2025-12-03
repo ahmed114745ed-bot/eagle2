@@ -86,7 +86,7 @@
         .rtl .content-wrapper,
         .rtl .main-footer {
             margin-left: 0;
-            margin-right: auto;
+            margin-right: 0;
         }
 
         .rtl .content-wrapper-rtl {

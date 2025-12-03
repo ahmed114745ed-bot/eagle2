@@ -1,4 +1,4 @@
-<style >
+n<style >
     /* Modern Dynamic Theme Variables */
     :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
@@ -20,6 +20,15 @@
         --success-button: linear-gradient(135deg, #10b981 0%, #059669 100%);
         --primary-button: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 
+        /* Additional unified color variables */
+        --white: #ffffff;
+        --gray-800: #1f2937;
+        --gray-700: #374151;
+        --gray-50: #f9fafb;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-900: #111827;
+
         /* Modern Design Variables */
         --sidebar-width: 280px;
         --header-height: 70px;
@@ -29,6 +38,7 @@
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
         /* .col-sm-8 {
         width: 80.66666667%;
     } */
@@ -49,19 +59,12 @@
        display: flex !important;
     } */
 
-    .pagination {
-        padding-left: revert !important;
-    }
-
     .fileinput-remove{
         display: none;
 
     }
     .rtl .pull-right{
         float: left !important;
-    }
-
-    .box-footer .pull-right {
     }
 
     .box-info .btn-group.pull-right {
@@ -74,12 +77,6 @@
 
     .rtl .box-info label {
         margin: 5px 10px 0 0 !important;
-    }
-
-    .btn-success {
-        background: var(--success-button) !important;
-        /*background: #FF9428 !important;*/
-        /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
     }
 
     .box-header {
@@ -117,22 +114,34 @@
     }
 
     /* Dynamic CSS */
+    @keyframes dynamic-sidebar-bg {
+        0% { background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%) !important; }
+        50% { background: linear-gradient(180deg, var(--gray-50) 0%, var(--white) 50%, var(--gray-200) 100%) !important; }
+        100% { background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%) !important; }
+    }
+
     .skin-black-light .main-sidebar,
     .skin-black-light .left-side {
-        background: linear-gradient(180deg, #1f2937 0%, #111827 100%) !important;
+        background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%) !important;
         box-shadow: var(--shadow-lg) !important;
-        border-right: 1px solid #374151 !important;
+        border-right: 1px solid var(--gray-200) !important;
+        animation: dynamic-sidebar-bg 10s ease-in-out infinite !important;
     }
 
     .skin-black-light .main-sidebar {
         width: var(--sidebar-width) !important;
         position: fixed !important;
         top: 0 !important;
-        left: 0 !important;
+        left: -var(--sidebar-width) !important;
         height: 100vh !important;
         z-index: 1000 !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
+        transition: left 0.3s ease !important;
+    }
+
+    .sidebar-open .main-sidebar {
+        left: 0 !important;
     }
 
     .skin-black-light .sidebar-menu > li.header {
@@ -148,7 +157,7 @@
     }
 
     * {
-        color: var(--text-secondary-color)
+        color: var(--text-secondary-color) !important;
     }
 
     body {
@@ -164,11 +173,23 @@
     }
 
     .skin-black-light .content-wrapper {
-        margin-left: var(--sidebar-width) !important;
+        margin-left: 0 !important;
         background: #f8fafc !important;
         min-height: calc(100vh - var(--header-height)) !important;
         padding: 24px !important;
         transition: var(--transition) !important;
+    }
+
+    /* Shift content when sidebar is open */
+    .sidebar-open .content-wrapper {
+        margin-left: var(--sidebar-width) !important;
+        padding-left: 0 !important;
+    }
+
+    /* Shift content when sidebar is open (RTL) */
+    .rtl.sidebar-open .content-wrapper {
+        margin-right: var(--sidebar-width) !important;
+        padding-right: 0 !important;
     }
 
     .skin-black-light .wrapper {
@@ -187,13 +208,22 @@
     }
 
     .skin-black-light .main-header > .navbar {
-        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
-        border-bottom: 1px solid #e5e7eb !important;
-        box-shadow: var(--shadow-sm) !important;
+        background: transparent !important;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
         height: var(--header-height) !important;
         display: flex !important;
         align-items: center !important;
-        padding: 0 24px !important;
+        padding: 0 32px !important;
+        position: relative !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border-radius: 0 0 var(--border-radius) var(--border-radius) !important;
+        z-index: 1030 !important;
+    }
+
+    .sidebar-open .skin-black-light .main-header > .navbar {
+        margin-left: var(--sidebar-width) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     }
 
     .content-header {
@@ -238,7 +268,7 @@
     }
 
     .skin-black-light .sidebar a {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: #374151 !important;
         text-decoration: none !important;
         display: flex !important;
         align-items: center !important;
@@ -246,7 +276,7 @@
     }
 
     .skin-black-light .sidebar a:hover {
-        color: #ffffff !important;
+        color: var(--primary-color) !important;
     }
 
     .skin-black-light .sidebar a i {
@@ -319,11 +349,10 @@
     }
 
     .skin-black-light .sidebar-menu > li > a {
-        color: rgba(255, 255, 255, 0.8) !important;
         border-radius: var(--border-radius);
         margin: 4px 16px;
         padding: 12px 16px;
-        transition: var(--transition);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         border: none !important;
         position: relative;
         overflow: hidden;
@@ -362,17 +391,209 @@
         transition: var(--transition);
     }
 
+    /* Sidebar Icon Animations */
+
+    /* Best Choice: Glow Pulse Animation - Active */
+    .skin-black-light .sidebar-menu > li:hover > a i {
+        animation: icon-glow 1s ease-in-out infinite;
+        filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.6));
+    }
+
+    @keyframes icon-glow {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.6)); }
+        50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.8)); }
+    }
+
+    /* Alternative Options - Uncomment to use */
+
+    /* Option 1: Gentle Pulse Animation */
+    /*
+    .skin-black-light .sidebar-menu > li:hover > a i {
+        animation: icon-pulse 0.6s ease-in-out;
+    }
+
+    @keyframes icon-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+    }
+    */
+
+    /* Option 2: Rotate Animation */
+    /*
+    .skin-black-light .sidebar-menu > li:hover > a i {
+        animation: icon-rotate 0.4s ease-in-out;
+    }
+
+    @keyframes icon-rotate {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.1); }
+        100% { transform: rotate(360deg) scale(1); }
+    }
+    */
+
+    /* Option 3: Bounce Animation */
+    /*
+    .skin-black-light .sidebar-menu > li:hover > a i {
+        animation: icon-bounce 0.8s ease-in-out;
+    }
+
+    @keyframes icon-bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
+        40% { transform: translateY(-8px) scale(1.1); }
+        60% { transform: translateY(-4px) scale(1.05); }
+    }
+    */
+
+    /* Option 4: Shake Animation */
+    /*
+    .skin-black-light .sidebar-menu > li:hover > a i {
+        animation: icon-shake 0.5s ease-in-out;
+    }
+
+    @keyframes icon-shake {
+        0%, 100% { transform: translateX(0) scale(1); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) scale(1.05); }
+        20%, 40%, 60%, 80% { transform: translateX(2px) scale(1.05); }
+    }
+    */
+
     .skin-black-light .treeview-menu > li.active > a,
     .skin-black-light .treeview-menu > li > a:hover {
         color: var(--text-secondary-color) !important;
     }
 
-    .sidebar-menu > li > .treeview-menu {
-        background: var(--secondary-color) !important;
+    /* Animation Option 1: Fast & Smooth (Current) */
+    .sidebar-menu .treeview-menu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, transform 0.25s ease;
     }
 
-    .form-control, select, .select2-container .select2-selection--single, .select2-container .select2-selection--multiple{
-        background: none !important;
+    .sidebar-menu li.active .treeview-menu,
+    .sidebar-menu li.menu-open .treeview-menu {
+        display: block;
+        max-height: 500px; /* Adjust based on content */
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .sidebar-collapse .sidebar-menu li:hover .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Animation Option 2: Ultra Fast (0.15s) - Uncomment to use */
+    /*
+    .sidebar-menu .treeview-menu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: max-height 0.15s ease-out, opacity 0.15s ease-out, transform 0.15s ease-out;
+    }
+
+    .sidebar-menu li.active .treeview-menu,
+    .sidebar-menu li.menu-open .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .sidebar-collapse .sidebar-menu li:hover .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    */
+
+    /* Animation Option 3: Gentle & Slow (0.4s) - Uncomment to use */
+    /*
+    .sidebar-menu .treeview-menu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-15px) scale(0.95);
+        transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .sidebar-menu li.active .treeview-menu,
+    .sidebar-menu li.menu-open .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .sidebar-collapse .sidebar-menu li:hover .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    */
+
+    /* Animation Option 4: Bounce Effect - Uncomment to use */
+    /*
+    .sidebar-menu .treeview-menu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .sidebar-menu li.active .treeview-menu,
+    .sidebar-menu li.menu-open .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .sidebar-collapse .sidebar-menu li:hover .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    */
+
+    /* Animation Option 5: Fade Only (No Slide) - Uncomment to use */
+    /*
+    .sidebar-menu .treeview-menu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+    }
+
+    .sidebar-menu li.active .treeview-menu,
+    .sidebar-menu li.menu-open .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+    }
+
+    .sidebar-collapse .sidebar-menu li:hover .treeview-menu {
+        display: block;
+        max-height: 500px;
+        opacity: 1;
+    }
+    */
+
+    .sidebar-menu > li > .treeview-menu {
+        background: var(--secondary-color) !important;
     }
 
     .table.table-hover tbody tr:hover {
@@ -380,14 +601,11 @@
         background-color: var(--primary-hover-alpha) !important;
     }
 
-    .filter-box {
-        color: var(--inverse-box-color) !important;
-    }
 
-    .filter-box input,
-    .filter-box select {
-        background-color: var(--second-alpha) !important;
-    }
+
+
+
+
 
     .input-group .input-group-addon {
         color: var(--text-secondary-color) !important;
@@ -405,13 +623,13 @@
     }
 
     .btn-info {
-        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%)!important;
-        color: var(--text-secondary-color); !important;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%) !important;
+        color: var(--text-secondary-color) !important;
         border-color: var(--secondary-color);
     }
 
     .btn-info:hover{
-        color: var(--secondary-color); !important;
+        color: var(--secondary-color) !important;
     }
 
     .btn-primary {
@@ -500,29 +718,29 @@
     .btn-success:hover {
         background: var(--primary-color);
         filter: brightness(0.85);
-        color: var(--secondary-color)
+        color: var(--secondary-color) !important;
     }
 
     .content-header > .breadcrumb > li > a {
         color: var(--text-secondary-color) !important;
     }
 
-    .skin-black-light .main-header > .navbar > .sidebar-toggle {
-        background: transparent !important;
-        border: none !important;
-        color: #374151 !important;
-        padding: 8px 12px !important;
-        border-radius: 6px !important;
-        transition: var(--transition) !important;
-        margin-right: 16px !important;
-    }
+.skin-black-light .main-header > .navbar > .sidebar-toggle {
+    background: transparent !important;
+    border: none !important;
+    color: #374151 !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    transition: var(--transition) !important;
+    margin-right: 16px !important;
+}
 
-    .skin-black-light .main-header > .navbar > .sidebar-toggle:hover {
-        background: #f3f4f6 !important;
-        color: var(--primary-color) !important;
-    }
+.navbar-nav {
+    margin: 0 !important;
+    margin-left: auto !important;
+}
 
-    .skin-black-light .main-header > .navbar .nav > li > a,
+.skin-black-light .main-header > .navbar .nav > li > a,
     .skin-black-light .main-header > .navbar .nav > li > a:active,
     .skin-black-light .main-header > .navbar .nav > li > a:focus,
     .skin-black-light .main-header > .navbar .nav .open > a,
@@ -535,8 +753,8 @@
     }
 
     .skin-black-light .main-header > .logo {
-        background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
-        color: #ffffff !important;
+        background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%) !important;
+        color: #374151 !important;
         border: none !important;
         padding: 0 24px !important;
         display: flex !important;
@@ -629,11 +847,11 @@
     }
 
     .rtl .box-body .fields-group [class*="col-md-12"] {
-        float: left; !important;
+        float: left !important;
     }
 
     .rtl [class*="col-md-12"] {
-        float: none; !important;
+        float: none !important;
     }
 
 
@@ -641,39 +859,11 @@
         float: right;
     }
 
-    .pagination > li > a, .pagination > li > span {
-        position: relative;
-        float: left;
-        padding: 6px 12px;
-        margin-left: -1px;
-        line-height: 1.42857143;
-        color: #337ab7;
-        text-decoration: none;
-        background-color: var(--second-alpha) !important;
-        border: 1px solid var(--primary-hover-alpha) !important;
-    }
-
     .skin-black-light .main-header > .navbar .sidebar-toggle:hover {
         background: #f3f4f6 !important;
         color: var(--primary-color) !important;
         transform: scale(1.05) !important;
     }
-
-    .form-control {
-        display: block;
-        width: 100%;
-
-        padding: 6px 12px;
-        font-size: 14px;
-        line-height: 1.42857143;
-        color: var(--text-secondary-color) !important;
-        background-color: #fff;
-        background-image: none;
-        border: 1px solid var(--primary-hover-alpha) !important;
-        border-radius: 4px;
-
-    }
-
 
     .select2-dropdown {
         background-color: #ffffff !important;
@@ -713,7 +903,7 @@
     }
 
     .modal-backdrop {
-        position: static; !important;
+        position: static !important;
     }
 
     .modal-content {
@@ -742,7 +932,7 @@
     }
 
     .main-footer {
-        background: transparent; !important;
+        background: transparent !important;
         padding: 15px;
         color: #444;
         border-top: 1px solid var(--primary-hover-alpha) !important;
@@ -752,7 +942,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-}
+    }
 
 .user-type-badges img {
     width: 40px;
@@ -764,7 +954,7 @@
 
 
     .skin-black-light .content-wrapper, .skin-black-light .main-footer{
-        background-image: none; !important;
+        background-image: none !important;
     }
 
     .dropdown-toggle {
@@ -790,12 +980,8 @@
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
-
-
-
         background: var(--primary-hover-alpha) !important;
         color: var(--text-secondary-color) !important;
-
     }
 
     .img-thumbnail {
@@ -865,30 +1051,6 @@
         border-bottom-width: 0;
     }
 
-    /* .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        z-index: 1000;
-        display: none;
-        float: left;
-        min-width: 160px;
-        padding: 5px 0;
-        margin: 2px 0 0;
-        font-size: 14px;
-        text-align: right;
-        list-style: none;
-        background-color: var(--secondary-color) !important;
-        filter: brightness(0.80);
-        -webkit-background-clip: padding-box;
-        background-clip: padding-box;
-        border: 1px solid var(--primary-hover-alpha) !important;
-        border: 1px solid rgba(0,0,0,.15);
-        border-radius: 4px;
-        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-        box-shadow: 0 6px 12px rgba(0,0,0,.175);
-        color: var(--inverse-box-color) !important;
-    } */
-
     .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -931,22 +1093,6 @@ html.ltr .dropdown-menu {
     right: auto;
     float: left;
 }
-
-
-
-
-    .rtl .dropdown-menu {
-        left: unset !important;
-    }
-
-    .ltr .dropdown-menu {
-        left: 0;
-    }
-
-    .rtl .dropdown-menu {
-        right: 0;
-    }
-
 
     .rtl  .column-reward .rtlSvga {
             direction: ltr !important;
@@ -995,7 +1141,7 @@ html.ltr .dropdown-menu {
     }
 
     .inputs_cus_form {
-        color: var( --text-secondary-color)!important;
+        color: var(--text-secondary-color) !important;
         background-color: var(--box-background-color) !important;
     }
 
@@ -1010,7 +1156,7 @@ html.ltr .dropdown-menu {
     }
 
     a {
-        color: var(--text-secondary-color); !important;
+        color: var(--text-secondary-color) !important;
     }
     .dropdown-menu>li>a {
         color: var(--text-secondary-color) !important;
@@ -1035,15 +1181,20 @@ html.ltr .dropdown-menu {
                   text-align: right;
             }
 
-            .rtl .main-sidebar {
-                right: 0;
+    .rtl .main-sidebar {
+                right: -var(--sidebar-width);
                 left: auto;
+                transition: right 0.3s ease;
+            }
+
+    .rtl.sidebar-open .main-sidebar {
+                right: 0;
             }
 
           .rtl .content-wrapper,
             .rtl .main-footer {
                 margin-left: 0;
-                margin-right: 230px;
+                margin-right: 260px;
             }
 
             .rtl .treeview-menu {
@@ -1082,7 +1233,7 @@ html.ltr .dropdown-menu {
             }
 
             .rtl .navbar-custom-menu {
-                float: left !important;
+                float: right !important;
             }
 
             .rtl .main-header .logo{
@@ -1096,21 +1247,43 @@ html.ltr .dropdown-menu {
 
             .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
                 position: absolute;
-                right: -238px;
+                right: 0;
+                left: auto;
             }
+
+    .rtl .skin-black-light .main-header > .navbar .nav > li {
+        float: right !important;
+    }
+
+    .rtl .skin-black-light .main-header > .navbar .nav > li > a {
+        float: right !important;
+    }
+
+    /* RTL Header Layout: Select menus (dropdowns) on right, other icons on left */
+    .rtl .skin-black-light .main-header > .navbar .nav > li.dropdown,
+    .rtl .skin-black-light .main-header > .navbar .nav > li.user-menu {
+        float: right !important;
+    }
+
+    .rtl .skin-black-light .main-header > .navbar .nav > li:not(.dropdown):not(.user-menu) {
+        float: left !important;
+    }
+
+    .rtl .skin-black-light .main-header > .navbar .nav > li:not(.dropdown):not(.user-menu) > a {
+        float: left !important;
+    }
 
             .rtl th{
                 text-align: start;
             }
-            .rtl .form-horizontal .row {
-                display: math !important;
-                direction: rtl !important;
-                flex-direction: row-reverse !important;
-            }
+    .rtl .form-horizontal .row {
+        display: block !important;
+        direction: rtl !important;
+    }
 
-            .ltr .form-horizontal .row {
-                display: math !important;
-            }
+    .ltr .form-horizontal .row {
+        display: block !important;
+    }
 
            .rtl .form-horizontal .box-footer .btn-group {
                 float: right;
@@ -1218,7 +1391,7 @@ html.ltr .dropdown-menu {
     .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
     .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,
     .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-down {
-        transform: rotate(-90deg);
+        transform: rotate(-90deg) !important;
     }
 
     .tab-buttons {
@@ -1258,7 +1431,7 @@ html.ltr .dropdown-menu {
     }
 
     button.active {
-        background-color: var(--secondary-color); !important;
+        background-color: var(--secondary-color) !important;
         color: var(--text-secondary-color) !important;
     }
 
@@ -1271,7 +1444,7 @@ html.ltr .dropdown-menu {
 
     .btn-warning:hover {
         background-color: var(--primary-color);
-        color: var(--secondary-color);
+        color: var(--secondary-color) !important;
         filter: brightness(0.85);
     }
 
@@ -1290,8 +1463,8 @@ html.ltr .dropdown-menu {
     .colorpicker.dropdown-menu.colorpicker-visible {
     top: 282.8px;
     right: 500.475px;
-    position: absolute; /* Required to make top/right take effect */
-}
+    position: absolute;
+    }
     /*.small-input {*/
     /*    width: 80px; !* Adjust width as needed *!*/
     /*    padding: 5px;*/
