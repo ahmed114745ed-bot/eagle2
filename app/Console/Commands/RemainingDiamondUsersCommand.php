@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 use App\Models\RemainingDiamond;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use App\Models\MonthlyDiamondReceive;
 use App\Traits\Salaries\UserSalaryTrait;
@@ -110,6 +111,7 @@ class ResetUserMonthlyDiamond extends Command
             'month' => $month,
             'year' => $year,
         ]);
+        CustomNotification::remainingDiamonds($user, 'coins', $month, $exchangeCoin);
     }
 
     /**
@@ -145,5 +147,7 @@ class ResetUserMonthlyDiamond extends Command
             'month' => $month,
             'year' => $year,
         ]);
+
+        CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
     }
 }

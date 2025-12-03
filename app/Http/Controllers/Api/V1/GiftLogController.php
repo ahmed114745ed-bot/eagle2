@@ -14,6 +14,7 @@ use App\Models\GiftLog;
 use App\Models\AppFeature;
 use App\Models\CoreWallet;
 use App\Helpers\UserCommon;
+use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
@@ -23,6 +24,7 @@ use App\Models\RemainingDiamond;
 use App\Services\LuckyGiftService;
 use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Services\Gifts\GiftService;
 use App\Services\RoomLevelServices;
@@ -38,9 +40,10 @@ use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\UpdateUserDataWhenSendGift;
 use Modules\CP\Http\Services\CpServices;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\GiftLogUtdResource;
 
+use Illuminate\Support\Facades\Validator;
+
+use App\Http\Resources\GiftLogUtdResource;
 use App\Traits\Gifts\LuckyGiftProbability;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -48,10 +51,8 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
-
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-use App\Models\UserSallary;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
@@ -788,5 +789,6 @@ class GiftLogController extends Controller
             'month' => $month,
             'year' => $year,
         ]);
+        CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
     }
 }

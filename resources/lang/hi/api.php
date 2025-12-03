@@ -23,7 +23,8 @@ return [
     "lucky_box" => "लकी बॉक्स",
     'closeNormalBox' => 'आपका सामान्य लकी बॉक्स समाप्त हो गया है।',
     "closeSuperBoxReturnCoins" => "आपके सुपर लकी बॉक्स की अवधि समाप्त हो गई और :coins सिक्के आपको वापस कर दिए गए हैं",
-
+    "remainingDiamondCoins" => "जोड़ा गया :coins सिक्के — महीने :month से इस महीने तक की बची हुई मूल्य",
+    "remainingDiamonds" => "जोड़ा गया :diamonds हीरे — महीने :month से इस महीने तक की बची हुई मूल्य",
     'sender_level' => 'बधाई हो! आप प्रेषक स्तर :level पर पहुँच गए हैं',
     'senderLevelUpgrade' => 'प्रेषक स्तर उन्नत कर दिया गया है',
     'receiver_level' => 'बधाई हो! आप रिसीवर स्तर :level पर पहुँच गए हैं',
