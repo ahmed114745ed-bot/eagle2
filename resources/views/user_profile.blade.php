@@ -1243,7 +1243,7 @@
            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
           <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
 
-          <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}" data-target="wallet-logs-tab">  {{ __('Wallet Logs') }} </a>
+          <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}" data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
     <div id="tab-loading" style="
             display: none;
@@ -1774,7 +1774,7 @@
         
         <div class="card-header">
             <h4 class="card-title" style="text-align: left;">
-                {{ __('Wallet Logs') }}
+                {{ __('wallet-transactions') }}
             </h4>
         </div>
 
@@ -1784,11 +1784,11 @@
                     <thead class="table-light">
                     <tr>
                         <th>#</th>
-                        <th>{{ __('Operation') }}</th>
                         <th>{{ __('Type') }}</th>
+                        <!-- <th>{{ __('Type') }}</th> -->
                         <th>{{ __('Amount') }}</th>
-                        <th>{{ __('Before') }}</th>
-                        <th>{{ __('After') }}</th>
+                        <th>{{ __('amount before') }}</th>
+                        <th>{{ __('amount after') }}</th>
                         <th>{{ __('Created at') }}</th>
                     </tr>
                     </thead>
@@ -1799,7 +1799,7 @@
                             <tr>
                                 <td>{{ $walletLogs->firstItem() + $index }}</td>
                                 <td>{{ $log->operation }}</td>
-                                <td>{{ $log->type }}</td>
+                                <!-- <td>{{ $log->type }}</td> -->
                                 <td>{{ number_format($log->amount, 2) }}</td>
                                 <td>{{ number_format($log->before_amount, 2) }}</td>
                                 <td>{{ number_format($log->after_amount, 2) }}</td>
