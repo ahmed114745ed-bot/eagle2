@@ -1,70 +1,25 @@
-{{-- Ultra-Modern Glassmorphism Dashboard --}}
+{{-- Admin Dashboard --}}
 {{-- eslint-disable --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #111111;
-    --bg-tertiary: #1a1a1a;
-    --bg-glass: rgba(255, 255, 255, 0.05);
-    --bg-glass-hover: rgba(255, 255, 255, 0.08);
-    --accent-primary: #00d4ff;
-    --accent-secondary: #ff0080;
-    --accent-tertiary: #00ff88;
-    --text-primary: #ffffff;
-    --text-secondary: #b8b8b8;
-    --text-muted: #888888;
-    --border-light: rgba(255, 255, 255, 0.1);
-    --border-glow: rgba(0, 212, 255, 0.3);
-    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 20px rgba(0, 212, 255, 0.15);
-    --shadow-danger: 0 0 20px rgba(255, 0, 128, 0.15);
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-accent: linear-gradient(135deg, #00d4ff 0%, #ff0080 100%);
-    --gradient-success: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
-    --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    --blur: blur(20px);
-    --blur-light: blur(10px);
-}
-
 * {
     box-sizing: border-box;
 }
 
 body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: #f8f9fa;
+    color: #212529;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
 }
 
 .dashboard-container {
-    background:
-        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-        var(--bg-primary);
+    background-color: #f8f9fa;
     min-height: 100vh;
-    padding: 24px;
-    position: relative;
-}
-
-.dashboard-container::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+    padding: 20px;
 }
 
 .section-header {
@@ -93,50 +48,29 @@ body {
     box-shadow: var(--shadow-glow);
 }
 
-.glass-card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    box-shadow: var(--shadow-soft);
-    margin-bottom: 32px;
+.card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
 }
 
-.glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-}
-
-.glass-card:hover {
-    background: var(--bg-glass-hover);
-    border-color: var(--border-glow);
-    box-shadow: var(--shadow-soft), var(--shadow-glow);
-    transform: translateY(-8px);
-}
-
-.card-header-glass {
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid var(--border-light);
-    padding: 24px 32px;
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 16px 20px;
     font-weight: 600;
-    font-size: 1.25rem;
-    color: var(--accent-primary);
+    font-size: 1.1rem;
+    color: #495057;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
-.card-body-glass {
-    padding: 32px;
+.card-body {
+    padding: 20px;
 }
 
 .balance-card-premium {
@@ -195,48 +129,35 @@ body {
     border-bottom: none;
 }
 
-.chart-container-premium {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 24px;
-    margin-top: 24px;
-    backdrop-filter: blur(10px);
+.chart-container {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
 }
 
-.btn-premium {
-    background: var(--gradient-accent);
-    border: none;
-    border-radius: 50px;
-    padding: 16px 32px;
+[dir="rtl"] .chart-container {
+    direction: ltr;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 6px;
+    padding: 10px 20px;
     color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
 }
 
-.btn-premium::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.btn-premium:hover::before {
-    left: 100%;
-}
-
-.btn-premium:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    color: white;
+    text-decoration: none;
 }
 
 .alert-premium {
@@ -358,134 +279,90 @@ body {
     }
 }
 
-@media (max-width: 1024px) {
-    .stats-masonry {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-    }
-}
-
 @media (max-width: 768px) {
     .dashboard-container {
-        padding: 16px;
+        padding: 10px;
     }
 
     .section-header {
-        font-size: 2rem;
-        margin: 40px 0 30px 0;
+        font-size: 1.5rem;
+        margin: 20px 0 15px 0;
     }
 
-    .stats-masonry {
+    .stats-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 15px;
     }
 
-    .card-body-glass {
-        padding: 20px;
+    .card-body {
+        padding: 15px;
     }
 
-    .card-header-glass {
-        padding: 20px 24px;
-        font-size: 1.1rem;
+    .card-header {
+        padding: 12px 16px;
+        font-size: 1rem;
     }
 
-    .balance-card-premium .row > div {
-        margin-bottom: 24px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-container {
-        padding: 12px;
-    }
-
-    .section-header {
-        font-size: 1.75rem;
-    }
-
-    .card-body-glass {
-        padding: 16px;
-    }
-
-    .btn-premium {
-        padding: 14px 24px;
-        font-size: 0.95rem;
+    .balance-card .row > div {
+        margin-bottom: 15px;
     }
 }
 
 /* Tab Styles */
 .tabs-container {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
-.nav-tabs-glass {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-light);
-    border-radius: 16px;
-    padding: 8px;
-    margin-bottom: 32px;
-    box-shadow: var(--shadow-soft);
+.nav-tabs {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.nav-tabs-glass .nav-link {
+.nav-tabs .nav-link {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 16px 24px;
-    margin: 0 4px;
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 12px 20px;
+    margin: 0 2px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
-.nav-tabs-glass .nav-link:hover {
-    background: var(--bg-glass-hover);
-    color: var(--text-primary);
+.nav-tabs .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #495057;
 }
 
-.nav-tabs-glass .nav-link.active {
-    background: var(--gradient-accent);
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
     color: white;
-    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0,123,255,0.3);
 }
 
-.nav-tabs-glass .nav-link.active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
-    border-radius: 12px;
-}
-
-.tab-content-glass {
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    padding: 32px;
-    box-shadow: var(--shadow-soft);
+.tab-content {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .tab-pane {
-    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: fadeIn 0.5s ease forwards;
     opacity: 0;
-    transform: translateY(20px);
 }
 
 .tab-pane.show {
     opacity: 1;
-    transform: translateY(0);
 }
 
 /* Loading states */
@@ -501,7 +378,7 @@ body {
 }
 </style>
 
-<div class="dashboard-container">
+<div class="dashboard-container" @if(app()->getLocale() == 'ar') dir="rtl" @endif>
     <div class="tabs-container fade-in-up" style="--stagger: 1">
         <ul class="nav nav-tabs nav-tabs-glass" id="statsTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -536,7 +413,7 @@ body {
             </li>
         </ul>
 
-        <div class="tab-content tab-content-glass" id="statsTabContent">
+        <div class="tab-content" id="statsTabContent">
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
                 <div class="filter-form-premium fade-in-up">
@@ -553,11 +430,11 @@ body {
                 @endif
 
                 @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                <div class="glass-card balance-card-premium fade-in-up" style="--stagger: 1">
-                    <div class="card-header-glass">
+                <div class="card balance-card fade-in-up" style="--stagger: 1">
+                    <div class="card-header">
                         <i class="fas fa-wallet"></i> {{ __('admin.balance') }} & {{ __('admin.game_recharge_rate') }}
                     </div>
-                    <div class="card-body-glass">
+                    <div class="card-body">
                         <div class="row">
                             <!-- Left content with table -->
                             <div class="col-md-6 d-flex align-items-center justify-content-center">
@@ -584,7 +461,7 @@ body {
                             </div>
 
                             <!-- Right content with chart -->
-                            <div class="col-md-6 chart-container-premium">
+                            <div class="col-md-6 chart-container">
                                 <canvas id="myChart"></canvas>
                             </div>
                         </div>
@@ -607,23 +484,23 @@ body {
 
             <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
                 <div class="col-md-12 mb-4">@include('admin.dashboard.stats')</div>
-                <div class="stats-masonry">
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.users_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.top_users_visits_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.signups_weekly_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.peak_hours_card')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.top_followers_table')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.users_online_chart')</div>
+                <div class="stats-grid">
+                    <div class="widget-card">@include('admin.dashboard.widgets.users_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.top_users_visits_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.signups_weekly_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.peak_hours_card')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.top_followers_table')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.users_online_chart')</div>
                 </div>
             </div>
 
             <div class="tab-pane fade" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
                 <div class="col-md-12 mb-4">@include('admin.dashboard.widgets.room_tab')</div>
-                <div class="stats-masonry">
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.rooms_activity_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div>
-                    <div class="widget-card-premium">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
+                <div class="stats-grid">
+                    <div class="widget-card">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.rooms_activity_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div>
+                    <div class="widget-card">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
                 </div>
             </div>
 
@@ -667,9 +544,9 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-var chartLabels = @json($chartLabels);
-var chartLabel = @json($chartLabel);
-var chartTitle = @json($chartTitle);
+var chartLabels = {!! json_encode($chartLabels) !!};
+var chartLabel = {!! json_encode($chartLabel) !!};
+var chartTitle = {!! json_encode($chartTitle) !!};
 </script>
 
 <script>
