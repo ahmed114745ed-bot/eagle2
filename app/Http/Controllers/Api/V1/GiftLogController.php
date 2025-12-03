@@ -742,22 +742,58 @@ class GiftLogController extends Controller
 
     public function increaseMonthlyDiamond()
     {
-        $userSalaries  = UserSallary::where(['month' => 11, 'year' => 2025, 'is_finished' => 0])->get();
-        foreach ($userSalaries as $userSalary) {
-            $user = $userSalary->user;
-            $diamonds = $userSalary->remaining_diamond ?? 0;
+        $userSalaries  = UserSallary::where([
+            'month' => 11,
+            'year' => 2025,
+            'is_finished' => 0
+        ])->get();
 
-            if (!$user || $diamonds <= 0) {
-                continue;
+        foreach ($userSalaries as $userSalary) {
+
+            try {
+
+                $user = $userSalary->user;
+                $diamonds = $userSalary->remaining_diamond ?? 0;
+
+                // If no user or no diamonds → LOG ONLY FOR USER 580
+                if (!$user || $diamonds <= 0) {
+
+                    if ($user && $user->id == 580) {
+                        \Log::warning("User 580 has diamonds but did NOT receive monthly diamond addition.", [
+                            'user_id' => 580,
+                            'diamonds' => $diamonds,
+                            'reason' => 'User not eligible or no diamonds to process'
+                        ]);
+                    }
+
+                    continue;
+                }
+
+                // Normal processing
+                $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+            } catch (\Throwable $e) {
+
+                // Log any crash
+                \Log::error("Monthly diamond add ERROR for user_id = {$userSalary->user_id}", [
+                    'error' => $e->getMessage()
+                ]);
+
+                // Extra special logging if user 580 triggers an error
+                if ($userSalary->user_id == 580) {
+                    \Log::error("User 580 ERROR DETAILS", [
+                        'diamonds' => $userSalary->remaining_diamond,
+                        'exception' => $e->getMessage()
+                    ]);
+                }
             }
-            $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'all diamonds added to monthly diamond receive.'
+            'message' => 'All diamonds processed.'
         ]);
     }
+
 
     private function processDiamonds($user, int $diamonds, Carbon $dt, $month, $year)
     {
