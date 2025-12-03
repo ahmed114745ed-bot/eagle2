@@ -14,6 +14,7 @@ class HostLevelResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'diamond' => $this->diamonds,
             'level' => $this->level,
             'name' => $this->name,
             'img' => $this->img,
