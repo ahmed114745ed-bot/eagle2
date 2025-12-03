@@ -25,7 +25,6 @@ use App\Models\WalletTransaction;
 use App\Services\BDChargeService;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
-use Modules\Wallet\Enum\WalletEnum;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;

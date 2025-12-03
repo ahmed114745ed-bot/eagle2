@@ -12,7 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\UsersWallet\Entities\UserWithdrawal;
-use Modules\Wallet\Entities\WalletField;
+use Modules\UsersWallet\Entities\WalletField;
 
 class UserWithdrawalController extends MainController
 {

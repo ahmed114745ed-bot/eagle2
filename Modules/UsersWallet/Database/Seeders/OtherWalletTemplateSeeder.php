@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Wallet\Database\Seeders;
+namespace Modules\UsersWallet\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;

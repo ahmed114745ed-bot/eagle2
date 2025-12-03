@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
-use Modules\UsersWallet\Http\Controllers\UsersWalletController;
+use Modules\UsersWallet\Http\Controllers\Api\UsersWalletController;
+use Modules\UsersWallet\Http\Controllers\Api\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,12 @@ use Modules\UsersWallet\Http\Controllers\UsersWalletController;
 
 Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'localization']], function (){
     Route::post('/withdraw', [UsersWalletController::class, 'requestWithdrawal'])->middleware('auth:sanctum');
+    Route::post('/transfer', [UsersWalletController::class, 'transferToUser']);
+    Route::get('/getTemplate', [WalletController::class, 'getTemplate']);
+    Route::get('/transactions', [WalletController::class, 'getWalletTransactions']);
+    Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
 
 });
 
+
+ 

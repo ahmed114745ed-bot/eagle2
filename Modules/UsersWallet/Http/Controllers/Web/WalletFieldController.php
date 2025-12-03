@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Wallet\Http\Controllers;
+namespace Modules\UsersWallet\Http\Controllers\Web;
 
 use App\Admin\Controllers\MainController;
 use App\Models\Language;
@@ -10,7 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Modules\Wallet\Entities\WalletField;
+use Modules\UsersWallet\Entities\WalletField;
 
 class WalletFieldController extends MainController
 {
