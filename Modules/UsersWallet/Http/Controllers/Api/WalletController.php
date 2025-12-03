@@ -3,6 +3,7 @@ namespace Modules\UsersWallet\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Resources\TransactionResource;
+use App\Http\Resources\UserCoinLogResource;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

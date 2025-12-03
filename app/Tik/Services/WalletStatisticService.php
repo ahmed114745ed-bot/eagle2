@@ -8,6 +8,7 @@ use App\Http\Resources\MomentGiftResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
 use App\Http\Resources\AudioGiftsListResource;
+use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 
 
 class WalletStatisticService
