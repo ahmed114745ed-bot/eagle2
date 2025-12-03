@@ -402,7 +402,7 @@ class CustomNotification
 
         $body = $type == 'diamonds' ? __("api.remainingDiamonds", ['diamonds' => $amount, 'month' => $month], $lang) : __("api.remainingDiamondCoins", ['coins' => $amount, 'month' => $month], $lang);
 
-        if (!$user->is_logout)  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, messageType: 'accept-agency');
+        if (!$user->is_logout)  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, messageType: 'remaining-diamonds');
         Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
