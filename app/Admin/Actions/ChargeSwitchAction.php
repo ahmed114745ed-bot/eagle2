@@ -10,7 +10,7 @@ class ChargeSwitchAction extends RowAction
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
-        return $this->row->transfer_salary
+        return !$this->row->transfer_salary
             ? __('Disable Transfer Salary')
             : __('Enable Transfer Salary');
     }
@@ -28,12 +28,12 @@ class ChargeSwitchAction extends RowAction
     }
     public function icon()
     {
-        return $this->row->transfer_salary ? 'fa-toggle-on' : 'fa-toggle-off';
+        return !$this->row->transfer_salary ? 'fa-toggle-on' : 'fa-toggle-off';
     }
 
     public function dialog()
     {
-        $msg = $this->row->transfer_salary
+        $msg = !$this->row->transfer_salary
             ? __('dashboard.confirm_disable_transfer_salary')
             : __('dashboard.confirm_enable_transfer_salary');
 
