@@ -44,7 +44,7 @@ class CreatorService
 
         $image = "<img src='{$url}' alt='{$name}' style='width:50px;height:50px;border-radius:50%;object-fit:cover;'>";
 
-        $showUrl = $showUrl ?: $this->creatorUrl($creator->id);
+        $showUrl = $showUrl ?: $this->creatorUrl($creator->id, $creator?->type);
 
         $uidHtml = $showUid ? "UID: <span id='uid-{$creator->id}'>{$uid}</span>
             <button onclick=\"event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$creator->id}')\"
@@ -100,7 +100,7 @@ class CreatorService
                 style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
                 title="Copy UID">📝</button>
         HTML
-        : '';
+            : '';
 
         return <<<HTML
         <a href="{$showUrl}"
@@ -114,8 +114,18 @@ class CreatorService
         HTML;
     }
 
-    protected function creatorUrl(int $id): string
+    protected function creatorUrl(int $id, $type): string
     {
-        return url("admin/users/{$id}");
+        $prefix = dashboardName();
+        if ($type === 'admin') {
+            return url($prefix . "/auth/users/{$id}");
+        } elseif ($type === 'superadmin') {
+            return url($prefix . "/superadmin-users/{$id}");
+        } elseif ($type === 'area-manager') {
+            return url($prefix . "/area-manager-users/{$id}");
+        } elseif ($type === 'sub_area_manager') {
+            return url($prefix . "/auth-users/{$id}");
+        }
+        return url($prefix . "/users/{$id}");
     }
 }
