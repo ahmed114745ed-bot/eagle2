@@ -757,15 +757,6 @@ class GiftLogController extends Controller
 
                 // If no user or no diamonds → LOG ONLY FOR USER 580
                 if (!$user || $diamonds <= 0) {
-
-                    if ($user && $user->id == 580) {
-                        \Log::warning("User 580 has diamonds but did NOT receive monthly diamond addition.", [
-                            'user_id' => 580,
-                            'diamonds' => $diamonds,
-                            'reason' => 'User not eligible or no diamonds to process'
-                        ]);
-                    }
-
                     continue;
                 }
 
