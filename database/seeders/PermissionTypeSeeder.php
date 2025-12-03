@@ -592,6 +592,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'hosts-target', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
+                     ['key' => 'remaining-diamonds-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                     ['key' => 'hosts', 'except' => ['create'], 'additional' => ['charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch',], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show', 'charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch'],
                     ],],
