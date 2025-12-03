@@ -131,10 +131,10 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         $schedule->command('coin-game:aggregate')
-        ->dailyAt('07:00')
-        ->timezone(getTimezone())
-        ->withoutOverlapping()
-        ->runInBackground();
+            ->dailyAt('07:00')
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->runInBackground();
 
         $this->scheduleRoomCupRewards($schedule);
 
@@ -156,6 +156,12 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/pk_session_job.log'));
+
+        $schedule->command('remaining-diamonds')
+            ->monthly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/remaining-diamonds.log'))
+            ->runInBackground();
     }
 
     protected function commands(): void
@@ -176,7 +182,7 @@ class Kernel extends ConsoleKernel
         $time     =  '00:00';
 
         $command = $schedule->command('roomcup:calculate-rewards')
-                            ->timezone(getTimezone());
+            ->timezone(getTimezone());
 
         match ($type) {
             'daily'   => $command->dailyAt($time),
@@ -220,7 +226,5 @@ class Kernel extends ConsoleKernel
         }
 
         return $settings;
-  }
-
-
+    }
 }

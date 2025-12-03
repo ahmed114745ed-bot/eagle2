@@ -2492,7 +2492,7 @@ use Modules\Vip\Entities\Vip;
                                                 <div class="col-md-12">
                                                     <label for="coin_exp">{{ __('diamond') }}</label>
                                                     <input type="text" id="coin_exp" name="exchange_coin_percentage"
-                                                        value="{{ $settings['exchange_coin_percentage'] ?? '' }}"
+                                                        value="{{ $settings['exchange_coin_percentage'] ?? 1 }}"
                                                         placeholder="{{ __('Enter Exp') }}" class="form-control">
                                                     <span class="form-text text-muted">1 diamond = X coin</span>
                                                 </div>
@@ -2500,7 +2500,7 @@ use Modules\Vip\Entities\Vip;
                                                 <div class="col-md-12 coin-calculator mt-3">
                                                     <label>{{ __('diamond') }}</label>
                                                     <input type="text" class="user_coin_input form-control" placeholder="Enter value">
-                                                    <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
+                                                    <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 1 }}">
                                                     <span class="exp_result fw-bold ms-2"></span>
                                                 </div>
 

@@ -22,6 +22,9 @@ return [
     'admins_greater_than' => 'Yönetici sayısı :limit değerinden büyük olmalıdır.',
     'room_title'           => 'Odayı Gizle',
     "lucky_box" => "Şans Kutusu",
+    "remainingDiamondCoins" => ":month ayından bu aya kadar kalan değerden :coins madeni para eklendi",
+    "remainingDiamonds"     => ":month ayından bu aya kadar kalan değerden :diamonds elmas eklendi",
+
     'sender_level' => 'Tebrikler! Gönderici seviyeniz :level oldu',
     'senderLevelUpgrade' => 'Gönderici seviyesi yükseltildi',
     'receiver_level' => 'Tebrikler! Alıcı seviyeniz :level oldu',
@@ -100,7 +103,7 @@ return [
     'rejectCp' => ':name ilişki isteğinizi reddetti',
     'luckBox' => 'Tebrikler! Şans kutusundan :coins coin kazandınız',
     'closeNormalBox' => 'Normal şans kutunuzun süresi doldu.',
-    
+
     "closeSuperBoxReturnCoins" => "Süper şans kutunuzun süresi doldu ve :coins coin size iade edildi",
 
     'rejectYourAgency' => 'Ajansınız reddedildi',

@@ -255,8 +255,8 @@ class FixedTargetService
     {
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-                logger('month_received Achieved:', [$month_received]);
-                logger('target Achieved:', [$target]);
+                // logger('month_received Achieved:', [$month_received]);
+                // logger('target Achieved:', [$target]);
 
             if ($target) {
 
