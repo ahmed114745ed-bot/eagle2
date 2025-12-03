@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
+use Modules\UsersWallet\Entities\UserWallet;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
@@ -1049,3 +1050,46 @@ if (!function_exists('isValidTimezone')) {
         return false;
     }
 }
+
+
+if (!function_exists('wallet_available_by_user')) {
+    function wallet_available_by_user($userId)
+    {
+        $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
+
+        $currentBalance   = $wallet->balance ?? 0;
+        $currentCutAmount = $wallet->cut_amount ?? 0;
+        $currentPending   = $wallet->pending_amount ?? 0;
+
+        return $currentBalance - $currentCutAmount + $currentPending;
+    }
+}
+
+
+if (!function_exists('wallet_curant_by_user')) {
+    function wallet_curant_by_user($userId)
+    {
+        $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
+
+        $currentBalance   = $wallet->balance ?? 0;
+        $currentPending   = $wallet->pending_amount ?? 0;
+
+        return $currentBalance  - $currentPending;
+    }
+}
+
+if (!function_exists('wallet_available_by_wallet')) {
+    function wallet_available_by_wallet($wallet)
+    {
+        if (!$wallet) {
+            return 0;
+        }
+
+        $currentBalance   = $wallet->balance ?? 0;
+        $currentCutAmount = $wallet->cut_amount ?? 0;
+        $currentPending   = $wallet->pending_amount ?? 0;
+
+        return $currentBalance - $currentCutAmount + $currentPending;
+    }
+}
+

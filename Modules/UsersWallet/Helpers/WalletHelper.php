@@ -75,14 +75,11 @@ class WalletHelper
     public static function createWithdrawal($userId, $amount, array $meta = [])
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
-    
-        $currentBalance = $wallet->balance;
-        $currentPending  = $wallet->pending_amount;
-    
-        $available = $currentBalance - $currentPending;
-    
+       
+        $available = wallet_available_by_wallet($wallet);
+
         if ($available < $amount) {
-            throw new \Exception('الرصيد غير كافٍ لإجراء السحب.');
+            throw new Exception('Insufficient balance.');
         }
     
         $wallet->pending_amount += $amount;
