@@ -22,15 +22,19 @@ class HostLevelController extends Controller
         $data = $this->hostLevelService->hostLevelIndex();
         $rule = $this->hostLevelService->roles();
         $field = "desc_" . app()->getLocale();
-        $eventType =  Common::getSettingValue('host_level_type') ?? 'daily';
-        $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
+        
+
+        [$diamonds ,$nextLevel, $currentLevel]= $this->hostLevelService->userInfoLevel($user);
+        request()->merge(['userDiamonds' => $diamonds]);
         $data = [
             'levels' => HostLevelResource::collection($data),
             'roles' => $rule != null ? $rule->$field : "",
             'user' => [
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',
-                'level' => $lastPickLevel->hostLevel->level ?? 0
+                'level' => $currentLevel ?? 0,
+                'next_level' => $nextLevel ?? 0,
+                'diamonds' => $diamonds,
             ],
         ];
         return Common::apiResponse(true, '', $data, 200, '', 'levels');
