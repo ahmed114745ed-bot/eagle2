@@ -101,9 +101,9 @@
             position: relative;
         }
 
-        .sidebar-open .content-wrapper {
-            margin-right: 250px;
-        }
+        /*.sidebar-open .content-wrapper {*/
+        /*    margin-right: 250px;*/
+        /*}*/
 
         .col-md-3,
         .col-sm-6 {
