@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Wallet\Http\Requests;
+namespace Modules\UsersWallet\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Modules\Wallet\Enum\WalletEnum;
+use Modules\UsersWallet\Enum\WalletEnum;
 
 class MakeTransferRequest extends FormRequest
 {

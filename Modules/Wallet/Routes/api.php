@@ -16,6 +16,4 @@ use Modules\Wallet\Http\Controllers\WalletController;
 
 Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'localization']], function (){
     Route::post('make_transfer', [WalletController::class, 'makeTransaction']);
-    Route::get('/transactions', [WalletController::class, 'getWalletTransactions']);
-    Route::get('getTemplate', [WalletController::class, 'getTemplate']);
 });

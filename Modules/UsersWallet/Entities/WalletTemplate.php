@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Wallet\Entities;
+namespace Modules\UsersWallet\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

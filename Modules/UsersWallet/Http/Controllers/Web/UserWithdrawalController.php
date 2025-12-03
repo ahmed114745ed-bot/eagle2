@@ -4,6 +4,7 @@ namespace Modules\UsersWallet\Http\Controllers\Web;
 
 use App\Admin\Controllers\MainController;
 use App\Admin\Services\UserService;
+use App\Helpers\CustomNotification;
 use App\Models\User;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -12,7 +13,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\UsersWallet\Entities\UserWithdrawal;
-use Modules\Wallet\Entities\WalletField;
+use Modules\UsersWallet\Entities\WalletField;
 
 class UserWithdrawalController extends MainController
 {
@@ -336,13 +337,17 @@ protected function detail($id)
         if ($withdrawal->status != 'pending') {
             return response()->json(['message' => 'العملية تمت مسبقاً'], 400);
         }
-
-        $wallet->balance -= $withdrawal->amount;
+        $available = wallet_available_by_wallet($wallet);
+        if ($available < $withdrawal->amount) {
+                throw new \Exception('Insufficient balance.');
+        }
+        $wallet->cut_amount += $withdrawal->amount;
         $wallet->pending_amount -= $withdrawal->amount;
         $wallet->save();
 
         $withdrawal->status = 'approved';
         $withdrawal->save();
+        CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 
         return response()->json([ 'success'=> true ,'message' => 'تمت الموافقة على السحب بنجاح']);
     }
@@ -361,6 +366,8 @@ protected function detail($id)
 
         $withdrawal->status = 'rejected';
         $withdrawal->save();
+        
+        CustomNotification::withdrawalRejected($withdrawal->user, $withdrawal->amount);
 
         return response()->json(['success'=> true ,'message' => 'تم رفض الطلب وإزالة المبلغ من المعلّق']);
     }

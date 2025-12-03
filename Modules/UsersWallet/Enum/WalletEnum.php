@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Wallet\Enum;
+namespace Modules\UsersWallet\Enum;
 
 enum WalletEnum: string
 {

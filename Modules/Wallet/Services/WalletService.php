@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\UsersWallet\Enum\WalletEnum;
 use Modules\Wallet\Entities\WalletTemplate;
-use Modules\Wallet\Enum\WalletEnum;
 
 class WalletService
 {
@@ -113,27 +113,5 @@ class WalletService
         }
     }
 
-    public function getWalletTransactions($request)
-    {
-        $user = Auth::user();
-        $type = $request['type'];
-
-        if (!in_array($type, ['add', 'cut'])) {
-            throw new Exception('Invalid transaction type. Allowed values: add, cut');
-        }
-
-        $transactions = WalletTransaction::whereHas('wallet', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->where('type', $type)
-            ->latest()
-            ->paginate(15);
-
-        return $transactions;
-    }
-
-    public function getTemplate($type): Collection|array
-    {
-        return WalletTemplate::with('fields')->where('type', $type)->get();
-    }
+    
 }

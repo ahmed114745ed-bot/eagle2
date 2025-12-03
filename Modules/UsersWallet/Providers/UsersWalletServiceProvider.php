@@ -4,6 +4,8 @@ namespace Modules\UsersWallet\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\UsersWallet\Repositories\Eloquent\WalletRepository;
+use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
 
 class UsersWalletServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,8 @@ class UsersWalletServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+         $this->app->bind(WalletRepositoryInterface::class, WalletRepository::class);
+
     }
 
     /**

@@ -1,32 +1,36 @@
 <?php
-
-namespace Modules\Wallet\Http\Controllers;
+namespace Modules\UsersWallet\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Resources\TransactionResource;
+use App\Http\Resources\UserCoinLogResource;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
-use Modules\Wallet\Http\Requests\MakeTransferRequest;
-use Modules\Wallet\Services\WalletService;
-use Modules\Wallet\Transformers\WalletTemplateResource;
+use Modules\UsersWallet\Http\Requests\MakeTransferRequest;
+use Modules\UsersWallet\Services\WalletService;
+use Modules\UsersWallet\Transformers\WalletTemplateResource;
 
 class WalletController extends Controller
 {
-    public function __construct(private readonly WalletService $walletService)
+    public function __construct(private readonly WalletService $walletService )
     {
     }
-    /**
-     * @throws \Exception
-     * @throws \Throwable
-     */
-    public function makeTransaction(MakeTransferRequest $request): JsonResponse
-    {
-        $result = $this->walletService->makeTransaction($request->validated());
 
-        return Common::apiResponse(1, 'success', $result, 201);
+    public function diamondsStatistic(Request $request)
+    {
+        $user = $request->user();
+        $data = $this->walletService->diamondsStatistic($user->id, $request->type, $request->startDate, $request->endDate, $request->perPage, $request->page);
+        return Common::apiResponse(true, '', $data, 200, null, 'list');
+    }
+
+       public function history(Request $request)
+    {
+        $user = $request->user();
+        $data = $this->walletService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
+        return Common::apiResponse(true, '', UserCoinLogResource::collection($data), 200);
     }
 
     public function getWalletTransactions(Request $request)

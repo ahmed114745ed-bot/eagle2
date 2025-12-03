@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Wallet\Services;
+namespace Modules\UsersWallet\Services;
 
 use App\Models\UserWallet;
 use Exception;

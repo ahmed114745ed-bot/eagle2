@@ -1130,7 +1130,11 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
-                        <span class="meta-value">{{ @$user->salary }}</span>
+
+                           <span class="meta-value d-block">{{ $curantBalance }}</span>
+                             <span class="meta-value d-block">{{ $availableBalance }}</span>
+                                <!-- <span class="meta-value">{{ $curantBalance }}</span>
+                                <span class="meta-value">{{ $availableBalance }}</span> -->
 
                     </div>
                     <div class="meta-item">
@@ -1237,8 +1241,9 @@
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-            <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
+          <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
 
+          <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}" data-target="wallet-logs-tab">  {{ __('Wallet Logs') }} </a>
     </div>
     <div id="tab-loading" style="
             display: none;
@@ -1762,7 +1767,64 @@
             </div>
         </div>
     </div>
-     
+    
+    <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
+
+    <div class="card">
+        
+        <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">
+                {{ __('Wallet Logs') }}
+            </h4>
+        </div>
+
+        <div class="table-responsive">
+            <div class="box-body">
+                <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
+                    <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>{{ __('Operation') }}</th>
+                        <th>{{ __('Type') }}</th>
+                        <th>{{ __('Amount') }}</th>
+                        <th>{{ __('Before') }}</th>
+                        <th>{{ __('After') }}</th>
+                        <th>{{ __('Created at') }}</th>
+                    </tr>
+                    </thead>
+
+                    @if($walletLogs && $walletLogs->count())
+                        <tbody style="color: rgb(208, 115, 43);">
+                        @foreach($walletLogs as $index => $log)
+                            <tr>
+                                <td>{{ $walletLogs->firstItem() + $index }}</td>
+                                <td>{{ $log->operation }}</td>
+                                <td>{{ $log->type }}</td>
+                                <td>{{ number_format($log->amount, 2) }}</td>
+                                <td>{{ number_format($log->before_amount, 2) }}</td>
+                                <td>{{ number_format($log->after_amount, 2) }}</td>
+                                <td>{{ $log->created_at }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    @endif
+
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination-wrapper">
+            {{ $walletLogs?->appends([
+                'tab'         => 'wallet_logs',
+                'wallet_logs_page' => $walletLogs?->currentPage(),
+            ])->links('vendor.pagination.default') }}
+        </div>
+
+    </div>
+
+</div>
+
+
      <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
         <div class="card">
             <div class="card-header">
