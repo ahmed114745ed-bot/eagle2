@@ -144,7 +144,7 @@ class HostLevelService
             ->where('diamonds', '<=', $diamonds)
             ->orderBy('level', 'asc')
             ->get();
-
+       dd($hostLevels);
         return [
             'next' => [
                 'next_level' => $nextLevel->level ?? 0,
