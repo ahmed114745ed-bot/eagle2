@@ -112,7 +112,7 @@ class HostLevelService
             $nextLevel = HostLevel::orderBy('level', 'asc')->first();
         }
 
-        $diamonds = $this->computeDiamonds($user->id);
+        $diamonds = $this->computeDiamonds($user->id) ?? 0;
 
         if ($nextLevel  && $lastPick) {
             $remaining = $nextLevel->diamonds - $diamonds;
@@ -140,11 +140,12 @@ class HostLevelService
             $progress  = 1;
             $remaining = 0;
         }
+        
         $hostLevels = HostLevel::with('rewards')
             ->where('diamonds', '<=', $diamonds)
             ->orderBy('level', 'asc')
             ->get();
-
+      
         return [
             'next' => [
                 'next_level' => $nextLevel->level ?? 0,

@@ -523,7 +523,8 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId,showUrl: admin_url("auth/users/{$creatorId->id}"));
+              $id = $creatorId;
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---
         $permission = $this->permission_name;

@@ -16,6 +16,7 @@ class HostLevelResource extends JsonResource
             'id' => $this->id,
             'level' => $this->level,
             'name' => $this->name,
+            'img' => $this->img,
             'rewards'=> WeeklyStarGift::collection($this->whenLoaded('rewards')),
         ];
     }

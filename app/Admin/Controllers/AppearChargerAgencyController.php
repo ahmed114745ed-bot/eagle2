@@ -343,7 +343,8 @@ class AppearChargerAgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId, showUrl: admin_url("auth/users/{$creatorId->id}"));
+            $id = $creatorId;
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
