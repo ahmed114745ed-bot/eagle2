@@ -20,7 +20,7 @@ class ChargeSwitchAction extends RowAction
         $model->transfer_salary = !$model->transfer_salary;
         $model->save();
     
-        $message = $model->transfer_salary
+        $message = !$model->transfer_salary
             ? __('Enabled Transfer Salary!')
             : __('Disabled Transfer Salary!');
     
