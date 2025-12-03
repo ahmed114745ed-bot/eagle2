@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Events\GiftBannerEvent;
-use App\Jobs\CleanGiftLogsJob;
 use App\Models\Cp;
 use App\Models\Pk;
 use Carbon\Carbon;
@@ -19,9 +17,11 @@ use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
+use App\Jobs\CleanGiftLogsJob;
+use App\Events\GiftBannerEvent;
+use App\Models\RemainingDiamond;
 use App\Services\LuckyGiftService;
 use App\Traits\Gifts\WinLuckyGift;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Services\Gifts\GiftService;
@@ -29,8 +29,10 @@ use App\Services\RoomLevelServices;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\GiftLogService;
+use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
 use App\Classes\Gifts\SendGiftService;
+use Illuminate\Support\Facades\Config;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
@@ -38,9 +40,10 @@ use App\Jobs\UpdateUserDataWhenSendGift;
 use Modules\CP\Http\Services\CpServices;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\GiftLogUtdResource;
-use App\Traits\Gifts\LuckyGiftProbability;
-use Illuminate\Database\Eloquent\Collection;
 
+use App\Traits\Gifts\LuckyGiftProbability;
+
+use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
@@ -48,7 +51,7 @@ use App\Repositories\Room\RoomTopUsersRepository;
 
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-
+use App\Models\UserSallary;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
@@ -732,6 +735,58 @@ class GiftLogController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Gift logs cleanup job has been dispatched for all users.'
+        ]);
+    }
+
+
+    public function increaseMonthlyDiamond()
+    {
+        $userSalaries  = UserSallary::where(['month' => 11, 'year' => 2025, 'is_finished' => 0])->get();
+        foreach ($userSalaries as $userSalary) {
+            $user = $userSalary->user;
+            $diamonds = $userSalary->remaining_diamond ?? 0;
+
+            if (!$user || $diamonds <= 0) {
+                continue;
+            }
+            $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'all diamonds added to monthly diamond receive.'
+        ]);
+    }
+
+    private function processDiamonds($user, int $diamonds, Carbon $dt, $month, $year)
+    {
+        $monthDiamondReceive = MonthlyDiamondReceive::firstOrNew(
+            [
+                'user_id' => $user->id,
+                'month'   => $dt->month,
+                'year'    => $dt->year,
+            ]
+        );
+
+        $monthDiamondReceive->monthly_diamond_received += $diamonds;
+        $monthDiamondReceive->save();
+
+        GiftLog::create([
+            'giftId' => 0,
+            'roomowner_id' => 0,
+            'giftPrice' => $diamonds,
+            'giftNum' => 1,
+            'sender_id' => 0,
+            'receiver_id' => $user->id,
+        ]);
+
+        RemainingDiamond::create([
+            'user_id' => $user->id,
+            'amount' => $diamonds,
+            'type' => 'diamonds',
+            'remaining' => $diamonds,
+            'month' => $month,
+            'year' => $year,
         ]);
     }
 }

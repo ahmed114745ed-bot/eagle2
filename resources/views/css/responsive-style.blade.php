@@ -101,6 +101,11 @@
             position: relative;
         }
 
+        .sidebar-open .content-header {
+            padding: 30px 20px !important;
+            margin: 35px 15px !important;
+        }
+
         /*.sidebar-open .content-wrapper {*/
         /*    margin-right: 250px;*/
         /*}*/

@@ -1,10 +1,9 @@
 <?php
 
-use App\Admin\Controllers\GameSettingsController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
-
 use Illuminate\Support\Facades\Route;
+
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\VipController;
@@ -67,6 +66,7 @@ use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\GameSettingsController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\ReelSettingsController;
@@ -115,6 +115,8 @@ use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\RemainingDiamondHistoryController;
+use App\Admin\Controllers\RemainingDiamondSettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
@@ -674,6 +676,9 @@ Route::group(
         Route::resource('notification-templates', NotificationsTemplatesController::class);
         Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::resource('remaining-diamonds', RemainingDiamondHistoryController::class);
+        Route::get('remaining-diamond-settings', [RemainingDiamondSettingController::class,'index']);
+        Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
             // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
