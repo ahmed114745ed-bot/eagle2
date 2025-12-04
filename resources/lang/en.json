@@ -23,7 +23,7 @@
 "Show superadmin": "Show  Country Manager",
 "bdsDescription" : "BDs displayed belong to the Area Manager's country",
 "professionalBdsDescription": "User BDs displayed belong to the Area Manager's country",
-"member": "عضو",    
+"member": "عضو",
     "SuperAdmin Charge":"charges",
     "Charge To Superadmin":"charges",
     "Browse charge to superadmin":"Browse charges ",
@@ -40,7 +40,7 @@
     "can not restore this super admin user taken": "can not restore this country manager",
     "Sub Super Admin": "super admin",
         "Superadmin Banners": "country manager Banners",
-     
+
 
     "SuperAdmin Banners": "country manager Banners",
     "Browse superadmin banners": "Browse country manager banners",
@@ -788,7 +788,7 @@
      "Delete": "Delete",
      "Add": "Add",
      "Add Users Count": "Add Users Count",
-    
+
      "agancy coins must be greater than user coins": "agancy coins must be greater than user coins",
      "soon": "soon",
      "firebase": "firebase",
@@ -924,7 +924,8 @@
   "make_bd_default":"When you enable this option, this BD will become the default instead of the current default.",
   "make_super_admin_default":"When you enable this option, this country manager will become the default instead of the current default.",
 "vip_gift_message": "You have received a new VIP level as a gift",
-"default_current": "This BD will become the default owner for any agency when its BD is deleted",
+    "badge_gift_message_en": "You have received a new badge as a gift.",
+    "default_current": "This BD will become the default owner for any agency when its BD is deleted",
 "default_current_superadmin": "This country manager will become the default owner for any bd when its country manager is deleted",
 "no_default_set": "No default BD has been set yet",
 "select_default_bd": "Select BD to be default",
@@ -1313,7 +1314,7 @@
   "dashboard.login.success": "Success",
   "dashboard.login.error.enter_username_first": "Please enter the username first",
   "login.error.enter_type":"Please enter the type first",
-  
+
   "dashboard.login.error.try_again": "An error occurred, please try again later",
   "dashboard.login.whatsapp.send_to_number": "A code will be sent via WhatsApp to the number:",
   "dashboard.login.loading.sending": "Sending...",
