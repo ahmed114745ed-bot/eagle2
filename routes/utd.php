@@ -518,6 +518,7 @@ Route::middleware([])->group(function () {
     });
     Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
     Route::post('/update-room-boom', [SettingController::class, 'updateRoomBoom']);
+    Route::post('/update-remaining-diamonds', [SettingController::class, 'updateRemainingDiamonds']);
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic

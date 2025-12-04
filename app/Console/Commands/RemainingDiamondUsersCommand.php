@@ -32,6 +32,11 @@ class RemainingDiamondUsersCommand extends Command
     public function handle()
     {
         try {
+            $remaining_diamonds_action = Common::getSettingValue('remaining_diamonds_action') ?? 0;
+            if (!$remaining_diamonds_action) {
+                $this->info('Remaining Diamonds Action is disabled. Exiting command.');
+                return;
+            }
             $setting = Common::getSettingValue('remaining_diamonds') ?? 'nothing';
 
             if ($setting === 'nothing') {

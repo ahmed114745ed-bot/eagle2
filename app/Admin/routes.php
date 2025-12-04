@@ -248,8 +248,8 @@ Route::group(
         Route::resource('/agencies/managers', AdminAgencyMangerController::class);
 
         Route::resource('auth/roles', RoleControllerNew::class);
-        Route::get('super-roles', [SuperRoleController::class,'index']);
-        Route::post('update-super-roles', [SuperRoleController::class,'updatePermissionRole'])->name('admin.update-super-roles');
+        Route::get('super-roles', [SuperRoleController::class, 'index']);
+        Route::post('update-super-roles', [SuperRoleController::class, 'updatePermissionRole'])->name('admin.update-super-roles');
 
 
         Route::resource('auth/rolesTest', 'RoleController');
@@ -486,18 +486,18 @@ Route::group(
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('usersBd', BdController::class);
-         Route::resource('user-Bds', BdController::class);
+        Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-//        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-//        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+        //        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        //        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
 
 
-         //Route::resource('ovip', 'OVipController');
+        //Route::resource('ovip', 'OVipController');
         // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
@@ -676,8 +676,8 @@ Route::group(
         Route::resource('notification-templates', NotificationsTemplatesController::class);
         Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);
-        Route::resource('remaining-diamonds', RemainingDiamondHistoryController::class);
-        Route::get('remaining-diamond-settings', [RemainingDiamondSettingController::class,'index']);
+        Route::resource('remaining-diamonds', RemainingDiamondHistoryController::class)->middleware('remaining.diamond.action');
+        Route::get('remaining-diamond-settings', [RemainingDiamondSettingController::class, 'index']);
         Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
@@ -702,10 +702,10 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-        Route::get('professional-bd', [BdController::class ,'professionalBd']);
+        Route::get('professional-bd', [BdController::class, 'professionalBd']);
 
 
-         Route::post('/set-preview-area-manager', function () {
+        Route::post('/set-preview-area-manager', function () {
             session(['preview_area_manager' => true]);
         });
 

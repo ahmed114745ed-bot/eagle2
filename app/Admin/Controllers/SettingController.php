@@ -147,4 +147,18 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function updateRemainingDiamonds(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'remaining_diamonds_action'], [
+                'key' => 'remaining_diamonds_action',
+                'value' => $request->value
+            ]);
+            Cache::put('remaining_diamonds_action', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
