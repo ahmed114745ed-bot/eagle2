@@ -1,36 +1,25 @@
 <div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
     <div class="card shadow-lg" style="width:95%; border-radius:15px;">
         <div class="card-header text-center bg-primary text-white" style="border-top-left-radius:15px; border-top-right-radius:15px;">
-            <!-- <h4 class="mb-0">{{ __('host level Settings') }}</h4> -->
+            <!-- <h4 class="mb-0">{{ __('remaining diamonds settings') }}</h4> -->
         </div>
         <div class="card-body p-4" style="    height: 100%;">
 
-            <form method="POST" action="{{ admin_url('host-level-settings/save') }}" style="height: 100%;">
+            <form method="POST" action="{{ admin_url('remaining-diamond-settings/save') }}" style="height: 100%;">
                 @csrf
 
-                <!-- Toggle Switch Group -->
-                <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
-                    <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
-                    <div class="d-flex align-items-center">
-                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable host level') }}</label>
-                        <label class="switch mb-0">
-                            <input type="checkbox" name="enabled" id="enabled" {{ $settings['enabled'] ? 'checked' : '' }}>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
 
                 <!-- Type of Schedule -->
                 <div class="mb-4 inp-div">
-                    <label for="type" class="form-label fw-bold d-block text-end">{{ __('Schedule Type') }}</label>
-                    <select name="type" id="type" class="form-control text-end">
-                        <option value="daily" {{ $settings['type']=='daily' ? 'selected' : '' }}>{{ __('Daily') }}</option>
-                        <option value="weekly" {{ $settings['type']=='weekly' ? 'selected' : '' }}>{{ __('Weekly') }}</option>
-                        <option value="monthly" {{ $settings['type']=='monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
+                    <label for="type" class="form-label fw-bold d-block text-end">{{ __('exchange to') }}</label>
+                    <select name="remaining_diamonds" id="remaining_diamonds" class="form-control text-end">
+                        <option value="nothing" {{ $settings['remaining_diamonds']=='nothing' ? 'selected' : '' }}>{{ __('Do not make any thing') }}</option>
+                        <option value="coins" {{ $settings['remaining_diamonds']=='coins' ? 'selected' : '' }}>{{ __('Coins') }}</option>
+                        <option value="diamonds" {{ $settings['remaining_diamonds']=='diamonds' ? 'selected' : '' }}>{{ __('diamonds') }}</option>
                     </select>
                 </div>
+                 <span class="help-block">{{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}</span>
 
-                
 
                 <!-- Save Button -->
                 <div class="d-flex justify-content-end div-btn-form">

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
-class HostLevelMiddleware
+class HostLevelActionMiddleWare
 {
     /**
      * Handle an incoming request.
@@ -24,10 +24,9 @@ class HostLevelMiddleware
             });
         };
 
-        $hostLevel = $getSetting('host_level_enabled') ?? 1;
+
         $utdHostLevel = $getSetting('host_level_action') ?? 0;
-       
-       if (!$hostLevel || !$utdHostLevel) return response()->json(['error' => 'something wrong'], 500);
+        if (!$utdHostLevel) abort(403, __('Not Found'));
 
         return $next($request);
     }
