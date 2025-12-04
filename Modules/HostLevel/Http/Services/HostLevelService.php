@@ -48,7 +48,6 @@ class HostLevelService
         $lastLevelEvent = HostLevel::orderByDesc('level')->first();
         if ($diamonds  > $lastLevelEvent->diamonds) {
             $nextLevel = $lastLevelEvent;
-            $courant = $lastLevelEvent->level;
         }
 
         return [$diamonds, $nextLevel->level ?? 0, $courant ?? 0, $level, $eventType];
