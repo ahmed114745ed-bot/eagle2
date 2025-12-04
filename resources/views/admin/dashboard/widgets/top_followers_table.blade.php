@@ -25,12 +25,6 @@
 </div> --}}
 
     <div class="box-body p-0">
-
-        <div id="top-followers-loading" class="text-center py-3">
-            <i class="fa fa-spinner fa-spin fa-2x"></i>
-            <p>{{ __('Loading...') }}</p>
-        </div>
-
         <div class="table-responsive d-none" id="top-followers-table-wrapper">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">

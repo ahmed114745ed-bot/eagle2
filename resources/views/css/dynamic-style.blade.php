@@ -98,7 +98,7 @@ n<style >
         border-color: #337ab7;
     }
     .skin-black-light .content-header {
-        background: var(--secondary-color) !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
         box-shadow: none;
     }
 
@@ -122,7 +122,7 @@ n<style >
 
     .skin-black-light .main-sidebar,
     .skin-black-light .left-side {
-        background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%) !important;
+        background: linear-gradient(180deg, var(--gray-50) 0%, var(--secondary-color) 100%) !important;
         box-shadow: var(--shadow-lg) !important;
         border-right: 1px solid var(--gray-200) !important;
         animation: dynamic-sidebar-bg 10s ease-in-out infinite !important;
@@ -138,6 +138,8 @@ n<style >
         overflow-y: auto !important;
         overflow-x: hidden !important;
         transition: left 0.3s ease !important;
+        border-radius: 0 20px 20px 0 !important;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
     }
 
     .sidebar-open .main-sidebar {
@@ -197,7 +199,7 @@ n<style >
     }
 
     form {
-        background-color: var(--secondary-color) !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
         filter: brightness(0.85);
     }
 
@@ -208,7 +210,7 @@ n<style >
     }
 
     .skin-black-light .main-header > .navbar {
-        background: transparent !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
         border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
         height: var(--header-height) !important;
@@ -593,7 +595,7 @@ n<style >
     */
 
     .sidebar-menu > li > .treeview-menu {
-        background: var(--secondary-color) !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
     }
 
     .table.table-hover tbody tr:hover {
@@ -1184,6 +1186,8 @@ html.ltr .dropdown-menu {
                 right: -var(--sidebar-width);
                 left: auto;
                 transition: right 0.3s ease;
+                border-radius: 20px 0 0 20px !important;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
             }
 
     .rtl.sidebar-open .main-sidebar {
@@ -1430,7 +1434,7 @@ html.ltr .dropdown-menu {
     }
 
     button.active {
-        background-color: var(--secondary-color) !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
         color: var(--text-secondary-color) !important;
     }
 
