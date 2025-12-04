@@ -16,6 +16,7 @@
     "Sending Level": "Gönderme Seviyesi",
     "Receiving Level": "Alma Seviyesi",
     "Recharge Level": "Yeniden Yükleme Seviyesi",
+    "badge_gift_message_tr": "Yeni bir rozet hediye olarak aldınız.",
     "Select area manager": "Bölge yöneticisini seç",
 "go to the preview": "Önizlemeye git",
 "Superadmin": "Süper Yönetici",
@@ -89,7 +90,7 @@
 "Delete host level reward": "Host seviyesi ödülünü sil",
 "Edit host level reward": "Host seviyesi ödülünü düzenle",
 "Show host level reward": "Host seviyesi ödülünü göster",
-"Diamonds must be greater than to previous level (:level) diamonds (:diamonds)": "Elmas değeri önceki seviye (:level) elmas (:diamonds) değerinden büyük olmalıdır", 
+"Diamonds must be greater than to previous level (:level) diamonds (:diamonds)": "Elmas değeri önceki seviye (:level) elmas (:diamonds) değerinden büyük olmalıdır",
 
 "you have already picked this host level before": "bu sunucu seviyesini daha önce seçtiniz",
 "host level not found": "sunucu seviyesi bulunamadı",

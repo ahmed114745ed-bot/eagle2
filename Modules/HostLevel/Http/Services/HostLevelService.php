@@ -87,6 +87,8 @@ class HostLevelService
 
     public function assignReward($user, $rewards)
     {
+        $notifications = [];
+
         foreach ($rewards as $reward) {
             if ($reward->type == "coins") {
 
@@ -100,26 +102,60 @@ class HostLevelService
 
                 $user->di += $reward->target;
                 $user->save();
+
+                $notifications[] = [
+                    'title' => __('Coin Reward'),
+                    'body'  => str_replace(':coin', $reward->target, __('You have received :coin coin.')),
+                ];
             } elseif ($reward->type == "vip") {
                 $vip = OVip::query()->find($reward->target);
                 UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
+
+                $notifications[] = [
+                    'title' => __('congratulations'),
+                    'body'  => __('vip_gift_message'),
+                ];
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
                 UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
+
+                $wareName = $ware->name ?? __('a special ware');
+                $notifications[] = [
+                    'title' => __('congratulations'),
+                    'body'  => str_replace(':ware', $wareName, __('You have received a gift: :ware')),
+                ];
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,
                     'custom_image' => $reward->target,
                 ];
                 UserAchievementLevel::create($attributes);
+
+                $notifications[] = [
+                    'title' => __('Achievement Reward'),
+                    'body'  => __('You have received a new achievement.'),
+                ];
             } elseif ($reward->type == 'badge') {
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
+
+                $notifications[] = [
+                    'title' => __('congratulations'),
+                    'body'  => __('badge_gift_message'),
+                ];
             }
+        }
+
+        $this->sendBatchNotifications($user, $notifications);
+    }
+
+    private function sendBatchNotifications($user, array $notifications): void
+    {
+        foreach ($notifications as $notification) {
+            Common::sendOfficialMessage($user->id, $notification['title'], $notification['body']);
+            Common::send_firebase_notification($user->notification_id, $notification['title'], $notification['body']);
         }
     }
 
-
-  
     private function getEventType(): string
     {
         return Common::getSettingValue('host_level_type') ?? 'daily';
