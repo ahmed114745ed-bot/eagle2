@@ -5,6 +5,7 @@ namespace Modules\HostLevel\Transformers;
 
 use App\Helpers\Common;
 use App\Models\GiftLog;
+use Modules\HostLevel\Entities\HostLevel;
 use Modules\Events\Transformers\WeeklyStarGift;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +17,8 @@ class HostLevelResource extends JsonResource
         $user = request()->user();
         $diamonds = $request->userDiamonds ?? 0;
         $remaining = $this->diamonds - $diamonds;
+        $nextLevel = $request->nextLevel ?? 0;
+        $lastLevel = HostLevel::where('level', '>', $nextLevel)->orderBy('level')->value('level') ?? 0;
 
         return [
             'id' => $this->id,
@@ -25,7 +28,7 @@ class HostLevelResource extends JsonResource
             'img' => $this->img,
             'picked_level' => $user->hostLevelWinnerByLevelAndEvent($this->id) ? true : false,
             'remaining' => $remaining < 0 ? 0 : $remaining,
-            'progress' =>  $this->progress($this->diamonds, $diamonds),
+            'progress' => ($this->level > $lastLevel) ? 0 : $this->progress($this->diamonds, $diamonds),
 
             'rewards' => WeeklyStarGift::collection($this->whenLoaded('rewards')),
         ];

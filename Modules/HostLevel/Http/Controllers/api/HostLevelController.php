@@ -25,7 +25,7 @@ class HostLevelController extends Controller
 
 
         [$diamonds, $nextLevel, $currentLevel, $level] = $this->hostLevelService->userInfoLevel($user);
-        request()->merge(['userDiamonds' => $diamonds]);
+        request()->merge(['userDiamonds' => $diamonds, 'nextLevel' => $level]);
         $data = [
             'levels' => HostLevelResource::collection($data),
             'roles' => $rule != null ? $rule->$field : "",
