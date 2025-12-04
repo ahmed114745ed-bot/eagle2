@@ -22,9 +22,9 @@ class HostLevelController extends Controller
         $data = $this->hostLevelService->hostLevelIndex();
         $rule = $this->hostLevelService->roles();
         $field = "desc_" . app()->getLocale();
-        
 
-        [$diamonds ,$nextLevel, $currentLevel]= $this->hostLevelService->userInfoLevel($user);
+
+        [$diamonds, $nextLevel, $currentLevel, $level] = $this->hostLevelService->userInfoLevel($user);
         request()->merge(['userDiamonds' => $diamonds]);
         $data = [
             'levels' => HostLevelResource::collection($data),
@@ -32,9 +32,10 @@ class HostLevelController extends Controller
             'user' => [
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',
-                'level' => $currentLevel ?? 0,
+                'current_level' => $currentLevel ?? 0,
                 'next_level' => $nextLevel ?? 0,
                 'diamonds' => $diamonds,
+                'last_level' => $level ?? 0,
             ],
         ];
         return Common::apiResponse(true, '', $data, 200, '', 'levels');
