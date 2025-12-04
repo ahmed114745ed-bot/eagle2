@@ -138,6 +138,7 @@ class UserPackHelper
      */
     public static function getFrameWare(User $user): mixed
     {
+        LogHelper::info('get frame ware',['user_id'=>$user->id]);
         return self::getWare($user, 4);
     }
 
