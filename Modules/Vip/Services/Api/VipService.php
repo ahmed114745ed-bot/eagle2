@@ -94,7 +94,7 @@ class VipService
         );
         $this->userRepository->decrementUserCoins($from, $total);
         $this->packRepository->deleteExpirePack();
-        $this->packRepository->unUseOldPack($user_id);
+       // $this->packRepository->unUseOldPack($user_id);
 
         VipCommon::createUserVip($vip ,$user , $vip->expire  , null ,'',$qty ,$sender_id,$total,'buy-vip');
 
