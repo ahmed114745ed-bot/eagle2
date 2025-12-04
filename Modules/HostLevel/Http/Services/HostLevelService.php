@@ -43,9 +43,9 @@ class HostLevelService
         $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
 
         $diamonds = $this->computeDiamonds($user->id) ?? 0;
-        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level') > value('level');
+        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
 
-        return [$diamonds, $nextLevel->level ?? 0, $lastPickLevel->hostLevel->level ?? 0,$level];
+        return [$diamonds, $nextLevel->level ?? 0, $lastPickLevel->hostLevel->level ?? 0, $level];
     }
 
 
