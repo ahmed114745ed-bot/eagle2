@@ -142,6 +142,113 @@ n<style >
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
     }
 
+    .skin-black-light .main-sidebar::-webkit-scrollbar {
+        width: 24px !important;
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-track {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.1) 100%) !important;
+        border-radius: 30px !important;
+        margin: 6px !important;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3), 0 0 10px rgba(37, 99, 235, 0.1) !important;
+        position: relative !important;
+        border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-track::before {
+        content: '' !important;
+        position: absolute !important;
+        top: -2px !important;
+        left: -2px !important;
+        right: -2px !important;
+        bottom: -2px !important;
+        background: conic-gradient(from 0deg, transparent 0deg, rgba(37, 99, 235, 0.2) 90deg, transparent 180deg, rgba(16, 185, 129, 0.2) 270deg, transparent 360deg) !important;
+        border-radius: 30px !important;
+        animation: track-rotate 8s linear infinite !important;
+    }
+
+    @keyframes track-rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--green-color) 20%, var(--primary-color) 40%, var(--green-color) 60%, var(--primary-color) 80%, var(--green-color) 100%) !important;
+        border-radius: 30px !important;
+        border: 8px solid rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 0 25px rgba(37, 99, 235, 0.8), 0 0 45px rgba(16, 185, 129, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3), 0 0 0 2px rgba(37, 99, 235, 0.3) !important;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        cursor: pointer !important;
+        background-size: 200% 200% !important;
+        animation: thumb-flow 3s ease-in-out infinite !important;
+    }
+
+    @keyframes thumb-flow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 10px !important;
+        height: 10px !important;
+        background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 0.4) 70%, transparent 100%) !important;
+        border-radius: 50% !important;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 1), 0 0 20px rgba(37, 99, 235, 0.8) !important;
+        animation: core-pulse 1.5s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes core-pulse {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb::after {
+        content: '' !important;
+        position: absolute !important;
+        top: -4px !important;
+        left: -4px !important;
+        right: -4px !important;
+        bottom: -4px !important;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%) !important;
+        border-radius: 30px !important;
+        animation: thumb-shimmer 2s ease-in-out infinite !important;
+    }
+
+    @keyframes thumb-shimmer {
+        0%, 100% { opacity: 0; transform: translateY(-100%); }
+        50% { opacity: 1; transform: translateY(100%); }
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, var(--green-color) 0%, var(--primary-color) 20%, var(--green-color) 40%, var(--primary-color) 60%, var(--green-color) 80%, var(--primary-color) 100%) !important;
+        box-shadow: 0 0 35px rgba(37, 99, 235, 1.2), 0 0 60px rgba(16, 185, 129, 1), inset 0 0 20px rgba(255, 255, 255, 0.4), 0 0 0 3px rgba(37, 99, 235, 0.5) !important;
+        transform: scale(1.05) !important;
+        border: 10px solid rgba(255, 255, 255, 0.6) !important;
+        animation-duration: 1.5s !important;
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb:hover::before {
+        width: 14px !important;
+        height: 14px !important;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 1.2), 0 0 30px rgba(37, 99, 235, 1) !important;
+        animation-duration: 1s !important;
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-thumb:hover::after {
+        animation-duration: 1s !important;
+    }
+
+    .skin-black-light .main-sidebar::-webkit-scrollbar-corner {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 0 0 30px 0 !important;
+    }
+
     .sidebar-open .main-sidebar {
         left: 0 !important;
     }
@@ -158,8 +265,116 @@ n<style >
         border-radius: 6px !important;
     }
 
-    * {
-        color: var(--text-secondary-color) !important;
+    /* Global Custom Scrollbar for Entire System - Cyberpunk Neon Design */
+    *::-webkit-scrollbar {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%) !important;
+        border-radius: 0 !important;
+        margin: 1px !important;
+        position: relative !important;
+        border: 1px solid rgba(37, 99, 235, 0.3) !important;
+        box-shadow: inset 0 0 20px rgba(37, 99, 235, 0.1), 0 0 10px rgba(16, 185, 129, 0.1) !important;
+    }
+
+    *::-webkit-scrollbar-track::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.1) 20%, rgba(16, 185, 129, 0.1) 80%, transparent 100%) !important;
+        animation: neon-track 4s ease-in-out infinite !important;
+    }
+
+    @keyframes neon-track {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.5; }
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #000000 0%, rgba(37, 99, 235, 0.8) 30%, rgba(16, 185, 129, 0.8) 70%, #000000 100%) !important;
+        border-radius: 0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.8), 0 0 20px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8) !important;
+        transition: all 0.2s ease !important;
+        position: relative !important;
+        cursor: pointer !important;
+        background-size: 400% 400% !important;
+        animation: neon-flow 6s linear infinite !important;
+        min-height: 40px !important;
+        min-width: 40px !important;
+    }
+
+    @keyframes neon-flow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    *::-webkit-scrollbar-thumb::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 2px !important;
+        left: 2px !important;
+        right: 2px !important;
+        bottom: 2px !important;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.9) 0%, rgba(37, 99, 235, 0.7) 50%, rgba(16, 185, 129, 0.7) 100%) !important;
+        border-radius: 0 !important;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(37, 99, 235, 0.6) !important;
+        animation: neon-core 3s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes neon-core {
+        0% { opacity: 0.7; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1.1); }
+    }
+
+    *::-webkit-scrollbar-thumb::after {
+        content: '' !important;
+        position: absolute !important;
+        top: -1px !important;
+        left: -1px !important;
+        right: -1px !important;
+        bottom: -1px !important;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%) !important;
+        border-radius: 0 !important;
+        animation: neon-glow 2s ease-in-out infinite !important;
+    }
+
+    @keyframes neon-glow {
+        0%, 100% { opacity: 0; }
+        50% { opacity: 1; }
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 1) 0%, rgba(16, 185, 129, 1) 50%, rgba(37, 99, 235, 1) 100%) !important;
+        box-shadow: 0 0 20px rgba(37, 99, 235, 1.2), 0 0 35px rgba(16, 185, 129, 1), inset 0 0 15px rgba(255, 255, 255, 0.3) !important;
+        transform: scale(1.05) !important;
+        border: 2px solid rgba(255, 255, 255, 1) !important;
+        animation-duration: 3s !important;
+    }
+
+    *::-webkit-scrollbar-thumb:hover::before {
+        box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(37, 99, 235, 0.8) !important;
+        animation-duration: 2s !important;
+    }
+
+    *::-webkit-scrollbar-thumb:active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 1) 0%, rgba(37, 99, 235, 1) 100%) !important;
+        box-shadow: 0 0 25px rgba(37, 99, 235, 1.5), 0 0 45px rgba(16, 185, 129, 1.2) !important;
+        transform: scale(0.95) !important;
+        animation-duration: 1.5s !important;
+    }
+
+    *::-webkit-scrollbar-corner {
+        background: rgba(0, 0, 0, 0.8) !important;
+        border: 1px solid rgba(37, 99, 235, 0.3) !important;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.2) !important;
     }
 
     body {
@@ -886,14 +1101,14 @@ n<style >
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: #374151 !important;
-        padding: 8px 12px !important;
     }
 
     .select2-container--default .select2-selection--single {
         border: 1px solid #d1d5db !important;
         border-radius: 8px !important;
-        height: auto !important;
         background: #ffffff !important;
+        height: 36px !important;
+        line-height: 36px !important;
     }
 
 
@@ -1591,10 +1806,6 @@ html.ltr .dropdown-menu {
         gap: 6px;
     }
 
-    .select-country .select2-container{
-        margin-top: 12px;
-    }
-
     #go-superadmin i {
         font-size: 15px;
     }
@@ -1609,7 +1820,7 @@ html.ltr .dropdown-menu {
     }
 
     .select2-container {
-        width: 190px !important;
+        width: 150px !important;
     }
 
     /*.settings-section {*/
