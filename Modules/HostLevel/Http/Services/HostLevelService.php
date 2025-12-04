@@ -118,7 +118,7 @@ class HostLevelService
 
                 $notifications[] = [
                     'title' => __('congratulations'),
-                    'body'  => __('vip_gift_message'),
+                    'body'  => __('vip_message', ['vip_name' => $vip->name]),
                 ];
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
