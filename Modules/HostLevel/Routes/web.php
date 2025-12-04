@@ -25,18 +25,19 @@ Route::group(
             'web',
             'admin',
             'adminIp',
+            'host.level.action',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-       Route::resource('host-levels', HostLevelController::class);
-       Route::resource('host-level-settings', HostLevelSettingController::class);
+        Route::resource('host-levels', HostLevelController::class);
+        Route::resource('host-level-settings', HostLevelSettingController::class);
         Route::post('host-level-settings/save', [HostLevelSettingController::class, 'save'])->name('host-level-settings.save');
 
-       Route::prefix('host-level-reward/{host_level_id}')->group(function () {
-            Route::get('/', [HostLevelRewardController::class, 'index']);  
+        Route::prefix('host-level-reward/{host_level_id}')->group(function () {
+            Route::get('/', [HostLevelRewardController::class, 'index']);
             Route::get('/create', [HostLevelRewardController::class, 'create']);
             Route::post('/', [HostLevelRewardController::class, 'store']);
             Route::get('/{id}', [HostLevelRewardController::class, 'show'])->where('id', '[0-9]+');
@@ -44,9 +45,6 @@ Route::group(
             Route::put('/{id}', [HostLevelRewardController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [HostLevelRewardController::class, 'destroy'])->where('id', '[0-9]+');
         });
+    }
 
-
-
-        }
-        
 );

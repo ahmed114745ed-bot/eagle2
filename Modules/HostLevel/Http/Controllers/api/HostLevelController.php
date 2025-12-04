@@ -24,11 +24,12 @@ class HostLevelController extends Controller
         $field = "desc_" . app()->getLocale();
 
 
-        [$diamonds, $nextLevel, $currentLevel, $level] = $this->hostLevelService->userInfoLevel($user);
+        [$diamonds, $nextLevel, $currentLevel, $level,$eventType] = $this->hostLevelService->userInfoLevel($user);
         request()->merge(['userDiamonds' => $diamonds, 'nextLevel' => $level]);
         $data = [
             'levels' => HostLevelResource::collection($data),
             'roles' => $rule != null ? $rule->$field : "",
+            'event_type' => $eventType,
             'user' => [
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',

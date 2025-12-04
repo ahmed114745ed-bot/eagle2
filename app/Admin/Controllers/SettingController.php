@@ -161,4 +161,18 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function updateHostLevel(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'host_level_action'], [
+                'key' => 'host_level_action',
+                'value' => $request->value
+            ]);
+            Cache::put('host_level_action', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
