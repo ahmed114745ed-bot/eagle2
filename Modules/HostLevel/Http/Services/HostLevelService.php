@@ -119,66 +119,7 @@ class HostLevelService
     }
 
 
-    public function nextLevel($user)
-    {
-        $eventType = $this->getEventType();
-        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
-        if ($lastPick && $lastPick->hostLevel) {
-            $nextLevel = HostLevel::where('level', '>', $lastPick->hostLevel->level)
-                ->orderBy('level', 'asc')
-                ->first();
-        } else {
-            $nextLevel = HostLevel::orderBy('level', 'asc')->first();
-        }
-
-        $diamonds = $this->computeDiamonds($user->id) ?? 0;
-
-        if ($nextLevel  && $lastPick) {
-            $remaining = $nextLevel->diamonds - $diamonds;
-            $exactlyValue    = @$nextLevel->diamonds;
-            $progressNext    = $nextLevel->diamonds - $lastPick->diamonds;
-            $progressCurrent = $diamonds - $lastPick->diamonds;
-            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
-
-            if ($prog >= 1) {
-                $bar = 1;
-            } else {
-                $bar = round($prog, 1);
-            }
-            $progress = $exactlyValue == 0 ? 1 : $bar;
-        } elseif ($lastPick) {
-
-            $exactlyValue    = @$nextLevel->diamonds;
-            $progressNext    = @$nextLevel->diamonds - $lastPick->diamonds;
-            $progressCurrent = $diamonds - $lastPick->diamonds;
-            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
-
-            $progress  = 1;
-            $remaining = 0;
-        } else {
-            $progress  = 1;
-            $remaining = 0;
-        }
-
-        $hostLevels = HostLevel::with('rewards')
-            ->where('diamonds', '<=', $diamonds)
-            ->orderBy('level', 'asc')
-            ->get();
-
-        return [
-            'next' => [
-                'next_level' => $nextLevel->level ?? 0,
-                'current_level' => $lastPick->hostLevel->level ?? 0,
-                'next_level_image' => $nextLevel->img ?? '',
-                'diamonds' => $diamonds,
-                'remaining' => $remaining < 0 ? 0 : $remaining,
-                'progress' => $progress,
-            ],
-
-            'levels' => $hostLevels,
-        ];
-    }
-
+  
     private function getEventType(): string
     {
         return Common::getSettingValue('host_level_type') ?? 'daily';

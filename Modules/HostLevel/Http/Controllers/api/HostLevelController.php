@@ -57,21 +57,4 @@ class HostLevelController extends Controller
         return Common::apiResponse(true, __('success process'));
     }
 
-    public function userHostLevels(Request $request)
-    {
-        $user = $request->user();
-
-        $dataUserLevel = $this->hostLevelService->nextLevel($user);
-
-        $data = [
-            'user' => [
-                'name' => $user->name ?? '',
-                'image' => $user->profile->avatar ?? '',
-            ],
-            'level' => $dataUserLevel['next'],
-            'host_levels' => UserHostLevelResource::collection($dataUserLevel['levels']),
-        ];
-
-        return Common::apiResponse(true, '', $data, 200,);
-    }
 }

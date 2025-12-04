@@ -20,6 +20,5 @@ Route::middleware(['auth:sanctum', 'update.last.seen'])->group(function () {
     Route::middleware(['host.level'])->prefix('host-level')->group(function () {
         Route::get('/', [HostLevelController::class, 'hostLevel']);
         Route::post('/pick', [HostLevelController::class, 'pick']);
-        Route::get('user-data', [HostLevelController::class, 'userHostLevels']);
     });
 });
