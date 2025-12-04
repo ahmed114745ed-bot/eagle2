@@ -753,7 +753,6 @@ n<style >
     }
 
     .skin-black-light .main-header > .logo {
-        background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%) !important;
         color: #374151 !important;
         border: none !important;
         padding: 0 24px !important;
@@ -1238,7 +1237,7 @@ html.ltr .dropdown-menu {
 
             .rtl .main-header .logo{
                 float: right !important;
-
+                width: 18%;
             }
             .rtl .navbar-static-top{
                 margin-left: 16px !important;
