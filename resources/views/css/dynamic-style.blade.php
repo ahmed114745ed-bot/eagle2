@@ -1237,7 +1237,7 @@ html.ltr .dropdown-menu {
 
             .rtl .main-header .logo{
                 float: right !important;
-                width: 18%;
+                width: 18.4%;
             }
             .rtl .navbar-static-top{
                 margin-left: 16px !important;
