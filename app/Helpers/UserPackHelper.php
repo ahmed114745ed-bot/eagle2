@@ -48,6 +48,11 @@ class UserPackHelper
             ->first()?->ware?->show_img ?? '';
     }
 
+    public static function getVipImage(User $user): string
+    {
+        return $user->UserVip?->OVip?->img ?? '';
+    }
+
     public static function getVipData(User $user)
     {
         return self::getPacks($user)
