@@ -117,13 +117,15 @@ class HostLevelService
                 ];
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
+                if ($ware){
+                    UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
 
-                $wareName = $ware->name ?? __('a special ware');
-                $notifications[] = [
-                    'title' => __('congratulations'),
-                    'body'  => str_replace(':ware', $wareName, __('You have received a gift: :ware')),
-                ];
+                    $wareName = $ware->name ?? __('a special ware');
+                    $notifications[] = [
+                        'title' => __('congratulations'),
+                        'body'  => str_replace(':ware', $wareName, __('You have received a gift: :ware')),
+                    ];
+                }
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,
