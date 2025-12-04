@@ -1839,4 +1839,15 @@ html.ltr .dropdown-menu {
     body {
         overflow-x: auto !important;
     }
+
+    .stats-container .info-box {
+        background: linear-gradient(135deg,
+        #667eea 0%,
+        #8B5CF6 25%,
+        #A855F7 50%,
+        #C084FC 75%,
+        #E879F9 100%
+        ) !important;
+        background-attachment: fixed !important;
+    }
 </style>
