@@ -16,8 +16,7 @@ class HostLevelResource extends JsonResource
         $user = request()->user();
         $diamonds = $request->userDiamonds ?? 0;
         $remaining = $this->diamonds - $diamonds;
-        $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
-        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
+
         return [
             'id' => $this->id,
             'diamond' => $this->diamonds,
@@ -26,28 +25,36 @@ class HostLevelResource extends JsonResource
             'img' => $this->img,
             'picked_level' => $user->hostLevelWinnerByLevelAndEvent($this->id) ? true : false,
             'remaining' => $remaining < 0 ? 0 : $remaining,
-            'progress' => $lastPick
-                ? ($this->id == $lastPick->hostLevel->id
-                    ? 1
-                    : $this->progress($this->diamonds, $diamonds, $lastPick->hostLevel->diamonds)
-                )
-                : 1,
+            'progress' =>  $this->progress($this->diamonds, $diamonds),
+
             'rewards' => WeeklyStarGift::collection($this->whenLoaded('rewards')),
         ];
     }
 
-    public function progress($nextDiamonds, $diamonds, $lastPickDiamonds)
+    public function progress($nextDiamonds, $userDiamonds)
     {
-        $exactlyValue    = $nextDiamonds;
-        $progressNext    = $nextDiamonds - $lastPickDiamonds;
-        $progressCurrent = $diamonds - $lastPickDiamonds;
-        $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
-
-        if ($prog >= 1) {
-            $bar = 1;
-        } else {
-            $bar = round($prog, 1);
+        if ($nextDiamonds <= 0) {
+            return 1;
         }
-        return  $exactlyValue == 0 ? 1 : ($bar < 0 ? 1 : $bar);
+
+        if ($userDiamonds <= 0) {
+            return 0;
+        }
+
+        // normalize
+        $progress = $userDiamonds / $nextDiamonds;
+
+        // NEW epsilon — anything below 0.0001 becomes zero
+        $epsilon = 0.0001;
+
+        if ($progress < $epsilon) {
+            return 0;
+        }
+
+        if ($progress > 1 - $epsilon) {
+            return 1;
+        }
+
+        return $progress;
     }
 }
