@@ -18,8 +18,8 @@ class HostLevelResource extends JsonResource
         $diamonds = $request->userDiamonds ?? 0;
         $remaining = $this->diamonds - $diamonds;
         $nextLevel = $request->nextLevel ?? 0;
-        $lastLevel = HostLevel::where('level', '>', $nextLevel)->orderBy('level')->value('level') ?? 0;
-
+        $lastLevel = HostLevel::where('level', '>=', $nextLevel)->orderBy('level')->value('level') ?? 0;
+       
         return [
             'id' => $this->id,
             'diamond' => $this->diamonds,
