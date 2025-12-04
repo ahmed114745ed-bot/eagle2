@@ -25,7 +25,6 @@
                     <label for="type" class="form-label fw-bold d-block text-end">{{ __('Schedule Type') }}</label>
                     <select name="type" id="type" class="form-control text-end">
                         <option value="daily" {{ $settings['type']=='daily' ? 'selected' : '' }}>{{ __('Daily') }}</option>
-                        <!-- <option value="every_x_days" {{ $settings['type']=='every_x_days' ? 'selected' : '' }}>{{ __('Every X Days') }}</option> -->
                         <option value="weekly" {{ $settings['type']=='weekly' ? 'selected' : '' }}>{{ __('Weekly') }}</option>
                         <option value="monthly" {{ $settings['type']=='monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
                     </select>
