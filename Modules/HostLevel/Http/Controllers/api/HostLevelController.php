@@ -22,19 +22,21 @@ class HostLevelController extends Controller
         $data = $this->hostLevelService->hostLevelIndex();
         $rule = $this->hostLevelService->roles();
         $field = "desc_" . app()->getLocale();
-        
 
-        [$diamonds ,$nextLevel, $currentLevel]= $this->hostLevelService->userInfoLevel($user);
-        request()->merge(['userDiamonds' => $diamonds]);
+
+        [$diamonds, $nextLevel, $currentLevel, $level, $eventType, ] = $this->hostLevelService->userInfoLevel($user);
+        request()->merge(['userDiamonds' => $diamonds, 'nextLevel' => $level]);
         $data = [
             'levels' => HostLevelResource::collection($data),
             'roles' => $rule != null ? $rule->$field : "",
+            'event_type' => $eventType == 'daily' ? 1 : ($eventType == 'weekly' ? 2 : 3),
             'user' => [
                 'name' => $user->name ?? '',
                 'image' => $user->profile->avatar ?? '',
-                'level' => $currentLevel ?? 0,
+                'current_level' => $currentLevel ?? 0,
                 'next_level' => $nextLevel ?? 0,
                 'diamonds' => $diamonds,
+                'last_level' => $level ?? 0,
             ],
         ];
         return Common::apiResponse(true, '', $data, 200, '', 'levels');
@@ -54,23 +56,5 @@ class HostLevelController extends Controller
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
         return Common::apiResponse(true, __('success process'));
-    }
-
-    public function userHostLevels(Request $request)
-    {
-        $user = $request->user();
-
-        $dataUserLevel = $this->hostLevelService->nextLevel($user);
-
-        $data = [
-            'user' => [
-                'name' => $user->name ?? '',
-                'image' => $user->profile->avatar ?? '',
-            ],
-            'level' => $dataUserLevel['next'],
-            'host_levels' => UserHostLevelResource::collection($dataUserLevel['levels']),
-        ];
-
-        return Common::apiResponse(true, '', $data, 200,);
     }
 }

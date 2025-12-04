@@ -742,11 +742,14 @@ class GiftLogController extends Controller
 
     public function increaseMonthlyDiamond()
     {
+        $remainingDiamonds = RemainingDiamond::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)->pluck('user_id')->toArray();
+
         UserSallary::where([
             'month' => 11,
             'year' => 2025,
             'is_finished' => 0
-        ])
+        ])->whereNotIn('user_id', $remainingDiamonds)
             ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
 
                 foreach ($userSalaries as $userSalary) {

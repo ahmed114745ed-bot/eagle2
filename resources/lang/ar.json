@@ -3003,6 +3003,8 @@
   "congratulations": "تهانينا",
   "superAdminRewardDescription":"تتيح ميزة مكافأة مدير دوله اختيار مدير دوله ومنحه مكافآت مع تاريخ انتهاء وعدد محدد من المكافآت. يمكن مدير دوله  بعد ذلك إهداء هذه المكافآت للمستخدمين في نفس البلد، وفقًا للعدد المحدد من المكافآت.",
   "vip_gift_message": "لقد حصلت على مستوى VIP جديد كهدية",
+    "vip_message": "لقد حصلت على مستوى VIP جديد كهدية: :vip_name",
+    "badge_gift_message": "لقد حصلت على شارة جديد كهدية",
 "you used this phone before": "لقد استخدمت هذا الرقم الهاتف من قبل",
 "Rewards Center":"مركز المكافات",
 "you do not have permission to dedicate this user": "ليس لديك إذن لتخصيص هذا المستخدم",

@@ -461,8 +461,10 @@
                     class="{{ $tab == 'targets_table' ? 'active' : '' }}">
                     {{ __('Targets') }}
                 </button>
-
-                <button onclick="showSection('remaining_diamonds')">{{ __('remaining diamonds') }}</button>
+                @if ($remaining_diamonds_action)
+                    <button onclick="showSection('remaining_diamonds')">{{ __('remaining diamonds') }}</button>
+                @endif
+                
             </div>
         </div>
 
@@ -517,54 +519,54 @@
                 </div>
             </form>
             </div>
+                @if ($remaining_diamonds_action)
+                    <div id="remaining_diamonds" class="settings-section p-4 shadow-sm rounded bg-white">
 
-                <div id="remaining_diamonds" class="settings-section p-4 shadow-sm rounded bg-white">
+                        <!-- Header Row -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
 
-                    <!-- Header Row -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                            <a href="{{ admin_url('remaining-diamonds') }}" class="btn btn-outline-primary fw-bold px-4 py-2">
+                                <i class="fa fa-history me-1"></i> {{ __('History') }}
+                            </a>
+                        </div>
 
-                        <a href="{{ admin_url('remaining-diamonds') }}" class="btn btn-outline-primary fw-bold px-4 py-2">
-                            <i class="fa fa-history me-1"></i> {{ __('History') }}
-                        </a>
+                        <form method="POST" action="{{ admin_url('remaining-diamond-settings/save') }}">
+                            @csrf
+
+                            <!-- Exchange Type -->
+                            <div class="mb-3">
+                                <label for="remaining_diamonds" class="form-label fw-semibold">{{ __('exchange to') }}</label>
+
+                                <select name="remaining_diamonds" id="remaining_diamonds" class="form-select form-select-lg">
+                                    <option value="nothing" {{ $settings['remaining_diamonds']=='nothing' ? 'selected' : '' }}>
+                                        {{ __('Do not make any thing') }}
+                                    </option>
+                                    <option value="coins" {{ $settings['remaining_diamonds']=='coins' ? 'selected' : '' }}>
+                                        {{ __('Coins') }}
+                                    </option>
+                                    <option value="diamonds" {{ $settings['remaining_diamonds']=='diamonds' ? 'selected' : '' }}>
+                                        {{ __('Diamonds') }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Context Text -->
+                            <div class="alert alert-info mt-3">
+                                <i class="fa fa-info-circle me-1"></i> 
+                                {{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}
+                            </div>
+
+                            <!-- Save Button -->
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn btn-success btn-lg px-4 fw-bold shadow">
+                                    <i class="fa fa-check-circle me-1"></i> {{ __('Save') }}
+                                </button>
+                            </div>
+
+                        </form>
                     </div>
 
-                    <form method="POST" action="{{ admin_url('remaining-diamond-settings/save') }}">
-                        @csrf
-
-                        <!-- Exchange Type -->
-                        <div class="mb-3">
-                            <label for="remaining_diamonds" class="form-label fw-semibold">{{ __('exchange to') }}</label>
-
-                            <select name="remaining_diamonds" id="remaining_diamonds" class="form-select form-select-lg">
-                                <option value="nothing" {{ $settings['remaining_diamonds']=='nothing' ? 'selected' : '' }}>
-                                    {{ __('Do not make any thing') }}
-                                </option>
-                                <option value="coins" {{ $settings['remaining_diamonds']=='coins' ? 'selected' : '' }}>
-                                    {{ __('Coins') }}
-                                </option>
-                                <option value="diamonds" {{ $settings['remaining_diamonds']=='diamonds' ? 'selected' : '' }}>
-                                    {{ __('Diamonds') }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Context Text -->
-                        <div class="alert alert-info mt-3">
-                            <i class="fa fa-info-circle me-1"></i> 
-                            {{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}
-                        </div>
-
-                        <!-- Save Button -->
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-success btn-lg px-4 fw-bold shadow">
-                                <i class="fa fa-check-circle me-1"></i> {{ __('Save') }}
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-
-
+                @endif
             <div id="Badges" class="settings-section">
                 <h3>{{ __('Badges') }}</h3>
 
