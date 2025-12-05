@@ -150,9 +150,9 @@ class MyDataResource extends JsonResource
             'vip' =>  [
                 'id'             => $this->UserVip?->id,
                 'level'          => $this->UserVip?->level,
-                'img_old'     => $this->UserVip?->OVip->img ?? '',
+                'img_old'        => $this->UserVip?->OVip->img ?? '',
                 'vip_upload_gif' => UserPackHelper::hasPack($this->resource, 22),
-                'vip_img'        => UserPackHelper::getVipIcon($this->resource),
+                'vip_img'        => UserPackHelper::getVipImage($this->resource),
                 'colored_name'   => UserPackHelper::getColorName($this->resource),
             ],
             //EndColorName
