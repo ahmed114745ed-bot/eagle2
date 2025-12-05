@@ -99,6 +99,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 6)
+            ->where('is_used', true)
             ->first()?->ware?->image_type ?? '';
     }
 
