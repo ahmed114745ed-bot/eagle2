@@ -13,6 +13,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 18)
+            ->where('is_used',1)
             ->first()?->ware?->color ?? '';
     }
 
@@ -45,7 +46,13 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 10)
+            ->where('is_used',1)
             ->first()?->ware?->show_img ?? '';
+    }
+
+    public static function getVipImage(User $user): string
+    {
+        return $user->UserVip?->OVip?->img ?? '';
     }
 
     public static function getVipData(User $user)
@@ -92,6 +99,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 6)
+            ->where('is_used', true)
             ->first()?->ware?->image_type ?? '';
     }
 
@@ -138,6 +146,7 @@ class UserPackHelper
      */
     public static function getFrameWare(User $user): mixed
     {
+        LogHelper::info('get frame ware',['user_id'=>$user->id]);
         return self::getWare($user, 4);
     }
 
@@ -162,6 +171,10 @@ class UserPackHelper
      */
     public static function getWare(User $user, int $type)
     {
+        LogHelper::info('get ware',['ware'=>self::getPacks($user)
+            ->where('type', $type)
+            ->where('is_used', true)
+            ->first()?->ware,'type'=>$type,'user_id'=>$user->id]);
         return self::getPacks($user)
             ->where('type', $type)
             ->where('is_used', true)

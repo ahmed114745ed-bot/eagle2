@@ -45,7 +45,7 @@ class CustomNotification
         }
         $lang = $user->lan ?? 'en';
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
-        $body = __('api.sender_level', ['level' => $user->total_sender_level],  $lang);
+        $body = __('api.sender_level', ['user' => $user->name, 'level' => $user->total_sender_level],  $lang);
 
         $title = __('api.senderLevelUpgrade', [], $lang);
 
@@ -101,7 +101,7 @@ class CustomNotification
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
         $salary               = $user->salary;
         $agencyName               = $user->agency?->name;
-        $body             = __('api.target', ['salary' => $salary, 'agency' => $agencyName], $lang);
+        $body             = __('api.target', ['user' => $user->name, 'salary' => $salary, 'agency' => $agencyName], $lang);
         $title = __('api.newTarget', [], $lang);
         $data['user_id'] = $user?->id;
         if (!$user->is_logout)  Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, data: $data,  messageType: 'achieve-target-monthly');
@@ -391,6 +391,18 @@ class CustomNotification
 
 
         if (!$user->is_logout)  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, messageType: 'accept-agency');
+        Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function remainingDiamonds(User $user, $type, $month, $amount)
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user->lan ?? 'en';
+
+        $body = $type == 'diamonds' ? __("api.remainingDiamonds", ['diamonds' => $amount, 'month' => $month], $lang) : __("api.remainingDiamondCoins", ['coins' => $amount, 'month' => $month], $lang);
+
+        if (!$user->is_logout)  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, messageType: 'remaining-diamonds');
         Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
