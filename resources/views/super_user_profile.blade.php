@@ -1151,7 +1151,7 @@
                         <span class="meta-label">{{ __('diamonds') }}:</span>
                         @php
 
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
+                            $user_diamonds = (in_array($user?->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
 
                         @endphp
                         <span class="meta-value">{{ @$user_diamonds }}</span>
@@ -1214,7 +1214,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           @if ($user->type_user != 1)
+           @if ($user?->type_user != 1)
             <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
            @endif
 

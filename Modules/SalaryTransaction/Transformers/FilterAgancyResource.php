@@ -8,7 +8,9 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\AdminsAgencyResource;
+use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
+use App\Models\AgencyJoinRequest;
 
 class FilterAgancyResource extends JsonResource
 {
@@ -28,9 +30,8 @@ class FilterAgancyResource extends JsonResource
         // } elseif (($this->Shipping_agency == 1) && ($this->Host_agency == 0)) {
         //     $type = 'shipping';
         // }
-        if ($this->type == 1 ) {
+        if ($this->type == 1) {
             $type = 'hosts ';
-         
         } elseif ($this->type == 2) {
             $type = 'shipping';
         }
@@ -46,6 +47,7 @@ class FilterAgancyResource extends JsonResource
             'total_members' => $this->mempers->count(),
             'members' => AgencyMemberResource::collection($this->mempers),
             'agency_type' =>  $type,
+            'is_join_request' => AgencyJoinRequest::where('user_id', request()->user()->id)->where('agency_id', $this->id)->exists(),
             'owner' => [
                 'id' => $this->owner->id ?? 0,
                 'uuid' => $this->owner->uuid ?? '',

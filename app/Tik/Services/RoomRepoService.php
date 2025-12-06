@@ -28,6 +28,7 @@ use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
+use Modules\TaskStream\Services\TaskStreamService;
 
 class RoomRepoService
 {
@@ -334,8 +335,13 @@ class RoomRepoService
 
         $user->now_room_uid = 0;
         $user->save();
-        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
 
+        $taskStreamRoom = $room->taskStreamRoom()->first();
+        if ($taskStreamRoom) {
+            app(TaskStreamService::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
+        }
+
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
             $room->update(['is_live' => false]);
         }
 
@@ -503,7 +509,7 @@ class RoomRepoService
         } catch (\Throwable $e) {
             // \Log::error("changeMode: Zego send failed - " . $e->getMessage());
         }
-      
+
 
         return Common::apiResponse(1, 'done', null, 201);
     }

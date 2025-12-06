@@ -533,6 +533,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
+Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
 
@@ -1097,15 +1098,16 @@ $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 });
 
 Route::get('/run-lucky-gift-unit-test', function () {
-    Artisan::call('test', [
-        '--filter' => 'SendLuckyGift2FeatureTest',
-    ]);
+    $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
+        ' --filter SendLuckyGift2FeatureTest';
 
-    return response(
-        '<pre>' . e(Artisan::output()) . '</pre>'
-    );
+    $process = Process::fromShellCommandline($command, base_path());
+    $process->setTimeout(300);
+
+    $process->run();
+
+    $output = $process->getOutput() . $process->getErrorOutput();
+
+    return response('<pre>'.e($output).'</pre>');
 });
 
-Route::get('/testt', function () {
-    return 'test';
-});

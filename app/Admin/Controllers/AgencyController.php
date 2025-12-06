@@ -473,7 +473,7 @@ class AgencyController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? superadmin_url("users/profile/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? admin_url("users/{$this->owner->id}") : 0;
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -523,6 +523,7 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+              $id = $creatorId;
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---

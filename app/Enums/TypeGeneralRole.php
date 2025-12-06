@@ -9,6 +9,7 @@ enum TypeGeneralRole : string
     case CHARGE_EVENT = 'charge_event';
     case EVENT_PERIOD = 'event_period';
     case WEEKLY_CP = 'weekly_cp';
+    case HOST_LEVEL = 'host_level';
 
 
     public static function getOptions(): array

@@ -81,7 +81,8 @@ class WeeklyStarWinner extends Command
                             $ware = Ware::query()->find($reward->target);
                             UserCommon::addWareToUser($entry->sender, $ware, $reward->expire, null, 'weekly-star');
                         } elseif ($reward->type == "achievement") {
-                            $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                            // $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                            $dateTimestamp = optional(Carbon::make($reward->expire))->format('Y-m-d H:i:s');
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
                                 'custom_image' => $reward->target,

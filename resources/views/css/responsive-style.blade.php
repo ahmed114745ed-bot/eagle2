@@ -101,9 +101,14 @@
             position: relative;
         }
 
-        .sidebar-open .content-wrapper {
-            margin-right: 250px;
+        .sidebar-open .content-header {
+            padding: 30px 20px !important;
+            margin: 35px 15px !important;
         }
+
+        /*.sidebar-open .content-wrapper {*/
+        /*    margin-right: 250px;*/
+        /*}*/
 
         .col-md-3,
         .col-sm-6 {
