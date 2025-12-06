@@ -119,4 +119,12 @@ return [
 'url' => ':attribute geçerli bir URL olmalıdır.',
 'uuid' => ':attribute geçerli bir UUID olmalıdır.',
 
+    'custom' => [
+        'username' => [
+            'unique' => 'Bu kullanıcı adı kullanılamaz.',
+        ],
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
 ];

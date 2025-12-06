@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HostLevelTrait;
+use Modules\CP\Traits\CpGiftLog;
+use Modules\Moment\Entities\Moment;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\CP\Traits\CpGiftLog;
-use Modules\Moment\Entities\Moment;
 
 class GiftLog extends Model
 {
-    use TimestampsWithTimezone, CpGiftLog;
+    use TimestampsWithTimezone, CpGiftLog, HostLevelTrait;
 
     protected $table = 'gift_logs';
 
@@ -52,7 +53,4 @@ class GiftLog extends Model
     {
         return $this->belongsTo(Agency::class, 'agency_id');
     }
-
-
-
 }

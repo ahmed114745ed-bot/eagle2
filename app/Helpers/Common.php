@@ -487,10 +487,10 @@ class Common
 
     public static function getSettingValue($key)
     {
-        if ($conf = Setting::query()->where('key', $key)->first()) {
-            return $conf->value;
-        }
-        return null;
+        $value = Cache::rememberForever($key, function () use ($key) {
+            return Setting::where('key', $key)->value('value');
+        });
+        return $value ?? null;
     }
 
     public static function getConfFromKey(array $keys)
