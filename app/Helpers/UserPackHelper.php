@@ -13,6 +13,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 18)
+            ->where('is_used',1)
             ->first()?->ware?->color ?? '';
     }
 
@@ -45,6 +46,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 10)
+            ->where('is_used',1)
             ->first()?->ware?->show_img ?? '';
     }
 
@@ -97,6 +99,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 6)
+            ->where('is_used', true)
             ->first()?->ware?->image_type ?? '';
     }
 
