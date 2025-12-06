@@ -33,5 +33,6 @@
     "AreaManager": true,
     "Form": true,
     "SuperAdmin": true,
-    "TaskStream": true
+    "TaskStream": true,
+    "HostLevel": true
 }
