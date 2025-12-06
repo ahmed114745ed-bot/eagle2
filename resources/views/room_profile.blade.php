@@ -414,7 +414,7 @@
                                     <img src="{{ getImagePath($gift->gift->img ?? '') }}"
                                          width="30" height="30"
                                          style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <span>{{ $gift->gift->giftName }}</span>
+                                    <span>{{ $gift->gift?->giftName ?? '' }}</span>
                                 </a>
                             </td>
                             <td>{{ $gift->giftNum }}</td>

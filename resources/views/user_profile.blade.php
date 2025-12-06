@@ -2398,6 +2398,10 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
+                                    @if ($giftType === 'receiver' &&@$giftSLog->giftId ==0)
+                                      
+                                            <h5>{{__('remaining diamond')}}</h5>
+                                        @else
                                     <a href="{{ url('admin/users/' . $id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
@@ -2407,6 +2411,7 @@
                                             <small class="text-muted">UUID: {{ $uid }}</small>
                                         </div>
                                     </a>
+                                    @endif
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))

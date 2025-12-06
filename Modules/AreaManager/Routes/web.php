@@ -106,6 +106,7 @@ Route::group(
     function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('area-manager-users/profile/{id}', [AdminAreaManagerController::class, 'showProfile']);
+        Route::get('area-manager-users/{id}', [AdminAreaManagerController::class, 'showProfile']);
         Route::get('sub-area-manager-users/profile/{id}', [AdminUserController::class, 'showProfile']);
 
         Route::resource('superadmin-users', SuperAdminController::class);

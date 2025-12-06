@@ -51,7 +51,7 @@ class GeneralRoleController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('General rules'))
             ->body($this->form()->edit($id)));
     }
@@ -69,7 +69,6 @@ class GeneralRoleController extends MainController
         $grid->id(__('ID'));
         $grid->type(__('type'));
         $grid->url(__('url'));
-        $grid->sub_type(__('subType'));
         $grid->desc_en(__('Description en'));
         $grid->desc_ar(__('Description ar'));
         $grid->desc_tr(__('Description tr'));
@@ -102,16 +101,21 @@ class GeneralRoleController extends MainController
         $this->disableFormTools($form);
 
         $form->display('ID');
-        $form->select('type', __('type'))->options(
-            TypeGeneralRole::getTranslatedOptions()
-        )->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
-            ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
+        if (!request('type')) {
+            $form->select('type', __('type'))->options(
+                TypeGeneralRole::getTranslatedOptions()
+            )->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
+                ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
+        } else {
+            $form->hidden('type')->value(request('type'));
+        }
+
         $form->url('url', trans('url'))->required();
-        $form->text('sub_type', 'sub_type');
-        $form->textarea('desc_en', 'Description en');
-        $form->textarea('desc_ar', 'Description ar');
-        $form->textarea('desc_tr', 'Description tr');
-        $form->textarea('desc_hi', 'Description hi');
+
+        $form->textarea('desc_en', __('Description en'));
+        $form->textarea('desc_ar', __('Description ar'));
+        $form->textarea('desc_tr', __('Description tr'));
+        $form->textarea('desc_hi', __('Description hi'));
 
         return $form;
     }
