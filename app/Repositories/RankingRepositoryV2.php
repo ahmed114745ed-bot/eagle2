@@ -282,8 +282,9 @@ class RankingRepositoryV2
         $timezone = Common::timeZone();
         $now = Carbon::now($timezone);
     
-       
-    
+
+        $type = (int) $type;
+        
         [$start, $end] = match ($type) {
             0 => [$now->copy()->startOfHour(), $now->copy()->endOfHour()],
             1 => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
@@ -294,8 +295,9 @@ class RankingRepositoryV2
             3 => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
             default => [null, null],
         };
-    
+      
         if ($start && $end) {
+      
             $query->whereBetween('created_at', [$start, $end]);
         }
     }

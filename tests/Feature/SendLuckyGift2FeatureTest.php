@@ -25,7 +25,7 @@ class SendLuckyGift2FeatureTest extends TestCase
     public function test_send_lucky_gift_monthly_report()
     {
 
-                Log::info(' start test_send_lucky_gift_monthly_report', []);
+                // Log::info(' start test_send_lucky_gift_monthly_report', []);
 
         // 1. تفعيل عرض الأخطاء
         $this->withoutExceptionHandling();
@@ -83,9 +83,9 @@ class SendLuckyGift2FeatureTest extends TestCase
         // إرسال الطلب مع التحقق من التوثيق
         $token = $user->createToken('test-token')->plainTextToken;
 
-        Log::info('Sender ID:', ['id' => $user->id]);
-        Log::info('Receiver ID:', ['id' => $user->id]);
-        Log::info('Gift ID:', ['id' => $gift->id]);
+        // Log::info('Sender ID:', ['id' => $user->id]);
+        // Log::info('Receiver ID:', ['id' => $user->id]);
+        // Log::info('Gift ID:', ['id' => $gift->id]);
 
         try {
             $response = $this->withHeaders([
@@ -98,10 +98,10 @@ class SendLuckyGift2FeatureTest extends TestCase
                 'num' => 1,
             ]);
 
-            Log::info('Database Queries:', DB::getQueryLog());
+            // Log::info('Database Queries:', DB::getQueryLog());
 
-            Log::info('Response Status:', ['status' => $response->status()]);
-            Log::info('Response Headers:', $response->headers->all());
+            // Log::info('Response Status:', ['status' => $response->status()]);
+            // Log::info('Response Headers:', $response->headers->all());
 
             if ($response->status() !== 200) {
                 Log::error('Response Content:', ['content' => $response->getContent()]);
@@ -109,7 +109,7 @@ class SendLuckyGift2FeatureTest extends TestCase
             }
 
             $responseData = $response->json();
-            LogHelper::info('Lucky Gift Monthly response', $responseData ?? []);
+            // LogHelper::info('Lucky Gift Monthly response', $responseData ?? []);
             // التحقق من الرد
             $response->assertStatus(200)
                      ->assertJson([

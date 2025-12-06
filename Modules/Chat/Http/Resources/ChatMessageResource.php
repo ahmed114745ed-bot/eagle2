@@ -141,6 +141,7 @@ class ChatMessageResource extends JsonResource
             'albums' => $albums->count() > 0 ?  $album_array : null,
             'created_at' => $this->create_at($timeZone),
             "date_time" => $this->created_at,
+            'local_id'             => $request->local_id,
         ];
     }
 }

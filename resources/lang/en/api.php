@@ -13,6 +13,9 @@ return [
 
 
     ],
+    "remainingDiamondCoins" => ":coins coins were added from the remaining value from month :month to the current month",
+    "remainingDiamonds"     => ":diamonds diamonds were added from the remaining value from month :month to the current month",
+
     "lucky_box" => 'lucky box',
     "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
     "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",
@@ -35,7 +38,7 @@ return [
     'maleCp' => "A relationship of type :type was sent by :name.",
     'acceptCp' => ' :name accepted your relation request',
     'rejectCp' => ' :name rejected your relation request',
-    
+
 
     'chat_with_friends_description_allow'    => "All my friends now have the ability to chat with you",
     'chat_with_all_description_allow'    => "After activating this option, users will be able to chat with you'",
@@ -79,7 +82,7 @@ return [
     'got_coin'            => 'Congrats :name !   :coins coins are added to your account by :admin from dashboard',
     'got_earned_coin' => 'Through the invitation code 🎉 Congratulations :name, :coins coins have been added to your account',
     'code_invitation_uses' => '🎉 Congratulations :name, your invitation code has been used!',
-    'sender_level'        => 'Congratulations you reach sender level :level',
+    'sender_level'        => 'Congratulations :user you reach sender level :level',
     'senderLevelUpgrade' => 'Sender level upgraded',
     'receiver_level'      => 'Congratulations you reach receiver level :level',
     'send_level'          => 'You sent :level level',
@@ -100,9 +103,9 @@ return [
     'invite_game'         => ":name invited you to play :gameName \nCome and play",
     'king'                => 'king',
     'queen'               => 'queen',
-    'target' => 'Congrats! you achieve new target in :agency your salary now is :salary',
-    'momentComment'=> 'moment comment',
-    'likeReal' =>'like real',
+    'target' => 'Congrats! :user  you achieve new target in :agency your salary now is :salary',
+    'momentComment' => 'moment comment',
+    'likeReal' => 'like real',
     'realComment' => 'real comment',
     'likeMoment' => 'like moment',
     'family_level_up' => 'Congrats! your family :name level up to :level',
@@ -117,7 +120,7 @@ return [
     'anther_dont_have_coin' => 'other player does not have this number of coins',
     'background_accept' => "Background image request accepted",
     'background_refuse' => "Background image request rejected",
-    'roomBackground'=>'room background',
+    'roomBackground' => 'room background',
     'newTarget' => 'New target',
     'freez_charge' => 'Your wallet has been frozen. Contact the administration!',
     'freez_charge_user' => 'User wallet has been frozen!',
@@ -152,7 +155,7 @@ return [
     'reject_agency' => 'Your request to join the agency :name has been rejected.',
     'closeNormalBox' => 'Your normal luck box has expired.',
     'closeSuperBox' => 'Your super luck box has expired.',
-    'acceptYourAgency'=> 'Your agency has been accepted',
-    'rejectYourAgency'=>'Your agency has been refused',
+    'acceptYourAgency' => 'Your agency has been accepted',
+    'rejectYourAgency' => 'Your agency has been refused',
 
 ];

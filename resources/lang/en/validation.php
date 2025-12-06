@@ -144,7 +144,7 @@ return [
 
     'custom' => [
         'username' => [
-            'unique' => 'custom-message',
+            'unique' => 'The username is not available for use',
         ],
         'attribute-name' => [
             'rule-name' => 'custom-message',
