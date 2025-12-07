@@ -41,7 +41,7 @@ class WalletService
 
                 $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
                         ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
-                $this->walletRepo->updateWallet($fromWallet->id, ['balance' => $fromWallet->balance - $amount]);
+                $this->walletRepo->updateWallet($fromWallet->id, ['cut_amount' => $fromWallet->cut_amount + $amount]);
                 $this->walletRepo->createLog([
                     'wallet_id' => $fromWallet->id,
                     'user_id' => $fromUserId,
