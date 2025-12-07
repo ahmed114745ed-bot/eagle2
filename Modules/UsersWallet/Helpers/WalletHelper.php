@@ -18,7 +18,7 @@ class WalletHelper
      * @param int|null $agencyId
      * @param string $type
      */
-    public static function addAllBalancesByDiffs(int $userId, array $newData, ?array $oldData = null, ?int $agencyId = null, string $type = 'system')
+    public static function addAllBalancesByDiffs(int $userId, array $newData, ?array $oldData = null, ?int $agencyId = null, string $type = 'system' ,$target_id = null)
     {
         $user_diff   = ($newData['sallary'] ?? 0) - ($oldData['sallary'] ?? 0);
         $agency_diff = ($newData['agency_sallary'] ?? 0) - ($oldData['agency_sallary'] ?? 0);
@@ -29,7 +29,7 @@ class WalletHelper
         }
 
         if ($user_diff != 0) {
-            self::addBalance($userId, $user_diff, 'user');
+            self::addBalance($userId, $user_diff, 'user' ,$target_id);
         }
 
         $ownerId = null;
@@ -43,16 +43,16 @@ class WalletHelper
             }
         }
         if ($ownerId && $agency_diff != 0) {
-            self::addBalance($ownerId, $agency_diff, 'agency_owner');
+            self::addBalance($ownerId, $agency_diff, 'agency_owner',$target_id);
         }
 
         if ($bdId && $bd_diff != 0) {
-            self::addBalance($bdId, $bd_diff, 'bd');
+            self::addBalance($bdId, $bd_diff, 'bd' ,$target_id);
         }
     }
 
 
-    private static function addBalance($userId, $amount, $type )
+    private static function addBalance($userId, $amount, $type ,$target_id)
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
 
@@ -68,6 +68,7 @@ class WalletHelper
             'type' => $type,
             'before_amount' => $before ,
             'after_amount' => $wallet->balance,
+            'target_id' => $target_id,
         ]);
     }
 

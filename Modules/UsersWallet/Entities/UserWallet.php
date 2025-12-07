@@ -13,6 +13,7 @@ class UserWallet extends Model
         'balance',
         'cut_amount',
         'pending_amount',
+        'target_id',
     ];
 
     public function logs()

@@ -18,17 +18,21 @@ class UpdateUserWalletBalances implements ShouldQueue
     protected array $oldData;
     protected ?int $agencyId;
     protected string $type;
+    protected ?int $target_id;
+
 
     /**
      * Create a new job instance.
      */
-    public function __construct(int $userId, array $newData, array $oldData, ?int $agencyId = null, string $type = 'system')
+    public function __construct(int $userId, array $newData, array $oldData, ?int $agencyId = null, string $type = 'system' , $target_id = null)
     {
         $this->userId   = $userId;
         $this->newData  = $newData;
         $this->oldData  = $oldData;
         $this->agencyId = $agencyId;
         $this->type     = $type;
+        $this->target_id = $target_id;
+
     }
 
     /**
@@ -41,7 +45,8 @@ class UpdateUserWalletBalances implements ShouldQueue
             $this->newData,
             $this->oldData,
             $this->agencyId,
-            $this->type
+            $this->type,
+            $this->target_id
         );
     }
 }
