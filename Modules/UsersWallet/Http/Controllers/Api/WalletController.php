@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
 use Modules\UsersWallet\Http\Requests\MakeTransferRequest;
+use Modules\UsersWallet\Http\Resources\TransactionLogsResource;
 use Modules\UsersWallet\Services\WalletService;
 use Modules\UsersWallet\Transformers\WalletTemplateResource;
 
@@ -53,5 +54,30 @@ class WalletController extends Controller
 
         return WalletTemplateResource::collection($result);
     }
+
+
+   public function getProfitsByType(Request $request)
+    {
+        $data = $this->walletService->getProfitsByType($request->all());
+
+        return Common::apiResponse(
+            1,
+            'success',
+            ProfitTypeResource::collection($data)
+        );
+    }
+
+    public function getLatestOperations(Request $request)
+    {
+        $data = $this->walletService->getLatestTransactions($request->all());
+
+        return Common::apiResponse(
+            1,
+            'success',
+            TransactionLogsResource::collection($data)
+        );
+    }
+
+
 }
 

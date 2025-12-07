@@ -140,4 +140,22 @@ class WalletService
     {
         return $this->userCoinLogRepository->index($userId, $type, $startDate, $endDate,$page, $perPage);
     }
+
+
+
+    public function getProfitsByType($params)
+    {
+        $userId = $params['user_id'];
+        $type = $params['type'];
+        return $this->walletRepo->getProfitsByType($userId,$type);
+    }
+
+    public function getLatestTransactions($params)
+    {
+        $userId = $params['user_id'];
+        $limit = $params['limit'] ?? 20;
+
+        return $this->walletRepo->getLatestTransactions($userId, $limit);
+    }
+    
 }

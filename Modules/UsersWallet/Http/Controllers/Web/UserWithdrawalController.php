@@ -356,7 +356,7 @@ protected function detail($id)
             'amount' => -$withdrawal->amount,
             'operation' => 'subtract',
             'type' => 'user',
-            'before_amount' => $available,
+            'before_amount' => $available ,
             'after_amount' => $after_amount,
         ]);
         \Log::info('Withdrawal Approved', [
