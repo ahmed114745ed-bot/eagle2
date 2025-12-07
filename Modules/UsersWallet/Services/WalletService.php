@@ -35,9 +35,10 @@ class WalletService
                 $fromWallet = $this->walletRepo->getWalletByUserId($fromUserId)
                             ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
 
-                if (($fromWallet->balance - $fromWallet->pending_amount  ) < $amount) {
-                    throw new Exception('Insufficient balance.');
-                }
+                 $available = wallet_available_by_wallet($fromWallet);
+                    if ($available < $amount) {
+                            throw new \Exception('Insufficient balance.');
+                    }
 
                 $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
                         ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
