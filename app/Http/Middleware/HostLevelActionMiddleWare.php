@@ -26,7 +26,7 @@ class HostLevelActionMiddleWare
 
 
         $utdHostLevel = $getSetting('host_level_action') ?? 0;
-        if (!$utdHostLevel) abort(403, __('Not Found'));
+        if (!$utdHostLevel) abort(403, __('This feature is currently unavailable. Please contact the application administration.'));
 
         return $next($request);
     }
