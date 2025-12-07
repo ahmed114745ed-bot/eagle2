@@ -97,23 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function isDesktopModeOnMobile() {
-        const isMobileDevice = /Mobi|Android|iPhone|iPod|iPad/i.test(navigator.userAgent);
-        const deviceWidth = window.screen.width;
-        const viewportWidth = window.innerWidth;
-
-        if (isMobileDevice && viewportWidth > deviceWidth * 1.2) {
-            return true;
-        }
-        return false;
-    }
-
-    if (isDesktopModeOnMobile()) {
-        document.body.classList.add('desktop-mode');
-    } else {
-        document.body.classList.remove('desktop-mode');
-    }
-
     // استدعاء عند النقر على زر التبديل
     toggleButton.addEventListener("click", function () {
 
