@@ -32,6 +32,7 @@ class WalletRepository implements WalletRepositoryInterface
         public function getProfitsByType($userId ,$type = 'user')
     {
         WalletLog::with('target')
+            ->whereNotNull('target_id')
             ->where('type', $type)
             ->where('user_id', $userId)
             ->get();
