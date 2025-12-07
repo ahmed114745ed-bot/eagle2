@@ -7,11 +7,19 @@
         .payment-card {
             height: 795px;
         }
+
+        .wrapper {
+            position: absolute !important;
+        }
     }
 
     @media (max-width: 1200px) {
         .content {
             width: 1160px !important;
+        }
+
+        .wrapper {
+            position: absolute !important;
         }
     }
 
@@ -24,11 +32,18 @@
             position: relative !important;
         }
 
+        .wrapper {
+            position: absolute !important;
+        }
     }
 
     @media (max-width: 768px) {
         .content {
             width: 100% !important;
+        }
+
+        .wrapper {
+            position: absolute !important;
         }
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
@@ -130,6 +145,10 @@
         .box-footer {
             flex-direction: column;
             align-items: center;
+        }
+
+        .wrapper {
+            position: absolute !important;
         }
 
         .pagination-info,
