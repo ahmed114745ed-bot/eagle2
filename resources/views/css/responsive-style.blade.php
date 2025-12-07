@@ -1,26 +1,26 @@
 <style>
     @media (max-width: 1400px) {
         .content {
-            width: 1340px !important;
+            width: auto !important;
         }
 
         .payment-card {
             height: 795px;
         }
 
-        .wrapper {
-            position: absolute !important;
-        }
+        /*.wrapper {*/
+        /*    position: absolute !important;*/
+        /*}*/
     }
 
     @media (max-width: 1200px) {
         .content {
-            width: 1160px !important;
+            width: auto !important;
         }
 
-        .wrapper {
-            position: absolute !important;
-        }
+        /*.wrapper {*/
+        /*    position: absolute !important;*/
+        /*}*/
     }
 
     @media (max-width: 992px) {
@@ -32,9 +32,9 @@
             position: relative !important;
         }
 
-        .wrapper {
-            position: absolute !important;
-        }
+        /*.wrapper {*/
+        /*    position: absolute !important;*/
+        /*}*/
     }
 
     @media (max-width: 768px) {
@@ -42,9 +42,9 @@
             width: 100% !important;
         }
 
-        .wrapper {
-            position: absolute !important;
-        }
+        /*.wrapper {*/
+        /*    position: absolute !important;*/
+        /*}*/
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
             float: none; !important;
@@ -148,8 +148,8 @@
         }
 
         .wrapper {
-            position: absolute !important;
-        }
+        /*    position: absolute !important;*/
+        /*}*/
 
         .pagination-info,
         .box-footer .pull-right {
