@@ -9,6 +9,7 @@ use Exception;
 use Modules\UsersWallet\Entities\UserWallet;
 use Modules\UsersWallet\Entities\WalletLog;
 use Modules\UsersWallet\Entities\WalletTemplate;
+use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use App\Helpers\Common;
