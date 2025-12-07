@@ -30,6 +30,7 @@
    "type admin": "نوع المسؤول",
 "country manager": "مدير الدولة",
 "Area mangers": "مديرين المناطق",
+"Status switch country":"زر الحاله",
 "Browse area manager": "تصفح مديري المناطق",
 "Create area manager": "إنشاء مدير منطقة",
 "Delete area manager": "حذف مدير المنطقة",
