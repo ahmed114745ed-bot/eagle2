@@ -9,28 +9,17 @@
         }
 
         .wrapper {
-            overflow: auto !important;
+            position: absolute !important;
         }
     }
 
     @media (max-width: 1200px) {
-        /* Hide sidebar and reset margins to prevent cutoff on zoomed views */
-        .main-sidebar {
-            display: none !important;
-        }
-
-        .content-wrapper,
-        .main-footer {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
-
         .content {
-            width: 100% !important;
+            width: 1160px !important;
         }
 
         .wrapper {
-            overflow: auto !important;
+            position: absolute !important;
         }
     }
 
@@ -44,7 +33,7 @@
         }
 
         .wrapper {
-            overflow: auto !important;
+            position: absolute !important;
         }
     }
 
@@ -54,7 +43,7 @@
         }
 
         .wrapper {
-            overflow: auto !important;
+            position: absolute !important;
         }
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
@@ -159,7 +148,7 @@
         }
 
         .wrapper {
-            overflow: auto !important;
+            position: absolute !important;
         }
 
         .pagination-info,
