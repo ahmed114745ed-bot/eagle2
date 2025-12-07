@@ -11,6 +11,21 @@
 |
 */
 
-Route::prefix('rankingreward')->group(function() {
-    Route::get('/', 'RankingRewardController@index');
-});
+use Modules\RankingReward\Http\Controllers\RankingTypeController;
+
+Route::group(
+    [
+        'prefix'     => config('admin.route.prefix'),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function () {
+        Route::resource('ranking-types', RankingTypeController::class);
+
+    }
+);

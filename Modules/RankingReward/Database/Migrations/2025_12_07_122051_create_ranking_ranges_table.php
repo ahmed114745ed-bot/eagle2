@@ -17,7 +17,7 @@ class CreateRankingRangesTable extends Migration
             $table->id();
             $table->foreignId('ranking_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->smallInteger('min');
-            $table->smallInteger('max');
+            $table->smallInteger('max')->nullable();
             $table->timestamps();
         });
     }
