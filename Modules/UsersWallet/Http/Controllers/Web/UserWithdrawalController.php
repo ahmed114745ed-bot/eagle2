@@ -349,7 +349,7 @@ protected function detail($id)
      
         $withdrawal->status = 'approved';
         $withdrawal->save();
-        $after_amount = wallet_curant_by_user($withdrawal->user->id);
+        $after_amount = wallet_available_by_user($withdrawal->user->id);
            WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
