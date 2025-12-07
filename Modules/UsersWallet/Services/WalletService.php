@@ -152,7 +152,7 @@ class WalletService
 
     public function getLatestTransactions($params)
     {
-        $userId = $params['user_id'];
+        $userId = Auth::user()->id;
         $limit = $params['limit'] ?? 20;
 
         return $this->walletRepo->getLatestTransactions($userId, $limit);
