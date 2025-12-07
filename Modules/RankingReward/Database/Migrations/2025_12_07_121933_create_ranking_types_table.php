@@ -17,7 +17,6 @@ class CreateRankingTypesTable extends Migration
             $table->id();
             $table->string('type');
             $table->enum('schedule', ['daily', 'weekly', 'monthly']);
-            $table->string('type');
             $table->timestamps();
         });
     }
