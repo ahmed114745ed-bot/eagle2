@@ -152,6 +152,7 @@
 
     body.desktop-mode .wrapper {
         position: absolute !important;
+        overflow: auto !important;
     }
 
     form {
