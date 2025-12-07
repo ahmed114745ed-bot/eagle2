@@ -29,7 +29,7 @@ class WalletRepository implements WalletRepositoryInterface
         return UserWallet::create($data);
     }
 
-        public function getProfitsByType($userId ,$type)
+        public function getProfitsByType($userId ,$type = 'user')
     {
         return WalletLog::with('target')->selectRaw('type, SUM(amount) as total')
             ->where('type', $type)
