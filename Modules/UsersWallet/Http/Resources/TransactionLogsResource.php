@@ -17,7 +17,6 @@ class TransactionLogsResource extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'wallet_id'     => $this->wallet_id,
             'user_id'       => $this->user_id,
             'amount'        => $this->amount,
             'operation'     => $this->operation,
@@ -25,7 +24,6 @@ class TransactionLogsResource extends JsonResource
             'before_amount' => $this->before_amount,
             'after_amount'  => $this->after_amount,
             'created_at'    => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
-            'updated_at'    => $this->updated_at ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
     }
 }
