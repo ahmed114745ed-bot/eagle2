@@ -97,8 +97,8 @@ class AgencyController extends MainController
 
         $agency = Agency::query()
             ->where('country_id', $user->country_id)
-            ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
+            ->with(['admins', 'owner:id,name,uuid','bd', 'owner.profile'])
+            ->select(['id', 'name', 'app_owner_id', 'phone', 'bd_id','coins', 'img', 'type'])
             ->find($id);
 
         if (!$agency) {
@@ -223,12 +223,13 @@ class AgencyController extends MainController
                 Carbon::now()->endOfMonth(),
             ])
             ->sum('giftPrice');
-
+        $prefix = dashboardName();
 
         return $content
             ->title(__('agency profile'))
             ->view('bd_agency_profile', compact(
                 'agency',
+                'prefix',
                 'members',
                 'charges',
                 'salaries',
@@ -335,8 +336,8 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.img', 'agencies.is_frozen','agencies.created_by'])
-            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries','creator'])
+            ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
+            ->with(['owner:id,name,uuid', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -421,7 +422,7 @@ class AgencyController extends MainController
                     </div>
                 </div>
             ";
-        }) ->sortable(['users.name' => 'asc']);
+        })->sortable(['users.name' => 'asc']);
 
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
@@ -585,8 +586,8 @@ class AgencyController extends MainController
             $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
             $row->width(12)->hidden('agency_manger_id', __('app manger id'));
             $row->width(12)->text('name', __('agency name'))->rules('required');
-             $row->hidden('status', __('status'))->default(1);
-           // $row->width(12)->switch('status', __('status'));
+            $row->hidden('status', __('status'))->default(1);
+            // $row->width(12)->switch('status', __('status'));
             $row->width(12)->hidden('country_id')->default(Auth::user()->country_id);
         });
     }
