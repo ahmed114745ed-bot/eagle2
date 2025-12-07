@@ -359,6 +359,18 @@ protected function detail($id)
             'before_amount' => $available,
             'after_amount' => $after_amount,
         ]);
+        \Log::info('Withdrawal Approved', [
+    'withdrawal_id' => $withdrawal->id,
+    'user_id'       => $withdrawal->user->id,
+    'amount'        => $withdrawal->amount,
+    'before_amount' => $available,
+    'after_amount'  => $after_amount,
+    'wallet_id'     => $wallet->id,
+    'status'        => 'approved',
+    'approved_at'   => now(),
+    'admin_id'      => auth()->id() ?? null,
+]);
+
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 
         return response()->json([ 'success'=> true ,'message' => 'تمت الموافقة على السحب بنجاح']);
