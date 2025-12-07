@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
 use Modules\UsersWallet\Http\Requests\MakeTransferRequest;
+use Modules\UsersWallet\Http\Resources\ProfitTypeResource;
 use Modules\UsersWallet\Http\Resources\TransactionLogsResource;
 use Modules\UsersWallet\Services\WalletService;
 use Modules\UsersWallet\Transformers\WalletTemplateResource;
