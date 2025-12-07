@@ -1,7 +1,7 @@
 name: SSh-lumio-pipline
 on:
   push:
-    branches: ["lumio"]
+    branches: ['testForLomyan'] #["lumio"]
 jobs:
   run_lumio_hub:
     runs-on: [self-hosted]  #ubuntu-latest  #
