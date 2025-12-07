@@ -29,4 +29,20 @@ class WalletRepository implements WalletRepositoryInterface
         return UserWallet::create($data);
     }
 
+        public function getProfitsByType($userId ,$type)
+    {
+        return WalletLog::selectRaw('type, SUM(amount) as total')
+            ->where('type', $userId)
+            ->where('user_id', $type)
+            ->orderBy('total', 'DESC')
+            ->get();
+    }
+
+    public function getLatestTransactions($userId, $limit = 20)
+    {
+        return WalletLog::where('user_id', $userId)
+            ->orderBy('id', 'DESC')
+            ->limit($limit)
+            ->get();
+    }
 }
