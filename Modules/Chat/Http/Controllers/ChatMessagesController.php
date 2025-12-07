@@ -73,7 +73,6 @@ class ChatMessagesController extends Controller
             return $setting?->value ?? 0;
         });
 
-
         if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
@@ -144,10 +143,6 @@ class ChatMessagesController extends Controller
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
             event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom, false));
         } catch (\Throwable $e) {
-        }
-
-        if (!$user2->current_room_chat != $chatRoom->id){
-            $this->messageService->sendNotification($user2, $message);
         }
 
         return [
