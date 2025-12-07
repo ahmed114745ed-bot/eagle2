@@ -31,6 +31,7 @@ use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Entities\CpRoomHistory;
 use Modules\RoomCup\Helpers\RoomCupHelper;
+use Modules\TaskStream\Services\TaskStreamService;
 
 class EnteranceRoomServices
 {
@@ -205,6 +206,11 @@ class EnteranceRoomServices
 
         if (!$room || !$user) {
             return response()->json(['status' => 'Webhook received but room or user not found']);
+        }
+
+        $taskStreamRoom = $room->taskStreamRoom()->first();
+        if ($taskStreamRoom) {
+            app(TaskStreamService::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
         }
 
         $visitors = $this->updateRoomVisitorsBasedOnEvent2($event, $room, $user->id);

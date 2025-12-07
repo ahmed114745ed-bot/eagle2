@@ -423,8 +423,8 @@ class UserCommon
 
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
 
-        $title = __('congratulations');
-        $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
+        $title = __('congratulations')  ;
+        $body = $user->name .':' .__('You have received a gift: :ware', ['ware' => $ware->name]);
 
         // if ($pack) {
         //     if ($pack->expire == 0) return '';
@@ -481,7 +481,7 @@ class UserCommon
     public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
     {
         $title = __('congratulations');
-        $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
+        $body = $user->name .':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
 
         DB::beginTransaction();
         try {
@@ -495,6 +495,8 @@ class UserCommon
             $arr['using']     = 1;
             $arr['is_read']   = 1;
             $arr['days']      = $expir;
+            $arr['expire']   = $expir ? time() + ($expir * 86400) : 0;
+
             $arr['receive_type']      = $receiveType;
 
 

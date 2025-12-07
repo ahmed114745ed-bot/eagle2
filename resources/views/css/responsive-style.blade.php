@@ -7,29 +7,16 @@
         .payment-card {
             height: 795px;
         }
-
-        .wrapper {
-            min-width: max-content;
-        }
     }
 
     @media (max-width: 1200px) {
         .content {
             width: 1160px !important;
         }
-
-        .wrapper {
-            min-width: max-content;
-        }
     }
 
     @media (max-width: 992px) {
-        .wrapper {
-            min-width: max-content;
-        }
-
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative !important;
             left: 0 !important;
         }
 
@@ -46,10 +33,6 @@
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
             float: none; !important;
-        }
-
-        .wrapper {
-            min-width: max-content;
         }
 
         .nprogress-custom-parent {
@@ -81,7 +64,6 @@
         }
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative !important;
             left: 0 !important;
         }
 
@@ -101,17 +83,32 @@
             width: calc(100% - 444px);
         }
 
-        .rtl .select-country {
+        /*select header menu*/
+        .rtl .select-country-rtl {
             transition: margin-right 0.3s ease-in-out, width 0.3s ease-in-out;
         }
-
-        .rtl .select-country.select-country-rtl {
-            margin-right: 177px !important;
+        .rtl .select-country-rtl {
+            margin-right: 230px !important;
+            top: -20px;
+            position: relative;
+        }
+        .ltr .select-country-rtl {
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+        .ltr .select-country-rtl {
+            margin-left: 230px !important;
+            top: -20px;
+            position: relative;
         }
 
-        .sidebar-open .content-wrapper {
-            margin-right: 250px;
+        .sidebar-open .content-header {
+            padding: 30px 20px !important;
+            margin: 35px 15px !important;
         }
+
+        /*.sidebar-open .content-wrapper {*/
+        /*    margin-right: 250px;*/
+        /*}*/
 
         .col-md-3,
         .col-sm-6 {
@@ -152,12 +149,7 @@
             order: 2;
         }
 
-        .wrapper {
-            min-width: max-content;
-        }
-
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            position: relative !important;
             left: 0 !important;
         }
     }
