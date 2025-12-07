@@ -145,7 +145,7 @@ class WalletService
 
     public function getProfitsByType($params)
     {
-        $userId = $params['user_id'];
+        $userId = Auth::user()->id;
         $type = $params['type'];
         return $this->walletRepo->getProfitsByType($userId,$type);
     }
