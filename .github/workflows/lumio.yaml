@@ -4,7 +4,7 @@ on:
     branches: ["lumio"]
 jobs:
   run_lumio_hub:
-    runs-on: ubuntu-latest  #[self-hosted]
+    runs-on: [self-hosted]  #ubuntu-latest  #
     steps:
     - name: print out lumio
       uses: appleboy/ssh-action@v1.2.1
@@ -27,7 +27,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_lumio_app:
-    runs-on: ubuntu-latest  #[self-hosted]
+    runs-on: [self-hosted]  #ubuntu-latest  #
     needs: run_lumio_hub
     steps:
     - name: print out lumio
@@ -67,7 +67,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_lumio_job:
-    runs-on: ubuntu-latest  #[self-hosted]
+    runs-on: [self-hosted]  #ubuntu-latest  #
     needs: run_lumio_hub
     steps:
     - name: print out lumio Job
