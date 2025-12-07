@@ -129,10 +129,11 @@ class CountryController extends MainController
         $form = new Form(new Country);
         $this->disableFormTools($form);
 
-        $form->display(__ ('ID'));
-        $form->text('name', trans('name'))->rules ('required');;
-        $form->text('e_name', trans('english name'))->rules ('required');;
-        $form->image ('flag',trans ('flag'))->rules ('required');
+        $form->display(__('ID'));
+        $form->text('name', trans('name'))->rules('required');;
+        $form->text('e_name', trans('english name'))->rules('required');;
+        $form->image('flag', trans('flag'))->rules('required');
+        $form->switch('status', trans('	status'))->states (Common::getSwitchStates());
 
 
 
