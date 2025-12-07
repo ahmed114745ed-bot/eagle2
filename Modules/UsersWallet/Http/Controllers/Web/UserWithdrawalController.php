@@ -349,14 +349,15 @@ protected function detail($id)
      
         $withdrawal->status = 'approved';
         $withdrawal->save();
+        $after_amount = wallet_available_by_wallet($wallet);
            WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
             'amount' => -$withdrawal->amount,
             'operation' => 'subtract',
             'type' => 'user',
-            'before_amount' => $available ,
-            'after_amount' => $wallet->balance,
+            'before_amount' => $available,
+            'after_amount' => $after_amount,
         ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 
