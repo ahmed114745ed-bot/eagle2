@@ -352,7 +352,7 @@ protected function detail($id)
            WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
-            'amount' => $withdrawal->amount,
+            'amount' => -$withdrawal->amount,
             'operation' => 'subtract',
             'type' => 'user',
             'before_amount' => $available ,
