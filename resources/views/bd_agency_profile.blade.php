@@ -909,7 +909,7 @@
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
-                $url =  url("bd/users/profile/{$agency?->owner?->id}");
+                $url =  url($prefix ."/users/profile/{$agency?->owner?->id}");
                 @endphp
             <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
@@ -934,6 +934,32 @@
             </div>
 
 
+        </div>
+
+        <div class="agency-header">
+
+           <h4> BD : </h4>
+            <div class="agency-avatar" style="border-radius: 50%;">
+                @php
+                $url =  url($prefix ."/user-Bds/{$agency?->bd?->id}");
+                @endphp
+            <a href="{{ $url }}">
+                <img src="{{ getImagePath($agency?->bd?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
+             </a>
+            </div>
+            <div class="agency-info">
+            <a href="{{ $url }}">
+                <h1 class="agency-name">{{ $agency?->bd?->name ?? $agency?->bd?->username}}</h1>
+                <div class="agency-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">{{__('id')}}:</span>
+
+                        <span class="meta-value">{{ @$agency?->bd?->id ?? 'N/A' }}</span>
+
+                    </div>
+                </div>
+                </a>
+            </div>
         </div>
 
         <!-- Notice Section -->
@@ -1144,7 +1170,7 @@
                                     $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
                                         ->where('id', $member->agency_id)
                                         ->exists();
-                                    $showUrl = $member ? url("admin/users/{$member->id}") : "#";
+                                    $showUrl = $member ? url($prefix."/users/{$member->id}") : "#";
                                     $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment',$member->agency_id) ?? [];
                                     $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel',$member->agency_id) ?? [];
 
@@ -1498,7 +1524,7 @@
 
                         <div class="card-target-filter-phone ">
                             <!-- Filter Form -->
-                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url($prefix.'/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1572,7 +1598,7 @@
 
 
                         <div class="card-target-filter">
-                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url($prefix.'/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
