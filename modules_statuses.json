@@ -34,5 +34,6 @@
     "Form": true,
     "SuperAdmin": true,
     "TaskStream": true,
-    "HostLevel": true
+    "HostLevel": true,
+    "RankingReward": true
 }
