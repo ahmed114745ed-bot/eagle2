@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Models\Agency;
 use App\Models\BdSalary;
-use App\Models\BDSallary;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;

@@ -32,7 +32,6 @@ use Encore\Admin\Controllers\AdminController;
 use Modules\Wallet\Services\CheckSystemConfigs;
 use Modules\Wallet\Services\CheckUserExistence;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Wallet\Services\CheckAvailableBalance;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class WalletController extends MainController

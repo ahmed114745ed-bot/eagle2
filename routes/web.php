@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Models\Country;
-use App\Models\BDSallary;
 use  App\helper\TimeHelper;
 use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
