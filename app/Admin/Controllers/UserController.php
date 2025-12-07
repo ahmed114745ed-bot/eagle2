@@ -639,6 +639,8 @@ class UserController extends MainController
             ->paginate(10, ['*'], 'badges_page');
         
         $curantBalance = wallet_available_by_user($id);
+        $availableBalance = wallet_available_by_user($id);
+       
         $walletLogs = WalletLog::where('user_id', $user->id) ->orderBy('id', 'DESC') ->paginate(20);
        
        
