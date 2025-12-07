@@ -145,6 +145,10 @@ class ChatMessagesController extends Controller
         } catch (\Throwable $e) {
         }
 
+        if (!$user2->current_room_chat != $chatRoom->id){
+            $this->messageService->sendNotification($user2, $message);
+        }
+
         return [
             'message' =>    $response['message_resource'],
             'card' =>  new ChatRoomResource($chatRoom)
