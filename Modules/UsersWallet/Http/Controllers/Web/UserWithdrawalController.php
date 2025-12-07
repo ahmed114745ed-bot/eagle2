@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\UsersWallet\Entities\UserWithdrawal;
 use Modules\UsersWallet\Entities\WalletField;
+use Modules\UsersWallet\Entities\WalletLog;
 
 class UserWithdrawalController extends MainController
 {
@@ -345,8 +346,18 @@ protected function detail($id)
         $wallet->pending_amount -= $withdrawal->amount;
         $wallet->save();
 
+     
         $withdrawal->status = 'approved';
         $withdrawal->save();
+           WalletLog::create([
+            'wallet_id' => $wallet->id,
+            'user_id' => $withdrawal->user->id,
+            'amount' => $withdrawal->amount,
+            'operation' => 'subtract',
+            'type' => 'user',
+            'before_amount' => $available ,
+            'after_amount' => $wallet->balance,
+        ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 
         return response()->json([ 'success'=> true ,'message' => 'تمت الموافقة على السحب بنجاح']);
