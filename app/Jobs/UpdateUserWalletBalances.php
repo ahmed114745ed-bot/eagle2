@@ -18,7 +18,7 @@ class UpdateUserWalletBalances implements ShouldQueue
     protected array $oldData;
     protected ?int $agencyId;
     protected string $type;
-    protected ?int $target_id;
+    protected   $target_id;
 
 
     /**

@@ -31,9 +31,9 @@ class WalletRepository implements WalletRepositoryInterface
 
         public function getProfitsByType($userId ,$type)
     {
-        return WalletLog::selectRaw('type, SUM(amount) as total')
-            ->where('type', $userId)
-            ->where('user_id', $type)
+        return WalletLog::with('target')->selectRaw('type, SUM(amount) as total')
+            ->where('type', $type)
+            ->where('user_id', $userId)
             ->orderBy('total', 'DESC')
             ->get();
     }
