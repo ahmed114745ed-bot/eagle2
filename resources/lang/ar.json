@@ -19,8 +19,10 @@
   "area":"منطقه",
     "Operation log": "سجل العمليات",
    "regular users":"المستخدمين العاديين",
-   "This feature is currently unavailable. Please contact the application administration.":"هذه الميزة غير متاحة حالياً. يُرجى الرجوع إلى إدارة التطبيق."
    "hosts":"المضيفين",
+  "This feature is currently unavailable.": "هذه الميزة غير متاحة حالياً.",
+"Please contact the application administration.": "يرجى التواصل مع إدارة التطبيق.",
+"Back to Dashboard": "العودة إلى لوحة التحكم",
    "Experience settings": "إعدادات الخبرة",
 "coin exchange": "تبادل العملات",
 "Enable host level":"تفعيل خصيه مستوى المضيف",
