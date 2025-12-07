@@ -9,7 +9,7 @@
         }
 
         .wrapper {
-            position: absolute !important;
+            overflow: auto !important;
         }
     }
 
@@ -30,7 +30,7 @@
         }
 
         .wrapper {
-            position: absolute !important;
+            overflow: auto !important;
         }
     }
 
@@ -44,7 +44,7 @@
         }
 
         .wrapper {
-            position: absolute !important;
+            overflow: auto !important;
         }
     }
 
@@ -54,7 +54,7 @@
         }
 
         .wrapper {
-            position: absolute !important;
+            overflow: auto !important;
         }
 
         .rtl .box-body .fields-group [class*="col-md-12"] {
@@ -159,7 +159,7 @@
         }
 
         .wrapper {
-            position: absolute !important;
+            overflow: auto !important;
         }
 
         .pagination-info,
