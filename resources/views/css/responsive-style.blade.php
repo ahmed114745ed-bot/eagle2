@@ -1,7 +1,7 @@
 <style>
     @media (max-width: 1400px) {
         .content {
-            width: 1340px !important;
+            width: auto !important;
         }
 
         .payment-card {
@@ -15,7 +15,7 @@
 
     @media (max-width: 1200px) {
         .content {
-            width: 1160px !important;
+            width: auto !important;
         }
 
         /*.wrapper {*/
