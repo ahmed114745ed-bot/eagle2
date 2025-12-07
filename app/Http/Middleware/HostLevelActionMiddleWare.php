@@ -26,7 +26,11 @@ class HostLevelActionMiddleWare
 
 
         $utdHostLevel = $getSetting('host_level_action') ?? 0;
-        if (!$utdHostLevel) abort(403, __('Not Found'));
+        // dd($utdHostLevel);
+        if (!$utdHostLevel) {
+
+            return response()->view('feature_blocked', [], 403);
+        }
 
         return $next($request);
     }
