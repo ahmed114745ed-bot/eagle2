@@ -73,6 +73,7 @@ class ChatMessagesController extends Controller
             return $setting?->value ?? 0;
         });
 
+
         if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
