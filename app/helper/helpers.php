@@ -1088,8 +1088,8 @@ if (!function_exists('wallet_available_by_wallet')) {
         $currentBalance   = $wallet->balance ?? 0;
         $currentCutAmount = $wallet->cut_amount ?? 0;
         $currentPending   = $wallet->pending_amount ?? 0;
-
-        return $currentBalance - $currentCutAmount + $currentPending;
+        $cuts =$currentCutAmount + $currentPending; 
+        return $currentBalance -  $cuts ;
     }
 }
 
