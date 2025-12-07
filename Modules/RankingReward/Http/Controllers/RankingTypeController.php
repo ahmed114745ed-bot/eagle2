@@ -45,23 +45,11 @@ class RankingTypeController extends MainController
 
     protected function grid()
     {
-        $grid = new Grid(new RoomBoomLevel());
+        $grid = new Grid(new RankingType());
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('level', __('level'));
-        $grid->column('min_target', __('min target'));
-        $grid->column('target', __('target'));
-        if (!request()->filled('_export_')) {
-            $grid->column('video', __('video'))->display(function ($path) {
-                $defaultImage = asset("images/image.png");
 
-                $url = getImagePath($path) ?? $defaultImage;
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
-            });
-        }
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
@@ -83,7 +71,7 @@ class RankingTypeController extends MainController
 
     protected function detail($id)
     {
-        $show = new Show(RoomBoomLevel::findOrFail($id));
+        $show = new Show(RankingType::findOrFail($id));
 
         $show->field('id', __('ID'));
         $show->field('level', __('level'));
@@ -101,30 +89,30 @@ class RankingTypeController extends MainController
 
     protected function form()
     {
-        $form = new Form(new RankingType());
+        return new Form(new RankingType(), function (Form $form) {
 
-        $form->number('level', __('level'))->rules('required|integer|min:1')
-            ->help(__('Represents the stage or rank of the Room Boom.'));
-        $form->number('min_target', __('min target'))->required()
-            ->help(__('The minimum required gifts to activate the Boom Room at this level.'));
-        $form->number('target', __('target'))->required()
-            ->help(__('The full target that must be achieved to complete the Room Boom at this level.'));
-        $form->file('video', trans('video'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png')
-            ->help(__('The special video for this level, displayed after completion. Each level has its own unique video.'));
+            $form->tab('Types', function (Form $form) {
+                $form->select('type', 'Type')
+                    ->options([
+                        'wealth' => 'Wealth',
+                        'charm'  => 'Charm',
+                        'game'   => 'Game',
+                        'room'   => 'Room',
+                        'agency' => 'Agency',
+                    ])
+                    ->rules('required|in:wealth,charm,game,room,agency');
+            });
 
-        $form->saving(function (Form $form) {
-            if (!$form->model()->exists) {
-                $count = RoomBoomLevel::count();
-                if ($count >= 5) {
-                    $error = __('You can only have a maximum of 5 Room Boom Levels.');
-                    admin_error($error);
-                    return back();
-                }
-            }
+            $form->tab('Schedule', function (Form $form) {
+                $form->select('schedule', 'Schedule')
+                    ->options([
+                        'daily'   => 'Daily',
+                        'weekly'  => 'Weekly',
+                        'monthly' => 'Monthly',
+                    ])
+                    ->rules('required|in:daily,weekly,monthly');
+            });
+
         });
-
-        return $form;
     }
 }

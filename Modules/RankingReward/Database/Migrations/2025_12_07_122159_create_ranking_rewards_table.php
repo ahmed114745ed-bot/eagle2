@@ -18,7 +18,7 @@ class CreateRankingRewardsTable extends Migration
             $table->foreignId('ranking_range_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('target_type');
             $table->string('target');
-            $table->integer('expire_days');
+            $table->integer('expire_days')->nullable();
             $table->timestamps();
         });
     }
