@@ -26,9 +26,9 @@ class HostLevelMiddleware
 
         $hostLevel = $getSetting('host_level_enabled') ?? 1;
         $utdHostLevel = (int)$getSetting('host_level_action') ?? 0;
-     //   dd($hostLevel,$utdHostLevel);
+      
        
-       if (!$hostLevel && !$utdHostLevel) return response()->json(['error' => 'something wrong'], 500);
+       if (!$hostLevel || !$utdHostLevel) return response()->json(['error' => 'something wrong'], 500);
 
         return $next($request);
     }
