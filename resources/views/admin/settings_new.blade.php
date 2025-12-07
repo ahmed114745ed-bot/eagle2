@@ -453,7 +453,7 @@ use Modules\Vip\Entities\Vip;
     }
 
     .border-success {
-        border: #4caf50, solid, 5px;
+        border: 5px solid #4caf50;
     }
 
     .position-relative {
@@ -490,11 +490,9 @@ use Modules\Vip\Entities\Vip;
     }
 
     .rtl .ribbon-banner {
-        right: auto;
-        left: -11px;
-        !important;
-        padding: 2px 13px;
-        !important;
+        right: auto !important;
+        left: -11px !important;
+        padding: 2px 13px !important;
     }
 
     .ribbon-banner span {
@@ -3414,14 +3412,7 @@ use Modules\Vip\Entities\Vip;
                     document.querySelectorAll(".settings-menu button").forEach(btn => {
                         btn.addEventListener("click", function () {
                             const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-
-                            // Update URL query param
-                            const url = new URL(window.location);
-                            url.searchParams.set("firsttab", sectionId);
-                            window.history.pushState({}, "", url);
-
-                            // Reload page
-                            window.location.reload();
+                            showSection(sectionId);
                         });
                     });
 
@@ -3429,13 +3420,7 @@ use Modules\Vip\Entities\Vip;
                     document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
                         btn.addEventListener("click", function () {
                             const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-
-                            const url = new URL(window.location);
-                            url.searchParams.set("type", type);
-                            window.history.pushState({}, "", url);
-
-                            // Reload page
-                            window.location.reload();
+                            changeInnerTab(type);
                         });
                     });
                 });

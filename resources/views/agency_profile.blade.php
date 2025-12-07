@@ -996,7 +996,7 @@
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
-                $url =  url("admin/users/{$agency?->owner?->id}");
+                $url =  url($prefix."/users/{$agency?->owner?->id}");
                 @endphp
             <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
@@ -1021,6 +1021,32 @@
             </div>
 
 
+        </div>
+
+        <div class="agency-header">
+
+           <h4> BD : </h4>
+            <div class="agency-avatar" style="border-radius: 50%;">
+                @php
+                $url =  url($prefix."/user-Bds/{$agency?->bd?->id}");
+                @endphp
+            <a href="{{ $url }}">
+                <img src="{{ getImagePath($agency?->bd?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
+             </a>
+            </div>
+            <div class="agency-info">
+            <a href="{{ $url }}">
+                <h1 class="agency-name">{{ $agency?->bd?->name ?? $agency?->bd?->username}}</h1>
+                <div class="agency-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">{{__('id')}}:</span>
+
+                        <span class="meta-value">{{ @$agency?->bd?->id ?? 'N/A' }}</span>
+
+                    </div>
+                </div>
+                </a>
+            </div>
         </div>
 
         <!-- Notice Section -->

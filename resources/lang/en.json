@@ -16,6 +16,7 @@
     "Email": "Email",
     "action": "Action",
     "Pay switch dashboard":"charge games",
+    "Status switch country": "Status Switch",
     "TargetDiamond":"This represents the goal amount of diamonds the room needs to achieve (e.g., 1,000,000).Once this target is reached, it may trigger certain rewards or unlock new features.",
 "ConditionGroeth":"Define the minimum number of visitors required for the room to gain more visibility or unlock new benefits.You can customize this condition based on room performance.",
 "NumberSeats":"Indicates how many admins are currently assigned to this room.When the room achieves its diamond target, more admin seats can be unlocked.(Hint: If a room starts with 4 admins and hits the target, it can increase to 5 admins.",
