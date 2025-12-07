@@ -150,11 +150,6 @@
         background-attachment: fixed !important;
     }
 
-    body.desktop-mode .wrapper {
-        position: absolute !important;
-        overflow: auto !important;
-    }
-
     form {
         background-color: var(--secondary-color) !important;
         filter: brightness(0.85);
