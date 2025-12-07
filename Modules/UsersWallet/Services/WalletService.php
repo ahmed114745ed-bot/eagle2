@@ -43,25 +43,28 @@ class WalletService
                 $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
                         ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
                 $this->walletRepo->updateWallet($fromWallet->id, ['cut_amount' => $fromWallet->cut_amount + $amount]);
+                $fromWalletCuts = $fromWallet->cut_amount + $fromWallet->pending_amount  ;
+               
                 $this->walletRepo->createLog([
                     'wallet_id' => $fromWallet->id,
                     'user_id' => $fromUserId,
                     'amount' => -$amount,
                     'operation' => 'transfer',
                     'type' => 'transfer',
-                    'before_amount' => $fromWallet->balance,
-                    'after_amount' => $fromWallet->balance - $amount
+                    'before_amount' => $fromWallet->balance - $fromWalletCuts,
+                    'after_amount' => wallet_available_by_user($fromUserId)
                 ]);
 
                 $this->walletRepo->updateWallet($toWallet->id, ['balance' => $toWallet->balance + $amount]);
+                $toWalletCuts = $toWallet->cut_amount + $toWallet->pending_amount  ;
                 $this->walletRepo->createLog([
                     'wallet_id' => $toWallet->id,
                     'user_id' => $toUserId,
                     'amount' => $amount,
                     'operation' => 'transfer',
                     'type' => 'transfer',
-                    'before_amount' => $toWallet->balance,
-                    'after_amount' => $toWallet->balance + $amount
+                    'before_amount' => $toWallet->balance - $toWalletCuts,
+                    'after_amount' =>  wallet_available_by_user($toUserId)
                 ]);
 
                 DB::commit();
