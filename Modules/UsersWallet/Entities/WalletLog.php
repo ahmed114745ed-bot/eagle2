@@ -18,6 +18,6 @@ class WalletLog extends Model
 
     public function wallet()
     {
-        return $this->belongsTo(Wallet::class);
+        return $this->belongsTo(UserWallet::class);
     }
 }
