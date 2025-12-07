@@ -4,8 +4,8 @@ namespace Modules\UsersWallet\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Wallet\Entities\WalletField;
-use Modules\Wallet\Entities\WalletTemplate;
+use Modules\UsersWallet\Entities\WalletField;
+use Modules\UsersWallet\Entities\WalletTemplate;
 
 class OtherWalletTemplateSeeder extends Seeder
 {
