@@ -11,7 +11,7 @@ class ProfitTypeResource extends JsonResource
      public function toArray($request)
     {
         $target = $this->target;
-        $targetName = $target?->name ?? '---';
+        $targetName = $target?->diamonds ?? '---';
         $broadcastTime = $this->hours ?? $this->days ?? 0;
         $totalDiamonds = $this->diamond ?? 0;
 
@@ -27,10 +27,7 @@ class ProfitTypeResource extends JsonResource
 
         switch ($this->type) {
             case 'user':
-                $app = $target?->app_profit_percentage ?? 0;
-                $db  = $target?->db_percentage ?? 0;
-                $agency = $target?->agency_share ?? 0;
-                $profitPercent = 100 - $app - $db - $agency;
+                $profitPercent = $target?->usd;
                 break;
             case 'bd':
                 $profitPercent = $target?->db_percentage ?? 0;
