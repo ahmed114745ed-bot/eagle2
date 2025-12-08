@@ -157,20 +157,30 @@ class RankingRewardController extends MainController
                 $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
 
                 $html .= '
-                    <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
-                        <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
-                            <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
-                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
-                                <i class="fa fa-times"></i>
-                            </button>
-                            <div >
-                                ' . $showImage . '
-                            </div>
-                            <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
-                            <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
-                            ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
-                        </div>
-                    </div>';
+<div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
+    <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
+        <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
+            style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
+            <i class="fa fa-times"></i>
+        </button>
+
+        <!-- Image wrapper centered -->
+        <div style="
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        ">
+            ' . $showImage . '
+        </div>
+
+        <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
+        <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
+        ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
+    </div>
+</div>';
             }
 
             $html .= '
