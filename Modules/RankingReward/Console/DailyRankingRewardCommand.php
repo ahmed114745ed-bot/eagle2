@@ -205,7 +205,7 @@ class DailyRankingRewardCommand extends Command
             // VIP
             elseif ($reward->target_type == "vip") {
                 $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking');
+                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, receiveType:'gift-ranking');
             }
 
             // Ware
