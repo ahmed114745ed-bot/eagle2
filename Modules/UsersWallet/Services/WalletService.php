@@ -18,6 +18,8 @@ use App\Http\Resources\MomentGiftResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
 use App\Http\Resources\AudioGiftsListResource;
+use Illuminate\Support\Facades\Log;
+
 class WalletService
 {
     protected $walletRepo;
@@ -112,6 +114,7 @@ class WalletService
                 break;
 
             case 2:
+                Log::info('Listing gift receive audio', ['userId' => $userId, 'startDate' => $startDate, 'endDate' => $endDate, 'perPage' => $perPage, 'page' => $page]);
                 $list = $this->GiftLogRepository->listGiftReceiveAudio($userId, $startDate, $endDate, $perPage, $page);
                 break;
 
