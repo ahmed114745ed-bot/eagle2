@@ -124,12 +124,12 @@ class RankingRewardController extends MainController
         $existingRewards = RankingReward::where('ranking_range_id', $rankingRangeId)->get();
         if ($existingRewards->count() > 0) {
             $html = '
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-gift"></i> ' . __('Added Rewards') . '</h3>
-        </div>
-        <div class="box-body">
-            <div class="row" id="added-rewards-list">';
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-gift"></i> ' . __('Added Rewards') . '</h3>
+                    </div>
+                    <div class="box-body">
+                    <div class="row" id="added-rewards-list">';
 
             foreach ($existingRewards as $reward) {
                 $name = $reward->target;
@@ -157,18 +157,20 @@ class RankingRewardController extends MainController
                 $showImage =  handleShowImageWithTypes($reward->id, $url, 50, 50);
 
                 $html .= '
-            <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
-                <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
-                    <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
-                        style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
-                        <i class="fa fa-times"></i>
-                    </button>
-                    <img src="' . $showImage . '" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;">
-                    <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
-                    <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
-                    ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
-                </div>
-            </div>';
+                    <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
+                        <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
+                            <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
+                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+                                ' . $showImage . '
+                            </div>
+                            <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
+                            <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
+                            ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
+                        </div>
+                    </div>';
             }
 
             $html .= '
@@ -222,42 +224,42 @@ class RankingRewardController extends MainController
         });
 
         $form->html('
-        <div class="form-group">
-            <button type="submit" name="action" value="add_more" class="btn btn-success">
-                <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
-            </button>
-            <button type="submit" name="action" value="done" class="btn btn-primary">
-                <i class="fa fa-check"></i> ' . __('Done') . '
-            </button>
-        </div>
-    ');
+            <div class="form-group">
+                <button type="submit" name="action" value="add_more" class="btn btn-success">
+                    <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
+                </button>
+                <button type="submit" name="action" value="done" class="btn btn-primary">
+                    <i class="fa fa-check"></i> ' . __('Done') . '
+                </button>
+            </div>
+        ');
 
         $form->html('
-    <script>
-    $(document).on("click", ".delete-reward", function() {
-        var id = $(this).data("id");
-        var item = $("#reward-item-" + id);
-        var rankingRangeId = "' . $rankingRangeId . '";
+            <script>
+            $(document).on("click", ".delete-reward", function() {
+                var id = $(this).data("id");
+                var item = $("#reward-item-" + id);
+                var rankingRangeId = "' . $rankingRangeId . '";
 
-        item.css("opacity", "0.5");
+                item.css("opacity", "0.5");
 
-        $.ajax({
-            url: "' . admin_url('ranking-rewards') . '/" + rankingRangeId + "/" + id,
-            type: "POST",
-            data: {
-                _token: LA.token,
-                _method: "DELETE"
-            },
-            success: function(response) {
-                item.fadeOut(300, function() {
-                    $(this).remove();
+                $.ajax({
+                    url: "' . admin_url('ranking-rewards') . '/" + rankingRangeId + "/" + id,
+                    type: "POST",
+                    data: {
+                        _token: LA.token,
+                        _method: "DELETE"
+                    },
+                    success: function(response) {
+                        item.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        toastr.success("Deleted!");
+                    }
                 });
-                toastr.success("Deleted!");
-            }
-        });
-    });
-    </script>
-');
+            });
+            </script>
+        ');
         return $form;
     }
 
@@ -310,18 +312,18 @@ class RankingRewardController extends MainController
             }
 
             $html = '
-        <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
-            <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
-                <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
-                    style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
-                    <i class="fa fa-times"></i>
-                </button>
-                <img src="' . $img . '" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;">
-                <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
-                <span class="label label-info" style="font-size: 10px;">' . $targetType . '</span>
-                ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
-            </div>
-        </div>';
+                <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
+                    <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
+                        <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
+                            style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        <img src="' . $img . '" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;">
+                        <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
+                        <span class="label label-info" style="font-size: 10px;">' . $targetType . '</span>
+                        ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
+                    </div>
+                </div>';
 
             return response()->json([
                 'status' => true,
