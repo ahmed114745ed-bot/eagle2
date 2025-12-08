@@ -41,6 +41,26 @@ class GiftRepository extends AbstractRepository
             ->get();
     }
 
+    public function getByCategory(?int $categoryId = null, ?int $type = null, int $perPage = 10)
+    {
+        $user = Auth::user();
+
+        $query = ($type === -1 && $user)
+            ? $user->myGifts()->withPivot('quantity')
+            : $this->model->newQuery()->where('enable', 1);
+
+        if ($categoryId && $type !== -1) {
+            $query->where('gift_category_id', $categoryId);
+        }
+
+        return $query->orderBy('use_count', 'desc')
+                    ->orderByRaw('ISNULL(`sort`), `sort`')
+                    ->orderBy('price')
+                    ->paginate($perPage);
+    }
+
+    
+
     public function get_images()
     {
 

@@ -380,6 +380,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
+                Route::get('/v2', [GiftController::class, 'getByCategory']);
                 Route::get('/images', [GiftController::class, 'get_images']);
                 // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
 
