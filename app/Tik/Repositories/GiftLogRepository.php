@@ -2,6 +2,7 @@
 
 namespace App\Tik\Repositories;
 
+use App\Helpers\LogHelper;
 use Carbon\Carbon;
 use App\Models\GiftLog;
 use Illuminate\Support\Facades\DB;
@@ -172,7 +173,23 @@ class GiftLogRepository extends AbstractRepository
     {
         $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
         $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
-
+        LogHelper::info('listGiftReceiveAudio', [
+            'userId' => $userId,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'perPage' => $perPage,
+            'page' => $page,
+            'query_data' => $this->model->query()->where('receiver_id', $userId)
+                ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
+                    $q->whereBetween('created_at', [$start, $end]);
+                })
+                ->whereHas('room', function ($q) {
+                    $q->where('type', 'audio');
+                })
+                ->selectRaw('sender_id, room_id,giftId,SUM(giftNum * giftPrice) AS total')
+                ->groupBy('sender_id', 'room_id', 'giftId')
+                ->with(['room', 'sender', 'gift'])->get(),
+        ]);
         return $this->model->query()
             ->where('receiver_id', $userId)
             ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
