@@ -95,7 +95,6 @@ class VersionController extends Controller
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",
-            'moment_status'    => (bool) (@$settings['moment_status'] ?? true),
             'reel_status'    => (bool) ($settings['reel_status'] ?? true),
             'youtube_status' => (bool) ($settings['youtube_status'] ?? true),
             'live_status'    => (bool) ($settings['live_status'] ?? true),
