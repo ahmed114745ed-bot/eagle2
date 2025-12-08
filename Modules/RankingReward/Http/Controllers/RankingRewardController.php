@@ -155,7 +155,6 @@ class RankingRewardController extends MainController
                     $url = getImagePath($reward->target);
                 }
                 $showImage = handleShowImageWithTypes($reward->id, $url, 60, 60, 4, 'cover');
-                $directionFix = app()->getLocale() == 'ar' ? 'margin-right: -300%;' : '';
 
                 $html .= '
                     <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
@@ -164,7 +163,7 @@ class RankingRewardController extends MainController
                                 style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
                                 <i class="fa fa-times"></i>
                             </button>
-                            <div style="width: 60px; height: 60px; margin: 0 auto 8px auto; ' . $directionFix . '">
+                            <div >
                                 ' . $showImage . '
                             </div>
                             <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
