@@ -86,8 +86,8 @@ class UserSallaryObserver
             $newData,
             $oldData,
             $userSalary->user_agency_id,
+            'sallary_update',
             $userSalary->target_id,
-            'sallary_update'
         )->onQueue('wallet');
         
 
