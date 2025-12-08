@@ -15,6 +15,9 @@ class ProfitTypeResource extends JsonResource
         $broadcastTime = $this->hours ?? $this->days ?? 0;
         $totalDiamonds = $this->diamond ?? 0;
 
+          \Log::info('Target object:', ['target' => $target]);
+    \Log::info('Type:', ['type' => $this->type]);
+    \Log::info('Diamond:', ['diamond' => $this->diamond]);
         $roleKey = match($this->type) {
             'bd' => 'role_bd',
             'agency_manager' => 'role_agency_manager',
@@ -37,9 +40,6 @@ class ProfitTypeResource extends JsonResource
                 break;
             case 'agency_manager':
                 $profitPercent = $target?->agency_share ?? 0;
-                break;
-            case 'app':
-                $profitPercent = $target?->app_profit_percentage ?? 0;
                 break;
             default:
                 $profitPercent = 0;
