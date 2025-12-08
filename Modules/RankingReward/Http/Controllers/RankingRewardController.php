@@ -154,16 +154,17 @@ class RankingRewardController extends MainController
                     $name = 'Achievement';
                     $url = getImagePath($reward->target);
                 }
-                $showImage =  handleShowImageWithTypes($reward->id, $url, 50, 50);
+                $showImage = handleShowImageWithTypes($reward->id, $url, 60, 60, 4, 'cover');
+                $directionFix = app()->getLocale() == 'ar' ? 'margin-right: -300%;' : '';
 
                 $html .= '
                     <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
                         <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
                             <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
-                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
+                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
                                 <i class="fa fa-times"></i>
                             </button>
-                            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+                            <div style="width: 60px; height: 60px; margin: 0 auto 8px auto; ' . $directionFix . '">
                                 ' . $showImage . '
                             </div>
                             <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
