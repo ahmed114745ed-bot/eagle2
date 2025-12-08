@@ -1506,7 +1506,13 @@
 "Browse live rooms": "Browse live broadcasts",
 "Show live rooms": "Show live broadcasts",
 "User Withdrawals": "User Withdrawals",
-"User Withdrawal": "User Withdrawal"
+"User Withdrawal": "User Withdrawal",
+"role_user": "User",
+"role_bd": "BD",
+"role_agency_manager": "Agency Manager",
+"role_app": "App",
+"diamonds_message": "Diamonds: :diamonds, Role: :role, Profit %: :profit, Broadcast Time: :time"
+
 
 
 
