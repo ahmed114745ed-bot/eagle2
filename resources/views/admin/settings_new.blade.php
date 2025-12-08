@@ -453,7 +453,7 @@ use Modules\Vip\Entities\Vip;
     }
 
     .border-success {
-        border: #4caf50, solid, 5px;
+        border: 5px solid #4caf50;
     }
 
     .position-relative {
@@ -490,11 +490,9 @@ use Modules\Vip\Entities\Vip;
     }
 
     .rtl .ribbon-banner {
-        right: auto;
-        left: -11px;
-        !important;
-        padding: 2px 13px;
-        !important;
+        right: auto !important;
+        left: -11px !important;
+        padding: 2px 13px !important;
     }
 
     .ribbon-banner span {
@@ -569,6 +567,22 @@ use Modules\Vip\Entities\Vip;
     }
 }
 
+    @media (max-width: 576px) {
+    }
+    @media (max-width: 768px) {
+    }
+    @media (max-width: 992px) {
+    }
+    @media (max-width: 1200px) {
+    }
+    @media (max-width: 1400px) {
+        .form-control {
+            width: 170px !important;
+        }
+        .rtl .copy-button {
+            right: 75px;
+        }
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
@@ -2476,7 +2490,7 @@ use Modules\Vip\Entities\Vip;
                                                 <div class="col-md-12">
                                                     <label for="coin_exp">{{ __('diamond') }}</label>
                                                     <input type="text" id="coin_exp" name="exchange_coin_percentage"
-                                                        value="{{ $settings['exchange_coin_percentage'] ?? '' }}"
+                                                        value="{{ $settings['exchange_coin_percentage'] ?? 1 }}"
                                                         placeholder="{{ __('Enter Exp') }}" class="form-control">
                                                     <span class="form-text text-muted">1 diamond = X coin</span>
                                                 </div>
@@ -2484,7 +2498,7 @@ use Modules\Vip\Entities\Vip;
                                                 <div class="col-md-12 coin-calculator mt-3">
                                                     <label>{{ __('diamond') }}</label>
                                                     <input type="text" class="user_coin_input form-control" placeholder="Enter value">
-                                                    <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 0 }}">
+                                                    <input type="hidden" class="exchange_rate" value="{{ $settings['exchange_coin_percentage'] ?? 1 }}">
                                                     <span class="exp_result fw-bold ms-2"></span>
                                                 </div>
 
@@ -2725,14 +2739,6 @@ use Modules\Vip\Entities\Vip;
                 </div>
             </div>
 
-
-
-
-
-
-
-
-
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App Settings') }}</h3>
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
@@ -2954,6 +2960,14 @@ use Modules\Vip\Entities\Vip;
                                         placeholder="اختر لون"
                                     >
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
+                                <input type="hidden" name="is_new_theme_enabled" value="0">
+                                <input type="checkbox" name="is_new_theme_enabled" value="1" data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
                             </div>
                         </div>
 
@@ -3393,14 +3407,7 @@ use Modules\Vip\Entities\Vip;
                     document.querySelectorAll(".settings-menu button").forEach(btn => {
                         btn.addEventListener("click", function () {
                             const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-
-                            // Update URL query param
-                            const url = new URL(window.location);
-                            url.searchParams.set("firsttab", sectionId);
-                            window.history.pushState({}, "", url);
-
-                            // Reload page
-                            window.location.reload();
+                            showSection(sectionId);
                         });
                     });
 
@@ -3408,13 +3415,7 @@ use Modules\Vip\Entities\Vip;
                     document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
                         btn.addEventListener("click", function () {
                             const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-
-                            const url = new URL(window.location);
-                            url.searchParams.set("type", type);
-                            window.history.pushState({}, "", url);
-
-                            // Reload page
-                            window.location.reload();
+                            changeInnerTab(type);
                         });
                     });
                 });

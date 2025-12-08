@@ -10,6 +10,15 @@
 @endphp
 
 <div class="box-body no-padding" style="margin: 10px">
+
+    <div class="box-body no-padding" style="margin: 10px">
+        <a href="{{ $role 
+                    ? url('admin/general-rols/' . $role->id . '/edit') 
+                    : url('admin/general-rols/create?type=' . $roleType) }}" 
+        class="btn btn-primary">
+            {{ $role ? __('Edit Rule') : __('Create Rule') }}
+        </a>
+   </div>
     <ul class="nav nav-tabs" role="tablist">
         @foreach($languages as $i => $lang)
             <li class="{{ $i === 0 ? 'active' : '' }}">
@@ -29,4 +38,9 @@
             </div>
         @endforeach
     </div>
+
+     
 </div>
+
+
+

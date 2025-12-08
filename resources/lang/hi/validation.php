@@ -142,6 +142,9 @@ return [
     */
 
     'custom' => [
+        'username' => [
+            'unique' => 'यह उपयोगकर्ता नाम उपलब्ध नहीं है।',
+        ],
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],

@@ -239,11 +239,11 @@ class SettingsController extends Controller
             // }
 
         }
-        
+
         if ($request->payment_getaway_id) {
             $paymentGetaway = PaymentCoin::find($request->payment_getaway_id);
             $key = "is_{$paymentGetaway->type}_active";
-          
+
             $paymentGetaway->status = $request->$key;
             $paymentGetaway->save();
         }

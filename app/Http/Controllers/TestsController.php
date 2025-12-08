@@ -79,4 +79,29 @@ public function discrepancyView(Request $request)
     return view('tests.load-test', $data);
 }
 
+
+
+
+ public function lucky_form()
+    {
+        return view('tests.lucky-load-test');
+    }
+
+public function lucky_run(Request $request, GiftLoadTestService $service)
+    {
+        $request->validate([
+            'count' => 'required|integer|min:1',
+            'concurrency' => 'required|integer|min:1',
+            'token' => 'required|string',
+            'id' => 'required|integer',
+            'owner_id' => 'required|integer',
+            'toUid' => 'required|integer',
+            'num' => 'required|integer|min:1',
+            'url'=> 'required|string',
+        ]);
+
+        $data = $service->luckyRun($request->all());
+
+        return view('tests.lucky-load-test', $data);
+    }
 }

@@ -208,8 +208,12 @@ class TaskStreamService extends TaskStreamValidationService
         $status = $data['status'];
         $taskStream = $this->taskStreamRepository->findOrFail($data['task_stream_id']);
 
-        $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
+      if ($this->taskStreamInvitationRepository->hasRecentAcceptedInvitation($taskStream->id)) {
+            throw new CValidationException(__('This task invitation has just been accepted by another user.'), ResponseAlias::HTTP_CONFLICT);
+        }
 
+        $invitation = $this->taskStreamInvitationRepository->findPendingInvitation($taskStream->id, $authUser->id);
+      
         if (! $invitation) {
             throw new CValidationException(__('No pending invitation found for this task.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }

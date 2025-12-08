@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Helpers\LogHelper;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
@@ -411,6 +412,7 @@ Route::get('/clear-admin-error', function () {
 });
 
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
+Route::get('/admin/super-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.super.logout');
 Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
@@ -531,6 +533,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
+Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
 
 
@@ -990,18 +993,16 @@ Route::get('/fix-pack-expire', function () {
     
     \App\Models\Pack::where('is_used', 1)
         ->whereNull('expire')
-        ->where('days', '>', 0)
-        ->chunk(200, function ($packs) use (&$updatedCount) {
-            foreach ($packs as $pack) {
-                $pack->expire = Carbon::now()->addDays($pack->days)->timestamp;
-                $pack->save();
-                $updatedCount++;
-            }
-        });
-    
-    \Log::info("Updated {$updatedCount} packs");
-    
-    return "Updated {$updatedCount} packs";
+        ->get(['id', 'days']);
+
+    foreach ($packs as $pack) {
+        if ($pack->days >= 0) {
+            $pack->expire = $pack->days == 0 ? 0 : Carbon::now()->addDays($pack->days)->timestamp;
+            $pack->save();
+        }
+    }
+
+    return 'done';
 });
 Route::get('/users-without-admin', function () {
     $types = [
@@ -1055,11 +1056,61 @@ Route::get('/users-without-admin/reset', function () {
     return response()->json($result);
 });
 
+/**
+ *
+ * tests
+ *
+ */
 Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
-// Route::get('/send-gift-test', function () {
-//     return view('tests.load-test');
-// });
 
 Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
 Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
 Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');
+
+
+
+Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
+Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
+Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
+
+
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+Route::get('/run-lucky-gift-test', function () {
+    LogHelper::info("starting lucky gift test...");
+    Artisan::call('cache:clear');
+$phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
+
+    $process = new Process([
+        $phpunitPath,
+        '--filter=SendLuckyGift2FeatureTest',
+        'tests/Feature/SendLuckyGift2FeatureTest.php'
+    ]);
+
+    $process->setWorkingDirectory(base_path()); // قاعدة مهمة جداً
+    $process->setTimeout(300);
+    $process->run();
+
+    return response()->json([
+        'exit_code'    => $process->getExitCode(),
+        'output'       => $process->getOutput(),
+        'error_output' => $process->getErrorOutput(),
+    ]);
+});
+
+Route::get('/run-lucky-gift-unit-test', function () {
+    $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
+        ' --filter SendLuckyGift2FeatureTest';
+
+    $process = Process::fromShellCommandline($command, base_path());
+    $process->setTimeout(300);
+
+    $process->run();
+
+    $output = $process->getOutput() . $process->getErrorOutput();
+
+    return response('<pre>'.e($output).'</pre>');
+});
+
