@@ -107,7 +107,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-           
+
             [
                 'name' => 'SuperAdmin',
                 'sort' => 4,
@@ -1154,6 +1154,21 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'wallet-fields', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ],
+            [
+                'name' => 'ranking rewards',
+                'sort' => 42,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 42],
+                ],
+                'permissions' => [
+                    ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                 ],

@@ -4628,6 +4628,31 @@
     "Bank Account ": "حساب بنكي",
     "Minimum": "الحد الأدنى",
     "Transfer Fee": "رسوم التحويل",
+
+    "Ranking Types": "أنواع التصنيف",
+    "Ranking Range": "نطاق التصنيف",
+    "Edit Ranking Range": "تعديل نطاق التصنيف",
+    "Create Ranking Range": "إنشاء نطاق التصنيف",
+    "Min Rank": "الحد الأدنى للترتيب",
+    "Max Rank": "الحد الأقصى للترتيب",
+    "Range": "النطاق",
+    "Ranking Rewards": "مكافآت التصنيف",
+    "Leave empty for single rank": "اتركه فارغاً للترتيب الفردي",
+    "Existing ranges:": "النطاقات الموجودة:",
+    "Min rank must be less than or equal to max rank": "يجب أن يكون الحد الأدنى للترتيب أقل من أو يساوي الحد الأقصى",
+    "Range overlaps with existing:": "النطاق يتداخل مع نطاق موجود:",
+    "Rank": "الترتيب",
+    "daily": "يومي",
+    "weekly": "أسبوعي",
+    "charm": "الجاذبية",
+    "Ranking Reward": "مكافأة التصنيف",
+    "Added Rewards": "المكافآت المضافة",
+    "Add & Continue": "إضافة ومتابعة",
+    "Done": "تم",
+    "Deleted!": "تم الحذف!",
+    "Reward added!": "تمت إضافة المكافأة!",
+    "Ware": "السلعة",
+
 "upload_card_back": "📷 اضغط لرفع صورة  "
 
 
