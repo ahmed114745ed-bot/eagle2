@@ -15,6 +15,7 @@ class WalletLog extends Model
         'type',
         'before_amount',
         'after_amount',
+        'target_id'
     ];
 
     public function wallet()
