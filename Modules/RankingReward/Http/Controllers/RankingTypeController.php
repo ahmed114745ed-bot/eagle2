@@ -24,7 +24,7 @@ class RankingTypeController extends MainController
         $schedule = request('schedule', 'daily');
 
         return $content
-            ->title('Ranking Types')
+            ->title(__('Ranking Types'))
             ->row(function($row) use ($type, $schedule) {
                 $row->column(12, $this->grid2($type, $schedule));
 
@@ -158,7 +158,7 @@ class RankingTypeController extends MainController
         }
 
         $form->number('min', __('Min Rank'))->min(1)->required();
-        $form->number('max', __('Max Rank'))->min(1)->help('Leave empty for single rank');
+        $form->number('max', __('Max Rank'))->min(1)->help(__('Leave empty for single rank'));
 
         $form->saving(function (Form $form) {
             $rankingTypeId = $form->ranking_type_id;
@@ -188,7 +188,7 @@ class RankingTypeController extends MainController
                 if ($this->rangesOverlap($min, $effectiveMax, $existingMin, $existingMax)) {
                     $display = $range->max === null ? "Rank {$range->min}" : "{$range->min} - {$range->max}";
                     $error = new MessageBag([
-                        'min' => ["Range overlaps with existing: {$display}"],
+                        'min' => [__('Range overlaps with existing:').$display],
                     ]);
                     return back()->withErrors($error)->withInput();
                 }
