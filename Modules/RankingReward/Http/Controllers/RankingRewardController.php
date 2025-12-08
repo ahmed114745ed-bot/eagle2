@@ -262,6 +262,11 @@ class RankingRewardController extends MainController
 
     public function store()
     {
+        request()->validate([
+            'ranking_range_id' => 'required',
+            'target_type' => 'required',
+        ]);
+
         $rankingRangeId = request('ranking_range_id');
         $targetType = request('target_type');
 

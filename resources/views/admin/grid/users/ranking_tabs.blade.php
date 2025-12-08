@@ -11,7 +11,7 @@
     @endforeach
 </ul>
 
-<div style="margin-top:20px;">
+<div style="margin-top:20px; display: flex; justify-content: flex-start;">
     <ul class="nav nav-pills">
         @foreach($schedules as $sch)
             <li class="{{ $sch == $schedule ? 'active' : '' }}">
@@ -20,3 +20,9 @@
         @endforeach
     </ul>
 </div>
+
+<style>
+    .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+        background: var(--primary-color) !important;
+    }
+</style>

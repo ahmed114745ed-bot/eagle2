@@ -188,7 +188,7 @@ class RankingTypeController extends MainController
                 if ($this->rangesOverlap($min, $effectiveMax, $existingMin, $existingMax)) {
                     $display = $range->max === null ? "Rank {$range->min}" : "{$range->min} - {$range->max}";
                     $error = new MessageBag([
-                        'min' => [__('Range overlaps with existing: :display', ['display' => $display])],
+                        'min' => [__('Range overlaps with existing:').$display],
                     ]);
                     return back()->withErrors($error)->withInput();
                 }
