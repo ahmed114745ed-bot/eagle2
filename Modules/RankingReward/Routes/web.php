@@ -12,6 +12,7 @@
 */
 
 use Modules\RankingReward\Http\Controllers\RankingTypeController;
+use Modules\RankingReward\Http\Controllers\WinnerRankingController;
 
 Route::group(
     [
@@ -26,6 +27,7 @@ Route::group(
     ],
     function () {
         Route::resource('ranking-types', RankingTypeController::class);
+        Route::resource('winner-rankings', WinnerRankingController::class);
 
 //        Route::prefix('tribe_tops/{tribe_period_id}')->group(function () {
 //            Route::get('/', [TribeTopController::class, 'index'])->name('tribe_tops.index');
