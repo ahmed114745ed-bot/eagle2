@@ -20,10 +20,6 @@ class WalletHelper
      */
     public static function addAllBalancesByDiffs(int $userId, array $newData, ?array $oldData = null, ?int $agencyId = null, string $type = 'system' ,$target_id = null)
     {
-              \Log::info('addAllBalancesByDiffs data', [
-    'target_id' => $target_id,
-  
-]);
         $user_diff   = ($newData['sallary'] ?? 0) - ($oldData['sallary'] ?? 0);
         $agency_diff = ($newData['agency_sallary'] ?? 0) - ($oldData['agency_sallary'] ?? 0);
         $bd_diff     = ($newData['dB'] ?? 0) - ($oldData['dB'] ?? 0);
@@ -63,7 +59,10 @@ class WalletHelper
         $before = $wallet?->balance ?? 0 ;
         $wallet->balance += $amount;
         $wallet->save();
-
+              \Log::info('addBalance data', [
+    'target_id' => $target_id,
+  
+]);
         WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
