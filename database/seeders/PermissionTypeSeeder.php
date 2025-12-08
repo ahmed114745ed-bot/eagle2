@@ -711,6 +711,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'gift', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'gift-categories', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
