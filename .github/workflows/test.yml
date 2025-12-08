@@ -20,3 +20,4 @@ jobs:
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           php artisan migrate --force
           php artisan optimize:clear
+          php artisan db:seed --class=GiftCategorySeeder
