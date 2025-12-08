@@ -708,8 +708,8 @@ class PermissionTypeSeeder extends Seeder
                 ],
                 'permissions' => [
 
-                    ['key' => 'gift', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
+                    ['key' => 'gift', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch','browse','create', 'delete', 'show', 'edit'],
                     ],],
                     ['key' => 'gift-categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,

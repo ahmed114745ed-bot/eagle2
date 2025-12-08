@@ -204,9 +204,11 @@ class GiftController extends MainController
     ");
         $permission    = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
 
-
-            if (Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*')) {
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
+                && ($model->category->type != 'lucky_gift' && $model->category->type != 'vip')
+            ) {
                 $actions->add(new MoveGiftCategory());
             }
         });
