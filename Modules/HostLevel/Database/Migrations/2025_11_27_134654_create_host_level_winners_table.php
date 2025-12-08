@@ -13,13 +13,15 @@ class CreateHostLevelWinnersTable extends Migration
      */
     public function up()
     {
-        Schema::create('host_level_winners', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('host_level_id')->nullable()->constrained('host_levels')->nullOnDelete();
+        if (!Schema::hasTable('host_level_winners')) {
+            Schema::create('host_level_winners', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('host_level_id')->nullable()->constrained('host_levels')->nullOnDelete();
 
-            $table->timestamps();
-        });
+                $table->timestamps();
+            });
+        }
     }
 
     /**

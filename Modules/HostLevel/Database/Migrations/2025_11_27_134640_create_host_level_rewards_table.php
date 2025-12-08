@@ -13,14 +13,16 @@ class CreateHostLevelRewardsTable extends Migration
      */
     public function up()
     {
-        Schema::create('host_level_rewards', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('host_level_id')->nullable()->constrained('host_levels')->nullOnDelete();
-            $table->string('type');
-            $table->string('target');
-            $table->integer('expire')->default('1');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('host_level_rewards')) {
+            Schema::create('host_level_rewards', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('host_level_id')->nullable()->constrained('host_levels')->nullOnDelete();
+                $table->string('type');
+                $table->string('target');
+                $table->integer('expire')->default('1');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
