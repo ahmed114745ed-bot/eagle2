@@ -13,7 +13,7 @@ class ProfitTypeResource extends JsonResource
         $target = $this->target;
         $targetName = $target?->diamonds ?? '---';
         $broadcastTime = $this->hours ?? $this->days ?? 0;
-        $totalDiamonds = $this->diamond ?? 0;
+        $totalDiamonds = $target?->diamonds ?? 0;
 
           \Log::info('Target object:', ['target' => $target]);
     \Log::info('Type:', ['type' => $this->type]);
