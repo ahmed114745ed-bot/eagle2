@@ -256,7 +256,32 @@ class GiftController extends MainController
             'model' => $id ? Gift::find($id) : [],
         ]));
 
+        $form->select('type', __('type'))->options(
+            translate(TYPE_GIFT)
+        )
+            ->when(6, function () use ($form) {
 
+                $type = old('type', $form->model()->type ?? null);
+                $form->number('luckyGift.win_probability', __('win probability'))
+                    ->min(1)->max(100)
+                    ->placeholder(__('Enter win probability'))
+                    ->attribute(['id' => 'win_probability']);
+
+                $probabilityTimes1 = \Cache::get('probability_times_1', []);
+                $probabilityTimes2 = \Cache::get('probability_times_2', []);
+                $probabilityTimes3 = \Cache::get('probability_times_3', []);
+
+                $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
+                    ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
+                    ->rules('min:0|max:100')
+                    ->default(0)
+                    ->required();
+
+                $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
+                    ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
+                    ->rules('min:0|max:100')
+                    ->default(0)
+                    ->required();
 
                 $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
                     ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
@@ -268,44 +293,61 @@ class GiftController extends MainController
                     $form->html(<<<'HTML'
                     <script>
 
+                        (function () {
+                            const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
 
-        //  $form->select('type', __('type'))->options(
-        // translate(TYPE_GIFT)
-        // )
+                            function getVal(field) {
+                                return parseFloat($(`input[name="luckyGift[${field}]"]`).val()) || 0;
+                            }
 
-        //     ->when(6, function () use ($form) {
+                            function setVal(field, val) {
+                                val = Math.max(0, Math.min(100, val));
+                                $(`input[name="luckyGift[${field}]"]`).val(val.toFixed(2));
+                            }
 
-        //         $type = old('type', $form->model()->type ?? null);
-        //         $form->number('luckyGift.win_probability', __('win probability'))
-        //             ->min(1)->max(100)
-        //             ->placeholder(__('Enter win probability'))
-        //             ->attribute(['id' => 'win_probability']);
+                            function updateDisplays() {
+                                // $('#min_percent_display').text('🔹 النسبة الحالية: ' + getVal('min_percentag') + '%');
+                                // $('#mid_percent_display').text('🔸 النسبة الحالية: ' + getVal('mid_percentag') + '%');
+                                // $('#max_percent_display').text('🟣 النسبة الحالية: ' + getVal('max_percentag') + '%');
+                            }
 
-        //         $probabilityTimes1 = \Cache::get('probability_times_1', []);
-        //         $probabilityTimes2 = \Cache::get('probability_times_2', []);
-        //         $probabilityTimes3 = \Cache::get('probability_times_3', []);
+                            function enforceLimit(changed) {
+                                const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
+                                if (total > 100) {
+                                    let current = getVal(changed);
+                                    let overflow = total - 100;
+                                    setVal(changed, current - overflow);
+                                }
+                            }
+                            window.percent_error_message = ' . json_encode(trans('admin.percent_error')) . ';
 
-        //         $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-        //             ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
+                            function checkBeforeSubmit(e) {
+                                const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
+                                if (Math.round(total) !== 100) {
+                                    alert(window.percent_error_message + total.toFixed(2) + '%');
+                                    e.preventDefault();
+                                    return false;
+                                }
+                            }
 
-        //         $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-        //             ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
+                            $(document).ready(function () {
+                                fields.forEach(function(field) {
+                                    $(document).on('input', `input[name="luckyGift[${field}]"]`, function () {
+                                        let val = parseFloat($(this).val()) || 0;
+                                        if (val < 0) val = 0;
+                                        if (val > 100) val = 100;
+                                        $(this).val(val.toFixed(2));
 
-        //         $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-        //             ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
-        //         if ($type == 6 || !$form->isEditing()) {
+                                        enforceLimit(field);
+                                        updateDisplays();
+                                    });
+                                });
 
-        //             $form->html(<<<'HTML'
-        //             <script>
+                                $('form').on('submit', checkBeforeSubmit);
+                                updateDisplays();
+                            });
+                        })();
+                        </script>
 
                     HTML);
                 }
@@ -313,7 +355,6 @@ class GiftController extends MainController
             ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
             });
-
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
