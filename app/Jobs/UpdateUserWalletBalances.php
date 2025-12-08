@@ -40,6 +40,8 @@ class UpdateUserWalletBalances implements ShouldQueue
      */
     public function handle(): void
     {
+        \Log::info($this->target_id);
+        \Log::info('test');
         WalletHelper::addAllBalancesByDiffs(
             $this->userId,
             $this->newData,
