@@ -1508,7 +1508,13 @@
 "role_agency_manager": "Agency Manager",
 "role_app": "App",
 "diamonds_message": "Diamonds: :diamonds, Role: :role, Profit %: :profit, Broadcast Time: :time"
-  ,"achieve_target": "Achieve Target"
+,"achieve_target": "Achieve Target",
+"add_user_profit": "Profit for target :target",
+"add_agency_profit": "Profit for agency :target",
+"add_bd_profit": "Profit for BD :admin",
+"transfer_to": "Transferred to :target",
+"transfer_from": "Transferred from :target",
+"withdraw": "Withdrawn by :admin"
 
 
 

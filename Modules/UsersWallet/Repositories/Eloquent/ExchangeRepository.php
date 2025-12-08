@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Tik\Repositories;
+namespace Modules\UsersWallet\Repositories\Eloquent;
 
 
 use App\Models\Exchange;
+use App\Tik\Repositories\AbstractRepository;
 
 class ExchangeRepository extends AbstractRepository
 {

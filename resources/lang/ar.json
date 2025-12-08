@@ -4590,10 +4590,14 @@
 "role_bd": "مدير BD",
 "role_agency_manager": "مدير الوكالة",
 "role_app": "التطبيق",
-    "achieve_target": "تحقيق تارجت",
-
+"achieve_target": "تحقيق تارجت",
 "diamonds_message": "عدد الماسات: :diamonds، الدور: :role، نسبة الربح: :profit٪، مدة البث: :time"
-
+,    "add_user_profit": "أرباح هدف :target",
+    "add_agency_profit": "أرباح وكالة :target",
+    "add_bd_profit": "أرباح مدير وكالة :admin",
+    "transfer_to": "تم التحويل إلى :target",
+    "transfer_from": "تم التحويل من :target",
+    "withdraw": "تم السحب بواسطة :admin"
 
 
 

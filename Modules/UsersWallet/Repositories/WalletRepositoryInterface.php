@@ -10,5 +10,6 @@ interface WalletRepositoryInterface
     public function createWallet(array $data);
     public function getProfitsByType(int $userId,  $type);
     public function getLatestTransactions($userId, $limit = 20);
+    public function getTransactions($userId, $type , $Perpage, $page);
 
 }

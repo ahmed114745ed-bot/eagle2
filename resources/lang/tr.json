@@ -4052,7 +4052,12 @@
     "upload_card_back": "📷 Kartın arka yüzünü yüklemek için tıklayın"
 ,"User Withdrawals": "Kullanıcı Çekimleri",
     "achieve_target": "Hedefi Başarmak",
-
+    "add_user_profit": ":target için kazanç",
+    "add_agency_profit": ":target için ajans kazancı",
+    "add_bd_profit": "BD için kazanç :admin",
+    "transfer_to": ":target'a transfer edildi",
+    "transfer_from": ":target'den transfer edildi",
+    "withdraw": ":admin tarafından çekildi",
     "User Withdrawal": "Kullanıcı Çekimi"
 ,    "diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
 

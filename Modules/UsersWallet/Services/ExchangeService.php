@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Modules\UsersWallet\Services;
 
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Tik\Repositories\ExchangeRepository;
-use App\Tik\Repositories\ExchangeLogRepository;
+use Modules\UsersWallet\Repositories\Eloquent\ExchangeLogRepository;
+use Modules\UsersWallet\Repositories\Eloquent\ExchangeRepository;
+
 
 
 class ExchangeService

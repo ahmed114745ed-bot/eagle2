@@ -3,7 +3,6 @@ namespace Modules\UsersWallet\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Resources\TransactionResource;
-use App\Http\Resources\UserCoinLogResource;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,6 +11,8 @@ use Illuminate\Routing\Controller;
 use Modules\UsersWallet\Http\Requests\MakeTransferRequest;
 use Modules\UsersWallet\Http\Resources\ProfitTypeResource;
 use Modules\UsersWallet\Http\Resources\TransactionLogsResource;
+use Modules\UsersWallet\Http\Resources\UserCoinLogResource;
+use Modules\UsersWallet\Http\Resources\UserProfitLogResource;
 use Modules\UsersWallet\Services\WalletService;
 use Modules\UsersWallet\Transformers\WalletTemplateResource;
 
@@ -32,13 +33,17 @@ class WalletController extends Controller
     {
         $user = $request->user();
         $data = $this->walletService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
+        
+        if ($request->type === 'profits') {
+            return Common::apiResponse(true, '', UserProfitLogResource::collection($data), 200);
+        }
         return Common::apiResponse(true, '', UserCoinLogResource::collection($data), 200);
     }
 
     public function getWalletTransactions(Request $request)
     {
         $result = $this->walletService->getWalletTransactions($request->all());
-        return Common::apiResponse(1, 'success', TransactionResource::collection( $result), 201);
+        return Common::apiResponse(1, 'success', TransactionLogsResource::collection( $result), 201);
     }
 
     public function getTemplate(Request $request): JsonResponse|AnonymousResourceCollection

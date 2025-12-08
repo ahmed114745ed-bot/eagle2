@@ -1,6 +1,7 @@
 <?php
 namespace Modules\UsersWallet\Entities;
 
+use App\Models\Admin;
 use App\Models\Target;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,7 +16,7 @@ class WalletLog extends Model
         'type',
         'before_amount',
         'after_amount',
-        'target_id'
+        'related_id'
     ];
 
     public function wallet()
@@ -24,6 +25,15 @@ class WalletLog extends Model
     }
         public function target()
     {
-        return $this->belongsTo(Target::class, 'target_id');
+        return $this->belongsTo(Target::class, 'related_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(Target::class, 'related_id');
+    }
+
+       public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'related_id');
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use Modules\UsersWallet\Http\Controllers\Api\UsersWalletController;
 use Modules\UsersWallet\Http\Controllers\Api\WalletController;
 
@@ -28,6 +29,13 @@ Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLate
     Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
     Route::get('history', [WalletController::class, 'history']);
 
+    Route::prefix('exchange')->group(function () {
+        Route::get('/list', [ExchangeController::class, 'exchangeList']);
+        Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
+        Route::post('/make', [ExchangeController::class, 'exchangeSave']);
+        Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
+        Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
+    });
 });
 
 

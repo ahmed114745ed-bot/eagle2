@@ -3685,7 +3685,12 @@
     "User Withdrawals": "उपयोगकर्ता निकासी",
     "User Withdrawal": "उपयोगकर्ता निकासी",
     "achieve_target": "लक्ष्य प्राप्त करें",
-
+    "add_user_profit": ":target के लिए लाभ",
+    "add_agency_profit": ":target के लिए एजेंसी लाभ",
+    "add_bd_profit": "BD के लिए लाभ :admin",
+    "transfer_to": ":target को स्थानांतरित किया",
+    "transfer_from": ":target से स्थानांतरित किया",
+    "withdraw": ":admin द्वारा निकाला गया",
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
 
 

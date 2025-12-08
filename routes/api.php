@@ -41,7 +41,6 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
@@ -428,13 +427,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::post('send_pack', [UserController::class, 'sendPack']);
 
-            Route::prefix('exchange')->group(function () {
-                Route::get('/list', [ExchangeController::class, 'exchangeList']);
-                Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
-                Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
-                Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
-            });
+        
 
             Route::get('trxs', [ChargeController::class, 'trxLog']);
             Route::get('images', [HomeController::class, 'getImages']);
