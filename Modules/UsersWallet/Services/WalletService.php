@@ -53,7 +53,9 @@ class WalletService
                     'operation' => 'transfer',
                     'type' => 'transfer',
                     'before_amount' => $fromWallet->balance - $fromWallet->cut_amount - $fromWallet->pending_amount ,
-                    'after_amount' => wallet_available_by_user($fromUserId)
+                    'after_amount' => wallet_available_by_user($fromUserId),
+                    'related_id'  =>  $toWallet
+
                 ]);
 
                 $this->walletRepo->updateWallet($toWallet->id, ['balance' => $toWallet->balance + $amount]);
@@ -64,7 +66,8 @@ class WalletService
                     'operation' => 'transfer',
                     'type' => 'transfer',
                     'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
-                    'after_amount' =>  wallet_available_by_user($toUserId)
+                    'after_amount' =>  wallet_available_by_user($toUserId),
+                    'related_id'  =>  $fromUserId
                 ]);
 
                 DB::commit();
@@ -80,21 +83,12 @@ class WalletService
 
     public function getWalletTransactions($request)
     {
-        $user = Auth::user();
-        $type = $request['type'];
+        $userId = Auth::user()->id ;
+        $type = $request['type'] ?? 'add';
+        $perPage = $request['per_page'] ?? 15;
+        $page = $request['page'] ?? 1;  
+        return $this->walletRepo->getTransactions($userId,$type  ,$perPage , $page);
 
-        if (!in_array($type, ['add', 'cut'])) {
-            throw new Exception('Invalid transaction type. Allowed values: add, cut');
-        }
-
-        $transactions = WalletTransaction::whereHas('wallet', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->where('type', $type)
-            ->latest()
-            ->paginate(15);
-
-        return $transactions;
     }
 
     public function getTemplate($type): Collection|array

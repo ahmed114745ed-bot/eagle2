@@ -29,11 +29,11 @@ class WalletRepository implements WalletRepositoryInterface
         return UserWallet::create($data);
     }
 
-        public function getProfitsByType($userId ,$type = 'user')
+    public function getProfitsByType($userId ,$type = 'user')
     {
        return   WalletLog::with('target')
-            ->whereNotNull('target_id')
             ->where('type', $type)
+            ->where('operation', 'add')
             ->where('user_id', $userId)
             ->get();
     }
@@ -45,4 +45,13 @@ class WalletRepository implements WalletRepositoryInterface
             ->limit($limit)
             ->get();
     }
+
+    public function getTransactions($userId, $type ,$perPage = 15 ,$page = 1)
+    {
+        return WalletLog::where('user_id', $userId)
+                        ->orderBy('id', 'DESC')
+                        ->where('operation', $type)
+                          ->paginate($perPage, ['*'], 'page', $page);
+    }
+    
 }

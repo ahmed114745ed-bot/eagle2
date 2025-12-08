@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace Modules\UsersWallet\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\ExchangeService;
+use Modules\UsersWallet\Services\ExchangeService;
 
 
 class ExchangeController extends Controller

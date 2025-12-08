@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Modules\UsersWallet\Http\Resources;
 
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserCoinLogResource extends JsonResource
+class UserProfitLogResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,7 +19,7 @@ class UserCoinLogResource extends JsonResource
         [$title, $description] = $this->getTitleAndDescription();
 
         return [
-            'feature_type' => $this->feature_type,
+            'feature_type' => $this->feature_type ?? '',
             'type' => $this->type,
             'amount' => $this->amount,
             'title' => $title,

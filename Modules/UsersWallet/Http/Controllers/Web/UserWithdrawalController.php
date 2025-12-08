@@ -12,6 +12,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
 use Modules\UsersWallet\Entities\UserWithdrawal;
 use Modules\UsersWallet\Entities\WalletField;
 use Modules\UsersWallet\Entities\WalletLog;
@@ -358,6 +359,8 @@ protected function detail($id)
             'type' => 'user',
             'before_amount' => $available ,
             'after_amount' => $after_amount,
+            'related_id'  =>  Auth::id()
+
         ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 

@@ -71,7 +71,7 @@ class WalletHelper
             'type' => $type,
             'before_amount' => $before ,
             'after_amount' => $wallet->balance,
-            'target_id' => $target_id,
+            'related_id' => $target_id,
         ]);
     }
 

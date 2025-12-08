@@ -7,6 +7,7 @@ use Carbon\Carbon;
 
 
 use App\Models\AllUserLog;
+use Modules\UsersWallet\Entities\WalletLog;
 
 
 class UserLogRepository extends AbstractRepository
@@ -22,6 +23,13 @@ class UserLogRepository extends AbstractRepository
     {
         $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
         $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
+ 
+        if ($type === 'profits') {
+            return WalletLog::where('user_id', $userId)
+                ->where('operation', 'add')
+                ->orderBy('id', 'DESC')
+                ->paginate($perPage, ['*'], 'page', $page);
+        }
 
         return $this->model
             ->where('user_id', $userId)
