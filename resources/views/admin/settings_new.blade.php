@@ -2963,7 +2963,7 @@ use Modules\Vip\Entities\Vip;
                             </div>
                         </div>
                   
-@if (in_array(env('APP_NAME'), ['Eagle', 'Lumio']))
+@if (in_array(env('APP_NAME'), ['Eagle', 'Lumio Voice Chat']))
 
                         <div class="col-md-6">
                             <div class="form-group">
