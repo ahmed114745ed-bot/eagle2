@@ -2,16 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
-use App\Models\Country;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\DB;
+use App\Helpers\Common;
+use App\Models\Country;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
+
 
 class CountryController extends MainController
 {
@@ -35,7 +35,7 @@ class CountryController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('countries'))
             ->body($this->detail($id)));
     }
@@ -49,7 +49,7 @@ class CountryController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('countries'))
             ->body($this->form()->edit($id)));
     }
@@ -78,14 +78,16 @@ class CountryController extends MainController
             $filter->equal('e_name', __('name'));
         });
 
-        $grid->id(__ ('ID'));
+        $grid->id(__('ID'));
         $grid->column('e_name', __('name'))->display(function ($value) {
             return __("countries.$value");
         });
         $grid->phone_code(trans('phone code'));
-        $grid->column ('flag',trans ('flag'))->image ('',30);
-        $grid->column ('status',trans ('status'))->switch (Common::getSwitchStates ());
-        $this->extendGrid ($grid);
+        $grid->column('flag', trans('flag'))->image('', 30);
+        if (Admin::user()->can('status-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('status', trans('status'))->switch(Common::getSwitchStates());
+        }
+        $this->extendGrid($grid);
         $grid->disableExport();
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -115,7 +117,7 @@ class CountryController extends MainController
         // $show->continent_name(trans('continent name'));
         // $show->e_continent_name(trans('english continent name'));
 
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -129,16 +131,14 @@ class CountryController extends MainController
         $form = new Form(new Country);
         $this->disableFormTools($form);
 
-        $form->display(__ ('ID'));
-        $form->text('name', trans('name'))->rules ('required');;
-        $form->text('e_name', trans('english name'))->rules ('required');;
-        $form->image ('flag',trans ('flag'))->rules ('required');
+        $form->display(__('ID'));
+        $form->text('name', trans('name'))->rules('required');;
+        $form->text('e_name', trans('english name'))->rules('required');;
+        $form->image('flag', trans('flag'))->rules('required');
+        $form->switch('status', trans('	status'))->states (Common::getSwitchStates());
 
 
 
         return $form;
     }
-
-
-
 }

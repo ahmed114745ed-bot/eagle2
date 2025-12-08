@@ -12,7 +12,7 @@
                 <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
                     <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
                     <div class="d-flex align-items-center">
-                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable Room Cup Feature') }}</label>
+                        <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable host level') }}</label>
                         <label class="switch mb-0">
                             <input type="checkbox" name="enabled" id="enabled" {{ $settings['enabled'] ? 'checked' : '' }}>
                             <span class="slider round"></span>
@@ -25,7 +25,6 @@
                     <label for="type" class="form-label fw-bold d-block text-end">{{ __('Schedule Type') }}</label>
                     <select name="type" id="type" class="form-control text-end">
                         <option value="daily" {{ $settings['type']=='daily' ? 'selected' : '' }}>{{ __('Daily') }}</option>
-                        <!-- <option value="every_x_days" {{ $settings['type']=='every_x_days' ? 'selected' : '' }}>{{ __('Every X Days') }}</option> -->
                         <option value="weekly" {{ $settings['type']=='weekly' ? 'selected' : '' }}>{{ __('Weekly') }}</option>
                         <option value="monthly" {{ $settings['type']=='monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
                     </select>

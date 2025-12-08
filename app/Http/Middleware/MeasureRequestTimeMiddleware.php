@@ -22,13 +22,13 @@ class MeasureRequestTimeMiddleware
         $duration = $end - $start; 
 
 
-        LogHelper::info('Request timing', [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'duration_seconds' => $duration,
-            'body' => $request->all(),
-            'response_body' => method_exists($response,'getContent') ? json_decode($response->getContent(), true) : null,
-        ]);
+        // LogHelper::info('Request timing', [
+        //     'url' => $request->fullUrl(),
+        //     'method' => $request->method(),
+        //     'duration_seconds' => $duration,
+        //     'body' => $request->all(),
+        //     'response_body' => method_exists($response,'getContent') ? json_decode($response->getContent(), true) : null,
+        // ]);
 
         return $response;
     }

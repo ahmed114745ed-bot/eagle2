@@ -127,6 +127,11 @@ class TargetController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
+        \Encore\Admin\Facades\Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 

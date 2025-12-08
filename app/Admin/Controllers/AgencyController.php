@@ -93,8 +93,8 @@ class AgencyController extends MainController
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
-                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
 
@@ -113,6 +113,7 @@ class AgencyController extends MainController
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
+
 
 
         $agencyId = $agency->id ?? $id;
@@ -273,10 +274,12 @@ class AgencyController extends MainController
             });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
+         $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
                 'agency',
+                'prefix',
                 'members',
                 'charges',
                 'salaries',
@@ -371,7 +374,7 @@ class AgencyController extends MainController
     protected function grid()
     {
         $countryID = null;
-       if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid = new Grid(new Agency);
         $grid->model()
@@ -523,6 +526,7 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            $id = $creatorId;
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---

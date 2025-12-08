@@ -30,7 +30,7 @@ class AgencySettingsController extends MainController
         }
 
         $tab = request('firsttab');
-       
+
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
         // $moments =  settings()->get('moments');
@@ -48,13 +48,27 @@ class AgencySettingsController extends MainController
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
+        $remaining_diamonds_action = Common::getSettingValue('remaining_diamonds_action') ?? 0;
         $languages = Language::all();
         $configAll = Config::all();
         $settings = $this->getSettings();
         $vars = compact(
-            'hours', 'days', 'moments', 'reels', 'diamonds', 'transfer_salary',
-            'stop_invite_code', 'stop_charge', 'make_rooms_top', 'make_gift_top', 'languages', 'configAll',
-            'hoursDays','tab','settings'
+            'hours',
+            'days',
+            'moments',
+            'remaining_diamonds_action',
+            'reels',
+            'diamonds',
+            'transfer_salary',
+            'stop_invite_code',
+            'stop_charge',
+            'make_rooms_top',
+            'make_gift_top',
+            'languages',
+            'configAll',
+            'hoursDays',
+            'tab',
+            'settings'
         );
 
         $targetGrid = app(TargetController::class)
@@ -64,15 +78,15 @@ class AgencySettingsController extends MainController
 
         $targetGridHtml = $targetGrid->render();
 
-           return parent::index(
-               $content->title(__('Agency settings'))
-                   ->view('agency_settings', array_merge($vars, [
-                       'targetGrid' => $targetGridHtml
-                   ]))
-           );
+        return parent::index(
+            $content->title(__('Agency settings'))
+                ->view('agency_settings', array_merge($vars, [
+                    'targetGrid' => $targetGridHtml
+                ]))
+        );
     }
 
-     private function getSettings()
+    private function getSettings()
     {
         $default = [
             'remaining_diamonds'     => 'nothing',
@@ -147,5 +161,4 @@ class AgencySettingsController extends MainController
             'data' => $data,
         ]);
     }
-
 }

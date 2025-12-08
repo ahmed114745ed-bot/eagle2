@@ -11,12 +11,13 @@ use Illuminate\Console\Command;
 use App\Models\RemainingDiamond;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use App\Models\MonthlyDiamondReceive;
 use App\Traits\Salaries\UserSalaryTrait;
 
 
-class ResetUserMonthlyDiamond extends Command
+class RemainingDiamondUsersCommand extends Command
 {
     use UserSalaryTrait;
 
@@ -31,6 +32,11 @@ class ResetUserMonthlyDiamond extends Command
     public function handle()
     {
         try {
+            $remaining_diamonds_action = Common::getSettingValue('remaining_diamonds_action') ?? 0;
+            if (!$remaining_diamonds_action) {
+                $this->info('Remaining Diamonds Action is disabled. Exiting command.');
+                return;
+            }
             $setting = Common::getSettingValue('remaining_diamonds') ?? 'nothing';
 
             if ($setting === 'nothing') {
@@ -46,43 +52,57 @@ class ResetUserMonthlyDiamond extends Command
             $month = $previous->month;
             $year  = $previous->year;
 
-            $userSalaries = UserSallary::where(['month' => $month, 'year' => $year, 'is_finished' => 0])
-                ->with('user')
-                ->get();
-
-            // Cache exchange percentage to avoid repeated DB calls
+            // Cache percentage once
             $exchangePercentage = $setting === 'coins'
                 ? (Common::getSettingValue('exchange_coin_percentage') ?? 1)
                 : 0;
 
-            foreach ($userSalaries as $userSalary) {
+            // 🔥 Process 100 users per chunk
+            UserSallary::where([
+                'month' => $month,
+                'year' => $year,
+                'is_finished' => 0
+            ])
+                ->with('user')
+                ->chunk(100, function ($userSalaries) use ($setting, $exchangePercentage, $dt, $month, $year) {
 
-                $user = $userSalary->user;
-                $diamonds = $userSalary->remaining_diamond ?? 0;
+                    foreach ($userSalaries as $userSalary) {
 
-                if (!$user || $diamonds <= 0) {
-                    continue;
-                }
-                $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)->whereMonth('created_at', $dt->month)
-                    ->whereYear('created_at', $dt->year)
-                    ->first();
-                if ($remainingDiamonds) {
-                    continue;
-                }
-                if ($setting === 'coins') {
-                    $this->processCoins($user, $diamonds, $exchangePercentage, $month, $year);
-                }
+                        $user = $userSalary->user;
+                        $diamonds = $userSalary->remaining_diamond ?? 0;
 
-                if ($setting === 'diamonds') {
-                    $this->processDiamonds($user, $diamonds, $dt, $month, $year);
-                }
-            }
+                        // Skip if no user or no diamonds
+                        if (!$user || $diamonds <= 0) {
+                            continue;
+                        }
+
+                        // Prevent double processing in same month
+                        $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)
+                            ->whereMonth('created_at', $dt->month)
+                            ->whereYear('created_at', $dt->year)
+                            ->first();
+
+                        if ($remainingDiamonds) {
+                            continue;
+                        }
+
+                        // Process based on type
+                        if ($setting === 'coins') {
+                            $this->processCoins($user, $diamonds, $exchangePercentage, $month, $year);
+                        }
+
+                        if ($setting === 'diamonds') {
+                            $this->processDiamonds($user, $diamonds, $dt, $month, $year);
+                        }
+                    }
+                });
 
             $this->info('Remaining Diamonds Command Run Successfully !');
         } catch (\Exception $exception) {
             $this->error('Remaining Diamonds failed: ' . $exception->getMessage());
         }
     }
+
 
     /**
      * Process remaining diamonds as coins
@@ -110,6 +130,7 @@ class ResetUserMonthlyDiamond extends Command
             'month' => $month,
             'year' => $year,
         ]);
+        CustomNotification::remainingDiamonds($user, 'coins', $month, $exchangeCoin);
     }
 
     /**
@@ -145,5 +166,7 @@ class ResetUserMonthlyDiamond extends Command
             'month' => $month,
             'year' => $year,
         ]);
+
+        CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
     }
 }

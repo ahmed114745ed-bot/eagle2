@@ -272,32 +272,34 @@
         @endphp
 
         @if (request()->is('admin*'))
-            <a class="nav-item select-country">
-                <select id="area-Manager-select" class="form-control">
-                    <option value="">{{ __('Select area manager') }}</option>
-                    @foreach($areaManagers as $areaManager)
-                        <option
-                            value="{{ $areaManager->id }}"
-                            data-flag="{{ getImagePath($areaManager->avatar) }}"
-                            {{ (string)$selectAreaManagerId === (string)$areaManager->id ? 'selected' : '' }}>
-                            {{ $areaManager->name ?? $areaManager->username }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
-            <a class="nav-item select-country">
-                <select id="country-select" class="form-control">
-                    <option value="">{{ __('Select Country...') }}</option>
-                    @foreach($countries as $currentCountry)
-                        <option
-                            value="{{ $currentCountry->id }}"
-                            data-flag="{{ getImagePath($currentCountry->flag) }}"
-                            {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
-                        </option>
-                    @endforeach
-                </select>
-            </a>
+            <div class="select-country-wrapper">
+                <a class="nav-item select-country">
+                    <select id="area-Manager-select" class="form-control">
+                        <option value="">{{ __('Select area manager') }}</option>
+                        @foreach($areaManagers as $areaManager)
+                            <option
+                                value="{{ $areaManager->id }}"
+                                data-flag="{{ getImagePath($areaManager->avatar) }}"
+                                {{ (string)$selectAreaManagerId === (string)$areaManager->id ? 'selected' : '' }}>
+                                {{ $areaManager->name ?? $areaManager->username }}
+                            </option>
+                        @endforeach
+                    </select>
+                </a>
+                <a class="nav-item select-country">
+                    <select id="country-select" class="form-control">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option
+                                value="{{ $currentCountry->id }}"
+                                data-flag="{{ getImagePath($currentCountry->flag) }}"
+                                {{ (string)$selectedCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </a>
+            </div>
         @endif
 
         @if (request()->is('areaManager*'))

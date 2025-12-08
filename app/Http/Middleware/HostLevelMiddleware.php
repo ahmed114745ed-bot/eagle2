@@ -18,14 +18,17 @@ class HostLevelMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $getSetting = function ($key, $default = 0) {
+        $getSetting = function ($key, $default = 1) {
             return \Cache::rememberForever($key, function () use ($key, $default) {
                 return Setting::where('key', $key)->value('value') ?? $default;
             });
         };
 
         $hostLevel = $getSetting('host_level_enabled') ?? 1;
-        if (!$hostLevel) abort(403, __('Not Found'));
+        $utdHostLevel = (int)$getSetting('host_level_action') ?? 0;
+      
+       
+       if (!$hostLevel || !$utdHostLevel) return response()->json(['error' => 'something wrong'], 500);
 
         return $next($request);
     }

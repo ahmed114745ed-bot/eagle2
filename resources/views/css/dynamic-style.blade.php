@@ -86,7 +86,7 @@
         color: #fff;
         cursor: default;
         background: var(--primary-button) !important;
-        border-color: #337ab7
+        border-color: #337ab7;
     }
     .skin-black-light .content-header {
     background: var(--secondary-color) !important;
@@ -122,7 +122,7 @@
     }
 
     * {
-        color: var(--text-secondary-color)
+        color: var(--text-secondary-color);
     }
 
     body {
@@ -351,7 +351,7 @@
     .btn-twitter,
     .btn-success {
         background-color: var(--primary-color) !important;
-        color: var(--inverse-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
     .btn-dropbox:hover,

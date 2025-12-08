@@ -92,7 +92,8 @@ class GiftLogTestController extends Controller
                 $user,
                 $request->input('X-Device-Token'),
                 $request->input('lat'),
-                $request->input('long')
+                $request->input('long'),
+                $request->input('iso'),
             );
             request()->default_background = \DB::table('backgrounds')
                 ->where('enable', 1)

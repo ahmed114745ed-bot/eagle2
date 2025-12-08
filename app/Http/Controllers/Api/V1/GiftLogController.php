@@ -14,6 +14,7 @@ use App\Models\GiftLog;
 use App\Models\AppFeature;
 use App\Models\CoreWallet;
 use App\Helpers\UserCommon;
+use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
@@ -23,6 +24,7 @@ use App\Models\RemainingDiamond;
 use App\Services\LuckyGiftService;
 use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Services\Gifts\GiftService;
 use App\Services\RoomLevelServices;
@@ -38,9 +40,10 @@ use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\UpdateUserDataWhenSendGift;
 use Modules\CP\Http\Services\CpServices;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\GiftLogUtdResource;
 
+use Illuminate\Support\Facades\Validator;
+
+use App\Http\Resources\GiftLogUtdResource;
 use App\Traits\Gifts\LuckyGiftProbability;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -48,10 +51,8 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
-
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-use App\Models\UserSallary;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
@@ -741,22 +742,59 @@ class GiftLogController extends Controller
 
     public function increaseMonthlyDiamond()
     {
-        $userSalaries  = UserSallary::where(['month' => 11, 'year' => 2025, 'is_finished' => 0])->get();
-        foreach ($userSalaries as $userSalary) {
-            $user = $userSalary->user;
-            $diamonds = $userSalary->remaining_diamond ?? 0;
+        $remainingDiamonds = RemainingDiamond::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)->pluck('user_id')->toArray();
 
-            if (!$user || $diamonds <= 0) {
-                continue;
-            }
-            $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
-        }
+        UserSallary::where([
+            'month' => 11,
+            'year' => 2025,
+            'is_finished' => 0
+        ])->whereNotIn('user_id', $remainingDiamonds)
+            ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
+
+                foreach ($userSalaries as $userSalary) {
+
+                    try {
+                        $user = $userSalary->user;
+                        $diamonds = $userSalary->remaining_diamond ?? 0;
+
+                        // Skip if no user OR no diamonds
+                        if (!$user || $diamonds <= 0) {
+                            continue;
+                        }
+                        $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->first();
+                        if ($remainingDiamonds) {
+                            continue;
+                        }
+
+                        // Normal processing
+                        $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+                    } catch (\Throwable $e) {
+
+                        \Log::error("Monthly diamond add ERROR for user_id = {$userSalary->user_id}", [
+                            'error' => $e->getMessage()
+                        ]);
+
+                        // Special log for user 580
+                        if ($userSalary->user_id == 580) {
+                            \Log::error("User 580 ERROR DETAILS", [
+                                'diamonds' => $userSalary->remaining_diamond,
+                                'exception' => $e->getMessage()
+                            ]);
+                        }
+                    }
+                }
+            });
 
         return response()->json([
             'status' => 'success',
-            'message' => 'all diamonds added to monthly diamond receive.'
+            'message' => 'All diamonds processed.'
         ]);
     }
+
+
 
     private function processDiamonds($user, int $diamonds, Carbon $dt, $month, $year)
     {
@@ -788,5 +826,6 @@ class GiftLogController extends Controller
             'month' => $month,
             'year' => $year,
         ]);
+        CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
     }
 }

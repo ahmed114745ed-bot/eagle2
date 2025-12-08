@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -172,7 +173,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     // all route with auth
-    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->group(
+    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
@@ -741,3 +742,4 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
+

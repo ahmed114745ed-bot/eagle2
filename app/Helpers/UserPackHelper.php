@@ -13,24 +13,27 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 18)
+            ->where('is_used',1)
             ->first()?->ware?->color ?? '';
     }
 
     public static function getFrameImage(User $user) : string
     {
         $ware = self::getFrameWare($user);
+        LogHelper::info('frame ware',['ware1' => $ware,'ware2' =>$ware?->img2 ?? ($ware?->img1 ?? '')]);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
-    }
-       public static function getFrameImageV2(User $user) : string
-    {
-        $ware = self::getFrameWare($user);
-        return $ware?->show_img ?? ($ware?->img2 ?? '');
     }
 
     public static function getFrameId(User $user) : string
     {
         $ware = self::getFrameWare($user);
         return $ware?->id ?? 0;
+    }
+
+    public static function getFrameType(User $user) : string
+    {
+        $ware = self::getFrameWare($user);
+        return $ware?->image_type ?? '';
     }
 
     public static function getProfileFrameId(User $user) : string
@@ -43,7 +46,13 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 10)
+            ->where('is_used',1)
             ->first()?->ware?->show_img ?? '';
+    }
+
+    public static function getVipImage(User $user): string
+    {
+        return $user->UserVip?->OVip?->img ?? '';
     }
 
     public static function getVipData(User $user)
@@ -90,6 +99,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 6)
+            ->where('is_used', true)
             ->first()?->ware?->image_type ?? '';
     }
 
@@ -136,6 +146,7 @@ class UserPackHelper
      */
     public static function getFrameWare(User $user): mixed
     {
+        LogHelper::info('get frame ware',['user_id'=>$user->id]);
         return self::getWare($user, 4);
     }
 
@@ -160,6 +171,10 @@ class UserPackHelper
      */
     public static function getWare(User $user, int $type)
     {
+        LogHelper::info('get ware',['ware'=>self::getPacks($user)
+            ->where('type', $type)
+            ->where('is_used', true)
+            ->first()?->ware,'type'=>$type,'user_id'=>$user->id]);
         return self::getPacks($user)
             ->where('type', $type)
             ->where('is_used', true)
