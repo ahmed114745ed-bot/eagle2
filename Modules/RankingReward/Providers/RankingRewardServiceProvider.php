@@ -4,6 +4,9 @@ namespace Modules\RankingReward\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\RankingReward\Console\WeeklyRankingCommand;
+use Modules\RankingReward\Console\MonthlyRankingCommand;
+use Modules\RankingReward\Console\DailyRankingRewardCommand;
 
 class RankingRewardServiceProvider extends ServiceProvider
 {
@@ -28,6 +31,13 @@ class RankingRewardServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                DailyRankingRewardCommand::class,
+                WeeklyRankingCommand::class,
+                MonthlyRankingCommand::class,
+            ]);
+        }
     }
 
     /**
@@ -51,7 +61,8 @@ class RankingRewardServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+            module_path($this->moduleName, 'Config/config.php'),
+            $this->moduleNameLower
         );
     }
 
