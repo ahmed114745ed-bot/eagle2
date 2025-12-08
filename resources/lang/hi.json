@@ -3691,6 +3691,8 @@
     "transfer_to": ":target को स्थानांतरित किया",
     "transfer_from": ":target से स्थानांतरित किया",
     "withdraw": ":admin द्वारा निकाला गया",
+    "source:": "स्रोत:",
+    "gift:": "उपहार:",
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
 
 

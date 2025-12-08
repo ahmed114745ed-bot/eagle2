@@ -4058,8 +4058,9 @@
     "transfer_to": ":target'a transfer edildi",
     "transfer_from": ":target'den transfer edildi",
     "withdraw": ":admin tarafından çekildi",
-    "User Withdrawal": "Kullanıcı Çekimi"
-,    "diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
+    "User Withdrawal": "Kullanıcı Çekimi",
+    "source:": "Kaynak:",
+    "gift:": "Hediye:","diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
 
 
 
