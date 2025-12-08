@@ -13,13 +13,15 @@ class CreateHostLevelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('host_levels', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->string('img');
-            $table->bigInteger('level');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('host_levels')) {
+            Schema::create('host_levels', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->nullable();
+                $table->string('img');
+                $table->bigInteger('level');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
