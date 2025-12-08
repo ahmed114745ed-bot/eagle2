@@ -9,7 +9,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Http\Request;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\MessageBag;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\RankingRange;
@@ -26,10 +26,7 @@ class RankingTypeController extends MainController
         return $content
             ->title('Ranking Types')
             ->row(function($row) use ($type, $schedule) {
-                $row->column(12, view('admin.grid.users.ranking_tabs', [
-                    'type' => $type,
-                    'schedule' => $schedule
-                ]));
+                $row->column(12, $this->grid2($type, $schedule));
 
                 $row->column(12, $this->grid($type, $schedule));
             });
@@ -54,6 +51,14 @@ class RankingTypeController extends MainController
         return parent::create($content
             ->title(__('Create Ranking Range'))
             ->body($this->form()));
+    }
+
+    protected function grid2($type, $schedule)
+    {
+        return new Box('', view('admin.grid.users.ranking_tabs', [
+            'type' => $type,
+            'schedule' => $schedule
+        ])->render());
     }
 
     protected function grid($type, $schedule)
@@ -94,7 +99,7 @@ class RankingTypeController extends MainController
         $grid->tools(function ($tools) use ($type, $schedule) {
             $tools->append(
                 "<a href='".admin_url("ranking-types/create?type={$type}&schedule={$schedule}")."' class='btn btn-sm btn-success'>
-                    <i class='fa fa-plus'></i>&nbsp;&nbsp;New
+                    <i class='fa fa-plus'></i>&nbsp;&nbsp;".__('New')."
                 </a>"
             );
         });
@@ -148,7 +153,7 @@ class RankingTypeController extends MainController
                 ->implode(', ');
 
             if ($existingRanges) {
-                $form->html("<div class='alert alert-info'>Existing ranges: <strong>{$existingRanges}</strong></div>");
+                $form->html("<div class='alert alert-info'> ".__('Existing ranges:')." <strong>{$existingRanges}</strong></div>");
             }
         }
 
@@ -165,7 +170,7 @@ class RankingTypeController extends MainController
 
             if ($max !== null && $min > $max) {
                 $error = new MessageBag([
-                    'min' => ['Min rank must be less than or equal to max rank'],
+                    'min' => [__('Min rank must be less than or equal to max rank')],
                 ]);
                 return back()->withErrors($error)->withInput();
             }
