@@ -2,12 +2,13 @@
 
 namespace App\Console;
 
+use Carbon\Carbon;
 use App\Models\Setting;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Cache;
-use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Modules\TaskStream\Jobs\PkSessionJob;
+use Illuminate\Console\Scheduling\Schedule;
+use Modules\CP\Console\WeeklyCpWinnerConsole;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
@@ -161,6 +162,24 @@ class Kernel extends ConsoleKernel
             ->monthly()
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/remaining-diamonds.log'))
+            ->runInBackground();
+
+        $schedule->command('monthly-ranking')
+            ->monthly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/monthly-ranking.log'))
+            ->runInBackground();
+
+        $schedule->command('daily-ranking')
+            ->dailyAt('00:00')
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/daily-ranking.log'))
+            ->runInBackground();
+
+        $schedule->command('weekly-ranking')
+            ->weeklyOn(Carbon::SATURDAY, '00:00')
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
             ->runInBackground();
     }
 

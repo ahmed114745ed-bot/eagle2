@@ -39,6 +39,7 @@ enum UserCoinLogType: string
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
     case HOST_LEVEL = 'host_level';
+    case GIFT_RANKING = 'gift-ranking';
 
     public function meta(): array
     {
@@ -218,6 +219,11 @@ enum UserCoinLogType: string
             self::REMAINING_DIAMONDS => [
                 'sub_type' => 'remaining_diamonds',
                 'item_name' => 'remaining_diamonds',
+                'queue_job' => null,
+            ],
+            self::GIFT_RANKING => [
+                'sub_type' => 'gift-ranking',
+                'item_name' => 'gift-ranking',
                 'queue_job' => null,
             ],
         };
