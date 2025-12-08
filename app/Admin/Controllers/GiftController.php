@@ -17,6 +17,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use App\Admin\Actions\MoveGiftCategory;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class GiftController extends MainController
@@ -201,6 +202,16 @@ class GiftController extends MainController
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
+        $permission    = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
+                && ($model->category->type != 'lucky_gift' && $model->category->type != 'vip'&& $model->category->type != null)
+            ) {
+                $actions->add(new MoveGiftCategory());
+            }
+        });
 
         return $grid;
     }
