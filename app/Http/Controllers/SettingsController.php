@@ -96,7 +96,7 @@ class SettingsController extends Controller
             Permission::check('edit-' . $this->permission_name);
         }
         $data = $request->except('_token');
-
+ 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
             ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||

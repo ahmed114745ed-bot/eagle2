@@ -547,9 +547,9 @@ Route::group(
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
-        Route::resource('moments', MomentController::class);
-        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
-        Route::resource('moment-settings', MomentSettingsController::class);
+        Route::resource('moments', MomentController::class)->middleware('moment.allowed');
+        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
+        Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
         Route::resource('reels', ReelController::class);
         Route::resource('reel-settings', ReelSettingsController::class);
         Route::resource('change-level-histories', ChangeLevelHistoryController::class);
@@ -623,7 +623,7 @@ Route::group(
 
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::resource('report-reals', ReportRealsController::class);
-        Route::resource('report-moments', ReportMomentController::class);
+        Route::resource('report-moments', ReportMomentController::class)->middleware('moment.allowed');
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
