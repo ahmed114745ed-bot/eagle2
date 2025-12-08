@@ -94,6 +94,7 @@ class VersionController extends Controller
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",
+            'moment_status'    => (bool) (@$settings['moment_status'] ?? true),
             'reel_status'    => (bool) ($settings['reel_status'] ?? true),
             'youtube_status' => (bool) ($settings['youtube_status'] ?? true),
             'live_status'    => (bool) ($settings['live_status'] ?? true),
@@ -199,7 +200,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting', 'is_new_theme_enabled'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['moment_status','reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting', 'is_new_theme_enabled'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool
