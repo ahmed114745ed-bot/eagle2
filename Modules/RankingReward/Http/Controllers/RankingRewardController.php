@@ -154,7 +154,7 @@ class RankingRewardController extends MainController
                     $name = 'Achievement';
                     $url = getImagePath($reward->target);
                 }
-                $showImage = handleShowImageWithTypes($reward->id, $url, 60, 60, 4, 'cover');
+                $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
 
                 $html .= '
                     <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
