@@ -22,4 +22,9 @@ class Coin extends Model
     {
         return $this->belongsTo(PaymentCoin::class, 'payment_gateway_id');
     }
+    public function logs()
+    {
+        return $this->hasMany(CoinLog::class, 'coin_id');
+    }
+
 }
