@@ -383,7 +383,9 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
+   // public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null)
+
     {
         DB::beginTransaction();
         VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed);

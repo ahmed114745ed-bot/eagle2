@@ -185,7 +185,7 @@ class DailyRankingRewardCommand extends Command
                 ->exists();
 
             if ($exists) {
-                 continue;  // reward already given today
+                continue;  // reward already given today
             }
 
             // Coins
