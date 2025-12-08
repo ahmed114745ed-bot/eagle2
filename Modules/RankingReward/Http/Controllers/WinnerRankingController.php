@@ -56,6 +56,28 @@ class WinnerRankingController extends  MainController
                     });
                 }, __('User'))->placeholder(__('Search by ID, UUID'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('type', __('type'))->select([
+                    'sender' => __('wealth'),
+                    'receiver' => __('charm'),
+                    'game' => __('game'),
+                    'charge' => __('charge'),
+                ]);
+            });
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->where(function ($query) {
+                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', '>=', $datt);
+                }, __('from_date'), 'from_date')->date();
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+
+                    $query->whereDate('created_at', '<=', $datt);
+                }, __('to_date'), 'to_date')->date();
+            });
         });
 
         $grid->column('id', __('Id'));
@@ -68,7 +90,10 @@ class WinnerRankingController extends  MainController
             return app(UserService::class)->adminUserAvatar($user);
         });
 
-        $grid->column('type', __('type'));
+        $grid->column('type', __('type'))->display(function ($type) {
+
+            return   $type == "sender" ? "wealth" : ($type == "receiver" ? "charm" : $type);
+        });
         $grid->column('reward.target_type', trans('reward type'))->display(function ($type) {
 
             return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
