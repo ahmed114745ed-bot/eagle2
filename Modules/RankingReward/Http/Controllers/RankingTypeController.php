@@ -24,7 +24,7 @@ class RankingTypeController extends MainController
         $schedule = request('schedule', 'daily');
 
         return $content
-            ->title('Ranking Types')
+            ->title(__('Ranking Types'))
             ->row(function($row) use ($type, $schedule) {
                 $row->column(12, $this->grid2($type, $schedule));
 
