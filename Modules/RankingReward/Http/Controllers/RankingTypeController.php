@@ -158,7 +158,7 @@ class RankingTypeController extends MainController
         }
 
         $form->number('min', __('Min Rank'))->min(1)->required();
-        $form->number('max', __('Max Rank'))->min(1)->help('Leave empty for single rank');
+        $form->number('max', __('Max Rank'))->min(1)->help(__('Leave empty for single rank'));
 
         $form->saving(function (Form $form) {
             $rankingTypeId = $form->ranking_type_id;
