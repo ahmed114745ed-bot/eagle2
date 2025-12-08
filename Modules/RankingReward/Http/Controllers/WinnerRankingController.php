@@ -44,6 +44,20 @@ class WinnerRankingController extends  MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
+             $filter->column(1 /2, function ($filter) {
+
+                $filter->where(function ($query) {
+                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', '>=', $datt);
+                }, __('from_date'), 'from_date')->date();
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+
+                    $query->whereDate('created_at', '<=', $datt);
+                }, __('to_date'), 'to_date')->date();
+            });
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
@@ -64,20 +78,7 @@ class WinnerRankingController extends  MainController
                     'charge' => __('charge'),
                 ]);
             });
-            $filter->column(1 /2, function ($filter) {
-
-                $filter->where(function ($query) {
-                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-                    $query->whereDate('created_at', '>=', $datt);
-                }, __('from_date'), 'from_date')->date();
-            // });
-            // $filter->column(1 / 3, function ($filter) {
-                $filter->where(function ($query) {
-                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-
-                    $query->whereDate('created_at', '<=', $datt);
-                }, __('to_date'), 'to_date')->date();
-            });
+           
         });
 
         $grid->column('id', __('Id'));
