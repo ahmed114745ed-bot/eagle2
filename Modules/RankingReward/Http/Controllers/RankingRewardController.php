@@ -133,27 +133,28 @@ class RankingRewardController extends MainController
 
             foreach ($existingRewards as $reward) {
                 $name = $reward->target;
-                $img = '';
+                $url = '';
 
                 if ($reward->target_type == 'ware') {
                     $ware = Ware::find($reward->target);
                     $name = $ware->name ?? $reward->target;
-                    $img = getImagePath($ware->img2 ?? $ware->show_img ?? '');
+                    $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
                 } elseif ($reward->target_type == 'badge') {
                     $badge = Badge::find($reward->target);
                     $name = $badge->name ?? $reward->target;
-                    $img = getImagePath($badge->img ?? '');
+                    $url = getImagePath($badge->img ?? '');
                 } elseif ($reward->target_type == 'vip') {
                     $vip = OVip::find($reward->target);
                     $name = $vip->name ?? $reward->target;
-                    $img = getImagePath($vip->img ?? '');
+                    $url = getImagePath($vip->img ?? '');
                 } elseif ($reward->target_type == 'coins') {
                     $name = $reward->target . ' coins';
-                    $img = getImagePath('coin.png');
+                    $url = getImagePath('coin.png');
                 } elseif ($reward->target_type == 'achievement') {
                     $name = 'Achievement';
-                    $img = getImagePath($reward->target);
+                    $url = getImagePath($reward->target);
                 }
+                $showImage =  handleShowImageWithTypes($reward->id, $url, 50, 50);
 
                 $html .= '
             <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
@@ -162,7 +163,7 @@ class RankingRewardController extends MainController
                         style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0;">
                         <i class="fa fa-times"></i>
                     </button>
-                    <img src="' . $img . '" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;">
+                    <img src="' . $showImage . '" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 8px;">
                     <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
                     <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
                     ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
