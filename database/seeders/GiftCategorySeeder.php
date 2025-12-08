@@ -64,7 +64,7 @@ class GiftCategorySeeder extends Seeder
         ]);
         Gift::where('type', 4)->update(['gift_category_id' => $moment->id]);
         $vip  = GiftCategory::create([
-            "type" => 'normal',
+            "type" => 'vip',
             "title" => [
                 'en' => 'VIP',
                 'ar' => 'شخص مهم',
