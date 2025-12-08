@@ -465,7 +465,6 @@ class WareTabController extends MainController
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
-                    LogHelper::info('This ext ', $ext);
                     /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
                         'original_name' => $img2->getClientOriginalName(),
                         'original_extension' => $img2->getClientOriginalExtension(),
