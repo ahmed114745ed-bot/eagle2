@@ -24,7 +24,7 @@ class MoveGiftCategory extends RowAction
         if (!$newCategory) {
             return $this->response()->error('Please select category')->refresh();
         }
-    dd($gift,  $newCategory);
+    
         $gift->gift_category_id = $newCategory;
         $gift->save();
 
