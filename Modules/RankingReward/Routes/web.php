@@ -13,6 +13,7 @@
 
 use Modules\RankingReward\Http\Controllers\RankingRewardController;
 use Modules\RankingReward\Http\Controllers\RankingTypeController;
+use Modules\RankingReward\Http\Controllers\WinnerRankingController;
 
 Route::group(
     [
@@ -27,6 +28,7 @@ Route::group(
     ],
     function () {
         Route::resource('ranking-types', RankingTypeController::class);
+        Route::resource('winner-rankings', WinnerRankingController::class);
 
         Route::prefix('ranking-rewards/{ranking_range_id}')->group(function () {
             Route::get('/', [RankingRewardController::class, 'index'])->name('ranking_rewards.index');
