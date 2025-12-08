@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
+use App\Events\PublicTestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -52,6 +53,7 @@ use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
+use App\Http\Controllers\Api\V1\GiftCategoryController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
@@ -66,6 +68,7 @@ use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\MallController as ControllersMallController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -386,6 +389,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+            });
+            Route::prefix('gift-categories')->group(function () {
+                Route::get('/', [GiftCategoryController::class, 'index']);
+                
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
