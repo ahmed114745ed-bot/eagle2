@@ -64,14 +64,14 @@ class WinnerRankingController extends  MainController
                     'charge' => __('charge'),
                 ]);
             });
-            $filter->column(1 / 2, function ($filter) {
+            $filter->column(1 /2, function ($filter) {
 
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
                     $query->whereDate('created_at', '>=', $datt);
                 }, __('from_date'), 'from_date')->date();
-            });
-            $filter->column(1 / 2, function ($filter) {
+            // });
+            // $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
 
