@@ -170,6 +170,11 @@ class ChangeCountryRequestController extends MainController
          $user->country_id = $request->country_id;
          $user->save();
 
+        $title = __('Change Country Request');
+        $body = __('Your country change request has been accepted');
+        Common::sendOfficialMessage($user->id, $title, $body);
+        Common::send_firebase_notification($user->notification_id, $title, $body);
+
         admin_toastr(__('Request accepted successfully'), 'success');
         return redirect()->back();
     }
@@ -185,6 +190,13 @@ class ChangeCountryRequestController extends MainController
 
         $request->status = 'rejected';
         $request->save();
+
+        $user = User::find($request->user_id);
+
+        $title = __('Change Country Request');
+        $body = __('Your country crhange request has been rejected');
+        Common::sendOfficialMessage($user->id, $title, $body);
+        Common::send_firebase_notification($user->notification_id, $title, $body);
 
         admin_toastr(__('Request rejected successfully'), 'success');
         return redirect()->back();
