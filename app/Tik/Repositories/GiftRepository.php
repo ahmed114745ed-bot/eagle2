@@ -90,7 +90,7 @@ class GiftRepository extends AbstractRepository
             'show_img',
             'show_img2',
             'image_type'
-        ])->where('id', $giftId)->where('enable', 1)->first();
+        ])->with('category')->where('id', $giftId)->where('enable', 1)->first();
     }
 
     public function findByGiftId($giftId)
