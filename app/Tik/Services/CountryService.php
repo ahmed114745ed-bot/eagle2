@@ -69,7 +69,6 @@ class CountryService
     {
         ChangeCountryRequest::updateOrCreate([
             'user_id' => auth()->id(),
-            'country_id' => $data['country_id'],
             'status' => 'pending'
         ], $data + ['user_id' => auth()->id()]);
 
