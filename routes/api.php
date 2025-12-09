@@ -531,6 +531,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/v2', [EmojiController::class, 'all']);
                 Route::get('/{id}', [EmojiController::class, 'show']);
             });
+
+            Route::prefix('/v2/emojis')->group(function () {
+                Route::get('/categories', [EmojiController::class, 'categories']);
+                Route::get('/', [EmojiController::class, 'all']);
+            });
             // start levels
             Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
             // end levels
