@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ChangeCountryRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -341,6 +342,10 @@ Route::group(
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
+        Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
+        Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
+        Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
+
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');

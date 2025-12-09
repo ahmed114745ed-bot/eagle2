@@ -4644,6 +4644,18 @@
     "Transfer Fee": "رسوم التحويل",
     "Moment Status":"اعدادات اللحظات",
     "Enable moment status Feature":"تمكين ميزه اللحظات ",
+
+    "you request has been sent successfully": "تم إرسال طلبك بنجاح",
+    "Change Country Requests": "طلبات تغيير الدولة",
+    "Accepted": "مقبول",
+    "No User": "لا يوجد مستخدم",
+    "Request accepted successfully": "تم قبول الطلب بنجاح",
+    "Request rejected successfully": "تم رفض الطلب بنجاح",
+    "This request has already been processed": "تم معالجة هذا الطلب مسبقاً",
+    "Change Country Request": "طلب تغيير الدولة",
+    "Your country change request has been accepted": "تم قبول طلب تغيير الدولة الخاص بك",
+    "Your country change request has been rejected": "تم رفض طلب تغيير الدولة الخاص بك",
+
     "upload_card_back": "📷 اضغط لرفع صورة  "
 
 
