@@ -18,6 +18,7 @@ class LanguageSeeder extends Seeder
             ['name' => 'العربية', 'code' => 'ar', 'direction' => 'RTL', 'is_enabled' => true],
             ['name' => 'Türkçe', 'code' => 'tr', 'direction' => 'LTR', 'is_enabled' => true],
             ['name' => 'हिन्दी', 'code' => 'hi', 'direction' => 'LTR', 'is_enabled' => true],
+            ['name' => 'Indonesia', 'code' => 'id', 'direction' => 'LTR', 'is_enabled' => true],
         ];
 
         foreach ($languages as $language) {
