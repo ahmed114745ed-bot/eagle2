@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ChangeCountryRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,7 @@ use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
+use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
@@ -69,14 +71,15 @@ use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\GameSettingsController;
+use App\Admin\Controllers\GiftCategoryController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\GiftCategoryController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\DeleteAccountController;
+use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
@@ -339,9 +342,21 @@ Route::group(
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
+        Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
+        Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
+        Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
+
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
+
+        Route::get('/emojis/create/{filter}', [EmojiController::class, 'create']);
+        Route::post('/emojis/create', [EmojiController::class, 'store']);
+
+        Route::prefix('emojis')->group(function () {
+            Route::get('/{filter?}', [EmojiController::class, 'index']);
+        });
+        Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');

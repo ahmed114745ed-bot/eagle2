@@ -628,7 +628,7 @@ class UserController extends MainController
         $countries = $this->countries();
         $badges = UserBadge::where('user_id', $id)->with('admin')
             ->orderByRaw("
-                    CASE 
+                    CASE
                         WHEN expire = 0 THEN 0
                         WHEN expire >= ? THEN 0
                         ELSE 1
