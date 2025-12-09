@@ -150,7 +150,7 @@ class GiftLogService
             })->whereIn('status', [1, 4])->first();
            
             $cpIds = [];
-            $cpEnableAllGifts = getSettingCash('cp_enable_all_gifts');
+            $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
             Log::info("CP Check: cpId={$cpId?->id}, cpEnableAllGifts={$cpEnableAllGifts}, giftId={$gift->id}, giftCategoryType={$gift->category?->type}");
 
