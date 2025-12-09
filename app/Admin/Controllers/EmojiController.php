@@ -84,13 +84,14 @@ class EmojiController extends MainController
         $grid = new Grid(new Emoji);
 
         // Get the current filter from request or default to first category
-        $filterType = request('filter', 'all');
+        $filterType = request()->get('filter', 'all');
         $category  = [];
+        
         if (request('filter') != 'all') {
             $category = EmojiCategory::find(request('filter'));
         }
 
-        $filterType = request()->get('filter', @$category->id);
+
 
         // Header tabs
         $grid->header(function () use ($filterType) {
