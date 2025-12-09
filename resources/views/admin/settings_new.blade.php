@@ -640,6 +640,7 @@ use Modules\Vip\Entities\Vip;
 
             <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="current_tab" value="">
                 <div class="form row">
 
                     <div class="col-md-6">
@@ -715,6 +716,7 @@ use Modules\Vip\Entities\Vip;
                 <div class="tab-content">
                     <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="landingSettingsForm">
                         @csrf
+                        <input type="hidden" name="current_tab" value="">
 
                         <!-- General Settings -->
                         <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -790,6 +792,7 @@ use Modules\Vip\Entities\Vip;
                     enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
+                        <input type="hidden" name="current_tab" value="">
 
 
                         {{-- <div class="col-md-6">
@@ -1549,6 +1552,7 @@ use Modules\Vip\Entities\Vip;
                                 <form action="{{ route('admin.app.settings.update') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
+                                    <input type="hidden" name="current_tab" value="">
                                     <div class="card payment-card p-3 shadow">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
@@ -2658,6 +2662,7 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                             <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="current_tab" value="">
                                 <div class="card exp-card-cont p-3 shadow">
                                     <div class="card-header exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('Android link') }}</h4>
@@ -2712,6 +2717,7 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                             <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="current_tab" value="">
                                 <div class="card exp-card-cont p-3 shadow">
                                     <div class="card-header exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('huawei link') }}</h4>
@@ -2962,7 +2968,7 @@ use Modules\Vip\Entities\Vip;
                                 </div>
                             </div>
                         </div>
-                  
+
 @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio']))
 
                         <div class="col-md-6">
@@ -3389,7 +3395,7 @@ use Modules\Vip\Entities\Vip;
                     }
 
                     // Which outer section is open?
-                    const activeTab = getQueryParam("firsttab") || "brandSettings";
+                    const activeTab = getQueryParam("tab") || "brandSettings";
                     showSection(activeTab);
 
                     // Auto-open inner tabs if workSettings is loaded
@@ -3430,11 +3436,19 @@ use Modules\Vip\Entities\Vip;
 
                     const section = document.getElementById(sectionId);
                     if (section) section.classList.add('active');
+
+                    // Update hidden inputs
+                    document.querySelectorAll('input[name="current_tab"]').forEach(input => {
+                        input.value = sectionId;
+                    });
+
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.set("tab", sectionId);
+                    window.history.pushState({}, "", url);
                 }
 
-
-
-                    function changeInnerTab(type) {
+                function changeInnerTab(type) {
                         const url = new URL(window.location);
                         url.searchParams.set("firsttab", "workSettings");
                         url.searchParams.set("type", type);
@@ -3450,17 +3464,14 @@ use Modules\Vip\Entities\Vip;
                         showInnerContent(type);
                     }
 
+                function showInnerContent(type) {
+                    document.querySelectorAll(".inner-tab-content").forEach(content => {
+                        content.style.display = "none";
+                    });
 
-function showInnerContent(type) {
-    document.querySelectorAll(".inner-tab-content").forEach(content => {
-        content.style.display = "none";
-    });
-
-    const section = document.getElementById(type + "_tab");
-    if (section) section.style.display = "block";
-}
-
-
+                    const section = document.getElementById(type + "_tab");
+                    if (section) section.style.display = "block";
+                }
 
                 function openFullScreen(imgElement) {
                     var modal = document.getElementById("imageModal");
@@ -3473,7 +3484,6 @@ function showInnerContent(type) {
                 function closeFullScreen() {
                     document.getElementById("imageModal").style.display = "none";
                 }
-
 
                 function toggleBackgroundInput() {
                     const type = document.getElementById("background_type").value;
