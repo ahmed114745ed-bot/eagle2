@@ -151,6 +151,7 @@ class GiftLogService
            
             $cpIds = [];
             $cpEnableAllGifts = getSettingCash('cp_enable_all_gifts');
+
 Log::info("CP Check: cpId={$cpId?->id}, cpEnableAllGifts={$cpEnableAllGifts}, giftId={$gift->id}, giftCategoryType={$gift->category?->type}");
 
             if ($cpId != null) {
