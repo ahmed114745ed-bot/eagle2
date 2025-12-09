@@ -43,30 +43,15 @@ class UpgradeReceiverLevelServices
 
     public function checkUserLevelUpgrated(User &$user)
     {
-            Log::info("Start checkUserLevelUpgrated", [
-        'user_id' => $user->id,
-        'old_received_level' => $user->received_level,
-        'sub_received_level' => $user->sub_receiver_level,
-        'total_received_diamonds' => $user->total_received_diamonds,
-    ]);
         $oldReceiverLevel = $user->received_level;
         $subReceivedLevel = $user->sub_receiver_level;
 
         $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
-         Log::info("Receiver level calculated", [
-        'user_id' => $user->id,
-        'new_level' => $receiverLevel,
-        'old_level' => $oldReceiverLevel
-    ]);
+   
        
         $user->received_level = $receiverLevel;
-        $user->save();
 
 
-    Log::info("User level saved", [
-        'user_id' => $user->id,
-        'saved_received_level' => $user->received_level
-    ]);
         if ($receiverLevel > $oldReceiverLevel) {
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_received_level);
             if ($hadNotRewards) {
