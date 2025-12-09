@@ -393,7 +393,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
-
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
@@ -442,7 +441,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
                 Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
+                Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 
@@ -527,8 +526,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
             Route::prefix('emojis')->group(function () {
+                Route::get('/categories', [EmojiController::class, 'categories']);
                 Route::get('/', [EmojiController::class, 'index']);
+                Route::get('/v2', [EmojiController::class, 'all']);
                 Route::get('/{id}', [EmojiController::class, 'show']);
+            });
+
+            Route::prefix('/v2/emojis')->group(function () {
+                Route::get('/categories', [EmojiController::class, 'categories']);
+                Route::get('/', [EmojiController::class, 'all']);
             });
             // start levels
             Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
@@ -753,4 +759,3 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
-

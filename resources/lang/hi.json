@@ -13,6 +13,7 @@
     "Select Super Admin": "सुपर एडमिन चुनें",
     "Roles": "भूमिकाएँ",
     "User Info": "उपयोगकर्ता जानकारी",
+    "Emoji Categories": "इमोजी श्रेणियाँ",
     "Charge by": "चार्ज करें द्वारा",
     "badge_gift_message_hi": "आपको एक नया बैज उपहार में मिला है।",
     "Charge reports": "चार्ज रिपोर्ट",
@@ -21,6 +22,14 @@
     "Agency name": "एजेंसी का नाम",
     "coins per hour": "सिक्के प्रति घंटा",
     "move": "स्थानांतरित करें",
+    "Move switch emoji": "इमोजी स्विच स्थानांतरित करें",
+"Browse emoji categories": "इमोजी श्रेणियों को ब्राउज़ करें",
+"Create emoji categories": "इमोजी श्रेणियाँ बनाएं",
+"Delete emoji categories": "इमोजी श्रेणियाँ हटाएँ",
+"Edit emoji categories": "इमोजी श्रेणियाँ संपादित करें",
+"Show emoji categories": "इमोजी श्रेणियाँ दिखाएँ",
+"Edit live rooms": "लाइव रूम संपादित करें",
+"Delete live rooms": "लाइव रूम हटाएँ",
 "Move switch gift": "स्विच गिफ्ट बटन",
 "Browse gift categories": "उपहार श्रेणियों ब्राउज़ करें",
 "Create gift categories": "उपहार श्रेणियां बनाएं",
@@ -3742,7 +3751,13 @@
     "Bank Account ": "बैंक खाता",
     "Minimum": "न्यूनतम",
     "Transfer Fee": "हस्तांतरण शुल्क",
-    "upload_card_back": "📷 कार्ड के पीछे की तस्वीर अपलोड करने के लिए क्लिक करें"
+    "upload_card_back": "📷 कार्ड के पीछे की तस्वीर अपलोड करने के लिए क्लिक करें",
+      "CP Settings": "CP सेटिंग्स",
+    "Enable all CP gifts": "सभी CP गिफ़्ट सक्षम करें",
+    "Enabled": "सक्रिय",
+    "Disabled": "निष्क्रिय",
+    "Updated successfully!": "सफलतापूर्वक अपडेट किया गया!",
+    "Something went wrong!": "कुछ गलत हो गया!"
 
 
 

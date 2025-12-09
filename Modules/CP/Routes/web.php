@@ -25,8 +25,10 @@ Route::group(
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
         $router->resource ('cp-reports',CpReportRelationController::class);
+        $router->get('cp-settings', \Modules\CP\Http\Controllers\web\CpSettingsController::class.'@index');
+        $router->post('cp-settings/update', \Modules\CP\Http\Controllers\web\CpSettingsController::class.'@update');
 
-
+       
         Route::prefix('cp-levels/{relation_id}')->group(function () {
             Route::get('/', [LevelController::class, 'index'])->name('cp-levels.index');
             Route::get('/create', [LevelController::class, 'create'])->name('cp-levels.create');

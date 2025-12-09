@@ -1505,7 +1505,13 @@
 "area name":"Area Name",
 "upload_card_back": "📷 Click to upload ",
 "Browse live rooms": "Browse live broadcasts",
-"Show live rooms": "Show live broadcasts"
+"Show live rooms": "Show live broadcasts",
+    "CP Settings": "CP Settings",
+    "Enable all CP gifts": "Enable all CP gifts",
+    "Enabled": "Enabled",
+    "Disabled": "Disabled",
+    "Updated successfully!": "Updated successfully!",
+    "Something went wrong!": "Something went wrong!"
 
 
 
