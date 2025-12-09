@@ -21,13 +21,13 @@ class MoveEmojiCategoryAction extends RowAction
         $newCategory = $request->get('category_id');
 
         if (!$newCategory) {
-            return $this->response()->error('Please select category')->refresh();
+            return $this->response()->error(__('Please select category'))->refresh();
         }
 
         $gift->emoji_category_id = $newCategory;
         $gift->save();
 
-        return $this->response()->success('emoji moved successfully')->refresh();
+        return $this->response()->success(__('emoji moved successfully'))->refresh();
     }
 
     // Popup form

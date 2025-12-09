@@ -84,15 +84,20 @@ class EmojiController extends MainController
         $grid = new Grid(new Emoji);
 
         // Get the current filter from request or default to first category
-        $category = EmojiCategory::first();
-        // $filterType = request('filter', optional($category)->id);
-        $filterType = request()->get('filter', @$category->id);
+        $filterType = request()->get('filter', 'all');
+        $category  = [];
+        
+        if (request('filter') != 'all') {
+            $category = EmojiCategory::find(request('filter'));
+        }
+
+
 
         // Header tabs
         $grid->header(function () use ($filterType) {
             $locale = App::getLocale();
 
-            $tabs = [];
+            $tabs = ['all' => __('All')];
             $categories = EmojiCategory::orderBy('id')->get();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
@@ -130,7 +135,7 @@ class EmojiController extends MainController
         $grid->disableExport();
         $grid->disableCreateButton();
 
-        if ($category) {
+        if ($category && $filterType != 'all') {
             $grid->tools(function (Grid\Tools $tools) use ($filterType) {
                 $url =  url('/admin/emojis/create/' . $filterType); // Use Laravel route helper
                 $add = __('add');
