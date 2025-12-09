@@ -155,9 +155,7 @@ class EmojiController extends MainController
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
-                && $model->category->type != null
-            ) {
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new MoveEmojiCategoryAction());
             }
         });
