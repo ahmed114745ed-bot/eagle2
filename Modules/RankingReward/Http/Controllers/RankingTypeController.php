@@ -91,15 +91,15 @@ class RankingTypeController extends MainController
             return Carbon::parse($value)->format('Y-m-d');
         });
 
-        if (Admin::user()->can('browse-ranking-rewards') || Admin::user()->can('*')) {
-            if (!request()->filled('_export_')) {
-                $grid->column(__('Procedures'))->display(function () {
-                    $url = url('admin/ranking-rewards/' . $this->id);
-                    $text = __('Ranking Rewards');
-                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
-                });
-            }
-        }
+//        if (Admin::user()->can('browse-ranking-rewards') || Admin::user()->can('*')) {
+//            if (!request()->filled('_export_')) {
+//                $grid->column(__('Procedures'))->display(function () {
+//                    $url = url('admin/ranking-rewards/' . $this->id);
+//                    $text = __('Ranking Rewards');
+//                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
+//                });
+//            }
+//        }
 
         $grid->disableCreateButton();
 
@@ -138,7 +138,6 @@ class RankingTypeController extends MainController
         $form->hidden('ranking_type_id');
         $form->hidden('action')->default('submit');
 
-        // Ignore reward fields from RankingRange
         $form->ignore(['target_type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire_days', 'action']);
 
         if (!$form->isEditing()) {
@@ -283,49 +282,72 @@ class RankingTypeController extends MainController
             });
 
         $form->html('
-        <script>
-        $(document).on("click", ".delete-reward", function() {
-            var id = $(this).data("id");
-            var item = $("#reward-item-" + id);
-            var rankingRangeId = "' . $rankingRangeId . '";
+            <script>
+            $(document).on("click", ".delete-reward", function() {
+                var id = $(this).data("id");
+                var item = $("#reward-item-" + id);
+                var rankingRangeId = "' . $rankingRangeId . '";
 
-            item.css("opacity", "0.5");
+                item.css("opacity", "0.5");
 
-            $.ajax({
-                url: "' . admin_url('ranking-rewards') . '/" + rankingRangeId + "/" + id,
-                type: "POST",
-                data: {
-                    _token: LA.token,
-                    _method: "DELETE"
-                },
-                success: function(response) {
-                    item.fadeOut(300, function() {
-                        $(this).remove();
-                    });
-                    toastr.success("Deleted!");
-                }
+                $.ajax({
+                    url: "' . admin_url('ranking-rewards') . '/" + rankingRangeId + "/" + id,
+                    type: "POST",
+                    data: {
+                        _token: LA.token,
+                        _method: "DELETE"
+                    },
+                    success: function(response) {
+                        item.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        toastr.success("Deleted!");
+                    },
+                    error: function() {
+                        item.css("opacity", "1");
+                        toastr.error("Error deleting!");
+                    }
+                });
             });
-        });
 
-        $(document).on("click", "#btn-add-continue", function() {
-            $("input[name=action]").val("add_continue");
-            $(this).closest("form").submit();
-        });
-        </script>
-    ');
+            $(document).off("click", "#btn-add-continue").on("click", "#btn-add-continue", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var btn = $(this);
+
+                if (btn.data("submitting")) {
+                    return false;
+                }
+                btn.data("submitting", true);
+
+                var form = btn.closest("form");
+
+                btn.html("<i class=\"fa fa-spinner fa-spin\"></i> ' . __('Loading...') . '");
+                btn.prop("disabled", true);
+
+                $("input[name=action]").val("add_continue");
+
+                form.find(".btn-primary[type=submit]").addClass("disabled").attr("disabled", true);
+
+                form.submit();
+
+                return false;
+            });
+            </script>
+        ');
 
         $form->html('
-        <div class="box-footer">
-            <button type="button" id="btn-add-continue" class="btn btn-success">
-                <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
-            </button>
-        </div>
-    ');
+            <div class="box-footer">
+                <button type="button" id="btn-add-continue" class="btn btn-success">
+                    <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
+                </button>
+            </div>
+        ');
 
         $form->saving(function (Form $form) {
             $action = request('action');
 
-            // Validate reward fields when adding
             if ($action === 'add_continue') {
                 $targetType = request('target_type');
 
@@ -399,11 +421,17 @@ class RankingTypeController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            static $rewardSaved = false;
+
+            if ($rewardSaved) {
+                return;
+            }
+
             $rankingRange = $form->model();
             $targetType = request('target_type');
             $action = request('action');
 
-            if ($targetType && $action === 'add_continue') {
+            if ($targetType) {
                 $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5');
 
                 if ($targetType === 'achievement' && request()->hasFile('target4')) {
@@ -411,18 +439,24 @@ class RankingTypeController extends MainController
                     $target = $file->store('achievements', 'gcs');
                 }
 
-                $reward = new RankingReward();
-                $reward->ranking_range_id = $rankingRange->id;
-                $reward->target_type = $targetType;
-                $reward->target = $target;
-                $reward->expire_days = request('expire_days');
-                $reward->save();
+                if ($target) {
+                    $reward = new RankingReward();
+                    $reward->ranking_range_id = $rankingRange->id;
+                    $reward->target_type = $targetType;
+                    $reward->target = $target;
+                    $reward->expire_days = request('expire_days');
+                    $reward->save();
 
-                admin_toastr(__('Reward added!'));
+                    $rewardSaved = true;
+                }
 
-                throw new HttpResponseException(
-                    redirect(admin_url('ranking-types/' . $rankingRange->id . '/edit'))
-                );
+                if ($action === 'add_continue') {
+                    admin_toastr(__('Reward added!'));
+
+                    throw new HttpResponseException(
+                        redirect(admin_url('ranking-types/' . $rankingRange->id . '/edit'))
+                    );
+                }
             }
         });
 

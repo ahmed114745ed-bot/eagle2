@@ -1168,9 +1168,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+//                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
+//                        PermissionType::ADMIN->value => $defaultMethods,
+//                    ],],
                 ],
             ],
         ];
