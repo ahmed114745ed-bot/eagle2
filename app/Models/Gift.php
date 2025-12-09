@@ -31,12 +31,17 @@ class Gift extends Model
     }
     public function vip()
     {
-        return $this->hasOne(OVip::class,'id','vip_level');
+        return $this->hasOne(OVip::class, 'id', 'vip_level');
     }
 
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_gifts')
             ->withPivot('quantity');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(GiftCategory::class, 'gift_category_id');
     }
 }

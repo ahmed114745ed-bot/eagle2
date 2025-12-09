@@ -1076,7 +1076,6 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
-    LogHelper::info("starting lucky gift test...");
     Artisan::call('cache:clear');
 $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 

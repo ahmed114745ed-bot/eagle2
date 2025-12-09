@@ -104,6 +104,12 @@
 "Copy": "نسخ",
 "helper links": "روابط المساعدة",
 
+      "English": "الإنجليزية",
+  "Arabic": "العربية",
+  "Hindi": "الهندية",
+  "Urdu": "الأردية",
+  "Title": "العنوان",
+  "Gift Categories": "فئات الهدايا",
 "Browse cp report": "تصفح تقرير CP",
 "Cancel cp switch cp report": "إلغاء CP أو تبديل تقرير CP",
 "Cp Relation": "علاقة CP",
@@ -491,6 +497,13 @@
     "full members": "الأعضاء مكتملون",
     "try to remove your self": "حاول إزالة نفسك",
     "cant follow your self": "لا يمكنك متابعة نفسك",
+    "move": "نقل",
+    "Move switch gift":" نقل",
+"Browse gift categories": "تصفح فئات الهدايا",
+"Create gift categories": "إنشاء فئات الهدايا",
+"Delete gift categories": "حذف فئات الهدايا",
+"Edit gift categories": "تعديل فئات الهدايا",
+"Show gift categories": "عرض فئات الهدايا",
     "this user not found": "لم يتم العثور على هذا المستخدم",
     "follow done": "تمت المتابعة",
     "unFollow done": "تم إلغاء المتابعة",
@@ -4628,7 +4641,9 @@
     "Bank Account ": "حساب بنكي",
     "Minimum": "الحد الأدنى",
     "Transfer Fee": "رسوم التحويل",
-"upload_card_back": "📷 اضغط لرفع صورة  "
+    "Moment Status":"اعدادات اللحظات",
+    "Enable moment status Feature":"تمكين ميزه اللحظات ",
+    "upload_card_back": "📷 اضغط لرفع صورة  "
 
 
 
