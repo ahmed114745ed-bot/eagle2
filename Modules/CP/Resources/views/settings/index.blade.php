@@ -71,7 +71,7 @@ input:checked + .slider:before {
     <div class="box-body no-padding">
         <div class="switch-container">
 
-            <div class="switch-item">
+            <div class="switch-item" style=" width: 50%;">
                 <label for="enableAllGiftsCP" class="switch-label">
                     {{ __('Enable all CP gifts') }}
                 </label>
