@@ -18,6 +18,7 @@ class EmojiCategoryController extends MainController
      * @var string
      */
     protected $title = 'EmojiCategory';
+    public $permission_name = 'emoji-categories';
 
     public function index(Content $content)
     {

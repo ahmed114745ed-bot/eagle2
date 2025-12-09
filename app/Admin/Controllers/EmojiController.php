@@ -11,6 +11,7 @@ use App\Models\EmojiCategory;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use App\Admin\Actions\MoveEmojiCategoryAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class EmojiController extends MainController
@@ -85,7 +86,7 @@ class EmojiController extends MainController
         // Get the current filter from request or default to first category
         $category = EmojiCategory::first();
         // $filterType = request('filter', optional($category)->id);
-        $filterType = request()->get('filter', $category->id);
+        $filterType = request()->get('filter', @$category->id);
 
         // Header tabs
         $grid->header(function () use ($filterType) {
@@ -129,25 +130,37 @@ class EmojiController extends MainController
         $grid->disableExport();
         $grid->disableCreateButton();
 
+        if ($category) {
+            $grid->tools(function (Grid\Tools $tools) use ($filterType) {
+                $url =  url('/admin/emojis/create/' . $filterType); // Use Laravel route helper
+                $add = __('add');
 
-        $grid->tools(function (Grid\Tools $tools) use ($filterType) {
-            $url =  url('/admin/emojis/create/' . $filterType); // Use Laravel route helper
-            $add = __('add');
-
-            $customButtonHTML = <<<HTML
+                $customButtonHTML = <<<HTML
                 <a href="{$url}" class="btn btn-sm btn-success" style="margi    n-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
             HTML;
 
-            $tools->append($customButtonHTML);
-        });
+                $tools->append($customButtonHTML);
+            });
+        }
+
         // Optional: remove table-responsive for large screens
         Admin::script("
         if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
+        $permission    = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
+                && $model->category->type != null
+            ) {
+                $actions->add(new MoveEmojiCategoryAction());
+            }
+        });
 
         return $grid;
     }
