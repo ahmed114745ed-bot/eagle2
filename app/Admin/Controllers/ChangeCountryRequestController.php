@@ -1,0 +1,192 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Admin\Services\UserService;
+use App\Models\ChangeCountryRequest;
+use App\Models\User;
+use Carbon\Carbon;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\Country;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
+
+
+class ChangeCountryRequestController extends MainController
+{
+    use HasResourceActions;
+
+    public $permission_name = 'change-country-request';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('Change Country Requests'))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Change Country Requests'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new ChangeCountryRequest());
+        $grid->model()->with(['country', 'user.packs'])->orderByDesc('created_at');
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->equal('status', __('Status'))->select([
+                'pending' => 'Pending',
+                'accepted' => 'Accepted',
+                'rejected' => 'Rejected'
+            ]);
+
+            $filter->equal('country_id', __('Country'))->select(
+                Country::pluck('e_name', 'id')
+            );
+        });
+
+        $grid->id(__('ID'));
+
+        $grid->column('name', __('Name'))
+            ->display(function ($name) {
+
+                $user = $this->user;
+                if (! $user) {
+                    return __('No User');
+                }
+                $showUrl = url("admin/users/{$user->id}");
+                return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl:$showUrl);
+            });
+
+        $grid->column('country.e_name', __('Country'))->display(function () {
+            if ($this->country) {
+                return __("countries.{$this->country->e_name}");
+            }
+            return '-';
+        });
+
+        $grid->column('country.flag', trans('flag'))->image('', 30);
+
+        $grid->column('status', trans('Status'))->display(function ($value) {
+            $colors = [
+                'pending' => 'warning',
+                'accepted' => 'success',
+                'rejected' => 'danger'
+            ];
+            $color = $colors[$value] ?? 'default';
+            return "<span class='label label-{$color}'>" . __(ucfirst($value)) . "</span>";
+        });
+
+        if (Admin::user()->can('status-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('action', trans('Action'))->display(function () {
+                if ($this->status === 'pending') {
+                    $acceptUrl = admin_url("country-requests/{$this->id}/accept");
+                    $rejectUrl = admin_url("country-requests/{$this->id}/reject");
+
+                    $acceptText = __('Accept');
+                    $rejectText = __('Reject');
+
+                    return <<<HTML
+                        <a href="{$acceptUrl}" class="btn btn-success btn-xs">
+                            <i class="fa fa-check"></i> {$acceptText}
+                        </a>
+                        <a href="{$rejectUrl}" class="btn btn-danger btn-xs">
+                            <i class="fa fa-times"></i> {$rejectText}
+                        </a>
+                    HTML;
+                }
+                return '-';
+            });
+        }
+
+        $grid->column('created_at', __('Created At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
+
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(ChangeCountryRequest::findOrFail($id));
+
+        $show->id('ID');
+        $show->field('country.e_name', trans('Country'));
+        $show->field('user_id', trans('User ID'));
+        $show->field('status', trans('Status'));
+        $show->field('created_at', trans('Created At'));
+        $show->field('updated_at', trans('Updated At'));
+
+        $this->extendShow($show);
+        return $show;
+    }
+
+    public function accept($id)
+    {
+        $request = ChangeCountryRequest::findOrFail($id);
+
+        if ($request->status !== 'pending') {
+            admin_toastr('This request has already been processed', 'error');
+            return redirect()->back();
+        }
+
+        $request->status = 'accepted';
+        $request->save();
+
+         $user = User::find($request->user_id);
+         $user->country_id = $request->country_id;
+         $user->save();
+
+        admin_toastr(__('Request accepted successfully'), 'success');
+        return redirect()->back();
+    }
+
+    public function reject($id)
+    {
+        $request = ChangeCountryRequest::findOrFail($id);
+
+        if ($request->status !== 'pending') {
+            admin_toastr(__('This request has already been processed'), 'error');
+            return redirect()->back();
+        }
+
+        $request->status = 'rejected';
+        $request->save();
+
+        admin_toastr(__('Request rejected successfully'), 'success');
+        return redirect()->back();
+    }
+}

@@ -393,7 +393,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
-                
+
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
@@ -408,6 +408,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
+                Route::post('change-request', [CountryController::class, 'changeRequest']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
