@@ -44,4 +44,23 @@ class Gift extends Model
     {
         return $this->belongsTo(GiftCategory::class, 'gift_category_id');
     }
+
+    public function canPassToCp($cpEnableAllGifts)
+    {
+        if ($cpEnableAllGifts) {
+            return true; 
+        }
+        return $this->category && $this->category->type === 'cp';
+    }
+
+        public function scopeCpAllowed($query, $cpEnableAllGifts)
+    {
+        if ($cpEnableAllGifts) {
+            return $query;
+        }
+
+        return $query->whereHas('category', function ($q) {
+            $q->where('type', 'cp');
+        });
+    }
 }
