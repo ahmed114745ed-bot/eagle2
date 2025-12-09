@@ -185,7 +185,7 @@ class DailyRankingRewardCommand extends Command
                 ->exists();
 
             if ($exists) {
-                 continue;  // reward already given today
+                continue;  // reward already given today
             }
 
             // Coins
@@ -205,7 +205,7 @@ class DailyRankingRewardCommand extends Command
             // VIP
             elseif ($reward->target_type == "vip") {
                 $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking');
+                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, receiveType:'gift-ranking');
             }
 
             // Ware
