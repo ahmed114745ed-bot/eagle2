@@ -32,9 +32,8 @@ class CpSettingsController
 
 private function getSetting($key, $default = null)
 {
-    return Cache::rememberForever($key, function () use ($key, $default) {
-        return Setting::where('key', $key)->value('value') ?? $default;
-    });
+   return  getCpGiftsStatus('cp_enable_all_gifts') ?? 1 ;
+   
 }
 
 private function setSetting($key, $value)
