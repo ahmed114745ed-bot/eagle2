@@ -3693,6 +3693,11 @@
     "withdraw": ":admin द्वारा निकाला गया",
     "source:": "स्रोत:",
     "gift:": "उपहार:",
+"wallet.add": "लक्ष्य प्राप्ति",
+"wallet.subtract": "निकासी",
+"wallet.transfer": "स्थानांतरण"
+
+,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
 
 

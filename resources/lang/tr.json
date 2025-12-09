@@ -4060,6 +4060,10 @@
     "withdraw": ":admin tarafından çekildi",
     "User Withdrawal": "Kullanıcı Çekimi",
     "source:": "Kaynak:",
+    "wallet.add": "Hedef Başarısı",
+"wallet.subtract": "Çekim",
+"wallet.transfer": "Transfer"
+,
     "gift:": "Hediye:","diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
 
 
