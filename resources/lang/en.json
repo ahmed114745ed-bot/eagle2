@@ -1521,7 +1521,11 @@
 "add_bd_profit": "Profit for BD :admin",
 "transfer_to": "Transferred to :target",
 "transfer_from": "Transferred from :target",
-"withdraw": "Withdrawn by :admin"
+"withdraw": "Withdrawn by :admin",
+"wallet.add": "Target Achievement",
+"wallet.subtract": "Withdraw",
+"wallet.transfer": "Transfer"
+
 
 
 

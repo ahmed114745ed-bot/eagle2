@@ -4708,7 +4708,12 @@
     "add_bd_profit": "أرباح مدير وكالة :admin",
     "transfer_to": "تم التحويل إلى :target",
     "transfer_from": "تم التحويل من :target",
-    "withdraw": "تم السحب بواسطة :admin"
+    "source:": "مصدر:",
+    "gift:": "هدية:",
+    "withdraw": "تم السحب بواسطة :admin",
+"wallet.add": "تحقيق تارجت",
+"wallet.subtract": "سحب",
+"wallet.transfer": "تحويل"
 
 
 

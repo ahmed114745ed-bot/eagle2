@@ -640,9 +640,22 @@ class UserController extends MainController
         
         $curantBalance = wallet_available_by_user($id);
         $availableBalance = wallet_available_by_user($id);
-       
-        $walletLogs = WalletLog::where('user_id', $user->id) ->orderBy('id', 'DESC') ->paginate(20);
-       
+        
+        $walletLogs = WalletLog::where('user_id', $user->id)
+            ->when(request('year'), function ($q) {
+                $q->whereYear('created_at', request('year'));
+            })
+            ->when(request('month'), function ($q) {
+                $q->whereMonth('created_at', request('month'));
+            })
+            ->orderByDesc('id')
+            ->paginate(20, ['*'], 'wallet_logs_page')
+            ->appends([
+                'tab'   => 'wallet_logs',
+                'year'  => request('year'),
+                'month' => request('month'),
+            ]);
+     
        
         $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries' ,'availableBalance','curantBalance','walletLogs');
         return  parent::show($id, $content->title(__('user profile'))
