@@ -51,7 +51,7 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
-         $languages = Language::select(['id', 'name'])->get();
+         $languages = Language::select(['id', 'name', 'code'])->get();
          $chargeTabType = request()->get('type', 'Experience');
 
 

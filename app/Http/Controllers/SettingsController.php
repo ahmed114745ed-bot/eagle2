@@ -258,7 +258,7 @@ class SettingsController extends Controller
         if ($request->has('default_language')) {
             Language::query()->update(['is_default' => 0]);
 
-            Language::where('id', (int)$request->default_language)->update(['is_default'=> 1]);
+            Language::where('code', $request->default_language)->update(['is_default'=> 1]);
         }
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

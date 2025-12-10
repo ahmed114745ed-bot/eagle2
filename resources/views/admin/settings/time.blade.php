@@ -28,8 +28,8 @@
             <label>{{ __('Default language:') }}</label>
             <select name="default_language" class="form-control select2-language">
                 @foreach ($languages as $language)
-                    <option value="{{ $language->id }}"
-                        {{ $language->id == ($settings['default_language'] ?? '') ? 'selected' : '' }}>
+                    <option value="{{ $language->code }}"
+                        {{ $language->code == ($settings['default_language'] ?? '') ? 'selected' : '' }}>
                         {{  $language->name  }}
                     </option>
                 @endforeach
