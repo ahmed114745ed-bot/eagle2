@@ -28,15 +28,15 @@ class LanguageController extends MainController
      * @return Grid
      */
 
-     public function index(Content $content)
-     {
-         return parent::index($content
-             ->title(__('Languages'))
-             ->description(__('Manage the available languages'))
-             ->body($this->grid()));
-     }
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__('Languages'))
+            ->description(__('Manage the available languages'))
+            ->body($this->grid()));
+    }
 
-     public function edit($id, Content $content)
+    public function edit($id, Content $content)
     {
         return parent::edit($id, $content
             ->title(trans('Languages'))
@@ -67,9 +67,45 @@ class LanguageController extends MainController
             'LTR' => __('Left to Right (LTR)'),
             'RTL' => __('Right to Left (RTL)')
         ]);
+        $grid->column('default', __('default language'))->display(function () {
+            if (request()->filled('_export_')) {
+                return $this->is_default;
+            }
 
-        if (Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('is_enabled', __('Is enabled'))->switch();
+            if ($this->is_default == 1) {
+                return <<<HTML
+                    <span style="display: flex; align-items: center;">
+                        <span style="
+                            font-size: smaller;
+                            background: red;
+                            display: inline-block;
+                            border-radius: 50%;
+                            width: 10px;
+                            height: 10px;
+                            margin-left: 5px;
+                        " title=""></span>
+                    </span>
+                HTML;
+            } else {
+                return '<span style="color: #999;"></span>';
+            }
+        });
+
+        if ((Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*'))) {
+            //   $grid->column('is_enabled', __('Is enabled'))->switch();
+
+            $grid->column('is_enabled', __('Is enabled'))
+                ->switch() // normal switch
+                ->display(function ($value) {
+                    // $this is the model here
+
+                    if ($this->is_default == 1) {
+                        $enable = __('Enabled');
+                        // For default language, just show the value, no switch
+                        return $value ? '<span class="label label-success">' . $enable . '</span>' : $value;
+                    }
+                    return $value;
+                });
         }
 
 
@@ -77,10 +113,21 @@ class LanguageController extends MainController
         $grid->disableActions();       // تعطيل زر العرض والتعديل والحذف لكل صف
         $grid->disableRowSelector();   // تعطيل تحديد الصفوف للحذف الجماعي
         $grid->disableExport();        // تعطيل زر التصدير (اختياري)
-     
-        // $grid->column('is_enabled', __('Is enabled'));
-        // $grid->column('created_at', __('Created at'));
-        // $grid->column('updated_at', __('Updated at'));
+        $defaultExist = Language::where('is_default', 1)->exists();
+        if (!$defaultExist) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $url = url('/admin/settings?tab=timeSettings');
+                $add = __('set default language');
+
+                $customButtonHTML = <<<HTML
+                    <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                        <i class="fa fa-plus"></i> {$add}
+                    </a>
+                    HTML;
+
+                $tools->append($customButtonHTML);
+            });
+        }
 
         return $grid;
     }
@@ -119,12 +166,12 @@ class LanguageController extends MainController
         $form->text('name', __('Name'));
         $form->text('code', __('Code'));
         $form->select('direction', __('Direction'))
-        ->options([
-            'LTR' => 'Left to Right (LTR)',
-            'RTL' => 'Right to Left (RTL)',
-        ])
-        ->default('LTR');
-            $form->switch('is_enabled', __('Is enabled'))->default(1);
+            ->options([
+                'LTR' => 'Left to Right (LTR)',
+                'RTL' => 'Right to Left (RTL)',
+            ])
+            ->default('LTR');
+        $form->switch('is_enabled', __('Is enabled'))->default(1);
 
         return $form;
     }

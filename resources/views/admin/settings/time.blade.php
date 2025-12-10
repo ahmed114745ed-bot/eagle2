@@ -25,6 +25,16 @@
                 @endforeach
             </select>
 
+            <label>{{ __('Default language:') }}</label>
+            <select name="default_language" class="form-control select2-language">
+                @foreach ($languages as $language)
+                    <option value="{{ $language->id }}"
+                        {{ $language->id == ($settings['default_language'] ?? '') ? 'selected' : '' }}>
+                        {{  $language->name  }}
+                    </option>
+                @endforeach
+            </select>
+
             <label class="mt-3">{{ __('Start of week:') }}</label>
 
             <select name="week_start" class="form-control">
