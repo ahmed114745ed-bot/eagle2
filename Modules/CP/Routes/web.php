@@ -26,7 +26,7 @@ Route::group(
         $router->resource ('weekly-cp',WeeklyCpController::class);
         $router->resource ('cp-reports',CpReportRelationController::class);
         $router->get('cp-settings', \Modules\CP\Http\Controllers\web\CpSettingsController::class.'@index');
-        $router->post('cp-settings/update', \Modules\CP\Http\Controllers\web\CpSettingsController::class.'@update');
+        $router->post('cp-settings/update', \Modules\CP\Http\Controllers\web\CpSettingsController::class.'@updateCp');
 
        
         Route::prefix('cp-levels/{relation_id}')->group(function () {

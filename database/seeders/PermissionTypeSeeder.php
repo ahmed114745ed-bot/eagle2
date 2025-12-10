@@ -742,6 +742,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
                     ],],
+                    ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                 ],
             ],
             [
