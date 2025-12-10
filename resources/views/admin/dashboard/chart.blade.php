@@ -354,12 +354,24 @@ body {
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
 }
 
 .tab-pane {
     animation: fadeIn 0.5s ease forwards;
     opacity: 0;
 }
+.nav-tabs {
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+}
+
+.nav-tabs li {
+    list-style: none;
+    margin: 0 10px; 
+}
+
 
 .tab-pane.show {
     opacity: 1;
@@ -417,7 +429,14 @@ body {
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
                 <div class="filter-form-premium fade-in-up">
-                    <form method="GET" action="{{ url()->current() }}" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <form method="GET" action="{{ url()->current() }}" style=" 
+                padding: 4px 17px;
+                display: flex;
+                border-radius: 15px;
+                gap: 15px;
+                align-items: center;
+                flex-wrap: wrap;
+                    ">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <i class="fas fa-calendar-alt" style="color: var(--accent-primary);"></i>
                             <input type="month" name="date" id="date-filter" value="{{ request('date') }}">

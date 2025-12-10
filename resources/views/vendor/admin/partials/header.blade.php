@@ -215,9 +215,18 @@
 <header class="main-header">
 
 <a href="{{ admin_url('/') }}" class="logo">
-        <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
-        <span class="logo-lg">{!! config('admin.logo', config('admin.name')) !!}</span>
-    </a>
+    <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
+    <span class="logo-lg">{!! config('admin.logo', config('admin.name')) !!}</span>
+</a>
+   <div class="logo-icon">
+                        @if(!empty($logo))
+                            <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
+                        @else
+                                {{ strtoupper(substr($appName, 0, 1)) }}
+                        @endif
+   </div>
+
+
     <nav class="navbar navbar-static-top" role="navigation">
 
         <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
