@@ -327,7 +327,7 @@ class BdController extends MainController
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'bd')->first();
-                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
+                $url = $milestoneId?->id ? url('admin/milestone-rewards/' . $milestoneId->id) : '';
                 $milestone = __('milestone');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
