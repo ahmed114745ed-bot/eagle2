@@ -883,27 +883,6 @@ n<style >
         color: #ffffff !important;
     }
 
-    .form-control,
-    select,
-    .select2-container .select2-selection--single,
-    .select2-container .select2-selection--multiple {
-        background: #ffffff !important;
-        color: #374151 !important;
-        border: 1px solid #d1d5db !important;
-        border-radius: 8px !important;
-        padding: 8px 12px !important;
-        font-size: 0.875rem !important;
-        transition: var(--transition) !important;
-        box-shadow: var(--shadow-sm) !important;
-    }
-
-    .form-control:focus,
-    .select2-container--focus .select2-selection--single {
-        border-color: var(--primary-color) !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
-        outline: none !important;
-    }
-
     .bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
         background-color: var(--primary-color) !important;
         color: var(--text-secondary-color);
@@ -965,7 +944,6 @@ n<style >
     .skin-black-light .main-header > .navbar .nav .open > a:focus,
     .skin-black-light .main-header > .navbar .nav > .active > a {
         background-color: var(--second-color) !important;
-        color: var(--primary-color) !important;
         border-left: 1px solid var(--second-alpha) !important;
     }
 
@@ -1565,15 +1543,7 @@ html.ltr .dropdown-menu {
                 content: "* ";
                 color: red;
             }
-            .rtl .select2-container--default .select2-selection--single .select2-selection__arrow {
-                height: 28px;
-                left: 3px !important;
-            }
-            .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
-                    cursor: pointer;
-                    float: left !important;
-                    left: 10px !important;
-            }
+
             .rtl .box-header .box-tools {
                 float: left !important;
 
@@ -1814,24 +1784,6 @@ html.ltr .dropdown-menu {
         height: 580px;
     }
 
-    #area-Manager-select,
-    #country-select {
-        width: 190px !important;
-    }
-
-    .select2-container {
-        width: 150px !important;
-    }
-
-    /*.settings-section {*/
-    /*    overflow-x: auto;*/
-    /*    overflow-y: auto;*/
-    /*}*/
-
-    /*.settings-section table {*/
-    /*    width: 100%;*/
-    /*}*/
-
     html {
         overflow-x: auto !important;
     }
@@ -1850,4 +1802,6 @@ html.ltr .dropdown-menu {
         ) !important;
         background-attachment: fixed !important;
     }
+
+    @include('css.select_menu_style')
 </style>
