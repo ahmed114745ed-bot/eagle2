@@ -1,3 +1,9 @@
+<style>
+    .jvectormap-container svg{
+  height: 400px !important;
+    }
+</style>
+
 <div class="card mt-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <strong>تحديد الدول المغطاة</strong>
