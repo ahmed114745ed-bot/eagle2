@@ -150,6 +150,11 @@ class EmojiController extends MainController
             });
         }
 
+        Admin::style("
+            .rtl .column-emoji .rtlSvga{
+                direction: ltr;
+            }
+        ");
         // Optional: remove table-responsive for large screens
         Admin::script("
         if (window.innerWidth >= 1024) {
