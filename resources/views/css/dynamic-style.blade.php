@@ -1,4 +1,4 @@
-n<style >
+<style >
     /* Modern Dynamic Theme Variables */
     :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
@@ -91,7 +91,13 @@ n<style >
         justify-content: space-between !important;
         padding: 21px 145px !important;
     }
-
+    .box-header  form{
+        padding-top: 8px;
+            border-radius: 36px;
+    }
+      .box-header  form .box-footer {
+            border-radius: 36px;
+    }
     .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
         z-index: 2;
         color: #fff;

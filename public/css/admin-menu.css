@@ -1,88 +1,106 @@
-/* -------------------------
-   إعدادات عامة للقائمة (إجباري)
--------------------------- */
-.menu-item {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+
+
+/* container items */
+.crs-item { list-style: none; margin: 0; padding: 0; }
+
+/* link base */
+.crs-link{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-radius:10px;
+    /* background: var(--crs-red); */
+    color: var(--text-secondary-color);
+    text-decoration:none;
+    font-weight:600;
+    font-family:var(--crs-font);
+    transition: transform var(--crs-transition) var(--crs-ease), box-shadow var(--crs-transition) var(--crs-ease), background var(--crs-transition) var(--crs-ease);
+    position:relative;
+    will-change: transform;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.08) inset;
 }
 
-.menu-link {
-    display: flex !important;
-    align-items: center !important;
-    padding: 10px 15px !important;
-    border-radius: 6px !important;
-    transition: all 0.3s ease !important;
-    color: #333 !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    position: relative !important;
+/* hover & focus */
+.crs-link:hover,
+.crs-link:focus {
+    /* background: linear-gradient(180deg, var(--crs-red-hover), var(--crs-red)); */
+    transform: translateX(6px);
+    box-shadow: 0 6px 18px rgba(192,57,43,0.12);
+    outline: none;
 }
 
-/* تأثير Hover احترافي */
-.menu-link:hover {
-    background: rgba(0, 123, 255, 0.08) !important;
-    color: #007bff !important;
+/* icon */
+.crs-icon{
+    width:36px;
+    min-width:36px;
+    text-align:center;
+    font-size:18px;
+    opacity:0.98;
+    transition: transform var(--crs-transition) var(--crs-ease), color var(--crs-transition) var(--crs-ease);
 }
 
-/* أيقونات القوائم */
-.menu-icon {
-    font-size: 18px !important;
-    width: 25px !important;
-    text-align: center !important;
-    margin-right: 10px !important;
-    transition: all 0.3s ease !important;
+/* title */
+.crs-title{
+    flex:1;
+    font-size:15px;
+    line-height:1;
+    transition: color var(--crs-transition) var(--crs-ease);
 }
 
-/* نص العنصر */
-.menu-title {
-    flex: 1 !important;
-    transition: color 0.3s ease !important;
+/* arrow */
+.crs-arrow{
+    transition: transform var(--crs-transition) var(--crs-ease);
+    opacity:0.95;
+    margin-left:8px;
 }
 
-/* -------------------------
-   Treeview القوائم الفرعية
--------------------------- */
-.treeview-menu {
-    overflow: hidden !important;
-    max-height: 0 !important;
-    opacity: 0 !important;
-    transform: translateY(-10px) !important;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    padding-left: 15px !important;
-    margin: 0 !important;
+/* submenu animation: use height measured by JS but keep fallback */
+.crs-submenu{
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 280ms var(--crs-ease), transform 320ms var(--crs-ease), max-height 360ms var(--crs-ease);
+    padding-left:10px;
+    margin:8px 0 0 0;
 }
 
-/* عند فتح القائمة الفرعية */
-.treeview.menu-item.open > .treeview-menu {
-    max-height: 1000px !important;
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
+/* submenu open state (JS toggles .crs-open) */
+.crs-tree.crs-open > .crs-submenu{
+    opacity:1;
+    transform: translateY(0);
+    /* max-height will be set inline by JS for smooth accurate animation */
 }
 
-/* السهم */
-.treeview-arrow {
-    transition: transform 0.3s ease !important;
+/* when open rotate arrow */
+.crs-tree.crs-open > .crs-toggle > .crs-arrow{
+    transform: rotate(-90deg);
 }
 
-/* تدوير السهم عند فتح القائمة */
-.treeview.menu-item.open > .treeview-toggle > .treeview-arrow {
-    transform: rotate(-90deg) !important;
+/* submenu item style (slightly lighter background) */
+.crs-submenu .crs-link{
+    /* background: var(--crs-white-faint); */
+    padding:10px 14px;
+    margin:4px 6px;
+    border-radius:8px;
+    font-size:14px;
+    color:#fff;
+    transform:none;
 }
 
-/* القوائم الفرعية للأطفال */
-.treeview-menu .menu-link {
-    padding-left: 40px !important;
-    font-size: 14px !important;
-    background: rgba(0, 0, 0, 0.03) !important;
-    border-radius: 5px !important;
-    margin-bottom: 2px !important;
+.crs-submenu .crs-link:hover{
+    /* background: var(--crs-white-faint-2); */
+    transform: translateX(6px);
+    box-shadow: none;
 }
 
-/* Hover للقوائم الفرعية */
-.treeview-menu .menu-link:hover {
-    background: rgba(0, 123, 255, 0.15) !important;
-    color: #007bff !important;
+/* accessibility focus */
+.crs-link:focus { box-shadow: 0 0 0 3px rgba(192,57,43,0.12); }
+
+/* small screens tweak */
+@media (max-width: 640px){
+    .crs-link { padding:10px 12px; }
+    .crs-icon{ width:30px; font-size:16px; }
+    .crs-title{ font-size:14px; }
 }

@@ -227,10 +227,13 @@
             width: 100%;
             z-index: 9999;
         }
+        .menu-link {
+                opacity: 1 !important;
+            }
     </style>
 <header class="main-header">
 
-<a href="{{ admin_url('/') }}" class="logo d-flex align-items-center gap-2">
+<a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2">
     <!-- النصوص الأصلية -->
     <span class="logo-mini">
         {!! config('admin.logo-mini', config('admin.name')) !!}
