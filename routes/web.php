@@ -1110,3 +1110,7 @@ Route::get('/run-lucky-gift-unit-test', function () {
     return response('<pre>'.e($output).'</pre>');
 });
 
+Route::get('/get-bucket', function () {
+
+    return env('GOOGLE_CLOUD_STORAGE_BUCKET');
+});
