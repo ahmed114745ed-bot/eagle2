@@ -113,7 +113,7 @@ class WinnerRankingController extends  MainController
                 $vip = Badge::find($target);
                 return $vip ? (@$vip->name ?? '') : "";
             } else {
-                $value = getDriverUrl() . '/' . @$this->reward->target;
+                $value = getDriverUrl() . '/' . @$target;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
