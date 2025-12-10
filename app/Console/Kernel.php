@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use Carbon\Carbon;
+use App\Helpers\Common;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Modules\TaskStream\Jobs\PkSessionJob;
@@ -175,9 +176,12 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/daily-ranking.log'))
             ->runInBackground();
+        $weekEnd = Common::getSettingValue('week_end') ?? 'sunday';
 
+        // Convert string to Carbon constant
+        $carbonDay = constant('Carbon\\Carbon::' . strtoupper($weekEnd));
         $schedule->command('weekly-ranking')
-            ->weeklyOn(Carbon::SATURDAY, '00:00')
+            ->weeklyOn($carbonDay, '00:00')
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
             ->runInBackground();
