@@ -16,7 +16,7 @@
             use Modules\Vip\Entities\Vip;
         @endphp
 
-        <div id="Experience_tab" class="inner-tab-content" style="display:none;">
+        <div id="Experience_tab" class="inner-tab-content" style="display:{{ $chargeTabType == 'Experience' ? 'block' : 'none' }};">
             <div class="form">
                 <label class="d-block">{{ __('Experience settings:') }}</label>
                 <div class="row mt-4">
@@ -244,7 +244,7 @@
             </div>
         </div>
 
-        <div id="coin_tab" class="inner-tab-content" style="display:none;">
+        <div id="coin_tab" class="inner-tab-content" style="display:{{ $chargeTabType == 'coin' ? 'block' : 'none' }};">
             <div class="form">
                 <div class="row mt-4">
                     <div class="col-md-6 mb-3" style="margin-top:40px;">

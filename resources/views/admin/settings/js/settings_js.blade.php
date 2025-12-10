@@ -235,6 +235,18 @@
         const url = new URL(window.location);
         url.searchParams.set("tab", sectionId);
         window.history.pushState({}, "", url);
+
+        if (sectionId === 'workSettings') {
+            const type = getQueryParam("type") || "Experience";
+            showInnerContent(type);
+
+            document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+            if (correctBtn) correctBtn.classList.add("active");
+        }
     }
 
     function changeInnerTab(type) {
