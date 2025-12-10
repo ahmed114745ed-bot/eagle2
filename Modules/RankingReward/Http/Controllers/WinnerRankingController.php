@@ -106,7 +106,6 @@ class WinnerRankingController extends  MainController
             } elseif (@$this->reward->target_type == 'vip') {
                 $vips = OVip::find($this->reward->target);
                 $path = $vips->img ?? '';
-                dd( $path,$vips);
             } elseif (@$this->reward->target_type == 'badge') {
                 // $vips = Badge::find($this->target);
                 $path = @$this->reward->badge->image ?? '';
