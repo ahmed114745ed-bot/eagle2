@@ -211,20 +211,59 @@
                 width: 100%;
             }
         }
+
+         .logo:hover {
+                background-color: none !important;
+            }
+
+            .logo:hover {
+            background-color: inherit !important;
+        }
+
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+        }
     </style>
 <header class="main-header">
 
-<a href="{{ admin_url('/') }}" class="logo">
-    <span class="logo-mini">{!! config('admin.logo-mini', config('admin.name')) !!}</span>
-    <span class="logo-lg">{!! config('admin.logo', config('admin.name')) !!}</span>
+<a href="{{ admin_url('/') }}" class="logo d-flex align-items-center gap-2">
+    <!-- النصوص الأصلية -->
+    <span class="logo-mini">
+        {!! config('admin.logo-mini', config('admin.name')) !!}
+    </span>
+
+    <span class="logo-lg">
+        {!! config('admin.logo', config('admin.name')) !!}
+    </span>
+
+    <!-- الأيقونة -->
+    <div class="logo-icon ms-2">
+        @php
+            $logo   = getAppLogo();
+            $locale = $lang ?? app()->getLocale();
+            $appName = $locale == 'ar' 
+                ? Cache::get('app_title_ar') 
+                : Cache::get('app_title_en');
+        @endphp
+
+        @if(!empty($logo))
+            <img src="{{ $logo }}" 
+                 alt="{{ $appName }}" 
+                 class="h-12 w-12 object-contain rounded-circle" 
+                 style="height:32px;width:32px;border-radius:50%;     margin: 12px 19px;">
+        @else
+            <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
+                  style="height:32px;width:32px;font-weight:bold;">
+                {{ strtoupper(substr($appName, 0, 1)) }}
+            </span>
+        @endif
+    </div>
+
 </a>
-   <div class="logo-icon">
-                        @if(!empty($logo))
-                            <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
-                        @else
-                                {{ strtoupper(substr($appName, 0, 1)) }}
-                        @endif
-   </div>
 
 
     <nav class="navbar navbar-static-top" role="navigation">
