@@ -47,7 +47,7 @@ class AdminUserController extends EncorUsersController
         });
 
         $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.superadmin.logout');
+                $logoutUrl = route('superadmin.superadmin.logout');
                 $loginText = __('login');
                 $areaManagerUrl = url('/superadmin/login');
 
