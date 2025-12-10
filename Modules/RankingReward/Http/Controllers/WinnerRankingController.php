@@ -99,25 +99,7 @@ class WinnerRankingController extends  MainController
 
             return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
-        $grid->column('reward.target', trans('target'))->display(function ($target) {
-
-            if (@$this?->reward?->target_type == "coins") {
-                return $target;
-            } elseif (@$this?->reward?->target_type == "ware") {
-                $ware = Ware::find($target);
-                return $ware ? ($ware->name ?? "") : "";
-            } elseif (@$this->reward->target_type == "vip") {
-                $vip = OVip::find($target);
-                return $vip ? ($vip->name ?? "") : "";
-            } elseif (@$this->target_type == "badge") {
-                $vip = Badge::find($target);
-                return $vip ? (@$vip->name ?? '') : "";
-            } else {
-                $value = getDriverUrl() . '/' . @$target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-
+        
         $grid->column('image', __('image'))->display(function ($path) {
                 if (@$this->reward->target_type == 'ware') {
                     $ware = Ware::find($this->reward->target);
@@ -130,6 +112,7 @@ class WinnerRankingController extends  MainController
                     $path = @$this->reward->badge->image ?? '';
                 } elseif (@$this->reward->target_type == 'achievement') {
                     $path = $this->reward->target;
+                    dd($path);
                 } else {
                     $path = 'coin.png';
                 }
