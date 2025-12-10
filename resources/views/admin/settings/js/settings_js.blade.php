@@ -249,6 +249,7 @@
         }
     }
 
+
     function changeInnerTab(type) {
         const url = new URL(window.location);
         url.searchParams.set("firsttab", "workSettings");
