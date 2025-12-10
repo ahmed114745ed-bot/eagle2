@@ -58,9 +58,9 @@ function initWorldMap() {
         const firstRegion = country.regions?.[0];
         const manager = firstRegion?.manager;
 
-        console.log(country);
-        console.log('mkkk');
-        console.log(manager);
+       // console.log(country);
+       // console.log('mkkk');
+       // console.log(manager);
 
         if (manager?.id === currentAreaManagerId && currentAreaManagerId != null) {
             regionColors[iso] = '#4CAF50'; 
