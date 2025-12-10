@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
-
+use Encore\Admin\Facades\Admin;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
@@ -101,15 +101,15 @@ class WinnerRankingController extends  MainController
         });
         $grid->column('reward.target', trans('target'))->display(function ($target) {
 
-            if ($this->type == "coins") {
+            if ($this->target_type == "coins") {
                 return $target;
-            } elseif ($this->type == "ware") {
+            } elseif ($this->target_type == "ware") {
                 $ware = Ware::find($target);
                 return $ware ? ($ware->name ?? "") : "";
-            } elseif ($this->type == "vip") {
+            } elseif ($this->target_type == "vip") {
                 $vip = OVip::find($target);
                 return $vip ? ($vip->name ?? "") : "";
-            } elseif ($this->type == "badge") {
+            } elseif ($this->target_type == "badge") {
                 $vip = Badge::find($target);
                 return $vip ? (@$vip->name ?? '') : "";
             } else {
@@ -117,12 +117,39 @@ class WinnerRankingController extends  MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+
+        $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->target_type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? ($ware->show_img ?? "");
+                } elseif ($this->target_type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips->img ?? '';
+                } elseif ($this->target_type == 'badge') {
+                    // $vips = Badge::find($this->target);
+                    $path = @$this->badge->image ?? '';
+                } elseif ($this->target_type == 'achievement') {
+                    $path = $this->target;
+                } else {
+                    $path = 'coin.png';
+                }
+
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
         $grid->column('created_at', __('Created at'));
 
         $grid->disableCreateButton();
         $grid->disableRowSelector();
         $grid->disableActions();
         $grid->disableExport();
+
+         Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
