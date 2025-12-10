@@ -456,6 +456,14 @@ return [
     "charge_level" => "Level Pengisian",
     'custom_img_image' => 'Berkas harus berupa gambar.',
     'custom_img_mimes' => 'Hanya tipe gambar berikut yang diperbolehkan: jpeg, png, jpg.',
+    'feature_description' => "Fitur ini memungkinkan Anda mengontrol hadiah mana yang dapat diakses oleh pengguna:
+
+Semua Hadiah:
+Saat dipilih, pengguna dapat melihat dan menggunakan semua hadiah yang tersedia di sistem.
+
+Hanya Hadiah CP:
+Saat dipilih, pengguna hanya akan melihat hadiah khusus CP, yang dapat mereka gunakan secara eksklusif dalam fitur CP.",
+
 
 
 

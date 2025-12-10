@@ -14,7 +14,7 @@ class CpSettingsController extends MainController
     public $permission_name = 'cp-setting';
     public function index(Content $content)
     {
-        $enableGifts = $this->getSetting('cp_enable_all_gifts', 0);
+        $enableGifts = (bool)$this->getSetting('cp_enable_all_gifts', 0);
 
         return $content
             ->title(__('CP Settings'))
@@ -24,11 +24,12 @@ class CpSettingsController extends MainController
 
     public function updateCp(Request $request)
     {
-        $value = (int)$request->cp_enable_all_gifts;
+        $value = $request->cp_enable_all_gifts == 'false' ? 0 : 1;
 
         $this->setSetting('cp_enable_all_gifts', $value);
 
-        return response()->json(['success' => true]);
+        admin_success(__("Saved successfully ✅"));
+        return redirect()->back();
     }
 
 
@@ -39,6 +40,7 @@ class CpSettingsController extends MainController
 
     private function setSetting($key, $value)
     {
+
         Setting::updateOrCreate(
             ['key' => $key],
             ['value' => $value]
