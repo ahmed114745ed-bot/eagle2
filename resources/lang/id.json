@@ -3010,7 +3010,21 @@
 "milestone_rewards_synced": "Hadiah pencapaian berhasil disinkronkan",
 "Reapply Rewards": "Terapkan Ulang Hadiah",
 "This is the default number of admins allowed per room.": "Ini adalah jumlah admin default yang diizinkan per ruangan.",
-"Form Details": "Detail Formulir"
+"Form Details": "Detail Formulir",
+"Cp Setting": "Pengaturan CP",
+"Browse cp setting": "Lihat pengaturan CP",
+"wallet fields": "Bidang dompet",
+"Browse wallet template": "Lihat template dompet",
+"Create wallet template": "Buat template dompet",
+"Delete wallet template": "Hapus template dompet",
+"Edit wallet template": "Edit template dompet",
+"Show wallet template": "Tampilkan template dompet",
+"Browse wallet fields": "Lihat bidang dompet",
+"Create wallet fields": "Buat bidang dompet",
+"Delete wallet fields": "Hapus bidang dompet",
+"Edit wallet fields": "Edit bidang dompet",
+"Show wallet fields": "Tampilkan bidang dompet",
+"accounts number": "Jumlah akun"
 
 
 
