@@ -53,7 +53,7 @@ class ProfitTypeResource extends JsonResource
             'id'      => $this->id,
             'user_id' => $this->user_id,
             'type'    => $this->type,
-            'amount'    => $this->amount,
+            'amount'    => $this->amount ?? 0 ,
             'message' => $message,
             'title'   => __('achieve_target') . ': ' . $targetName, 
             'date'    => $this->created_at?->format('Y-m-d H:i:s'),
