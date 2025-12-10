@@ -313,7 +313,16 @@ function initWorldMap() {
 }
 
 function reloadMapWhenFormOpens() {
-    $('#world-map').empty();
+    const mapElement = $('#world-map');
+
+    if (!mapElement.length) {
+        console.warn("world-map not found yet... retrying");
+        setTimeout(reloadMapWhenFormOpens, 200); 
+        return;
+    }
+
+    mapElement.empty();
+
     if (typeof $.fn.vectorMap === 'undefined') {
         loadWorldMapScripts(() => initWorldMap());
     } else {
@@ -323,4 +332,5 @@ function reloadMapWhenFormOpens() {
 
 $(document).ready(reloadMapWhenFormOpens);
 $(document).on('pjax:complete', reloadMapWhenFormOpens);
+
 </script>
