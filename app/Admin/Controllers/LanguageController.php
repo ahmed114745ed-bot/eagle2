@@ -114,20 +114,20 @@ class LanguageController extends MainController
         $grid->disableRowSelector();   // تعطيل تحديد الصفوف للحذف الجماعي
         $grid->disableExport();        // تعطيل زر التصدير (اختياري)
         $defaultExist = Language::where('is_default', 1)->exists();
-        if (!$defaultExist) {
+         if (!$defaultExist) {
             $grid->tools(function (Grid\Tools $tools) {
                 $url = url('/admin/settings?tab=timeSettings');
                 $add = __('set default language');
 
-                $customButtonHTML = <<<HTML
-                    <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                        <i class="fa fa-plus"></i> {$add}
-                    </a>
+              $customButtonHTML = <<<HTML
+                        <a href="javascript:void(0)" onclick="window.location.href='{$url}';" class="btn btn-sm btn-success" style="margin-right:10px;">
+                            <i class="fa fa-plus"></i> {$add}
+                        </a>
                     HTML;
 
                 $tools->append($customButtonHTML);
             });
-        }
+         }
 
         return $grid;
     }
