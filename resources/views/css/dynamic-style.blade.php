@@ -85,9 +85,11 @@ n<style >
         padding: 16px 24px !important;
         margin: -24px -24px 24px -24px !important;
         border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
-        display: flex !important;
+        /* display: flex !important; */
+        display: block !important;
         align-items: center !important;
         justify-content: space-between !important;
+        padding: 21px 145px !important;
     }
 
     .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
@@ -1434,7 +1436,7 @@ html.ltr .dropdown-menu {
 
             .rtl .main-header .logo{
                 float: right !important;
-                width: 18.4%;
+                width: 21.4%;
             }
             .rtl .navbar-static-top{
                 margin-left: 16px !important;
@@ -1480,12 +1482,19 @@ html.ltr .dropdown-menu {
     .ltr .form-horizontal .row {
         display: block !important;
     }
+      .ltr .main-header .logo{
+                float: left !important;
+                width: 21.4%;
+            }
 
            .rtl .form-horizontal .box-footer .btn-group {
                 float: right;
             }
             .rtl .content-wrapper-rtl{
                 margin-right: 42px !important;
+            }
+             .ltr .content-wrapper{
+                margin-left: 260px !important;
             }
 
             .rtl .fields-group .form-group{
@@ -1803,5 +1812,10 @@ html.ltr .dropdown-menu {
         background-attachment: fixed !important;
     }
 
+    @media (max-width: 767px) {
+            .ltr .content-wrapper {
+                margin-left: 0 !important;
+            }
+        }
     @include('css.select_menu_style')
 </style>

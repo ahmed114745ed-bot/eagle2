@@ -91,7 +91,7 @@
     .all-page {
         display: inline-flex;
         /* allow the container to grow beyond viewport so browser shows scrollbars */
-        min-width: max-content;
+        /* min-width: max-content; */
     }
 
     .wrapper {
