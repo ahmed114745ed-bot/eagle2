@@ -1447,19 +1447,19 @@ html.ltr .dropdown-menu {
                 left: auto;
             }
 
-    .rtl .skin-black-light .main-header > .navbar .nav > li {
-        float: right !important;
-    }
+    /*.rtl .skin-black-light .main-header > .navbar .nav > li {*/
+    /*    float: right !important;*/
+    /*}*/
 
     .rtl .skin-black-light .main-header > .navbar .nav > li > a {
         float: right !important;
     }
 
     /* RTL Header Layout: Select menus (dropdowns) on right, other icons on left */
-    .rtl .skin-black-light .main-header > .navbar .nav > li.dropdown,
-    .rtl .skin-black-light .main-header > .navbar .nav > li.user-menu {
-        float: right !important;
-    }
+    /*.rtl .skin-black-light .main-header > .navbar .nav > li.dropdown,*/
+    /*.rtl .skin-black-light .main-header > .navbar .nav > li.user-menu {*/
+    /*    float: right !important;*/
+    /*}*/
 
     .rtl .skin-black-light .main-header > .navbar .nav > li:not(.dropdown):not(.user-menu) {
         float: left !important;

@@ -61,7 +61,7 @@
     }
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 38px !important;
+        line-height: 43px !important;
         padding-right: 16px !important;
         padding-left: 40px !important;
         color: var(--gray-700, #374151) !important;
@@ -223,16 +223,12 @@
         height: 36px !important;
     }
 
-    /* ============================================
-   Clear (X) Button Styling
-   ============================================ */
     .select2-container--default .select2-selection--single .select2-selection__clear {
         position: absolute !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
         width: 22px !important;
         height: 22px !important;
-        background: var(--gray-200, #e5e7eb) !important;
         border-radius: 50% !important;
         color: var(--gray-700, #374151) !important;
         font-size: 16px !important;
@@ -252,7 +248,9 @@
         transform: translateY(-50%) scale(1.1) !important;
     }
 
-    /* RTL X Button Position */
+    /* ============================================
+       RTL Support (Arabic)
+       ============================================ */
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear,
     [dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__clear {
         right: auto !important;
@@ -260,9 +258,6 @@
         float: none !important;
     }
 
-    /* ============================================
-       RTL Support (Arabic)
-       ============================================ */
     .rtl .select2-container--default .select2-selection--single .select2-selection__rendered,
     [dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__rendered {
         padding-right: 16px !important;
@@ -272,8 +267,8 @@
     .rtl .select2-container--default .select2-selection--single .select2-selection__arrow,
     [dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__arrow {
         right: auto !important;
-        left: 8px !important;
-        height: 40px !important;
+        left: 20px !important;
+        height: 43px !important;
     }
 
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear,
