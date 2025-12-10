@@ -328,7 +328,7 @@
             @endphp
 
             @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin') &&!session('preview_area_manager'))
-                @each('admin::partials.menu', $filteredMenu, 'item')
+                @each('vendor.admin.partials.menu', $filteredMenu, 'item')
             @elseif(session('preview_superadmin'))
                 @php
                     $superadminPreviewLinks = [

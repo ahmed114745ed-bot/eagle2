@@ -1,0 +1,23 @@
+.menu-icon {
+    width: 20px;
+    text-align: center;
+}
+
+.treeview-menu {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+    padding-left: 15px;
+}
+
+.treeview.menu-item.open > .treeview-menu {
+    max-height: 500px; 
+}
+
+.treeview-arrow {
+    transition: transform 0.3s ease;
+}
+
+.treeview.menu-item.open > .treeview-toggle > .treeview-arrow {
+    transform: rotate(-90deg);
+}
