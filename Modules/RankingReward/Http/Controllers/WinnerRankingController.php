@@ -101,15 +101,15 @@ class WinnerRankingController extends  MainController
         });
         $grid->column('reward.target', trans('target'))->display(function ($target) {
 
-            if ($this->reward->target_type == "coins") {
+            if (@$this?->reward?->target_type == "coins") {
                 return $target;
-            } elseif ($this->reward->target_type == "ware") {
+            } elseif (@$this?->reward?->target_type == "ware") {
                 $ware = Ware::find($target);
                 return $ware ? ($ware->name ?? "") : "";
-            } elseif ($this->reward->target_type == "vip") {
+            } elseif (@$this->reward->target_type == "vip") {
                 $vip = OVip::find($target);
                 return $vip ? ($vip->name ?? "") : "";
-            } elseif ($this->target_type == "badge") {
+            } elseif (@$this->target_type == "badge") {
                 $vip = Badge::find($target);
                 return $vip ? (@$vip->name ?? '') : "";
             } else {
@@ -119,16 +119,16 @@ class WinnerRankingController extends  MainController
         });
 
         $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->reward->target_type == 'ware') {
+                if (@$this->reward->target_type == 'ware') {
                     $ware = Ware::find($this->reward->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->reward->target_type == 'vip') {
+                } elseif (@$this->reward->target_type == 'vip') {
                     $vips = OVip::find($this->reward->target);
                     $path = $vips->img ?? '';
-                } elseif ($this->reward->target_type == 'badge') {
+                } elseif (@$this->reward->target_type == 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->reward->badge->image ?? '';
-                } elseif ($this->target_type == 'achievement') {
+                } elseif (@$this->reward->target_type == 'achievement') {
                     $path = $this->reward->target;
                 } else {
                     $path = 'coin.png';
