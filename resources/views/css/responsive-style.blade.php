@@ -355,7 +355,7 @@
             justify-content: center;
             align-items: center;
             border-radius: 8px;
-            right:  253%;
+            right:  180%;
             position: relative;
         }
         .ltr  #mobileSelectBtn {
