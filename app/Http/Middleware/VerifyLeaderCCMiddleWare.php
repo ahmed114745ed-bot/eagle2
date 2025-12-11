@@ -109,12 +109,6 @@ class VerifyLeaderCCMiddleWare
         $expectedSign = md5($rawString);
 
         if (!hash_equals(strtolower($expectedSign), strtolower($request->input('sign')))) {
-            LogHelper::info(' expectedSign', [
-                'url'      => 'Verify signature fail',
-                'expectedSign'      =>$expectedSign,
-                'sign'      => $request->input('sign'),
-             
-            ]);
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg' => 'Verify signature fail'

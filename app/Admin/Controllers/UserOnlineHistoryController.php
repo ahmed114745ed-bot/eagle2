@@ -67,8 +67,8 @@ class UserOnlineHistoryController extends MainController
         ->unique('device_token')
         ->count();
          // Fetch weekly active users
-        $endDate = Carbon::now()->endOfWeek(weekEndsAt: Carbon::SATURDAY);
-        $startDate = Carbon::now()->startOfWeek(Carbon::SUNDAY);
+        $endDate = Carbon::now()->endOfWeek();
+        $startDate = Carbon::now()->startOfWeek();
         $online_users = User::where('online',1)->count();
             $weekly_active_users = DB::table('user_online_histories')
             ->join('users', 'user_online_histories.user_id', '=', 'users.id')

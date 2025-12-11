@@ -22,6 +22,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use App\Jobs\ChangeCinemaModeJob;
+use App\Models\Language;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\File;
 use App\Models\MonthlyDiamondReceive;
@@ -226,6 +227,8 @@ class SettingsController extends Controller
                 Cache::forget('favicon');
             }
 
+
+
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -252,7 +255,11 @@ class SettingsController extends Controller
         if ($request->has('user_coins')) {
             Config::query()->where('name', '=', 'one_usd_value_in_coins')->update(['value' => $request->user_coins]);
         }
+        if ($request->has('default_language')) {
+            Language::query()->update(['is_default' => 0]);
 
+            Language::where('code', $request->default_language)->update(['is_default'=> 1]);
+        }
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
         return back();

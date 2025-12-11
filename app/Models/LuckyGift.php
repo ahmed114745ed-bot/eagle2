@@ -10,7 +10,7 @@ class LuckyGift extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['gift_id', 'win_probability'];
+    protected $fillable = ['gift_id', 'win_probability','min_percentage'];
 
     protected $appends = ['min_percentag', 'mid_percentag', 'max_percentag'];
 
