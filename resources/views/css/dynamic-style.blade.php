@@ -1472,17 +1472,17 @@ html.ltr .dropdown-menu {
 
             .rtl .navbar-custom-menu {
                 float: right !important;
-            
+
             }
 
             .rtl .main-header .logo {
                 float: right !important;
-                width: 17%;
+                width: 16%;
             }
             .rtl .navbar-static-top {
-                margin-left: 1% !important;
+                margin-left: 0% !important;
                 float: left;
-                width: 80%;
+                width: 82.5%;
             }
 
             .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
@@ -1860,9 +1860,9 @@ html.ltr .dropdown-menu {
             }
 
             .ltr .main-header .logo{
-            
+
               display: none !important;
-            }  
+            }
              .rtl .main-header .logo{
                display: none !important;
             }
@@ -1879,7 +1879,7 @@ html.ltr .dropdown-menu {
             #app{
                     margin-top: 19% !important;
             }
-            
+
             .sidebar-open .content-wrapper {
                 margin-left: 0 !important;
                 padding-left: 24px !important;
@@ -1894,7 +1894,7 @@ html.ltr .dropdown-menu {
             }
              .sidebar-open .main-sidebar {
                  left: 0 !important;
-    
+
             }
 
             .rtl .navbar-custom-menu {
@@ -1906,8 +1906,8 @@ html.ltr .dropdown-menu {
                 right: 0px;
             }
 
-         
+
         }
 
-    
+
 </style>

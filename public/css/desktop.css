@@ -1,7 +1,7 @@
 /* Desktop / Laptop header */
 @media (min-width: 992px) {
     .main-header {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%);
+        /*background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%);*/
         box-shadow: none;
         height: var(--header-height);
         display: flex;
@@ -40,7 +40,7 @@
     }
 
     .main-header .navbar {
-        flex: 1;
+        /*flex: 1;*/
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -85,7 +85,7 @@
     .select-country-wrapper{
          display: none !important;
     }
-    
+
 }
 
 @media (min-width: 1200px) {
