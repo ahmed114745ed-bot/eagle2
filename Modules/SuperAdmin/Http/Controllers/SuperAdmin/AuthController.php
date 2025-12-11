@@ -294,6 +294,18 @@ class AuthController extends BaseAuthController
         return redirect(superadmin_url('login'));
     }
 
+      public function customSuperadminLogout(Request $request)
+    {
+        $this->getLogout($request);
+        return redirect('/superadmin/login');
+    }
+
+        public function getLogout(Request $request)
+    {
+        $this->guard()->logout();
+        return redirect(config('admin.superadmin_route.prefix'));
+    }
+
     public function putSetting()
     {
         if (\request('password') != Admin::user()->getAuthPassword()) {

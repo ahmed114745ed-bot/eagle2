@@ -15,6 +15,8 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "Move switch gift": "Move",
+
     "Pay switch dashboard":"charge games",
     "Status switch country": "Status Switch",
     "TargetDiamond":"This represents the goal amount of diamonds the room needs to achieve (e.g., 1,000,000).Once this target is reached, it may trigger certain rewards or unlock new features.",
@@ -1503,7 +1505,15 @@
 "area name":"Area Name",
 "upload_card_back": "📷 Click to upload ",
 "Browse live rooms": "Browse live broadcasts",
-"Show live rooms": "Show live broadcasts"
+"Show live rooms": "Show live broadcasts",
+    "CP Settings": "CP Settings",
+    "Enable all CP gifts": "Enable all CP gifts",
+    "Enabled": "Enabled",
+    "Disabled": "Disabled",
+    "Updated successfully!": "Updated successfully!",
+    "Something went wrong!": "Something went wrong!",
+    "cp-settings":"cp settings"
+
 
 
 

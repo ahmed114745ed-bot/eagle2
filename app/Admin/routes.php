@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ChangeCountryRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,7 @@ use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
+use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
@@ -27,6 +29,7 @@ use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -57,6 +60,7 @@ use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\GiftLogTestController;
+use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
@@ -67,6 +71,7 @@ use App\Admin\Controllers\ZegoFeatureController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\GameSettingsController;
+use App\Admin\Controllers\GiftCategoryController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\NotificationController;
 use App\Admin\Controllers\ReelSettingsController;
@@ -74,12 +79,14 @@ use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\DeleteAccountController;
+use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
@@ -323,6 +330,7 @@ Route::group(
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
+        Route::resource('gift-categories', GiftCategoryController::class);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
@@ -334,9 +342,21 @@ Route::group(
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
+        Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
+        Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
+        Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
+
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
+
+        Route::get('/emojis/create/{filter}', [EmojiController::class, 'create']);
+        Route::post('/emojis/create', [EmojiController::class, 'store']);
+
+        Route::prefix('emojis')->group(function () {
+            Route::get('/{filter?}', [EmojiController::class, 'index']);
+        });
+        Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
         Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
@@ -489,10 +509,10 @@ Route::group(
         Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-
-        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-        //        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        //        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])
+            ->name('bd.toggle-salary-transfer');
+        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
 
@@ -547,9 +567,9 @@ Route::group(
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
-        Route::resource('moments', MomentController::class);
-        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
-        Route::resource('moment-settings', MomentSettingsController::class);
+        Route::resource('moments', MomentController::class)->middleware('moment.allowed');
+        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
+        Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
         Route::resource('reels', ReelController::class);
         Route::resource('reel-settings', ReelSettingsController::class);
         Route::resource('change-level-histories', ChangeLevelHistoryController::class);
@@ -623,7 +643,7 @@ Route::group(
 
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::resource('report-reals', ReportRealsController::class);
-        Route::resource('report-moments', ReportMomentController::class);
+        Route::resource('report-moments', ReportMomentController::class)->middleware('moment.allowed');
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
@@ -659,7 +679,11 @@ Route::group(
         Route::resource('wallet-transactions', WalletTransactionController::class);
 
         Route::resource('banners', BannerController::class);
-        Route::resource('languages', LanguageController::class);
+        
+        Route::prefix('languages')->group(function () {
+            Route::get('/', [LanguageController::class, 'index']);
+            Route::put('/{id}', [LanguageController::class, 'update'])->where('id', '[0-9]+');
+        });
         Route::resource('settings', SettingController::class)
             ->except(['update'])
             ->names('admin.settings');
