@@ -44,7 +44,6 @@
         --crs-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
  </style>
-<link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
 
 
 
