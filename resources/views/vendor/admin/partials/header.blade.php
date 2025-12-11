@@ -316,7 +316,7 @@
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
     
-        <div class="logo-icon ms-2" style="width: 51%; margin: auto;">
+        <div class="logo-icon ms-2" style="width: 100%; margin: auto;">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();
