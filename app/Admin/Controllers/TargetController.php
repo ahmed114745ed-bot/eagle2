@@ -88,9 +88,9 @@ class TargetController extends MainController
     protected bool $under_edit = false;
 
 
-     protected function grid()
-    {        
-        
+    protected function grid()
+    {
+
         $this->under_edit = Target::where('under_edit', 1)->exists();
 
         $grid = new Grid(new Target);
@@ -117,12 +117,23 @@ class TargetController extends MainController
             if ($this->under_edit) {
                 $url = route('admin.targets.confirm');
 
-               $tools->append('<button class="btn btn-sm btn-danger confirm-btn" data-url="'.$url.'">
-                            <i class="fa fa-check"></i> '.__('Confirm Update').'
+                $tools->append('<button class="btn btn-sm btn-danger confirm-btn" data-url="' . $url . '">
+                            <i class="fa fa-check"></i> ' . __('Confirm Update') . '
                         </button>');
             }
             return '';
         });
+
+        Admin::html('
+        <div id="loadingOverlay" 
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(255,255,255,0.7); z-index:999999; text-align:center;">
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
+                <i class="fa fa-spinner fa-spin fa-3x"></i>
+                <p style="margin-top:10px;">Loading...</p>
+            </div>
+        </div>
+    ');
 
 
         $this->extendGrid($grid);
@@ -134,23 +145,23 @@ class TargetController extends MainController
     {
         $grid->column('level', __('target no'));
     }
-    
+
     protected function addDiamondsColumn($grid, $coins)
     {
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['diamonds'] ?? $value;
                 }
-    
+
                 $endFormatted = $coins ? ($new / $coins) : 0;
                 $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
-    
+
                 $display = $this->displayOldNewValue($old, $new, '💎 ');
-    
+
                 return "
                     <div style='display:flex;flex-direction:column;'>
                         {$display}
@@ -159,23 +170,23 @@ class TargetController extends MainController
                 ";
             });
     }
-    
+
     protected function addUsdColumn($grid, $coins)
     {
         $grid->usd(__('Host Percentage'))
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['usd'] ?? $value;
                 }
-    
+
                 $endFormatted = $this->diamonds / $coins;
                 $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
-    
+
                 $display = $this->displayOldNewValue($old, $new, '', true);
-    
+
                 return "
                     <div style='display:flex;flex-direction:column;'>
                         {$display}
@@ -184,23 +195,23 @@ class TargetController extends MainController
                 ";
             });
     }
-    
+
     protected function addAgencyShareColumn($grid, $coins)
     {
         $grid->agency_share(__('agency share'))
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['agency_share'] ?? $value;
                 }
-    
+
                 $endFormatted = $this->diamonds / $coins;
                 $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
-    
+
                 $display = $this->displayOldNewValue($old, $new, '', true);
-    
+
                 return "
                     <div style='display:flex;flex-direction:column;'>
                         {$display}
@@ -209,23 +220,23 @@ class TargetController extends MainController
                 ";
             });
     }
-    
+
     protected function addDbPercentageColumn($grid, $coins)
     {
         $grid->db_percentage(__('DB Percentage'))
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['db_percentage'] ?? $value;
                 }
-    
+
                 $endFormatted = $this->diamonds / $coins;
                 $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
-    
+
                 $display = $this->displayOldNewValue($old, $new, '', true);
-    
+
                 return "
                     <div style='display:flex;flex-direction:column;'>
                         {$display}
@@ -234,23 +245,23 @@ class TargetController extends MainController
                 ";
             });
     }
-    
+
     protected function addAppProfitColumn($grid, $coins)
     {
         $grid->app_profit_percentage(__('App Profit Percentage'))
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['app_profit_percentage'] ?? $value;
                 }
-    
+
                 $endFormatted = $this->diamonds / $coins;
                 $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
-    
+
                 $display = $this->displayOldNewValue($old, $new, '', true);
-    
+
                 return "
                     <div style='display:flex;flex-direction:column;'>
                         {$display}
@@ -259,7 +270,7 @@ class TargetController extends MainController
                 ";
             });
     }
-    
+
     protected function addHoursDaysColumns($grid)
     {
         $grid->hours(__('hours'))->display(function ($value) {
@@ -270,7 +281,7 @@ class TargetController extends MainController
             }
             return $this->displayOldNewValue($old, $new);
         });
-    
+
         $grid->days(__('days'))->display(function ($value) {
             $old = $value;
             $new = $value;
@@ -280,18 +291,18 @@ class TargetController extends MainController
             return $this->displayOldNewValue($old, $new);
         });
     }
-    
+
     protected function addReelColumn($grid)
     {
         $grid->column('reel', __('Reel'))
             ->display(function ($value) {
                 $old = explode(',', $value);
                 $new = $old;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = explode(',', $this->edit->data['reel'] ?? $value);
                 }
-    
+
                 $labels = [__('admin.update'), __('admin.like'), __('admin.comment')];
                 $html = '';
                 foreach ($labels as $i => $label) {
@@ -300,18 +311,18 @@ class TargetController extends MainController
                 return $html;
             });
     }
-    
+
     protected function addMomentColumn($grid)
     {
         $grid->column('moment', __('Moment'))
             ->display(function ($value) {
                 $old = explode(',', $value);
                 $new = $old;
-    
+
                 if ($this->under_edit && $this->edit) {
                     $new = explode(',', $this->edit->data['moment'] ?? $value);
                 }
-    
+
                 $labels = [__('admin.update'), __('admin.like'), __('admin.comment')];
                 $html = '';
                 foreach ($labels as $i => $label) {
@@ -320,7 +331,7 @@ class TargetController extends MainController
                 return $html;
             });
     }
-    
+
 
     protected function addConfirmColumn($grid)
     {
@@ -328,7 +339,7 @@ class TargetController extends MainController
             ->display(function () {
                 if ($this->under_edit) {
                     $url = route('admin.targets.confirm', $this->id);
-                    return '<button class="btn btn-sm btn-success confirm-btn" data-url="'.$url.'">'.__('تأكيد التعديل').'</button>';
+                    return '<button class="btn btn-sm btn-success confirm-btn" data-url="' . $url . '">' . __('تأكيد التعديل') . '</button>';
                 }
                 return '';
             });
@@ -339,13 +350,13 @@ class TargetController extends MainController
             $formatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
             return "<span style='font-weight:bold;'>{$formatted}</span>";
         }
-    
+
         $oldFormatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
         $newFormatted = $isPercentage ? "% {$new}" : "{$prefix}{$new}";
-    
+
         $color = $new > $old ? '#28a745' : '#dc3545';
         $arrow = $new > $old ? '↑' : '↓';
-    
+
         return "
             <div style='display:flex;align-items:center;gap:5px;'>
                 <span style='color:#dc3545;text-decoration:line-through;'>{$oldFormatted}</span>
@@ -354,37 +365,70 @@ class TargetController extends MainController
             </div>
         ";
     }
-    
 
+
+
+    // protected function addConfirmScript()
+    // {
+
+    //         Admin::script("
+    //             document.querySelectorAll('.confirm-btn').forEach(function(button){
+    //                 button.addEventListener('click', function(){
+    //                     var url = this.dataset.url;
+
+    //                     Swal.fire({
+    //                         title: '".__('confirm_title')."',
+    //                         html: '<p style=\"color: #000; font-weight: 500;\">".__('confirm_text')."</p>',
+    //                         type: 'warning',
+    //                         showCancelButton: true,
+    //                         confirmButtonText: '".__('confirm_button')."',
+    //                         cancelButtonText: '".__('cancel_button')."',
+    //                         reverseButtons: true
+    //                     }).then((result) => {
+    //                         if (result.value) {
+    //                             window.location.href = url;
+    //                         }
+    //                     });
+    //                 });
+    //             });
+    //         ");
+
+
+
+    // }
 
     protected function addConfirmScript()
     {
-      
-            Admin::script("
-                document.querySelectorAll('.confirm-btn').forEach(function(button){
-                    button.addEventListener('click', function(){
-                        var url = this.dataset.url;
-        
-                        Swal.fire({
-                            title: '".__('confirm_title')."',
-                            html: '<p style=\"color: #000; font-weight: 500;\">".__('confirm_text')."</p>',
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: '".__('confirm_button')."',
-                            cancelButtonText: '".__('cancel_button')."',
-                            reverseButtons: true
-                        }).then((result) => {
-                            if (result.value) {
-                                window.location.href = url;
-                            }
-                        });
-                    });
+        Admin::script("
+        document.querySelectorAll('.confirm-btn').forEach(function(button){
+            button.addEventListener('click', function(){
+                var url = this.dataset.url;
+
+                Swal.fire({
+                    title: '" . __('confirm_title') . "',
+                    html: '<p style=\"color: #000; font-weight: 500;\">" . __('confirm_text') . "</p>',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: '" . __('confirm_button') . "',
+                    cancelButtonText: '" . __('cancel_button') . "',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+
+                        $('#loadingOverlay').show();
+                        $('.confirm-btn').prop('disabled', true);
+
+                        window.location.href = url;
+                    }
                 });
-            ");
-        
-    
-    
+            });
+        });
+    ");
     }
+
+
+
+
 
     protected function addExportButton($grid)
     {
@@ -638,7 +682,7 @@ class TargetController extends MainController
             $target = Target::find($form->model()->id);
 
             if ($target) {
-                $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month',now()->month)->where('year',now()->year)->count();
+                $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month', now()->month)->where('year', now()->year)->count();
                 if ($users > 0) {
                     admin_warning('تحذير', __('target_change_warning'));
                 }
@@ -664,7 +708,7 @@ class TargetController extends MainController
 
 
         $form->saving(function (Form $form) {
-            
+
 
             $fields = [
                 'usd' => request()->usd,
@@ -701,7 +745,7 @@ class TargetController extends MainController
 
             if ($form->isEditing()) {
                 $target = $form->model();
-        
+
                 $editData = [
                     'diamonds' => $form->diamonds,
                     'usd' => $form->usd,
@@ -713,17 +757,17 @@ class TargetController extends MainController
                     'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
                     'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
                 ];
-        
+
 
                 $edit = TargetEdit::updateOrCreate(
-                    ['target_id' => $target->id], 
+                    ['target_id' => $target->id],
                     [
-                        'edited_by' => Auth::id(), 
+                        'edited_by' => Auth::id(),
                         'data' => $editData,
                         'status' => 'pending',
                     ]
                 );
-        
+
                 $target->under_edit = true;
                 $target->edit_id = $edit->id;
                 $target->save();
@@ -862,7 +906,7 @@ class TargetController extends MainController
             admin_toastr(__('not found'), 'info');
             return back();
         }
-    
+
         foreach ($targets as $target) {
             try {
                 $this->applyPendingEdit($target);
@@ -875,12 +919,12 @@ class TargetController extends MainController
         return back();
     }
 
-    protected function applyPendingEdit( $target): void
+    protected function applyPendingEdit($target): void
     {
-        
+
 
         if (!$target->under_edit || !$target->edit_id) {
-            return; 
+            return;
         }
 
         $edit = TargetEdit::find($target->edit_id);
@@ -905,7 +949,5 @@ class TargetController extends MainController
         ]);
 
         $edit->delete();
-        
     }
-
 }
