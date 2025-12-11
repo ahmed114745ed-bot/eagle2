@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Reals\Http\Controllers\web;
 
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Modules\Reals\Entities\Real;
+use App\Admin\Controllers\MainController;
 
 class ReelController extends MainController
 {

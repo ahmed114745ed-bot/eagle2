@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Reals\Http\Controllers\web;
 
 use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class ReelSettingsController extends AdminController
+class ReelSettingsController extends MainController
 {
     /**
      * Title for current resource.

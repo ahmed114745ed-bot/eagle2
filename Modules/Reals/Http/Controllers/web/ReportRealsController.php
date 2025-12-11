@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Reals\Http\Controllers\web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

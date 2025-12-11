@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Moment\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
+
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
 
-class MomentSettingsController extends AdminController
+
+class MomentSettingsController extends MainController
 {
     /**
      * Title for current resource.
