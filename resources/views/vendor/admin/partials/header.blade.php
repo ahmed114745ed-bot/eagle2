@@ -454,7 +454,7 @@
                 </button>
 
                 <div id="mobileSelectMenu" class="mobile-select-menu">
-                    <select id="area-Manager-select-mobile" class="form-control" style="margin: 6% 0%;">
+                    <select id="area-Manager-select" class="form-control" style="margin: 6% 0%;">
                         <option value="">{{ __('Select area manager') }}</option>
                         @foreach($areaManagers as $areaManager)
                             <option value="{{ $areaManager->id }}">
@@ -463,7 +463,7 @@
                         @endforeach
                     </select>
 
-                    <select id="country-select-mobile" class="form-control mt-2" style="margin: 6% 0%;">
+                    <select id="country-select" class="form-control mt-2" style="margin: 6% 0%;">
                         <option value="">{{ __('Select Country...') }}</option>
                         @foreach($countries as $currentCountry)
                             <option value="{{ $currentCountry->id }}">
