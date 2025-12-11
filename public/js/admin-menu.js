@@ -1,5 +1,5 @@
 // custom-red-sidebar.js
-console.log('✅ notifications.js loaded');
+console.log('✅ sidebar js loaded');
 
 (function () {
     'use strict';
