@@ -79,18 +79,17 @@
         margin: 5px 10px 0 0 !important;
     }
 
-    .box-header {
+    /* .box-header {
         background: #f9fafb !important;
         border-bottom: 1px solid #e5e7eb !important;
         padding: 16px 24px !important;
         margin: -24px -24px 24px -24px !important;
         border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
-        /* display: flex !important; */
         display: block !important;
         align-items: center !important;
         justify-content: space-between !important;
         padding: 21px 145px !important;
-    }
+    } */
 
     /* Responsive fixes for box-header on mobile */
     @media (max-width: 767px) {
