@@ -1473,6 +1473,7 @@ html.ltr .dropdown-menu {
 
             .rtl .navbar-custom-menu {
                 float: right !important;
+            
             }
 
             .rtl .main-header .logo {
@@ -1866,7 +1867,7 @@ html.ltr .dropdown-menu {
              .rtl .main-header .logo{
                display: none !important;
             }
-        .rtl .navbar-static-top {
+            .rtl .navbar-static-top {
                 margin-left: 1% !important;
                 float: left;
                 width: 99%;
@@ -1893,8 +1894,21 @@ html.ltr .dropdown-menu {
                 border-radius: 0 !important;
             }
              .sidebar-open .main-sidebar {
-        left: 0 !important;
+                 left: 0 !important;
     
+            }
+
+            .rtl .navbar-custom-menu {
+                 position: absolute;
+                left: 0px;
+            }
+               .ltr .navbar-custom-menu {
+                 position: absolute;
+                right: 0px;
+            }
+
+         
         }
-        }
+
+    
 </style>
