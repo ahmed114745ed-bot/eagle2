@@ -172,7 +172,7 @@ class EmojiController extends MainController
         });
 
         $grid->batchActions(function ($batch) {
-             $batch->disableDelete(); 
+            $batch->disableDelete();
             $batch->add(new MoveGroupEmoji());
         });
 
@@ -227,6 +227,14 @@ class EmojiController extends MainController
         $form->text('name', __('name'));
         $form->text('name_en', __('name_en'));
         $form->file('emoji', __('emoji'));
+        $form->select('image_type', __('image_type'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+            ]
+        )->required();
         $form->number('t_length', __('t_length'));
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
         $form->number('sort', __('sort'));
@@ -239,5 +247,17 @@ class EmojiController extends MainController
         });
 
         return $form;
+    }
+
+
+    public function gitImage()
+    {
+        $gifts = Emoji::whereNotNull('emoji')->get();
+        foreach ($gifts as $gift) {
+            $ImageType =     pathinfo($gift->emoji, PATHINFO_EXTENSION);
+            $gift->image_type = $ImageType == 'alpha' ? 'mp4' : $ImageType;
+            $gift->save();
+        }
+        return $gifts;
     }
 }
