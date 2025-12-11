@@ -1442,7 +1442,7 @@ html.ltr .dropdown-menu {
 
             .rtl .main-header .logo{
                 float: right !important;
-                width: 21.4%;
+                width: 20%;
             }
             .rtl .navbar-static-top{
                 margin-left: 16px !important;
@@ -1488,9 +1488,9 @@ html.ltr .dropdown-menu {
     .ltr .form-horizontal .row {
         display: block !important;
     }
-      .ltr .main-header .logo{
+           .ltr .main-header .logo{
                 float: left !important;
-                width: 21.4%;
+                width: 20%;
             }
 
            .rtl .form-horizontal .box-footer .btn-group {

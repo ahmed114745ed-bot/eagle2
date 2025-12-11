@@ -58,7 +58,7 @@
         @endphp
 
         <ul class="sidebar-menu">
-            <li class="header">{{ trans('admin.menu') }}</li>
+            <!-- <li class="header">{{ trans('admin.menu') }}</li> -->
 
             @if (Admin::user()->type == 'bd')
                 @php
