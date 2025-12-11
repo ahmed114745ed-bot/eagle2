@@ -24,7 +24,12 @@ class CreateUsersAccountsSeeder extends Seeder
         $vips = OVip::all();
         for ($i = 0; $i < 20; $i++) {
             $phoneMiddle = $startNumber + ($i * 10); // 12, 22, 32, 42...
-            $fullPhone = $basePhone . $phoneMiddle . $suffix;
+            $number = $phoneMiddle . $suffix;
+            if (strlen($number) == 7) {  // Check if length is 7
+                $number .= '2';           // Append '2' at the end
+            }
+            $fullPhone = $basePhone . $number;
+
             $userFind = User::where('phone', $fullPhone)->first();
             if ($userFind) {
                 $userFind->forceDelete();
