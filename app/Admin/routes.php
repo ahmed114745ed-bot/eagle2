@@ -10,7 +10,6 @@ use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\GiftController;
-use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
@@ -22,14 +21,11 @@ use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
-use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\TargetController;
-use App\Admin\Controllers\AdminNotification;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\GiftLogController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
@@ -60,10 +56,8 @@ use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
-use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\V2\SalariesController;
@@ -74,8 +68,6 @@ use App\Admin\Controllers\GameSettingsController;
 use App\Admin\Controllers\GiftCategoryController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\ReelSettingsController;
-use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\DeleteAccountController;
@@ -86,13 +78,11 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\SuperBoomRuleController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\GiftLogSummaryController;
-use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
@@ -129,7 +119,6 @@ use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
-use App\Http\Controllers\Dashboard\Notification\AdminNotificationController;
 
 Route::group(
     [
@@ -216,8 +205,8 @@ Route::group(
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
-        Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
-        Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
+       
+       
         Route::get('search/host-agency', [UserV1Controller::class, 'hostAgencies'])->name('hostAgency');
         Route::post('/locale', MultiLanguageController::class . '@locale');
         if (MultiLanguage::config("show-login-page", true)) {
@@ -567,11 +556,8 @@ Route::group(
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
-        Route::resource('moments', MomentController::class)->middleware('moment.allowed');
-        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
-        Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
-        Route::resource('reels', ReelController::class);
-        Route::resource('reel-settings', ReelSettingsController::class);
+       
+       
         Route::resource('change-level-histories', ChangeLevelHistoryController::class);
         Route::resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
@@ -642,8 +628,7 @@ Route::group(
         //     }));
 
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        Route::resource('report-reals', ReportRealsController::class);
-        Route::resource('report-moments', ReportMomentController::class)->middleware('moment.allowed');
+       
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);

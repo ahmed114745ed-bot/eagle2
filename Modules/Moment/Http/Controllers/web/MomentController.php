@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Moment\Http\Controllers\web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -10,6 +10,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Moment\Entities\Moment;
+use App\Admin\Controllers\MainController;
 
 class MomentController extends MainController
 {

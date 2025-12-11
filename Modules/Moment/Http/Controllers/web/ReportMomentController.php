@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Moment\Http\Controllers\web;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Admin\Extensions\CheckRow;
 use Modules\Moment\Entities\Moment;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 
 class ReportMomentController extends MainController
