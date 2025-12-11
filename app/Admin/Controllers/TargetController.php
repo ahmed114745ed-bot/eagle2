@@ -117,7 +117,7 @@ class TargetController extends MainController
             if ($this->under_edit) {
                 $url = route('admin.targets.confirm');
 
-               $tools->append('<button class="btn btn-sm btn-success confirm-btn" data-url="'.$url.'">
+               $tools->append('<button class="btn btn-sm btn-danger confirm-btn" data-url="'.$url.'">
                             <i class="fa fa-check"></i> '.__('Confirm Update').'
                         </button>');
             }
