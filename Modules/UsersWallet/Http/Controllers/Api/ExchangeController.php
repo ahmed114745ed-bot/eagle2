@@ -30,7 +30,7 @@ class ExchangeController extends Controller
         $user = $request->user();
         $list = $this->exchangeService->exchangeSetting();
         $data = [
-            'exchange_coin_percentage' => (int)$list ?? 0,
+            'exchange_coin_percentage' => (int)$list ?? 1,
             'usr_diamond' => $user->monthly_diamond_received
         ];
         /** @var User $user */
@@ -56,7 +56,7 @@ class ExchangeController extends Controller
         if (!$request->diamonds && !$request->exchange) return Common::apiResponse(0, 'missing param', null, 422);
         try {
             $this->exchangeService->createExchange($user, $request->diamonds, $request->exchange);
-            return Common::apiResponse(1, $user->total_diamond_received, ['diamond' => $user->total_diamond_received, 'coins' => $user->di], 200);
+            return Common::apiResponse(1, __('exchange done successful'), ['diamond' => $user->total_diamond_received, 'coins' => $user->di], 200);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

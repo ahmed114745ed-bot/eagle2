@@ -28,7 +28,7 @@ class ExchangeService
     {
         return   \Cache::rememberForever('exchange_coin_percentage', function () {
             $setting = Setting::where('key', 'exchange_coin_percentage')->first();
-            return $setting?->value ?? 0;
+            return $setting?->value ?? 1;
         });
     }
 

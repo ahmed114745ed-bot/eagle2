@@ -1768,17 +1768,83 @@
     </div>
     
     <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
-
-    <div class="card">
-        
+       <div class="box-body">
         <div class="card-header">
             <h4 class="card-title" style="text-align: left;">
                 {{ __('wallet-transactions') }}
             </h4>
         </div>
 
-        <div class="table-responsive">
-            <div class="box-body">
+      
+    <div class="card">
+ 
+      <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                            <input type="hidden" name="tab" value="wallet_logs">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="fields-group">
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                               value="{{ request('year') }}" style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                               name="month" value="{{ request('month') }}"
+                                                               style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=wallet_logs') }}"
+                                                   class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+<div class="box-body">
+  
+
                 <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
                     <thead class="table-light">
                     <tr>
@@ -1797,7 +1863,8 @@
                         @foreach($walletLogs as $index => $log)
                             <tr>
                                 <td>{{ $walletLogs->firstItem() + $index }}</td>
-                                <td>{{ $log->operation }}</td>
+                                <td>{{ __("wallet." . $log->operation) }}</td>
+
                                 <!-- <td>{{ $log->type }}</td> -->
                                 <td>{{ number_format($log->amount, 2) }}</td>
                                 <td>{{ number_format($log->before_amount, 2) }}</td>

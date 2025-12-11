@@ -63,6 +63,7 @@
 "Users around your country": "المستخدمون حول بلدك",
 "All Agencies around your country": "جميع الوكالات حول بلدك",
 "bds around your country": "مديرو العلاقات حول بلدك",
+"exchange done successful": "تمت عملية التبادل بنجاح",
 "Specifies the percentage of the total profit distributed among all admins.": "يحدد نسبة الأرباح الإجمالية الموزعة بين جميع المسؤولين.",
 "Specifies the percentage of the total profit allocated to the room owner.": "يحدد نسبة الأرباح الإجمالية المخصصة لمالك الغرفة.",
 "Admin Profit Percentage (Admin Profit %)": "نسبة أرباح المسؤول (٪ أرباح المسؤول)",
@@ -4599,7 +4600,10 @@
     "transfer_from": "تم التحويل من :target",
     "source:": "مصدر:",
     "gift:": "هدية:",
-    "withdraw": "تم السحب بواسطة :admin"
+    "withdraw": "تم السحب بواسطة :admin",
+"wallet.add": "تحقيق تارجت",
+"wallet.subtract": "سحب",
+"wallet.transfer": "تحويل"
 
 
 
