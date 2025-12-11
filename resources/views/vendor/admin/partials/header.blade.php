@@ -454,7 +454,7 @@
                 </button>
 
                 <div id="mobileSelectMenu" class="mobile-select-menu">
-                    <select id="area-Manager-select" class="form-control" style="margin: 6% 0%;">
+                    <select id="area-Manager-select-mobile" class="form-control" style="margin: 6% 0%;">
                         <option value="">{{ __('Select area manager') }}</option>
                         @foreach($areaManagers as $areaManager)
                             <option value="{{ $areaManager->id }}">
@@ -463,7 +463,7 @@
                         @endforeach
                     </select>
 
-                    <select id="country-select" class="form-control mt-2" style="margin: 6% 0%;">
+                    <select id="country-select-mobile" class="form-control mt-2" style="margin: 6% 0%;">
                         <option value="">{{ __('Select Country...') }}</option>
                         @foreach($countries as $currentCountry)
                             <option value="{{ $currentCountry->id }}">
@@ -644,6 +644,17 @@
         location.reload();
         toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
     });
+    $('#area-Manager-select-mobile').on('change', function () {
+    const val = $(this).val();
+        $('#area-Manager-select').val(val).trigger('change');
+    });
+
+    $('#country-select-mobile').on('change', function () {
+        const val = $(this).val();
+        $('#country-select').val(val).trigger('change'); 
+    });
+
+
     $(document).ready(function () {
         const $countrySelect = $('#country-select');
         const $AreaManagerSelect = $('#area-Manager-select');
