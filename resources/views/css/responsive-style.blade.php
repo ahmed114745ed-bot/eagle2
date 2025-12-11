@@ -308,6 +308,9 @@
                 display: none !important;
             }
 
+            .select-country{
+                 display: none !important;
+            }
                  .mobile-select-toggle {
             position: relative;
         }

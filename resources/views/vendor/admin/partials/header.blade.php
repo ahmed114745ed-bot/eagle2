@@ -304,14 +304,39 @@
             }
 }
 
-                #mobileSelectBtn {
+            #mobileSelectBtn {
                     display: none;
                 }
             .mobile-select-toggle{
                 display: none;
 
             }
-       
+            @media (max-width: 768px) {
+                #preview-buttons-wrapper,
+                #preview-buttons-wrapper li,
+                #preview-buttons-wrapper button {
+                    display: none !important;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .mobile-preview-buttons {
+                    display: block;
+                }
+            }
+
+            @media (min-width: 769px) {
+                .mobile-preview-buttons {
+                    display: none !important;
+                }
+            }
+                
+            .mobile-preview-buttons button {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+                border-radius: 6px;
+            }
     </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
@@ -446,6 +471,44 @@
                             </option>
                         @endforeach
                     </select>
+
+                      @if (request()->is('areaManager*'))
+                            <a class="nav-item select-country">
+                                <select id="country-select" class="form-control">
+                                    <option value="">{{ __('Select Country...') }}</option>
+                                    @foreach($areaManagerCountries as $currentCountry)
+                                        <option
+                                            value="{{ $currentCountry->id }}"
+                                            data-flag="{{ getImagePath($currentCountry->flag) }}"
+                                            {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </a>
+                    @endif
+
+                     @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
+                            @if (request()->is('admin*'))
+                                <button id="preview-superadmin-btn-mobile" class="btn btn-default btn-block">
+                                    <i class="fa fa-eye"></i> {{ __('go to the country') }}
+                                </button>
+                            @endif
+                        @elseif(!session('preview_area_manager')  && session('area_manager_id') )
+                            @if (request()->is('admin*'))
+                                <button id="preview-area-manger-btn-mobile" class="btn btn-default btn-block">
+                                    <i class="fa fa-eye"></i> {{ __('go to the preview') }}
+                                </button>
+                            @endif
+                        @endif
+
+                        @if(session('preview_superadmin') || session('preview_area_manager'))
+                            @if (request()->is('admin*'))
+                                <button id="exit-preview-btn-mobile" class="btn btn-danger btn-block mt-2">
+                                    <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
+                                </button>
+                            @endif
+                        @endif
                 </div>
             </div>
         @endif
