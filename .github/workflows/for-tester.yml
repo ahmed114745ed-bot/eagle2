@@ -1,12 +1,12 @@
 name: SSh-for-tester-pipline
 on:
   push:
-    branches: ["for-tester"]
+    branches: ["new-design"]
 jobs:
-  run_example_job:
+  run_new-design_job:
     runs-on: ubuntu-latest
     steps:
-    - name: print out for-tester Eagle
+    - name: print out new-design Eagle
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.18.32"
