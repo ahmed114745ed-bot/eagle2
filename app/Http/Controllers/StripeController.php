@@ -185,14 +185,6 @@ class StripeController extends Controller
     private function findCoinLog(?string $orderId, ?string $trxId): ?CoinLog
     {
         $coinLog = CoinLog::find($orderId);
-    
-        if (!$coinLog) {
-            LogHelper::info("Stripe Webhook: No CoinLog found", [
-                'orderId' => $orderId,
-                'trxId'   => $trxId,
-            ]);
-        }
-    
         return $coinLog;
     }
     
@@ -218,9 +210,6 @@ class StripeController extends Controller
  
     private function handleMissingUser(CoinLog $coinLog)
     {
-        LogHelper::info("Stripe Webhook: No user found for CoinLog", [
-            'coinLogId' => $coinLog->id,
-        ]);
         return response()->json([
             'status'  => false,
             'trx'     => $coinLog->trx,
@@ -254,9 +243,6 @@ class StripeController extends Controller
     
     private function finalizeResponse(CoinLog $coinLog)
     {
-        LogHelper::info("Stripe Webhook: Transaction {$coinLog->trx} completed successfully", [
-            'coinLogId' => $coinLog->id,
-        ]);
         return response()->json([
             'status'  => true,
             'trx'     => $coinLog->trx,

@@ -17,9 +17,14 @@ class GiftService
 
     public function index($type)
     {
-       
         return $this->giftRepository->all($type);
     }
+
+    public function getByCategory($categoryId ,$typ)
+    {
+        return $this->giftRepository->getByCategory($categoryId ,$typ);
+    }
+    
     public function get_images()
     {
         return $this->giftRepository->get_images();

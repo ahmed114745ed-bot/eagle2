@@ -1,3 +1,9 @@
+<style>
+    .jvectormap-container svg{
+  height: 400px !important;
+    }
+</style>
+
 <div class="card mt-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <strong>تحديد الدول المغطاة</strong>
@@ -58,9 +64,9 @@ function initWorldMap() {
         const firstRegion = country.regions?.[0];
         const manager = firstRegion?.manager;
 
-        console.log(country);
-        console.log('mkkk');
-        console.log(manager);
+       // console.log(country);
+       // console.log('mkkk');
+       // console.log(manager);
 
         if (manager?.id === currentAreaManagerId && currentAreaManagerId != null) {
             regionColors[iso] = '#4CAF50'; 
@@ -313,7 +319,16 @@ function initWorldMap() {
 }
 
 function reloadMapWhenFormOpens() {
-    $('#world-map').empty();
+    const mapElement = $('#world-map');
+
+    if (!mapElement.length) {
+        console.warn("world-map not found yet... retrying");
+        setTimeout(reloadMapWhenFormOpens, 200); 
+        return;
+    }
+
+    mapElement.empty();
+
     if (typeof $.fn.vectorMap === 'undefined') {
         loadWorldMapScripts(() => initWorldMap());
     } else {
@@ -323,4 +338,5 @@ function reloadMapWhenFormOpens() {
 
 $(document).ready(reloadMapWhenFormOpens);
 $(document).on('pjax:complete', reloadMapWhenFormOpens);
+
 </script>

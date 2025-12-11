@@ -30,7 +30,7 @@ class ExchangeController extends Controller
         $user = $request->user();
         $list = $this->exchangeService->exchangeSetting();
         $data = [
-            'exchange_coin_percentage' => (int)$list ?? 0,
+            'exchange_coin_percentage' => (int)$list ?? 1,
             'usr_diamond' => $user->monthly_diamond_received
         ];
         /** @var User $user */

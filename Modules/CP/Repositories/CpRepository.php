@@ -372,8 +372,8 @@ class CpRepository
             $t === 2,
             fn($q) =>
             $q->whereBetween('gift_logs.created_at', [
-                $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY),
-                $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->addDays(6)->endOfDay(),
+                $now->copy()->startOfWeek(),
+                $now->copy()->startOfWeek()->addDays(6)->endOfDay(),
             ])
         );
 

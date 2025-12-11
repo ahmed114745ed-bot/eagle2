@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
+use App\Events\PublicTestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -52,6 +53,7 @@ use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
+use App\Http\Controllers\Api\V1\GiftCategoryController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
@@ -66,6 +68,7 @@ use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\MallController as ControllersMallController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -377,6 +380,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
+                Route::get('/v2', [GiftController::class, 'getByCategory']);
                 Route::get('/images', [GiftController::class, 'get_images']);
                 // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
 
@@ -386,6 +390,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+            });
+            Route::prefix('gift-categories')->group(function () {
+                Route::get('/', [GiftCategoryController::class, 'index']);
             });
 
             Route::get('my_gifts', [GiftLogController::class, 'giftLogsList']);
@@ -400,6 +407,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
+                Route::post('change-request', [CountryController::class, 'changeRequest']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
@@ -433,7 +441,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
                 Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                 Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
+                Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
 
@@ -518,8 +526,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
             Route::prefix('emojis')->group(function () {
+                Route::get('/categories', [EmojiController::class, 'categories']);
                 Route::get('/', [EmojiController::class, 'index']);
+                Route::get('/v2', [EmojiController::class, 'all']);
                 Route::get('/{id}', [EmojiController::class, 'show']);
+            });
+
+            Route::prefix('/v2/emojis')->group(function () {
+                Route::get('/categories', [EmojiController::class, 'categories']);
+                Route::get('/', [EmojiController::class, 'all']);
             });
             // start levels
             Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
@@ -744,4 +759,3 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
-

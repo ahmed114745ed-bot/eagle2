@@ -11,6 +11,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use Doctrine\DBAL\Schema\Index;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CountryController extends Controller
 {
@@ -82,5 +83,15 @@ class CountryController extends Controller
         $page = $request->get('page', 1);
         $countries = $this->countryService->searchRegions($key, $page);
         return response()->json($countries);
+    }
+
+    public function changeRequest(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'country_id' => ['required', 'integer', Rule::exists('countries', 'id')],
+        ]);
+        $this->countryService->changeRequest($data);
+
+        return Common::apiResponse(1, __('you request has been sent successfully'), 200);
     }
 }
