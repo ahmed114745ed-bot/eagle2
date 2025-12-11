@@ -305,6 +305,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
+                Route::get('/details', [UserController::class, 'showUsersDetails'])->where('id', '[0-9]+');
                 Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
