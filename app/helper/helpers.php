@@ -764,6 +764,16 @@ if (!function_exists('getSettingCash')) {
     }
 }
 
+if (!function_exists('getCpGiftsStatus')) {
+    function getCpGiftsStatus($key)
+    {
+        return \Cache::rememberForever($key, function () use ($key) {
+            $setting = \App\Models\Setting::where('key', $key)->first();
+            return $setting?->value ?? true;
+        });
+    }
+}
+
 if (! function_exists('getFavIcon')) {
     function getFavIcon(): ?string
     {

@@ -15,6 +15,11 @@ class EmojiService
         return  $this->emojiRepository->all($request);
     }
 
+     public function all($request)
+    {
+        return  $this->emojiRepository->index($request);
+    }
+
     public function show($id)
     {
         return $this->emojiRepository->findById($id);

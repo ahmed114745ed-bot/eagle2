@@ -275,10 +275,12 @@ class UserService
     {
         $countryId = $user->country_id;
 
-        if ($iso) {
-            $country = Country::where('iso', strtoupper($iso))->first();
-            if ($country) {
-                $countryId = $country->id;
+        if (!$countryId){
+            if ($iso) {
+                $country = Country::where('iso', strtoupper($iso))->first();
+                if ($country) {
+                    $countryId = $country->id;
+                }
             }
         }
 
@@ -297,7 +299,9 @@ class UserService
         }
         // end update location
 
-        $this->userRepository->updateCountry($user, $countryId);
+        if (!$countryId){
+            $this->userRepository->updateCountry($user, $countryId);
+        }
         //        $this->updateCountryAgencyAndBD($user->id, $countryId);
 
         return $this->userRepository->getUserWithMedals($user->id);

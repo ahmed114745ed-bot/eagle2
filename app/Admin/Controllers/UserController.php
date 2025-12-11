@@ -303,7 +303,7 @@ class UserController extends MainController
             }
         ");
 
-        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+        $grid->column('custom_button2', __('accounts number'))->display(function () {
             $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
@@ -629,7 +629,7 @@ class UserController extends MainController
         $countries = $this->countries();
         $badges = UserBadge::where('user_id', $id)->with('admin')
             ->orderByRaw("
-                    CASE 
+                    CASE
                         WHEN expire = 0 THEN 0
                         WHEN expire >= ? THEN 0
                         ELSE 1

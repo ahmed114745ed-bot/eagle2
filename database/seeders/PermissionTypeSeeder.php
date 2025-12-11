@@ -23,7 +23,7 @@ class PermissionTypeSeeder extends Seeder
 
         // Define your base categories
         $categories = [
-             [
+            [
                 'name' => 'Dashboard',
                 'sort' => 1,
                 'types' => [
@@ -37,14 +37,14 @@ class PermissionTypeSeeder extends Seeder
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => ['pay-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse','pay-switch'],
+                            PermissionType::ADMIN->value => ['browse', 'pay-switch'],
                             PermissionType::SUPER_ADMIN->value => ['browse'],
                             PermissionType::AREA_MANAGER->value => ['browse'],
                         ],
                     ],
                 ],
             ],
-             [
+            [
                 'name' => 'host level',
                 'sort' => 2,
                 'types' => [
@@ -121,8 +121,8 @@ class PermissionTypeSeeder extends Seeder
                         'except' => [],
                         'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete','show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create','show'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
 
                         ],
                     ],
@@ -150,7 +150,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['add-switch', 'history-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-                           // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
+                            // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
 
                         ],
                     ],
@@ -592,7 +592,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'hosts-target', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
-                     ['key' => 'remaining-diamonds-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                    ['key' => 'remaining-diamonds-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
                     ['key' => 'hosts', 'except' => ['create'], 'additional' => ['charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch',], 'types' => [
@@ -692,7 +692,10 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-background', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'emoji', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
@@ -708,7 +711,10 @@ class PermissionTypeSeeder extends Seeder
                 ],
                 'permissions' => [
 
-                    ['key' => 'gift', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'gift', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'gift-categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
@@ -735,6 +741,9 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
+                    ],],
+                    ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
                     ],],
                 ],
             ],
@@ -907,8 +916,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => ['show','create'], 'additional' => ['status-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['status-switch','edit','browse'],
+                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['status-switch', 'edit', 'browse'],
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,

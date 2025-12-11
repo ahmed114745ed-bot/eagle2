@@ -131,6 +131,7 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\WalletController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
 });
 
 
@@ -277,6 +278,9 @@ Route::group(
             Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         });
+
+            Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
+             Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
     }
 );
 

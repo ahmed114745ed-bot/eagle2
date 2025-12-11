@@ -15,6 +15,8 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "Move switch gift": "Move",
+
     "Pay switch dashboard":"charge games",
     "Status switch country": "Status Switch",
     "TargetDiamond":"This represents the goal amount of diamonds the room needs to achieve (e.g., 1,000,000).Once this target is reached, it may trigger certain rewards or unlock new features.",

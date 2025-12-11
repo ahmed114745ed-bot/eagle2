@@ -129,5 +129,6 @@ class Kernel extends HttpKernel
 
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
+        'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
     ];
 }
