@@ -179,6 +179,20 @@ body {
     margin-bottom: 40px;
 }
 
+/* Responsive for masonry grid */
+@media (max-width: 768px) {
+    .stats-masonry {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-masonry {
+        gap: 12px;
+    }
+}
+
 .widget-card-premium {
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
@@ -221,7 +235,6 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-light);
     border-radius: 16px;
-    padding: 24px;
     margin-bottom: 32px;
     box-shadow: var(--shadow-soft);
 }
@@ -363,13 +376,55 @@ body {
 }
 .nav-tabs {
     display: flex;
-    justify-content: center; 
-    align-items: center;     
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .nav-tabs li {
     list-style: none;
-    margin: 0 10px; 
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments for tabs */
+@media (max-width: 768px) {
+    .nav-tabs {
+        justify-content: flex-start;
+        padding: 4px;
+    }
+
+    .nav-tabs li {
+        margin: 2px 5px;
+    }
+
+    .nav-tabs .nav-link {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        white-space: nowrap;
+    }
+
+    .nav-tabs .nav-link i {
+        margin-right: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-tabs li {
+        margin: 2px 2px;
+    }
+
+    .nav-tabs .nav-link {
+        font-size: 0.8rem;
+        padding: 6px 8px;
+    }
 }
 
 
@@ -427,7 +482,7 @@ body {
 
         <div class="tab-content" id="statsTabContent">
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-      
+
                 <div class="col-md-12">@include('admin.dashboard.widgets.overview_tab')</div>
 
             </div>

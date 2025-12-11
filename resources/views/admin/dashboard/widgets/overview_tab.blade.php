@@ -10,6 +10,11 @@
 
 
 <style>
+    /* ---------- Base Fixes ---------- */
+    #overview.tab-pane {
+        overflow: visible !important;
+    }
+
     /* ---------- Floating dots background ---------- */
     .floating-dots {
         position: absolute;
@@ -21,40 +26,179 @@
         opacity: 0.6;
         pointer-events: none;
     }
+    
     @keyframes moveDots {
         from { background-position: 0 0; }
         to { background-position: 400px 400px; }
     }
 
     /* ---------- Dashboard wrapper ---------- */
-    .dashboard-wrap { position: relative; z-index: 1; }
-    .page-padding { padding: 1.25rem; }
+    .dashboard-wrap { 
+        position: relative; 
+        z-index: 1; 
+    }
+    
+    .page-padding { 
+        padding: 1.25rem; 
+    }
+
+    /* ---------- Card Fixes ---------- */
+    .card {
+        width: 100% !important;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
 
     /* ---------- Stats counter ---------- */
-    .stat-number { font-weight: 700; font-size: 1.75rem; transition: all 0.6s ease; }
-    .pulse { position: relative; display: inline-block; }
-    .pulse::after {
-        content: '';
-        position: absolute;
-        top: -6px; left: -6px; right: -6px; bottom: -6px;
-        border-radius: 8px;
-        background: rgba(0, 200, 83, 0.15);
-        animation: pulseAnim 1.6s infinite;
-        z-index: -1;
-    }
-    @keyframes pulseAnim {
-        0% { transform: scale(1); opacity: 0.9; }
-        100% { transform: scale(1.9); opacity: 0; }
+    .stat-number { 
+        font-weight: 700; 
+        font-size: 1.75rem; 
+        transition: all 0.6s ease; 
     }
 
     /* ---------- Sparkline ---------- */
-    .sparkline { height: 32px; }
+    .sparkline { 
+        height: 32px; 
+        max-width: 80px;
+    }
 
     /* ---------- Chart card ---------- */
-    .chart-card { min-height: 220px; }
+    .chart-card { 
+        min-height: 220px; 
+    }
+    
+    .chart-card canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
 
     /* ---------- Table avatars ---------- */
-    .avatar-sm { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
+    .avatar-sm { 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 6px; 
+        object-fit: cover; 
+    }
+
+    /* ---------- Heatmap Fix ---------- */
+    #heatmapGrid {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        min-height: 200px;
+    }
+
+    /* ========== RESPONSIVE FIXES ========== */
+    
+    /* Tablet */
+    @media (max-width: 992px) {
+        .page-padding { 
+            padding: 1rem; 
+        }
+        
+        .chart-card { 
+            min-height: 200px; 
+        }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .page-padding { 
+            padding: 0.75rem; 
+        }
+        
+        .stat-number { 
+            font-size: 1.5rem; 
+        }
+        
+        .chart-card { 
+            min-height: 180px; 
+        }
+        
+        .sparkline { 
+            height: 28px;
+            max-width: 60px;
+        }
+        
+        .avatar-sm { 
+            width: 32px; 
+            height: 32px; 
+        }
+
+        /* Force full width columns */
+        .row > [class*="col-md-"],
+        .row > [class*="col-lg-"] {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        /* Fix card content */
+        .card .d-flex {
+            flex-wrap: wrap;
+        }
+
+        /* Heatmap adjustment */
+        #heatmapGrid {
+            height: auto !important;
+            min-height: 150px;
+        }
+
+        #heatmapGrid > .col {
+            width: 25% !important;
+            flex: 0 0 25% !important;
+        }
+
+        /* Table scroll */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 480px) {
+        .page-padding { 
+            padding: 0.5rem; 
+        }
+        
+        .stat-number { 
+            font-size: 1.25rem; 
+        }
+        
+        .chart-card { 
+            min-height: 150px; 
+        }
+        
+        .sparkline { 
+            height: 24px;
+            max-width: 50px;
+        }
+        
+        .avatar-sm { 
+            width: 28px; 
+            height: 28px; 
+        }
+
+        /* Stack stat cards content */
+        .card .d-flex.justify-content-between {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .card .d-flex.justify-content-between > div {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Smaller heatmap grid */
+        #heatmapGrid > .col {
+            width: 33.33% !important;
+            flex: 0 0 33.33% !important;
+        }
+
+        /* Chart titles */
+        .card h6 {
+            font-size: 0.875rem;
+        }
+    }
 </style>
 
 <div class="position-relative">
