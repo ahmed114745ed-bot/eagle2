@@ -1822,6 +1822,13 @@ html.ltr .dropdown-menu {
             .ltr .content-wrapper {
                 margin-left: 0 !important;
             }
+
+            .ltr .main-header .logo{
+            
+           display: none !important;
+            }   .rtl .main-header .logo{
+               display: none !important;
+            }
         }
     @include('css.select_menu_style')
 </style>

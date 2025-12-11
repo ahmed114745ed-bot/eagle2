@@ -3,6 +3,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/desktop.css') }}" media="screen and (min-width: 1200px)">
 
 <script>
     window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
@@ -284,19 +285,27 @@
             }
 
         .logo {
-    box-shadow: none !important;
-}
+            box-shadow: none !important;
+            box-shadow: none !important; background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        }
 
-.skin-black-light .main-header {
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
-    margin-bottom: 13px !important;
+        .skin-black-light .main-header {
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+            margin-bottom: 13px !important;
+        }
+             @media (max-width: 767px) {
+  
+            .logo{
+                display: none !important;
+            }
+            .select-country-wrapper{
+                display: none !important;
+            }
 }
     </style>
 <header class="main-header">
-
-
-    <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" box-shadow: none !important; background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;">
+    <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
     
         <div class="logo-icon ms-2" style="width: 51%; margin: auto;">
             @php
