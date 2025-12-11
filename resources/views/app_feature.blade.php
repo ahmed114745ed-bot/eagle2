@@ -271,6 +271,11 @@
                     style="text-align: right;">
                 {{ __('room cup setting') }}
             </button>
+            
+             <button onclick="showSection('MomentStatus')"
+                    style="text-align: right;">
+                {{ __('Moment Status') }}
+            </button>
         </div>
     </div>
 
@@ -437,6 +442,38 @@
                 </div>
             </form>
         </div>
+         <div id="MomentStatus" class="settings-section">
+            <h2>{{ __('Moment Status') }}</h2>
+            <form id="momentStatusForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable moment status Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="moment_status_toggle" {{ $momentStatus ? 'checked' : '' }}
+                            onchange="document.getElementById('moment_status_value').value = this.checked ? '1' : '0';
+                                document.getElementById('momentStatusForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="moment_status" id="moment_status_value" value="{{ $momentStatus ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+         </div>
     </div>
 </div>
 

@@ -19,6 +19,7 @@ use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
@@ -147,14 +148,21 @@ class GiftLogService
             $cpId =  Cp::where(function ($query) use ($user) {
                 $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
             })->whereIn('status', [1, 4])->first();
+           
             $cpIds = [];
-            //check type of cp
-            if ($cpId != null) {
-                try {
-                    $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
-                    // dd($cpIds);
-                } catch (\Exception $e) {
+            $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
+            Log::info("CP Check: cpId={$cpId?->id}, cpEnableAllGifts={$cpEnableAllGifts}, giftId={$gift->id}, giftCategoryType={$gift->category?->type}");
+
+            if ($cpId != null) {
+                 if ($cpEnableAllGifts || ($gift->category && $gift->category->type === 'cp')) {
+                    try {
+                         Log::info("Processing CP gift for user {$user->id} to receivers: " . implode(',', $receivedUsers->pluck('id')->toArray()));
+
+                        $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                    } catch (\Exception $e) {
+
+                    }
                 }
             }
 
