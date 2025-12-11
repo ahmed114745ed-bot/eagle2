@@ -39,7 +39,6 @@ use App\Observers\AgencyObserver;
 use App\Observers\ConfigObserver;
 use App\Observers\FamilyObserver;
 use App\Observers\SettingObserver;
-use Illuminate\Support\Facades\DB;
 use App\Helpers\CustomNotification;
 use App\Repositories\Room\RoomRepo;
 use App\Repositories\User\UserRepo;
@@ -48,7 +47,6 @@ use App\Observers\FamilyUserObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Observers\UserSallaryObserver;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\RoomBoomLevelObserver;
 use App\Services\Gifts\LuckyGiftService;
@@ -59,22 +57,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
-use App\Repositories\Room\RoomRepo;
-use App\Repositories\Room\RoomRepoInterface;
-use App\Repositories\User\UserRepo;
-use App\Repositories\User\UserRepoInterface;
-use App\Services\Gifts\LuckyGiftService;
-use App\Services\RedisService;
-use Carbon\Carbon;
-use Encore\Admin\Form;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\ServiceProvider;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
