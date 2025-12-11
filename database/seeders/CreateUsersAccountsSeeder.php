@@ -27,11 +27,11 @@ class CreateUsersAccountsSeeder extends Seeder
             $fullPhone = $basePhone . $phoneMiddle . $suffix;
             $userFind = User::where('phone', $fullPhone)->first();
             if ($userFind) {
-                $userFind -> forceDelete();
+                $userFind->forceDelete();
             }
             $user = User::create([
                 'phone' => $fullPhone,
-                'password' => bcrypt('111'),
+                'password' => 111,
             ]);
 
             $vip = $vips->random();
