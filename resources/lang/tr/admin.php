@@ -438,4 +438,11 @@ return [
     "CDN" => "CDN",
     "L3" => "L3",
     "charge_level" => "şarj seviyesi",
+    'feature_description' => "Bu özellik, bir kullanıcının hangi hediyelere erişebileceğini kontrol etmenizi sağlar:
+
+Tüm Hediyeler:
+Seçildiğinde, kullanıcı sistemde mevcut olan tüm hediyeleri görebilir ve kullanabilir.
+
+Sadece CP Hediyeleri:
+Seçildiğinde, kullanıcı yalnızca CP’ye özel hediyeleri görebilecek ve bunları yalnızca CP özelliği içinde kullanabilecektir.",
 ];

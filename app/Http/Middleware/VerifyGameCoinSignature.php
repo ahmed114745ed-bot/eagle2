@@ -12,11 +12,6 @@ class VerifyGameCoinSignature
 {
     public function handle(Request $request, Closure $next)
     {
-        LogHelper::info('Check signature request', [
-            'request' => $request->all(),
-           
-        ]);
-
         $orderId    = (string)$request->input('orderId');
         $gameId     = (string)$request->input('gameId');
         $roundId    = (string)$request->input('roundId');

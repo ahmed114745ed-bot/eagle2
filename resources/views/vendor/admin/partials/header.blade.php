@@ -65,12 +65,19 @@
         }
 
         .modal-header {
-            display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
             border-bottom: 1px solid #e9ecef;
             background-color: #f8f9fa;
+        }
+
+        .rtl .modal-header {
+            display: block !important;
+        }
+
+        .rtl .close {
+            float: left;
         }
 
         .modal-header h5 {

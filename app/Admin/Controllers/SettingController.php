@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Models\Language;
 use Cache;
 
 class SettingController extends MainController
@@ -50,6 +51,7 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
+         $languages = Language::select(['id', 'name', 'code'])->get();
          $chargeTabType = request()->get('type', 'Experience');
 
 
@@ -64,6 +66,7 @@ class SettingController extends MainController
                 'pusher_app_id',
                 'pusher_app_cluster',
                 'settings',
+                'languages',
                 'timezones',
                 'agora_app_id',
                 'zego_server_secret',

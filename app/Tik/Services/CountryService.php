@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
+use App\Models\ChangeCountryRequest;
 use Modules\AreaManager\Entities\Region;
 use App\Tik\Repositories\CountryRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -62,5 +63,15 @@ class CountryService
             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function changeRequest($data): true
+    {
+        ChangeCountryRequest::updateOrCreate([
+            'user_id' => auth()->id(),
+            'status' => 'pending'
+        ], $data + ['user_id' => auth()->id()]);
+
+        return true;
     }
 }
