@@ -2,62 +2,63 @@
 
 namespace App\Providers;
 
-use App\Admin\Fields\Image;
-use App\Admin\Fields\ImagePath;
-use App\Classes\UserHandling;
-use App\Helpers\CacheHelper;
-use App\Helpers\CustomNotification;
-use App\Helpers\ManagerHelper;
-use App\Helpers\RoomHelper;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Models\Emoji;
-use App\Models\Family;
-use App\Models\FamilyUser;
-use App\Models\Gift;
-use App\Models\Language;
 use App\Models\Pk;
+use Carbon\Carbon;
+use App\Models\Gift;
 use App\Models\Room;
-use App\Models\Setting;
 use App\Models\User;
-use App\Models\UserSallary;
-use App\Observers\ConfigObserver;
-use App\Observers\SettingObserver;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
-use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
-use App\Observers\AgencyJoinRequestObserver;
-use App\Observers\AgencyObserver;
-use App\Observers\EmojiObserver;
-use App\Observers\FamilyObserver;
-use App\Observers\FamilyUserObserver;
-use App\Observers\GiftObserver;
+use App\Models\Emoji;
+use App\Models\Agency;
+use App\Models\Family;
+use Encore\Admin\Form;
+use App\Helpers\Common;
+use App\Models\Setting;
+use App\Models\Language;
+use App\Models\FamilyUser;
+use App\Admin\Fields\Image;
+use App\Helpers\RoomHelper;
+use App\Models\UserSallary;
+use App\Helpers\CacheHelper;
+use Illuminate\Http\Request;
+use App\Classes\UserHandling;
 use App\Observers\PKObserver;
-use App\Observers\RoomBoomLevelObserver;
+use Modules\Vip\Entities\Vip;
+use App\Helpers\ManagerHelper;
+use App\Observers\VipObserver;
+use App\Services\RedisService;
+use App\Admin\Fields\ImagePath;
+use App\Observers\GiftObserver;
 use App\Observers\RoomObserver;
 use App\Observers\UserObserver;
-use App\Observers\UserSallaryObserver;
-use App\Observers\VipObserver;
 use App\Observers\WareObserver;
+use Encore\Admin\Facades\Admin;
+use App\Observers\EmojiObserver;
+use App\Models\AgencyJoinRequest;
+use App\Observers\AgencyObserver;
+use App\Observers\ConfigObserver;
+use App\Observers\FamilyObserver;
+use App\Observers\SettingObserver;
+use Illuminate\Support\Facades\DB;
+use App\Helpers\CustomNotification;
+use App\Repositories\Room\RoomRepo;
+use App\Repositories\User\UserRepo;
+use Illuminate\Support\Facades\URL;
+use App\Observers\FamilyUserObserver;
+use Illuminate\Support\Facades\Cache;
+use App\Observers\UserSallaryObserver;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use App\Observers\RoomBoomLevelObserver;
+use App\Services\Gifts\LuckyGiftService;
+use App\Observers\AgencyJoinRequestObserver;
+use App\Repositories\Room\RoomRepoInterface;
+use App\Repositories\User\UserRepoInterface;
+use Illuminate\Database\Eloquent\Collection;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
-use App\Repositories\Room\RoomRepo;
-use App\Repositories\Room\RoomRepoInterface;
-use App\Repositories\User\UserRepo;
-use App\Repositories\User\UserRepoInterface;
-use App\Services\Gifts\LuckyGiftService;
-use App\Services\RedisService;
-use Carbon\Carbon;
-use Encore\Admin\Form;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\ServiceProvider;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -71,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
         Form::extend('imagePath', ImagePath::class);
 
         if ($this->app->isLocal()) {
-//            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+            //            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -95,6 +96,13 @@ class AppServiceProvider extends ServiceProvider
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
+
+        // Load your custom settings
+        $start = Common::getSettingValue('week_start') ?? 'monday';
+        $end   = Common::getSettingValue('week_end')   ?? 'sunday';
+
+        Carbon::setWeekStartsAt(constant('Carbon\\Carbon::' . strtoupper($start)));
+        Carbon::setWeekEndsAt(constant('Carbon\\Carbon::' . strtoupper($end)));
     }
 
     public function dashboardAdminConfig(): void
@@ -142,7 +150,7 @@ class AppServiceProvider extends ServiceProvider
         $settings = CacheHelper::cacheSettings();
 
         /** @var Collection $rememberForever*/
-        if (gettype($settings) !== 'array'){
+        if (gettype($settings) !== 'array') {
             $settings = $settings->pluck('value', 'key')->toArray();
         }
 

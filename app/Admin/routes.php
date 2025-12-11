@@ -679,7 +679,11 @@ Route::group(
         Route::resource('wallet-transactions', WalletTransactionController::class);
 
         Route::resource('banners', BannerController::class);
-        Route::resource('languages', LanguageController::class);
+        
+        Route::prefix('languages')->group(function () {
+            Route::get('/', [LanguageController::class, 'index']);
+            Route::put('/{id}', [LanguageController::class, 'update'])->where('id', '[0-9]+');
+        });
         Route::resource('settings', SettingController::class)
             ->except(['update'])
             ->names('admin.settings');

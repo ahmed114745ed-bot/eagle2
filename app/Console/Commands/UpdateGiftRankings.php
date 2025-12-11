@@ -27,7 +27,7 @@ class UpdateGiftRankings extends Command
         //'Africa/Cairo'
         $periods = [
             'daily' => \Carbon\Carbon::now($timezone)->startOfDay()->copy()->setTimezone('UTC'),
-            'weekly' => \Carbon\Carbon::now($timezone)->startOfWeek(Carbon::SATURDAY)->startOfDay()->copy()->setTimezone('UTC'),
+            'weekly' => \Carbon\Carbon::now($timezone)->startOfWeek()->startOfDay()->copy()->setTimezone('UTC'),
             'monthly' => \Carbon\Carbon::now($timezone)->startOfMonth()->startOfDay()->copy()->setTimezone('UTC'),
         ];
 

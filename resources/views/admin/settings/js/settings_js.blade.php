@@ -157,6 +157,9 @@
 </script>
 
 <script>
+    document.addEventListener('openSettingsTab', function(e) {
+    showSection(e.detail);
+});
     function previewImage(event) {
         let file = event.target.files[0];
         if (file) {

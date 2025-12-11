@@ -4615,8 +4615,9 @@
 "gifts type": "نوع الهدايا",
 "all gifts": "جميع الهدايا",
 "Saved successfully ✅":"تم الحفظ بنجاح ✅",
-
-
+"Default language:": "اللغة الافتراضية:",
+"default language": "اللغة الافتراضية",
+"set default language":"تعيين اللغة الافتراضية",
 "Form ID": "رقم الطلب",
 "Full Form Information": "معلومات الطلب الكاملة",
 "User Name": "اسم المستخدم",
