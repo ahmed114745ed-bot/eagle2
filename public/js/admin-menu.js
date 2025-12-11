@@ -1,5 +1,4 @@
 // custom-red-sidebar.js
-alert('vdfdf');
 (function () {
     'use strict';
 
