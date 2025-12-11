@@ -30,6 +30,7 @@
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
             left: 0 !important;
+             width: 32%  !important;
         }
 
         .navbar-custom-menu>.navbar-nav>li {
@@ -80,6 +81,7 @@
 
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
             left: 0 !important;
+            width: 32%  !important;
         }
 
         .rtl .content-wrapper,
@@ -168,8 +170,16 @@
             /* min-width: max-content; */
         }
 
+        
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-            left: 0 !important;
+           position: absolute;
+                    right: -113px;
+                    width: 60%  !important;
+        }
+            .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+           position: absolute;
+                    left: -113px;
+                    width: 60%  !important;
         }
     }
 </style>
