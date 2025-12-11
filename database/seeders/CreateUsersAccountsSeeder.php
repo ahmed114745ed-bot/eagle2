@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\UserVip;
 
-class CreateUsersAccounts extends Seeder
+class CreateUsersAccountsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,18 +20,15 @@ class CreateUsersAccounts extends Seeder
     {
         $basePhone = '+2010';
         $startNumber = 12; // This will increment: 12, 22, 32, 42 ...
-        $suffix = '222222'; // Last 6 digits
+        $suffix = '22222'; // Last 6 digits
         $vips = OVip::all();
         for ($i = 0; $i < 20; $i++) {
             $phoneMiddle = $startNumber + ($i * 10); // 12, 22, 32, 42...
-            if($phoneMiddle == 2 || $phoneMiddle == 22 || $phoneMiddle == 222){
-                $phoneMiddle +=1;
-            }
             $fullPhone = $basePhone . $phoneMiddle . $suffix;
 
             $user = User::create([
                 'phone' => $fullPhone,
-                'password' => Hash::make('111'),
+                'password' => bcrypt('111'),
             ]);
 
             $vip = $vips->random();
