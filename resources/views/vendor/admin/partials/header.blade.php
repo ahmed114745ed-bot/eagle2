@@ -329,7 +329,7 @@
                 <img src="{{ $logo }}" 
                     alt="{{ $appName }}" 
                     class="h-12 w-12 object-contain rounded-circle" 
-                    style="height:32px;width:32px;border-radius:50%;     margin: 12px 19px;">
+                    style="height: 95%;  width: 89%; border-radius:50%;     margin: 12px 19px;">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
                     style="height:32px;width:32px;font-weight:bold;">
