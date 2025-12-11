@@ -11,6 +11,7 @@ use App\Models\EmojiCategory;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use App\Admin\Actions\Grid\MoveGroupEmoji;
 use App\Admin\Actions\MoveEmojiCategoryAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -86,7 +87,7 @@ class EmojiController extends MainController
         // Get the current filter from request or default to first category
         $filterType = request()->get('filter', 'all');
         $category  = [];
-        
+
         if (request('filter') != 'all') {
             $category = EmojiCategory::find(request('filter'));
         }
@@ -168,6 +169,11 @@ class EmojiController extends MainController
             if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new MoveEmojiCategoryAction());
             }
+        });
+
+        $grid->batchActions(function ($batch) {
+             $batch->disableDelete(); 
+            $batch->add(new MoveGroupEmoji());
         });
 
         return $grid;
