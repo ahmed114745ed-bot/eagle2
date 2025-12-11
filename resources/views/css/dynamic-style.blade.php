@@ -91,6 +91,42 @@
         justify-content: space-between !important;
         padding: 21px 145px !important;
     }
+
+    /* Responsive fixes for box-header on mobile */
+    @media (max-width: 767px) {
+        .box-header {
+            padding: 12px 16px !important;
+            margin: -16px -16px 16px -16px !important;
+            display: block !important;
+            text-align: left !important;
+        }
+
+        .box-header.with-border {
+            padding: 12px 16px !important;
+            margin: -16px -16px 16px -16px !important;
+        }
+
+        .box-header.with-border.filter-box {
+            padding: 12px 16px !important;
+            margin: -16px -16px 16px -16px !important;
+        }
+
+        .box-header .pull-right,
+        .box-header .pull-left {
+            float: none !important;
+            text-align: center !important;
+            margin: 8px 0 !important;
+        }
+
+        .box-header .box-title {
+            font-size: 16px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .box-header form {
+            padding-top: 0 !important;
+        }
+    }
     .box-header  form{
         padding-top: 8px;
             border-radius: 36px;
