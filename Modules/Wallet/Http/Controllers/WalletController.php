@@ -47,7 +47,7 @@ class WalletController extends Controller
 
         $result = $this->walletService->getTemplate($type);
 
-        return Common::apiResponse(1, 'success', WalletTemplateResource::collection( $result), 200);
+        return WalletTemplateResource::collection($result);
     }
 }
 
