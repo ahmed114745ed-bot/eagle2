@@ -116,12 +116,6 @@ trait PaymentTrait
         if ($newTrx){
             $coinLog->update(['trx' => $newTrx]);
         }
-
-        LogHelper::info('CoinLog processed', [
-            'coinLogId' => $coinLog->id,
-            'trx'       => $coinLog->trx,
-            'user_id'   => $coinLog->user_id,
-        ]);
     }
 
     private function resolveCoinLogOwner(CoinLog $coinLog)

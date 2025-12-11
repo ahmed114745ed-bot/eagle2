@@ -70,6 +70,7 @@ class VersionController extends Controller
 
         $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
 
+
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version,
@@ -102,6 +103,8 @@ class VersionController extends Controller
             'is_show_room_activity' => ($settings['room_cup'] ?? 0) == 1 || ($settings['room_cup_setting'] ?? 0) == 1,
             'app_url' => @$appUrl,
             'is_new_theme_enabled' => (bool) ($settings['is_new_theme_enabled'] ?? false),
+            'moment_status'  => (bool) ($settings['moment_status'] ?? true), 
+        
         ];
 
         //update current version for user
@@ -199,7 +202,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting', 'is_new_theme_enabled'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature','huawei_link','ios_link','android_link', 'room_cup','room_cup_setting', 'is_new_theme_enabled' ,'moment_status'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool

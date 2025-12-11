@@ -461,4 +461,12 @@ return [
     'custom_img_mimes' => 'Only jpeg, png, jpg images are allowed.',
     'is_preview' => 'Live Preview',
 
+      'feature_description' => "This feature allows you to control which gifts a user can access:
+
+All Gifts:
+When selected, the user will be able to view and use all available gifts in the system.
+
+CP Gifts Only:
+When selected, the user will only see CP-specific gifts, which they can use exclusively within the CP feature.",
+
 ];

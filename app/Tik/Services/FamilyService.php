@@ -97,7 +97,7 @@ class FamilyService
                 $query = ['month' => now()->month, 'year' => now()->year,];
                 break;
             case 'week':
-                $query = ['created_at' => [today()->startOfWeek(CarbonInterface::SATURDAY), today()->endOfWeek(CarbonInterface::FRIDAY)]];
+                $query = ['created_at' => [today()->startOfWeek(), today()->endOfWeek()]];
                 break;
             default:
                 throw new \Exception('time not define');
