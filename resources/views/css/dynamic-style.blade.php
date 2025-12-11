@@ -137,7 +137,7 @@
     }
 
     .skin-black-light .main-sidebar {
-        width: var(--sidebar-width) !important;
+        width: 18%;
         position: fixed !important;
         top: 0 !important;
         left: -var(--sidebar-width) !important;
@@ -439,7 +439,6 @@
         height: var(--header-height) !important;
         display: flex !important;
         align-items: center !important;
-        padding: 0 32px !important;
         position: relative !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         border-radius: 0 0 var(--border-radius) var(--border-radius) !important;
@@ -1440,13 +1439,14 @@ html.ltr .dropdown-menu {
                 float: right !important;
             }
 
-            .rtl .main-header .logo{
+            .rtl .main-header .logo {
                 float: right !important;
-                width: 20.49%;
+                width: 17%;
             }
-            .rtl .navbar-static-top{
-                margin-left: 16px !important;
-
+            .rtl .navbar-static-top {
+                margin-left: 1% !important;
+                float: left;
+                width: 80%;
             }
 
             .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
@@ -1830,5 +1830,21 @@ html.ltr .dropdown-menu {
                display: none !important;
             }
         }
-    @include('css.select_menu_style')
+  
+            .sidebar-open .content-wrapper {
+                margin-left: 0 !important;
+                padding-left: 24px !important;
+            }
+            .sidebar-open .skin-black-light .main-header > .navbar {
+                margin-left: 0 !important;
+            }
+            .skin-black-light .main-sidebar {
+                width: 100% !important;
+                left: -100% !important;
+                border-radius: 0 !important;
+            }
+             .sidebar-open .main-sidebar {
+        left: 0 !important;
+    
+}
 </style>
