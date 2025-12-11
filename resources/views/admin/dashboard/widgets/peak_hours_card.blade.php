@@ -87,5 +87,4 @@
     loadPeakData(); 
 });
 
-    loadPeakData();
 </script>

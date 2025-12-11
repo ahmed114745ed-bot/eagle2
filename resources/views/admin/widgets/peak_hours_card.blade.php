@@ -87,5 +87,4 @@
     $(document).on('pjax:end', function() {
     loadPeakData(); 
 });
-    loadPeakData();
 </script>
