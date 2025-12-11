@@ -25,7 +25,10 @@ class CreateUsersAccountsSeeder extends Seeder
         for ($i = 0; $i < 20; $i++) {
             $phoneMiddle = $startNumber + ($i * 10); // 12, 22, 32, 42...
             $fullPhone = $basePhone . $phoneMiddle . $suffix;
-
+            $userFind = User::where('phone', $fullPhone)->first();
+            if ($userFind) {
+                $userFind -> forceDelete();
+            }
             $user = User::create([
                 'phone' => $fullPhone,
                 'password' => bcrypt('111'),
