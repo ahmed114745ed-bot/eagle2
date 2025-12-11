@@ -1825,12 +1825,25 @@ html.ltr .dropdown-menu {
 
             .ltr .main-header .logo{
             
-           display: none !important;
-            }   .rtl .main-header .logo{
+              display: none !important;
+            }  
+             .rtl .main-header .logo{
                display: none !important;
             }
-        }
-  
+        .rtl .navbar-static-top {
+                margin-left: 1% !important;
+                float: left;
+                width: 99%;
+            }
+             .ltr .navbar-static-top {
+                margin-left: 1% !important;
+                float: left;
+                width: 99%;
+            }
+            #app{
+                    margin-top: 19% !important;
+            }
+            
             .sidebar-open .content-wrapper {
                 margin-left: 0 !important;
                 padding-left: 24px !important;
@@ -1846,5 +1859,6 @@ html.ltr .dropdown-menu {
              .sidebar-open .main-sidebar {
         left: 0 !important;
     
-}
+        }
+        }
 </style>
