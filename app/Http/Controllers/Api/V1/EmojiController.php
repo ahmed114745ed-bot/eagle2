@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Tik\Services\EmojiService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EmojiResource;
+use App\Http\Resources\GiftCategoryResource;
+use App\Models\EmojiCategory;
 
 class EmojiController extends Controller
 {
@@ -15,6 +17,13 @@ class EmojiController extends Controller
     public function index(Request $request)
     {
         $data = $this->emojiService->index($request);
+
+        return Common::apiResponse(1, '', EmojiResource::collection($data), 200);
+    }
+
+    public function all(Request $request)
+    {
+        $data = $this->emojiService->all($request);
 
         return Common::apiResponse(1, '', EmojiResource::collection($data), 200);
     }
@@ -43,5 +52,11 @@ class EmojiController extends Controller
         }
 
         return Common::apiResponse(1, '', $data);
+    }
+
+    public function categories(Request $request)
+    {
+        $categories = EmojiCategory::get();
+        return Common::apiResponse(1, '', GiftCategoryResource::collection($categories));
     }
 }

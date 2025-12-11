@@ -83,7 +83,9 @@
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("main-sidebar");
     const contentWrapper = document.getElementById("pjax-container");
-    const mainHeader = document.querySelector(".select-country");
+    // const selectCountries = document.querySelectorAll(".select-country");
+    // const mainHeader = document.querySelector(".select-country");
+    const selectWrapper = document.querySelector(".select-country-wrapper");
     const toggleButton = document.querySelector(".sidebar-toggle");
 
     function updateLayout() {
@@ -101,7 +103,11 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.classList.toggle("active");
         sidebar.classList.toggle("active_hide");
         contentWrapper.classList.toggle("content-wrapper-rtl");
-        mainHeader.classList.toggle("select-country-rtl");
+        selectWrapper.classList.toggle("select-country-rtl");
+        // mainHeader.classList.toggle("select-country-rtl");
+        // selectCountries.forEach(function(selectElement) {
+        //     selectElement.classList.toggle("select-country-rtl");
+        // });
         updateLayout();
     });
 

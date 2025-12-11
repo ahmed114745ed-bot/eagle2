@@ -184,23 +184,24 @@ class RankingRepository
     }
 
 
-    public function getUserRanking(string $role, string $rankingType, int $perPage = 10 ,$type = 1 )
+    public function getUserRanking(string $role, string $rankingType, int $perPage = 10, $type = 1)
     {
-        $query =GiftRanking::query();
-           $this->applyDateFiltersV2($query, $type);
+        $query = GiftRanking::query();
+        $this->applyDateFiltersV2($query, $type);
 
-           return  $query->whereHas('ranker')
+        return  $query->whereHas('ranker')
             ->where('role', $role)
             ->when($role == 'roomId', function ($query) {
                 return $query->where('ranker_type', Room::class)->with([
                     'ranker' => function ($q) {
-                        $q->with('owner')->select(['id', 'room_name','uid','room_cover' ]);
+                        $q->with('owner')->select(['id', 'room_name', 'uid', 'room_cover']);
                     },
                 ]);
             })
             ->when($role != 'roomId', function ($query) use ($role) {
                 return $query->where('ranker_type', User::class)->with([
                     'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'))
                 ]);
             })
 
@@ -208,18 +209,17 @@ class RankingRepository
             ->orderByDesc('total_gifts')
             ->take($perPage)
             ->get();
-         
     }
 
-    public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  =1)
+    public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  = 1)
     {
-        $query =GiftRanking::query();
+        $query = GiftRanking::query();
         $this->applyDateFiltersV2($query, $type);
         $query->with([
-                'ranker' => function ($q) {
-                    $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img', 'app_owner_id']);
-                },
-            ])
+            'ranker' => function ($q) {
+                $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img', 'app_owner_id']);
+            },
+        ])
             ->where('role', $role)
             ->where('ranker_type', Agency::class)
             ->where('type', $rankingType)
@@ -230,7 +230,7 @@ class RankingRepository
 
     public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
     {
-        $query = GiftRanking::query()
+        $query = GiftRanking::query()->whereHas('ranker')
             ->with([
                 'ranker' => function ($q) use ($role) {
                     $q->with([
@@ -244,6 +244,7 @@ class RankingRepository
             ->where('ranker_type', User::class)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
+        $this->applyDateFiltersV2($query, 1);
 
         return $query->limit($limit)->get();
     }
@@ -318,6 +319,8 @@ class RankingRepository
     protected function applyDateFiltersV2(&$query, $type)
     {
         $timezone = Common::timeZone();
+        $startWeek = Common::getSettingValue('week_start');
+        $endWeek = Common::getSettingValue('week_end');
         if ($type == 0) {
             $query->whereBetween('created_at', [Carbon::now($timezone)->startOfHour(), Carbon::now($timezone)->endOfHour()]);
         } elseif ($type == 1) {

@@ -20,12 +20,12 @@ class VerifyLeaderCCMiddleWare
     
         $path = ltrim(str_replace('api/', '', $request->path()), '/');
         $key = config('games.leader_CC_game_key');
-        LogHelper::info('LeaderCC Request Timing', [
-            'url'      => $request->fullUrl(),
-            'method'   => $request->method(),
-            'body'     => $request->all(),
-            'path' => $path,
-        ]);
+        // LogHelper::info('LeaderCC Request Timing', [
+        //     'url'      => $request->fullUrl(),
+        //     'method'   => $request->method(),
+        //     'body'     => $request->all(),
+        //     'path' => $path,
+        // ]);
      
         if (!$key) {
             return response()->json([
@@ -109,12 +109,6 @@ class VerifyLeaderCCMiddleWare
         $expectedSign = md5($rawString);
 
         if (!hash_equals(strtolower($expectedSign), strtolower($request->input('sign')))) {
-            LogHelper::info(' expectedSign', [
-                'url'      => 'Verify signature fail',
-                'expectedSign'      =>$expectedSign,
-                'sign'      => $request->input('sign'),
-             
-            ]);
             return response()->json([
                 'errorCode' => 10004,
                 'errorMsg' => 'Verify signature fail'

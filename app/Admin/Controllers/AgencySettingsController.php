@@ -2,13 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Auth\Permission;
+use App\Models\Config;
+use App\Helpers\Common;
+use App\Models\Setting;
+use App\Models\Language;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
-use App\Models\Config;
-use App\Models\Language;
 
 class AgencySettingsController extends MainController
 {
@@ -28,7 +30,7 @@ class AgencySettingsController extends MainController
         }
 
         $tab = request('firsttab');
-       
+
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
         // $moments =  settings()->get('moments');
@@ -46,13 +48,27 @@ class AgencySettingsController extends MainController
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
+        $remaining_diamonds_action = Common::getSettingValue('remaining_diamonds_action') ?? 0;
         $languages = Language::all();
         $configAll = Config::all();
-
+        $settings = $this->getSettings();
         $vars = compact(
-            'hours', 'days', 'moments', 'reels', 'diamonds', 'transfer_salary',
-            'stop_invite_code', 'stop_charge', 'make_rooms_top', 'make_gift_top', 'languages', 'configAll',
-            'hoursDays','tab'
+            'hours',
+            'days',
+            'moments',
+            'remaining_diamonds_action',
+            'reels',
+            'diamonds',
+            'transfer_salary',
+            'stop_invite_code',
+            'stop_charge',
+            'make_rooms_top',
+            'make_gift_top',
+            'languages',
+            'configAll',
+            'hoursDays',
+            'tab',
+            'settings'
         );
 
         $targetGrid = app(TargetController::class)
@@ -62,12 +78,39 @@ class AgencySettingsController extends MainController
 
         $targetGridHtml = $targetGrid->render();
 
-           return parent::index(
-               $content->title(__('Agency settings'))
-                   ->view('agency_settings', array_merge($vars, [
-                       'targetGrid' => $targetGridHtml
-                   ]))
-           );
+        return parent::index(
+            $content->title(__('Agency settings'))
+                ->view('agency_settings', array_merge($vars, [
+                    'targetGrid' => $targetGridHtml
+                ]))
+        );
+    }
+
+    private function getSettings()
+    {
+        $default = [
+            'remaining_diamonds'     => 'nothing',
+        ];
+
+        $settings = [];
+
+        foreach ($default as $key => $defaultValue) {
+            $cacheKey =   $key;
+            $value = Cache::get($cacheKey);
+
+            if ($value === null) {
+                $setting = Setting::where('key', $cacheKey)->first();
+                $value = $setting ? $setting->value : $defaultValue;
+
+                Cache::put($cacheKey, $value);
+            }
+
+
+
+            $settings[$key] = $value;
+        }
+
+        return $settings;
     }
 
     public function badges()
@@ -118,5 +161,4 @@ class AgencySettingsController extends MainController
             'data' => $data,
         ]);
     }
-
 }

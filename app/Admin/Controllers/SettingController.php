@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Models\Language;
 use Cache;
 
 class SettingController extends MainController
@@ -50,6 +51,7 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
+         $languages = Language::select(['id', 'name', 'code'])->get();
          $chargeTabType = request()->get('type', 'Experience');
 
 
@@ -64,6 +66,7 @@ class SettingController extends MainController
                 'pusher_app_id',
                 'pusher_app_cluster',
                 'settings',
+                'languages',
                 'timezones',
                 'agora_app_id',
                 'zego_server_secret',
@@ -142,6 +145,34 @@ class SettingController extends MainController
                 'value' => $request->value
             ]);
             Cache::put('room_boom', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateRemainingDiamonds(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'remaining_diamonds_action'], [
+                'key' => 'remaining_diamonds_action',
+                'value' => $request->value
+            ]);
+            Cache::put('remaining_diamonds_action', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateHostLevel(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'host_level_action'], [
+                'key' => 'host_level_action',
+                'value' => $request->value
+            ]);
+            Cache::put('host_level_action', $request->value);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

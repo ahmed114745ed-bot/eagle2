@@ -60,7 +60,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\LogApiRequestResponse::class,
-            'ip'=>IpMiddleware::class,
+            'ip' => IpMiddleware::class,
         ],
     ];
 
@@ -82,15 +82,15 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'localization' => \App\Http\Middleware\Localization::class,
-        'multiLanguage'=>MultiLanguageMiddleware::class,
-        'agency'=>AgencyMiddleware::class,
-        'ip'=>IpMiddleware::class,
-        'adminIp'=>AdminIpMiddleware::class,
-        'generalBan'=>GeneralBanMiddleware::class,
-        'adminGeneralBan'=>AdminGeneralBanMiddleware::class,
+        'multiLanguage' => MultiLanguageMiddleware::class,
+        'agency' => AgencyMiddleware::class,
+        'ip' => IpMiddleware::class,
+        'adminIp' => AdminIpMiddleware::class,
+        'generalBan' => GeneralBanMiddleware::class,
+        'adminGeneralBan' => AdminGeneralBanMiddleware::class,
         'checkLatestToken' => \App\Http\Middleware\CheckLatestToken::class,
-        'userBan'=>UserBanMiddleware::class,
-//        'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
+        'userBan' => UserBanMiddleware::class,
+        //        'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
         'checkCpu' => \App\Http\Middleware\CheckCpu::class,
         'configM' => ConfigMiddleware::class,
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
@@ -100,7 +100,7 @@ class Kernel extends HttpKernel
         'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
 
         // 'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
-//        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
+        //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
         'auth.redirect' => CheckLoginAdmin::class,
@@ -110,7 +110,7 @@ class Kernel extends HttpKernel
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
-//        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
+        //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
         'web-agency-feature' => WebAgencyFeatureEnable::class,
@@ -120,10 +120,15 @@ class Kernel extends HttpKernel
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
         'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
+        'remaining.diamond.action' => \App\Http\Middleware\RemainingDiamondsMiddleware::class,
+
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
+        'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
+         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
+        'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
     ];
 }

@@ -94,8 +94,8 @@ class AgencyController extends MainController
 
         $agency = Agency::query()
             // ->whereIn('country_id', $countries)
-            ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select(['id', 'name', 'app_owner_id', 'phone', 'coins', 'img', 'type'])
+            ->with(['admins', 'owner:id,name,uuid', 'bd','owner.profile'])
+            ->select(['id', 'name', 'app_owner_id', 'phone', 'coins','bd_id', 'img', 'type'])
             ->find($id);
 
         if (!$agency) {
@@ -221,11 +221,12 @@ class AgencyController extends MainController
             ])
             ->sum('giftPrice');
 
-
+        $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
             ->view('bd_agency_profile', compact(
                 'agency',
+                'prefix',
                 'members',
                 'charges',
                 'salaries',
