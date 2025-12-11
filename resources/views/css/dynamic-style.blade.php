@@ -50,6 +50,10 @@
         margin: 0 !important;
     }
 
+
+    .sidebar-menu {
+        margin: 11% 0px;
+    }
     /*.ltr label {*/
     /*    margin: 0 !important;*/
     /*}*/
