@@ -1051,7 +1051,8 @@
         font-weight: 600 !important;
         padding: 12px 16px !important;
         text-transform: uppercase !important;
-        font-size: 0.875rem !important;
+        /* font-size: 0.875rem !important; */  /* يافنان اوعي تفعل دي بتأثر علي كل الداش بورد     ***** امضاء  شامي***** */
+
         letter-spacing: 0.05em !important;
     }
 
