@@ -303,6 +303,15 @@
                 display: none !important;
             }
 }
+
+                #mobileSelectBtn {
+                    display: none;
+                }
+            .mobile-select-toggle{
+                display: none;
+
+            }
+       
     </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
