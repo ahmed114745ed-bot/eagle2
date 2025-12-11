@@ -1485,7 +1485,7 @@ html.ltr .dropdown-menu {
                 width: 16%;
             }
             .rtl .navbar-static-top {
-                margin-left: 0% !important;
+                margin-left: 0 !important;
                 float: left;
                 width: 82.5%;
             }
