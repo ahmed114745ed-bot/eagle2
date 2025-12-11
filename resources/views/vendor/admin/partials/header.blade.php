@@ -413,6 +413,32 @@
                     </select>
                 </a>
             </div>
+
+            <div class="mobile-select-toggle d-lg-none">
+                <button id="mobileSelectBtn" class="btn btn-primary">
+                    <i class="fa fa-sliders"></i>
+                </button>
+
+                <div id="mobileSelectMenu" class="mobile-select-menu">
+                    <select id="area-Manager-select-mobile" class="form-control">
+                        <option value="">{{ __('Select area manager') }}</option>
+                        @foreach($areaManagers as $areaManager)
+                            <option value="{{ $areaManager->id }}">
+                                {{ $areaManager->name ?? $areaManager->username }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <select id="country-select-mobile" class="form-control mt-2">
+                        <option value="">{{ __('Select Country...') }}</option>
+                        @foreach($countries as $currentCountry)
+                            <option value="{{ $currentCountry->id }}">
+                                {{ app()->getLocale() === 'ar' ? $currentCountry->name : $currentCountry->e_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
         @endif
 
         @if (request()->is('areaManager*'))
@@ -957,4 +983,23 @@
             }
         }
     })
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const mobileBtn = document.getElementById("mobileSelectBtn");
+    const mobileMenu = document.getElementById("mobileSelectMenu");
+
+    if (mobileBtn) {
+        mobileBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            mobileMenu.classList.toggle("show");
+        });
+    }
+
+    document.addEventListener("click", function (e) {
+        if (!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+            mobileMenu.classList.remove("show");
+        }
+    });
+});
+
 </script>
