@@ -33,7 +33,7 @@ class WalletController extends Controller
     {
         $user = $request->user();
         $data = $this->walletService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
-        
+
         if ($request->type === 'profits') {
             return Common::apiResponse(true, '', UserProfitLogResource::collection($data), 200);
         }
@@ -58,7 +58,7 @@ class WalletController extends Controller
 
         $result = $this->walletService->getTemplate($type);
 
-        return WalletTemplateResource::collection($result);
+        return Common::apiResponse(1, 'success', WalletTemplateResource::collection( $result));
     }
 
 
