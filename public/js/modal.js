@@ -1,6 +1,5 @@
 console.log('✅ notifications.js loaded');
 
-alert('vdfdf');
 
 document.addEventListener("DOMContentLoaded", function () {
     const notifCountEl = document.getElementById('notificationsCount');

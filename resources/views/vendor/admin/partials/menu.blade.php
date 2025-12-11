@@ -45,8 +45,7 @@
     }
  </style>
 <link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
-<script src="{{ asset('js/admin-menu.js') }}"></script>
-<script src="{{ asset('js/modal.js') }}"></script>
+
 
 
 @php
