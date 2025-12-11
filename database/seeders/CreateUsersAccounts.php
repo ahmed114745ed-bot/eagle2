@@ -18,7 +18,7 @@ class CreateUsersAccounts extends Seeder
      */
     public function run(): void
     {
-        $basePhone = '+2012';
+        $basePhone = '+2010';
         $startNumber = 12; // This will increment: 12, 22, 32, 42 ...
         $suffix = '222222'; // Last 6 digits
         $vips = OVip::all();
