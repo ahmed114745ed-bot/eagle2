@@ -136,20 +136,7 @@ class LanguageController extends MainController
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
-    {
-        $show = new Show(Language::findOrFail($id));
-
-        $show->field('id', __('Id'));
-        $show->field('name', __('Name'));
-        $show->field('code', __('Code'));
-        $show->field('direction', __('Direction'));
-        $show->field('is_enabled', __('Is enabled'));
-        // $show->field('created_at', __('Created at'));
-        // $show->field('updated_at', __('Updated at'));
-
-        return $show;
-    }
+   
 
     /**
      * Make a form builder.
