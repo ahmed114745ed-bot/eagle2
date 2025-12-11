@@ -1490,7 +1490,7 @@ html.ltr .dropdown-menu {
     }
            .ltr .main-header .logo{
                 float: left !important;
-                width: 20%;
+                width: 20.49%;
             }
 
            .rtl .form-horizontal .box-footer .btn-group {

@@ -290,21 +290,15 @@
 .skin-black-light .main-header {
     -webkit-box-shadow: none !important;
     box-shadow: none !important;
+    margin-bottom: 13px !important;
 }
     </style>
 <header class="main-header">
 
 
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" box-shadow: none !important; background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;">
-        <span class="logo-mini">
-            {!! config('admin.logo-mini', config('admin.name')) !!}
-        </span>
-
-        <span class="logo-lg">
-            {!! config('admin.logo', config('admin.name')) !!}
-        </span>
-
-        <div class="logo-icon ms-2">
+    
+        <div class="logo-icon ms-2" style="width: 51%; margin: auto;">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();

@@ -44,8 +44,9 @@
         --crs-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
  </style>
-<link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
-<script src="{{ asset('js/admin-menu.js') }}"></script>
+
+
+
 @php
     $uri = \Illuminate\Support\Arr::get($item, 'uri', '');
     $shouldHideBd = Str::startsWith($uri, 'bd/') && !Admin::user()->inRoles(['bd']);

@@ -1,5 +1,6 @@
 <aside id="main-sidebar" class="main-sidebar">
-
+<link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
+<script src="{{ asset('js/admin-menu.js') }}"></script></section>
     <section class="sidebar">
 
     
