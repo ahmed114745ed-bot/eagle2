@@ -113,8 +113,7 @@ class LanguageController extends MainController
         $grid->disableActions();       // تعطيل زر العرض والتعديل والحذف لكل صف
         $grid->disableRowSelector();   // تعطيل تحديد الصفوف للحذف الجماعي
         $grid->disableExport();        // تعطيل زر التصدير (اختياري)
-        $defaultExist = Language::where('is_default', 1)->exists();
-         if (!$defaultExist) {
+        
             $grid->tools(function (Grid\Tools $tools) {
                 $url = url('/admin/settings?tab=timeSettings');
                 $add = __('set default language');
@@ -127,7 +126,6 @@ class LanguageController extends MainController
 
                 $tools->append($customButtonHTML);
             });
-         }
 
         return $grid;
     }
