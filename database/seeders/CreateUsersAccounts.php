@@ -24,6 +24,9 @@ class CreateUsersAccounts extends Seeder
         $vips = OVip::all();
         for ($i = 0; $i < 20; $i++) {
             $phoneMiddle = $startNumber + ($i * 10); // 12, 22, 32, 42...
+            if($phoneMiddle == 2 || $phoneMiddle == 22 || $phoneMiddle == 222){
+                $phoneMiddle +=1;
+            }
             $fullPhone = $basePhone . $phoneMiddle . $suffix;
 
             $user = User::create([
