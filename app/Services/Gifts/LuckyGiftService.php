@@ -72,7 +72,6 @@ class LuckyGiftService
 
 
 
-
         if (isset($ownerId)){
             $room = Room::withoutAppends()
             ->where('uid', $ownerId)
@@ -90,6 +89,12 @@ class LuckyGiftService
 
         $roomId   = $room->id;
 
+
+         \Log::info('🚀 Sending  room 19...', [
+                            'user_id'  => $userId,
+                            'owner_id' => $ownerId,
+                            'room_id'  => $room->id ?? null,
+                        ]);
 
         /// todo check visitors
 
@@ -262,11 +267,7 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-   \Log::info('🚀 Sending  room 19...', [
-                            'user_id'  => $userId,
-                            'owner_id' => $ownerId,
-                            'room_id'  => $room->id ?? null,
-                        ]);
+  
         return  $responseData;
     }
 
