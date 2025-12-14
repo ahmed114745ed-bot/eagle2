@@ -19,7 +19,7 @@ class UserProfitLogResource extends JsonResource
         [$title, $description] = $this->getTitleAndDescription();
 
         return [
-            'feature_type' => $this->feature_type ?? '',
+            'feature_type' => 'profits',
             'type' => $this->type,
             'amount' => $this->amount,
             'title' => $title,
