@@ -53,7 +53,7 @@
 .card h3 { font-size:1rem; margin-bottom:10px; color:#333; }
 .card .amount { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#1e3a8a; transition: all 0.6s ease; }
 .card canvas { width:100% !important; height:120px !important; }
-.card .card-icon{ position: absolute; top:15px}
+.card .card-icon{ position: absolute; top:7px}
 .main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
 .main-chart-container canvas {
     height: 200px !important;  
