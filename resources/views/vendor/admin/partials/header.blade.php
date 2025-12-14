@@ -295,7 +295,7 @@
             margin-bottom: 13px !important;
         }
              @media (max-width: 767px) {
-  
+
             .logo{
                 display: none !important;
             }
@@ -330,7 +330,7 @@
                     display: none !important;
                 }
             }
-                
+
             .mobile-preview-buttons button {
                 width: 100%;
                 text-align: center;
@@ -340,21 +340,21 @@
     </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
-    
-        <div class="logo-icon ms-2" style="width: 100%; margin: auto;">
+
+        <div class="logo-icon ms-2" style="width: 100%;">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();
-                $appName = $locale == 'ar' 
-                    ? Cache::get('app_title_ar') 
+                $appName = $locale == 'ar'
+                    ? Cache::get('app_title_ar')
                     : Cache::get('app_title_en');
             @endphp
 
             @if(!empty($logo))
-                <img src="{{ $logo }}" 
-                    alt="{{ $appName }}" 
-                    class="h-12 w-12 object-contain rounded-circle" 
-                    style="height: 95%;  width: 89%; border-radius:50%;     margin: 12px 19px;">
+                <img src="{{ $logo }}"
+                    alt="{{ $appName }}"
+                    class="h-12 w-12 object-contain rounded-circle"
+                    style="height: 95%;  width: 89%; border-radius:50%;">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
                     style="height:32px;width:32px;font-weight:bold;">
