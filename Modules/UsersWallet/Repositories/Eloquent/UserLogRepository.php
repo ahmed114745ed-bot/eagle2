@@ -38,6 +38,7 @@ class UserLogRepository extends AbstractRepository
             ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
                 $q->whereBetween('created_at', [$start, $end]);
             })
+            ->orderByDesc('created_at')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 }
