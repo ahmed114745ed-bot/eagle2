@@ -173,6 +173,15 @@ class PermissionTypeSeeder extends Seeder
                         ],
                     ],
                     [
+                        'key' => 'super-package-reward',
+                        'except' => ['edit', 'delete', 'show'],
+                        'additional' => ['dedicate-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'create'],
+
+                        ],
+                    ],
+                    [
                         'key' => 'super-admin-reward-history',
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => [],
