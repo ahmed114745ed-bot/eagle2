@@ -1996,17 +1996,6 @@
         }
     }
 
-    .stats-container .info-box {
-        background: linear-gradient(135deg,
-        #667eea 0%,
-        #8B5CF6 25%,
-        #A855F7 50%,
-        #C084FC 75%,
-        #E879F9 100%
-        ) !important;
-        background-attachment: fixed !important;
-    }
-
     /* form inputs */
     .form-horizontal .fields-group > .col-md-12 {
         display: grid !important;
@@ -2076,4 +2065,18 @@
     }
     /* end form inputs */
 
+    .iti--separate-dial-code .iti__selected-flag {
+        background-color: rgba(0, 0, 0, 0.02) !important;
+    }
+
+    .stats-container .info-box {
+        background: linear-gradient(135deg,
+        #667eea 0%,
+        #8B5CF6 25%,
+        #A855F7 50%,
+        #C084FC 75%,
+        #E879F9 100%
+        ) !important;
+        background-attachment: fixed !important;
+    }
 </style>
