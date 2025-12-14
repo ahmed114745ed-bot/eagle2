@@ -22,7 +22,7 @@ class UserLogRepository extends AbstractRepository
     public function index($userId, $type = null, $startDate = null, $endDate = null, $page, $perPage)
     {
         $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
-        $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
+        $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : Carbon::now()->endOfDay();
  
         if ($type === 'profits') {
             return WalletLog::where('user_id', $userId)
