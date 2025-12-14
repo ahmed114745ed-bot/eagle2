@@ -57,7 +57,9 @@
                                 <option value="365">{{ __("filter_year") }}</option>
                             </select>
                         </div>
-                        <canvas id="shipmentsChart"></canvas>
+                            <div class="chart-container" style="margin-top: -22px">
+                                <canvas id="shipmentsChart"></canvas>
+                            </div>
                     </div>
                 </div>
 
@@ -126,8 +128,8 @@
 .card .card-icon{ position: absolute; top:7px}
 .main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
 .main-chart-container canvas {
-    height: 200px !important;  
-    width: 100% !important;   
+    /* height: 200px !important;  
+    width: 100% !important;    */
 }
 .main-chart-container {
     position: relative;
@@ -151,6 +153,7 @@
 
 @media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 
@@ -158,6 +161,7 @@
 AOS.init({ once:true, duration:600 });
 
 let financeChart = null;
+let shipmentsChart = null;
 
 function animateAmount(el, value) {
     let start = 0;
@@ -166,147 +170,115 @@ function animateAmount(el, value) {
 
     function step(now){
         const p = Math.min((now-startTime)/duration,1);
-        el.innerText = Math.floor(start + p * value).toLocaleString() + ' EGP';
+        el.innerText = Math.floor(start + p * value).toLocaleString() + ' $';
         if(p<1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
 }
 
 async function loadFinance() {
+    try {
+        const params = new URLSearchParams({
+            from: document.getElementById('from_date')?.value || '',
+            to: document.getElementById('to_date')?.value || '',
+            days: document.getElementById('filterChart')?.value || 7
+        });
 
-    const params = new URLSearchParams({
-        from: document.getElementById('from_date').value,
-        to: document.getElementById('to_date').value,
-        gateway: document.getElementById('gateway').value,
-    });
+        const res = await fetch(`/admin/dashboard/finance?${params}`);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
 
-    const res = await fetch(`/api/dashboard/finance?${params}`);
-    const data = await res.json();
+        console.log('Finance API Response:', data); 
 
-    // 🔢 Cards
-    Object.keys(data.cards).forEach(key=>{
-        const card = document.getElementById(key);
-        if(card){
-            animateAmount(card.querySelector('.amount'), data.cards[key]);
-        }
-    });
+        Object.keys(data.cards).forEach(key=>{
+            const card = document.getElementById(key);
+            if(card){
+                animateAmount(card.querySelector('.amount'), data.cards[key]);
+            }
+        });
 
-    // 📊 Chart
-    if(financeChart) financeChart.destroy();
 
-    financeChart = new Chart(document.getElementById('main-chart'), {
-        type:'bar',
-        data:{
-            labels: data.chart.labels,
-            datasets:[{
-                label:'Shipments',
-                data: data.chart.values,
-                backgroundColor:'#2563eb',
-                borderRadius:8,
-                barThickness:26
-            }]
-        },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            animation:{ duration:1200 },
-            plugins:{ legend:{display:false} },
-            scales:{ y:{ beginAtZero:true } }
-        }
-    });
 
-    // 📋 Table
-    const tbody = document.getElementById('paymentsTable');
-    tbody.innerHTML = '';
+const ctx = document.getElementById('shipmentsChart').getContext('2d');
+if (shipmentsChart) shipmentsChart.destroy();
 
-    data.payments.forEach(p=>{
-        tbody.innerHTML += `
-            <tr>
-                <td>#${p.id}</td>
-                <td>${p.gateway}</td>
-                <td>${p.amount.toLocaleString()} EGP</td>
-                <td><span class="badge bg-${p.status_color}">${p.status}</span></td>
-                <td class="text-muted small">${p.date}</td>
-            </tr>
-        `;
-    });
-}
-
-document.getElementById('applyFilter').addEventListener('click', loadFinance);
-document.addEventListener('DOMContentLoaded', loadFinance);
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    const ctx = document.getElementById('shipmentsChart').getContext('2d');
-
-    // البيانات الافتراضية (أسبوع)
-    let labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    let data = [1200, 2500, 1800, 3000, 2200, 2800, 3500]; // مبالغ افتراضية
-
-    const shipmentsChart = new Chart(ctx,{
-        type:'bar',
-        data:{
-            labels: labels,
-            datasets:[{
-                label:'إيرادات الشحنات',
-                data:data,
-                backgroundColor:'#1d4ed8',
-                borderRadius:8
-            }]
-        },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            animation:{
-                duration:1500,
-                easing:'easeOutQuart'
-            },
-            plugins:{
-                legend:{
-                    display:true,
-                    position:'bottom'
-                },
-                tooltip:{
-                    callbacks:{
-                        label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} EGP`
-                    }
-                }
-            },
-            scales:{
-                x:{ grid:{display:false} },
-                y:{
-                    beginAtZero:true,
-                    ticks:{
-                        callback:v => v.toLocaleString()
-                    }
+shipmentsChart = new Chart(ctx, {
+    type: 'bar', 
+    data: {
+        labels: data.chart.labels,
+        datasets: [{
+            label: 'إيرادات الشحنات',
+            data: data.chart.values,
+            backgroundColor: '#1d4ed8',
+            borderRadius: 8,
+            maxBarThickness: 50, 
+            minBarLength: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false, 
+        animation: { duration: 1200, easing: 'easeOutQuart' },
+        plugins: {
+            legend: { display: true, position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} $`
                 }
             }
+        },
+        scales: {
+            x: { 
+                grid: { display: false },
+                ticks: { autoSkip: false }
+            },
+            y: {
+                beginAtZero: true,
+                suggestedMin: 0, 
+                ticks: { callback: v => v.toLocaleString() }
+            }
         }
-    });
-
-    // فلتر الأيام
-    const filter = document.getElementById('filterChart');
-    filter.addEventListener('change', () => {
-        const days = parseInt(filter.value);
-
-        // ⚡ لاحقًا يمكن جلب البيانات من API حسب الأيام
-        if(days === 7){
-            shipmentsChart.data.labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-            shipmentsChart.data.datasets[0].data = [1200,2500,1800,3000,2200,2800,3500];
-        } else if(days === 30){
-            shipmentsChart.data.labels = Array.from({length:30}, (_,i)=> `Day ${i+1}`);
-            shipmentsChart.data.datasets[0].data = Array.from({length:30}, ()=> Math.floor(Math.random()*5000)+1000);
-        } else if(days === 365){
-            shipmentsChart.data.labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            shipmentsChart.data.datasets[0].data = Array.from({length:12}, ()=> Math.floor(Math.random()*120000)+20000);
-        }
-
-        shipmentsChart.update();
-    });
-
+    }
 });
-</script>
 
+
+console.log('labels:', data.chart.labels);
+console.log('values:', data.chart.values);
+console.log('canvas size:', ctx.canvas.width, ctx.canvas.height);
+        const paymentsTbody = document.getElementById('paymentsTable');
+        paymentsTbody.innerHTML = '';
+        data.payments.forEach(p=>{
+            paymentsTbody.innerHTML += `
+                <tr>
+                    <td>#${p.id}</td>
+                    <td>${p.gateway}</td>
+                    <td>${p.amount.toLocaleString()} $</td>
+                    <td><span class="badge bg-${p.status_color}">${p.status}</span></td>
+                    <td class="text-muted small">${p.date}</td>
+                </tr>
+            `;
+        });
+
+        const withdrawalsTbody = document.getElementById('withdrawalsTable');
+        withdrawalsTbody.innerHTML = '';
+        data.withdrawals.forEach(w=>{
+            withdrawalsTbody.innerHTML += `
+                <tr>
+                    <td>#${w.id}</td>
+                    <td>${w.wallet_name}</td>
+                    <td>${w.amount.toLocaleString()} $</td>
+                    <td>${w.type}</td>
+                    <td class="text-muted small">${w.date}</td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        console.error('Error loading finance data:', err);
+    }
+}
+
+document.getElementById('applyFilter')?.addEventListener('click', loadFinance);
+document.getElementById('filterChart')?.addEventListener('change', loadFinance);
+document.addEventListener('DOMContentLoaded', loadFinance);
+</script>
