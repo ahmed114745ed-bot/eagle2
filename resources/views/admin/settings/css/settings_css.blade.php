@@ -15,7 +15,13 @@
     }
 
     
+.settings-section {
+    display: none; /* Hide all sections by default */
+}
 
+.settings-section.active {
+    display: block; /* Only show the active section */
+}
 .settings-menu button {
     display: inline-flex;   /* important: keep inline alignment */
     align-items: center;
