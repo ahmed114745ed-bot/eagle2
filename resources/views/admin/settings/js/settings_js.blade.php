@@ -186,71 +186,134 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    // document.addEventListener("DOMContentLoaded", function () {
 
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+    //     function getQueryParam(name) {
+    //         const urlParams = new URLSearchParams(window.location.search);
+    //         return urlParams.get(name);
+    //     }
 
-        const activeTab = getQueryParam("tab") || request("tab")|| "brandSettings" 
-        showSection(activeTab);
+    //     const activeTab = getQueryParam("tab") || request("tab")|| "brandSettings" 
+    //     showSection(activeTab);
 
-        if (activeTab === "workSettings") {
-            const type = getQueryParam("type") || "Experience";
-            showInnerContent(type);
+    //     if (activeTab === "workSettings") {
+    //         const type = getQueryParam("type") || "Experience";
+    //         showInnerContent(type);
 
-            document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
-                btn.classList.remove("active");
-            });
+    //         document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+    //             btn.classList.remove("active");
+    //         });
 
-            const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
-            if (correctBtn) correctBtn.classList.add("active");
-        }
+    //         const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+    //         if (correctBtn) correctBtn.classList.add("active");
+    //     }
 
-        document.querySelectorAll(".settings-menu button").forEach(btn => {
-            btn.addEventListener("click", function () {
-                const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-                showSection(sectionId);
-            });
-        });
+    //     document.querySelectorAll(".settings-menu button").forEach(btn => {
+    //         btn.addEventListener("click", function () {
+    //             const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+    //             showSection(sectionId);
+    //         });
+    //     });
 
-        document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
-            btn.addEventListener("click", function () {
-                const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-                changeInnerTab(type);
-            });
+    //     document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+    //         btn.addEventListener("click", function () {
+    //             const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+    //             changeInnerTab(type);
+    //         });
+    //     });
+    // });
+
+    // function showSection(sectionId) {
+    //     document.querySelectorAll('.settings-section').forEach(section => {
+    //         section.classList.remove('active');
+    //     });
+
+    //     const section = document.getElementById(sectionId);
+    //     if (section) section.classList.add('active');
+
+    //     document.querySelectorAll('input[name="current_tab"]').forEach(input => {
+    //         input.value = sectionId;
+    //     });
+
+    //     const url = new URL(window.location);
+    //     url.searchParams.set("tab", sectionId);
+    //     window.history.pushState({}, "", url);
+
+    //     if (sectionId === 'workSettings') {
+    //         const type = getQueryParam("type") || "Experience";
+    //         showInnerContent(type);
+
+    //         document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+    //             btn.classList.remove("active");
+    //         });
+
+    //         const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+    //         if (correctBtn) correctBtn.classList.add("active");
+    //     }
+    // }
+document.addEventListener("DOMContentLoaded", function () {
+
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    const activeTab = getQueryParam("tab") || "brandSettings";
+    showSection(activeTab);
+
+    document.querySelectorAll(".settings-menu button").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+            showSection(sectionId);
         });
     });
 
-    function showSection(sectionId) {
-        document.querySelectorAll('.settings-section').forEach(section => {
-            section.classList.remove('active');
+    document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
+            changeInnerTab(type);
+        });
+    });
+});
+
+function showSection(sectionId) {
+    // Show/hide sections
+    document.querySelectorAll('.settings-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    const section = document.getElementById(sectionId);
+    if (section) section.classList.add('active');
+
+    // Update hidden input (if needed)
+    document.querySelectorAll('input[name="current_tab"]').forEach(input => {
+        input.value = sectionId;
+    });
+
+    // Update URL without reloading
+    const url = new URL(window.location);
+    url.searchParams.set("tab", sectionId);
+    window.history.pushState({}, "", url);
+
+    // Highlight the active main tab button
+    document.querySelectorAll(".settings-menu button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+    const activeBtn = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+    if (activeBtn) activeBtn.classList.add("active");
+
+    // Handle inner tabs if 'workSettings'
+    if (sectionId === 'workSettings') {
+        const type = getQueryParam("type") || "Experience";
+        showInnerContent(type);
+
+        document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
+            btn.classList.remove("active");
         });
 
-        const section = document.getElementById(sectionId);
-        if (section) section.classList.add('active');
-
-        document.querySelectorAll('input[name="current_tab"]').forEach(input => {
-            input.value = sectionId;
-        });
-
-        const url = new URL(window.location);
-        url.searchParams.set("tab", sectionId);
-        window.history.pushState({}, "", url);
-
-        if (sectionId === 'workSettings') {
-            const type = getQueryParam("type") || "Experience";
-            showInnerContent(type);
-
-            document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
-                btn.classList.remove("active");
-            });
-
-            const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
-            if (correctBtn) correctBtn.classList.add("active");
-        }
+        const correctBtn = document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`);
+        if (correctBtn) correctBtn.classList.add("active");
     }
+}
 
 
     function changeInnerTab(type) {
