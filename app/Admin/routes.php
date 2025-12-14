@@ -205,8 +205,8 @@ Route::group(
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
-       
-       
+
+
         Route::get('search/host-agency', [UserV1Controller::class, 'hostAgencies'])->name('hostAgency');
         Route::post('/locale', MultiLanguageController::class . '@locale');
         if (MultiLanguage::config("show-login-page", true)) {
@@ -499,43 +499,14 @@ Route::group(
         Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
-        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])
-            ->name('bd.toggle-salary-transfer');
+        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
-
-
-
-        //Route::resource('ovip', 'OVipController');
-        // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
-
-
-        // Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
-
         Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-        Route::prefix('ware-gift')->group(function () {
 
-            // Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-            // Route::post('/{level}', [OvipGiftTapController::class, 'store']);
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-        });
-        // Route::resource('ware-gifts', 'OvipGiftTapController');
-        // Route::prefix('ware-gifts')->group(function () {
-
-
-        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
-        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-        // });
-        // Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
@@ -557,8 +528,8 @@ Route::group(
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
-       
-       
+
+
         Route::resource('change-level-histories', ChangeLevelHistoryController::class);
         Route::resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
@@ -629,7 +600,7 @@ Route::group(
         //     }));
 
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-       
+
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
@@ -665,7 +636,7 @@ Route::group(
         Route::resource('wallet-transactions', WalletTransactionController::class);
 
         Route::resource('banners', BannerController::class);
-        
+
         Route::prefix('languages')->group(function () {
             Route::get('/', [LanguageController::class, 'index']);
             Route::put('/{id}', [LanguageController::class, 'update'])->where('id', '[0-9]+');
