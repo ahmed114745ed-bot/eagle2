@@ -157,45 +157,57 @@ class SuperAdminRewardController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
     }
+
     protected function package($grid)
     {
         $grid->column('title', __('package'));
         $grid->column('members', __('rewards'))->expand(function ($model) {
             $mempers = $model->packageRewards()
-                ->get() // 👈 fetch the related records first
+                ->with([
+                    'ware:id,name,img2,show_img',
+                    'vip:id,name,img',
+                    'badge:id,name,image',
+                ])
+                ->select('id', 'type', 'target', 'expire', 'quantity', 'super_package_id')
+                ->get()
                 ->map(function ($memper) {
-                    $gifts = '';
-                    $path = '';
 
-                    if ($memper->type == "ware") {
-                        $gifts = @$memper->ware->name ?? '';
-                        $path = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
-                    } elseif ($memper->type == "vip") {
-                        $gifts = @$memper->vip->name ?? '';
-                        $path = @$memper->vip->img ?? '';
-                    } elseif ($memper->type == "badge") {
-                        $gifts = @$memper->badge->name ?? '';
-                        $path = @$memper->badge->image ?? '';
-                    } elseif ($memper->type == "coins") {
-                        $gifts = @$memper->target;
-                        $path = 'coin.png';
-                    } elseif ($memper->type == "achievement") {
-                        $value = getDriverUrl() . '/' . @$memper->target;
-                        $gifts = "<img src='$value' width='80' height='80'>";
-                        $path = $memper->target;
+                    $gifts = '';
+                    $path  = '';
+
+                    switch ($memper->type) {
+                        case 'ware':
+                            $gifts = $memper->ware->name ?? '';
+                            $path  = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
+                            break;
+
+                        case 'vip':
+                            $gifts = $memper->vip->name ?? '';
+                            $path  = $memper->vip->img ?? '';
+                            break;
+
+                        case 'badge':
+                            $gifts = $memper->badge->name ?? '';
+                            $path  = $memper->badge->image ?? '';
+                            break;
+
+                        case 'coins':
+                            $gifts = $memper->target;
+                            $path  = 'coin.png';
+                            break;
+
+                        case 'achievement':
+                            $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
+                            $path  = $memper->target;
+                            break;
                     }
-                    /** @var Ware $this */
-                    $url = getImagePath($path);
-                   
 
                     return [
-                        'id'    => $memper->id,
-                        'type'  => $memper->type,
-                        'gift'  => $gifts,
-                        
-                        'quantity' => $memper->expire,
-                        'expire'  => $memper->quantity,
-
+                        'id'       => $memper->id,
+                        'type'     => $memper->type,
+                        'gift'     => $gifts,
+                        'quantity' => $memper->quantity,
+                        'expire'   => $memper->expire,
                     ];
                 });
 
@@ -204,10 +216,9 @@ class SuperAdminRewardController extends MainController
                 $mempers->toArray()
             );
         });
-
     }
 
-    
+
     protected function badge($grid)
     {
         $grid->model()->orderBy('priority', 'desc');

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Common;
+use Modules\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,8 +12,8 @@ class SuperPackageReward extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    
-     protected $appends = [
+
+    protected $appends = [
         'wares',
         'badges',
         'vips',
@@ -31,6 +32,21 @@ class SuperPackageReward extends Model
     public function packageRewards()
     {
         return $this->hasMany(PackageReward::class, 'super_package_id');
+    }
+
+    public function ware()
+    {
+        return $this->hasOne(Ware::class, 'id', 'target');
+    }
+
+    public function vip()
+    {
+        return $this->hasOne(OVip::class, 'id', 'target');
+    }
+
+    public function badge()
+    {
+        return $this->hasOne(Badge::class, 'id', 'target');
     }
 
     public function getWaresAttribute()
@@ -135,7 +151,7 @@ class SuperPackageReward extends Model
         parent::boot();
 
         static::saving(function ($model) {
-           
+
             // Get all the extra data before unsetting
             $model->wares = array_filter(request('wares'));
             $model->badges = array_filter(request('badges'));
@@ -168,7 +184,7 @@ class SuperPackageReward extends Model
             $vips = array_filter(request('vips')) ?? [];
             $coins = request('coins') ?? null;
             $achievement = request('achievement') ?? null;
-           $model->packageRewards()->whereIn('type', ['ware', 'badge', 'vip', 'coin', 'achievement'])->delete();
+            $model->packageRewards()->whereIn('type', ['ware', 'badge', 'vip', 'coin', 'achievement'])->delete();
             // Wares
             foreach ($wares as $wareId) {
                 $model->packageRewards()->create([
