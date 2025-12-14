@@ -1555,13 +1555,42 @@
     .rtl .navbar-static-top {
         margin-left: 0 !important;
         float: left;
-        width: 82.5%;
+        width: 81.5%;
+    }
+
+    .main-header .logo {
+        width: 17% !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .main-header .logo {
+        width: 5% !important;
+        height: 75% !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .main-sidebar {
+        width: 6% !important;
+    }
+
+    .rtl .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .right-side, .sidebar-mini.sidebar-collapse .main-footer {
+        margin-left: 3% !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .right-side, .sidebar-mini.sidebar-collapse .main-footer {
+        margin-left: 5% !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .main-header .navbar {
+        width: 93.5% !important;
+    }
+
+    .rtl .sidebar-mini.sidebar-collapse .main-header .navbar {
+        margin-left: 3% !important;
+        width: 90.5% !important;
     }
 
     .ltr .navbar-static-top {
-        margin-right: 0 !important;
         float: right;
-        width: 82.5%;
+        width: 81.5%;
     }
 
     .ltr .main-header > .navbar {
@@ -1618,7 +1647,7 @@
     }
 
     .rtl .content-wrapper-rtl {
-        margin-right: 42px !important;
+        margin-right: 5% !important;
     }
 
     .ltr .content-wrapper {
@@ -2141,6 +2170,7 @@
             grid-template-columns: 1fr !important;
         }
     }
+
     /* end form inputs */
 
     .iti--separate-dial-code .iti__selected-flag {
