@@ -113,7 +113,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'creator', 'createdBy'])
+        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'country','creator','appUser','appUser.profile', 'createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
@@ -266,35 +266,6 @@ class SuperAdminController extends MainController
                 HTML;
         });
 
-        //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
-        //            return $this->agencies_count;
-        //        });
-        //
-        //
-        //        $grid->column('total_salary', __('total proft'))->display(function () {
-        //            return truncateAndTrim($this->total_salary, 2);
-        //        });
-        //
-        //        $grid->column('current_balance', __('current_balance'))->display(function () {
-        //            $total = floatval($this->total_salary);
-        //            $cut   = floatval($this->total_cut);
-        //            return truncateAndTrim($total - $cut, 2);
-        //        });
-        //
-        //        $grid->column('total_cut', __('Cut amount'))->display(function () {
-        //            return truncateAndTrim($this->total_cut, 2);
-        //        });
-
-        //        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-        //            $col = $grid->column('transfer_salary', __("transfer_salary"))
-        //                ->display(function () {
-        //                    return $this->transfer_salary ? 1 : 0;
-        //                });
-        //
-        //            if (! request()->filled('_export_')) {
-        //                $col->switch(Common::getSwitchStates());
-        //            }
-        //        }
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             $creator = $this->creator;
@@ -316,24 +287,6 @@ class SuperAdminController extends MainController
             }
         });
 
-        //        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-        //            $grid->tools(function (Grid\Tools $tools) {
-        //                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-        //                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-        //                $milestone = __('milestone');   // Translates 'milestone' via your language files
-        //
-        //                $customButtonHTML = <<<HTML
-        //                <div style="display: contents; align-items: center;">
-        //                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-        //                         {$milestone}
-        //                    </a>
-        //                </div>
-        //            HTML;
-        //
-        //                // Append the custom HTML button to the grid's toolbar
-        //                $tools->append($customButtonHTML);
-        //            });
-        //        }
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
 
