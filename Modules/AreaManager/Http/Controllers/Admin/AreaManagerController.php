@@ -96,12 +96,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with([
-            'appUser:id,uuid,name',
-            'appUser.profile:id,avatar',
-            'regionArea:id,name',
-            'creator:id,name'
-        ])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea', 'creator'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
