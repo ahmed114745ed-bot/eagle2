@@ -5,7 +5,8 @@
     display: inline-block;
     *display: inline;
     vertical-align: middle;
-    margin: 0;
+    margin-right: 5px;
+    margin-top: 5px;
     padding: 0;
     width: 18px;
     height: 18px;
@@ -14,6 +15,10 @@
     cursor: pointer;
 }
 
+.rtl .icheckbox_minimal-blue,
+.iradio_minimal-blue {
+    margin-left: 5px !important;
+}
 .icheckbox_minimal-blue {
     background-position: 0 0;
 }
