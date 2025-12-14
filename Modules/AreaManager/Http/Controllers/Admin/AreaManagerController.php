@@ -93,148 +93,9 @@ class AreaManagerController extends MainController
             ->body($this->form()));
     }
 
-    // protected function grid()
-    // {
-    //     $grid = new Grid(new AreaManager());
-    //     $grid->model()->with(['appUser.packs', 'regionArea', 'creator'])->orderByDesc('id');
-
-    //     $grid->filter(function ($filter) {
-    //         $filter->like('appUser.uuid', __('App User UUID'));
-    //         $filter->like('appUser.name', __('User Name'));
-    //     });
-
-    //     $grid->column('id', __('Id'));
-    //     $grid->column('username', __('Area Manager'))->display(function ($name) {
-    //         $id = $this->id ?? '-';
-    //         $name = $this->username ?? __('Unknown');
-    //         $url = getImagePath($this->avatar) ?? asset("images/businessman-icon.jpg");
-    //         if (!isImageExists($url)) $url = asset("images/businessman-icon.jpg");
-    //         $image = handleShowImageWithTypes($id, $url, 40, 40);
-    //         $showUrl = url("admin/area-manager-users/{$id}");
-
-    //         return "
-    //             <div style='display:flex; align-items:center; gap:10px;'>
-    //                 $image
-    //                 <div>
-    //                     <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
-    //                         <span style='text-decoration:underline; cursor:pointer;'>$name</span>
-    //                     </a>
-    //                     <span style='font-size:smaller;'>ID: $id</span>
-    //                 </div>
-    //             </div>
-    //         ";
-    //     });
-
-
-    //     $grid->column('default', __('default'))->display(function () {
-    //         if ($this->default == 1) {
-    //             return '<span style="color:green;">●</span>';
-    //         }
-    //         return '<span style="color:#999;">●</span>';
-    //     });
-
-    //     $grid->column('appUser.name', __('User'))->display(function ($name) {
-    //         $user = $this->appUser;
-    //         if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
-    //         $uid = $user->uuid ?? __('Unknown');
-    //         $defaultImage = asset("images/businessman-icon.jpg");
-    //         $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
-    //         if (! isImageExists($url)) {
-    //             $url = $defaultImage;
-    //         }
-    //         $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-    //         $showUrl = url("admin/users/{$user->id}");
-
-    //         return "
-    //             <div style='display:flex; align-items:center; gap:10px;'>
-    //                 $image
-    //                 <div>
-    //                     <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
-    //                         <span style='text-decoration:underline; cursor:pointer;'>$name</span>
-    //                     </a>
-    //                     <span style='font-size:smaller;'>UUID: $uid</span>
-    //                 </div>
-    //             </div>
-    //         ";
-    //     });
-
-    //     $grid->column('regionArea.name', __('Regions'));
-
-    //     $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-    //         return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
-    //     });
-    //     $grid->column('created_at', __('Created at'))->display(function ($date) {
-    //         $carbonDate = Carbon::parse($date)->locale(App::getLocale());
-    //         return $carbonDate->translatedFormat('d F Y H:i');
-    //     });
-
-    //     if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-    //         $grid->tools(function (Grid\Tools $tools) {
-    //             $milestoneId = Milestone::where('slug', 'area-manager')->first();
-    //             $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
-    //             $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
-
-    //             $customButtonHTML = <<<HTML
-    //              <div style="display: contents; align-items: center;">
-    //                  <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-    //                       {$milestone}
-    //                  </a>
-    //              </div>
-    //          HTML;
-
-    //             // Append the custom HTML button to the grid's toolbar
-    //             $tools->append($customButtonHTML);
-    //         });
-
-    //         $grid->tools(function ($tools) {
-    //             $logoutUrl = route('admin.custom.logout');
-    //             $loginText = __('login');
-    //             $areaManagerUrl = url('/areaManager/login');
-
-    //             $customButtonHTML = <<<HTML
-    //             <div style="display: contents; align-items: center;">
-    //                 <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
-    //                     <i class="fa fa-sign-in"></i> {$loginText}
-    //                 </a>
-    //                 <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
-    //                     <i class="fa fa-copy"></i>   
-    //                 </button>
-
-    //             </div>
-    //                  <script>
-    //                 function copyAreaManagerUrl() {
-    //                     const url = '{$areaManagerUrl}';
-    //                     navigator.clipboard.writeText(url).then(() => {
-    //                         toastr.success('تم نسخ الرابط بنجاح');
-    //                     }).catch(() => {
-    //                         alert('تعذر نسخ الرابط');
-    //                     });
-    //                 }
-    //             </script>
-    //             HTML;
-
-    //             $tools->append($customButtonHTML);
-    //         });
-    //     }
-
-    //     $grid->disableRowSelector();
-    //     $this->extendGrid($grid);
-    //     $permission = $this->permission_name;
-    //     $grid->actions(function ($actions) use ($permission) {
-    //         $actions->disableDelete();
-    //         if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
-    //             $actions->add(new DeleteAreaManagerAction());
-    //         }
-    //     });
-
-    //     return $grid;
-    // }
-
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-
-        // Eager load only necessary relations and selected columns
         $grid->model()->with([
             'appUser:id,uuid,name,profile_id',
             'appUser.profile:id,avatar',
@@ -242,48 +103,76 @@ class AreaManagerController extends MainController
             'creator:id,name'
         ])->orderByDesc('id');
 
-        // Filters
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
 
-        // Helper for rendering user/avatar columns
-        $renderUserColumn = function ($entity, $nameField, $urlPrefix = 'users') {
-            if (!$entity) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
-
-            $id = $entity->id ?? '-';
-            $name = $entity->{$nameField} ?? __('Unknown');
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($entity->avatar ?? $entity->profile?->avatar) ?? $defaultImage;
-            if (!isImageExists($url)) $url = $defaultImage;
+        $grid->column('id', __('Id'));
+        $grid->column('username', __('Area Manager'))->display(function ($name) {
+            $id = $this->id ?? '-';
+            $name = $this->username ?? __('Unknown');
+            $url = getImagePath($this->avatar) ?? asset("images/businessman-icon.jpg");
+            if (!isImageExists($url)) $url = asset("images/businessman-icon.jpg");
             $image = handleShowImageWithTypes($id, $url, 40, 40);
-            $showUrl = url("admin/{$urlPrefix}/{$id}");
-            $uuidOrId = $entity->uuid ?? $id;
+            $showUrl = url("admin/area-manager-users/{$id}");
 
             return "
-            <div style='display:flex; align-items:center; gap:10px;'>
-                $image
-                <div>
-                    <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
-                        <span style='text-decoration:underline; cursor:pointer;'>$name</span>
-                    </a>
-                    <span style='font-size:smaller;'>UUID/ID: $uuidOrId</span>
+                <div style='display:flex; align-items:center; gap:10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
+                            <span style='text-decoration:underline; cursor:pointer;'>$name</span>
+                        </a>
+                        <span style='font-size:smaller;'>ID: $id</span>
+                    </div>
                 </div>
-            </div>
-        ";
-        };
+            ";
+        });
 
-        // Columns
-        $grid->column('id', __('Id'));
-        $grid->column('username', __('Area Manager'))->display(fn() => $renderUserColumn($this, 'username', 'area-manager-users'));
-        $grid->column('default', __('default'))->display(fn($v) => $v ? '<span style="color:green;">●</span>' : '<span style="color:#999;">●</span>');
-        $grid->column('appUser.name', __('User'))->display(fn() => $renderUserColumn($this->appUser, 'name', 'users'));
+
+        $grid->column('default', __('default'))->display(function () {
+            if ($this->default == 1) {
+                return '<span style="color:green;">●</span>';
+            }
+            return '<span style="color:#999;">●</span>';
+        });
+
+        $grid->column('appUser.name', __('User'))->display(function ($name) {
+            $user = $this->appUser;
+            if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
+            $uid = $user->uuid ?? __('Unknown');
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display:flex; align-items:center; gap:10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
+                            <span style='text-decoration:underline; cursor:pointer;'>$name</span>
+                        </a>
+                        <span style='font-size:smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
         $grid->column('regionArea.name', __('Regions'));
-        $grid->column('created_by', __('Creator'))->display(fn($creatorId) => app(\App\Admin\Services\CreatorService::class)->show($creatorId));
-        $grid->column('created_at', __('Created at'))->display(fn($date) => Carbon::parse($date)->locale(App::getLocale())->translatedFormat('d F Y H:i'));
 
-        // Tools
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+        });
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            $carbonDate = Carbon::parse($date)->locale(App::getLocale());
+            return $carbonDate->translatedFormat('d F Y H:i');
+        });
+
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
                 $milestoneId = Milestone::where('slug', 'area-manager')->first();
@@ -333,11 +222,8 @@ class AreaManagerController extends MainController
             });
         }
 
-
-        // Disable row selector
         $grid->disableRowSelector();
-
-        // Actions
+        $this->extendGrid($grid);
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
@@ -346,10 +232,129 @@ class AreaManagerController extends MainController
             }
         });
 
-        $this->extendGrid($grid);
-
         return $grid;
     }
+
+    // protected function grid()
+    // {
+    //     $grid = new Grid(new AreaManager());
+
+    //     // Eager load only necessary relations and selected columns
+    //     $grid->model()->with([
+    //         'appUser:id,uuid,name,profile_id',
+    //         'appUser.profile:id,avatar',
+    //         'regionArea:id,name',
+    //         'creator:id,name'
+    //     ])->orderByDesc('id');
+
+    //     // Filters
+    //     $grid->filter(function ($filter) {
+    //         $filter->like('appUser.uuid', __('App User UUID'));
+    //         $filter->like('appUser.name', __('User Name'));
+    //     });
+
+    //     // Helper for rendering user/avatar columns
+    //     $renderUserColumn = function ($entity, $nameField, $urlPrefix = 'users') {
+    //         if (!$entity) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
+
+    //         $id = $entity->id ?? '-';
+    //         $name = $entity->{$nameField} ?? __('Unknown');
+    //         $defaultImage = asset("images/businessman-icon.jpg");
+    //         $url = getImagePath($entity->avatar ?? $entity->profile?->avatar) ?? $defaultImage;
+    //         if (!isImageExists($url)) $url = $defaultImage;
+    //         $image = handleShowImageWithTypes($id, $url, 40, 40);
+    //         $showUrl = url("admin/{$urlPrefix}/{$id}");
+    //         $uuidOrId = $entity->uuid ?? $id;
+
+    //         return "
+    //         <div style='display:flex; align-items:center; gap:10px;'>
+    //             $image
+    //             <div>
+    //                 <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
+    //                     <span style='text-decoration:underline; cursor:pointer;'>$name</span>
+    //                 </a>
+    //                 <span style='font-size:smaller;'>UUID/ID: $uuidOrId</span>
+    //             </div>
+    //         </div>
+    //     ";
+    //     };
+
+    //     // Columns
+    //     $grid->column('id', __('Id'));
+    //     $grid->column('username', __('Area Manager'))->display(fn() => $renderUserColumn($this, 'username', 'area-manager-users'));
+    //     $grid->column('default', __('default'))->display(fn($v) => $v ? '<span style="color:green;">●</span>' : '<span style="color:#999;">●</span>');
+    //     $grid->column('appUser.name', __('User'))->display(fn() => $renderUserColumn($this->appUser, 'name', 'users'));
+    //     $grid->column('regionArea.name', __('Regions'));
+    //     $grid->column('created_by', __('Creator'))->display(fn($creatorId) => app(\App\Admin\Services\CreatorService::class)->show($creatorId));
+    //     $grid->column('created_at', __('Created at'))->display(fn($date) => Carbon::parse($date)->locale(App::getLocale())->translatedFormat('d F Y H:i'));
+
+    //     // Tools
+    //     if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
+    //         $grid->tools(function (Grid\Tools $tools) {
+    //             $milestoneId = Milestone::where('slug', 'area-manager')->first();
+    //             $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
+    //             $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
+
+    //             $customButtonHTML = <<<HTML
+    //              <div style="display: contents; align-items: center;">
+    //                  <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+    //                       {$milestone}
+    //                  </a>
+    //              </div>
+    //          HTML;
+
+    //             // Append the custom HTML button to the grid's toolbar
+    //             $tools->append($customButtonHTML);
+    //         });
+
+    //         $grid->tools(function ($tools) {
+    //             $logoutUrl = route('admin.custom.logout');
+    //             $loginText = __('login');
+    //             $areaManagerUrl = url('/areaManager/login');
+
+    //             $customButtonHTML = <<<HTML
+    //             <div style="display: contents; align-items: center;">
+    //                 <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+    //                     <i class="fa fa-sign-in"></i> {$loginText}
+    //                 </a>
+    //                 <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+    //                     <i class="fa fa-copy"></i>   
+    //                 </button>
+
+    //             </div>
+    //                  <script>
+    //                 function copyAreaManagerUrl() {
+    //                     const url = '{$areaManagerUrl}';
+    //                     navigator.clipboard.writeText(url).then(() => {
+    //                         toastr.success('تم نسخ الرابط بنجاح');
+    //                     }).catch(() => {
+    //                         alert('تعذر نسخ الرابط');
+    //                     });
+    //                 }
+    //             </script>
+    //             HTML;
+
+    //             $tools->append($customButtonHTML);
+    //         });
+    //     }
+
+
+    //     // Disable row selector
+    //     $grid->disableRowSelector();
+
+    //     // Actions
+    //     $permission = $this->permission_name;
+    //     $grid->actions(function ($actions) use ($permission) {
+    //         $actions->disableDelete();
+    //         if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+    //             $actions->add(new DeleteAreaManagerAction());
+    //         }
+    //     });
+
+    //     $this->extendGrid($grid);
+
+    //     return $grid;
+    // }
 
 
 
