@@ -37,6 +37,8 @@
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        --gradient-primary: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%);
     }
 
     /* .col-sm-8 {
@@ -151,7 +153,7 @@
     }
 
     .skin-black-light .content-header {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
         box-shadow: none;
     }
 
@@ -513,7 +515,7 @@
     }
 
     form {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
         filter: brightness(0.85);
     }
 
@@ -524,7 +526,7 @@
     }
 
     .skin-black-light .main-header > .navbar {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
         border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
         height: var(--header-height) !important;
@@ -918,7 +920,7 @@
     */
 
     .sidebar-menu > li > .treeview-menu {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
     }
 
     .table.table-hover tbody tr:hover {
@@ -937,7 +939,7 @@
     }
 
     .box-footer {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
         border-top: 1px solid var(--second-alpha) !important;
     }
 
@@ -1100,7 +1102,6 @@
     .table {
         background: #ffffff !important;
         border-radius: var(--border-radius) !important;
-        overflow: hidden !important;
         box-shadow: var(--shadow-sm) !important;
     }
 
@@ -1358,7 +1359,7 @@
         margin: 2px 0 0;
         font-size: 14px;
         list-style: none;
-        background-color: var(--secondary-color) !important;
+        background: var(--gradient-primary) !important;
         filter: brightness(0.80);
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
@@ -1752,7 +1753,7 @@
     }
 
     button.active {
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
         color: var(--text-secondary-color) !important;
     }
 
@@ -1926,17 +1927,6 @@
         overflow-x: auto !important;
     }
 
-    .stats-container .info-box {
-        background: linear-gradient(135deg,
-        #667eea 0%,
-        #8B5CF6 25%,
-        #A855F7 50%,
-        #C084FC 75%,
-        #E879F9 100%
-        ) !important;
-        background-attachment: fixed !important;
-    }
-
     @media (max-width: 767px) {
         .ltr .content-wrapper {
             margin-left: 0 !important;
@@ -1996,9 +1986,60 @@
             position: absolute;
             right: 0px;
         }
-
-
     }
 
+    .stats-container .info-box {
+        background: linear-gradient(135deg,
+        #667eea 0%,
+        #8B5CF6 25%,
+        #A855F7 50%,
+        #C084FC 75%,
+        #E879F9 100%
+        ) !important;
+        background-attachment: fixed !important;
+    }
+
+    /* form inputs */
+    .form-horizontal .fields-group > .col-md-12 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+        direction: rtl !important;
+        width: 100% !important;
+        padding: 15px !important;
+    }
+
+    .form-horizontal .fields-group > .col-md-12 > .form-group {
+        margin: 0 !important;
+    }
+
+    .form-horizontal .fields-group .form-group .col-sm-2,
+    .form-horizontal .fields-group .form-group .col-sm-8,
+    .form-horizontal .fields-group .form-group [class*="col-sm-"] {
+        width: 100% !important;
+        float: none !important;
+        padding: 0 5px !important;
+    }
+
+    .form-horizontal .fields-group .form-group .control-label {
+        text-align: right !important;
+        margin-bottom: 8px !important;
+    }
+
+    .form-horizontal .fields-group > .col-md-12 > input[type="hidden"] {
+        display: none !important;
+    }
+
+    .form-horizontal .box-footer {
+        width: 100%;
+        clear: both;
+    }
+
+    @media (max-width: 768px) {
+        .form-horizontal .fields-group > .col-md-12 {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    /* end form inputs */
 
 </style>
