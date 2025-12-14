@@ -163,7 +163,7 @@ class AreaManagerController extends MainController
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
            
-                return app(\App\Admin\Services\CreatorService::class)->showV2($this->creator);
+                return app(\App\Admin\Services\CreatorService::class)->showV2($creatorId);
            
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
