@@ -27,7 +27,6 @@ use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Helpers\Common;
-use App\Admin\Services\UserService;
 
 class AreaManagerController extends MainController
 {
@@ -97,7 +96,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs', 'regionArea','appUser', 'creator','appUser.profile'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea:id,name,manager_id','appUser', 'creator','appUser.profile'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -137,7 +136,26 @@ class AreaManagerController extends MainController
         $grid->column('appUser.name', __('User'))->display(function ($name) {
             $user = $this->appUser;
             if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
-                return app(UserService::class)->adminUserAvatar($user);
+            $uid = $user->uuid ?? __('Unknown');
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display:flex; align-items:center; gap:10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
+                            <span style='text-decoration:underline; cursor:pointer;'>$name</span>
+                        </a>
+                        <span style='font-size:smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
 
         $grid->column('regionArea.name', __('Regions'));
