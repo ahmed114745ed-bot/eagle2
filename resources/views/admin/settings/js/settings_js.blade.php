@@ -193,7 +193,7 @@
             return urlParams.get(name);
         }
 
-        const activeTab = getQueryParam("tab") || "brandSettings";
+        const activeTab = getQueryParam("tab") || request("tab")|| "brandSettings" 
         showSection(activeTab);
 
         if (activeTab === "workSettings") {
