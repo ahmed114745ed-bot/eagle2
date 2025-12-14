@@ -143,38 +143,8 @@ class SuperAdminController extends MainController
         });
         
         $grid->column('id', __('Id'));
-        
-        $grid->column('username', __('Super Admin'))->display(function ($name) {
-            if (request()->filled('_export_')) {
-                return $name;
-            }
+        $this->superAdminData($grid);
 
-            $id = $this->id ?? '-';
-            $name = $this->username ?? 'غير معروف';
-            $path = $this->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/superadmin-users/{$this->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
-        
         $grid->column('default', __('default_superadmin_status'))->display(function () {
             if (request()->filled('_export_')) {
                 return $this->default;
@@ -198,61 +168,12 @@ class SuperAdminController extends MainController
                 return '<span style="color: #999;"></span>';
             }
         });
-        
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
-            $user = $this->appUser;
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+        $this->appUserData($grid);
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+        $this->countryData($grid);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-        
-        $grid->column('country.name', __('country'))->display(function () {
-            $country = $this->country;
-
-            if (!$country) {
-                return '-';
-            }
-
-            $name = app()->getLocale() === 'ar'
-                ? ($country->name ?: $country->e_name)
-                : ($country->e_name ?: $country->name);
-
-            $flag = $country->flag ? getImagePath($country->flag) : null;
-
-            return <<<HTML
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
-                    <span>$name</span>
-                </div>
-            HTML;
-        });
-        
-        $grid->column('created_by', __('Creator'))->display(function () {
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             $creator = $this->createdBy;
             
             if (!$creator) {
@@ -350,6 +271,103 @@ class SuperAdminController extends MainController
         return $grid;
     }
 
+
+    private function superAdminData($grid)
+    {
+        $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+
+            $id = $this->id ?? '-';
+            $name = $this->username ?? 'غير معروف';
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/superadmin-users/{$this->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
+        });
+    }
+
+
+    private function appUserData($grid)
+    {
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
+            $user = $this->appUser;
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $uid = $user->uuid ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+    }
+    private function countryData($grid)
+    {
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+    }
     /**
      * Make a form builder.
      *
