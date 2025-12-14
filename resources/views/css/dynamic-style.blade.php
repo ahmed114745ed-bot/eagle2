@@ -622,6 +622,7 @@
     .iti {
         position: relative;
         z-index: 1050 !important;
+        width: 100%;
     }
 
     .iti__country-list {
@@ -2054,8 +2055,34 @@
         clear: both;
     }
 
-    .file-input .btn-file {
-        margin-top: 2px;
+    .file-input .input-group.file-caption-main {
+        position: relative !important;
+        display: block !important;
+        direction: ltr !important;
+    }
+
+    .file-input .input-group.file-caption-main .file-caption {
+        direction: rtl !important;
+    }
+
+    .file-input .input-group.file-caption-main .input-group-btn {
+        position: absolute !important;
+    }
+
+    .file-input .input-group.file-caption-main .btn-file {
+        padding: 5px 15px !important;
+        border-radius: 6px !important;
+        font-size: 12px !important;
+        margin-top: 65% !important;
+        margin-right: 100% !important;
+    }
+
+    .rtl .file-input .input-group.file-caption-main .btn-file {
+        margin-left: 100% !important;
+    }
+
+    .form-control:focus {
+        border-color: var(--secondary-color) !important;
     }
 
     @media (max-width: 768px) {
