@@ -1557,7 +1557,7 @@
         width: 82.5%;
     }
 
-    .ltr .main-header>.navbar {
+    .ltr .main-header > .navbar {
         margin-left: 0 !important;
     }
 
@@ -2002,9 +2002,12 @@
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 20px !important;
-        direction: rtl !important;
         width: 100% !important;
         padding: 15px !important;
+    }
+
+    .rtl .form-horizontal .fields-group > .col-md-12 {
+        direction: rtl !important;
     }
 
     .form-horizontal .fields-group > .col-md-12 > .form-group {
@@ -2019,11 +2022,15 @@
 
     .form-horizontal .fields-group > .col-md-12 > .form-group .control-label {
         width: 100% !important;
-        text-align: right !important;
+        text-align: left !important;
         margin-bottom: 8px !important;
         padding: 0 5px !important;
         font-weight: 600;
         order: 1;
+    }
+
+    .rtl .form-horizontal .fields-group > .col-md-12 > .form-group .control-label {
+        text-align: right !important;
     }
 
     .form-horizontal .fields-group > .col-md-12 > .form-group .col-sm-2,
@@ -2061,7 +2068,7 @@
         direction: ltr !important;
     }
 
-    .file-input .input-group.file-caption-main .file-caption {
+    .rtl .file-input .input-group.file-caption-main .file-caption {
         direction: rtl !important;
     }
 
@@ -2083,6 +2090,43 @@
 
     .form-control:focus {
         border-color: var(--secondary-color) !important;
+    }
+
+    .box-footer {
+        display: grid !important;
+        padding: 16px 24px !important;
+        direction: ltr !important;
+    }
+
+    .rtl .box-footer {
+        direction: rtl !important;
+    }
+
+    .box-footer .col-md-8 {
+        float: none !important;
+        width: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        margin-right: auto !important;
+    }
+
+    .box-footer .btn-group.pull-right {
+        order: -2 !important;
+        float: none !important;
+    }
+
+    .box-footer .btn-group.pull-left {
+        order: -1 !important;
+        float: none !important;
+    }
+
+    .box-footer .pull-right:not(.btn-group) {
+        float: none !important;
+    }
+
+    .box-footer .checkbox {
+        margin: 0 !important;
     }
 
     @media (max-width: 768px) {
