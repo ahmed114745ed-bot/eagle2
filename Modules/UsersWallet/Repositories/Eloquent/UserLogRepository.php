@@ -27,6 +27,9 @@ class UserLogRepository extends AbstractRepository
         if ($type === 'profits') {
             return WalletLog::where('user_id', $userId)
                 ->where('operation', 'add')
+                ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
+                   $q->whereBetween('created_at', [$start, $end]);
+                 })
                 ->orderBy('id', 'DESC')
                 ->paginate($perPage, ['*'], 'page', $page);
         }
