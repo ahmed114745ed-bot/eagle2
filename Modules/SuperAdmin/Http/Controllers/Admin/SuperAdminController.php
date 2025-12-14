@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
 use App\Admin\Actions\DeleteSuperAdminAction;
+use Illuminate\Support\Facades\Cache;
+use IntlDateFormatter;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
 use Modules\SuperAdmin\Entities\SuperAdmin;
@@ -108,19 +110,38 @@ class SuperAdminController extends MainController
      *
      * @return Grid
      */
-    protected function grid()
+   protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
+        
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))
-            ->with(['appUser.packs', 'country', 'appUser', 'appUser.profile', 'createdBy.agency', 'createdBy:id,avatar,username'])
-            ->orderByDesc('id');
-
+        
+        $grid->model()->orderByDesc('id');
+        
+        if ($countryID && $areaManagerPreview) {
+            $grid->model()->whereIn('country_id', $countryID);
+        }
+        
+        $grid->model()->with([
+            'appUser.packs',
+            'country', 
+            'appUser',
+            'appUser.profile', 
+            'createdBy.agency',
+            'createdBy'
+        ]);
+        
+        $milestoneCacheKey = 'milestone_super_admin';
+        $milestoneId = Cache::remember($milestoneCacheKey, 3600, function() {
+            return Milestone::where('slug', 'super-admin')->first();
+        });
+        
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
+        
         $grid->column('id', __('Id'));
         $this->superAdminData($grid);
 
@@ -154,14 +175,43 @@ class SuperAdminController extends MainController
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             $creator = $this->createdBy;
-            return app(\App\Admin\Services\CreatorService::class)->showV2(creatorInput: $creator);
+            
+            if (!$creator) {
+                return __('Unknown');
+            }
+            
+            $url = url("admin/admin-users/{$creator->id}");
+            $avatar = getImagePath($creator->avatar) ?? asset("images/businessman-icon.jpg");
+            
+            if (!isImageExists($avatar)) {
+                $avatar = asset("images/businessman-icon.jpg");
+            }
+            
+            $image = handleShowImageWithTypes($creator->id, $avatar, 30, 30);
+            $name = $creator->username ?? __('Unknown');
+            
+            return "
+                <div style='display:flex; align-items:center; gap:8px;'>
+                    {$image}
+                    <a href='{$url}' style='text-decoration:none;'>
+                        <span style='text-decoration:underline; cursor:pointer;'>{$name}</span>
+                    </a>
+                </div>
+            ";
         });
-
+        
         $grid->column('created_at', __('Created at'))->display(function ($date) {
-            $carbonDate = Carbon::parse($date);
-            $locale = App::getLocale();
-            $carbonDate->locale($locale);
-            return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
+            static $formatter = null;
+            
+            if ($formatter === null) {
+                $formatter = new IntlDateFormatter(
+                    App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
+                    IntlDateFormatter::LONG,
+                    IntlDateFormatter::SHORT
+                );
+            }
+            
+            return $formatter->format(strtotime($date));
         });
 
         $permission = $this->permission_name;
@@ -172,31 +222,25 @@ class SuperAdminController extends MainController
             }
         });
 
-
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-
-            $grid->tools(function (Grid\Tools $tools) {
-                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
+            $grid->tools(function (Grid\Tools $tools) use ($milestoneId) {
+                $url = url('admin/milestone-rewards/' . @$milestoneId->id);
                 $milestone = __('Acquisitions');
-
+                
                 $customButtonHTML = <<<HTML
-                 <div style="display: contents; align-items: center;">
-                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                          {$milestone}
-                     </a>
-                 </div>
-             HTML;
-
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        {$milestone}
+                    </a>
+                </div>
+            HTML;
                 $tools->append($customButtonHTML);
-            });
-
-            $grid->tools(function ($tools) {
+                
                 $logoutUrl = route('admin.super.logout');
                 $loginText = __('login');
                 $areaManagerUrl = url('/superadmin/login');
-
-                $customButtonHTML = <<<HTML
+                
+                $customButtonHTML2 = <<<HTML
                 <div style="display: contents; align-items: center;">
                     <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
                         <i class="fa fa-sign-in"></i> {$loginText}
@@ -204,9 +248,8 @@ class SuperAdminController extends MainController
                     <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
                         <i class="fa fa-copy"></i>
                     </button>
-
                 </div>
-                     <script>
+                    <script>
                     function copyAreaManagerUrl() {
                         const url = '{$areaManagerUrl}';
                         navigator.clipboard.writeText(url).then(() => {
@@ -217,14 +260,14 @@ class SuperAdminController extends MainController
                     }
                 </script>
                 HTML;
-
-                $tools->append($customButtonHTML);
+                
+                $tools->append($customButtonHTML2);
             });
         }
 
         $grid->disableRowSelector();
-
         $this->extendGrid($grid);
+        
         return $grid;
     }
 
