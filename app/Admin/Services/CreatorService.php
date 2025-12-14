@@ -104,7 +104,7 @@ class CreatorService
     }
 
 
-    
+
 
 
     public function showV2($creatorInput, bool $showUid = true, ?string $showUrl = null): string
@@ -136,7 +136,7 @@ class CreatorService
              style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
         HTML;
 
-        $showUrl = $showUrl ?: $this->creatorUrl($uid);
+        $showUrl = $showUrl ?: $this->creatorUrl($uid, $creator?->type);
 
         $uidHtml = $showUid
             ? <<<HTML
