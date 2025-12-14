@@ -7,72 +7,94 @@
 
     <div class="dashboard-wrap page-padding">
 
-        {{-- 🔎 FILTER --}}
         <div class="card p-3 mb-4" data-aos="fade-down">
             <div class="row g-2 align-items-end">
                 <div class="col-md-3">
-                    <label class="small text-muted">من تاريخ</label>
+                    <label class="small text-muted">{{    __('From')}}</label>
                     <input type="date" id="from_date" class="form-control">
                 </div>
                 <div class="col-md-3">
-                    <label class="small text-muted">إلى تاريخ</label>
+                    <label class="small text-muted">   {{  __('To')}} </label>
                     <input type="date" id="to_date" class="form-control">
                 </div>
              
                 <div class="col-md-3">
                     <button id="applyFilter" class="btn btn-primary w-100">
-                        تطبيق الفلتر
+                     {{ __('Filter') }}
                     </button>
                 </div>
             </div>
         </div>
 
-        {{-- 💰 STAT CARDS --}}
+            
         <div class="cards-container mb-4" data-aos="fade-up">
             @foreach ([
-                'total_balance'     => ['إجمالي الرصيد','fa-wallet'],
-                'pending_balance'   => ['قيد المعالجة','fa-clock'],
-                'available_balance' => ['المتاح','fa-money-bill-wave'],
-                'today_balance'     => ['اليوم','fa-coins'],
-            ] as $id => [$label,$icon])
+                'total_balance'     => 'fa-wallet',
+                'pending_balance'   => 'fa-clock',
+                'available_balance' => 'fa-money-bill-wave',
+                'today_balance'     => 'fa-coins'
+            ] as $id => $icon)
                 <div class="card finance-card" id="{{ $id }}">
                     <div class="card-icon"><i class="fa-solid {{ $icon }}"></i></div>
-                    <h2 style="margin-top: 0px !important;">{{ $label }}</h2>
+                    <h2 style="margin-top:0 !important;">{{ __("{$id}") }}</h2>
                     <p class="amount">0 $</p>
-                    <h3>{{ $label }}</h3>
+                    <h3>{{ __("{$id}") }}</h3>
                 </div>
             @endforeach
         </div>
 
-        {{-- 📊 CHART + TABLE --}}
         <div class="row g-3">
 
             <div class="col-lg-7">
-              <div class="main-chart-container" data-aos="fade-up">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="chart-title">إيرادات الشحنات</h5>
-                        <select id="filterChart" class="form-select form-select-sm" style="width:auto;">
-                            <option value="7" selected>أسبوع</option>
-                            <option value="30">شهر</option>
-                            <option value="365">سنة</option>
-                        </select>
+
+                <div class="col-lg-12">
+                    <div class="main-chart-container" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="chart-title">{{ __("shipments_revenue") }}</h5>
+                            <select id="filterChart" class="form-select form-select-sm" style="width:auto;">
+                                <option value="7" selected>{{ __("filter_week") }}</option>
+                                <option value="30">{{ __("filter_month") }}</option>
+                                <option value="365">{{ __("filter_year") }}</option>
+                            </select>
+                        </div>
+                        <canvas id="shipmentsChart"></canvas>
                     </div>
-                    <canvas id="shipmentsChart"></canvas>
                 </div>
+
+                <div class="col-lg-12 mt-4">
+                    <div class="card card-with p-3" data-aos="fade-up">
+                        <h5 class="mb-3">{{ __("latest_withdrawals") }}</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-borderless align-middle mb-0">
+                                <thead class="text-muted small">
+                                    <tr>
+                                        <th>{{ __("table_header_index") }}</th>
+                                        <th>{{ __("table_header_account") }}</th>
+                                        <th>{{ __("table_header_amount") }}</th>
+                                        <th>{{ __("table_header_status") }}</th>
+                                        <th>{{ __("table_header_date") }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="withdrawalsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="col-lg-5">
-                <div class="card p-3" data-aos="fade-up">
-                    <h5 class="mb-3">آخر عمليات الدفع</h5>
+                <div class="card card-trans p-3" data-aos="fade-up">
+                    <h5 class="mb-3">{{ __("latest_payments") }}</h5>
                     <div class="table-responsive">
                         <table class="table table-sm table-borderless align-middle">
                             <thead class="text-muted small">
                                 <tr>
-                                    <th>#</th>
-                                    <th>البوابة</th>
-                                    <th>المبلغ</th>
-                                    <th>الحالة</th>
-                                    <th>التاريخ</th>
+                                    <th>{{ __("table_header_index") }}</th>
+                                    <th>{{ __("table_header_gateway") }}</th>
+                                    <th>{{ __("table_header_amount") }}</th>
+                                    <th>{{ __("table_header_status") }}</th>
+                                    <th>{{ __("table_header_date") }}</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentsTable"></tbody>
@@ -82,6 +104,7 @@
             </div>
 
         </div>
+
 
     </div>
 </div>
@@ -96,7 +119,7 @@
 .cards-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:20px; margin-bottom:40px; }
 .card { background:#fff; border-radius:12px; padding:10px 12px; text-align:end; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
 .card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
-.card h2 { font-size:2rem; color:#333; }
+.card h2 { font-size:1.3rem; color:#333; }
 .card h3 { font-size:1rem; margin-bottom:10px; color:#333; }
 .card .amount { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#1e3a8a; transition: all 0.6s ease; }
 .card canvas { width:100% !important; height:120px !important; }
@@ -121,8 +144,10 @@
 
 #shipmentsChart{
     width:100% !important;
-    height:100% !important;
+    height:81% !important;
 }
+.card-trans{min-height: 370px;}
+.card-with{margin-top:20px;}
 
 @media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
 </style>
