@@ -83,6 +83,7 @@ class CreatorService
         $name = htmlspecialchars($creator->username ?? 'Unknown', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         $url = $creator->avatar ?? asset('images/businessman-icon.jpg');
+        $url = $creator?->avatar ? getImagePath($creator?->avatar) : asset('images/businessman-icon.jpg');;
         $image = "<img src='{$url}' alt='{$name}' style='width:50px;height:50px;border-radius:50%;object-fit:cover;'>";
 
         $showUrl = $showUrl ?: $this->creatorUrl($creator->id, $creator?->type);
