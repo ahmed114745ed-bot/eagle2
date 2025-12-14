@@ -4147,7 +4147,12 @@
     "Bank Account ": "Banka Hesabı",
     "Minimum": "Minimum",
     "Transfer Fee": "Transfer Ücreti",
-    "upload_card_back": "📷 Kartın arka yüzünü yüklemek için tıklayın"
+    "upload_card_back": "📷 Kartın arka yüzünü yüklemek için tıklayın",
+    "update_start":"Veri işleme başlatıldı ve değişiklik tamamlandıktan sonra uygulanacaktır",
+    "confirm_title": "Emin misiniz?",
+    "confirm_text": "Onayladığınızda, bu hedefe ait tüm mevcut maaşlar kapatılacak, kullanıcıların kazandığı elmaslar hesaplanacak ve kalan elmaslarla yeni bir maaş dönemi başlayacaktır. Bu işlem geri alınamaz.",
+    "confirm_button": "Onayla",
+    "cancel_button": "İptal"
 
 
 
