@@ -777,4 +777,42 @@ class AllStatisticController extends MainController
             ], 500);
         }
     }
+
+    
+
+    public function financeIndex(Request $request)
+    {
+        return response()->json([
+            'cards' => [
+                'total_balance'     => 185000,
+                'pending_balance'   => 32000,
+                'available_balance' => 153000,
+                'today_balance'     => 7400,
+            ],
+
+            'chart' => [
+                'labels' => ['Jan','Feb','Mar','Apr','May','Jun'],
+                'values' => [12000,18000,15000,24000,26000,31000],
+            ],
+
+            'payments' => [
+                [
+                    'id'=>101,
+                    'gateway'=>'Paymob',
+                    'amount'=>1200,
+                    'status'=>'Success',
+                    'status_color'=>'success',
+                    'date'=>'2025-12-12'
+                ],
+                [
+                    'id'=>102,
+                    'gateway'=>'Stripe',
+                    'amount'=>850,
+                    'status'=>'Pending',
+                    'status_color'=>'warning',
+                    'date'=>'2025-12-11'
+                ],
+            ]
+        ]);
+    }
 }
