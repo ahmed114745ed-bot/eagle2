@@ -11,7 +11,7 @@
         .wrapper {
             /* min-width: max-content; */
         }
-       
+
     }
 
     @media (max-width: 1200px) {
@@ -50,6 +50,15 @@
 
         .wrapper {
             /* min-width: max-content; */
+        }
+
+        .form-horizontal .fields-group > .col-md-12 {
+            grid-template-columns: 1fr !important;
+        }
+
+        .box-footer .pull-right label,
+        .box-footer label.pull-right {
+            display: none !important;
         }
 
         .nprogress-custom-parent {
@@ -229,7 +238,7 @@
             /* min-width: max-content; */
         }
 
-        
+
         .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
            position: absolute;
                     right: -113px;
@@ -373,6 +382,6 @@
         }
         }
 
-   
+
 
 </style>
