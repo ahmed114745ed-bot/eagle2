@@ -994,6 +994,13 @@
         color: var(--text-secondary-color) !important;
     }
 
+    .rtl .box-header > .fa,
+    .rtl .box-header > .glyphicon,
+    .rtl .box-header > .ion,
+    .rtl .box-header .box-title {
+        float: right !important;
+    }
+
     .grid-create-btn > .btn-success {
         background-color: var(--primary-color) !important;
         color: var(--inverse-color) !important;
