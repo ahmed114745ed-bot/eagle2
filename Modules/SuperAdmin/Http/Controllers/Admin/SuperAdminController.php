@@ -113,7 +113,7 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'agencies','country','appUser','appUser.profile', 'createdBy'])
+        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'agencies.dashOwner','country','appUser','appUser.profile', 'createdBy'])
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
