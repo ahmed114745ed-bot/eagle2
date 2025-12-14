@@ -164,11 +164,7 @@ class LuckyGiftService
         
                 if ($isPopular) {
 
-                    //  \Log::info('🚀 Sending Popular To Zego...', [
-                    //         'user_id'  => $userId,
-                    //         'owner_id' => $ownerId,
-                    //         'room_id'  => $room->id ?? null,
-                    //     ]);
+                  
 
                     $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
@@ -266,7 +262,11 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-
+   \Log::info('🚀 Sending  room 19...', [
+                            'user_id'  => $userId,
+                            'owner_id' => $ownerId,
+                            'room_id'  => $room->id ?? null,
+                        ]);
         return  $responseData;
     }
 
