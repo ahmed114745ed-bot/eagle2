@@ -644,6 +644,17 @@
         location.reload();
         toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
     });
+    $('#area-Manager-select-mobile').on('change', function () {
+    const val = $(this).val();
+        $('#area-Manager-select').val(val).trigger('change');
+    });
+
+    $('#country-select-mobile').on('change', function () {
+        const val = $(this).val();
+        $('#country-select').val(val).trigger('change'); 
+    });
+
+
     $(document).ready(function () {
         const $countrySelect = $('#country-select');
         const $AreaManagerSelect = $('#area-Manager-select');
