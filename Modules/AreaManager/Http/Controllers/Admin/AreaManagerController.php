@@ -162,9 +162,9 @@ class AreaManagerController extends MainController
         $grid->column('regionArea.name', __('Regions'));
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return Cache::remember("creator_{$creatorId}", now()->addMinutes(60), function () use ($creatorId) {
-                return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
-            });
+           
+                return app(\App\Admin\Services\CreatorService::class)->showV2($creatorId);
+           
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date)->locale(App::getLocale());
