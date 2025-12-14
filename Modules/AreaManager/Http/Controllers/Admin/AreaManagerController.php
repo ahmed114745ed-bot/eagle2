@@ -97,7 +97,7 @@ class AreaManagerController extends MainController
     {
         $grid = new Grid(new AreaManager());
         $grid->model()->with([
-            'appUser:id,uuid,name,profile_id',
+            'appUser:id,uuid,name',
             'appUser.profile:id,avatar',
             'regionArea:id,name',
             'creator:id,name'
