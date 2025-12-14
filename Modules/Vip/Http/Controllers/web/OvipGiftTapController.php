@@ -243,10 +243,14 @@ class OvipGiftTapController extends MainController
         ");
 
         Admin::style("
-        .box-body{
-                overflow: scroll !important;
+            .box-body{
+                overflow: auto !important;
+                scrollbar-width: none;      
             }
 
+            .box-body::-webkit-scrollbar{
+                display: none;              
+            }
         ");
         return $grid;
     }
