@@ -23,21 +23,14 @@ class UserLogRepository extends AbstractRepository
     {
         $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
         $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : Carbon::now()->endOfDay();
- 
-        if ($type === 'profits') {
-            return WalletLog::where('user_id', $userId)
-                ->where('operation', 'add')
-                ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
-                   $q->whereBetween('created_at', [$start, $end]);
-                 })
-                ->orderBy('id', 'DESC')
-                ->paginate($perPage, ['*'], 'page', $page);
-        }
 
         return $this->model
             ->where('user_id', $userId)
             ->when($type == 'coin', function ($q) {
                 $q->where('feature_type', 'coin');
+            })
+            ->when($type == 'profits', function ($q) {
+                $q->where('feature_type', 'wallet');
             })
             ->when($type == 'diamonds', function ($q) {
                 $q->where('feature_type', 'diamond');
