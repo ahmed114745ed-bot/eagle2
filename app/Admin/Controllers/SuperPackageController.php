@@ -15,7 +15,7 @@ use App\Models\SuperPackageReward;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Log;
+
 
 
 
@@ -84,48 +84,46 @@ class SuperPackageController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
 
-
-
         $grid->column('members', __('rewards'))->expand(function ($model) {
-            $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
+            $mempers = $model->packageRewards()->with('ware','vip','badge')->get()->map(function ($reward)  {
                 $gifts = '';
                 $path  = '';
 
-                switch ($memper->type) {
+                switch ($reward->type) {
                     case "ware":
-                        $gifts = @$memper->ware->name ?? '';
-                        $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+                        $gifts = @$reward->ware->name ?? '';
+                        $path  = @$reward->ware->img2 ?? (@$reward->ware->show_img ?? "");
                         break;
                     case "vip":
-                        $gifts = @$memper->vip->name ?? '';
-                        $path  = @$memper->vip->img ?? '';
+                        $gifts = @$reward->vip->name ?? '';
+                        $path  = @$reward->vip->img ?? '';
                         break;
                     case "badge":
-                        $gifts = @$memper->badge->name ?? '';
-                        $path  = @$memper->badge->image ?? '';
+                        $gifts = @$reward->badge->name ?? '';
+                        $path  = @$reward->badge->image ?? '';
                         break;
                     case "coin":
-                        $gifts = @$memper->target;
+                        $gifts = @$reward->target;
                         $path  = 'coin.png';
                         break;
                     case "achievement":
-                        $value = getDriverUrl() . '/' . @$memper->target;
+                        $value = getDriverUrl() . '/' . @$reward->target;
                         $gifts = "<img src='$value' width='80' height='80'>";
-                        $path  = $memper->target;
+                        $path  = $reward->target;
                         break;
                 }
 
                 $url = getImagePath($path);
 
-                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                $image = handleShowImageWithTypes($reward->id, $url, 50, 50);
 
                 return [
-                    'id'       => $memper->id,
-                    'type'     => $memper->type,
+                    'id'       => $reward->id,
+                    'type'     => $reward->type,
                     'gift'     => $gifts,
                     'image'    => $image,
-                    'quantity' => $memper->expire,
-                    'expire'   => $memper->quantity,
+                    'quantity' => $reward->expire,
+                    'expire'   => $reward->quantity,
                 ];
             });
 
