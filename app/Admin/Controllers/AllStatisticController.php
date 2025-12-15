@@ -871,11 +871,19 @@ class AllStatisticController extends MainController
                 $users = $topUsers->map(function($u) {
                     $user = \App\Models\User::find($u->user_id);
 
+                        $defaultImage = asset('images/businessman-icon.jpg');
+                        $path = $user->profile?->avatar; 
+
+                        $url = getImagePath($path) ?? $defaultImage;
+
+                        if (! isImageExists($url)) {
+                            $url = $defaultImage;
+                        }
                     return [
                         'id' => $u->user_id,
                         'name' => $user->name ?? 'غير معروف',
                         'uuid' => $user->uuid ?? 'غير معروف',
-                        'avatar' => getImagePath($user->profile?->avatar) ?? '/images/default-avatar.png',
+                        'avatar' => $url,
                         'total_usd' => $u->total_usd,
                         'last_charge' => $u->last_charge,
                     ];
