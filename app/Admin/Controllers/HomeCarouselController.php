@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\WebPHelper;
 use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -292,8 +293,22 @@ class HomeCarouselController extends MainController
     protected function syncDisplaysBeforeSave(Form $form)
     {
         $form->ignore(['duration']);
+       
 
+            $form->saving(function (Form $form) {
 
+        if (request()->hasFile('img')) {
+
+                $path = WebPHelper::uploadWebp(
+                    request()->file('img'),
+                    'images',       
+                    'splash',        
+                                
+                );
+
+                $form->image_url = $path;
+            }
+        });
         // dd($form->display_at , $form->model()->display_at ,request('display_at'));
 
 
