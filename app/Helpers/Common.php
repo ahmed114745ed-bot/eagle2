@@ -2122,8 +2122,8 @@ class Common
                 ];
             case 'sub_area_manager':
                 return [
-                    'name' => $resource->receiverSubAreaManager->name ?? '',
-                    'image' => $resource->receiverSubAreaManager->img ?? '',
+                    'name' => $resource->receiverSubAreaManager->username ?? '',
+                    'image' => $resource->receiverSubAreaManager->avatar ?? '',
                     'uuid' => $resource->receiverSubAreaManager->id ?? '',
                     'id' => $resource->receiverSubAreaManager->id ?? '',
                     'type' => 'sub_area_manager',
