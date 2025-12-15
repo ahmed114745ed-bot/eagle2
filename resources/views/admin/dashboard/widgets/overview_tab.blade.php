@@ -163,7 +163,6 @@
                                         <th>{{ __("table_header_index") }}</th>
                                         <th>{{ __("table_header_account") }}</th>
                                         <th>{{ __("table_header_amount") }}</th>
-                                        <th>{{ __("table_header_status") }}</th>
                                         <th>{{ __("table_header_date") }}</th>
                                     </tr>
                                 </thead>
@@ -267,8 +266,8 @@ async function loadFinanceCards() {
    Tables Loader
 ======================= */
 async function loadFinanceTables() {
-    
     const paymentsTbody = document.getElementById('paymentsTable');
+    const withdrawalsTbody = document.getElementById('withdrawalsTable');
     const topUsersContainer = document.getElementById('topUsersContainer');
 
     try {
@@ -293,8 +292,24 @@ async function loadFinanceTables() {
             `;
         });
 
-     let topUsers = data.topUsers ?? [];
+        withdrawalsTbody.innerHTML = '';
+        (data.withdrawals || []).forEach(w => {
+            withdrawalsTbody.innerHTML += `
+                <tr>
+                    <td>#${w.id}</td>
+                    <td>
+                        <a href="/admin/wallet-withdrawal?user_id=${w.user_id}" target="_blank">
+                            ${w.user_name}
+                        </a>
+                    </td>
+                    <td>${w.amount.toLocaleString()} $</td>
+                    <td class="text-muted small">${w.date}</td>
+                </tr>
+            `;
+        });
 
+        // عرض المستخدمين الأعلى
+        let topUsers = data.topUsers ?? [];
         if (!Array.isArray(topUsers) || topUsers.length === 0) {
             console.warn('No top users found, displaying defaults.');
             topUsers = [
@@ -310,7 +325,7 @@ async function loadFinanceTables() {
         const bottomRow = topUsers.slice(3, topUsers.length);
 
         topUsersContainer.innerHTML = `
-            <div class="top-row" style="display: flex; justify-content: center; gap: 10px;margin-top: 10px; margin-bottom: 10px;">
+            <div class="top-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
                 ${topRow.map(u => `
                     <div class="user-card" style="flex: 0 0 calc(${100 / topRow.length}% - 10px);">
                         <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
@@ -325,18 +340,16 @@ async function loadFinanceTables() {
                         <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
                         <div class="user-name">${u.name}</div>
                         <div class="user-name">${u.uuid}</div>
-
                     </div>
                 `).join('')}
             </div>` : ''}
         `;
 
-
-
     } catch(err) {
-        console.error('Finance tables/top users load error:', err);
+        console.error('Finance tables load error:', err);
 
         paymentsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
+        withdrawalsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
         topUsersContainer.innerHTML = [
             { name: "User 1", avatar: "/images/default-avatar.png" },
             { name: "User 2", avatar: "/images/default-avatar.png" },
@@ -348,10 +361,11 @@ async function loadFinanceTables() {
                 <img src="${u.avatar}" alt="${u.name}">
                 <div class="user-name">${u.name}</div>
                 <div class="user-name">${u.name}</div>
-
             </div>
         `).join('');
     }
+
+
 }
 
 /* =======================
