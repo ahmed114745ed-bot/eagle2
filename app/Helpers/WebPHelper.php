@@ -1,4 +1,5 @@
 <?php
+namespace App\Helpers;
 
 use Illuminate\Http\UploadedFile;
 use App\Tik\Services\Files\ImageConverter;
