@@ -868,7 +868,7 @@ class AllStatisticController extends MainController
                     ->limit(5)
                     ->get();
 
-                $users = $topUsers->map(function($u) {
+            $users = $topUsers->map(function($u) {
                     $user = \App\Models\User::find($u->user_id);
 
                         $defaultImage = asset('images/businessman-icon.jpg');

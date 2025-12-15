@@ -327,23 +327,28 @@ async function loadFinanceTables() {
         topUsersContainer.innerHTML = `
             <div class="top-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
                 ${topRow.map(u => `
-                    <div class="user-card" style="flex: 0 0 calc(${100 / topRow.length}% - 10px);">
-                        <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
-                        <div class="user-name">${u.name}</div>
-                        <div class="user-name">${u.uuid}</div>
-                    </div>
+                    <a href="/admin/users/${u.id}" style="text-decoration: none; color: inherit; flex: 0 0 calc(${100 / topRow.length}% - 10px);">
+                        <div class="user-card">
+                            <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                            <div class="user-name">${u.name}</div>
+                            <div class="user-name">${u.uuid}</div>
+                        </div>
+                    </a>
                 `).join('')}
             </div>
             ${bottomRow.length > 0 ? `<div class="bottom-row" style="display: flex; justify-content: center; gap: 10px;">
                 ${bottomRow.map(u => `
-                    <div class="user-card" style="flex: 0 0 calc(${100 / bottomRow.length}% - 10px);">
-                        <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
-                        <div class="user-name">${u.name}</div>
-                        <div class="user-name">${u.uuid}</div>
-                    </div>
+                    <a href="/admin/users/${u.id}" style="text-decoration: none; color: inherit; flex: 0 0 calc(${100 / bottomRow.length}% - 10px);">
+                        <div class="user-card">
+                            <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                            <div class="user-name">${u.name}</div>
+                            <div class="user-name">${u.uuid}</div>
+                        </div>
+                    </a>
                 `).join('')}
             </div>` : ''}
         `;
+
 
     } catch(err) {
         console.error('Finance tables load error:', err);
