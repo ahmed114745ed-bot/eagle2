@@ -143,6 +143,7 @@ class ChargeController extends MainController
             }
 
             if ($info['type'] == 'sub_super_admin') {
+                $showUrl = '#';
                 if (request()->filled('_export_')) {
                     return $info['name'];
                 }
@@ -151,7 +152,9 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("superadmin/users/profile/{$info['id']}");
+                if (!empty($info['uuid'])) {
+                    $showUrl = url("superadmin/users/profile/{$info['id']}");
+                }
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
@@ -200,7 +203,7 @@ class ChargeController extends MainController
 
         $grid->column('usd', __('usd'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-//            number_format();
+            //            number_format();
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
