@@ -293,7 +293,8 @@ async function loadFinanceTables() {
             `;
         });
 
-        let topUsers = data.topUsers ?? [];
+     let topUsers = data.topUsers ?? [];
+
         if (!Array.isArray(topUsers) || topUsers.length === 0) {
             console.warn('No top users found, displaying defaults.');
             topUsers = [
@@ -305,24 +306,31 @@ async function loadFinanceTables() {
             ];
         }
 
+        const topRow = topUsers.slice(0, Math.min(3, topUsers.length));
+        const bottomRow = topUsers.slice(3, topUsers.length);
+
         topUsersContainer.innerHTML = `
-        <div class="top-row" style="display: flex; justify-content: center; gap: 10px;    margin-top: 50px; margin-bottom: 10px;">
-            ${topUsers.slice(0, 3).map(u => `
-            <div class="user-card" style="flex: 0 0 calc(33.33% - 6.6px);" >
-                <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
-                <div class="user-name">${u.name}</div>
+            <div class="top-row" style="display: flex; justify-content: center; gap: 10px;margin-top: 10px; margin-bottom: 10px;">
+                ${topRow.map(u => `
+                    <div class="user-card" style="flex: 0 0 calc(${100 / topRow.length}% - 10px);">
+                        <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                        <div class="user-name">${u.name}</div>
+                        <div class="user-name">${u.uuid}</div>
+                    </div>
+                `).join('')}
             </div>
-            `).join('')}
-        </div>
-        <div class="bottom-row" style="display: flex; justify-content: center; gap: 10px;">
-            ${topUsers.slice(3, 5).map(u => `
-            <div class="user-card" style="flex: 0 0 calc(50% - 5px);" >
-                <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
-                <div class="user-name">${u.name}</div>
-            </div>
-            `).join('')}
-        </div>
+            ${bottomRow.length > 0 ? `<div class="bottom-row" style="display: flex; justify-content: center; gap: 10px;">
+                ${bottomRow.map(u => `
+                    <div class="user-card" style="flex: 0 0 calc(${100 / bottomRow.length}% - 10px);">
+                        <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                        <div class="user-name">${u.name}</div>
+                        <div class="user-name">${u.uuid}</div>
+
+                    </div>
+                `).join('')}
+            </div>` : ''}
         `;
+
 
 
     } catch(err) {
@@ -339,6 +347,8 @@ async function loadFinanceTables() {
             <div class="user-card">
                 <img src="${u.avatar}" alt="${u.name}">
                 <div class="user-name">${u.name}</div>
+                <div class="user-name">${u.name}</div>
+
             </div>
         `).join('');
     }

@@ -870,6 +870,7 @@ class AllStatisticController extends MainController
                     return [
                         'id' => $u->user_id,
                         'name' => $user->name ?? 'غير معروف',
+                        'uuid' => $user->uuid ?? 'غير معروف',
                         'avatar' => getImagePath($user->profile?->avatar) ?? '/images/default-avatar.png',
                         'total_usd' => $u->total_usd,
                         'last_charge' => $u->last_charge,
