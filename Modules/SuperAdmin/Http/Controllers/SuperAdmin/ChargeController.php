@@ -153,7 +153,7 @@ class ChargeController extends MainController
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
                 if (!empty($info['uuid'])) {
-                    $showUrl = url("superadmin/users/profile/{$info['id']}");
+                    $showUrl = url("superadmin/auth-users/{$info['id']}");
                 }
 
                 return "

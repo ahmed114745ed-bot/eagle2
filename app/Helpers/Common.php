@@ -1459,7 +1459,6 @@ class Common
             return $promises;
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-
         }
     }
 
@@ -1779,16 +1778,16 @@ class Common
 
         //leave mic
 
-//        foreach ($usersIdInRooms as $userId) {
-//            if (isset($room->microphone)) {
-//
-//                $microphones = explode(',', $room->microphone);
-//                if (in_array($userId, $microphones)) {
-//                    UserHandling::calcTime($userId);
-//                }
-//            }
-//            self::quit_hand_2($room->uid, $userId);
-//        }
+        //        foreach ($usersIdInRooms as $userId) {
+        //            if (isset($room->microphone)) {
+        //
+        //                $microphones = explode(',', $room->microphone);
+        //                if (in_array($userId, $microphones)) {
+        //                    UserHandling::calcTime($userId);
+        //                }
+        //            }
+        //            self::quit_hand_2($room->uid, $userId);
+        //        }
 
         $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
 
@@ -1918,7 +1917,7 @@ class Common
                     'colored_name' => '',
                 ];
 
-                case UserTypeEnum::SUB_AREA_MANAGER:
+            case UserTypeEnum::SUB_AREA_MANAGER:
                 $subAreaManager = $resource->subAreaManager;
                 return [
                     'name' => $subAreaManager->name ?? '',
@@ -1926,7 +1925,7 @@ class Common
                     'uuid' => $subAreaManager->id ?? '',
                     'id' => $subAreaManager->id ?? '',
                     'type' => 'dash',
-                    'url' => $subAreaManager ? url($prefix ."/auth/users/{$subAreaManager->id}") : '#',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
                     'image_color' => null,
                     'id_image' => '',
                     'colored_name' => '',
@@ -2107,7 +2106,7 @@ class Common
             $prefix = 'admin';
         }
 
-        switch ($resource->user_type ??  '') {
+        switch ($resource->user_type) {
             case 'agency':
                 return [
                     'name' => $resource->receiveragency->name ?? '',
@@ -2136,8 +2135,8 @@ class Common
                 ];
             case 'super_admin':
                 return [
-                    'name' => $resource->receiverSuperAdmin->name ?? '',
-                    'image' => $resource->receiverSuperAdmin->img ?? '',
+                    'name' => $resource->receiverSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSuperAdmin->avatar ?? '',
                     'uuid' => $resource->receiverSuperAdmin->id ?? '',
                     'id' => $resource->receiverSuperAdmin->id ?? '',
                     'type' => 'super_admin',
@@ -2148,8 +2147,8 @@ class Common
                 ];
             case 'sub_super_admin':
                 return [
-                    'name' => $resource->receiverSubSuperAdmin->name ?? '',
-                    'image' => $resource->receiverSubSuperAdmin->img ?? '',
+                    'name' => $resource->receiverSubSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->avatar ?? '',
                     'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
                     'id' => $resource->receiverSubSuperAdmin->id ?? '',
                     'type' => 'sub_super_admin',
@@ -2355,7 +2354,7 @@ class Common
         $adminId = session('area_manager_id') ?? auth()->id();
 
         $authAdmin = AreaManager::find($adminId)
-                    ?? SubAreaManager::find($adminId);
+            ?? SubAreaManager::find($adminId);
 
         if (!$authAdmin) {
             return [];
@@ -2376,7 +2375,7 @@ class Common
     public static function areaCountriesV2($adminId): array
     {
         $authAdmin = AreaManager::find($adminId)
-                    ?? SubAreaManager::find($adminId);
+            ?? SubAreaManager::find($adminId);
 
         if (!$authAdmin) {
             return [];
