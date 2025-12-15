@@ -252,7 +252,7 @@ class AreaManagerController extends MainController
         $form = new Form(new AreaManager());
         $this->disableFormTools($form);
 
-        $form->text('name', __('name'));
+        $form->text('name', __('name'))->required();
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
                 $table = "{$connection}.{$userTable}";
