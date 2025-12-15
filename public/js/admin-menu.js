@@ -1,22 +1,45 @@
 // custom-red-sidebar.js
-// console.log('✅ sidebar js loaded');
+console.log('✅ sidebar js loaded');
 
 (function () {
     'use strict';
 
-    // Close all other open menus except the current one
+    // Animate submenu items with stagger
+    function animateSubmenuItems(submenu) {
+        const items = submenu.querySelectorAll('.crs-item');
+
+        items.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-15px)';
+
+            setTimeout(() => {
+                item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, index * 50);
+        });
+    }
+
+    // Reset submenu items when closing
+    function resetSubmenuItems(submenu) {
+        const items = submenu.querySelectorAll('.crs-item');
+
+        items.forEach((item) => {
+            item.style.transition = 'none';
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-15px)';
+        });
+    }
+
+    // Close all other open menus
     function closeOtherMenus(currentTree) {
-        const openMenus = document.querySelectorAll('.crs-tree.crs-open');
-        // console.log('📋 Open menus found:', openMenus.length);
-
-        openMenus.forEach(function(tree) {
+        document.querySelectorAll('.crs-tree.crs-open').forEach(function(tree) {
             if (tree !== currentTree) {
-                // console.log('🔒 Closing menu:', tree);
-
                 const submenu = tree.querySelector('.crs-submenu');
                 const toggle = tree.querySelector('.crs-toggle');
 
                 if (submenu) {
+                    resetSubmenuItems(submenu);
                     submenu.style.maxHeight = submenu.scrollHeight + 'px';
                     void submenu.offsetHeight;
                     submenu.style.maxHeight = '0px';
@@ -41,25 +64,18 @@
         if (!toggle) return;
 
         e.preventDefault();
-        // console.log('🖱️ Toggle clicked:', toggle);
 
         const tree = toggle.closest('.crs-tree');
-        if (!tree) {
-            // console.log('❌ No .crs-tree found');
-            return;
-        }
+        if (!tree) return;
 
         const submenu = tree.querySelector('.crs-submenu');
-        if (!submenu) {
-            // console.log('❌ No .crs-submenu found');
-            return;
-        }
+        if (!submenu) return;
 
         const isOpen = tree.classList.contains('crs-open');
-        // console.log('📂 Is currently open:', isOpen);
 
         if (isOpen) {
             // Close current menu
+            resetSubmenuItems(submenu);
             submenu.style.maxHeight = submenu.scrollHeight + 'px';
             void submenu.offsetHeight;
             submenu.style.maxHeight = '0px';
@@ -72,13 +88,15 @@
             });
         } else {
             // Close other menus first
-            // console.log('🔄 Closing other menus...');
             closeOtherMenus(tree);
 
             // Open current menu
             submenu.style.maxHeight = submenu.scrollHeight + 'px';
             tree.classList.add('crs-open');
             toggle.setAttribute('aria-expanded', 'true');
+
+            // Animate submenu items
+            animateSubmenuItems(submenu);
 
             submenu.addEventListener('transitionend', function _k() {
                 submenu.style.maxHeight = 'none';
@@ -89,11 +107,13 @@
 
     document.addEventListener('click', handleToggleClick);
 
+    // On DOM ready
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.crs-submenu').forEach(function (sm) {
             const tree = sm.closest('.crs-tree');
             if (!tree || !tree.classList.contains('crs-open')) {
                 sm.style.maxHeight = '0px';
+                resetSubmenuItems(sm);
             } else {
                 sm.style.maxHeight = 'none';
             }
