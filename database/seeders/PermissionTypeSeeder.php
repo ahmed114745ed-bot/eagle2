@@ -119,9 +119,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'superadmin',
                         'except' => [],
-                        'additional' => [],
+                        'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'show'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch','show'],
                             PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
 
                         ],

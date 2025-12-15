@@ -16,6 +16,7 @@
     "Email": "Email",
     "action": "Action",
     "Move switch gift": "Move",
+    "Charge switch superadmin": "Freeze wallet",
 
     "Pay switch dashboard":"charge games",
     "Status switch country": "Status Switch",
@@ -1171,6 +1172,8 @@
 "disable_transfer_salary_success": "Transfer salary has been disabled successfully",
 "confirm_enable_transfer_salary": "Are you sure you want to enable transfer salary?",
 "confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
+
+
 "You have received :coin coin.": "You have received :coin coin.",
 "You have received a gift: :ware": "You have received a gift: :ware",
     "You have received the gift: :giftName": "You have received the gift: :giftName",

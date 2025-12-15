@@ -17,6 +17,13 @@
    "Area managers" : "مديرين المناطق",
   "charges area manager": "رسوم مدير المنطقة",
   "area":"منطقه",
+  "Disable frozen wallet": "تعطيل المحفظة المجمدة",
+"Enable frozen wallet": "تفعيل المحفظة المجمدة",
+"Enabled frozen wallet!": "تم تفعيل المحفظة المجمدة!",
+"Disabled frozen wallet!": "تم تعطيل المحفظة المجمدة!",
+"Delete super package reward": "حذف مكافأة الباقة الفائقة",
+  "Charge switch superadmin":"تجميد المحفظة",
+  
     "Operation log": "سجل العمليات",
    "regular users":"المستخدمين العاديين",
    "Super Package Reward":"مكافأة الحزمة الفائقة",
