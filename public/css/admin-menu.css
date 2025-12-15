@@ -70,7 +70,12 @@
 .crs-tree.crs-open > .crs-submenu{
     opacity:1;
     transform: translateY(0);
+    /*margin-left: -16%;*/
     /* max-height will be set inline by JS for smooth accurate animation */
+}
+
+.rtl .crs-tree.crs-open > .crs-submenu{
+    margin-right: -16%;
 }
 
 /* when open rotate arrow */
