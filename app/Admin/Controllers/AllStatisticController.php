@@ -815,7 +815,7 @@ class AllStatisticController extends MainController
             $payments = CoinLog::with('coin.paymentGateway')
                 ->whereIn('status', [1,2])
                 ->latest()
-                ->take(8)
+                ->take(7)
                 ->get()
                 ->map(fn($p) => [
                     'id' => $p->id,
