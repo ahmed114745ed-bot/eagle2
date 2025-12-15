@@ -48,6 +48,12 @@
 #applyFilter{
     margin-top: 19px  !important;
 }
+.tab-content {
+    min-height: 2000px  !important;
+}
+.CardwalletLogsTable{
+    overflow: scroll;
+}
 @media (max-width: 992px) {
     .main-chart-container {
         /* min-height: 300px; */
@@ -220,7 +226,7 @@
 
 
 
-<div class="card">
+<div class="card  CardwalletLogsTable">
     <div class="card-header">
         <h4>{{ __('Core Wallet Transactions') }}</h4>
     </div>
