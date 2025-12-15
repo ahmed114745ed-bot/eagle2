@@ -87,10 +87,13 @@ class ProfileService
         }
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
-                $imagePath = Common::upload('profile', $file);
-
+               $newImagePath = WebPHelper::uploadWebp(
+                    $img,
+                    'profile',
+                    'profile_image'
+                );
                 $user->images()->create([
-                    'img' => $imagePath,
+                    'img' => $newImagePath,
                 ]);
             }
         }
