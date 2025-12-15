@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\WebPHelper;
 use App\Http\Services\BannerServices;
 use App\Models\Banner;
 use Encore\Admin\Form;
@@ -161,6 +162,20 @@ class   BannerController extends MainController
             ]);
         });
 
+    $form->saving(function (Form $form) {
+
+        if (request()->hasFile('image_url')) {
+
+            $path = WebPHelper::uploadWebp(
+                request()->file('image_url'),
+                'banners',       
+                'banner',        
+                              
+            );
+
+            $form->image_url = $path;
+        }
+    });
         return $form;
     }
 }
