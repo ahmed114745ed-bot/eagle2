@@ -1,6 +1,96 @@
 
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+.floating-dots { position:absolute; inset:0; z-index:0; background: radial-gradient(circle, rgba(0,0,0,0.06) 2px, transparent 3px); background-size:40px 40px; animation: moveDots 40s linear infinite; opacity:0.6; pointer-events:none; }
+@keyframes moveDots { from { background-position:0 0;} to { background-position:400px 400px; } }
+
+.dashboard-wrap{ position:relative; z-index:1; }
+.page-padding{ padding:1.25rem; }
+
+.cards-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:20px; margin-bottom:40px; }
+.ltr .card { position: relative;  background:#fff; border-radius:12px; padding:10px 12px; text-align:start; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
+.rtl .card { position: relative; background:#fff; border-radius:12px; padding:10px 12px; text-align:start; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
+.card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+.card h2 { font-size:1.3rem; color:#333; }
+.card h3 { font-size:1rem; margin-bottom:10px; color:#333; }
+.card .amount { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#1e3a8a; transition: all 0.6s ease; }
+.card canvas { width:100% !important; height:120px !important; }
+.rtl .card .card-icon{   left: 14px; position: absolute; top:7px}
+.ltr .card .card-icon{   right: 14px; position: absolute; top:7px}
+.main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+.main-chart-container canvas {
+    /* height: 200px !important;  
+    width: 100% !important;    */
+}
+.main-chart-container {
+    position: relative;
+    width: 100%;
+    /* height: 260px;  */
+}
+.main-chart-container{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+     height: 102%;
+}
+
+#shipmentsChart{
+    width:100% !important;
+    height:81% !important;
+}
+.card-trans{min-height: 370px;}
+.card-with{margin-top:20px;}
+.carPay {min-height :456px;}
+#applyFilter{
+    margin-top: 19px  !important;
+}
+@media (max-width: 992px) {
+    .main-chart-container {
+        /* min-height: 300px; */
+    }
+}
+
+@media (max-width: 600px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .chart-container {
+        height: 250px !important;
+    }
+    .chart-title {
+        font-size: 1rem;
+    }
+    #applyFilter{
+            margin-top: 12px  !important;
+    }
+    .carPay {min-height :auto !important;}
+}
+#topUsersContainer .user-card {
+    text-align: center;
+    flex: 0 0 calc(50% - 0.5rem); 
+}
+#topUsersContainer .user-card:nth-child(n+3) {
+    flex: 0 0 calc(33.33% - 0.5rem); 
+}
+.user-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0.25rem;
+    border: 2px solid #1d4ed8;
+}
+.user-card .user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+@media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
+</style>
+
 
 <div class="position-relative">
     <div class="floating-dots"></div>
@@ -73,7 +163,6 @@
                                         <th>{{ __("table_header_index") }}</th>
                                         <th>{{ __("table_header_account") }}</th>
                                         <th>{{ __("table_header_amount") }}</th>
-                                        <th>{{ __("table_header_status") }}</th>
                                         <th>{{ __("table_header_date") }}</th>
                                     </tr>
                                 </thead>
@@ -103,6 +192,11 @@
                         </table>
                     </div>
                 </div>
+
+                 <div class="card card-trans p-3 mt-4" data-aos="fade-up">
+                    <h5 class="mb-3">{{ __("top_users_shipping") }}</h5>
+                    <div class="row g-2 justify-content-center" id="topUsersContainer"></div>
+                </div>
             </div>
 
         </div>
@@ -110,75 +204,6 @@
 
     </div>
 </div>
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<style>
-.floating-dots { position:absolute; inset:0; z-index:0; background: radial-gradient(circle, rgba(0,0,0,0.06) 2px, transparent 3px); background-size:40px 40px; animation: moveDots 40s linear infinite; opacity:0.6; pointer-events:none; }
-@keyframes moveDots { from { background-position:0 0;} to { background-position:400px 400px; } }
-
-.dashboard-wrap{ position:relative; z-index:1; }
-.page-padding{ padding:1.25rem; }
-
-.cards-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:20px; margin-bottom:40px; }
-.ltr .card { position: relative;  background:#fff; border-radius:12px; padding:10px 12px; text-align:start; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
-.rtl .card { position: relative; background:#fff; border-radius:12px; padding:10px 12px; text-align:start; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
-.card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
-.card h2 { font-size:1.3rem; color:#333; }
-.card h3 { font-size:1rem; margin-bottom:10px; color:#333; }
-.card .amount { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#1e3a8a; transition: all 0.6s ease; }
-.card canvas { width:100% !important; height:120px !important; }
-.rtl .card .card-icon{   left: 14px; position: absolute; top:7px}
-.ltr .card .card-icon{   right: 14px; position: absolute; top:7px}
-.main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-.main-chart-container canvas {
-    /* height: 200px !important;  
-    width: 100% !important;    */
-}
-.main-chart-container {
-    position: relative;
-    width: 100%;
-    /* height: 260px;  */
-}
-.main-chart-container{
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,.1);
-     height: 102%;
-}
-
-#shipmentsChart{
-    width:100% !important;
-    height:81% !important;
-}
-.card-trans{min-height: 370px;}
-.card-with{margin-top:20px;}
-
-#applyFilter{
-    margin-top: 19px  !important;
-}
-@media (max-width: 992px) {
-    .main-chart-container {
-        /* min-height: 300px; */
-    }
-}
-
-@media (max-width: 600px) {
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .chart-container {
-        height: 250px !important;
-    }
-    .chart-title {
-        font-size: 1rem;
-    }
-    #applyFilter{
-            margin-top: 12px  !important;
-    }
-}
-@media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
-</style>
 
 
 
@@ -241,13 +266,22 @@ async function loadFinanceCards() {
    Tables Loader
 ======================= */
 async function loadFinanceTables() {
+    const paymentsTbody = document.getElementById('paymentsTable');
+    const withdrawalsTbody = document.getElementById('withdrawalsTable');
+    const topUsersContainer = document.getElementById('topUsersContainer');
+
     try {
         const res = await fetch('/admin/dashboard/finance/tables');
-        if (!res.ok) throw new Error(res.statusText);
+        console.log('Finance tables API status:', res.status);
+       const defaultAvatar = "{{ asset('images/businessman-icon.jpg') }}";
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+
         const data = await res.json();
-        const paymentsTbody = document.getElementById('paymentsTable');
+        console.log('Finance tables data:', data);
+
         paymentsTbody.innerHTML = '';
-        (data.payments || []).forEach(p=>{
+        (data.payments || []).forEach(p => {
             paymentsTbody.innerHTML += `
                 <tr>
                     <td>#${p.id}</td>
@@ -258,9 +292,86 @@ async function loadFinanceTables() {
                 </tr>
             `;
         });
+
+        withdrawalsTbody.innerHTML = '';
+        (data.withdrawals || []).forEach(w => {
+            withdrawalsTbody.innerHTML += `
+                <tr>
+                    <td>#${w.id}</td>
+                    <td>
+                        <a href="/admin/wallet-withdrawal?user_id=${w.user_id}" target="_blank">
+                            ${w.user_name}
+                        </a>
+                    </td>
+                    <td>${w.amount.toLocaleString()} $</td>
+                    <td class="text-muted small">${w.date}</td>
+                </tr>
+            `;
+        });
+
+        // عرض المستخدمين الأعلى
+        let topUsers = data.topUsers ?? [];
+        if (!Array.isArray(topUsers) || topUsers.length === 0) {
+            console.warn('No top users found, displaying defaults.');
+            topUsers = [
+                { name: "User 1", avatar: defaultAvatar },
+                { name: "User 2", avatar: defaultAvatar },
+                { name: "User 3", avatar: defaultAvatar },
+                { name: "User 4", avatar: defaultAvatar },
+                { name: "User 5", avatar: defaultAvatar }
+            ];
+        }
+
+        const topRow = topUsers.slice(0, Math.min(3, topUsers.length));
+        const bottomRow = topUsers.slice(3, topUsers.length);
+
+        topUsersContainer.innerHTML = `
+            <div class="top-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
+                ${topRow.map(u => `
+                    <a href="/admin/users/${u.id}" style="text-decoration: none; color: inherit; flex: 0 0 calc(${100 / topRow.length}% - 10px);">
+                        <div class="user-card">
+                            <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                            <div class="user-name">${u.name}</div>
+                            <div class="user-name">${u.uuid}</div>
+                        </div>
+                    </a>
+                `).join('')}
+            </div>
+            ${bottomRow.length > 0 ? `<div class="bottom-row" style="display: flex; justify-content: center; gap: 10px;">
+                ${bottomRow.map(u => `
+                    <a href="/admin/users/${u.id}" style="text-decoration: none; color: inherit; flex: 0 0 calc(${100 / bottomRow.length}% - 10px);">
+                        <div class="user-card">
+                            <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
+                            <div class="user-name">${u.name}</div>
+                            <div class="user-name">${u.uuid}</div>
+                        </div>
+                    </a>
+                `).join('')}
+            </div>` : ''}
+        `;
+
+
     } catch(err) {
-        console.error('Tables load error:', err);
+        console.error('Finance tables load error:', err);
+
+        paymentsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
+        withdrawalsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
+        topUsersContainer.innerHTML = [
+            { name: "User 1", avatar: defaultAvatar },
+            { name: "User 2", avatar: defaultAvatar },
+            { name: "User 3", avatar: defaultAvatar },
+            { name: "User 4", avatar: defaultAvatar },
+            { name: "User 5", avatar: defaultAvatar },
+        ].map(u => `
+            <div class="user-card">
+                <img src="${u.avatar}" alt="${u.name}">
+                <div class="user-name">${u.name}</div>
+                <div class="user-name">${u.name}</div>
+            </div>
+        `).join('');
     }
+
+
 }
 
 /* =======================
@@ -300,9 +411,12 @@ async function loadFinanceChart() {
     }
 }
 
+
 /* =======================
    Events
 ======================= */
+
+
 document.addEventListener('DOMContentLoaded', () => {
     loadFinanceCards();
     loadFinanceTables();

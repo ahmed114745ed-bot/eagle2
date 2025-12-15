@@ -330,10 +330,10 @@ class WalletController extends MainController
         $amount = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
-        if (settings()->get("stop_charge", 0)) {
+        // if (settings()->get("stop_charge", 0)) {
 
-            throw new \Exception(__('api_responses.freez_charge'));
-        }
+        //     throw new \Exception(__('api_responses.freez_charge'));
+        // }
 
 
         if ($from->transfer_salary == 1) {

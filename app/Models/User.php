@@ -42,6 +42,7 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Modules\UsersWallet\Entities\UserWallet;
 
 /**
  * @method static withoutAppends()
@@ -905,20 +906,20 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        // $userSalary = UserSallary::query()
 
-            ->where('user_id', $this->id)
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+        //     ->where('user_id', $this->id)
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+        //     $q->where('uid', $this->id);
+        // })
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('salary - cut_amount'));
 
-        $total = $userSalary + $roomSalary;
-
+        // $total = $userSalary + $roomSalary;
+        $total =wallet_available_by_user($this->id); 
         return floor($total * 100) / 100;
     }
 
@@ -2339,5 +2340,10 @@ class User extends Authenticatable
     public function lastHostLevelWinnerByEvent($eventType)
     {
         return $this->lastHostLevelWinner()->filterByEventType($eventType);
+    }
+    
+    public function userWallet()
+    {
+        return $this->hasOne(UserWallet::class);
     }
 }

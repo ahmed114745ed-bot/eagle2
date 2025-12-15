@@ -26,4 +26,10 @@ class PackageReward extends Model
     {
         return $this->hasOne(Badge::class, 'id', 'target');
     }
+
+
+    public function superPackage()
+    {
+        return $this->belongsTo(SuperPackageReward::class, 'super_package_id ');
+    }
 }

@@ -29,6 +29,7 @@ use Modules\AreaManager\Entities\AreaManager;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
  use Carbon\CarbonPeriod;
+ use Modules\UsersWallet\Entities\WalletLog;
 
 class AllStatisticController extends MainController
 {
@@ -844,21 +845,53 @@ class AllStatisticController extends MainController
                     'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
                 ]);
 
-            // $withdrawals = WalletLog::where('type','cut operation')
-            //     ->latest()
-            //     ->take(8)
-            //     ->get()
-            //     ->map(fn($w)=>[
-            //         'id' => $w->id,
-            //         'wallet_name' => $w->wallet_id,
-            //         'amount' => $w->amount,
-            //         'type' => $w->type,
-            //         'date' => $w->created_at->format('Y-m-d')
-            //     ]);
-            
+            $withdrawals = WalletLog::with ('user')->where('operation','subtract')
+                ->latest()
+                ->take(8)
+                ->get()
+                ->map(fn($w)=>[
+                    'id' => $w->id,
+                    'user_name' => $w->user->name ?? '',
+                    'user_id' => $w->user_id,
+                    'amount' => $w->amount,
+                    'type' => $w->type,
+                    'date' => $w->created_at->format('Y-m-d')
+                ]);
+            \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
+
+                
+             $topUsers = \DB::table('charges')
+                    ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
+                    ->where('user_type', 'user')   
+                    ->groupBy('user_id')
+                    ->orderByDesc('total_usd')
+                    ->limit(5)
+                    ->get();
+
+            $users = $topUsers->map(function($u) {
+                    $user = \App\Models\User::find($u->user_id);
+
+                        $defaultImage = asset('images/businessman-icon.jpg');
+                        $path = $user->profile?->avatar; 
+
+                        $url = getImagePath($path) ?? $defaultImage;
+
+                        if (! isImageExists($url)) {
+                            $url = $defaultImage;
+                        }
+                    return [
+                        'id' => $u->user_id,
+                        'name' => $user->name ?? 'غير معروف',
+                        'uuid' => $user->uuid ?? 'غير معروف',
+                        'avatar' => $url,
+                        'total_usd' => $u->total_usd,
+                        'last_charge' => $u->last_charge,
+                    ];
+                });
             return response()->json([
                 'payments' => $payments,
-                'withdrawals' => [] 
+                'withdrawals' =>$withdrawals,
+                'topUsers' => $users
             ]);
         }
     public function financeChartIndex(Request $request)
@@ -887,5 +920,10 @@ class AllStatisticController extends MainController
 
         return response()->json(['labels'=>$labels,'values'=>$values]);
     }
+
+
+
+
+
 
 }

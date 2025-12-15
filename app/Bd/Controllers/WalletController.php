@@ -25,7 +25,6 @@ use App\Models\WalletTransaction;
 use App\Services\BDChargeService;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
-use Modules\Wallet\Enum\WalletEnum;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
@@ -33,7 +32,6 @@ use Encore\Admin\Controllers\AdminController;
 use Modules\Wallet\Services\CheckSystemConfigs;
 use Modules\Wallet\Services\CheckUserExistence;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Wallet\Services\CheckAvailableBalance;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class WalletController extends MainController
