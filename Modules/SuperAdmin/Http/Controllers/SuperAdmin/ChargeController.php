@@ -275,11 +275,11 @@ class ChargeController extends MainController
         $page = $request->get('page', 1);
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
-
+       dd(auth()->id());
         $query = DB::table('admin_users')
             ->where('type', PermissionType::SUB_SUPER_ADMIN->value)
             ->where('is_preview', 0)
-            ->where('parent_id', auth('admin')->id());
+            ->where('parent_id', auth()->id());
 
 
         if ($key) {
