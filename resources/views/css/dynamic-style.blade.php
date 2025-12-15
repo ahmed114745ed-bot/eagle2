@@ -494,7 +494,7 @@
         margin-left: 0 !important;
         background: #f8fafc !important;
         min-height: calc(100vh - var(--header-height)) !important;
-        padding: 24px !important;
+        padding: 1% !important;
         transition: var(--transition) !important;
     }
 
@@ -667,8 +667,8 @@
 
     .skin-black-light .sidebar-menu > li > a {
         border-radius: var(--border-radius);
-        margin: 4px 16px;
-        padding: 12px 16px;
+        margin: 4px 0px;
+        padding: 12px 0px;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         border: none !important;
         position: relative;
@@ -1171,6 +1171,7 @@
         border-radius: 8px !important;
         box-shadow: var(--shadow-lg) !important;
         margin-top: 4px !important;
+        z-index: 10000 !important;
     }
 
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
@@ -1382,8 +1383,8 @@
     /* RTL override */
     html.rtl .dropdown-menu {
         text-align: right;
-        right: 0;
-        left: auto;
+        left: 0 !important;
+        right: auto !important;
         float: right;
     }
 
@@ -1498,7 +1499,7 @@
     .rtl .content-wrapper,
     .rtl .main-footer {
         margin-left: 0;
-        margin-right: 260px;
+        margin-right: 17.5%;
     }
 
     .rtl .treeview-menu {
@@ -1572,7 +1573,7 @@
     }
 
     .rtl .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .right-side, .sidebar-mini.sidebar-collapse .main-footer {
-        margin-left: 3% !important;
+        margin-left: 0% !important;
     }
 
     .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .right-side, .sidebar-mini.sidebar-collapse .main-footer {
@@ -1584,8 +1585,7 @@
     }
 
     .rtl .sidebar-mini.sidebar-collapse .main-header .navbar {
-        margin-left: 3% !important;
-        width: 90.5% !important;
+        width: 93.5% !important;
     }
 
     .ltr .navbar-static-top {
@@ -1647,11 +1647,11 @@
     }
 
     .rtl .content-wrapper-rtl {
-        margin-right: 5% !important;
+        margin-right: 5.5% !important;
     }
 
     .ltr .content-wrapper {
-        margin-left: 260px !important;
+        margin-left: 17% !important;
     }
 
     .rtl .fields-group .form-group {
@@ -2128,17 +2128,20 @@
         border-color: var(--secondary-color) !important;
     }
 
-    .box-footer {
+    .form-horizontal + .box-footer,
+    .form-horizontal .box-footer {
         display: grid !important;
         padding: 16px 24px !important;
         direction: ltr !important;
     }
 
-    .rtl .box-footer {
+    .rtl .form-horizontal + .box-footer,
+    .rtl .form-horizontal .box-footer {
         direction: rtl !important;
     }
 
-    .box-footer .col-md-8 {
+    .form-horizontal + .box-footer .col-md-8,
+    .form-horizontal .box-footer .col-md-8 {
         float: none !important;
         width: auto !important;
         display: flex !important;
@@ -2147,21 +2150,25 @@
         margin-right: auto !important;
     }
 
-    .box-footer .btn-group.pull-right {
+    .form-horizontal + .box-footer .btn-group.pull-right,
+    .form-horizontal .box-footer .btn-group.pull-right {
         order: -2 !important;
         float: none !important;
     }
 
-    .box-footer .btn-group.pull-left {
+    .form-horizontal + .box-footer .btn-group.pull-left,
+    .form-horizontal .box-footer .btn-group.pull-left {
         order: -1 !important;
         float: none !important;
     }
 
-    .box-footer .pull-right:not(.btn-group) {
+    .form-horizontal + .box-footer .pull-right:not(.btn-group),
+    .form-horizontal .box-footer .pull-right:not(.btn-group) {
         float: none !important;
     }
 
-    .box-footer .checkbox {
+    .form-horizontal + .box-footer .checkbox,
+    .form-horizontal .box-footer .checkbox {
         margin: 0 !important;
     }
 
@@ -2170,12 +2177,19 @@
             grid-template-columns: 1fr !important;
         }
     }
-
     /* end form inputs */
 
     .iti--separate-dial-code .iti__selected-flag {
         background-color: rgba(0, 0, 0, 0.02) !important;
     }
+
+    .grid-table td .dropdown,
+    .grid-table td .dropup,
+    .table td .dropdown,
+    .table td .dropup {
+        position: absolute;
+    }
+
 
     .stats-container .info-box {
         background: linear-gradient(135deg,
