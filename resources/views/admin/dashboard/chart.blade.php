@@ -394,6 +394,10 @@ body {
     flex-shrink: 0;
 }
 
+img {
+    display: unset !important;
+}
+
 /* Responsive adjustments for tabs */
 @media (max-width: 768px) {
     .nav-tabs {
