@@ -154,7 +154,7 @@
 .card-with{margin-top:20px;}
 @media (max-width: 992px) {
     .main-chart-container {
-        min-height: 300px;
+        /* min-height: 300px; */
     }
 }
 
