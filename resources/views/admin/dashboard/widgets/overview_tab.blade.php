@@ -152,6 +152,10 @@
 }
 .card-trans{min-height: 370px;}
 .card-with{margin-top:20px;}
+
+#applyFilter{
+    margin-top: 12px  !important;
+}
 @media (max-width: 992px) {
     .main-chart-container {
         /* min-height: 300px; */
