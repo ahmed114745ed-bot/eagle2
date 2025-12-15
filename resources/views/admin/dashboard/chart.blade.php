@@ -394,6 +394,10 @@ body {
     flex-shrink: 0;
 }
 
+.skin-black-light .sidebar a {
+    margin-right: 18%;
+}
+
 img {
     display: unset !important;
 }

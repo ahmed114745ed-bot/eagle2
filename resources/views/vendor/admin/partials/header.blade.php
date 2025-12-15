@@ -296,10 +296,6 @@
         margin-bottom: 13px !important;
     }
 
-    .skin-black-light .sidebar a {
-        margin-right: 18%;
-    }
-
     @media (max-width: 767px) {
 
         .logo {
