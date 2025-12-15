@@ -203,7 +203,7 @@ function getFilters() {
 
 function animateAmount(el, value) {
     let start = 0;
-    const duration = 700;
+    const duration = 100;
     const startTime = performance.now();
     function step(now) {
         const p = Math.min((now - startTime)/duration, 1);
