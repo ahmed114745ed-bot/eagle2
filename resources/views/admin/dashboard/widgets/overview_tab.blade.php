@@ -18,10 +18,10 @@
 .card canvas { width:100% !important; height:120px !important; }
 .rtl .card .card-icon{   left: 14px; position: absolute; top:7px}
 .ltr .card .card-icon{   right: 14px; position: absolute; top:7px}
-.main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+.main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1);     overflow: hidden; }
 .main-chart-container canvas {
-    /* height: 200px !important;  
-    width: 100% !important;    */
+    height: 200px !important;  
+    width: 100% !important;   
 }
 .main-chart-container {
     position: relative;
@@ -41,10 +41,18 @@
     height:81% !important;
 }
 .card-trans{min-height: 370px;}
+.card-trans2{min-height: 468px;  max-height:468px ;}
+
 .card-with{margin-top:20px;}
 .carPay {min-height :456px;}
 #applyFilter{
     margin-top: 19px  !important;
+}
+.tab-content {
+    min-height: 2000px  !important;
+}
+.CardwalletLogsTable{
+    overflow: scroll !important;
 }
 @media (max-width: 992px) {
     .main-chart-container {
@@ -58,7 +66,7 @@
         gap: 10px;
     }
     .chart-container {
-        height: 250px !important;
+        height: 300px !important;
     }
     .chart-title {
         font-size: 1rem;
@@ -101,11 +109,12 @@
     <div class="floating-dots"></div>
 
     <div class="dashboard-wrap page-padding">
-
-
-        <button id="toggleFilter" class="btn btn-dropbox 694015f1a711d-filter-btn mb-3">
-            {{ __('Filter') }}
-        </button>
+              
+        <div class="dashboard-wrap page-padding" style=" position: relative;     margin-bottom: 53px;">
+            <button id="toggleFilter" class="btn btn-dropbox 694015f1a711d-filter-btn mb-3" style=" left: 0;position: absolute;">
+                    <i class="fas fa-filter"></i>
+            </button>
+        </div>
 
         <div id="filterCard" class="card p-3 mb-4" data-aos="fade-down">
             <div class="row g-2 align-items-end">
@@ -185,7 +194,7 @@
             </div>
 
             <div class="col-lg-5">
-                <div class="card card-trans p-3" data-aos="fade-up">
+                <div class="card card-trans card-trans2 p-3" data-aos="fade-up">
                     <h5 class="mb-3">{{ __("latest_payments") }}</h5>
                     <div class="table-responsive">
                         <table class="table table-sm table-borderless align-middle">
@@ -214,6 +223,90 @@
 
     </div>
 </div>
+
+
+
+<div class="card  CardwalletLogsTable">
+    <div class="card-header">
+        <h4>{{ __('Core Wallet Transactions') }}</h4>
+    </div>
+    <div class="card-body">
+        <table id="walletLogsTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>{{ __('ID') }}</th>
+                    <th>{{ __('User') }}</th>
+                    <th> {{ __('Amount') }}</th>
+                    <th> {{ __('balance before') }}</th>
+                    <th> {{ __('amount after') }}</th>
+                    <th> {{ __('created at') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<script>
+
+$(document).ready(function() {
+
+    function loadWalletLogs() {
+        $.ajax({
+            url: "{{ route('admin.wallet-logs.ajax') }}",
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                const tbody = $('#walletLogsTable tbody');
+                tbody.empty(); 
+
+                if(response.data && response.data.length > 0) {
+                    response.data.forEach(log => {
+                        const operationBadge = log.operation === 'add' 
+                            ? '<span class="badge bg-success">ADD</span>'
+                            : '<span class="badge bg-danger">CUT</span>';
+
+                        const row = `
+                            <tr>
+                                <td>${log.id}</td>
+                              
+                                <td>
+                                    <a href="/admin/users/${log.user_id}" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+                                        <img src="${log.img}" alt="${log.user_name}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                        <div>
+                                            <div style="font-weight:600;">${log.user_name}</div>
+                                            <div style="font-size:12px; color:#666;">${log.user_uuid}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>${parseFloat(log.amount).toLocaleString()} $</td>
+                                <td>${log.before_amount}</td>
+                                <td>${log.after_amount}</td>
+                                <td>${log.created_at}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="8" class="text-center">لا توجد سجلات</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.log("Response:", xhr.responseText);
+                alert("حدث خطأ أثناء جلب البيانات. تحقق من الكونسول.");
+            }
+        });
+    }
+
+    loadWalletLogs();
+});
+
+</script>
+
 
 
 

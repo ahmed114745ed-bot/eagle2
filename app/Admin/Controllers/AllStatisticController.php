@@ -923,6 +923,42 @@ class AllStatisticController extends MainController
 
 
 
+     public function ajaxWalletLogs(Request $request)
+    {
+
+        $logs = WalletLog::with('user.profile')
+        ->whereIn('operation', ['add', 'cut'])
+        ->orderBy('created_at', 'desc')
+        ->take(8)
+        ->get();
+
+    return response()->json([
+        'data' => $logs->map(function($log) {
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $path = $log->user->profile?->avatar ?? null;
+            $url = $path ? getImagePath($path) : $defaultImage;
+
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return [
+                'id' => $log->id,
+                'user_name' => $log->user ? $log->user->name : '-',
+                'user_id' => $log->user ? $log->user->id : '-',
+                'user_uuid' => $log->user ? $log->user->uuid : '-',
+                'img' => $url,
+                'amount' => $log->amount,
+                'operation' => $log->operation,
+                'type' => $log->type,
+                'before_amount' => $log->before_amount,
+                'after_amount' => $log->after_amount,
+                'created_at' => $log->created_at->format('Y-m-d H:i'),
+            ];
+        }),
+    ]);
+    }
+
 
 
 
