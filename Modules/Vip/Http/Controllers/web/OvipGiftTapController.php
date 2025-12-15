@@ -324,9 +324,10 @@ class OvipGiftTapController extends MainController
                     ]);
             }
         }
-    
+        
+            $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
             if ($form->show_img instanceof UploadedFile) {
-                $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+                // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
                 $ext = strtolower($form->show_img->guessExtension());
     
                 if (!in_array($ext, $allowed)) {
@@ -337,7 +338,7 @@ class OvipGiftTapController extends MainController
             }
     
             if ($form->img2 instanceof UploadedFile) {
-                $allowed = ['svga', 'mp4','svg','alpha', 'vap', 'png'];
+                // $allowed = ['svga', 'mp4','svg','alpha', 'vap', 'png'];
                 $ext = strtolower($form->img2->guessExtension());
                 $originalExt = strtolower($form->img2->getClientOriginalExtension());
     
