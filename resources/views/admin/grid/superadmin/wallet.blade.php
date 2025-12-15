@@ -408,6 +408,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         function updateRate() {
         const targetType = document.getElementById('target_type').value;
         currentRate = targetType === 'user' ? superAdminRate : shippingRate;
+        console.log('Target type:', targetType, 'Current rate:', currentRate);
         updateConvertedAmount(); // recalc after changing rate
     }
 
@@ -421,9 +422,11 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             if (type === 'dollar') {
                 const coins = amount * currentRate;
                 output.textContent = `≈ ${coins.toFixed(2)} 🪙`;
+                 console.log(`Amount: $${amount} → Coins: ${coins.toFixed(2)}`);
             } else {
                 const dollars = amount / currentRate;
                 output.textContent = `≈ $${dollars.toFixed(2)}`;
+                console.log(`Amount: ${amount} coins → Dollars: $${dollars.toFixed(2)}`); 
             }
         } else {
             output.style.display = 'none';
