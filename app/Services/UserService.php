@@ -659,6 +659,12 @@ class UserService
         //        $this->packRepository->deleteAllExpiredPacks();
     }
 
+    public function showUsers($usersIds)
+    {
+        return  $this->userRepository->getUsersWithMedals($usersIds);
+        //        $this->packRepository->deleteAllExpiredPacks();
+    }
+
     private function getUserWithRelations($userId)
     {
         // return  $this->userRepository->findUserData($userId);

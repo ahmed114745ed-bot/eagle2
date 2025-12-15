@@ -324,10 +324,10 @@ class UserController extends Controller
 
     public function userBdByCountries(Request $request)
     {
-         $areaManager = $request->get('area_manager_id');
+        $areaManager = $request->get('area_manager_id');
         $key = $request->q;
         $page = $request->get('page', 1);
-        $users = $this->userService->userBdByCountries($areaManager,$key, $page);
+        $users = $this->userService->userBdByCountries($areaManager, $key, $page);
 
         return response()->json($users);
     }
@@ -547,14 +547,14 @@ class UserController extends Controller
         $cacheKey = "user_response_{$id}";
 
         $response =
-         \Cache::remember(
-            $cacheKey,
-            now()->addMinutes(30),
-            function () use ($id) {
-                $user = $this->userService->showUser($id);
-                return (new UserResource($user))->toArray(request());
-            }
-        );
+            \Cache::remember(
+                $cacheKey,
+                now()->addMinutes(30),
+                function () use ($id) {
+                    $user = $this->userService->showUser($id);
+                    return (new UserResource($user))->toArray(request());
+                }
+            );
 
         $authUserId = auth()->id();
         $user = User::with([
@@ -578,10 +578,21 @@ class UserController extends Controller
 
         $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
 
-      //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
+        //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
 
         $response['chat_id'] = $chatRoom->id ?? null;
         $response['unread_messages_count'] = $unreadMessagesCount;
+
+        return Common::apiResponse(true, '', $response, 200);
+    }
+
+    public function showUsersDetails(Request $request)
+    {
+
+        $users_ids =  explode(',', $request->users_ids);
+
+        $user = $this->userService->showUsers($users_ids);
+        $response = (UserResource::collection($user))->toArray(request());
 
         return Common::apiResponse(true, '', $response, 200);
     }

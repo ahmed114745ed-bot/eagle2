@@ -38,6 +38,7 @@ class MyStoreResource extends JsonResource
             $hostSalary = number_format((float) ($agencySallary ?? $agency_owner?->salary ?? 0), 3, '.', '');
             $sallary = $hostSalary;
         }
+
         $pendingDollar = $this->totalUserSalary->sum("pending_dollar");
         $paid = $this->totalUserSalary->sum("cut_amount");
         $roomSalary = $this->ownerRoom?->roomSalary->sum(function ($roomSalary) {

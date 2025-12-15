@@ -15,7 +15,7 @@ use App\Models\SuperPackageReward;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Log;
+
 
 
 
@@ -80,61 +80,75 @@ class SuperPackageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperPackageReward());
+        $grid->model()->select('id', 'title')->with([
+            'packageRewards.ware:id,name,img2,show_img',
+            'packageRewards.vip:id,name,img',
+            'packageRewards.badge:id,name,image',
+            'packageRewards:id,super_package_id,type,target,expire,quantity',
+        ]);
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
 
 
-
         $grid->column('members', __('rewards'))->expand(function ($model) {
-            $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
-                $gifts = '';
-                $path  = '';
 
-                switch ($memper->type) {
-                    case "ware":
-                        $gifts = @$memper->ware->name ?? '';
-                        $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+            $members = $model->packageRewards->map(function ($reward) {
+
+                $gift = '';
+                $path = '';
+
+                switch ($reward->type) {
+                    case 'ware':
+                        $gift = optional($reward->ware)->name;
+                        $path = optional($reward->ware)->img2
+                            ?? optional($reward->ware)->show_img;
                         break;
-                    case "vip":
-                        $gifts = @$memper->vip->name ?? '';
-                        $path  = @$memper->vip->img ?? '';
+
+                    case 'vip':
+                        $gift = optional($reward->vip)->name;
+                        $path = optional($reward->vip)->img;
                         break;
-                    case "badge":
-                        $gifts = @$memper->badge->name ?? '';
-                        $path  = @$memper->badge->image ?? '';
+
+                    case 'badge':
+                        $gift = optional($reward->badge)->name;
+                        $path = optional($reward->badge)->image;
                         break;
-                    case "coin":
-                        $gifts = @$memper->target;
-                        $path  = 'coin.png';
+
+                    case 'coin':
+                        $gift = $reward->target;
+                        $path = 'coin.png';
                         break;
-                    case "achievement":
-                        $value = getDriverUrl() . '/' . @$memper->target;
-                        $gifts = "<img src='$value' width='80' height='80'>";
-                        $path  = $memper->target;
+
+                    case 'achievement':
+                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
+                        $path = $reward->target;
                         break;
                 }
 
-                $url = getImagePath($path);
-
-                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                $image = handleShowImageWithTypes(
+                    $reward->id,
+                    getImagePath($path),
+                    50,
+                    50
+                );
 
                 return [
-                    'id'       => $memper->id,
-                    'type'     => $memper->type,
-                    'gift'     => $gifts,
+                    'id'       => $reward->id,
+                    'type'     => $reward->type,
+                    'gift'     => $gift,
                     'image'    => $image,
-                    'quantity' => $memper->expire,
-                    'expire'   => $memper->quantity,
+                    'quantity' => $reward->expire,
+                    'expire'   => $reward->quantity,
                 ];
             });
 
-
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $mempers->toArray()
+                $members->toArray()
             );
         });
+
 
 
         Admin::script("
@@ -163,6 +177,10 @@ class SuperPackageController extends MainController
             }
         ");
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+            $actions->disableEdit();
+        });
         $this->extendGrid($grid);
         return $grid;
     }
@@ -173,54 +191,13 @@ class SuperPackageController extends MainController
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
-    {
-        $show = new Show(SuperPackageReward::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('title', __('Title'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        return $show;
-    }
 
     /**
      * Make a form builder.
      *
      * @return Form
      */
-    // protected function form()
-    // {
-    //     $form = new Form(new SuperPackageReward());
-
-    //     $form->text('title', __('Title'));
-    //     $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-    //         ->when("ware", function () use ($form) {
-    //             $this->addWareField($form);
-    //         })
-    //         ->when("badge", function () use ($form) {
-    //             $this->addBadgeField($form);
-    //         })
-    //         ->when("vip", function () use ($form) {
-    //             $form->select('target2', trans('vips'))->options(function () {
-    //                 $vips = OVip::query()->select('id', 'name')->get();
-    //                 foreach ($vips as  $vip) {
-    //                     $ops[$vip->id] = $vip->name;
-    //                 }
-    //                 return $ops;
-    //             });
-    //         })
-    //         ->when("coins", function () use ($form) {
-    //             $form->number("target3", __("coins"));
-    //         })->when("achievement", function () use ($form) {
-    //             $form->image("target4", __('image'))->name(function ($file) {
-    //                 return now()->timestamp . '.' . $file->guessExtension();
-    //             })->disk('gcs');
-    //         });
-
-    //     return $form;
-    // }
 
 
     protected function form()

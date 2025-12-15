@@ -1525,14 +1525,32 @@
 "Show live rooms": "Show live broadcasts",
     "CP Settings": "CP Settings",
     "Enable all CP gifts": "Enable all CP gifts",
-    "Enabled": "Enabled",
     "Disabled": "Disabled",
     "Updated successfully!": "Updated successfully!",
     "Something went wrong!": "Something went wrong!",
-    "cp-settings":"cp settings"
-
-
-
+    "cp-settings":"cp settings",
+"User Withdrawals": "User Withdrawals",
+"User Withdrawal": "User Withdrawal",
+"role_user": "User",
+"role_bd": "BD",
+"role_agency_manager": "Agency Manager",
+"role_app": "App",
+"diamonds_message": "Diamonds: :diamonds, Role: :role, Profit %: :profit, Broadcast Time: :time"
+,"achieve_target": "Achieve Target",
+"add_user_profit": "Profit for target :target",
+"add_agency_profit": "Profit for agency :target",
+"add_bd_profit": "Profit for BD :admin",
+"transfer_to": "Transferred to :target",
+"transfer_from": "Transferred from :target",
+"withdraw": "Withdrawn by :admin",
+"wallet.add": "Target Achievement",
+"wallet.subtract": "Withdraw",
+"wallet.transfer": "Transfer",
+"update_start":"Data processing has started, and the modification will be applied once completed",
+"confirm_title": "Are you sure?",
+"confirm_text": "By confirming, all current salaries for this target will be closed, achieved diamonds will be calculated for users, and a new salary cycle for the current month will begin with the remaining diamonds after deduction. This action cannot be undone.",
+"confirm_button": "Confirm",
+"cancel_button": "Cancel"
 
 
 

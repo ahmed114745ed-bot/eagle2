@@ -210,7 +210,7 @@ class UserRepository extends Repository
         if (!$areaManager)  $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
 
-        $countries =$areaManager->countriesQuery()->pluck('id')->toArray();
+        $countries = $areaManager->countriesQuery()->pluck('id')->toArray();
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
             ->where(function ($query) use ($key) {
 
@@ -426,7 +426,7 @@ class UserRepository extends Repository
         if (!$areaManager) $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();
         // $countries = $areaManager?->countries?->pluck('id')->toArray() ?? [];
-        $countries =$areaManager->countriesQuery()->pluck('id')->toArray();
+        $countries = $areaManager->countriesQuery()->pluck('id')->toArray();
 
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where(function ($query) {
@@ -530,13 +530,13 @@ class UserRepository extends Repository
 
     public function getUserWithMedals($userId)
     {
-//        $authUserId = auth()->id();
+        //        $authUserId = auth()->id();
         return User::with([
             'packs',
-//            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
-//                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-//                ->where('is_used', 1)
-//                ->with(['ware']),
+            //            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
+            //                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+            //                ->where('is_used', 1)
+            //                ->with(['ware']),
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
             'receiverLevel:id,img,level',
             'senderLevel:id,img,level',
@@ -545,22 +545,39 @@ class UserRepository extends Repository
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
             'shippingAgency:id,app_owner_id,name,img',
-//            'chatRoomsAsUser' => function ($q) use ($authUserId) {
-//                $q->where('user_id2', $authUserId)
-//                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-//                        $query->where('user_id', '<>', $authUserId)
-//                            ->where('status', '<>', 'seen');
-//                    }]);
-//            },
-//            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
-//                $q->where('user_id', $authUserId)
-//                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-//                        $query->where('user_id', '<>', $authUserId)
-//                            ->where('status', '<>', 'seen');
-//                    }]);
-//            },
+            //            'chatRoomsAsUser' => function ($q) use ($authUserId) {
+            //                $q->where('user_id2', $authUserId)
+            //                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+            //                        $query->where('user_id', '<>', $authUserId)
+            //                            ->where('status', '<>', 'seen');
+            //                    }]);
+            //            },
+            //            'chatRoomsAsUser2' => function ($q) use ($authUserId) {
+            //                $q->where('user_id', $authUserId)
+            //                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+            //                        $query->where('user_id', '<>', $authUserId)
+            //                            ->where('status', '<>', 'seen');
+            //                    }]);
+            //            },
         ])
             ->find($userId);
+    }
+
+    public function getUsersWithMedals($usersIds)
+    {
+
+        return User::with([
+            'packs',
+            'UserVip' => fn($q) => $q->with('OVip:id,img'),
+            'receiverLevel:id,img,level',
+            'senderLevel:id,img,level',
+            'chargeLevel:id,img,level',
+            'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
+            'profile',
+            'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
+            'shippingAgency:id,app_owner_id,name,img',
+
+        ])->whereIn('id', $usersIds)->get();
     }
 
     public function update_user_multi_images($user, $id, $src)

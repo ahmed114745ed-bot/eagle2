@@ -18,6 +18,8 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
 use App\Admin\Actions\MoveGiftCategory;
+
+use App\Admin\Actions\Grid\MoveGroupsGifts;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class GiftController extends MainController
@@ -212,9 +214,15 @@ class GiftController extends MainController
                 $actions->add(new MoveGiftCategory());
             }
         });
-
+        $grid->batchActions(function ($batch) {
+            $batch->disableDelete();
+            $batch->add(new MoveGroupsGifts());
+        });
         return $grid;
     }
+
+
+    
 
     /**
      * Make a show builder.
