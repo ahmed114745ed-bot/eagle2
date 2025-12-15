@@ -14,8 +14,8 @@ use App\Http\Resources\WareResource;
 use App\Http\Resources\WareResourceAll;
 use App\Http\Resources\WarePaddingResource;
 use App\Http\Resources\BestWareSaleResource;
+
 use App\Tik\Services\WalletStatisticService;
-use Modules\Public\Http\Services\UserCounterServices;
 
 
 class WalletController extends Controller
@@ -28,4 +28,6 @@ class WalletController extends Controller
         $data = $this->walletStatisticService->diamondsStatistic($user->id, $request->type, $request->startDate, $request->endDate, $request->perPage, $request->page);
         return Common::apiResponse(true, '', $data, 200, null, 'list');
     }
+
+ 
 }

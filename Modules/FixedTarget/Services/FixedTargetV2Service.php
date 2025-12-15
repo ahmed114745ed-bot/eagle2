@@ -3,10 +3,8 @@
 namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
-use App\Models\BDSallary;
 use App\Models\GiftLog;
 use App\Models\UsersJoinedAgency;
-use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;

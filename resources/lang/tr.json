@@ -104,6 +104,7 @@
 "Enable room cup Feature": "Oda kupa özelliğini etkinleştir",
 "Request under review!": "İstek inceleme altında!",
 "something got wrong": "Bir şeyler yanlış gitti",
+"exchange done successful": "Değişim başarıyla tamamlandı",
 "App owner profit": "Uygulama sahibinin kârı",
 "owner gift": "Sahibin hediyesi",
 "All Agencies around your region": "Bölgenizin çevresindeki tüm acenteler",
@@ -4160,8 +4161,22 @@
     "confirm_title": "Emin misiniz?",
     "confirm_text": "Onayladığınızda, bu hedefe ait tüm mevcut maaşlar kapatılacak, kullanıcıların kazandığı elmaslar hesaplanacak ve kalan elmaslarla yeni bir maaş dönemi başlayacaktır. Bu işlem geri alınamaz.",
     "confirm_button": "Onayla",
-    "cancel_button": "İptal"
-
+    "cancel_button": "İptal",
+  "User Withdrawals": "Kullanıcı Çekimleri",
+    "achieve_target": "Hedefi Başarmak",
+    "add_user_profit": ":target için kazanç",
+    "add_agency_profit": ":target için ajans kazancı",
+    "add_bd_profit": "BD için kazanç :admin",
+    "transfer_to": ":target'a transfer edildi",
+    "transfer_from": ":target'den transfer edildi",
+    "withdraw": ":admin tarafından çekildi",
+    "User Withdrawal": "Kullanıcı Çekimi",
+    "source:": "Kaynak:",
+    "wallet.add": "Hedef Başarısı",
+"wallet.subtract": "Çekim",
+"wallet.transfer": "Transfer"
+,
+    "gift:": "Hediye:","diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
 
 
 

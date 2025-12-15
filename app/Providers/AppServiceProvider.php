@@ -59,6 +59,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -103,6 +104,11 @@ class AppServiceProvider extends ServiceProvider
 
         Carbon::setWeekStartsAt(constant('Carbon\\Carbon::' . strtoupper($start)));
         Carbon::setWeekEndsAt(constant('Carbon\\Carbon::' . strtoupper($end)));
+        if (!Str::hasMacro('unescape')) {
+            Str::macro('unescape', function ($value) {
+                return htmlspecialchars_decode($value, ENT_QUOTES);
+            });
+        }
     }
 
     public function dashboardAdminConfig(): void
