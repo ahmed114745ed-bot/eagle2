@@ -1,7 +1,6 @@
 
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<!-- <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet"> -->
 <style>
 .floating-dots { position:absolute; inset:0; z-index:0; background: radial-gradient(circle, rgba(0,0,0,0.06) 2px, transparent 3px); background-size:40px 40px; animation: moveDots 40s linear infinite; opacity:0.6; pointer-events:none; }
 @keyframes moveDots { from { background-position:0 0;} to { background-position:400px 400px; } }
@@ -88,6 +87,12 @@
     font-size: 0.875rem;
     font-weight: 500;
 }
+#filterCard {
+    display: none;
+}
+#toggleFilter{
+    margin-bottom: 10px;
+}
 @media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
 </style>
 
@@ -97,24 +102,29 @@
 
     <div class="dashboard-wrap page-padding">
 
-        <div class="card p-3 mb-4" data-aos="fade-down">
+
+        <button id="toggleFilter" class="btn btn-dropbox 694015f1a711d-filter-btn mb-3">
+            {{ __('Filter') }}
+        </button>
+
+        <div id="filterCard" class="card p-3 mb-4" data-aos="fade-down">
             <div class="row g-2 align-items-end">
                 <div class="col-md-3">
-                    <label class="small text-muted">{{    __('From')}}</label>
+                    <label class="small text-muted">{{ __('From') }}</label>
                     <input type="date" id="from_date" class="form-control">
                 </div>
                 <div class="col-md-3">
-                    <label class="small text-muted">   {{  __('To')}} </label>
+                    <label class="small text-muted">{{ __('To') }}</label>
                     <input type="date" id="to_date" class="form-control">
                 </div>
-             
                 <div class="col-md-3">
                     <button id="applyFilter" class="btn btn-primary w-100">
-                     {{ __('Filter') }}
+                        {{ __('Filter') }}
                     </button>
                 </div>
             </div>
         </div>
+
 
             
         <div class="cards-container mb-4" data-aos="fade-up">
@@ -432,5 +442,14 @@ document.getElementById('applyFilter')?.addEventListener('click', () => {
 document.getElementById('filterChart')?.addEventListener('change', () => {
     loadFinanceCards();
     loadFinanceChart();
+});
+
+document.getElementById('toggleFilter').addEventListener('click', function() {
+    const card = document.getElementById('filterCard');
+    if (card.style.display === 'none' || card.style.display === '') {
+        card.style.display = 'block';
+    } else {
+        card.style.display = 'none';
+    }
 });
 </script>
