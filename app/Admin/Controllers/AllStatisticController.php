@@ -2,7 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Charge;
+use App\Helpers\Common;
+ use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\MonthlyDiamondReceive;
 use App\Models\User;
@@ -787,26 +788,44 @@ class AllStatisticController extends MainController
 
         public function financeCards(Request $request)
         {
-            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
-            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
+            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->startOfDay() ;
+            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->startOfDay();
 
-            $totalDiamonds = MonthlyDiamondReceive::when($from, fn($q) => $q->where('created_at','>=',$from))
-                                                ->when($to, fn($q) => $q->where('created_at','<=',$to))
-                                                ->sum('monthly_diamond_received');
+            $result = UserSallary::when($from, fn($q) => $q->where('created_at', '>=', $from))
+                     ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+                     ->selectRaw('
+                         SUM(pending_dollar) as total_dollars,
+                         SUM(agency_sallary) as total_agency_dollars,
+                         SUM(sallary) as total_user_dollars
+                     ')
+                     ->first();
+
+                $totalDollars       = $result->total_dollars ?? 0;
+                $totalAgencyDollars = $result->total_agency_dollars ?? 0;
+                $totalUserDollars   = $result->total_user_dollars ?? 0;
+
+                $totalTargets = $totalDollars + $totalAgencyDollars + $totalUserDollars;
 
             $totalCharges  = Charge::when($from, fn($q) => $q->where('created_at','>=',$from))
                                 ->when($to, fn($q) => $q->where('created_at','<=',$to))
-                                ->sum('amount');
+                                ->sum('usd');
 
             $totalPayments = CoinLog::when($from, fn($q) => $q->where('created_at','>=',$from))
                                     ->when($to, fn($q) => $q->where('created_at','<=',$to))
                                     ->sum('obtained_coins');
 
+            $totalGiftsValue = GiftLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
+                           ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+                           ->sum(\DB::raw('giftPrice * giftNum'));  
+                           
+            $rate = Common::getCoinsValue('user_coins');
+            $totalGiftsUsd  =   $totalGiftsValue  /$rate;
+
             return response()->json([
-                'total_balance' => $totalDiamonds,
+                'total_balance' => $totalTargets,
                 'pending_balance' => $totalCharges,
                 'available_balance' => $totalPayments,
-                'today_balance' => Charge::whereDate('created_at', now())->sum('amount'),
+                'today_balance' => $totalGiftsUsd
             ]);
         }
 
@@ -842,40 +861,31 @@ class AllStatisticController extends MainController
                 'withdrawals' => [] 
             ]);
         }
+    public function financeChartIndex(Request $request)
+    {
+        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->subDays(6)->startOfDay();
+        $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
+        $days = $request->query('days', null);
 
-        public function financeChartIndex(Request $request)
-        {
-            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
-            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
-            $days = $request->query('days', null);
+        $period = CarbonPeriod::create($from, $to);
 
-            $labels = [];
-            $values = [];
+        $values = array_fill_keys(
+            array_map(fn($d) => $d->format('Y-m-d'), iterator_to_array($period)),
+            0
+        );
 
-            if ($from && $to) {
-                $period = CarbonPeriod::create($from, $to);
-                foreach ($period as $day) {
-                    $labels[] = $day->format('d M');
-                    $values[] = Charge::whereDate('created_at', $day)->sum('amount');
-                }
-            } elseif ($days) {
-                $start = now()->subDays($days - 1);
-                for ($i = 0; $i < $days; $i++) {
-                    $day = $start->copy()->addDays($i);
-                    $labels[] = $day->format($days == 7 ? 'D' : 'd M');
-                    $values[] = Charge::whereDate('created_at', $day)->sum('amount');
-                }
-            } else {
-                for ($i = 1; $i <= 12; $i++) {
-                    $labels[] = Carbon::create(now()->year, $i, 1)->format('M');
-                    $values[] = Charge::whereYear('created_at', now()->year)
-                                    ->whereMonth('created_at', $i)
-                                    ->sum('amount');
-                }
-            }
+        $charges = Charge::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(usd) as total'))
+            ->whereBetween('created_at', [$from, $to])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->pluck('total', 'date')
+            ->toArray();
 
-            return response()->json(['labels'=>$labels,'values'=>$values]);
-        }
+        $values = array_merge($values, $charges);
 
+        $labels = array_map(fn($d) => Carbon::parse($d)->format($days == 7 ? 'D' : 'd M'), array_keys($values));
+        $values = array_values($values);
+
+        return response()->json(['labels'=>$labels,'values'=>$values]);
+    }
 
 }
