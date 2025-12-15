@@ -17,6 +17,8 @@
     "action": "Action",
     "Move switch gift": "Move",
 "total_balance": "Total Target",
+  "top_users_shipping":"Top Users Shipping",
+
   "pending_balance": "Total Shipments",
   "available_balance": "Total Payment Gateway Transactions",
   "today_balance": "Today Gifts",

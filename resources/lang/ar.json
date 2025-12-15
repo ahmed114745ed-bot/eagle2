@@ -12,6 +12,7 @@
     "Roles": "الادوار",
       "total_balance": "اجمالي التارجت ",
   "pending_balance": "اجمالي الشحنات",
+  "top_users_shipping":"المستخدمين الاكثر شحنا",
   "available_balance": "اجمالي عمليات بوابات الدفع",
   "today_balance": " هدايا اليوم",
   "shipments_revenue": "إيرادات الشحنات",

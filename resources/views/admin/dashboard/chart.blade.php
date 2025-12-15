@@ -484,7 +484,7 @@ img {
             </li>
         </ul>
 
-        <div class="tab-content"  id="statsTabContent" style="min-height: 900px;">
+        <div class="tab-content"  id="statsTabContent" style="min-height: 1450px;    ">
 
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 <div class="col-md-12">@include('admin.dashboard.widgets.overview_tab')</div>

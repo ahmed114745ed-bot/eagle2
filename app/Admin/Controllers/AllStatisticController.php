@@ -856,9 +856,29 @@ class AllStatisticController extends MainController
             //         'date' => $w->created_at->format('Y-m-d')
             //     ]);
             
+             $topUsers = \DB::table('charges')
+                    ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
+                    ->where('user_type', 'user')   
+                    ->groupBy('user_id')
+                    ->orderByDesc('total_usd')
+                    ->limit(5)
+                    ->get();
+
+                $users = $topUsers->map(function($u) {
+                    $user = \App\Models\User::find($u->user_id);
+
+                    return [
+                        'id' => $u->user_id,
+                        'name' => $user->name ?? 'غير معروف',
+                        'avatar' => getImagePath($user->profile?->avatar) ?? '/images/default-avatar.png',
+                        'total_usd' => $u->total_usd,
+                        'last_charge' => $u->last_charge,
+                    ];
+                });
             return response()->json([
                 'payments' => $payments,
-                'withdrawals' => [] 
+                'withdrawals' => [] ,
+                'topUsers' => $users
             ]);
         }
     public function financeChartIndex(Request $request)
@@ -887,5 +907,10 @@ class AllStatisticController extends MainController
 
         return response()->json(['labels'=>$labels,'values'=>$values]);
     }
+
+
+
+
+
 
 }
