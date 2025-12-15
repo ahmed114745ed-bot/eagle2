@@ -154,7 +154,7 @@
 .card-with{margin-top:20px;}
 
 #applyFilter{
-    margin-top: 12px  !important;
+    margin-top: 19px  !important;
 }
 @media (max-width: 992px) {
     .main-chart-container {
