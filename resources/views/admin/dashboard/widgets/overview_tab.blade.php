@@ -313,11 +313,11 @@ async function loadFinanceTables() {
         if (!Array.isArray(topUsers) || topUsers.length === 0) {
             console.warn('No top users found, displaying defaults.');
             topUsers = [
-                { name: "User 1", avatar: "/images/default-avatar.png" },
-                { name: "User 2", avatar: "/images/default-avatar.png" },
-                { name: "User 3", avatar: "/images/default-avatar.png" },
-                { name: "User 4", avatar: "/images/default-avatar.png" },
-                { name: "User 5", avatar: "/images/default-avatar.png" }
+                { name: "User 1", avatar: {{ asset('images/businessman-icon.jpg') }} },
+                { name: "User 2", avatar: {{ asset('images/businessman-icon.jpg') }} },
+                { name: "User 3", avatar: {{ asset('images/businessman-icon.jpg') }} },
+                { name: "User 4", avatar: {{ asset('images/businessman-icon.jpg') }} },
+                { name: "User 5", avatar: {{ asset('images/businessman-icon.jpg') }} }
             ];
         }
 
@@ -356,11 +356,11 @@ async function loadFinanceTables() {
         paymentsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
         withdrawalsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
         topUsersContainer.innerHTML = [
-            { name: "User 1", avatar: "/images/default-avatar.png" },
-            { name: "User 2", avatar: "/images/default-avatar.png" },
-            { name: "User 3", avatar: "/images/default-avatar.png" },
-            { name: "User 4", avatar: "/images/default-avatar.png" },
-            { name: "User 5", avatar: "/images/default-avatar.png" },
+            { name: "User 1", avatar: {{ asset('images/businessman-icon.jpg') }} },
+            { name: "User 2", avatar: {{ asset('images/businessman-icon.jpg') }} },
+            { name: "User 3", avatar: {{ asset('images/businessman-icon.jpg') }} },
+            { name: "User 4", avatar: {{ asset('images/businessman-icon.jpg') }} },
+            { name: "User 5", avatar: {{ asset('images/businessman-icon.jpg') }} },
         ].map(u => `
             <div class="user-card">
                 <img src="${u.avatar}" alt="${u.name}">
