@@ -57,7 +57,7 @@
 
 /* submenu animation: use height measured by JS but keep fallback */
 .crs-submenu{
-    overflow: hidden;
+    /*overflow: hidden;*/
     max-height: 0;
     opacity: 0;
     transform: translateY(-8px);

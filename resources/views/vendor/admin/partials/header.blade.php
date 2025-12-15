@@ -3,7 +3,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
-    <link rel="stylesheet" href="{{ asset('css/desktop.css') }}" media="screen and (min-width: 1200px)">
+<link rel="stylesheet" href="{{ asset('css/desktop.css') }}" media="screen and (min-width: 1200px)">
 
 <script>
     window.PUSHER_CONFIG = @json(config('broadcasting.connections.pusher'));
@@ -23,11 +23,10 @@
 </script>
 
 
-
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
-     :root {
+    :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
         --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
         --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
@@ -64,280 +63,290 @@
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-         --crs-red-hover: #e74c3c;
-        --crs-white-faint: rgba(255,255,255,0.06);
-        --crs-white-faint-2: rgba(255,255,255,0.16);
+        --crs-red-hover: #e74c3c;
+        --crs-white-faint: rgba(255, 255, 255, 0.06);
+        --crs-white-faint-2: rgba(255, 255, 255, 0.16);
         --crs-transition: 320ms;
-        --crs-ease: cubic-bezier(0.25,0.8,0.25,1);
+        --crs-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
         --crs-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
- </style>
+</style>
 
 </script>
 
-   <style>
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
 
+    .modal-no {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        animation: modal-appear 0.3s ease-out;
+    }
+
+    @keyframes modal-appear {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal-header {
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+
+    .rtl .modal-header {
+        display: block !important;
+    }
+
+    .rtl .close {
+        float: left;
+    }
+
+    .modal-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6c757d;
+        transition: color 0.2s;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        color: #343a40;
+    }
+
+    .modal-body2 {
+        padding: 0;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f3f4;
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .notification-item.unread {
+        background-color: #e7f1ff;
+    }
+
+    .notification-item.unread:hover {
+        background-color: #dbe9fd;
+    }
+
+    .notification-title {
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: #212529;
+    }
+
+    .notification-time {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-top: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+
+    .btn-footer {
+        border-radius: 6px;
+        font-weight: 500;
+        padding: 8px 16px;
+        transition: all 0.2s;
+    }
+
+    .btn-mark-all {
+        background-color: var(--primary-color);
+        border: 1px solid #0d6efd;
+        color: white;
+    }
+
+    .btn-mark-all:hover {
+        background-color: var(--primary-color);
+        border-color: #0a58ca;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+    }
+
+    .btn-show-more {
+        background-color: var(--primary-color);
+        border: 1px solid #6c757d;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-show-more:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+    }
+
+    .btn-show-more i {
+        margin-left: 6px;
+        font-size: 0.9em;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .p-3 {
+        padding: 1rem !important;
+    }
+
+    #preview-buttons-wrapper {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
         .modal-no {
-            background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            animation: modal-appear 0.3s ease-out;
-        }
-
-        @keyframes modal-appear {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid #e9ecef;
-            background-color: #f8f9fa;
-        }
-
-        .rtl .modal-header {
-            display: block !important;
-        }
-
-        .rtl .close {
-            float: left;
-        }
-
-        .modal-header h5 {
-            margin: 0;
-            font-weight: 600;
-            color: #343a40;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #6c757d;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: #343a40;
-        }
-
-        .modal-body2 {
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            padding: 14px 20px;
-            border-bottom: 1px solid #f1f3f4;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .notification-item.unread {
-            background-color: #e7f1ff;
-        }
-
-        .notification-item.unread:hover {
-            background-color: #dbe9fd;
-        }
-
-        .notification-title {
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #212529;
-        }
-
-        .notification-time {
-            font-size: 0.85rem;
-            color: #6c757d;
+            width: 95%;
         }
 
         .modal-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-top: 1px solid #e9ecef;
-            background-color: #f8f9fa;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .btn-footer {
-            border-radius: 6px;
-            font-weight: 500;
-            padding: 8px 16px;
-            transition: all 0.2s;
-        }
-
-        .btn-mark-all {
-            background-color: var(--primary-color);
-            border: 1px solid #0d6efd;
-            color: white;
-        }
-
-        .btn-mark-all:hover {
-            background-color: var(--primary-color);
-            border-color: #0a58ca;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
-        }
-
-        .btn-show-more {
-            background-color: var(--primary-color);
-            border: 1px solid #6c757d;
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .btn-show-more:hover {
-            background-color:var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
-        }
-
-        .btn-show-more i {
-            margin-left: 6px;
-            font-size: 0.9em;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-muted {
-            color: #6c757d !important;
-        }
-
-        .p-3 {
-            padding: 1rem !important;
-        }
-
-        #preview-buttons-wrapper {
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 576px) {
-            .modal-no {
-                width: 95%;
-            }
-
-            .modal-footer {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .btn-footer {
-                width: 100%;
-            }
-        }
-
-         .logo:hover {
-                background-color: none !important;
-            }
-
-            .logo:hover {
-            background-color: inherit !important;
-        }
-
-        .main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            z-index: 9999;
         }
-        .menu-link {
-                opacity: 1 !important;
-            }
+    }
+
+    .logo:hover {
+        background-color: none !important;
+    }
+
+    .logo:hover {
+        background-color: inherit !important;
+    }
+
+    .main-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9999;
+    }
+
+    .menu-link {
+        opacity: 1 !important;
+    }
+
+    .logo {
+        box-shadow: none !important;
+        box-shadow: none !important;
+        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+    }
+
+    .skin-black-light .main-header {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        margin-bottom: 13px !important;
+    }
+
+    .skin-black-light .sidebar a {
+        margin-right: 18%;
+    }
+
+    @media (max-width: 767px) {
 
         .logo {
-            box-shadow: none !important;
-            box-shadow: none !important; background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+            display: none !important;
         }
 
-        .skin-black-light .main-header {
-            -webkit-box-shadow: none !important;
-            box-shadow: none !important;
-            margin-bottom: 13px !important;
+        .select-country-wrapper {
+            display: none !important;
         }
-             @media (max-width: 767px) {
+    }
 
-            .logo{
-                display: none !important;
-            }
-            .select-country-wrapper{
-                display: none !important;
-            }
-}
+    #mobileSelectBtn {
+        display: none;
+    }
 
-            #mobileSelectBtn {
-                    display: none;
-                }
-            .mobile-select-toggle{
-                display: none;
+    .mobile-select-toggle {
+        display: none;
 
-            }
-            @media (max-width: 768px) {
-                #preview-buttons-wrapper,
-                #preview-buttons-wrapper li,
-                #preview-buttons-wrapper button {
-                    display: none !important;
-                }
-            }
+    }
 
-            @media (max-width: 768px) {
-                .mobile-preview-buttons {
-                    display: block;
-                }
-            }
+    @media (max-width: 768px) {
+        #preview-buttons-wrapper,
+        #preview-buttons-wrapper li,
+        #preview-buttons-wrapper button {
+            display: none !important;
+        }
+    }
 
-            @media (min-width: 769px) {
-                .mobile-preview-buttons {
-                    display: none !important;
-                }
-            }
+    @media (max-width: 768px) {
+        .mobile-preview-buttons {
+            display: block;
+        }
+    }
 
-            .mobile-preview-buttons button {
-                width: 100%;
-                text-align: center;
-                margin-bottom: 10px;
-                border-radius: 6px;
-            }
-    </style>
+    @media (min-width: 769px) {
+        .mobile-preview-buttons {
+            display: none !important;
+        }
+    }
+
+    .mobile-preview-buttons button {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+        border-radius: 6px;
+    }
+</style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
 
@@ -352,12 +361,12 @@
 
             @if(!empty($logo))
                 <img src="{{ $logo }}"
-                    alt="{{ $appName }}"
-                    class="h-12 w-12 object-contain rounded-circle"
-                    style="height: 95%;  width: 89%; border-radius:50%;">
+                     alt="{{ $appName }}"
+                     class="h-12 w-12 object-contain rounded-circle"
+                     style="height: 95%;  width: 89%; border-radius:50%;">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
-                    style="height:32px;width:32px;font-weight:bold;">
+                      style="height:32px;width:32px;font-weight:bold;">
                     {{ strtoupper(substr($appName, 0, 1)) }}
                 </span>
             @endif
@@ -472,43 +481,46 @@
                         @endforeach
                     </select>
 
-                      @if (request()->is('areaManager*'))
-                            <a class="nav-item select-country">
-                                <select id="country-select" class="form-control" style="margin: 6% 0%;">
-                                    <option value="">{{ __('Select Country...') }}</option>
-                                    @foreach($areaManagerCountries as $currentCountry)
-                                        <option
-                                            value="{{ $currentCountry->id }}"
-                                            data-flag="{{ getImagePath($currentCountry->flag) }}"
-                                            {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
-                                            {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </a>
+                    @if (request()->is('areaManager*'))
+                        <a class="nav-item select-country">
+                            <select id="country-select" class="form-control" style="margin: 6% 0%;">
+                                <option value="">{{ __('Select Country...') }}</option>
+                                @foreach($areaManagerCountries as $currentCountry)
+                                    <option
+                                        value="{{ $currentCountry->id }}"
+                                        data-flag="{{ getImagePath($currentCountry->flag) }}"
+                                        {{ (string)$selectedAreaManagerCountryId === (string)$currentCountry->id ? 'selected' : '' }}>
+                                        {{app()->getLocale() === 'ar' ?  $currentCountry->name :$currentCountry->e_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </a>
                     @endif
 
-                     @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
-                            @if (request()->is('admin*'))
-                                <button id="preview-superadmin-btn-mobile" class="btn btn-default btn-block" style="margin: 6% 0%;">
-                                    <i class="fa fa-eye"></i> {{ __('go to the country') }}
-                                </button>
-                            @endif
-                        @elseif(!session('preview_area_manager')  && session('area_manager_id') )
-                            @if (request()->is('admin*'))
-                                <button id="preview-area-manger-btn-mobile" class="btn btn-default btn-block" style="margin: 6% 0%;">
-                                    <i class="fa fa-eye"></i> {{ __('go to the preview') }}
-                                </button>
-                            @endif
+                    @if(!session('preview_superadmin') && session('filter_country_id') && !session('area_manager_id'))
+                        @if (request()->is('admin*'))
+                            <button id="preview-superadmin-btn-mobile" class="btn btn-default btn-block"
+                                    style="margin: 6% 0%;">
+                                <i class="fa fa-eye"></i> {{ __('go to the country') }}
+                            </button>
                         @endif
+                    @elseif(!session('preview_area_manager')  && session('area_manager_id') )
+                        @if (request()->is('admin*'))
+                            <button id="preview-area-manger-btn-mobile" class="btn btn-default btn-block"
+                                    style="margin: 6% 0%;">
+                                <i class="fa fa-eye"></i> {{ __('go to the preview') }}
+                            </button>
+                        @endif
+                    @endif
 
-                        @if(session('preview_superadmin') || session('preview_area_manager'))
-                            @if (request()->is('admin*'))
-                                <button id="exit-preview-btn-mobile" class="btn btn-danger btn-block mt-2" style="margin: 6% 0%;">
-                                    <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
-                                </button>
-                            @endif
+                    @if(session('preview_superadmin') || session('preview_area_manager'))
+                        @if (request()->is('admin*'))
+                            <button id="exit-preview-btn-mobile" class="btn btn-danger btn-block mt-2"
+                                    style="margin: 6% 0%;">
+                                <i class="fa fa-times"></i> {{ __('Back to the main dashboard') }}
+                            </button>
                         @endif
+                    @endif
                 </div>
             </div>
         @endif
@@ -532,7 +544,7 @@
 
 
         <ul class="nav navbar-nav hidden-sm visible-lg-block">
-        {!! Admin::getNavbar()->render('left') !!}
+            {!! Admin::getNavbar()->render('left') !!}
         </ul>
 
         <div class="navbar-custom-menu">
@@ -546,28 +558,28 @@
 
             <ul class="nav navbar-nav">
 
-            <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
-        @if (!Admin::user()->type || Admin::user()->type == '')
+                <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
+                    @if (!Admin::user()->type || Admin::user()->type == '')
 
-                @endif
+                    @endif
 
 
-                @php
-                    $admin = Auth::user();
+                    @php
+                        $admin = Auth::user();
 
-                @endphp
+                    @endphp
 
-                @if (empty($admin->type))
-                    @include('admin.notifications.admin')
-                @endif
+                    @if (empty($admin->type))
+                        @include('admin.notifications.admin')
+                    @endif
 
-                @if ($admin->type == 'superadmin')
+                    @if ($admin->type == 'superadmin')
 
-                   @include('SuperAdmin::notifications.super')
+                        @include('SuperAdmin::notifications.super')
 
-                @endif
+                    @endif
 
-            </ul>
+                </ul>
                 {!! Admin::getNavbar()->render() !!}
 
                 <li class="dropdown user user-menu">
@@ -586,16 +598,20 @@
                         <li class="user-footer">
                             <div class="pull-left">
                                 @if (Admin::user()->type == 'bd')
-                                    <a href="{{ bd_url('setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
+                                    <a href="{{ bd_url('setting') }}"
+                                       class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
                                 @else
-                                    <a href="{{ admin_url('auth/setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
+                                    <a href="{{ admin_url('auth/setting') }}"
+                                       class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
                                 @endif
                             </div>
                             <div class="pull-right">
                                 @if (Admin::user()->type == 'bd')
-                                    <a href="{{ bd_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                                    <a href="{{ bd_url('/logout') }}"
+                                       class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
                                 @else
-                                    <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                                    <a href="{{ admin_url('auth/logout') }}"
+                                       class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
                                 @endif
                             </div>
                         </li>
@@ -640,18 +656,18 @@
 
 <script>
 
-     $('.container-refresh').off('click').on('click', function() {
+    $('.container-refresh').off('click').on('click', function () {
         location.reload();
-        toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass:"toast-top-center"});
+        toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass: "toast-top-center"});
     });
     $('#area-Manager-select-mobile').on('change', function () {
-    const val = $(this).val();
+        const val = $(this).val();
         $('#area-Manager-select').val(val).trigger('change');
     });
 
     $('#country-select-mobile').on('change', function () {
         const val = $(this).val();
-        $('#country-select').val(val).trigger('change'); 
+        $('#country-select').val(val).trigger('change');
     });
 
 
@@ -661,11 +677,11 @@
         const isPreviewSuperadmin = @json(session('preview_superadmin'));
         const isPreviewAreaManager = @json(session('preview_area_manager'));
 
-          $('#area-Manager-select').select2({
-                placeholder: '{{ __("Select area manager") }}',
-                allowClear: true,
-                width: '190px'
-            });
+        $('#area-Manager-select').select2({
+            placeholder: '{{ __("Select area manager") }}',
+            allowClear: true,
+            width: '190px'
+        });
 
         $AreaManagerSelect.on('change', function () {
             const $this = $(this);
@@ -678,7 +694,7 @@
 
                 if ($.pjax) {
                     setTimeout(() => {
-                        $.pjax({ url: url.toString(), container: '#pjax-container' });
+                        $.pjax({url: url.toString(), container: '#pjax-container'});
                     }, 1);
                 } else {
                     window.location.href = url.toString();
@@ -703,7 +719,7 @@
             //         $.pjax({url: url.toString(), container: '#pjax-container'});
             //     }, 1);
             // } else {
-                window.location.href = url.toString();
+            window.location.href = url.toString();
             // }
         });
 
@@ -713,7 +729,9 @@
                 allowClear: true,
                 templateResult: formatCountry,
                 templateSelection: formatCountry,
-                escapeMarkup: function (markup) { return markup; }
+                escapeMarkup: function (markup) {
+                    return markup;
+                }
             });
 
             $countrySelect.on('change', function () {
@@ -727,7 +745,7 @@
 
                     if ($.pjax) {
                         setTimeout(() => {
-                            $.pjax({ url: url.toString(), container: '#pjax-container' });
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
                         }, 1);
                     } else {
                         window.location.href = url.toString();
@@ -754,7 +772,7 @@
             });
 
             @if(request()->is('areaManager*'))
-                $countrySelect.on('change', function () {
+            $countrySelect.on('change', function () {
                 const $this = $(this);
                 if (!$this.val()) {
                     setTimeout(() => $this.select2('close'), 0);
@@ -765,7 +783,7 @@
 
                     if ($.pjax) {
                         setTimeout(() => {
-                            $.pjax({ url: url.toString(), container: '#pjax-container' });
+                            $.pjax({url: url.toString(), container: '#pjax-container'});
                         }, 1);
                     } else {
                         window.location.href = url.toString();
@@ -773,25 +791,25 @@
                     return;
                 }
 
-                    const countryId = $(this).val();
-                    const url = new URL(window.location.href);
+                const countryId = $(this).val();
+                const url = new URL(window.location.href);
 
-                    if (countryId && countryId !== 'null') {
-                        url.searchParams.set('area_manager_country_id', countryId);
-                        url.searchParams.delete('clear_area_manager_country');
-                    } else {
-                        url.searchParams.set('clear_area_manager_country', 1);
-                        url.searchParams.delete('area_manager_country_id');
-                    }
+                if (countryId && countryId !== 'null') {
+                    url.searchParams.set('area_manager_country_id', countryId);
+                    url.searchParams.delete('clear_area_manager_country');
+                } else {
+                    url.searchParams.set('clear_area_manager_country', 1);
+                    url.searchParams.delete('area_manager_country_id');
+                }
 
-                    if ($.pjax) {
-                        setTimeout(() => {
-                            $.pjax({url: url.toString(), container: '#pjax-container'});
-                        }, 1);
-                    } else {
-                        window.location.href = url.toString();
-                    }
-                });
+                if ($.pjax) {
+                    setTimeout(() => {
+                        $.pjax({url: url.toString(), container: '#pjax-container'});
+                    }, 1);
+                } else {
+                    window.location.href = url.toString();
+                }
+            });
             @endif
         }
 
@@ -838,7 +856,7 @@
             previewBtn.addEventListener('click', function () {
                 fetch('/admin/set-preview-superadmin', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
+                    headers: {'X-CSRF-TOKEN': csrf}
                 }).then(() => window.location.reload());
             });
         }
@@ -856,28 +874,28 @@
             previewBtnArea.addEventListener('click', function () {
                 fetch('/admin/set-preview-area-manager', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
+                    headers: {'X-CSRF-TOKEN': csrf}
                 }).then(() => window.location.reload());
             });
         }
 
-    if (exitBtn) {
-        if (isPreviewSuperadmin) {
-            exitBtn.addEventListener('click', function () {
-                fetch('/admin/unset-preview-superadmin', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
-        } else if (isPreviewAreaManager) {
-            exitBtn.addEventListener('click', function () {
-                fetch('/admin/unset-preview-area-manager', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf }
-                }).then(() => window.location.reload());
-            });
+        if (exitBtn) {
+            if (isPreviewSuperadmin) {
+                exitBtn.addEventListener('click', function () {
+                    fetch('/admin/unset-preview-superadmin', {
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': csrf}
+                    }).then(() => window.location.reload());
+                });
+            } else if (isPreviewAreaManager) {
+                exitBtn.addEventListener('click', function () {
+                    fetch('/admin/unset-preview-area-manager', {
+                        method: 'POST',
+                        headers: {'X-CSRF-TOKEN': csrf}
+                    }).then(() => window.location.reload());
+                });
+            }
         }
-    }
 
 
     });
@@ -887,9 +905,11 @@
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         line-height: 25px;
     }
-    .rtl .select2-container--default .select2-selection--single .select2-selection__clear{
+
+    .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
         left: 5px !important;
     }
+
     .select2-container .select2-selection--single .select2-selection__rendered img {
         margin-right: 5px;
         vertical-align: middle;
@@ -897,25 +917,22 @@
 </style>
 
 
-
-
-
 <script>
-    window.handleNotificationClick = function(id, url) {
+    window.handleNotificationClick = function (id, url) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         if (!id) return;
 
-            fetch(`/admin/notifications/mark-as-read/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin',
-            })
+        fetch(`/admin/notifications/mark-as-read/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+        })
             .then(res => res.json())
             .then(data => {
                 const el = document.querySelector(`.notification-item[data-id='${id}']`);
@@ -931,22 +948,21 @@
     };
 
 
-
-    window.superAdminhandleNotificationClick = function(id, url) {
+    window.superAdminhandleNotificationClick = function (id, url) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
         if (!id) return;
 
-            fetch(`/superadmin/notifications/mark-as-read/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'same-origin',
-            })
+        fetch(`/superadmin/notifications/mark-as-read/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+        })
             .then(res => res.json())
             .then(data => {
                 const el = document.querySelector(`.notification-item[data-id='${id}']`);
@@ -1002,7 +1018,9 @@
                     allowClear: true,
                     templateResult: formatCountry,
                     templateSelection: formatCountry,
-                    escapeMarkup: function (markup) { return markup; }
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
                 });
 
                 // Remove any existing change handlers to prevent duplicates
@@ -1026,7 +1044,7 @@
 
                         if ($.pjax) {
                             setTimeout(() => {
-                                $.pjax({ url: url.toString(), container: '#pjax-container' });
+                                $.pjax({url: url.toString(), container: '#pjax-container'});
                             }, 1);
                         } else {
                             window.location.href = url.toString();
@@ -1068,21 +1086,21 @@
     })
 
     document.addEventListener("DOMContentLoaded", function () {
-    const mobileBtn = document.getElementById("mobileSelectBtn");
-    const mobileMenu = document.getElementById("mobileSelectMenu");
+        const mobileBtn = document.getElementById("mobileSelectBtn");
+        const mobileMenu = document.getElementById("mobileSelectMenu");
 
-    if (mobileBtn) {
-        mobileBtn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            mobileMenu.classList.toggle("show");
-        });
-    }
-
-    document.addEventListener("click", function (e) {
-        if (!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
-            mobileMenu.classList.remove("show");
+        if (mobileBtn) {
+            mobileBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle("show");
+            });
         }
+
+        document.addEventListener("click", function (e) {
+            if (!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
+                mobileMenu.classList.remove("show");
+            }
+        });
     });
-});
 
 </script>
