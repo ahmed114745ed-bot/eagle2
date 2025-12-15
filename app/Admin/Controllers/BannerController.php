@@ -10,6 +10,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\UploadedFile;
 
 class   BannerController extends MainController
 {
@@ -164,17 +165,21 @@ class   BannerController extends MainController
 
     $form->saving(function (Form $form) {
 
-        if (request()->hasFile('image_url')) {
+        if ($form->image_url instanceof UploadedFile) {
 
-            $path = WebPHelper::uploadWebp(
-                request()->file('image_url'),
-                'banners',       
-                'banner',        
-                              
-            );
+                if ($form->model()->image_url) {
+                    \Storage::delete($form->model()->image_url);
+                }
 
-            $form->image_url = $path;
-        }
+                $path = WebPHelper::uploadWebp(
+                    $form->image_url, 
+                    'banners',
+                    'banner',
+                
+                );
+
+                $form->image_url = $path;
+            }
     });
         return $form;
     }
