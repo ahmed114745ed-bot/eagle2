@@ -143,7 +143,7 @@ class   BannerController extends MainController
         $form = new Form(new Banner());
         $this->disableFormTools($form);
 
-          $form->image('image_url', __('Image url'))
+          $form->imagePath('image_url', __('Image url'))
          ->required();
 
         $form->switch('publish', __('Publish Now'));
@@ -163,21 +163,7 @@ class   BannerController extends MainController
             ]);
         });
 
-    $form->saving(function (Form $form) {
-
-       if ($form->image_url instanceof UploadedFile) {
-
-            if ($form->model()->image_url) {
-                \Storage::delete($form->model()->image_url);
-            }
-
-            $form->image_url = WebPHelper::uploadWebp(
-                $form->image_url, 
-                'banners',        
-                'banner',         
-            );
-        }
-    });
+    
         return $form;
     }
 }
