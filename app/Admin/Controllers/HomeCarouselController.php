@@ -190,7 +190,7 @@ class HomeCarouselController extends MainController
     {
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
-        $form->image('img', trans('img'))
+        $form->imagePath('img', trans('img'))
             /**->setResolution(80)*/
             ->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
