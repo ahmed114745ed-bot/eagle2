@@ -365,7 +365,7 @@ body {
     background: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    padding: 20px;
+    padding-top: 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
 }
@@ -484,11 +484,10 @@ img {
             </li>
         </ul>
 
-        <div class="tab-content" id="statsTabContent">
+        <div class="tab-content"  id="statsTabContent" style="min-height: 900px;">
+
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-
                 <div class="col-md-12">@include('admin.dashboard.widgets.overview_tab')</div>
-
             </div>
 
             <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
