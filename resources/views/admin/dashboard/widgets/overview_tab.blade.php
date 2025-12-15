@@ -52,7 +52,7 @@
     min-height: 2000px  !important;
 }
 .CardwalletLogsTable{
-    overflow: scroll;
+    overflow: scroll !important;
 }
 @media (max-width: 992px) {
     .main-chart-container {
