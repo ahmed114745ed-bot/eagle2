@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\Common;
+use App\Helpers\WebPHelper;
 use App\Models\Profile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,6 @@ use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
-use WebPHelper;
 
 class ProfileService
 {
