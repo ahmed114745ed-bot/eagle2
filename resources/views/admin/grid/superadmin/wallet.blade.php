@@ -315,7 +315,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         </div>
 
         @php
-                $rate = App\Helpers\Common::getCoinsValue('shipping_coins'); // e.g. 10 coins per dollar
+                $shippingRate = App\Helpers\Common::getCoinsValue('shipping_coins');
+                $superAdminRate = App\Helpers\Common::getCoinsValue('super_admin_coins');
             @endphp
 
             <div class="form-group">
@@ -362,7 +363,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 <script>
 
 
-    const rate = {{ $rate ?? 1 }}; // fallback 1 if null
+    // const rate = {{ $rate ?? 1 }}; // fallback 1 if null
+     let shippingRate = {{ $shippingRate ?? 1 }};
+    let superAdminRate = {{ $superAdminRate ?? 1 }};
+      let currentRate = superAdminRate;
 
     function updateChargeInputLabel() {
         const type = document.getElementById('charge_type').value;
@@ -382,24 +386,53 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         document.getElementById('amount').value = '';
     }
 
+    // function updateConvertedAmount() {
+    //     const amount = parseFloat(document.getElementById('amount').value) || 0;
+    //     const type = document.getElementById('charge_type').value;
+    //     const result = amount * currentRate;
+    //     const invResult = amount / currentRate;
+    //     const output = document.getElementById('convertedAmount');
+
+    //     if (amount > 0) {
+    //         output.style.display = 'block';
+    //         if (type === 'dollar') {
+    //             output.textContent = `= ${result.toFixed(2)} 🪙`;
+    //         } else {
+    //             output.textContent = `≈ ${invResult.toFixed(2)} 💲`;
+    //         }
+    //     } else {
+    //         output.style.display = 'none';
+    //     }
+    // }
+
+        function updateRate() {
+        const targetType = document.getElementById('target_type').value;
+        currentRate = targetType === 'user' ? superAdminRate : shippingRate;
+        updateConvertedAmount(); // recalc after changing rate
+    }
+
     function updateConvertedAmount() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         const type = document.getElementById('charge_type').value;
-        const result = amount * rate;
-        const invResult = amount / rate;
         const output = document.getElementById('convertedAmount');
 
         if (amount > 0) {
             output.style.display = 'block';
             if (type === 'dollar') {
-                output.textContent = `= ${result.toFixed(2)} 🪙`;
+                const coins = amount * currentRate;
+                output.textContent = `≈ ${coins.toFixed(2)} 🪙`;
             } else {
-                output.textContent = `≈ ${invResult.toFixed(2)} 💲`;
+                const dollars = amount / currentRate;
+                output.textContent = `≈ $${dollars.toFixed(2)}`;
             }
         } else {
             output.style.display = 'none';
         }
     }
+
+    // Initialize default rate
+    updateRate();
+
 
     function openChargeModal() {
         document.getElementById('chargeModal').style.display = 'block';
