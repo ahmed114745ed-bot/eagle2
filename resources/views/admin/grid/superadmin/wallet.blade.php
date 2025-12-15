@@ -405,17 +405,14 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     //     }
     // }
 
-        function updateRate() {
-        const targetType = document.getElementById('target_type').value;
-        currentRate = targetType === 'user' ? superAdminRate : shippingRate;
-        console.log('Target type:', targetType, 'Current rate:', currentRate);
-        updateConvertedAmount(); // recalc after changing rate
-    }
 
     function updateConvertedAmount() {
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         const type = document.getElementById('charge_type').value;
         const output = document.getElementById('convertedAmount');
+        const targetType = document.getElementById('target_type').value;
+        currentRate = targetType === 'user' ? superAdminRate : shippingRate;
+        console.log('Target type:', targetType, 'Current rate:', currentRate);
 
         if (amount > 0) {
             output.style.display = 'block';
@@ -433,8 +430,6 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         }
     }
 
-    // Initialize default rate
-    updateRate();
 
 
     function openChargeModal() {
