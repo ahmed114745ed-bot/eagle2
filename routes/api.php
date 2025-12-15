@@ -1,13 +1,12 @@
 <?php
 
-use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Events\PublicTestEvent;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
-use App\Events\PublicTestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -28,6 +27,7 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
+use App\Http\Controllers\TestDiamondController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -66,6 +66,7 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
