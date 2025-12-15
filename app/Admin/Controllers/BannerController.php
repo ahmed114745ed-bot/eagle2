@@ -143,9 +143,9 @@ class   BannerController extends MainController
         $form = new Form(new Banner());
         $this->disableFormTools($form);
 
-        $form->image('image_url', __('Image url'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->required()->dir('banners');
+          $form->image('image_url', __('Image url'))
+         ->required();
+
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
@@ -165,21 +165,18 @@ class   BannerController extends MainController
 
     $form->saving(function (Form $form) {
 
-        if ($form->image_url instanceof UploadedFile) {
+       if ($form->image_url instanceof UploadedFile) {
 
-                if ($form->model()->image_url) {
-                    \Storage::delete($form->model()->image_url);
-                }
-
-                $path = WebPHelper::uploadWebp(
-                    $form->image_url, 
-                    'banners',
-                    'banner',
-                
-                );
-
-                $form->image_url = $path;
+            if ($form->model()->image_url) {
+                \Storage::delete($form->model()->image_url);
             }
+
+            $form->image_url = WebPHelper::uploadWebp(
+                $form->image_url, 
+                'banners',        
+                'banner',         
+            );
+        }
     });
         return $form;
     }
