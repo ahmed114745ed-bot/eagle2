@@ -273,6 +273,7 @@ async function loadFinanceTables() {
     try {
         const res = await fetch('/admin/dashboard/finance/tables');
         console.log('Finance tables API status:', res.status);
+       const defaultAvatar = "{{ asset('images/businessman-icon.jpg') }}";
 
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 
@@ -313,11 +314,11 @@ async function loadFinanceTables() {
         if (!Array.isArray(topUsers) || topUsers.length === 0) {
             console.warn('No top users found, displaying defaults.');
             topUsers = [
-                { name: "User 1", avatar: {{ asset('images/businessman-icon.jpg') }} },
-                { name: "User 2", avatar: {{ asset('images/businessman-icon.jpg') }} },
-                { name: "User 3", avatar: {{ asset('images/businessman-icon.jpg') }} },
-                { name: "User 4", avatar: {{ asset('images/businessman-icon.jpg') }} },
-                { name: "User 5", avatar: {{ asset('images/businessman-icon.jpg') }} }
+                { name: "User 1", avatar: defaultAvatar },
+                { name: "User 2", avatar: defaultAvatar },
+                { name: "User 3", avatar: defaultAvatar },
+                { name: "User 4", avatar: defaultAvatar },
+                { name: "User 5", avatar: defaultAvatar }
             ];
         }
 
@@ -356,11 +357,11 @@ async function loadFinanceTables() {
         paymentsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
         withdrawalsTbody.innerHTML = `<tr><td colspan="5" class="text-center">لا توجد بيانات</td></tr>`;
         topUsersContainer.innerHTML = [
-            { name: "User 1", avatar: {{ asset('images/businessman-icon.jpg') }} },
-            { name: "User 2", avatar: {{ asset('images/businessman-icon.jpg') }} },
-            { name: "User 3", avatar: {{ asset('images/businessman-icon.jpg') }} },
-            { name: "User 4", avatar: {{ asset('images/businessman-icon.jpg') }} },
-            { name: "User 5", avatar: {{ asset('images/businessman-icon.jpg') }} },
+            { name: "User 1", avatar: defaultAvatar },
+            { name: "User 2", avatar: defaultAvatar },
+            { name: "User 3", avatar: defaultAvatar },
+            { name: "User 4", avatar: defaultAvatar },
+            { name: "User 5", avatar: defaultAvatar },
         ].map(u => `
             <div class="user-card">
                 <img src="${u.avatar}" alt="${u.name}">
