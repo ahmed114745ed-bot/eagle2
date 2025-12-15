@@ -242,10 +242,11 @@
 
 @keyframes pulseActive {
     0%, 100% {
-        box-shadow: 0 0 0 0 var(--secondary-color);
+        box-shadow: 0 0 0 0 var(--primary-color);
     }
     50% {
-        box-shadow: 0 0 0 1px var(--secondary-color);
+        box-shadow: 0 0 0 1px var(--primary-color);
+        filter: brightness(0.50);
     }
 }
 
@@ -260,7 +261,7 @@
     border-radius: 10px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    box-shadow: 0 0 20px var(--secondary-color);
+    box-shadow: 0 0 20px var(--primary-color);
     pointer-events: none;
 }
 
