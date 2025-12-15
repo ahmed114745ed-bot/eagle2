@@ -2034,6 +2034,19 @@
         }
     }
 
+    .navbar.navbar-static-top {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1030;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .navbar.navbar-static-top.navbar-hidden {
+        transform: translateY(-100%);
+    }
+
     /* form inputs */
     .form-horizontal .fields-group > .col-md-12 {
         display: grid !important;
