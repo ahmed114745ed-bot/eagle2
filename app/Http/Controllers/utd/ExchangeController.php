@@ -6,8 +6,8 @@ use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\ExchangeService;
 use Illuminate\Support\Facades\Validator;
+use Modules\UsersWallet\Services\ExchangeService;
 
 class ExchangeController extends Controller
 {

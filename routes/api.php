@@ -43,7 +43,6 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
@@ -605,9 +604,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
-            Route::prefix('wallet')->group(function () {
-                Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
-            });
+          
 
 
             Route::prefix('banners')->group(function () {
