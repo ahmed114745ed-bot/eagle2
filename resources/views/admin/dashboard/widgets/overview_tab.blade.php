@@ -152,7 +152,27 @@
 }
 .card-trans{min-height: 370px;}
 .card-with{margin-top:20px;}
+@media (max-width: 992px) {
+    .main-chart-container {
+        min-height: 300px;
+    }
+}
 
+@media (max-width: 600px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .chart-container {
+        height: 250px !important;
+    }
+    .chart-title {
+        font-size: 1rem;
+    }
+    #applyFilter{
+            margin-top: 12px  !important;
+    }
+}
 @media (max-width:600px){ .cards-container{ grid-template-columns:1fr; } }
 </style>
 
