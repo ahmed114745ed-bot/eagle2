@@ -39,6 +39,7 @@
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         --gradient-primary: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%);
+        --gradient-vertical-primary: linear-gradient(180deg, var(--gray-50) 0%, var(--secondary-color) 100%);
     }
 
     /* .col-sm-8 {
@@ -667,8 +668,8 @@
 
     .skin-black-light .sidebar-menu > li > a {
         border-radius: var(--border-radius);
-        margin: 4px 0px;
-        padding: 12px 0px;
+        margin: 4px 16px;
+        padding: 12px 16px;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         border: none !important;
         position: relative;

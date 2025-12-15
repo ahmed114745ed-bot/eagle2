@@ -64,18 +64,15 @@
     transition: opacity 280ms var(--crs-ease), transform 320ms var(--crs-ease), max-height 360ms var(--crs-ease);
     padding-left:10px;
     margin:8px 0 0 0;
+    background: var(--gradient-vertical-primary);
+    filter: brightness(0.99);
 }
 
 /* submenu open state (JS toggles .crs-open) */
 .crs-tree.crs-open > .crs-submenu{
     opacity:1;
     transform: translateY(0);
-    /*margin-left: -16%;*/
     /* max-height will be set inline by JS for smooth accurate animation */
-}
-
-.rtl .crs-tree.crs-open > .crs-submenu{
-    margin-right: -16%;
 }
 
 /* when open rotate arrow */
