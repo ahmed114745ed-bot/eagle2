@@ -161,8 +161,8 @@ class GiftLogRepository extends AbstractRepository
             ->whereHas('room', function ($q) {
                 $q->where('type', 'live');
             })
-            ->selectRaw('sender_id, room_id,giftId,SUM(giftNum * giftPrice) AS total')
-            ->groupBy('sender_id', 'room_id', 'giftId')
+            ->selectRaw('sender_id, room_id,created_at,giftId,SUM(giftNum * giftPrice) AS total')
+            ->groupBy('sender_id', 'room_id', 'giftId','created_at')
             ->with(['room', 'sender', 'gift'])
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -181,8 +181,8 @@ class GiftLogRepository extends AbstractRepository
             ->whereHas('room', function ($q) {
                 $q->where('type', 'audio');
             })
-            ->selectRaw('sender_id, room_id,giftId,SUM(giftNum * giftPrice) AS total')
-            ->groupBy('sender_id', 'room_id', 'giftId')
+            ->selectRaw('sender_id,created_at, room_id,giftId,SUM(giftNum * giftPrice) AS total')
+            ->groupBy('sender_id', 'room_id', 'giftId','created_at')
             ->with(['room', 'sender', 'gift'])
             ->paginate($perPage, ['*'], 'page', $page);
     }
