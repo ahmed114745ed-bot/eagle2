@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -235,6 +236,13 @@ class SuperPackageReward extends Model
                     'quantity' => 0,
                 ]);
             }
+
+            Cache::forget("super_package_rewards_{$model->id}");
+        });
+
+
+        static::deleted(function ($model) {
+            Cache::forget("super_package_rewards_{$model->id}");
         });
     }
 }

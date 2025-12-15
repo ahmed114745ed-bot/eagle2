@@ -8,13 +8,14 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Selectables\OVips;
 use App\Selectables\Badges;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
+use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
-use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
 
 
 
@@ -89,113 +90,86 @@ class SuperPackageController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
 
+
         // $grid->column('members', __('rewards'))->expand(function ($model) {
-        //     $mempers = $model->packageRewards()->with('ware', 'vip', 'badge')->get()->map(function ($reward) {
-        //         $gifts = '';
-        //         $path  = '';
+
+        //     $members = $model->packageRewards->map(function ($reward) {
+
+        //         $gift = '';
+        //         $path = '';
 
         //         switch ($reward->type) {
-        //             case "ware":
-        //                 $gifts = @$reward->ware->name ?? '';
-        //                 $path  = @$reward->ware->img2 ?? (@$reward->ware->show_img ?? "");
+        //             case 'ware':
+        //                 $gift = optional($reward->ware)->name;
+        //                 $path = optional($reward->ware)->img2
+        //                     ?? optional($reward->ware)->show_img;
         //                 break;
-        //             case "vip":
-        //                 $gifts = @$reward->vip->name ?? '';
-        //                 $path  = @$reward->vip->img ?? '';
+
+        //             case 'vip':
+        //                 $gift = optional($reward->vip)->name;
+        //                 $path = optional($reward->vip)->img;
         //                 break;
-        //             case "badge":
-        //                 $gifts = @$reward->badge->name ?? '';
-        //                 $path  = @$reward->badge->image ?? '';
+
+        //             case 'badge':
+        //                 $gift = optional($reward->badge)->name;
+        //                 $path = optional($reward->badge)->image;
         //                 break;
-        //             case "coin":
-        //                 $gifts = @$reward->target;
-        //                 $path  = 'coin.png';
+
+        //             case 'coin':
+        //                 $gift = $reward->target;
+        //                 $path = 'coin.png';
         //                 break;
-        //             case "achievement":
-        //                 $value = getDriverUrl() . '/' . @$reward->target;
-        //                 $gifts = "<img src='$value' width='80' height='80'>";
-        //                 $path  = $reward->target;
+
+        //             case 'achievement':
+        //                 $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
+        //                 $path = $reward->target;
         //                 break;
         //         }
 
-        //         $url = getImagePath($path);
-
-        //         $image = handleShowImageWithTypes($reward->id, $url, 50, 50);
+        //         $image = handleShowImageWithTypes(
+        //             $reward->id,
+        //             getImagePath($path),
+        //             50,
+        //             50
+        //         );
 
         //         return [
         //             'id'       => $reward->id,
         //             'type'     => $reward->type,
-        //             'gift'     => $gifts,
+        //             'gift'     => $gift,
         //             'image'    => $image,
         //             'quantity' => $reward->expire,
         //             'expire'   => $reward->quantity,
         //         ];
         //     });
 
-
         //     return new Table(
         //         ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-        //         $mempers->toArray()
+        //         $members->toArray()
         //     );
         // });
 
+
         $grid->column('members', __('rewards'))->expand(function ($model) {
 
-            $members = $model->packageRewards->map(function ($reward) {
-
-                $gift = '';
-                $path = '';
-
-                switch ($reward->type) {
-                    case 'ware':
-                        $gift = optional($reward->ware)->name;
-                        $path = optional($reward->ware)->img2
-                            ?? optional($reward->ware)->show_img;
-                        break;
-
-                    case 'vip':
-                        $gift = optional($reward->vip)->name;
-                        $path = optional($reward->vip)->img;
-                        break;
-
-                    case 'badge':
-                        $gift = optional($reward->badge)->name;
-                        $path = optional($reward->badge)->image;
-                        break;
-
-                    case 'coin':
-                        $gift = $reward->target;
-                        $path = 'coin.png';
-                        break;
-
-                    case 'achievement':
-                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
-                        $path = $reward->target;
-                        break;
-                }
-
-                $image = handleShowImageWithTypes(
-                    $reward->id,
-                    getImagePath($path),
-                    50,
-                    50
-                );
-
-                return [
-                    'id'       => $reward->id,
-                    'type'     => $reward->type,
-                    'gift'     => $gift,
-                    'image'    => $image,
-                    'quantity' => $reward->expire,
-                    'expire'   => $reward->quantity,
-                ];
-            });
+            $members = Cache::rememberForever(
+                "super_package_rewards_{$model->id}",
+                fn() => $model->packageRewards
+            );
 
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $members->toArray()
+                $members->map(fn($reward) => [
+                    'id'       => $reward->id,
+                    'type'     => $reward->type,
+                    'gift'     => $reward->target,
+                    'image'    => '...',
+                    'quantity' => $reward->expire,
+                    'expire'   => $reward->quantity,
+                ])->toArray()
             );
         });
+
 
 
 
