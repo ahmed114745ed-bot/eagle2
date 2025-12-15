@@ -27,7 +27,7 @@ use Illuminate\Http\Request;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
-
+ use Carbon\CarbonPeriod;
 
 class AllStatisticController extends MainController
 {
@@ -783,38 +783,47 @@ class AllStatisticController extends MainController
 
     
 
-    public function financeIndex(Request $request)
-    {
-        try {
-            $from = $request->query('from') ? \Carbon\Carbon::parse($request->query('from'))->startOfDay() : null;
-            $to   = $request->query('to')   ? \Carbon\Carbon::parse($request->query('to'))->endOfDay() : null;
+   
 
-            $totalDiamonds = MonthlyDiamondReceive::when($from,function($q) use($from){ $q->where('created_at','>=',$from); })
-                ->when($to,function($q) use($to){ $q->where('created_at','<=',$to); })
-                ->sum('monthly_diamond_received');
+        public function financeCards(Request $request)
+        {
+            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
+            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
 
-            $totalCharges = Charge::when($from,function($q) use($from){ $q->where('created_at','>=',$from); })
-                ->when($to,function($q) use($to){ $q->where('created_at','<=',$to); })
-                ->sum('amount');
-    
-    
-             $totalPayments = CoinLog::when($from,function($q) use($from){ $q->where('created_at','>=',$from); })
-                ->when($to,function($q) use($to){ $q->where('created_at','<=',$to); })
-                ->sum('obtained_coins');
+            $totalDiamonds = MonthlyDiamondReceive::when($from, fn($q) => $q->where('created_at','>=',$from))
+                                                ->when($to, fn($q) => $q->where('created_at','<=',$to))
+                                                ->sum('monthly_diamond_received');
 
+            $totalCharges  = Charge::when($from, fn($q) => $q->where('created_at','>=',$from))
+                                ->when($to, fn($q) => $q->where('created_at','<=',$to))
+                                ->sum('amount');
 
+            $totalPayments = CoinLog::when($from, fn($q) => $q->where('created_at','>=',$from))
+                                    ->when($to, fn($q) => $q->where('created_at','<=',$to))
+                                    ->sum('obtained_coins');
+
+            return response()->json([
+                'total_balance' => $totalDiamonds,
+                'pending_balance' => $totalCharges,
+                'available_balance' => $totalPayments,
+                'today_balance' => Charge::whereDate('created_at', now())->sum('amount'),
+            ]);
+        }
+
+        public function financeTables(Request $request)
+        {
             $payments = CoinLog::with('coin.paymentGateway')
-                        ->latest()
-                        ->take(8)
-                        ->get()
-                        ->map(fn($p)=>[
-                            'id' => $p->id,
-                            'gateway' => $p->coin->paymentGateway->title ??'',
-                            'amount' => $p->obtained_coins,
-                            'status' => $p->status,
-                            'status_color' => $p->status == 'Success' ? 'success' : ($p->status == 'Pending' ? 'warning' : 'danger'),
-                            'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d') // ✅ اجبر التحويل
-                        ]);
+                ->whereIn('status', [1,2])
+                ->latest()
+                ->take(8)
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'gateway' => $p->coin->paymentGateway->title ?? '',
+                    'amount' => $p->obtained_coins,
+                    'status' => $p->status, 
+                    'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
+                ]);
 
             // $withdrawals = WalletLog::where('type','cut operation')
             //     ->latest()
@@ -827,53 +836,46 @@ class AllStatisticController extends MainController
             //         'type' => $w->type,
             //         'date' => $w->created_at->format('Y-m-d')
             //     ]);
+            
+            return response()->json([
+                'payments' => $payments,
+                'withdrawals' => [] 
+            ]);
+        }
 
-            $days = $request->query('days', 7);
+        public function financeChartIndex(Request $request)
+        {
+            $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : null;
+            $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : null;
+            $days = $request->query('days', null);
+
             $labels = [];
             $values = [];
 
-            if($days == 7){
-                $start = now()->subDays(6);
-                for($i=0;$i<7;$i++){
-                    $day = $start->copy()->addDays($i);
-                    $labels[] = $day->format('D');
-                    $values[] = Charge::whereDate('created_at',$day)->sum('amount');
-                }
-            } elseif($days == 30){
-                $start = now()->subDays(29);
-                for($i=0;$i<30;$i++){
-                    $day = $start->copy()->addDays($i);
+            if ($from && $to) {
+                $period = CarbonPeriod::create($from, $to);
+                foreach ($period as $day) {
                     $labels[] = $day->format('d M');
-                    $values[] = Charge::whereDate('created_at',$day)->sum('amount');
+                    $values[] = Charge::whereDate('created_at', $day)->sum('amount');
+                }
+            } elseif ($days) {
+                $start = now()->subDays($days - 1);
+                for ($i = 0; $i < $days; $i++) {
+                    $day = $start->copy()->addDays($i);
+                    $labels[] = $day->format($days == 7 ? 'D' : 'd M');
+                    $values[] = Charge::whereDate('created_at', $day)->sum('amount');
                 }
             } else {
-                for($i=1;$i<=12;$i++){
-                    $labels[] = \Carbon\Carbon::create(now()->year,$i,1)->format('M');
-                    $values[] = Charge::whereYear('created_at',now()->year)->whereMonth('created_at',$i)->sum('amount');
+                for ($i = 1; $i <= 12; $i++) {
+                    $labels[] = Carbon::create(now()->year, $i, 1)->format('M');
+                    $values[] = Charge::whereYear('created_at', now()->year)
+                                    ->whereMonth('created_at', $i)
+                                    ->sum('amount');
                 }
             }
 
-            return response()->json([
-                'cards'=>[
-                    'total_balance' => $totalDiamonds,
-                    'pending_balance' => $totalCharges,
-                    'available_balance' => $totalPayments, 
-                    'today_balance' => Charge::whereDate('created_at', now())->sum('amount'),
-                ],
-                'chart'=>[
-                    'labels'=> $labels,
-                    'values'=> $values
-                ],
-                'payments' => $payments,
-                // 'withdrawals' => $withdrawals
-            ]);
-
-        } catch (\Throwable $th) {
-            \Log::error('Dashboard finance error: '.$th->getMessage(), ['trace'=>$th->getTraceAsString()]);
-            return response()->json([
-                'error'=>'Something went wrong',
-                'message'=>$th->getMessage()
-            ],500);
+            return response()->json(['labels'=>$labels,'values'=>$values]);
         }
-    }
+
+
 }
