@@ -14,6 +14,7 @@ use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
+use WebPHelper;
 
 class ProfileService
 {
@@ -61,9 +62,15 @@ class ProfileService
 
             $user->profile_count += 1;
             $user->save();
-            $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
+
+             $newImagePath = WebPHelper::uploadWebp(
+                    $img,
+                    'profile',
+                    'profile_image'
+                );
+            // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
             //  $imagePath = Common::upload('profile', $img);
-            $this->profileRepo->updateAvatar($profile, $newImagePass);
+            $this->profileRepo->updateAvatar($profile, $newImagePath);
         }
 
         if ($request->has('old_multi_image')) {
