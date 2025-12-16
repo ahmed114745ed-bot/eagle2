@@ -154,7 +154,6 @@
     }
 
     .skin-black-light .content-header {
-        background: var(--gradient-primary) !important;
         box-shadow: none;
     }
 

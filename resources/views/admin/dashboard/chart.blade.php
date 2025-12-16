@@ -173,7 +173,6 @@ body {
 }
 
 .stats-masonry {
-    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
     margin-bottom: 40px;
