@@ -32,11 +32,11 @@ class MyStoreResource extends JsonResource
         $sallary      = $salary; 
         $userSalary   = $sallary;
 
-        // if (($this->type_user == 2 || $this->type_user == 4)) {
-        //     $userSalary = $salary; //
-        //     $hostSalary = number_format((float) ($agencySallary ?? $agency_owner?->salary ?? 0), 3, '.', '');
-        //     $sallary = $hostSalary;
-        // }
+        if (($this->type_user == 2 || $this->type_user == 4)) {
+            $userSalary = $salary; //
+            $hostSalary = number_format((float) ($agencySallary ?? $agency_owner?->salary ?? 0), 3, '.', '');
+            $sallary = $hostSalary;
+        }
 
         $pendingDollar = $this->totalUserSalary->sum("pending_dollar");
         $paid = $this->totalUserSalary->sum("cut_amount");
@@ -57,7 +57,7 @@ class MyStoreResource extends JsonResource
                 'usd' => (double)$sallary,
                 'user_usd' => (string) truncateAndTrim($userSalary) ?? '',
                 'user_usd_new' => (string) (isset($userSalary) ? round($userSalary, 0) : ''),
-                'host_usd' => (string) @$sallary ?? '',
+                'host_usd' => (string) @$hostSalary ?? '',
                 'pending_dollar' => (string) $pendingDollar ?? '',
                 'room_salary' => (string) $roomSalary ?? '',
                 'paid' =>  $paid ?? 0,
