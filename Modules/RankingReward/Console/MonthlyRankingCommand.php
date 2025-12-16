@@ -203,13 +203,13 @@ class MonthlyRankingCommand extends Command
             // VIP
             elseif ($reward->target_type == "vip") {
                 $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking');
+                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking', sendNotification: 0);
             }
 
             // Ware
             elseif ($reward->target_type == "ware") {
                 $ware = Ware::find($reward->target);
-                UserCommon::addWareToUser($user, $ware, $reward->expire_days, null, 'gift-ranking');
+                UserCommon::addWareToUser($user, $ware, $reward->expire_days, null, 'gift-ranking', sendNotification: 0);
             }
 
             // Achievement
