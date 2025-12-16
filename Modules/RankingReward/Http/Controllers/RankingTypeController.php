@@ -2,24 +2,25 @@
 
 namespace Modules\RankingReward\Http\Controllers;
 
-use App\Admin\Controllers\MainController;
-use App\Models\Ware;
-use App\Selectables\Badges;
-use App\Selectables\WaresByType;
 use Carbon\Carbon;
-use Encore\Admin\Facades\Admin;
+use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Selectables\Badges;
 use Encore\Admin\Widgets\Box;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\MessageBag;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
+use App\Selectables\WaresByType;
+use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
-use Modules\RankingReward\Entities\RankingReward;
+use Illuminate\Support\MessageBag;
+use App\Admin\Controllers\MainController;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\RankingRange;
-use Modules\Vip\Entities\OVip;
+use Modules\RankingReward\Entities\RankingReward;
+use Modules\Reals\Http\Services\InterventionImage;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RankingTypeController extends MainController
 {
@@ -32,7 +33,7 @@ class RankingTypeController extends MainController
 
         return $content
             ->title(__('Ranking Types'))
-            ->row(function($row) use ($type, $schedule) {
+            ->row(function ($row) use ($type, $schedule) {
                 $row->column(12, $this->grid2($type, $schedule));
 
                 $row->column(12, $this->grid($type, $schedule));
@@ -91,22 +92,22 @@ class RankingTypeController extends MainController
             return Carbon::parse($value)->format('Y-m-d');
         });
 
-//        if (Admin::user()->can('browse-ranking-rewards') || Admin::user()->can('*')) {
-//            if (!request()->filled('_export_')) {
-//                $grid->column(__('Procedures'))->display(function () {
-//                    $url = url('admin/ranking-rewards/' . $this->id);
-//                    $text = __('Ranking Rewards');
-//                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
-//                });
-//            }
-//        }
+        //        if (Admin::user()->can('browse-ranking-rewards') || Admin::user()->can('*')) {
+        //            if (!request()->filled('_export_')) {
+        //                $grid->column(__('Procedures'))->display(function () {
+        //                    $url = url('admin/ranking-rewards/' . $this->id);
+        //                    $text = __('Ranking Rewards');
+        //                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
+        //                });
+        //            }
+        //        }
 
         $grid->disableCreateButton();
 
         $grid->tools(function ($tools) use ($type, $schedule) {
             $tools->append(
-                "<a href='".admin_url("ranking-types/create?type={$type}&schedule={$schedule}")."' class='btn btn-sm btn-success'>
-                    <i class='fa fa-plus'></i>&nbsp;&nbsp;".__('New')."
+                "<a href='" . admin_url("ranking-types/create?type={$type}&schedule={$schedule}") . "' class='btn btn-sm btn-success'>
+                    <i class='fa fa-plus'></i>&nbsp;&nbsp;" . __('New') . "
                 </a>"
             );
         });
@@ -163,7 +164,7 @@ class RankingTypeController extends MainController
                 ->implode(', ');
 
             if ($existingRanges) {
-                $form->html("<div class='alert alert-info'> ".__('Existing ranges:')." <strong>{$existingRanges}</strong></div>");
+                $form->html("<div class='alert alert-info'> " . __('Existing ranges:') . " <strong>{$existingRanges}</strong></div>");
             }
         }
 
@@ -413,7 +414,7 @@ class RankingTypeController extends MainController
                 if ($this->rangesOverlap($min, $effectiveMax, $existingMin, $existingMax)) {
                     $display = $range->max === null ? "Rank {$range->min}" : "{$range->min} - {$range->max}";
                     $error = new MessageBag([
-                        'min' => [__('Range overlaps with existing:').$display],
+                        'min' => [__('Range overlaps with existing:') . $display],
                     ]);
                     return back()->withErrors($error)->withInput();
                 }
@@ -449,6 +450,64 @@ class RankingTypeController extends MainController
 
                     $rewardSaved = true;
                 }
+
+                $rewards = RankingReward::where('ranking_range_id', $rankingRange->id)->get();
+                $intervalImage = (new InterventionImage());
+
+     
+                $images = [];
+
+                foreach ($rewards as $reward) {
+
+                    $path = null;
+
+                    switch ($reward->target_type) {
+
+                        case 'ware':
+                            $path = $reward->ware->img2
+                                ? getImagePath($reward->ware->img2)
+                                : asset('images/ware-image.jpg');
+                            break;
+
+                         case 'vip':
+                            $path = $reward->vip->image2
+                                ? getImagePath($reward->vip->image2)
+                                : asset('images/ware-image.jpg');
+                            break;
+
+                        case 'badge':
+                            $path = $reward->badge->image
+                                ? getImagePath($reward->badge->image)
+                                : asset('images/ware-image.jpg');
+                            break;
+
+                        case 'coins':
+                            $path = /**getImagePath('coin.png')*/ asset('images/ware-image.jpg');
+                            break;
+
+                        case 'achievement':
+                            $path = getImagePath($reward->target);
+                            break;
+                    }
+
+                    if ($path) {
+                        $localPath =  $intervalImage->readImage($path);
+
+                        if ($localPath) {
+                            $images[] = $localPath;
+                        }
+                    }
+                }
+
+              //  dd( $images,$rewards,$target);
+                if (!empty($images)) {
+                    $intervalImageUrl =  $intervalImage->combineImages($images);
+                    if ($intervalImageUrl) {
+                        $rankingRange->generate_image = $intervalImageUrl;
+                        $rankingRange->save();
+                    }
+                }
+
 
                 if ($action === 'add_continue') {
                     admin_toastr(__('Reward added!'));
