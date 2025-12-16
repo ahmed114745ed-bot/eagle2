@@ -1130,7 +1130,10 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
-                        <span class="meta-value">{{ @$user->salary }}</span>
+
+                             <span class="meta-value d-block">{{ $availableBalance }}</span>
+                                <!-- <span class="meta-value">{{ $curantBalance }}</span>
+                                <span class="meta-value">{{ $availableBalance }}</span> -->
 
                     </div>
                     <div class="meta-item">
@@ -1237,8 +1240,9 @@
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-            <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
+          <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
 
+          <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}" data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
     <div id="tab-loading" style="
             display: none;
@@ -1762,7 +1766,131 @@
             </div>
         </div>
     </div>
-     
+    
+    <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
+       <div class="box-body">
+        <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">
+                {{ __('wallet-transactions') }}
+            </h4>
+        </div>
+
+      
+    <div class="card">
+ 
+      <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                            <input type="hidden" name="tab" value="wallet_logs">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="fields-group">
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                               value="{{ request('year') }}" style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                               name="month" value="{{ request('month') }}"
+                                                               style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=wallet_logs') }}"
+                                                   class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+<div class="box-body">
+  
+
+                <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
+                    <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>{{ __('Type') }}</th>
+                        <!-- <th>{{ __('Type') }}</th> -->
+                        <th>{{ __('Amount') }}</th>
+                        <th>{{ __('amount before') }}</th>
+                        <th>{{ __('amount after') }}</th>
+                        <th>{{ __('Created at') }}</th>
+                    </tr>
+                    </thead>
+
+                    @if($walletLogs && $walletLogs->count())
+                        <tbody style="color: rgb(208, 115, 43);">
+                        @foreach($walletLogs as $index => $log)
+                            <tr>
+                                <td>{{ $walletLogs->firstItem() + $index }}</td>
+                                <td>{{ __("wallet." . $log->operation) }}</td>
+
+                                <!-- <td>{{ $log->type }}</td> -->
+                                <td>{{ number_format($log->amount, 2) }}</td>
+                                <td>{{ number_format($log->before_amount, 2) }}</td>
+                                <td>{{ number_format($log->after_amount, 2) }}</td>
+                                <td>{{ $log->created_at }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    @endif
+
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination-wrapper">
+            {{ $walletLogs?->appends([
+                'tab'         => 'wallet_logs',
+                'wallet_logs_page' => $walletLogs?->currentPage(),
+            ])->links('vendor.pagination.default') }}
+        </div>
+
+    </div>
+
+</div>
+
+
      <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
         <div class="card">
             <div class="card-header">

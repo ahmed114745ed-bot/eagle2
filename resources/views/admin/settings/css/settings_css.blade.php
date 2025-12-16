@@ -14,6 +14,31 @@
         cursor: pointer;
     }
 
+    
+.settings-section {
+    display: none; /* Hide all sections by default */
+}
+
+.settings-section.active {
+    display: block; /* Only show the active section */
+}
+.settings-menu button {
+    display: inline-flex;   /* important: keep inline alignment */
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: none;
+    background-color: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+    white-space: nowrap;    /* prevent text from wrapping */
+}
+
+.settings-menu button.active {
+    background-color:var(--primary-color); /* active tab color */
+    color: white;
+}
+
     .inner-settings-menu button.active {
         background: var(--primary-color);
         color: black;
