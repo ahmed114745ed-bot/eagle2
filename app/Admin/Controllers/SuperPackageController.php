@@ -85,7 +85,7 @@ class SuperPackageController extends MainController
     {
         $grid = new Grid(new SuperPackageReward());
         $grid->model()->select('id', 'title')->with([
-            'packageRewards.ware:id,name,img2,show_img',
+            'packageRewards.ware:id,name,img2',
             'packageRewards.vip:id,name,img',
             'packageRewards.badge:id,name,image',
             'packageRewards:id,super_package_id,type,target,expire,quantity',
@@ -106,7 +106,7 @@ class SuperPackageController extends MainController
                     case 'ware':
                         $gift = optional($reward->ware)->name;
                         $path = optional($reward->ware)->img2
-                            ?? optional($reward->ware)->show_img;
+                            ?? optional($reward->ware)->img2;
                         break;
 
                     case 'vip':
