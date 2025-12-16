@@ -183,7 +183,6 @@ class SuperPackageController extends MainController
         $grid->disableExport();
         $grid->actions(function ($actions) {
             $actions->disableView();
-            $actions->disableEdit();
         });
         $this->extendGrid($grid);
         return $grid;
@@ -204,7 +203,7 @@ class SuperPackageController extends MainController
      */
 
 
-    protected function form()
+    protected function form1()
     {
         $form = new Form(new SuperPackageReward());
 
@@ -247,13 +246,13 @@ class SuperPackageController extends MainController
         return $form;
     }
 
-    protected function form2()
+    protected function form()
     {
         $form = new Form(new SuperPackageReward());
 
+     $form->hidden('action')->default('submit');
 
-
-        $form->ignore(['target_type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire_days', 'action']);
+        $form->ignore(['type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire', 'action']);
 
 
         $form->text('title', __('title'))->required();
