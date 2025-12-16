@@ -130,9 +130,17 @@ class SuperPackageController extends MainController
                         break;
                 }
 
+                $defaultImage = asset('images/reward.jpg');
+
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
                 $image = handleShowImageWithTypes(
                     $reward->id,
-                    getImagePath($path),
+                    $url,
                     50,
                     50
                 );
@@ -264,6 +272,15 @@ class SuperPackageController extends MainController
                         $name = 'Achievement';
                         $url = getImagePath($reward->target);
                     }
+
+                    $defaultImage = asset('images/reward.jpg');
+
+                    $url = $url ?? $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
                     $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
 
                     $html .= '
