@@ -69,15 +69,23 @@
     @if(!isset($item['children']))
         <li class="crs-item" data-crs-id="{{ $itemId }}">
             <a href="{{ $href }}" class="crs-link crs-leaf">
-                <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
-                <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                @if(str_contains($item['icon'] ?? '', 'fa-'))
+                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
+                @else
+                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+                @endif
+                    <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
             </a>
         </li>
     @else
         <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
             <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false" aria-controls="crs-sub-{{ $itemId }}">
-                <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
-                <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                @if(str_contains($item['icon'] ?? '', 'fa-'))
+                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
+                @else
+                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+                @endif
+                    <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
                 <i class="fa fa-angle-left crs-arrow" aria-hidden="true"></i>
             </a>
 

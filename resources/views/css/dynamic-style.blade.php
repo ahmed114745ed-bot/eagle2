@@ -521,7 +521,6 @@
     }
 
     .skin-black-light .main-header > .navbar {
-        background: var(--gradient-primary) !important;
         border-bottom: 1px solid rgba(229, 231, 235, 0.3) !important;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
         height: var(--header-height) !important;
@@ -1161,7 +1160,7 @@
 
     .skin-black-light .main-header > .navbar .sidebar-toggle:hover {
         background: #f3f4f6 !important;
-        color: var(--primary-color) !important;
+        color: var(--secondary-color) !important;
         transform: scale(1.05) !important;
     }
 
@@ -1756,6 +1755,10 @@
         transform: rotate(-90deg) !important;
     }
 
+    .navbar.navbar-static-top .fa {
+        color: var(--secondary-color);
+    }
+
     .tab-buttons {
         display: flex;
         width: 100%;
@@ -2207,6 +2210,9 @@
         position: absolute;
     }
 
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: var(--secondary-color) transparent transparent transparent !important;
+    }
 
     .stats-container .info-box {
         background: linear-gradient(135deg,

@@ -80,7 +80,7 @@
     }
 
     .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: var(--primary-color) transparent transparent transparent !important;
+        border-color: var(--secondary-color) transparent transparent transparent !important;
         border-width: 6px 5px 0 5px !important;
         margin-top: -3px !important;
         transition: transform 0.3s ease !important;
