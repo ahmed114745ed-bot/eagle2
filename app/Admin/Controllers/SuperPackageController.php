@@ -245,22 +245,22 @@ class SuperPackageController extends MainController
                     $name = $reward->target;
                     $url = '';
 
-                    if ($reward->target_type == 'ware') {
+                    if ($reward->type == 'ware') {
                         $ware = Ware::find($reward->target);
                         $name = $ware->name ?? $reward->target;
                         $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
-                    } elseif ($reward->target_type == 'badge') {
+                    } elseif ($reward->type == 'badge') {
                         $badge = Badge::find($reward->target);
                         $name = $badge->name ?? $reward->target;
                         $url = getImagePath($badge->img ?? '');
-                    } elseif ($reward->target_type == 'vip') {
+                    } elseif ($reward->type == 'vip') {
                         $vip = OVip::find($reward->target);
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
-                    } elseif ($reward->target_type == 'coins') {
+                    } elseif ($reward->type == 'coins') {
                         $name = $reward->target . ' coins';
                         $url = getImagePath('coin.png');
-                    } elseif ($reward->target_type == 'achievement') {
+                    } elseif ($reward->type == 'achievement') {
                         $name = 'Achievement';
                         $url = getImagePath($reward->target);
                     }
