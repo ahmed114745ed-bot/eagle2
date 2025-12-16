@@ -454,7 +454,7 @@ class RankingTypeController extends MainController
                 $rewards = RankingReward::where('ranking_range_id', $rankingRange->id)->get();
                 $intervalImage = (new InterventionImage());
 
-     
+
                 $images = [];
 
                 foreach ($rewards as $reward) {
@@ -469,7 +469,7 @@ class RankingTypeController extends MainController
                                 : asset('images/ware-image.jpg');
                             break;
 
-                         case 'vip':
+                        case 'vip':
                             $path = $reward->vip->image2
                                 ? getImagePath($reward->vip->image2)
                                 : asset('images/ware-image.jpg');
@@ -482,7 +482,9 @@ class RankingTypeController extends MainController
                             break;
 
                         case 'coins':
-                            $path = /**getImagePath('coin.png')*/ asset('images/ware-image.jpg');
+                            $path =
+                            /**getImagePath('coin.png')*/
+                            asset('images/ware-image.jpg');
                             break;
 
                         case 'achievement':
@@ -491,15 +493,11 @@ class RankingTypeController extends MainController
                     }
 
                     if ($path) {
-                        $localPath =  $intervalImage->readImage($path);
-
-                        if ($localPath) {
-                            $images[] = $localPath;
-                        }
+                        $images[] = $path; // <-- Store **path string**, not readImage() output
                     }
                 }
 
-              //  dd( $images,$rewards,$target);
+                //  dd( $images,$rewards,$target);
                 if (!empty($images)) {
                     $intervalImageUrl =  $intervalImage->combineImages($images);
                     if ($intervalImageUrl) {
