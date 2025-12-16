@@ -257,8 +257,8 @@ class SuperPackageController extends MainController
                         $vip = OVip::find($reward->target);
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
-                    } elseif ($reward->type == 'coins') {
-                        $name = $reward->target . ' coin';
+                    } elseif ($reward->type == 'coin') {
+                        $name = $reward->target . 'coin';
                         $url = getImagePath('coin.png');
                     } elseif ($reward->type == 'achievement') {
                         $name = 'Achievement';
@@ -428,7 +428,7 @@ class SuperPackageController extends MainController
                 } elseif ($targetType === 'vip') {
                     $target = request('target2');
                     $fieldName = 'target2';
-                } elseif ($targetType === 'coins') {
+                } elseif ($targetType === 'coin') {
                     $target = request('target3');
                     $fieldName = 'target3';
                 } elseif ($targetType === 'achievement') {
