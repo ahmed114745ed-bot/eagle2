@@ -287,7 +287,7 @@ class UserController extends MainController
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
 
-        Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {
                 max-width: 90%;
@@ -637,10 +637,10 @@ class UserController extends MainController
                 ", [now()->timestamp])
             ->orderByDesc('expire')
             ->paginate(10, ['*'], 'badges_page');
-        
+
         $curantBalance = wallet_available_by_user($id);
         $availableBalance = wallet_available_by_user($id);
-        
+
         $walletLogs = WalletLog::where('user_id', $user->id)
             ->when(request('year'), function ($q) {
                 $q->whereYear('created_at', request('year'));
@@ -655,8 +655,8 @@ class UserController extends MainController
                 'year'  => request('year'),
                 'month' => request('month'),
             ]);
-     
-       
+
+
         $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries' ,'availableBalance','curantBalance','walletLogs');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));

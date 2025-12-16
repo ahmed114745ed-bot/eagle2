@@ -2146,12 +2146,12 @@
     .form-horizontal .box-footer {
         display: grid !important;
         padding: 16px 24px !important;
-        direction: ltr !important;
+        direction: rtl !important;
     }
 
     .rtl .form-horizontal + .box-footer,
     .rtl .form-horizontal .box-footer {
-        direction: rtl !important;
+        direction: ltr !important;
     }
 
     .form-horizontal + .box-footer .col-md-8,

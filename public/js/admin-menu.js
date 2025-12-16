@@ -13,10 +13,10 @@ console.log('✅ sidebar js loaded');
             item.style.transform = 'translateX(-15px)';
 
             setTimeout(() => {
-                item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
                 item.style.opacity = '1';
                 item.style.transform = 'translateX(0)';
-            }, index * 50);
+            }, index * 120);
         });
     }
 
