@@ -75,7 +75,7 @@
 
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 40px !important;
-        right: 8px !important;
+        right: 20px !important;
         width: 0 !important;
     }
 
@@ -239,7 +239,7 @@
         transition: var(--transition) !important;
         margin: 0 !important;
         padding: 0 !important;
-        right: 35px !important;
+        right: 13% !important;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__clear:hover {
