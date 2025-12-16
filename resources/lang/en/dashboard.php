@@ -3,8 +3,8 @@
 return [
     'login.title'           => 'Dashboard Access',
     'login.titleBD'           => ' BD Dashboard Access',
-    'login.titleSuperAdmin'  =>' country manager Dashboard Access',
-    'login.titleAreaManager'  =>' Area Manager Dashboard Access',
+    'login.titleSuperAdmin'  => ' country manager Dashboard Access',
+    'login.titleAreaManager'  => ' Area Manager Dashboard Access',
     'login.remember'        => 'Remember me',
     'login.rights'          => ' © 2023. All rights reserved',
     'login.language.switch' => 'الانتقال إلى',
@@ -249,6 +249,10 @@ return [
     'confirm_disable_invite_code' => 'Are you sure you want to disable Invite Code?',
     'confirm_enable_transfer_salary' => 'Are you sure you want to enable Transfer Salary?',
     'confirm_disable_transfer_salary' => 'Are you sure you want to disable Transfer Salary?',
+
+
+    'confirm_enable_frozen_wallet' => 'Are you sure you want to enable frozen wallet?',
+    'confirm_disable_frozen_wallet' => 'Are you sure you want to disable frozen wallet?',
 
 
     'min_tx_num'                       => 'The minimum withdrawal for a regular user',

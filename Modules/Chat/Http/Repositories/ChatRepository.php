@@ -12,12 +12,14 @@ class ChatRepository
     {
         $chatRoom = ChatRoom::BetweenUsers($userId, $userId2)->first();
 
-        if ($chatRoom->user_1_deleted) {
-            $chatRoom->update(['user_1_deleted' => null]);
-        }
+        if ($chatRoom) {
+            if ($chatRoom->user_1_deleted) {
+                $chatRoom->update(['user_1_deleted' => null]);
+            }
 
-        if ($chatRoom->user_2_deleted) {
-            $chatRoom->update(['user_2_deleted' => null]);
+            if ($chatRoom->user_2_deleted) {
+                $chatRoom->update(['user_2_deleted' => null]);
+            }
         }
 
         return $chatRoom;

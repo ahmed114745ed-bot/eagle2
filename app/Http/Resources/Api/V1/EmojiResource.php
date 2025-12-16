@@ -25,6 +25,7 @@ class EmojiResource extends JsonResource
             "emoji" => $this->emoji,
             "t_length" => $this->t_length ?? 0,
             "sort" => $this->sort,
+            'type' => $this->image_type ?? 'svga',
 
         ];
     }

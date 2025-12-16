@@ -53,78 +53,171 @@ class RoomBoomRewardController extends MainController
             ->body($this->form()));
     }
 
+    // protected function grid()
+    // {
+    //     $grid = new Grid(new RoomBoomReward());
+    //     $grid->model()->with(['ware', 'gift']);
+
+    //     $roomBoomLevelId = request('room_boom_level_id');
+    //     $grid->model()->where('room_boom_level_id', $roomBoomLevelId);
+
+    //     $grid->column('id', __('ID'))->sortable();
+    //     $grid->column('target_type', __('target type'));
+    //     $grid->column('target', __('target'))->display(function () {
+    //         if ($this->target_type == "ware") {
+    //             return @$this->ware->name;
+    //         } elseif ($this->target_type == "gift") {
+    //             return @$this->gift->name;
+    //         } elseif ($this->target_type == "achievement") {
+    //             $value = getDriverUrl() . '/' . @$this->target;
+    //             return "<img src='$value' width='80' height='80'>";
+    //         } elseif ($this?->target_type == "coin") {
+    //             return @$this?->target;
+    //         }
+    //     });
+    //     if (!request()->filled('_export_')) {
+    //         $grid->column('image', __('image'))->display(function ($path) {
+    //             if ($this->target_type == 'ware') {
+    //                 $path = @$this->ware->img2 ?? @$this->ware?->show_img;
+    //             } elseif ($this->target_type == 'gift') {
+    //                 $path = @$this->gift->show_img ?? @$this->gift?->img;
+    //             } elseif ($this->target_type == 'achievement') {
+    //                 $value = getDriverUrl() . '/' . @$this?->target;
+    //                 return "<img src='$value' width='80' height='80'>";
+    //             } elseif ($this?->target_type == "coin") {
+    //                 $path = 'coin.png';
+    //             } else {
+    //                 $path = '';
+    //             }
+    //             /** @var Gift $this */
+    //             $url = getImagePath($path);
+    //             return handleShowImageWithTypes($this->id, $url, 50, 50);
+    //         });
+    //     }
+    //     $grid->column('priority', __('priority'));
+    //     $grid->column('quantity', __('Quantity'));
+    //     $grid->column('expire_days', __('expire'));
+    //     $grid->column('created_at', __('Created At'))->display(function ($value) {
+    //         return Carbon::parse($value)->format('Y-m-d');
+    //     });
+    //     if (method_exists($this, 'extendGrid')) {
+    //         $this->extendGrid($grid);
+    //     }
+
+    //     $grid->tools(function (Grid\Tools $tools) {
+    //         $label = __('Back');
+    //         $url   = admin_url('room_boom_levels');
+
+    //         $tools->append(
+    //             <<<HTML
+    //                 <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+    //                     <i class="fa fa-arrow-left"></i> {$label}
+    //                 </a>
+    //             HTML
+    //         );
+    //     });
+
+    //     \Encore\Admin\Facades\Admin::script("
+    //     if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+    //         $('.table-responsive').removeClass('table-responsive');
+    //         }
+    //     ");
+
+    //     return $grid;
+    // }
+    
     protected function grid()
-    {
-        $grid = new Grid(new RoomBoomReward());
-        $grid->model()->with(['ware', 'gift']);
+{
+    $grid = new Grid(new RoomBoomReward());
 
-        $roomBoomLevelId = request('room_boom_level_id');
-        $grid->model()->where('room_boom_level_id', $roomBoomLevelId);
+    $roomBoomLevelId = request('room_boom_level_id');
 
-        $grid->column('id', __('ID'))->sortable();
-        $grid->column('target_type', __('target type'));
-        $grid->column('target', __('target'))->display(function () {
-            if ($this->target_type == "ware") {
-                return @$this->ware->name;
-            } elseif ($this->target_type == "gift") {
-                return @$this->gift->name;
-            } elseif ($this->target_type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            } elseif ($this?->target_type == "coin") {
-                return @$this?->target;
+    $grid->model()
+        ->where('room_boom_level_id', $roomBoomLevelId)
+        ->with([
+            'ware:id,name,img2,show_img',
+            'gift:id,name,show_img,img'
+        ])
+        ->select([
+            'id',
+            'target_type',
+            'target',
+            'priority',
+            'quantity',
+            'expire_days',
+            'created_at',
+            'room_boom_level_id'
+        ]);
+
+    $grid->column('id', __('ID'))->sortable();
+    $grid->column('target_type', __('Target Type'));
+
+    // ✅ Target name / value
+    $grid->column('target', __('Target'))->display(function () {
+        return match ($this->target_type) {
+            'ware'        => $this->ware?->name,
+            'gift'        => $this->gift?->name,
+            'coin'        => $this->target,
+            'achievement' => sprintf(
+                "<img src='%s/%s' width='80' height='80'>",
+                getDriverUrl(),
+                $this->target
+            ),
+            default => '-'
+        };
+    });
+
+    // ✅ Image (skip during export)
+    if (!request()->filled('_export_')) {
+        $grid->column('image', __('Image'))->display(function () {
+
+            $path = match ($this->target_type) {
+                'ware'  => $this->ware?->img2 ?? $this->ware?->show_img,
+                'gift'  => $this->gift?->show_img ?? $this->gift?->img,
+                'coin'  => 'coin.png',
+                default => null
+            };
+
+            if (!$path) {
+                return '-';
             }
+
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->target_type == 'ware') {
-                    $path = @$this->ware->img2 ?? @$this->ware?->show_img;
-                } elseif ($this->target_type == 'gift') {
-                    $path = @$this->gift->show_img ?? @$this->gift?->img;
-                } elseif ($this->target_type == 'achievement') {
-                    $value = getDriverUrl() . '/' . @$this?->target;
-                    return "<img src='$value' width='80' height='80'>";
-                } elseif ($this?->target_type == "coin") {
-                    $path = 'coin.png';
-                } else {
-                    $path = '';
-                }
-                /** @var Gift $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
-            });
-        }
-        $grid->column('priority', __('priority'));
-        $grid->column('quantity', __('Quantity'));
-        $grid->column('expire_days', __('expire'));
-        $grid->column('created_at', __('Created At'))->display(function ($value) {
-            return Carbon::parse($value)->format('Y-m-d');
-        });
-        if (method_exists($this, 'extendGrid')) {
-            $this->extendGrid($grid);
-        }
-
-        $grid->tools(function (Grid\Tools $tools) {
-            $label = __('Back');
-            $url   = admin_url('room_boom_levels');
-
-            $tools->append(
-                <<<HTML
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                        <i class="fa fa-arrow-left"></i> {$label}
-                    </a>
-                HTML
-            );
-        });
-
-        \Encore\Admin\Facades\Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
-            }
-        ");
-
-        return $grid;
     }
+
+    $grid->column('priority', __('Priority'));
+    $grid->column('quantity', __('Quantity'));
+    $grid->column('expire_days', __('Expire'));
+
+    // ✅ No Carbon parse per row
+    $grid->column('created_at', __('Created At'))
+        ->display(fn ($v) => substr($v, 0, 10));
+
+    // Extend grid if exists
+    if (method_exists($this, 'extendGrid')) {
+        $this->extendGrid($grid);
+    }
+
+    // Back button
+    $grid->tools(function (Grid\Tools $tools) {
+        $tools->append(
+            '<a href="'.admin_url('room_boom_levels').'" class="btn btn-sm btn-info">
+                <i class="fa fa-arrow-left"></i> '.__('Back').'
+            </a>'
+        );
+    });
+
+    // Desktop optimization
+    \Encore\Admin\Facades\Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+
+    return $grid;
+}
 
     protected function detail($id)
     {

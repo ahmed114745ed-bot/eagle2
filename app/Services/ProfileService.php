@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\Common;
+use App\Helpers\WebPHelper;
 use App\Models\Profile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -61,9 +62,15 @@ class ProfileService
 
             $user->profile_count += 1;
             $user->save();
-            $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
+
+             $newImagePath = WebPHelper::uploadWebp(
+                    $img,
+                    'profile',
+                    'profile_image'
+                );
+            // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
             //  $imagePath = Common::upload('profile', $img);
-            $this->profileRepo->updateAvatar($profile, $newImagePass);
+            $this->profileRepo->updateAvatar($profile, $newImagePath);
         }
 
         if ($request->has('old_multi_image')) {
@@ -80,10 +87,13 @@ class ProfileService
         }
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
-                $imagePath = Common::upload('profile', $file);
-
+               $newImagePath = WebPHelper::uploadWebp(
+                    $img,
+                    'profile',
+                    'profile_image'
+                );
                 $user->images()->create([
-                    'img' => $imagePath,
+                    'img' => $newImagePath,
                 ]);
             }
         }
