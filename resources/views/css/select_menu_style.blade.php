@@ -76,7 +76,7 @@
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 40px !important;
         right: 8px !important;
-        width: 30px !important;
+        width: 0 !important;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__arrow b {
@@ -256,6 +256,10 @@
         right: auto !important;
         left: 35px !important;
         float: none !important;
+    }
+
+    .rtl .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        left: 0 !important;
     }
 
     .rtl .select2-container--default .select2-selection--single .select2-selection__rendered,
