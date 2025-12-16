@@ -11,7 +11,16 @@ class WalletRepository implements WalletRepositoryInterface
 {
     public function getWalletByUserId(int $userId)
     {
-        return UserWallet::where('user_id', $userId)->first();
+           $wallet = UserWallet::firstOrCreate(
+                ['user_id' => $userId],
+                [
+                    'balance' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            return $wallet;
     }
 
     public function updateWallet(int $walletId, array $data)

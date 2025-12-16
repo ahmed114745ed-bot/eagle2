@@ -3,6 +3,7 @@ namespace Modules\UsersWallet\Entities;
 
 use App\Models\Admin;
 use App\Models\Target;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -29,7 +30,7 @@ class WalletLog extends Model
     }
     public function user()
     {
-        return $this->belongsTo(Target::class, 'related_id');
+        return $this->belongsTo(User::class, 'related_id');
     }
 
        public function admin()
