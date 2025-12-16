@@ -334,7 +334,7 @@ class WalletController extends MainController
 
         //     throw new \Exception(__('api_responses.freez_charge'));
         // }
-        if (!$user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
@@ -440,7 +440,7 @@ class WalletController extends MainController
             throw new \Exception(__('Invalid request data.'));
         }
 
-        if (!$user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
 
         $subAdmin = SubAdmin::where('parent_id', $user->id)->find($toId);
 
