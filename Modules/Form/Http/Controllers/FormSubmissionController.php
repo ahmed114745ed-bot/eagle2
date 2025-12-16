@@ -204,7 +204,7 @@ class FormSubmissionController extends Controller
                 'expected_hosts'
             ])
             ->update([
-                'can_not_delete' => 1,
+                'can_not_delete' => 0,
                 'updated_at'     => now(),
             ]);
 
