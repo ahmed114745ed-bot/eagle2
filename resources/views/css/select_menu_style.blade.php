@@ -304,7 +304,7 @@
     }
 
     .select2-container {
-        width: 200px !important;
+        width: 220px !important;
         margin: 2px !important;
     }
 </style>
