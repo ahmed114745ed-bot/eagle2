@@ -483,7 +483,7 @@ class RankingTypeController extends MainController
 
                         case 'coins':
                             $path =
-                            getImagePath('coin.png')
+                            getImagePath('coin.png');
                             //asset('images/ware-image.jpg');
                             break;
 
