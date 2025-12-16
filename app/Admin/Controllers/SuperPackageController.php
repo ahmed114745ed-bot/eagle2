@@ -258,7 +258,7 @@ class SuperPackageController extends MainController
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
                     } elseif ($reward->type == 'coins') {
-                        $name = $reward->target . ' coins';
+                        $name = $reward->target . ' coin';
                         $url = getImagePath('coin.png');
                     } elseif ($reward->type == 'achievement') {
                         $name = 'Achievement';
@@ -305,7 +305,7 @@ class SuperPackageController extends MainController
             "ware" => __('ware'),
             "badge" => __('badge'),
             "vip" => __('vip'),
-            "coins" => __('coins'),
+            "coin" => __('coins'),
             "achievement" => __('achievement')
         ])
             ->when("ware", function () use ($form) {
@@ -329,7 +329,7 @@ class SuperPackageController extends MainController
                 $form->number('expire', __('expire'))->default(1);
                 $form->number('quantity', __('number'))->min(0);
             })
-            ->when("coins", function () use ($form) {
+            ->when("coin", function () use ($form) {
                 $form->number("target3", __("coins"));
             })
             ->when("achievement", function () use ($form) {
