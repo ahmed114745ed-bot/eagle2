@@ -447,13 +447,14 @@ class AreaManagerController extends MainController
         }
         $selectedCountriesJson = json_encode($selectedCountries);
 
-        $form->column(12, function (Form $form) use ($countriesJson, $selectedCountriesJson, $currentAreaManagerId) {
-            $form->html(view('admin.partials.country_map', [
-                'countriesJson' => $countriesJson,
-                'selectedCountriesJson' => $selectedCountriesJson,
-                'currentAreaManagerId' => $currentAreaManagerId,
-            ])->render());
-        });
+        $mapHtml = view('admin.partials.country_map', [
+            'countriesJson' => $countriesJson,
+            'selectedCountriesJson' => $selectedCountriesJson,
+            'currentAreaManagerId' => $currentAreaManagerId,
+        ])->render();
+
+        $marker = '<div class="full-column-width">'.$mapHtml.'</div>';
+        $form->html($marker, '')->setWidth(12, 0);
     }
 
 

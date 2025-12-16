@@ -2186,6 +2186,10 @@
         margin: 0 !important;
     }
 
+    .form-horizontal .fields-group > .col-md-12 > .form-group:has(.full-column-width){
+        grid-column: 1 / -1 !important;
+    }
+
     @media (max-width: 768px) {
         .form-horizontal .fields-group > .col-md-12 {
             grid-template-columns: 1fr !important;
