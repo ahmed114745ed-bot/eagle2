@@ -920,7 +920,7 @@ class User extends Authenticatable
 
         $total = $userSalary + $roomSalary;
         // $total =wallet_available_by_user($this->id); 
-        // return floor($total * 100) / 100;
+        return floor($total * 100) / 100;
     }
 
     public function getSalaryByAgencyAttribute()
