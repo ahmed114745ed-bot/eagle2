@@ -4,12 +4,13 @@ namespace App\Observers;
 
 use App\Models\Agency;
 use App\Models\BdSalary;
-use App\Models\BDSallary;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Services\BdAgencyHostSallaryService;
+use Modules\UsersWallet\Helpers\WalletHelper;
+use App\Jobs\UpdateUserWalletBalances;
 
 class UserSallaryObserver
 {
@@ -33,6 +34,26 @@ class UserSallaryObserver
         $this->updateOrCreateAgencySallary($userSalary);
         $this->updateBdHostSallary($userSalary,$originalDbValue);
 
+        $newData = [
+            'sallary' => $userSalary->sallary,
+            'agency_sallary' => $userSalary->agency_sallary,
+            'dB' => $userSalary->dB,
+        ];
+        
+        $oldData = [
+            'sallary' => $userSalary->getOriginal('sallary') ?? 0,
+            'agency_sallary' => $userSalary->getOriginal('agency_sallary') ?? 0,
+            'dB' => $originalDbValue ?? 0,
+        ];
+        
+        UpdateUserWalletBalances::dispatch(
+            $userSalary->user_id,
+            $newData,
+            $oldData,
+            $userSalary->user_agency_id,
+            'sallary_update',
+            $userSalary->target_id,
+        )->onQueue('wallet');
     }
 
     public function updating(UserSallary $userSalary)
@@ -44,10 +65,31 @@ class UserSallaryObserver
         if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0) {
             dispatch(new SendCustomOfficialMessageToUser($userSalary->user_id, NotificationType::TARGET))->onQueue('notification');
         }
-            
+        
         $this->updateBdHostSallary($userSalary, $originalDbValue);
 
 
+        $newData = [
+            'sallary' => $userSalary->sallary,
+            'agency_sallary' => $userSalary->agency_sallary,
+            'dB' => $userSalary->dB,
+        ];
+        
+        $oldData = [
+            'sallary' => $userSalary->getOriginal('sallary') ?? 0,
+            'agency_sallary' => $userSalary->getOriginal('agency_sallary') ?? 0,
+            'dB' => $originalDbValue ?? 0,
+        ];
+        \Log::info($userSalary->target_id,);
+        UpdateUserWalletBalances::dispatch(
+            $userSalary->user_id,
+            $newData,
+            $oldData,
+            $userSalary->user_agency_id,
+            'sallary_update',
+            $userSalary->target_id,
+        )->onQueue('wallet');
+        
 
     }
 

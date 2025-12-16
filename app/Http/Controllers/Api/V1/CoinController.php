@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\PaymentCoinResource;
 use App\Models\ShippingAgency;
 use Exception;
 use App\Models\Coin;
@@ -106,7 +107,7 @@ class CoinController extends Controller
             $type = 'shipping_agency';
         }
         $data =  $this->coinService->paymentCoin($type);
-        return Common::apiResponse(1, '', $data);
+        return Common::apiResponse(1, '',  PaymentCoinResource::collection($data));
     }
 
     public function createPaymentGateway(Request $request)

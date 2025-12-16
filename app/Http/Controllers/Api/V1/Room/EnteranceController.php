@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Room;
 
 use App\Facades\UserHandling;
+use App\Helpers\WebPHelper;
 use App\Models\AllGame;
 use App\Models\Room;
 use App\Models\User;
@@ -533,7 +534,12 @@ class EnteranceController extends Controller
             }
 
             if ($request->hasFile('room_cover')) {
-                $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+
+                $room->room_cover = WebPHelper::uploadWebp(
+                        $request->file('room_cover'),
+                        'rooms',
+                        'room_cover'
+                    );
             }
 
             if ($request->free_mic) {

@@ -7,7 +7,6 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\BDSallary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Layout\Content;
