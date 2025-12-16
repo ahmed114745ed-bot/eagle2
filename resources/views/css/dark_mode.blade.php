@@ -118,13 +118,12 @@
 <script>
     (function () {
         try {
-            let pref = null;
-            try {
-                pref = localStorage.getItem('dark_mode_pref');
-            } catch (e) {
+            const darkModeSetting = '{{ !empty(settings("dark_mode")) && settings("dark_mode") ? "1" : "0" }}';
+            if (darkModeSetting === '1') {
+                document.documentElement.classList.add('dark-mode');
             }
-            if (pref === '1') document.documentElement.classList.add('dark-mode');
         } catch (e) {
+            console.error('Dark mode initialization error:', e);
         }
     })();
 </script>

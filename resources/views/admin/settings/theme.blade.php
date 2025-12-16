@@ -98,35 +98,43 @@
             </div>
         </div>
 
-        <div class="col-12 d-flex gap-3 mt-3">
-            <input type="hidden" name="dark_mode" id="dark_mode_input" value="{{ $settings['dark_mode'] ?? 0 }}">
-            <label style="display:inline-flex;align-items:center;gap:8px;margin-right:auto;" for="dark_mode_toggle">
-                <input type="checkbox" id="dark_mode_toggle" style="width:auto;" {{ !empty($settings['dark_mode']) && $settings['dark_mode'] ? 'checked' : '' }}>
-                <span>{{ __('Dark Mode') }}</span>
-            </label>
-            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-            <button type="button" id="resetColors"
-                    class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+        <div class="col-12 mt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="m-0">{{ __('Dark Mode') }}</h4>
+                <div class="d-flex align-items-center gap-3">
+                    <input type="hidden" name="dark_mode" id="dark_mode_input" value="0">
+                    <input type="checkbox" name="dark_mode" value="1" data-bootstrap-switch
+                        {{ !empty($settings['dark_mode']) && $settings['dark_mode'] ? 'checked' : '' }}>
+                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    <button type="button" id="resetColors"
+                            class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                </div>
+            </div>
         </div>
     </form>
 </div>
 
 <script>
-(function(){
-    const checkbox = document.getElementById('dark_mode_toggle');
-    const input = document.getElementById('dark_mode_input');
-    const apply = (enabled) => {
-        document.documentElement.classList.toggle('dark-mode', enabled);
-        if (input) input.value = enabled ? '1' : '0';
-        try { localStorage.setItem('dark_mode_pref', enabled ? '1' : '0'); } catch(e) {}
-    };
-    if (checkbox) {
-        checkbox.addEventListener('change', function() { apply(checkbox.checked); });
-        let stored = null;
-        try { stored = localStorage.getItem('dark_mode_pref'); } catch(e) {}
-        const initial = stored !== null ? (stored === '1') : (checkbox.checked);
-        checkbox.checked = initial;
-        apply(initial);
+function initDarkModeSwitch() {
+    const $switch = $('input[name="dark_mode"][data-bootstrap-switch]');
+    const $input = document.getElementById('dark_mode_input');
+
+    $switch.each(function () {
+        $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+    });
+
+    $switch.on('switchChange.bootstrapSwitch', function (event, state) {
+        const value = state ? '1' : '0';
+        if ($input) $input.value = value;
+        document.documentElement.classList.toggle('dark-mode', state);
+    });
+    
+    // Apply dark mode if already checked on page load
+    if ($switch.is(':checked')) {
+        document.documentElement.classList.add('dark-mode');
     }
-})();
+}
+
+$(document).ready(initDarkModeSwitch);
+$(document).on('pjax:success', initDarkModeSwitch);
 </script>
