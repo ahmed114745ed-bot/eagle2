@@ -66,7 +66,7 @@ class SuperPackageController extends MainController
     {
         return parent::edit($id, $content
             ->title(trans('Super Package reward'))
-            ->body($this->form()->edit($id)));
+            ->body($this->form($id)->edit($id)));
     }
 
     public function create(Content $content)
@@ -203,56 +203,22 @@ class SuperPackageController extends MainController
      */
 
 
-    protected function form1()
+
+    protected function form($id = null)
     {
         $form = new Form(new SuperPackageReward());
-
-        $form->text('title', __('title'))->required();
-
-        $form->fieldset(__('Wares'), function (Form $form) {
-            $this->addWareField($form);
-            $form->number('expire_ware', __('expire'));
-            $form->number('quantity_ware', __('number'))->min(0);
+        $form->tools(function (Form\Tools $tools) {
+            $url = '/admin/super-package-rewards';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
+            $tools->append($button);
+            if (request()->is('*edit*')) {
+                $tools->disableDelete();
+            }
         });
 
-        $form->fieldset(__('Badges'), function (Form $form) {
-            $this->addBadgeField($form);
-            $form->number('expire_badge', __('expire'));
-            $form->number('quantity_badge', __('number'))->min(0);
-        });
+        $form->hidden('action')->default('submit');
 
-        $form->fieldset(__('vips'), function (Form $form) {
-            $form->belongsToMany('vips', OVips::class, trans('vips'));
-            $form->number('expire_vip', __('expire'));
-            $form->number('quantity_vip', __('number'))->min(0);
-        });
-
-        $form->fieldset(__('Coins'), function (Form $form) {
-            $form->number('coins', __('Coins'))->min(0);
-        });
-
-        $form->fieldset(__('Achievement'), function (Form $form) {
-            $form->image('achievement', __('Image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            })->disk('gcs');
-            $form->number('expire_achievement', __('expire'));
-        });
-
-        Admin::script('
-            $(".collapse.in").removeClass("in"); // Bootstrap 3
-            $(".collapse.show").removeClass("show"); // Bootstrap 4/5
-        ');
-
-        return $form;
-    }
-
-    protected function form()
-    {
-        $form = new Form(new SuperPackageReward());
-
-     $form->hidden('action')->default('submit');
-
-        $form->ignore(['type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire', 'action']);
+        $form->ignore(['type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire', 'quantity', 'action']);
 
 
         $form->text('title', __('title'))->required();
@@ -262,7 +228,8 @@ class SuperPackageController extends MainController
 
         $rankingRangeId = null;
         if ($form->isEditing()) {
-            $rankingRangeId = request()->route('super-package-rewards');
+            $rankingRangeId = $id;
+            //  dd( $rankingRangeId );
             $existingRewards = PackageReward::where('super_package_id', $rankingRangeId)->get();
 
             if ($existingRewards->count() > 0) {
@@ -344,10 +311,12 @@ class SuperPackageController extends MainController
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
                 $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
             })
             ->when("badge", function () use ($form) {
                 $this->addBadgeField($form);
                 $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
@@ -358,6 +327,7 @@ class SuperPackageController extends MainController
                     return $ops ?? [];
                 });
                 $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
@@ -474,9 +444,8 @@ class SuperPackageController extends MainController
                 }
             }
 
-         
-            $currentId = $form->model()->id;
 
+            $currentId = $form->model()->id;
         });
 
         $form->saved(function (Form $form) {
@@ -487,12 +456,12 @@ class SuperPackageController extends MainController
             }
 
             $rankingRange = $form->model();
-            $targetType = request('target_type');
+            $targetType = request('type');
             $action = request('action');
 
             if ($targetType) {
                 $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5');
-
+                // dd($target);
                 if ($targetType === 'achievement' && request()->hasFile('target4')) {
                     $file = request()->file('target4');
                     $target = $file->store('achievements', 'gcs');
@@ -503,7 +472,8 @@ class SuperPackageController extends MainController
                     $reward->super_package_id = $rankingRange->id;
                     $reward->type = $targetType;
                     $reward->target = $target;
-                    $reward->expire = request('expire');
+                    $reward->expire = request('expire') ?? 0;
+                    $reward->quantity = request('quantity') ?? 0;
                     $reward->save();
 
                     $rewardSaved = true;
@@ -527,7 +497,7 @@ class SuperPackageController extends MainController
     protected function addWareField(Form $form)
     {
         $prefix = 'wares';
-        $form->belongsTo('target1', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+        $form->belongsTo('target1', WaresByType::class, __('ware'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'target1')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
