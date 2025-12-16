@@ -14,7 +14,7 @@
         cursor: pointer;
     }
 
-    
+
 .settings-section {
     display: none; /* Hide all sections by default */
 }
@@ -29,7 +29,6 @@
     padding: 8px 12px;
     border: none;
     background-color: #f0f0f0;
-    color: #333;
     cursor: pointer;
     white-space: nowrap;    /* prevent text from wrapping */
 }
@@ -256,9 +255,8 @@
 
     img {
         width: 201px;
-        display: block;
+        display: inline;
         height: 99px;
-        margin-bottom: 20px;
     }
 
     .settings-sidebar {
@@ -290,7 +288,6 @@
         font-size: 16px;
         cursor: pointer;
         transition: color 0.3s ease-in-out;
-        color: var(--text-secondary-color) !important;
     }
 
     .card {

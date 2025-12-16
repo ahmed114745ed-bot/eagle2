@@ -99,9 +99,34 @@
         </div>
 
         <div class="col-12 d-flex gap-3 mt-3">
+            <input type="hidden" name="dark_mode" id="dark_mode_input" value="{{ $settings['dark_mode'] ?? 0 }}">
+            <label style="display:inline-flex;align-items:center;gap:8px;margin-right:auto;" for="dark_mode_toggle">
+                <input type="checkbox" id="dark_mode_toggle" style="width:auto;" {{ !empty($settings['dark_mode']) && $settings['dark_mode'] ? 'checked' : '' }}>
+                <span>{{ __('Dark Mode') }}</span>
+            </label>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
             <button type="button" id="resetColors"
                     class="btn btn-secondary">{{ __('Reset Colors') }}</button>
         </div>
     </form>
 </div>
+
+<script>
+(function(){
+    const checkbox = document.getElementById('dark_mode_toggle');
+    const input = document.getElementById('dark_mode_input');
+    const apply = (enabled) => {
+        document.documentElement.classList.toggle('dark-mode', enabled);
+        if (input) input.value = enabled ? '1' : '0';
+        try { localStorage.setItem('dark_mode_pref', enabled ? '1' : '0'); } catch(e) {}
+    };
+    if (checkbox) {
+        checkbox.addEventListener('change', function() { apply(checkbox.checked); });
+        let stored = null;
+        try { stored = localStorage.getItem('dark_mode_pref'); } catch(e) {}
+        const initial = stored !== null ? (stored === '1') : (checkbox.checked);
+        checkbox.checked = initial;
+        apply(initial);
+    }
+})();
+</script>
