@@ -99,11 +99,11 @@ class WeeklyRankingCommand extends Command
         $timezone = getTimezone();
         $start = Carbon::now($timezone)
             ->subWeek()
-            ->startOfWeek(Carbon::SATURDAY);
+            ->startOfWeek();
 
         $end = Carbon::now($timezone)
             ->subWeek()
-            ->endOfWeek(Carbon::FRIDAY);
+            ->endOfWeek();
 
         return User::query()
             ->leftJoinSub(
