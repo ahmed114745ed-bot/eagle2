@@ -903,7 +903,30 @@
     }
 
     .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
-        left: 5px !important;
+        left: 5% !important;
+        top: -3px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+        background: #ef4444 !important;
+        color: white !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+        top: 50% !important;
+        width: 22px !important;
+        height: 22px !important;
+        border-radius: 50% !important;
+        color: var(--gray-700, #374151) !important;
+        font-size: 16px !important;
+        font-weight: normal !important;
+        line-height: 20px !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        transition: var(--transition) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        right: 35px !important;
     }
 
     .select2-container .select2-selection--single .select2-selection__rendered img {
