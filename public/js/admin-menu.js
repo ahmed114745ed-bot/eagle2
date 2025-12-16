@@ -1,10 +1,8 @@
-// custom-red-sidebar.js
 console.log('✅ sidebar js loaded');
 
 (function () {
     'use strict';
 
-    // Animate submenu items with stagger
     function animateSubmenuItems(submenu) {
         const items = submenu.querySelectorAll('.crs-item');
 
@@ -20,7 +18,6 @@ console.log('✅ sidebar js loaded');
         });
     }
 
-    // Reset submenu items when closing
     function resetSubmenuItems(submenu) {
         const items = submenu.querySelectorAll('.crs-item');
 
@@ -31,10 +28,11 @@ console.log('✅ sidebar js loaded');
         });
     }
 
-    // Close all other open menus
     function closeOtherMenus(currentTree) {
+        const currentLevel = getMenuLevel(currentTree);
+
         document.querySelectorAll('.crs-tree.crs-open').forEach(function(tree) {
-            if (tree !== currentTree) {
+            if (tree !== currentTree && getMenuLevel(tree) === currentLevel) {
                 const submenu = tree.querySelector('.crs-submenu');
                 const toggle = tree.querySelector('.crs-toggle');
 
@@ -58,7 +56,20 @@ console.log('✅ sidebar js loaded');
         });
     }
 
-    // Handle toggle click
+    function getMenuLevel(tree) {
+        let level = 0;
+        let parent = tree.parentElement;
+
+        while (parent) {
+            if (parent.classList && parent.classList.contains('crs-submenu')) {
+                level++;
+            }
+            parent = parent.parentElement;
+        }
+
+        return level;
+    }
+
     function handleToggleClick(e) {
         const toggle = e.target.closest('.crs-toggle');
         if (!toggle) return;
@@ -74,7 +85,6 @@ console.log('✅ sidebar js loaded');
         const isOpen = tree.classList.contains('crs-open');
 
         if (isOpen) {
-            // Close current menu
             resetSubmenuItems(submenu);
             submenu.style.maxHeight = submenu.scrollHeight + 'px';
             void submenu.offsetHeight;
@@ -87,15 +97,12 @@ console.log('✅ sidebar js loaded');
                 submenu.removeEventListener('transitionend', _h);
             });
         } else {
-            // Close other menus first
             closeOtherMenus(tree);
 
-            // Open current menu
             submenu.style.maxHeight = submenu.scrollHeight + 'px';
             tree.classList.add('crs-open');
             toggle.setAttribute('aria-expanded', 'true');
 
-            // Animate submenu items
             animateSubmenuItems(submenu);
 
             submenu.addEventListener('transitionend', function _k() {
@@ -107,7 +114,6 @@ console.log('✅ sidebar js loaded');
 
     document.addEventListener('click', handleToggleClick);
 
-    // On DOM ready
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.crs-submenu').forEach(function (sm) {
             const tree = sm.closest('.crs-tree');
