@@ -141,6 +141,17 @@ class DailyRankingRewardCommand extends Command
             ->get()->values();
     }
 
+    protected function getUserIdKey(string $type): string
+    {
+        return match ($type) {
+            'wealth' => 'sender_id',
+            'charm'  => 'receiver_id',
+            'charge',
+            'game'   => 'user_id',
+            default  => 'user_id',
+        };
+    }
+
     public function applyRanges($rankingList, RankingType $rankingType)
     {
         foreach ($rankingType->ranges as $range) {
@@ -154,13 +165,63 @@ class DailyRankingRewardCommand extends Command
             $records = $rankingList->slice($startIndex, $count)->values();
             // dd($records ,$range);
 
+            $userIdKey = $this->getUserIdKey($rankingType->type);
+            $userIds = $records->pluck($userIdKey)->filter()->values();
+
             foreach ($records as $record) {
 
 
                 $this->giveReward($record, $range, $rankingType->type);
             }
+            $this->dispatchNotification($userIds, $range, $rankingType->type);
         }
     }
+
+
+    protected function dispatchNotification($userIds, $range, $type)
+    {
+        if (empty($userIds)) {
+            return;
+        }
+
+        $wareTitle = __('congratulations');
+
+        // ✅ level text (1 or 1–6)
+        $levelText = $range->min === ($range->max ?? $range->min)
+            ? $range->min
+            : $range->min . '-' . $range->max;
+
+        $body = __('rankingRewardLevel', [
+            'level' => $levelText,
+        ]) . " ({$type})";
+
+        $tokens = User::whereIn('id', $userIds)
+            ->whereNotNull('notification_id')
+            ->pluck('notification_id')
+            ->toArray();
+
+        $image = $range->generate_image;
+        $icon  = getImagePath($image);
+
+        // ✅ group official message
+        Common::sendOfficialMessage(
+            $userIds,
+            $wareTitle,
+            $body,
+            image: $image
+        );
+
+        // ✅ group firebase notification
+        if (!empty($tokens)) {
+            Common::send_firebase_notification(
+                $tokens,
+                $wareTitle,
+                $body,
+                icon: $icon
+            );
+        }
+    }
+
 
     public function giveReward($record, $range, $type)
     {
