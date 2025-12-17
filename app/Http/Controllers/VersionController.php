@@ -105,6 +105,9 @@ class VersionController extends Controller
             'app_url' => @$appUrl,
             'is_new_theme_enabled' => (bool) ($settings['is_new_theme_enabled'] ?? false),
             'moment_status'  => (bool) ($settings['moment_status'] ?? true),
+            'is_show_host_level' =>
+            intval($settings['host_level_action'] ?? 0) === 1
+                && intval($settings['host_level_enabled'] ?? 0) === 1,
 
         ];
 
@@ -203,7 +206,7 @@ class VersionController extends Controller
      */
     public function getSettingsArray()
     {
-        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
+        return Cache::get('all_settings')->whereIn('key', ['reel_status', 'youtube_status', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
     }
 
     private function updateUserCurrentVersion(?User $user, $version): bool
