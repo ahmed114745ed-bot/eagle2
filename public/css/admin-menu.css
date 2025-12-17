@@ -91,7 +91,7 @@
     position: unset !important;
 }
 
-.sidebar-mini.sidebar-collapse .crs-submenu .crs-icon {
+.rtl .sidebar-mini.sidebar-collapse .crs-submenu .crs-icon {
     width: 24px;
     min-width: 24px;
     height: 24px;
