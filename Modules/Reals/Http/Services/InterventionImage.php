@@ -90,18 +90,18 @@ class InterventionImage
         $canvasWidth = ($columns > 1 ? ($columns - 1) * $tileWidth : $tileWidth) + $tileWidth;
         $canvasHeight = ($rows > 1 ? ($rows - 1) * $tileHeight : $tileHeight) + $tileHeight;
 
-        $canvas = $manager->canvas($canvasWidth, $canvasHeight);
+        $canvas = $manager->create($canvasWidth, $canvasHeight);
 
         // 4️⃣ Place images
         foreach ($images as $i => $img) {
             $x = ($i % $columns) * $tileWidth;
             $y = floor($i / $columns) * $tileHeight;
-            $canvas->insert($img, 'top-left', $x, $y);
+            $canvas->place($img, 'top-left', $x, $y);
         }
 
         // 5️⃣ Generate filename and save
         $fileName = 'merged_' . Str::random(16) . '.png';
-        $imageContent = (string) $canvas->encode('png', 80); // you can reduce quality for smaller file
+        $imageContent = (string) $canvas->toPng(); // you can reduce quality for smaller file
 
         Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
 
