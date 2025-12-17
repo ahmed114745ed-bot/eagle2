@@ -204,21 +204,11 @@ class DailyRankingRewardCommand extends Command
         $icon  = getImagePath($image);
 
         // ✅ group official message
-        Common::sendOfficialMessage(
-            $userIds,
-            $wareTitle,
-            $body,
-            image: $image
-        );
+        Common::sendOfficialMessage($userIds, $wareTitle, $body, image: $image);
 
         // ✅ group firebase notification
         if (!empty($tokens)) {
-            Common::send_firebase_notification(
-                $tokens,
-                $wareTitle,
-                $body,
-                icon: $icon
-            );
+            Common::send_firebase_notification($tokens, $wareTitle, $body, icon: $icon);
         }
     }
 
