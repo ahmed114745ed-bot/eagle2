@@ -56,6 +56,7 @@
 
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active>a,
     .dark-mode .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,
+    .dark-mode .table-striped>tbody>tr:nth-of-type(odd),
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
     }
@@ -90,6 +91,7 @@
     .dark-mode .table-responsive,
     .dark-mode .box-body.table-responsive,
     .dark-mode .content-wrapper,
+    .dark-mode .CardwalletLogsTable,
     .dark-mode .main-sidebar {
         scrollbar-color: var(--dark-secondry-color) var(--dark-primary-color) !important;
         scrollbar-width: thin;

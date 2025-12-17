@@ -273,35 +273,35 @@ $(document).ready(function() {
                         const amount = parseFloat(log.amount);
 
                         if (amount > 0) {
-                            bgColor = '#e8fff1';
+                            bgColor = '#10b981';
                         } else if (amount < 0) {
-                            bgColor = '#ffecec';
+                            bgColor = '#ef4444';
                         } else {
-                            bgColor = '#f8f9fa';
+                            bgColor = '#6b7280';
                         }
 
                         const row = `
-                        <tr style="background-color:${bgColor}">
-                            <td>${log.id}</td>
+                            <tr>
+                                <td>${log.id}</td>
 
-                            <td>
-                                <a href="/admin/users/${log.user_id}"
-                                style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
-                                    <img src="${log.img}" alt="${log.user_name}"
-                                        style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                                    <div>
-                                        <div style="font-weight:600;">${log.user_name}</div>
-                                        <div style="font-size:12px; color:#666;">${log.user_uuid}</div>
-                                    </div>
-                                </a>
-                            </td>
+                                <td>
+                                    <a href="/admin/users/${log.user_id}"
+                                    style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+                                        <img src="${log.img}" alt="${log.user_name}"
+                                            style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                                        <div>
+                                            <div style="font-weight:600;">${log.user_name}</div>
+                                            <div style="font-size:12px; color:#666;">${log.user_uuid}</div>
+                                        </div>
+                                    </a>
+                                </td>
 
-                            <td>${amount.toLocaleString()} $</td>
-                            <td>${log.before_amount}</td>
-                            <td>${log.after_amount}</td>
-                            <td>${log.created_at}</td>
-                        </tr>
-                        `;
+                                <td style="background-color:${bgColor}; font-weight:600;">${amount.toLocaleString()} $</td>
+                                <td>${log.before_amount}</td>
+                                <td>${log.after_amount}</td>
+                                <td>${log.created_at}</td>
+                            </tr>
+                            `;
 
                         tbody.append(row);
 
