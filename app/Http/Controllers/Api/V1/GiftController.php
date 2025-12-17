@@ -24,7 +24,7 @@ class GiftController extends Controller
     public function getByCategory(Request $request)
     {
 
-        $categoryId = $request->input('type');
+        $categoryId = $request->input('gift_category_id');
         $type       = $request->input('type'); 
         $gifts = $this->giftService->getByCategory($categoryId, $type);
         return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
