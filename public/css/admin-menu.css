@@ -91,6 +91,25 @@
     position: unset !important;
 }
 
+.sidebar-mini.sidebar-collapse .crs-submenu .crs-icon {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-right: -14px;
+}
+
+.sidebar-mini.sidebar-collapse .crs-submenu .crs-icon.emoji-icon {
+    font-size: 16px;
+}
+
+.sidebar-mini.sidebar-collapse .crs-submenu .crs-link:hover .crs-icon {
+    background: var(--primary-color);
+    transform: scale(1.1);
+}
+
 /* hover & focus */
 .crs-link:hover,
 .crs-link:focus {
