@@ -11,51 +11,51 @@ use Illuminate\Support\Str;
 class InterventionImage
 {
 
-    public function combineImages(array $paths)
-    {
-        $manager = new ImageManager(new Driver());
+    // public function combineImages(array $paths)
+    // {
+    //     $manager = new ImageManager(new Driver());
 
-        $images = [];
+    //     $images = [];
 
-        foreach ($paths as $path) {
-            $img = $this->readImage($path);
-            if ($img) {
-                $images[] = $img->resize(300, 300);
-            }
-        }
+    //     foreach ($paths as $path) {
+    //         $img = $this->readImage($path);
+    //         if ($img) {
+    //             $images[] = $img->resize(300, 300);
+    //         }
+    //     }
 
-        if (empty($images)) {
-            return null;
-        }
+    //     if (empty($images)) {
+    //         return null;
+    //     }
 
-        $count   = count($images);
-        $columns = ceil(sqrt($count));
-        $rows    = ceil($count / $columns);
+    //     $count   = count($images);
+    //     $columns = ceil(sqrt($count));
+    //     $rows    = ceil($count / $columns);
 
-        $canvas = $manager->create($columns * 300, $rows * 300);
+    //     $canvas = $manager->create($columns * 300, $rows * 300);
 
-        foreach ($images as $i => $img) {
-            $canvas->place(
-                $img,
-                'top-left',
-                ($i % $columns) * 300,
-                floor($i / $columns) * 300
-            );
-        }
+    //     foreach ($images as $i => $img) {
+    //         $canvas->place(
+    //             $img,
+    //             'top-left',
+    //             ($i % $columns) * 300,
+    //             floor($i / $columns) * 300
+    //         );
+    //     }
 
-        // Generate random filename
-        $fileName = 'merged_' . Str::random(16) . '.png';
+    //     // Generate random filename
+    //     $fileName = 'merged_' . Str::random(16) . '.png';
 
-        // Get image content in memory
-        $imageContent = (string) $canvas->toPng();
-
-
-        // Upload to GCS (or other disk)
-        Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, 'public');
+    //     // Get image content in memory
+    //     $imageContent = (string) $canvas->toPng();
 
 
-        return 'merged/' . $fileName;
-    }
+    //     // Upload to GCS (or other disk)
+    //     Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, 'public');
+
+
+    //     return 'merged/' . $fileName;
+    // }
 
     public function combineImages(array $paths, $maxTileSize = 300)
     {
