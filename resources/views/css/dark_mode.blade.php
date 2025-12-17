@@ -105,6 +105,7 @@
 
     .dark-mode input,
     .dark-mode textarea,
+    .dark-mode .table > tbody > tr:hover,
     .dark-mode select {
         background-color: var(--dark-primary-color) !important;
         color: var(--text-primary-color) !important;
