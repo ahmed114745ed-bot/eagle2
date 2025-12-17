@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\WebPHelper;
 use App\Http\Services\BannerServices;
 use App\Models\Banner;
 use Encore\Admin\Form;
@@ -9,6 +10,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\UploadedFile;
 
 class   BannerController extends MainController
 {
@@ -141,9 +143,9 @@ class   BannerController extends MainController
         $form = new Form(new Banner());
         $this->disableFormTools($form);
 
-        $form->image('image_url', __('Image url'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->required()->dir('banners');
+          $form->imagePath('image_url', __('Image url'))
+         ->required();
+
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
@@ -161,6 +163,7 @@ class   BannerController extends MainController
             ]);
         });
 
+    
         return $form;
     }
 }

@@ -152,7 +152,10 @@ class AuthService
         //  $user->firebase_uuid = $request['uuid'];
         //  $user->save();
 
-        $this->rule($user, '', @$request['device_token'], $request);
+        $device_token = $request['device_token'] ?? null;
+        $this->rule($user, '', $device_token, $request);
+
+        // $this->rule($user, '', @$request['device_token'], $request);
 
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0);
@@ -166,15 +169,18 @@ class AuthService
     {
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
-
-        // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
-
         $payload = $client->verifyIdToken($request['id_token']);
         if (!$payload) {
             throw new \Exception('Google ID Token not found or invalid');
         }
-        $google_id = $payload['sub'];
+        // $google_id = $payload['sub'];
 
+        $google_id = $request['google_id'] ?? null;
+
+        if (!$google_id) {
+            throw new \Exception('Google ID not found in token or request');
+        }
+        
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
         if (!$user) {
@@ -191,15 +197,8 @@ class AuthService
                     'firebase_uuid' =>$request['uuid'],
 
                 ];
-                /*return  [[], '', $resource];
-                Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
-                // if ($request['id_token']) {
-                //     $checkValidation = $this->verifyGoogleToken($request['id_token']);
-                //     if (!$checkValidation /*|| $checkValidation['sub'] != $request['google_id']*/) {
-                //         throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
-                //     }
-                // }
+            
                 $email =    $this->userRepository->findByEmail($request['email']);
                 if ($email) throw new \Exception('you used this email before');
                 $country = $this->countryRepository->findByPhoneCode('101');
@@ -226,10 +225,6 @@ class AuthService
                     }
                 }
 
-//                if (!$countryId && $lat && $long){
-//                    $countryId = getCountryIdFromLatLong($lat, $long);
-//                }
-
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
@@ -240,21 +235,39 @@ class AuthService
                     $user->save();
                 }
                 $is_new = true;
-                $this->storeImage($request, $data, $user);
+          
 
-                if (request('tags') && is_array(request('tags'))) {
-                    $user->tags()->attach(request('tags'));
+                try {
+                     $this->storeImage($request, $data, $user);
+                } catch (\Exception $e) {
+                    logger()->error('Failed to store user image', [
+                        'user_id' => $user->id ?? null,
+                        'error' => $e->getMessage()
+                    ]);
                 }
 
-                /*$user->country_id = @$country->id ?: null;
-                $user->is_points_first = 1;
-                $user->save();*/
+                    $tags = request('tags');
+                    if ($tags && is_array($tags)) {
+                        try {
+                            $user->tags()->attach($tags);
+                        } catch (\Exception $e) {
+                            logger()->error('Failed to attach user tags', [
+                                'user_id' => $user->id ?? null,
+                                'tags' => $tags,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+
+
             }
         }
-
-        // $user->firebase_uuid = $request['uuid'];
         $user->save();
-        $this->rule($user, '', @$request['device_token'], $request);
+          
+        $device_token = $request['device_token'] ?? null;
+        $this->rule($user, '', $device_token, $request);
+        // $this->rule($user, '', @$request['device_token'], $request);
+
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0, $is_new);
         return [$user, $token, []];

@@ -8,14 +8,18 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Selectables\OVips;
 use App\Selectables\Badges;
+use App\Models\PackageReward;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
+use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
-use Encore\Admin\Facades\Admin;
+use Illuminate\Support\MessageBag;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
 
 
 
@@ -62,7 +66,7 @@ class SuperPackageController extends MainController
     {
         return parent::edit($id, $content
             ->title(trans('Super Package reward'))
-            ->body($this->form()->edit($id)));
+            ->body($this->form($id)->edit($id)));
     }
 
     public function create(Content $content)
@@ -80,61 +84,83 @@ class SuperPackageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperPackageReward());
+        $grid->model()->select('id', 'title')->with([
+            'packageRewards.ware:id,name,img2',
+            'packageRewards.vip:id,name,img',
+            'packageRewards.badge:id,name,image',
+            'packageRewards:id,super_package_id,type,target,expire,quantity',
+        ]);
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
 
 
-
         $grid->column('members', __('rewards'))->expand(function ($model) {
-            $mempers = $model->packageRewards()->get()->map(function ($memper) use ($model) {
-                $gifts = '';
-                $path  = '';
 
-                switch ($memper->type) {
-                    case "ware":
-                        $gifts = @$memper->ware->name ?? '';
-                        $path  = @$memper->ware->img2 ?? (@$memper->ware->show_img ?? "");
+            $members = $model->packageRewards->map(function ($reward) {
+
+                $gift = '';
+                $path = '';
+
+                switch ($reward->type) {
+                    case 'ware':
+                        $gift = optional($reward->ware)->name;
+                        $path = optional($reward->ware)->img2
+                            ?? optional($reward->ware)->img2;
                         break;
-                    case "vip":
-                        $gifts = @$memper->vip->name ?? '';
-                        $path  = @$memper->vip->img ?? '';
+
+                    case 'vip':
+                        $gift = optional($reward->vip)->name;
+                        $path = optional($reward->vip)->img;
                         break;
-                    case "badge":
-                        $gifts = @$memper->badge->name ?? '';
-                        $path  = @$memper->badge->image ?? '';
+
+                    case 'badge':
+                        $gift = optional($reward->badge)->name;
+                        $path = optional($reward->badge)->image;
                         break;
-                    case "coin":
-                        $gifts = @$memper->target;
-                        $path  = 'coin.png';
+
+                    case 'coin':
+                        $gift = $reward->target;
+                        $path = 'coin.png';
                         break;
-                    case "achievement":
-                        $value = getDriverUrl() . '/' . @$memper->target;
-                        $gifts = "<img src='$value' width='80' height='80'>";
-                        $path  = $memper->target;
+
+                    case 'achievement':
+                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
+                        $path = $reward->target;
                         break;
                 }
 
-                $url = getImagePath($path);
+                $defaultImage = asset('images/reward.jpg');
 
-                $image = handleShowImageWithTypes($memper->id, $url, 50, 50);
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                $image = handleShowImageWithTypes(
+                    $reward->id,
+                    $url,
+                    50,
+                    50
+                );
 
                 return [
-                    'id'       => $memper->id,
-                    'type'     => $memper->type,
-                    'gift'     => $gifts,
+                    'id'       => $reward->id,
+                    'type'     => $reward->type,
+                    'gift'     => $gift,
                     'image'    => $image,
-                    'quantity' => $memper->expire,
-                    'expire'   => $memper->quantity,
+                    'quantity' => $reward->expire,
+                    'expire'   => $reward->quantity,
                 ];
             });
 
-
             return new Table(
                 ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
-                $mempers->toArray()
+                $members->toArray()
             );
         });
+
 
 
         Admin::script("
@@ -163,6 +189,9 @@ class SuperPackageController extends MainController
             }
         ");
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
         $this->extendGrid($grid);
         return $grid;
     }
@@ -173,105 +202,320 @@ class SuperPackageController extends MainController
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
-    {
-        $show = new Show(SuperPackageReward::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('title', __('Title'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-
-        return $show;
-    }
 
     /**
      * Make a form builder.
      *
      * @return Form
      */
-    // protected function form()
-    // {
-    //     $form = new Form(new SuperPackageReward());
-
-    //     $form->text('title', __('Title'));
-    //     $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-    //         ->when("ware", function () use ($form) {
-    //             $this->addWareField($form);
-    //         })
-    //         ->when("badge", function () use ($form) {
-    //             $this->addBadgeField($form);
-    //         })
-    //         ->when("vip", function () use ($form) {
-    //             $form->select('target2', trans('vips'))->options(function () {
-    //                 $vips = OVip::query()->select('id', 'name')->get();
-    //                 foreach ($vips as  $vip) {
-    //                     $ops[$vip->id] = $vip->name;
-    //                 }
-    //                 return $ops;
-    //             });
-    //         })
-    //         ->when("coins", function () use ($form) {
-    //             $form->number("target3", __("coins"));
-    //         })->when("achievement", function () use ($form) {
-    //             $form->image("target4", __('image'))->name(function ($file) {
-    //                 return now()->timestamp . '.' . $file->guessExtension();
-    //             })->disk('gcs');
-    //         });
-
-    //     return $form;
-    // }
 
 
-    protected function form()
+
+    protected function form($id = null)
     {
         $form = new Form(new SuperPackageReward());
+        $form->tools(function (Form\Tools $tools) {
+            $url = '/admin/super-package-rewards';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
+            $tools->append($button);
+            if (request()->is('*edit*')) {
+                $tools->disableDelete();
+            }
+        });
+
+        $form->hidden('action')->default('submit');
+
+        $form->ignore(['type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire', 'quantity', 'action']);
+
 
         $form->text('title', __('title'))->required();
 
-        $form->fieldset(__('Wares'), function (Form $form) {
-            $this->addWareField($form);
-            $form->number('expire_ware', __('expire'));
-            $form->number('quantity_ware', __('number'))->min(0);
-        });
 
-        $form->fieldset(__('Badges'), function (Form $form) {
-            $this->addBadgeField($form);
-            $form->number('expire_badge', __('expire'));
-            $form->number('quantity_badge', __('number'))->min(0);
-        });
+        $form->divider(__('Rewards'));
 
-        $form->fieldset(__('vips'), function (Form $form) {
-            $form->belongsToMany('vips', OVips::class, trans('vips'));
-            $form->number('expire_vip', __('expire'));
-            $form->number('quantity_vip', __('number'))->min(0);
-        });
+        $rankingRangeId = null;
+        if ($form->isEditing()) {
+            $rankingRangeId = $id;
+            //  dd( $rankingRangeId );
+            $existingRewards = PackageReward::where('super_package_id', $rankingRangeId)->get();
 
-        $form->fieldset(__('Coins'), function (Form $form) {
-            $form->number('coins', __('Coins'))->min(0);
-        });
+            if ($existingRewards->count() > 0) {
+                $html = '
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-gift"></i> ' . __('Added Rewards') . '</h3>
+                    </div>
+                    <div class="box-body">
+                    <div class="row" id="added-rewards-list">';
 
-        $form->fieldset(__('Achievement'), function (Form $form) {
-            $form->image('achievement', __('Image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            })->disk('gcs');
-            $form->number('expire_achievement', __('expire'));
-        });
+                foreach ($existingRewards as $reward) {
+                    $name = $reward->target;
+                    $url = '';
 
-        Admin::script('
-            $(".collapse.in").removeClass("in"); // Bootstrap 3
-            $(".collapse.show").removeClass("show"); // Bootstrap 4/5
+                    if ($reward->type == 'ware') {
+                        $ware = Ware::find($reward->target);
+                        $name = $ware->name ?? $reward->target;
+                        $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
+                    } elseif ($reward->type == 'badge') {
+                        $badge = Badge::find($reward->target);
+                        $name = $badge->name ?? $reward->target;
+                        $url = getImagePath($badge->img ?? '');
+                    } elseif ($reward->type == 'vip') {
+                        $vip = OVip::find($reward->target);
+                        $name = $vip->name ?? $reward->target;
+                        $url = getImagePath($vip->img ?? '');
+                    } elseif ($reward->type == 'coin') {
+                        $name = $reward->target . 'coin';
+                        $url = getImagePath('coin.png');
+                    } elseif ($reward->type == 'achievement') {
+                        $name = 'Achievement';
+                        $url = getImagePath($reward->target);
+                    }
+
+                    $defaultImage = asset('images/reward.jpg');
+
+                    $url = $url ?? $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                    $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
+
+                    $html .= '
+                    <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
+                        <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
+                            <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
+                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
+                                <i class="fa fa-times"></i>
+                            </button>
+
+                            <div style="
+                                width: 100%;
+                                height: 80px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin-bottom: 8px;
+                            ">
+                                ' . $showImage . '
+                            </div>
+
+                            <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
+                            <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
+                            ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
+                        </div>
+                    </div>';
+                }
+
+                $html .= '
+                    </div>
+                </div>
+            </div>';
+
+                $form->html($html);
+            }
+        }
+
+        $form->select('type', trans('type'))->options([
+            "ware" => __('ware'),
+            "badge" => __('badge'),
+            "vip" => __('vip'),
+            "coin" => __('coins'),
+            "achievement" => __('achievement')
+        ])
+            ->when("ware", function () use ($form) {
+                $this->addWareField($form);
+                $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
+            })
+            ->when("badge", function () use ($form) {
+                $this->addBadgeField($form);
+                $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
+            })
+            ->when("vip", function () use ($form) {
+                $form->select('target2', trans('vips'))->options(function () {
+                    $vips = OVip::query()->select('id', 'name')->get();
+                    foreach ($vips as $vip) {
+                        $ops[$vip->id] = $vip->name;
+                    }
+                    return $ops ?? [];
+                });
+                $form->number('expire', __('expire'))->default(1);
+                $form->number('quantity', __('number'))->min(0);
+            })
+            ->when("coin", function () use ($form) {
+                $form->number("target3", __("coins"));
+            })
+            ->when("achievement", function () use ($form) {
+                $form->image("target4", __('image'))->name(function ($file) {
+                    return now()->timestamp . '.' . $file->guessExtension();
+                })->disk('gcs');
+                $form->number('expire', __('expire'))->default(1);
+            });
+
+        $form->html('
+            <script>
+            $(document).on("click", ".delete-reward", function() {
+                var id = $(this).data("id");
+                var item = $("#reward-item-" + id);
+                var rankingRangeId = "' . $rankingRangeId . '";
+
+                item.css("opacity", "0.5");
+
+                $.ajax({
+                    url: "' . admin_url('super-package-rewards') . '/" + rankingRangeId + "/" + id,
+                    type: "POST",
+                    data: {
+                        _token: LA.token,
+                        _method: "DELETE"
+                    },
+                    success: function(response) {
+                        item.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        toastr.success("Deleted!");
+                    },
+                    error: function() {
+                        item.css("opacity", "1");
+                        toastr.error("Error deleting!");
+                    }
+                });
+            });
+
+            $(document).off("click", "#btn-add-continue").on("click", "#btn-add-continue", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var btn = $(this);
+
+                if (btn.data("submitting")) {
+                    return false;
+                }
+                btn.data("submitting", true);
+
+                var form = btn.closest("form");
+
+                btn.html("<i class=\"fa fa-spinner fa-spin\"></i> ' . __('Loading...') . '");
+                btn.prop("disabled", true);
+
+                $("input[name=action]").val("add_continue");
+
+                form.find(".btn-primary[type=submit]").addClass("disabled").attr("disabled", true);
+
+                form.submit();
+
+                return false;
+            });
+            </script>
         ');
+
+        $form->html('
+            <div class="box-footer">
+                <button type="button" id="btn-add-continue" class="btn btn-success">
+                    <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
+                </button>
+            </div>
+        ');
+
+        $form->saving(function (Form $form) {
+            $action = request('action');
+
+            if ($action === 'add_continue') {
+                $targetType = request('type');
+
+                if (!$targetType) {
+                    $error = new MessageBag([
+                        'type' => [__('Please select reward type')],
+                    ]);
+                    return back()->withErrors($error)->withInput();
+                }
+
+                $target = null;
+                $fieldName = 'type';
+
+                if ($targetType === 'ware') {
+                    $target = request('target1');
+                    $fieldName = 'target1';
+                } elseif ($targetType === 'badge') {
+                    $target = request('target5');
+                    $fieldName = 'target5';
+                } elseif ($targetType === 'vip') {
+                    $target = request('target2');
+                    $fieldName = 'target2';
+                } elseif ($targetType === 'coin') {
+                    $target = request('target3');
+                    $fieldName = 'target3';
+                } elseif ($targetType === 'achievement') {
+                    $target = request()->hasFile('target4') ? request()->file('target4') : null;
+                    $fieldName = 'target4';
+                }
+
+                if (empty($target)) {
+                    $error = new MessageBag([
+                        $fieldName => [__('Please select or enter reward value')],
+                    ]);
+                    return back()->withErrors($error)->withInput();
+                }
+            }
+
+
+            $currentId = $form->model()->id;
+        });
+
+        $form->saved(function (Form $form) {
+            static $rewardSaved = false;
+
+            if ($rewardSaved) {
+                return;
+            }
+
+            $rankingRange = $form->model();
+            $targetType = request('type');
+            $action = request('action');
+
+            if ($targetType) {
+                $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5');
+                // dd($target);
+                if ($targetType === 'achievement' && request()->hasFile('target4')) {
+                    $file = request()->file('target4');
+                    $target = $file->store('achievements', 'gcs');
+                }
+
+                if ($target) {
+                    $reward = new PackageReward();
+                    $reward->super_package_id = $rankingRange->id;
+                    $reward->type = $targetType;
+                    $reward->target = $target;
+                    $reward->expire = request('expire') ?? 0;
+                    $reward->quantity = request('quantity') ?? 0;
+                    $reward->save();
+
+                    $rewardSaved = true;
+                }
+
+                if ($action === 'add_continue') {
+                    admin_toastr(__('Reward added!'));
+
+                    throw new HttpResponseException(
+                        redirect(admin_url('super-package-rewards/' . $rankingRange->id . '/edit'))
+                    );
+                }
+            }
+        });
 
         return $form;
     }
 
 
+
     protected function addWareField(Form $form)
     {
         $prefix = 'wares';
-        $form->belongsToMany('wares', WaresByType::class, __('Wares'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'wares')
+        $form->belongsTo('target1', WaresByType::class, __('ware'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target1')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
                     if (!$id) return [];
@@ -292,8 +536,8 @@ class SuperPackageController extends MainController
     protected function addBadgeField(Form $form)
     {
         $prefix = 'badges';
-        $form->belongsToMany('badges', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'badges')
+        $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
                     if (!$id) return [];

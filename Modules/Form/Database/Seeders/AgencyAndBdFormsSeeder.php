@@ -216,7 +216,7 @@ class AgencyAndBdFormsSeeder extends Seeder
             'name' => 'total_salaries',
             'type' => 'number',
             'placeholder' => ['en' => 'Enter total salaries', 'ar' => 'أدخل مجموع الرواتب'],
-            'can_not_delete' => true,
+            'can_not_delete' => false,
             'order' => 3,
         ],
         [
@@ -224,7 +224,7 @@ class AgencyAndBdFormsSeeder extends Seeder
             'name' => 'expected_hosts',
             'type' => 'number',
             'placeholder' => ['en' => 'Enter expected host count', 'ar' => 'أدخل عدد المضيفين المتوقع'],
-            'can_not_delete' => true,
+            'can_not_delete' => false,
             'order' => 4,
         ],
     ];

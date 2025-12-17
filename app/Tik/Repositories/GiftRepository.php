@@ -55,8 +55,7 @@ class GiftRepository extends AbstractRepository
 
         return $query->orderBy('use_count', 'desc')
                     ->orderByRaw('ISNULL(`sort`), `sort`')
-                    ->orderBy('price')
-                    ->paginate($perPage);
+                    ->orderBy('price')->get();
     }
 
     

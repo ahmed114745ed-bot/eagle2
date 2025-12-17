@@ -272,7 +272,7 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        $close_open_gifts = settings()->get('close_open_gifts');
+       $close_open_gifts = settings()->get('close_open_gifts');
 
         if ($close_open_gifts == 1) {
             return Common::apiResponse(0, __('Send gift stopped by admin'));
@@ -298,9 +298,17 @@ class GiftLogController extends Controller
         }
 
         settings()->set('gift_send', true);
+        $tpUsers = request()->toUid;
+        $idsArray = explode(',', $tpUsers);
 
+        // Optional: convert to integers
+        $idsArray = array_map('intval', $idsArray);
 
-        return Common::apiResponse(true, $message);
+        // Prepare API response
+        $data = [
+            'ids' => $idsArray
+        ];
+        return Common::apiResponse(true, $message,   $data);
     }
 
 

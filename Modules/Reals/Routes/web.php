@@ -1,5 +1,10 @@
 <?php
 
+use Modules\Reals\Http\Controllers\web\ReelController;
+use Modules\Reals\Http\Controllers\web\ReportRealsController;
+use Modules\Reals\Http\Controllers\web\ReelSettingsController;
+use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,3 +20,28 @@ Route::prefix('reals')->middleware("appFeatureEnable:reel")->group(function() {
     Route::get('/', 'RealsController@index');
     Route::get('delete-reel/{real_id}/{id}', 'RealsController@destroy_dash')->name('delete-reel')->middleware(['appFeatureEnable:reel']);
 });
+
+Route::group(
+    [
+        'prefix'     => config('admin.route.prefix'),
+        'namespace'  => 'web',
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as'         => config('admin.route.prefix') . '.',
+    ],
+    function () {
+
+
+
+        Route::resource('report-reals', ReportRealsController::class);
+         Route::resource('reels', ReelController::class);
+        Route::resource('reel-settings', ReelSettingsController::class);
+         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
+
+    }
+);

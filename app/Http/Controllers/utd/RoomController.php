@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Helpers\WebPHelper;
 use Exception;
 use App\Models\Room;
 use App\Helpers\Common;
@@ -95,7 +96,12 @@ class RoomController extends Controller
 
         ];
         if ($request->hasFile('room_cover')) {
-            $data['room_cover'] = Common::upload('images', $request->file('room_cover'));
+
+              $data['room_cover'] = WebPHelper::uploadWebp(
+                        $request->file('room_cover'),
+                        'images',
+                        'room_cover'
+                 );
         }
 
         try {
@@ -145,7 +151,12 @@ class RoomController extends Controller
 
         ];
         if ($request->hasFile('room_cover')) {
-            $data['room_cover'] = Common::upload('images', $request->file('room_cover'));
+
+            $data['room_cover'] = WebPHelper::uploadWebp(
+                        $request->file('room_cover'),
+                        'images',
+                        'room_cover'
+                 );
         }
 
         try {
