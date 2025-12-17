@@ -476,8 +476,8 @@ class RankingTypeController extends MainController
                             break;
 
                         case 'badge':
-                            $path = $reward->badge->image
-                                ? getImagePath($reward->badge->image)
+                            $path = $reward->badge->show_image
+                                ? getImagePath($reward->badge->show_image)
                                 : asset('images/ware-image.jpg');
                             break;
 
