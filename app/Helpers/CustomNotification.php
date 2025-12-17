@@ -4,15 +4,12 @@ namespace App\Helpers;
 
 use App\Models\Gift;
 use App\Models\User;
-use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Family;
 use Modules\Vip\Entities\Vip;
-use App\Models\OfficialMessage;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserOfficialMessage;
-use Illuminate\Support\Facades\Log;
 use Modules\Moment\Entities\Moment;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Lang;
@@ -565,6 +562,17 @@ class CustomNotification
 
         $data['coins'] = $amount;
         if (!$user->is_logout)   Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
+        Common::sendOfficialMessage($user->id,  title: $body,  titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function rankingReward(User $user, $level)
+    {
+        $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $lang = $user?->lan ?? 'en';
+        $body = __('api.rankingRewardLevel', ['level' => $level], $lang);
+        $data['user_id'] = $user?->id;
+        if (!$user->is_logout)   Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'ranking-rewards');
         Common::sendOfficialMessage($user->id,  title: $body,  titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }

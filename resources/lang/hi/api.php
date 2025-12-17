@@ -18,6 +18,7 @@ return [
     'anonymous_title'      => 'गुमनाम',
     'country_title'        => 'देश का शीर्षक',
     'last_active_title'    => 'अंतिम सक्रिय',
+    'rankingRewardLevel' => 'बधाई हो! आपने स्तर :level का इनाम प्राप्त किया है',
     'visit_title'          => 'दौरा',
     "closeNormalBoxReturnCoins" => "आपके सामान्य लकी बॉक्स की अवधि समाप्त हो गई है और बॉक्स के :coins सिक्के आपको वापस कर दिए गए हैं",
     "lucky_box" => "लकी बॉक्स",
