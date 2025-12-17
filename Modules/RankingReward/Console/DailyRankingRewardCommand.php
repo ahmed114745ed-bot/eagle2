@@ -15,8 +15,9 @@ use Illuminate\Console\Command;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Modules\RankingReward\Entities\RankingType;
-use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RankingReward\Entities\WinnerRanking;
+use Modules\Achievement\Entities\UserAchievementLevel;
+use App\Jobs\SendFirebaseNotificationIndividualUserJob;
 
 class DailyRankingRewardCommand extends Command
 {
@@ -173,27 +174,19 @@ class DailyRankingRewardCommand extends Command
 
                 $this->giveReward($record, $range, $rankingType->type);
             }
-            $this->dispatchNotification($userIds, $range, $rankingType->type);
+            $this->dispatchNotification($userIds, $range);
         }
     }
 
 
-    protected function dispatchNotification($userIds, $range, $type)
+    protected function dispatchNotification($userIds, $range)
     {
         if (empty($userIds)) {
             return;
         }
 
-        $wareTitle = __('congratulations');
-
-        // ✅ level text (1 or 1–6)
-        $levelText = $range->min === ($range->max ?? $range->min)
-            ? $range->min
-            : $range->min . '-' . $range->max;
-
-        $body = __('rankingRewardLevel', [
-            'level' => $levelText,
-        ]) . " ({$type})";
+        $min =  $range->min;
+        $max =   $range->max;
 
         $tokens = User::whereIn('id', $userIds)
             ->whereNotNull('notification_id')
@@ -202,23 +195,21 @@ class DailyRankingRewardCommand extends Command
 
         $image = $range->generate_image;
         $icon  = getImagePath($image);
-
+        $data['image'] = $icon;
         // ✅ group official message
-        Common::sendOfficialMessage(
-            $userIds,
-            $wareTitle,
-            $body,
-            image: $image
-        );
+
 
         // ✅ group firebase notification
         if (!empty($tokens)) {
-            Common::send_firebase_notification(
-                $tokens,
-                $wareTitle,
-                $body,
-                icon: $icon
-            );
+            SendFirebaseNotificationIndividualUserJob::dispatch(
+                tokens: $tokens,
+                data: $data,
+                min: $min,
+                max: $max,
+                dataType: $image,
+
+
+            )->onQueue('notification_heavy');
         }
     }
 

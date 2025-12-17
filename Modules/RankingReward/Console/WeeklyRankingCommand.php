@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\WinnerRanking;
 use Modules\Achievement\Entities\UserAchievementLevel;
+use App\Jobs\SendFirebaseNotificationIndividualUserJob;
 
 class WeeklyRankingCommand extends Command
 {
@@ -155,6 +156,17 @@ class WeeklyRankingCommand extends Command
             ->get()->values();
     }
 
+    protected function getUserIdKey(string $type): string
+    {
+        return match ($type) {
+            'wealth' => 'sender_id',
+            'charm'  => 'receiver_id',
+            'charge',
+            'game'   => 'user_id',
+            default  => 'user_id',
+        };
+    }
+
     public function applyRanges($rankingList, RankingType $rankingType)
     {
         foreach ($rankingType->ranges as $range) {
@@ -167,15 +179,51 @@ class WeeklyRankingCommand extends Command
 
             $records = $rankingList->slice($startIndex, $count)->values();
             // dd($records ,$range);
-
+            $userIdKey = $this->getUserIdKey($rankingType->type);
+            $userIds = $records->pluck($userIdKey)->filter()->values();
             foreach ($records as $record) {
 
 
                 $this->giveReward($record, $range, $rankingType->type);
             }
+            $this->dispatchNotification($userIds, $range);
         }
     }
 
+
+    protected function dispatchNotification($userIds, $range)
+    {
+        if (empty($userIds)) {
+            return;
+        }
+
+        $min =  $range->min;
+        $max =   $range->max;
+
+        $tokens = User::whereIn('id', $userIds)
+            ->whereNotNull('notification_id')
+            ->pluck('notification_id')
+            ->toArray();
+
+        $image = $range->generate_image;
+        $icon  = getImagePath($image);
+        $data['image'] = $icon;
+        // ✅ group official message
+
+
+        // ✅ group firebase notification
+        if (!empty($tokens)) {
+            SendFirebaseNotificationIndividualUserJob::dispatch(
+                tokens: $tokens,
+                data: $data,
+                min: $min,
+                max: $max,
+                dataType: $image,
+
+
+            )->onQueue('notification_heavy');
+        }
+    }
     public function giveReward($record, $range, $type)
     {
         $type = $type === 'wealth' ? 'sender' : ($type === 'charm' ? 'receiver' : $type);
