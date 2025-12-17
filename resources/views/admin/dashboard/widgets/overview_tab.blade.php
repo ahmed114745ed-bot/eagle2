@@ -418,8 +418,14 @@ async function loadFinanceTables() {
                 <tr>
                     <td>#${w.id}</td>
                     <td>
-                        <a href="/admin/wallet-withdrawal?user_id=${w.user_id}" target="_blank">
-                            ${w.user_name}
+                        <a href="/admin/users/${w.user_id}" target="_blank"
+                        style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+                            <img src="${w.img || '/images/default-avatar.png'}" alt="${w.user_name}"
+                                style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                            <div>
+                                <div style="font-weight:600;">${w.user_name}</div>
+                                <div style="font-size:12px; color:#666;">${w.uuid || ''}</div>
+                            </div>
                         </a>
                     </td>
                     <td>${w.amount.toLocaleString()} $</td>

@@ -57,6 +57,7 @@
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active>a,
     .dark-mode .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,
     .dark-mode .table-striped>tbody>tr:nth-of-type(odd),
+    .dark-mode .pagination-wrapper,
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
     }
@@ -106,6 +107,9 @@
     .dark-mode input,
     .dark-mode textarea,
     .dark-mode .table > tbody > tr:hover,
+    .dark-mode .agency-header,
+    .dark-mode .card-header,
+    .dark-mode .table tbody tr:nth-child(even),
     .dark-mode select {
         background-color: var(--dark-primary-color) !important;
         color: var(--text-primary-color) !important;

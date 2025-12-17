@@ -1123,7 +1123,7 @@
                      alt="flag Image"
                      title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
                 </div>
-               
+
 
             </div>
             <div class="agency-stats">
@@ -1272,7 +1272,7 @@
             </div>
             <div class="box-body">
                 <div class="nav-scroll-container">
-                  
+
                         <ul class="nav nav-pills">
                             @foreach($types as $id => $name)
                                 <li class="{{ $type == $id ? 'active' : '' }}">
@@ -1366,7 +1366,7 @@
                                                         $showUrl = url("admin/users/" . @$pack->sender->id);
                                                     @endphp
 
-                                                    <a href="{{ $showUrl }}" 
+                                                    <a href="{{ $showUrl }}"
                                                     style="text-decoration: none; color: #007bff; display: inline-block;">
                                                         <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                             sender:
@@ -1381,7 +1381,7 @@
                                                     $showUrl = url("admin/auth/users/" . @$pack->admin->id);
                                                 @endphp
 
-                                                <a href="{{ $showUrl }}" 
+                                                <a href="{{ $showUrl }}"
                                                 style="text-decoration: none; color: #28a745; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         admin:
@@ -1390,7 +1390,7 @@
                                                         {{ $name }}
                                                     </span>
                                                 </a>
-        
+
                                                 @endif
                                             </div>
                                         </td>
@@ -1418,7 +1418,7 @@
 
             <div class="pagination-wrapper">
                 {{ $packs?->appends([
-                     'type'        => $type, 
+                     'type'        => $type,
                     'vip_page' => $userVips?->currentPage(),
                     'salary_page' => $salaries?->currentPage(),
                     'gift_page' => $giftSLogs?->currentPage(),
@@ -1460,12 +1460,12 @@
                                     <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                     <td>{{ $userVip->level }}</td>
                                     <td>
-                                        {{ 
-                                            (!empty($userVip->expire) && $userVip->expire != '0') 
-                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') 
-                                                : $userVip->days 
+                                        {{
+                                            (!empty($userVip->expire) && $userVip->expire != '0')
+                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
+                                                : $userVip->days
                                         }}
-                                    </td> 
+                                    </td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
                                   <td>
@@ -1482,7 +1482,7 @@
                                                     $showUrl = url("admin/users/" . @$userVip->sender->id);
                                                 @endphp
 
-                                                <a href="{{ $showUrl }}" 
+                                                <a href="{{ $showUrl }}"
                                                 style="text-decoration: none; color: #007bff; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         sender:
@@ -1498,7 +1498,7 @@
                                                     $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
                                                 @endphp
 
-                                                <a href="{{ $showUrl }}" 
+                                                <a href="{{ $showUrl }}"
                                                 style="text-decoration: none; color: #007bff; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         sender:
@@ -1510,7 +1510,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    
+
                                     <td>
                                         <div class="d-flex">
 
@@ -1766,7 +1766,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
        <div class="box-body">
         <div class="card-header">
@@ -1775,9 +1775,9 @@
             </h4>
         </div>
 
-      
+
     <div class="card">
- 
+
       <div class="card mb-4">
                     <div class="card-body">
                         <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
@@ -1843,7 +1843,7 @@
                     </div>
                 </div>
 <div class="box-body">
-  
+
 
                 <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
                     <thead class="table-light">
@@ -1896,7 +1896,7 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('badges') }}</h4>
             </div>
-           
+
 
             <div class="table-responsive">
                 <div class="box-body ">
@@ -1916,7 +1916,7 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($badges as $index => $badge)
-                               @php 
+                               @php
                                         $admin = $badge->admin;
 
                                     $image = $admin->avatar ?? '';
@@ -1946,8 +1946,8 @@
 
                                 </td>
                                     <td>{{ (!empty($badge->expire) && $badge->expire !== '0') ? \Carbon\Carbon::parse($badge->expire)->format('Y-m-d H:i:s') :$badge->days  }}</td>
-                                   
-                                        
+
+
                                  <td>{{ $badge->receive_type }}</td>
                                    <td>{{ $badge->created_at }}</td>
                                     <td>
@@ -1970,7 +1970,7 @@
 
             <div class="pagination-wrapper">
                 {{ $badges?->appends([
-                     'type'        => $type, 
+                     'type'        => $type,
                     'badges_page' => $badges?->currentPage(),
                 ])->links('vendor.pagination.default') }}
             </div>
@@ -2527,7 +2527,7 @@
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
                                     @if ($giftType === 'receiver' &&@$giftSLog->giftId ==0)
-                                      
+
                                             <h5>{{__('remaining diamond')}}</h5>
                                         @else
                                     <a href="{{ url('admin/users/' . $id) }}" target="_blank"
@@ -2787,7 +2787,7 @@
         </div>
     </div>
 
-     
+
 
 
 <!-- jQuery أولاً -->
@@ -2916,7 +2916,7 @@
                 e.preventDefault();
                 let btn = $(this);
                 let url = btn.data('url');
-        
+
                 Swal.fire({
                     title: 'هل أنت متأكد؟',
                     text: "لن تستطيع التراجع بعد الحذف!",
@@ -2937,7 +2937,7 @@
                         })).append($('<input>', {
                             'type': 'hidden',
                             'name': '_method',
-                            'value': 'POST'  
+                            'value': 'POST'
                         }));
                         form.appendTo('body').submit();
                     }

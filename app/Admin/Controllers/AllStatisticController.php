@@ -46,28 +46,28 @@ class AllStatisticController extends MainController
         if (!empty($filterCountryId)) {
             return [(int) $filterCountryId];
         }
-    
+
         $adminId = session('area_manager_id') ?? auth()->id();
-    
+
         if (!$adminId) {
             return [];
         }
-    
+
         $authAdmin = AreaManager::find($adminId);
-    
+
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if (!empty($sessionCountryId)) {
             return (array) $sessionCountryId;
         }
-    
+
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
+
         return [];
     }
 
@@ -783,9 +783,9 @@ class AllStatisticController extends MainController
         }
     }
 
-    
 
-   
+
+
 
         public function financeCards(Request $request)
         {
@@ -817,8 +817,8 @@ class AllStatisticController extends MainController
 
             $totalGiftsValue = GiftLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
                            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
-                           ->sum(\DB::raw('giftPrice * giftNum'));  
-                           
+                           ->sum(\DB::raw('giftPrice * giftNum'));
+
             $rate = Common::getCoinsValue('user_coins');
             $totalGiftsUsd  =   $totalGiftsValue  /$rate;
 
@@ -841,7 +841,7 @@ class AllStatisticController extends MainController
                     'id' => $p->id,
                     'gateway' => $p->coin->paymentGateway->title ?? '',
                     'amount' => $p->obtained_coins,
-                    'status' => $p->status, 
+                    'status' => $p->status,
                     'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
                 ]);
 
@@ -852,6 +852,7 @@ class AllStatisticController extends MainController
                 ->map(fn($w)=>[
                     'id' => $w->id,
                     'user_name' => $w->user->name ?? '',
+                    'uuid' => $w->user->uuid ?? '',
                     'user_id' => $w->user_id,
                     'amount' => $w->amount,
                     'type' => $w->type,
@@ -859,10 +860,10 @@ class AllStatisticController extends MainController
                 ]);
             \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
 
-                
+
              $topUsers = \DB::table('charges')
                     ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
-                    ->where('user_type', 'user')   
+                    ->where('user_type', 'user')
                     ->groupBy('user_id')
                     ->orderByDesc('total_usd')
                     ->limit(5)
@@ -872,7 +873,7 @@ class AllStatisticController extends MainController
                     $user = \App\Models\User::find($u->user_id);
 
                         $defaultImage = asset('images/businessman-icon.jpg');
-                        $path = $user->profile?->avatar; 
+                        $path = $user->profile?->avatar;
 
                         $url = getImagePath($path) ?? $defaultImage;
 
