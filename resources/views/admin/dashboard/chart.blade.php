@@ -17,7 +17,6 @@ body {
 }
 
 .dashboard-container {
-    background-color: #f8f9fa;
     min-height: 100vh;
     padding: 20px;
 }
@@ -58,7 +57,6 @@ body {
 }
 
 .card-header {
-    background-color: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
     padding: 16px 20px;
     font-weight: 600;
@@ -130,7 +128,7 @@ body {
 }
 
 .chart-container {
-    background: #ffffff;
+    background: none;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     padding: 20px;

@@ -20,8 +20,8 @@
 .ltr .card .card-icon{   right: 14px; position: absolute; top:7px}
 .main-chart-container { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.1);     overflow: hidden; }
 .main-chart-container canvas {
-    height: 200px !important;  
-    width: 100% !important;   
+    height: 200px !important;
+    width: 100% !important;
 }
 .main-chart-container {
     position: relative;
@@ -29,7 +29,7 @@
     /* height: 260px;  */
 }
 .main-chart-container{
-    background:#fff;
+    background: none;
     border-radius:12px;
     padding:20px;
     box-shadow:0 4px 12px rgba(0,0,0,.1);
@@ -78,10 +78,10 @@
 }
 #topUsersContainer .user-card {
     text-align: center;
-    flex: 0 0 calc(50% - 0.5rem); 
+    flex: 0 0 calc(50% - 0.5rem);
 }
 #topUsersContainer .user-card:nth-child(n+3) {
-    flex: 0 0 calc(33.33% - 0.5rem); 
+    flex: 0 0 calc(33.33% - 0.5rem);
 }
 .user-card img {
     width: 60px;
@@ -109,7 +109,7 @@
     <div class="floating-dots"></div>
 
     <div class="dashboard-wrap page-padding">
-              
+
         <div class="dashboard-wrap page-padding" style=" position: relative;     margin-bottom: 53px;">
             <button id="toggleFilter" class="btn btn-dropbox 694015f1a711d-filter-btn mb-3" style=" left: 0;position: absolute;">
                     <i class="fas fa-filter"></i>
@@ -135,7 +135,7 @@
         </div>
 
 
-            
+
         <div class="cards-container mb-4" data-aos="fade-up">
             @foreach ([
                 'total_balance'     => 'fa-wallet',
@@ -261,11 +261,11 @@ $(document).ready(function() {
             dataType: "json",
             success: function(response) {
                 const tbody = $('#walletLogsTable tbody');
-                tbody.empty(); 
+                tbody.empty();
 
                 if(response.data && response.data.length > 0) {
                     response.data.forEach(log => {
-                        const operationBadge = log.operation === 'add' 
+                        const operationBadge = log.operation === 'add'
                             ? '<span class="badge bg-success">ADD</span>'
                             : '<span class="badge bg-danger">CUT</span>';
                         let bgColor = '';
@@ -273,11 +273,11 @@ $(document).ready(function() {
                         const amount = parseFloat(log.amount);
 
                         if (amount > 0) {
-                            bgColor = '#e8fff1'; 
+                            bgColor = '#e8fff1';
                         } else if (amount < 0) {
-                            bgColor = '#ffecec'; 
+                            bgColor = '#ffecec';
                         } else {
-                            bgColor = '#f8f9fa'; 
+                            bgColor = '#f8f9fa';
                         }
 
                         const row = `
@@ -304,7 +304,7 @@ $(document).ready(function() {
                         `;
 
                         tbody.append(row);
-                     
+
                     });
                 } else {
                     tbody.append('<tr><td colspan="8" class="text-center">لا توجد سجلات</td></tr>');

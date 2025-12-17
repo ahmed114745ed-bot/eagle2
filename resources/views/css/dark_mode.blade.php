@@ -1,6 +1,4 @@
 <style>
-    /* Dark mode: ONLY change white/light surfaces (boxes, tables, backgrounds, text) */
-    /* DO NOT change dynamic colors (primary, secondary, buttons, sidebar gradients) */
     .dark-mode {
         /* Background and text colors ONLY */
         --white: #152038;
@@ -13,7 +11,6 @@
         --text-secondary-color: #9ca3af;
         --dark-primary-color: rgb(15, 23, 42);
         --dark-secondry-color: rgb(30, 41, 59);
-        /* NOTE: --primary-color, --secondary-color, gradients UNCHANGED */
     }
 
     body.dark-mode, .dark-mode body {
@@ -27,6 +24,8 @@
     .dark-mode .table,
     .dark-mode .modal-content,
     .dark-mode .skin-black-light .main-header > .navbar,
+    .dark-mode .nav-tabs-custom,
+    .dark-mode .form-col,
     .dark-mode .form-horizontal {
         background-color: var(--dark-secondry-color) !important;
         color: var(--text-primary-color) !important;
@@ -38,6 +37,7 @@
     .dark-mode .pagination > .disabled > a:hover,
     .dark-mode .pagination > .disabled > span,
     .dark-mode .pagination > .disabled > span:focus,
+    .dark-mode .pagination>li>a,
     .dark-mode .pagination > .disabled > span:hover {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -46,8 +46,18 @@
     .dark-mode .skin-black-light .wrapper,
     .dark-mode .select2-container--default .select2-selection--single,
     .dark-mode form,
+    .dark-mode .nav-tabs,
+    .dark-mode .tab-content,
+    .dark-mode .settings-sidebar,
+    .dark-mode #landPageSettings,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
+    }
+
+    .dark-mode .nav-tabs-custom>.nav-tabs>li.active>a,
+    .dark-mode .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,
+    .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
+        background: none !important;
     }
 
     .dark-mode .table > thead > tr > th {
@@ -61,6 +71,8 @@
     }
 
     .dark-mode,
+    .dark-mode .content-header > .breadcrumb > li > a,
+    .dark-mode .content-header > h1,
     .dark-mode * {
         color: #ffffff !important;
     }
@@ -74,9 +86,13 @@
         border-top-color: rgba(255, 255, 255, 0.05) !important;
     }
 
-    .dark-mode,
+    .dark-mode .box-body,
+    .dark-mode .table-responsive,
+    .dark-mode .box-body.table-responsive,
+    .dark-mode .content-wrapper,
     .dark-mode .main-sidebar {
         scrollbar-color: var(--dark-secondry-color) var(--dark-primary-color) !important;
+        scrollbar-width: thin;
     }
 
     .dark-mode .content-header {
@@ -118,9 +134,12 @@
 <script>
     (function () {
         try {
-            const darkModeSetting = '{{ !empty(settings("dark_mode")) && settings("dark_mode") ? "1" : "0" }}';
-            if (darkModeSetting === '1') {
+            const darkModeSetting = '{{ \App\Models\Setting::where("key", "dark_mode")->value("value") ?? "0" }}';
+
+            if (darkModeSetting === '1' || darkModeSetting === 1) {
                 document.documentElement.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
             }
         } catch (e) {
             console.error('Dark mode initialization error:', e);

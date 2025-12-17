@@ -33,7 +33,6 @@
         width: 100%;
         text-align: right;
         padding: 15px;
-        background: #333;
         color: white;
         border: none;
         margin-bottom: 5px;
@@ -464,7 +463,7 @@
                 @if ($remaining_diamonds_action)
                     <button onclick="showSection('remaining_diamonds')">{{ __('remaining diamonds') }}</button>
                 @endif
-                
+
             </div>
         </div>
 
@@ -552,7 +551,7 @@
 
                             <!-- Context Text -->
                             <div class="alert alert-info mt-3">
-                                <i class="fa fa-info-circle me-1"></i> 
+                                <i class="fa fa-info-circle me-1"></i>
                                 {{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}
                             </div>
 
