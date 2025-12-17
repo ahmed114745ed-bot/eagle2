@@ -81,7 +81,7 @@ Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
 Broadcast::channel('pk.battle.{creatorId}', function ($user, $creatorId) {
     return [
         'id'   => $user->id,
-        'name' => $user->name,
+        // 'name' => $user->name,
         'creator_id' => $creatorId,
     ];
 });
