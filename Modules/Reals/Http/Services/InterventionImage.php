@@ -57,12 +57,12 @@ class InterventionImage
     //     return 'merged/' . $fileName;
     // }
 
-    public function combineImages(array $paths, $maxTileSize = 300)
+    public function combineImages(array $paths)
     {
         $manager = new ImageManager(new Driver());
         $images = [];
 
-        // Read and validate images
+        // 1️⃣ Read images and store their dimensions
         foreach ($paths as $path) {
             $img = $this->readImage($path);
             if ($img) {
@@ -74,44 +74,40 @@ class InterventionImage
             return null;
         }
 
-        $count   = count($images);
+        $count = count($images);
         $columns = ceil(sqrt($count));
-        $rows    = ceil($count / $columns);
+        $rows = ceil($count / $columns);
 
-        // Dynamically calculate tile size
-        $tileWidth  = (int) min($maxTileSize, 1000 / $columns);
-        $tileHeight = (int) min($maxTileSize, 1000 / $rows);
+        // 2️⃣ Determine minimal width and height per tile
+        $tileWidths = array_map(fn($img) => $img->width(), $images);
+        $tileHeights = array_map(fn($img) => $img->height(), $images);
 
-        // Resize each image
-        foreach ($images as &$img) {
-            $img->resize($tileWidth, $tileHeight, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-        }
+        // Use the **max width/height per row/column**
+        $tileWidth = max($tileWidths);
+        $tileHeight = max($tileHeights);
 
-        // Create canvas
-        $canvas = $manager->canvas($columns * $tileWidth, $rows * $tileHeight);
+        // 3️⃣ Calculate minimal canvas size
+        $canvasWidth = ($columns > 1 ? ($columns - 1) * $tileWidth : $tileWidth) + $tileWidth;
+        $canvasHeight = ($rows > 1 ? ($rows - 1) * $tileHeight : $tileHeight) + $tileHeight;
 
-        // Place images on canvas
+        $canvas = $manager->canvas($canvasWidth, $canvasHeight);
+
+        // 4️⃣ Place images
         foreach ($images as $i => $img) {
-            $canvas->insert(
-                $img,
-                'top-left',
-                ($i % $columns) * $tileWidth,
-                floor($i / $columns) * $tileHeight
-            );
+            $x = ($i % $columns) * $tileWidth;
+            $y = floor($i / $columns) * $tileHeight;
+            $canvas->insert($img, 'top-left', $x, $y);
         }
 
-        // Generate filename (JPG for smaller size)
-        $fileName = 'merged_' . Str::random(16) . '.jpg';
-        $imageContent = (string) $canvas->encode('jpg', 70); // 70% quality
+        // 5️⃣ Generate filename and save
+        $fileName = 'merged_' . Str::random(16) . '.png';
+        $imageContent = (string) $canvas->encode('png', 80); // you can reduce quality for smaller file
 
-        // Upload to GCS
         Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
 
         return 'merged/' . $fileName;
     }
+
 
 
 
