@@ -73,6 +73,24 @@
     height: 300px;
 }
 
+.sidebar-mini.sidebar-collapse .main-sidebar .user-panel>.info,
+.sidebar-mini.sidebar-collapse .sidebar-form,
+.sidebar-mini.sidebar-collapse .sidebar-menu>li>a>span,
+.sidebar-mini.sidebar-collapse .sidebar-menu>li>.treeview-menu,
+.sidebar-mini.sidebar-collapse .sidebar-menu>li>a>.pull-right,
+.sidebar-mini.sidebar-collapse .sidebar-menu li.header {
+    display: block !important;
+}
+
+.sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>a>span {
+    padding: 0 !important;
+}
+
+.sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>a>span:not(.pull-right),
+.sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>.treeview-menu{
+    position: unset !important;
+}
+
 /* hover & focus */
 .crs-link:hover,
 .crs-link:focus {
