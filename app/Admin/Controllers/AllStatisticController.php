@@ -845,19 +845,30 @@ class AllStatisticController extends MainController
                     'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
                 ]);
 
-            $withdrawals = WalletLog::with ('user')->where('operation','subtract')
+            $withdrawals = WalletLog::with('user.profile')->where('operation','subtract')
                 ->latest()
                 ->take(8)
                 ->get()
-                ->map(fn($w)=>[
-                    'id' => $w->id,
-                    'user_name' => $w->user->name ?? '',
-                    'uuid' => $w->user->uuid ?? '',
-                    'user_id' => $w->user_id,
-                    'amount' => $w->amount,
-                    'type' => $w->type,
-                    'date' => $w->created_at->format('Y-m-d')
-                ]);
+                ->map(function($w) {
+                    $defaultImage = asset('images/businessman-icon.jpg');
+                    $path = $w->user->profile?->avatar ?? null;
+                    $url = $path ? getImagePath($path) : $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                    return [
+                        'id' => $w->id,
+                        'user_name' => $w->user->name ?? '',
+                        'uuid' => $w->user->uuid ?? '',
+                        'user_id' => $w->user_id,
+                        'img' => $url,
+                        'amount' => $w->amount,
+                        'type' => $w->type,
+                        'date' => $w->created_at->format('Y-m-d')
+                    ];
+                });
             \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
 
 
