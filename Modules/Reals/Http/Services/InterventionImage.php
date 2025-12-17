@@ -57,59 +57,61 @@ class InterventionImage
         return 'merged/' . $fileName;
     }
 
+    public function combineImages(array $paths, $maxTileSize = 300)
+    {
+        $manager = new ImageManager(new Driver());
+        $images = [];
 
-    // public function combineImages(array $paths, $maxTileSize = 300)
-    // {
-    //     $manager = new ImageManager(new Driver());
-    //     $images = [];
+        // Read and validate images
+        foreach ($paths as $path) {
+            $img = $this->readImage($path);
+            if ($img) {
+                $images[] = $img;
+            }
+        }
 
-    //     foreach ($paths as $path) {
-    //         $img = $this->readImage($path);
-    //         if ($img) {
-    //             $images[] = $img;
-    //         }
-    //     }
+        if (empty($images)) {
+            return null;
+        }
 
-    //     if (empty($images)) {
-    //         return null;
-    //     }
+        $count   = count($images);
+        $columns = ceil(sqrt($count));
+        $rows    = ceil($count / $columns);
 
-    //     $count   = count($images);
-    //     $columns = ceil(sqrt($count));
-    //     $rows    = ceil($count / $columns);
+        // Dynamically calculate tile size
+        $tileWidth  = (int) min($maxTileSize, 1000 / $columns);
+        $tileHeight = (int) min($maxTileSize, 1000 / $rows);
 
-    //     // Calculate dynamic tile size to minimize width/height
-    //     $tileWidth = (int) min($maxTileSize, 1000 / $columns); // e.g., max 1000px width
-    //     $tileHeight = (int) min($maxTileSize, 1000 / $rows);   // max 1000px height
+        // Resize each image
+        foreach ($images as &$img) {
+            $img->resize($tileWidth, $tileHeight, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+        }
 
-    //     // Resize images dynamically
-    //     foreach ($images as &$img) {
-    //         $img->resize($tileWidth, $tileHeight, function ($constraint) {
-    //             $constraint->aspectRatio();
-    //             $constraint->upsize();
-    //         });
-    //     }
+        // Create canvas
+        $canvas = $manager->canvas($columns * $tileWidth, $rows * $tileHeight);
 
-    //     $canvas = $manager->create($columns * $tileWidth, $rows * $tileHeight);
+        // Place images on canvas
+        foreach ($images as $i => $img) {
+            $canvas->insert(
+                $img,
+                'top-left',
+                ($i % $columns) * $tileWidth,
+                floor($i / $columns) * $tileHeight
+            );
+        }
 
-    //     foreach ($images as $i => $img) {
-    //         $canvas->place(
-    //             $img,
-    //             'top-left',
-    //             ($i % $columns) * $tileWidth,
-    //             floor($i / $columns) * $tileHeight
-    //         );
-    //     }
+        // Generate filename (JPG for smaller size)
+        $fileName = 'merged_' . Str::random(16) . '.jpg';
+        $imageContent = (string) $canvas->encode('jpg', 70); // 70% quality
 
-    //     // Generate random filename (use JPG for smaller size)
-    //     $fileName = 'merged_' . Str::random(16) . '.jpg';
-    //     $imageContent = (string) $canvas->toJpeg(70); // 70% quality to reduce size
+        // Upload to GCS
+        Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
 
-    //     Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
-
-    //     return 'merged/' . $fileName;
-    // }
-
+        return 'merged/' . $fileName;
+    }
 
 
 
