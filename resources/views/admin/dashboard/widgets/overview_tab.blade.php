@@ -13,7 +13,7 @@
 .rtl .card { position: relative; background:#fff; border-radius:12px; padding:10px 12px; text-align:start; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; overflow:hidden; }
 .card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
 .card h2 { font-size:1.3rem; color:#333; }
-.card h3 { font-size:1rem; margin-bottom:10px; color:#333; margin-top: 0 !important;}
+.card h3 { font-size:1.3rem; margin-bottom:10px; color:#333; margin-top: 0 !important;}
 .card .amount { font-size:1.5rem; font-weight:bold; margin-bottom:15px; color:#1e3a8a; transition: all 0.6s ease; }
 .card canvas { width:100% !important; height:120px !important; }
 .rtl .card .card-icon{   left: 14px; position: absolute; top:7px}
