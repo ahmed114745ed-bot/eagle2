@@ -19,8 +19,8 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
     public function __construct(
         public array $tokens,
-        public string $title,
-        public string $body,
+        // public string $title,
+        // public string $body,
         public array $data = [],
         public ?string $messageType = null,
         public $user = null,
@@ -30,7 +30,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         public string $notification_type = 'user_notification',
         public ?int $min = null,
         public ?int $max = null,
-        public string $dataType = '',
+         public ?string $dataType = null,
 
 
     ) {}
@@ -38,7 +38,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
     public function handle()
     {
 
-        $wareTitle = __('congratulations');
+        $title = __('congratulations');
 
 
 
@@ -69,8 +69,13 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         // Counter for levels
         $level = $minLevel;
 
-        foreach ($users as $user) {
-            $currentLevel = $level;
+       foreach ($users as $index => $user) {
+
+            $currentLevel = $minLevel + $index;
+
+            if ($currentLevel > $maxLevel) {
+                break;
+            }
 
             $lang = $user?->lan ?? 'en';
             $body = __('api.rankingRewardLevel', ['level' => $currentLevel], $lang);
@@ -78,7 +83,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
             Common::sendOfficialMessage(
                 $user->id,
-                $wareTitle,
+                $title,
                 $body,
                 image: $this->dataType,
             );
@@ -87,8 +92,8 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
 
             $notification = [
-                'title' => $this->title,
-                'body'  => $this->body,
+                'title' => $title,
+                'body'  => $body,
             ];
 
             $userData = [];
@@ -134,10 +139,10 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
                 'json' => ['message' => $payload]
             ]);
 
-            $level++;
-            if ($level > $maxLevel) {
-                $level = $minLevel; // Reset if exceeds max
-            }
+            // $level++;
+            // if ($level > $maxLevel) {
+            //     $level = $minLevel; // Reset if exceeds max
+            // }
         }
 
         try {
