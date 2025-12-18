@@ -233,6 +233,7 @@ class EmojiController extends MainController
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
                 'vap' => __('vap'),
+                 'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
             ]
         )->required();
         $form->number('t_length', __('t_length'));
