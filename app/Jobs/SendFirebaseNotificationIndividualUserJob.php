@@ -132,11 +132,26 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
             if (!empty($userData)) {
                 $dataPayload['user'] = json_encode($userData);
             }
-
+            $imageUrl = $this->data['image'] ?? null;
             $payload = [
                 'token' => $token,
                 'notification' => $notification,
                 'data' => $dataPayload,
+                'android' => [
+                    'notification' => [
+                        'image' => $imageUrl
+                    ]
+                ],
+                'apns' => [
+                    'payload' => [
+                        'aps' => [
+                            'mutable-content' => 1
+                        ]
+                    ],
+                    'fcm_options' => [
+                        'image' => $imageUrl
+                    ]
+                ],
             ];
 
             if (isset($this->data['image'])) {
