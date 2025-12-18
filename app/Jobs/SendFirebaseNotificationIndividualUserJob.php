@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use GuzzleHttp\Client;
@@ -30,7 +31,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         public string $notification_type = 'user_notification',
         public ?int $min = null,
         public ?int $max = null,
-         public ?string $dataType = null,
+        public ?string $dataType = null,
 
 
     ) {}
@@ -41,6 +42,9 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
+        Log::info('Firebase project ID', [
+            'projectId' => $projectId
+        ]);
 
         $client = new Client([
             'headers'  => [
