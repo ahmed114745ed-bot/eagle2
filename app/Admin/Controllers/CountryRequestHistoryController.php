@@ -24,19 +24,7 @@ class CountryRequestHistoryController extends MainController
             ->body($this->grid());
     }
 
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
-    public function show($id, Content $content)
-    {
-        return parent::show($id, $content
-            ->title(trans('Change Country Requests'))
-            ->body($this->detail($id)));
-    }
+  
 
     /**
      * Make a grid builder.
@@ -47,7 +35,7 @@ class CountryRequestHistoryController extends MainController
     {
         $grid = new Grid(new ChangeCountryRequest());
         $grid->model()->with(['country', 'user.packs'])->where('status','pending')->orderByDesc('created_at');
-
+     
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -120,5 +108,6 @@ class CountryRequestHistoryController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
+         return $grid;
     }
 }
