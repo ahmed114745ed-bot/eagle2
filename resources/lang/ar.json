@@ -4633,6 +4633,8 @@
 "Delete wallet fields": "حذف حقول المحفظة",
 "Edit wallet fields": "تعديل حقول المحفظة",
 "Show wallet fields": "عرض حقول المحفظة",
+"country requests" : "طلبات الدول",
+"Browse change country request" : "استعراض طلب الدولة",
 "accounts number":"عدد الحسابات",
 "gifts type": "نوع الهدايا",
 "all gifts": "جميع الهدايا",

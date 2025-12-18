@@ -433,6 +433,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'complaints', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'change-country-request', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
