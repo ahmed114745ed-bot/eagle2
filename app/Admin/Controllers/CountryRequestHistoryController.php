@@ -15,7 +15,7 @@ use App\Admin\Controllers\MainController;
 class CountryRequestHistoryController extends MainController
 {
 
-   // public $permission_name = 'country-request-action';
+    // public $permission_name = 'country-request-action';
 
     public function index(Content $content)
     {
@@ -24,7 +24,7 @@ class CountryRequestHistoryController extends MainController
             ->body($this->grid());
     }
 
-  
+
 
     /**
      * Make a grid builder.
@@ -34,8 +34,8 @@ class CountryRequestHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user.packs'])->where('status','pending')->orderByDesc('created_at');
-     
+        $grid->model()->with(['country', 'user.packs'])->where('status', '!=', 'pending')->orderByDesc('created_at');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -63,7 +63,7 @@ class CountryRequestHistoryController extends MainController
                 return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
             });
 
-         $grid->column('country.name', __('country'))->display(function () {
+        $grid->column('country.name', __('country'))->display(function () {
 
             $country = $this->country;
 
@@ -108,6 +108,6 @@ class CountryRequestHistoryController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
-         return $grid;
+        return $grid;
     }
 }
