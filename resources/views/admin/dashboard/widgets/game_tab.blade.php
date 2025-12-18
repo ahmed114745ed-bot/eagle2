@@ -74,7 +74,6 @@
                 <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
                 <h3>{{ __('App Profit') }}</h3>
                 <p class="amount" id="appProfit">0 $</p>
-                <small>{{ __('Total earnings from app') }}</small>
             </div>
         </div>
     </div>
