@@ -355,7 +355,7 @@ class MicService
         })->toArray();
 
         $json = $this->cpMapJson($indices);
-
+        Log::info("📩 [CP] Sending lovely message in room {$room->id} for user {$user->id}: {$json}", []);
         Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
     }
     public function cpMapJson($indices): string|false
