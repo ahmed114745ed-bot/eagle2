@@ -38,7 +38,7 @@
 
 #shipmentsChart{
     width:100% !important;
-    height:81% !important;
+    height: 100% !important;
 }
 .card-trans{min-height: 370px;}
 .card-trans2{min-height: 468px;  max-height:468px ;}
@@ -66,7 +66,8 @@
         gap: 10px;
     }
     .chart-container {
-        height: 300px !important;
+        position: relative;
+        height: 320px !important;
     }
     .chart-title {
         font-size: 1rem;

@@ -908,9 +908,15 @@ class AllStatisticController extends MainController
         }
     public function financeChartIndex(Request $request)
     {
-        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->subDays(6)->startOfDay();
-        $to   = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
-        $days = $request->query('days', null);
+        $days = (int) $request->query('days', 7);
+
+        $to = $request->filled('to')
+            ? Carbon::parse($request->query('to'))->endOfDay()
+            : now()->endOfDay();
+
+        $from = $request->filled('from')
+            ? Carbon::parse($request->query('from'))->startOfDay()
+            : $to->copy()->subDays($days - 1)->startOfDay();
 
         $period = CarbonPeriod::create($from, $to);
 
@@ -919,20 +925,27 @@ class AllStatisticController extends MainController
             0
         );
 
-        $charges = Charge::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(usd) as total'))
+        $charges = Charge::selectRaw('DATE(created_at) as date, SUM(usd) as total')
             ->whereBetween('created_at', [$from, $to])
-            ->groupBy(DB::raw('DATE(created_at)'))
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date')
             ->pluck('total', 'date')
             ->toArray();
 
-        $values = array_merge($values, $charges);
+        foreach ($charges as $date => $total) {
+            $values[$date] = (float) $total;
+        }
 
-        $labels = array_map(fn($d) => Carbon::parse($d)->format($days == 7 ? 'D' : 'd M'), array_keys($values));
-        $values = array_values($values);
+        $labels = array_map(
+            fn($d) => Carbon::parse($d)->format($days === 7 ? 'D' : 'd M'),
+            array_keys($values)
+        );
 
-        return response()->json(['labels'=>$labels,'values'=>$values]);
+        return response()->json([
+            'labels' => $labels,
+            'values' => array_values($values),
+        ]);
     }
-
 
 
      public function ajaxWalletLogs(Request $request)
