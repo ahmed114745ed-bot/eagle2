@@ -171,15 +171,13 @@ body {
 }
 
 .stats-masonry {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 24px;
     margin-bottom: 40px;
 }
 
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 24px;
     margin-bottom: 40px;
 }
