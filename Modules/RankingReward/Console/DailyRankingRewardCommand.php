@@ -15,8 +15,10 @@ use Illuminate\Console\Command;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Modules\RankingReward\Entities\RankingType;
-use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RankingReward\Entities\WinnerRanking;
+use Modules\Achievement\Entities\UserAchievementLevel;
+use App\Jobs\SendFirebaseNotificationIndividualUserJob;
+use Illuminate\Support\Facades\Log;
 
 class DailyRankingRewardCommand extends Command
 {
@@ -51,17 +53,17 @@ class DailyRankingRewardCommand extends Command
         switch ($rankingType->type) {
 
             case 'wealth':
-            case 'charm':
+           // case 'charm':
                 return $this->giftRanking($rankingType->type);
 
-            case 'charge':
-                return $this->charge();
+            // case 'charge':
+            //     return $this->charge();
 
-            case 'game':
-                return $this->gameRanking();
+            // case 'game':
+            //     return $this->gameRanking();
 
-            default:
-                return collect();
+            // default:
+            //     return collect();
         }
     }
 
@@ -163,7 +165,7 @@ class DailyRankingRewardCommand extends Command
             $count = $max - $min + 1;
 
             $records = $rankingList->slice($startIndex, $count)->values();
-            // dd($records ,$range);
+          //   dd($records ,$range);
 
             $userIdKey = $this->getUserIdKey($rankingType->type);
             $userIds = $records->pluck($userIdKey)->filter()->values();
@@ -173,44 +175,110 @@ class DailyRankingRewardCommand extends Command
 
                 $this->giveReward($record, $range, $rankingType->type);
             }
-            $this->dispatchNotification($userIds, $range, $rankingType->type);
+
+          //  dd($userIds);
+            $this->dispatchNotification($userIds->toArray(), $range);
         }
     }
 
 
-    protected function dispatchNotification($userIds, $range, $type)
-    {
-        if (empty($userIds)) {
-            return;
-        }
+    // protected function dispatchNotification($userIds, $range)
+    // {
+    //   //  dd($userIds);
+    //     if (empty($userIds)) {
+    //         return;
+    //     }
 
-        $wareTitle = __('congratulations');
+    //    // dd(123);
 
-        // ✅ level text (1 or 1–6)
-        $levelText = $range->min === ($range->max ?? $range->min)
-            ? $range->min
-            : $range->min . '-' . $range->max;
+    //     $min =  $range->min;
+    //     $max =   $range->max;
 
-        $body = __('rankingRewardLevel', [
-            'level' => $levelText,
-        ]) . " ({$type})";
+    //     $tokens = User::whereIn('id', $userIds)
+    //         ->whereNotNull('notification_id')
+    //         ->pluck('notification_id')
+    //         ->toArray();
 
-        $tokens = User::whereIn('id', $userIds)
-            ->whereNotNull('notification_id')
-            ->pluck('notification_id')
-            ->toArray();
+    //         // dd($tokens);
 
-        $image = $range->generate_image;
-        $icon  = getImagePath($image);
+    //     $image = $range->generate_image;
+    //     $icon  = getImagePath($image);
+    //     $data['image'] = $icon;
+    //     // ✅ group official message
 
-        // ✅ group official message
-        Common::sendOfficialMessage($userIds, $wareTitle, $body, image: $image);
 
-        // ✅ group firebase notification
-        if (!empty($tokens)) {
-            Common::send_firebase_notification($tokens, $wareTitle, $body, icon: $icon);
-        }
+    //     // ✅ group firebase notification
+    //     if (!empty($tokens)) {
+    //     //    dd(123);
+    //         SendFirebaseNotificationIndividualUserJob::dispatch(
+    //             tokens: $tokens,
+    //             data: $data,
+    //             min: $min,
+    //             max: $max,
+    //             dataType: $image,
+
+
+    //         )->onQueue('notification_heavy');
+    //     }
+    // }
+
+
+protected function dispatchNotification($userIds, $range)
+{
+    // Convert to array if it's a Collection
+    $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
+
+    // Log the user IDs being notified
+    Log::info('Dispatching notifications to user IDs', [
+        'user_ids' => $userIds,
+        'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
+    ]);
+
+    if (empty($userIds)) {
+        Log::warning('No user IDs found for notification');
+        return;
     }
+
+    $min = $range->min;
+    $max = $range->max ?? $min;
+
+    $tokens = User::whereIn('id', $userIds)
+        ->whereNotNull('notification_id')
+        ->pluck('notification_id')
+        ->toArray();
+
+    // Log the tokens that will receive notifications
+    Log::info('Notification tokens', [
+        'tokens' => $tokens
+    ]);
+
+    $image = $range->generate_image;
+    $icon  = getImagePath($image);
+    $data['image'] = $icon;
+
+    if (!empty($tokens)) {
+        // Log that the job is being dispatched
+        // Log::info('Dispatching SendFirebaseNotificationIndividualUserJob', [
+        //     'tokens_count' => count($tokens),
+        //     'range_min'    => $min,
+        //     'range_max'    => $max,
+        //     'image'        => $image
+        // ]);
+
+        SendFirebaseNotificationIndividualUserJob::dispatch(
+            tokens: $tokens,
+            data: $data,
+            min: $min,
+            max: $max,
+            dataType: $image
+        )->onQueue('notification_heavy');
+    } else {
+        Log::warning('No tokens found to send notification', [
+            'user_ids' => $userIds
+        ]);
+    }
+}
+
 
 
     public function giveReward($record, $range, $type)
