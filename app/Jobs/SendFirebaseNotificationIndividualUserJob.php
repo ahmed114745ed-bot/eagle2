@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use GuzzleHttp\Client;
@@ -30,7 +31,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         public string $notification_type = 'user_notification',
         public ?int $min = null,
         public ?int $max = null,
-         public ?string $dataType = null,
+        public ?string $dataType = null,
 
 
     ) {}
@@ -41,6 +42,9 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
+        Log::info('Firebase project ID', [
+            'projectId' => $projectId
+        ]);
 
         $client = new Client([
             'headers'  => [
@@ -128,11 +132,26 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
             if (!empty($userData)) {
                 $dataPayload['user'] = json_encode($userData);
             }
-
+            $imageUrl = $this->data['image'] ?? null;
             $payload = [
                 'token' => $token,
                 'notification' => $notification,
                 'data' => $dataPayload,
+                'android' => [
+                    'notification' => [
+                        'image' => $imageUrl
+                    ]
+                ],
+                'apns' => [
+                    'payload' => [
+                        'aps' => [
+                            'mutable-content' => 1
+                        ]
+                    ],
+                    'fcm_options' => [
+                        'image' => $imageUrl
+                    ]
+                ],
             ];
 
             if (isset($this->data['image'])) {
