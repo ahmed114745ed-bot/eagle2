@@ -135,17 +135,18 @@ console.log('✅ sidebar js loaded');
 
         let top = r.top + (r.height / 2) - (tr.height / 2);
 
-        const rtl = isRTL();
         let left;
 
         tip.classList.remove('from-left', 'from-right');
 
-        if (rtl) {
+        const preferLeft = r.left > (window.innerWidth / 2);
+
+        if (preferLeft) {
             left = r.left - tr.width - gap;
-            tip.classList.add('from-right');
+            tip.classList.add('from-right'); // arrow on right side
         } else {
             left = r.right + gap;
-            tip.classList.add('from-left');
+            tip.classList.add('from-left');  // arrow on left side
         }
 
         if (left < 10) {
@@ -257,13 +258,17 @@ console.log('✅ sidebar js loaded');
         let top = anchorRect.top + (anchorRect.height / 2) - (popoverRect.height / 2);
 
         let left;
-        popover.classList.remove('from-right');
 
-        if (isRTL()) {
+        popover.classList.remove('from-left', 'from-right');
+
+        const preferLeft = anchorRect.left > (window.innerWidth / 2);
+
+        if (preferLeft) {
             left = anchorRect.left - popoverRect.width - gap;
-            popover.classList.add('from-right');
+            popover.classList.add('from-right'); // arrow on right side
         } else {
             left = anchorRect.right + gap;
+            popover.classList.add('from-left');  // arrow on left side
         }
 
         if (left < 10) {
@@ -363,12 +368,14 @@ console.log('✅ sidebar js loaded');
     }
 
     function handleMenuItemHover(e) {
-        const link = e.target.closest('.crs-link');
+        const link = e.target.closest('.crs-link') || e.target.closest('.crs-item')?.querySelector('.crs-link');
         if (!link) return;
 
         const inPopover = !!link.closest('.crs-popover');
 
         if (e.type === 'mouseenter' || e.type === 'focus') {
+            if (e.relatedTarget && link.contains(e.relatedTarget)) return;
+
             if (isSidebarCollapsed()) {
                 const isToggle = link.classList.contains('crs-toggle');
 
@@ -404,7 +411,7 @@ console.log('✅ sidebar js loaded');
                     if (tooltipTimeout) clearTimeout(tooltipTimeout);
                     tooltipTimeout = setTimeout(() => {
                         if (isSidebarCollapsed()) createLeafTooltip(link);
-                    }, 200);
+                    }, 0);
                     return;
                 }
             } else {
@@ -488,4 +495,29 @@ console.log('✅ sidebar js loaded');
         });
     });
 
+    (function () {
+        function isMobile() {
+            // pick the breakpoint that matches your CSS (Laravel-Admin/AdminLTE usually ~768)
+            return window.matchMedia('(max-width: 767px)').matches;
+        }
+
+        document.addEventListener('click', function (e) {
+            const leaf = e.target.closest('a.crs-link.crs-leaf');
+            if (!leaf) return;
+
+            // only force reload on MOBILE
+            if (!isMobile()) return;
+
+            // keep normal browser behaviors
+            if (e.defaultPrevented) return;
+            if (e.button !== 0) return; // left click only
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            if (leaf.target && leaf.target !== '_self') return;
+
+            e.preventDefault();
+
+            // force full navigation (bypass PJAX)
+            window.location.href = leaf.href;
+        }, true);
+    })();
 })();

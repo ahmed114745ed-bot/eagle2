@@ -687,6 +687,10 @@
         border-radius: 0 4px 4px 0;
     }
 
+    .ltr .skin-black-light .sidebar-menu > li > a::before {
+        left: 85% !important;
+    }
+
     .skin-black-light .sidebar-menu > li:hover > a,
     .skin-black-light .sidebar-menu > li.active > a {
         color: #ffffff !important;

@@ -287,7 +287,7 @@
     .logo {
         box-shadow: none !important;
         box-shadow: none !important;
-        background: linear-gradient(90deg, var(--secondary-color) 0%, var(--gray-50) 100%) !important;
+        background: var(--gradient-primary) !important;
     }
 
     .skin-black-light .main-header {

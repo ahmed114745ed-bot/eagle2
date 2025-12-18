@@ -158,7 +158,7 @@
             <div class="col-lg-7">
 
                 <div class="col-lg-12">
-                    <div class="main-chart-container" data-aos="fade-up">
+                    <div class="main-chart-container card" data-aos="fade-up">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="chart-title">{{ __("shipments_revenue") }}</h5>
                             <select id="filterChart" class="form-select form-select-sm" style="width:auto;">

@@ -88,6 +88,7 @@
         border-top-color: rgba(255, 255, 255, 0.05) !important;
     }
 
+    .dark-mode
     .dark-mode .box-body,
     .dark-mode .table-responsive,
     .dark-mode .box-body.table-responsive,
