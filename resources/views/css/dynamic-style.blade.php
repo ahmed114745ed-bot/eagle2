@@ -1602,7 +1602,7 @@
     .rtl .navbar-custom-menu > .navbar-nav > li > .dropdown-menu {
         position: absolute;
         right: 0;
-        left: auto;
+        left: 0;
     }
 
     /*.rtl .skin-black-light .main-header > .navbar .nav > li {*/

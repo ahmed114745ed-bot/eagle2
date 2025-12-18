@@ -1,5 +1,5 @@
- <style>
-     :root {
+<style>
+    :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
         --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
         --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
@@ -36,15 +36,14 @@
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-         --crs-red-hover: #e74c3c;
-        --crs-white-faint: rgba(255,255,255,0.06);
-        --crs-white-faint-2: rgba(255,255,255,0.16);
+        --crs-red-hover: #e74c3c;
+        --crs-white-faint: rgba(255, 255, 255, 0.06);
+        --crs-white-faint-2: rgba(255, 255, 255, 0.16);
         --crs-transition: 320ms;
-        --crs-ease: cubic-bezier(0.25,0.8,0.25,1);
+        --crs-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
         --crs-font: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
- </style>
-
+</style>
 
 
 @php
@@ -74,19 +73,23 @@
                 @else
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
-                    <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                <span
+                    class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
             </a>
         </li>
     @else
         <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
-            <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false" aria-controls="crs-sub-{{ $itemId }}">
+            <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false"
+               aria-controls="crs-sub-{{ $itemId }}">
                 @if(str_contains($item['icon'] ?? '', 'fa-'))
                     <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
                 @else
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
-                    <span class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
-                <i class="fa fa-angle-left crs-arrow" aria-hidden="true"></i>
+                <span
+                    class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                @php $isRtl = app()->getLocale() === 'ar'; @endphp
+                <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow" aria-hidden="true"></i>
             </a>
 
             <ul id="crs-sub-{{ $itemId }}" class="crs-submenu" data-crs-parent="{{ $itemId }}">

@@ -3,24 +3,26 @@ console.log('✅ sidebar js loaded');
 (function () {
     'use strict';
 
-    let currentPopover = null;      // kept for backward compatibility (always top-most)
+    let currentPopover = null;
     let popoverTimeout = null;
 
-    // NEW: support multiple (nested) popovers
-    let popoverStack = [];          // [{ el, level }]
+    let popoverStack = [];
     let treeIdCounter = 1;
 
-    // Check if sidebar is collapsed
+    let currentTooltip = null;
+    let tooltipTimeout = null;
+
+    let openChildTimer = null;
+    let closeChildTimer = null;
+
     function isSidebarCollapsed() {
         return document.body.classList.contains('sidebar-collapse');
     }
 
-    // NEW: RTL helper (for correct side positioning)
     function isRTL() {
         return document.documentElement.dir === 'rtl' || document.body.classList.contains('rtl');
     }
 
-    // NEW: Assign ids to original trees so cloned links can reference them
     function indexTrees() {
         document.querySelectorAll('.crs-tree').forEach(tree => {
             if (!tree.dataset.crsTreeId) {
@@ -57,7 +59,7 @@ console.log('✅ sidebar js loaded');
     function closeOtherMenus(currentTree) {
         const currentLevel = getMenuLevel(currentTree);
 
-        document.querySelectorAll('.crs-tree.crs-open').forEach(function(tree) {
+        document.querySelectorAll('.crs-tree.crs-open').forEach(function (tree) {
             if (tree !== currentTree && getMenuLevel(tree) === currentLevel) {
                 const submenu = tree.querySelector('.crs-submenu');
                 const toggle = tree.querySelector('.crs-toggle');
@@ -96,8 +98,87 @@ console.log('✅ sidebar js loaded');
         return level;
     }
 
-    // NEW: Close popovers from a given nesting level (keeps parents)
+    function closeTooltip() {
+        if (tooltipTimeout) {
+            clearTimeout(tooltipTimeout);
+            tooltipTimeout = null;
+        }
+
+        if (currentTooltip) {
+            currentTooltip.classList.remove('show');
+            const el = currentTooltip;
+            currentTooltip = null;
+            setTimeout(() => {
+                if (el && el.parentNode) el.remove();
+            }, 200);
+        }
+    }
+
+    function createLeafTooltip(link) {
+        closeTooltip();
+
+        const titleEl = link.querySelector('.crs-title');
+        if (!titleEl) return;
+
+        const text = titleEl.textContent.trim();
+        if (!text) return;
+
+        const tip = document.createElement('div');
+        tip.className = 'crs-tooltip';
+        tip.textContent = text;
+
+        document.body.appendChild(tip);
+
+        const r = link.getBoundingClientRect();
+        const tr = tip.getBoundingClientRect();
+        const gap = 12;
+
+        let top = r.top + (r.height / 2) - (tr.height / 2);
+
+        const rtl = isRTL();
+        let left;
+
+        tip.classList.remove('from-left', 'from-right');
+
+        if (rtl) {
+            left = r.left - tr.width - gap;
+            tip.classList.add('from-right');
+        } else {
+            left = r.right + gap;
+            tip.classList.add('from-left');
+        }
+
+        if (left < 10) {
+            left = r.right + gap;
+            tip.classList.remove('from-right');
+            tip.classList.add('from-left');
+        }
+        if (left + tr.width > window.innerWidth - 10) {
+            left = r.left - tr.width - gap;
+            tip.classList.remove('from-left');
+            tip.classList.add('from-right');
+        }
+
+        if (top < 10) top = 10;
+        if (top + tr.height > window.innerHeight - 10) top = window.innerHeight - tr.height - 10;
+
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+
+        setTimeout(() => tip.classList.add('show'), 10);
+        currentTooltip = tip;
+    }
+
     function closePopoversFrom(level) {
+        if (openChildTimer) {
+            clearTimeout(openChildTimer);
+            openChildTimer = null;
+        }
+        if (closeChildTimer) {
+            clearTimeout(closeChildTimer);
+            closeChildTimer = null;
+        }
+
         for (let i = popoverStack.length - 1; i >= 0; i--) {
             const p = popoverStack[i];
             if (p.level >= level) {
@@ -114,37 +195,31 @@ console.log('✅ sidebar js loaded');
 
     function closeAllPopovers() {
         closePopoversFrom(0);
+        closeTooltip();
     }
 
-    // NEW: Find the original tree for a toggle
     function resolveTreeFromToggle(toggle) {
-        // If this is a cloned toggle inside a popover, it will have a target tree id
         const targetId = toggle && toggle.dataset ? toggle.dataset.targetTreeId : null;
         if (targetId) {
-            return document.querySelector(`.crs-tree[data-crs-tree-id="${CSS.escape(targetId)}"]`);
+            const safe = (window.CSS && CSS.escape) ? CSS.escape(targetId) : targetId;
+            return document.querySelector(`.crs-tree[data-crs-tree-id="${safe}"]`);
         }
-        // Otherwise it's a real toggle in the sidebar
         return toggle.closest('.crs-tree');
     }
 
-    // NEW: Build popover items (direct children only); nested trees become "proxy toggles"
     function buildPopoverItemsFromSubmenu(popover, submenu) {
-        const children = Array.from(submenu.children); // direct only (prevents deep nesting)
+        const children = Array.from(submenu.children);
 
         children.forEach(child => {
-            // nested tree item
             if (child.classList && child.classList.contains('crs-tree')) {
                 const nestedToggle = child.querySelector(':scope > .crs-toggle');
                 if (!nestedToggle) return;
 
-                // Create a list item wrapper
                 const li = document.createElement('li');
                 li.className = 'crs-item';
 
-                // Clone ONLY the toggle row (not the nested submenu)
                 const clonedToggle = nestedToggle.cloneNode(true);
 
-                // Mark it so we can open the next popover
                 if (child.dataset && child.dataset.crsTreeId) {
                     clonedToggle.dataset.targetTreeId = child.dataset.crsTreeId;
                 }
@@ -154,14 +229,12 @@ console.log('✅ sidebar js loaded');
                 return;
             }
 
-            // normal leaf item (or any non-tree element)
             popover.appendChild(child.cloneNode(true));
         });
     }
 
-    // UPDATED: createPopover supports nested popovers via `level`
     function createPopover(toggle, level = 0) {
-        // Close any popovers at this level or deeper, but keep parents
+        closeTooltip();
         closePopoversFrom(level);
 
         const tree = resolveTreeFromToggle(toggle);
@@ -174,79 +247,49 @@ console.log('✅ sidebar js loaded');
         popover.className = 'crs-popover';
         popover.dataset.level = String(level);
 
-        // Clone submenu direct items (and convert nested submenus into proxy toggles)
         buildPopoverItemsFromSubmenu(popover, submenu);
-
         document.body.appendChild(popover);
 
-        // Anchor position
         const anchorRect = toggle.getBoundingClientRect();
         const popoverRect = popover.getBoundingClientRect();
+        const gap = 12;
 
-        let top, left;
+        let top = anchorRect.top + (anchorRect.height / 2) - (popoverRect.height / 2);
 
-        if (level === 0) {
-            // Original behavior: below toggle (or above if overflow)
-            top = anchorRect.bottom + 10;
-            left = anchorRect.left + (anchorRect.width / 2) - (popoverRect.width / 2);
+        let left;
+        popover.classList.remove('from-right');
 
-            // Adjust if popover goes off screen
-            if (left < 10) left = 10;
-            if (left + popoverRect.width > window.innerWidth - 10) {
-                left = window.innerWidth - popoverRect.width - 10;
-            }
-
-            if (top + popoverRect.height > window.innerHeight - 10) {
-                top = anchorRect.top - popoverRect.height - 10;
-                popover.style.setProperty('--arrow-position', 'bottom');
-            }
+        if (isRTL()) {
+            left = anchorRect.left - popoverRect.width - gap;
+            popover.classList.add('from-right');
         } else {
-            // NEW: Nested behavior: open to the side of the hovered item
-            const gap = 10;
+            left = anchorRect.right + gap;
+        }
 
-            top = anchorRect.top - 8;
+        if (left < 10) {
+            left = anchorRect.right + gap;
+            popover.classList.remove('from-right');
+        }
+        if (left + popoverRect.width > window.innerWidth - 10) {
+            left = anchorRect.left - popoverRect.width - gap;
+            popover.classList.add('from-right');
+        }
 
-            const rtl = isRTL();
-            let preferredLeft = rtl
-                ? (anchorRect.left - popoverRect.width - gap)
-                : (anchorRect.right + gap);
-
-            // If preferred side overflows, flip to the other side
-            if (preferredLeft < 10) {
-                preferredLeft = anchorRect.right + gap;
-            }
-            if (preferredLeft + popoverRect.width > window.innerWidth - 10) {
-                preferredLeft = anchorRect.left - popoverRect.width - gap;
-            }
-
-            left = preferredLeft;
-
-            // Clamp
-            if (left < 10) left = 10;
-            if (left + popoverRect.width > window.innerWidth - 10) {
-                left = window.innerWidth - popoverRect.width - 10;
-            }
-            if (top < 10) top = 10;
-            if (top + popoverRect.height > window.innerHeight - 10) {
-                top = window.innerHeight - popoverRect.height - 10;
-            }
+        if (top < 10) top = 10;
+        if (top + popoverRect.height > window.innerHeight - 10) {
+            top = window.innerHeight - popoverRect.height - 10;
         }
 
         popover.style.left = left + 'px';
         popover.style.top = top + 'px';
 
-        // Show popover
         setTimeout(() => {
             popover.classList.add('show');
         }, 10);
 
-        // Track popover stack
         popoverStack.push({ el: popover, level });
         currentPopover = popover;
 
-        // Handle popover link clicks:
-        // - leaf: close all
-        // - proxy toggle (has data-target-tree-id): open child popover instead
         popover.querySelectorAll('.crs-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 const isProxyToggle = link.classList.contains('crs-toggle') && !!link.dataset.targetTreeId;
@@ -261,7 +304,6 @@ console.log('✅ sidebar js loaded');
             });
         });
 
-        // Add hover listeners to keep popovers open
         popover.addEventListener('mouseenter', handlePopoverHover);
         popover.addEventListener('mouseleave', handlePopoverHover);
     }
@@ -280,19 +322,15 @@ console.log('✅ sidebar js loaded');
 
         const isOpen = tree.classList.contains('crs-open');
 
-        // Only show popover on click when sidebar is collapsed
         if (isSidebarCollapsed()) {
-            console.log('✅ isSidebarCollapsed');
             if (isOpen) {
                 closeAllPopovers();
-            }
-            else {
+            } else {
                 createPopover(toggle, 0);
             }
             tree.classList.toggle('crs-open');
             toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
         } else {
-            // Normal behavior when expanded - toggle submenu
             closeAllPopovers();
 
             if (isOpen) {
@@ -331,66 +369,75 @@ console.log('✅ sidebar js loaded');
         const inPopover = !!link.closest('.crs-popover');
 
         if (e.type === 'mouseenter' || e.type === 'focus') {
-            // Only show tooltip/popover when sidebar is collapsed
             if (isSidebarCollapsed()) {
                 const isToggle = link.classList.contains('crs-toggle');
 
-                // NEW: If hovering a toggle INSIDE a popover and it points to a nested tree,
-                // open a child popover instead of making the current one long.
                 if (inPopover && isToggle && link.dataset.targetTreeId) {
-                    if (popoverTimeout) clearTimeout(popoverTimeout);
+                    closeTooltip();
+
+                    if (openChildTimer) clearTimeout(openChildTimer);
+                    if (closeChildTimer) clearTimeout(closeChildTimer);
 
                     const parentPopover = link.closest('.crs-popover');
                     const parentLevel = parentPopover ? parseInt(parentPopover.dataset.level || '0', 10) : 0;
 
-                    popoverTimeout = setTimeout(() => {
-                        if (isSidebarCollapsed()) {
-                            createPopover(link, parentLevel + 1);
-                        }
-                    }, 220);
+                    openChildTimer = setTimeout(() => {
+                        if (isSidebarCollapsed()) createPopover(link, parentLevel + 1);
+                    }, 80);
 
                     return;
                 }
 
-                // Original behavior (sidebar items)
                 if (!inPopover && isToggle) {
+                    closeTooltip();
+
                     if (popoverTimeout) clearTimeout(popoverTimeout);
 
                     popoverTimeout = setTimeout(() => {
-                        const tree = link.closest('.crs-tree');
-                        if (isSidebarCollapsed()) {
-                            createPopover(link, 0);
-                        }
+                        if (isSidebarCollapsed()) createPopover(link, 0);
                     }, 300);
-                } else if (!inPopover) {
-                    // Tooltips only for leaf items in the sidebar (not inside popovers)
-                    const title = link.querySelector('.crs-title');
-                    if (title && !title.textContent.includes('...')) {
-                        link.setAttribute('data-tooltip', title.textContent.trim());
-                    }
+
+                    return;
+                }
+
+                if (!inPopover && !isToggle) {
+                    if (tooltipTimeout) clearTimeout(tooltipTimeout);
+                    tooltipTimeout = setTimeout(() => {
+                        if (isSidebarCollapsed()) createLeafTooltip(link);
+                    }, 200);
+                    return;
                 }
             } else {
                 closeAllPopovers();
             }
-        } else if (e.type === 'mouseleave' || e.type === 'blur') {
-            if (popoverTimeout) clearTimeout(popoverTimeout);
+        }
 
-            // If leaving a row inside a popover, close only deeper popovers (not the parent)
+        if (e.type === 'mouseleave' || e.type === 'blur') {
+            if (popoverTimeout) clearTimeout(popoverTimeout);
+            if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+            closeTooltip();
+
             if (inPopover) {
                 const parentPopover = link.closest('.crs-popover');
                 const parentLevel = parentPopover ? parseInt(parentPopover.dataset.level || '0', 10) : 0;
 
-                setTimeout(() => {
-                    // If not hovering any popover, close all; otherwise close deeper levels
+                if (parentPopover && e.relatedTarget && parentPopover.contains(e.relatedTarget)) {
+                    return;
+                }
+
+                if (openChildTimer) clearTimeout(openChildTimer);
+
+                if (closeChildTimer) clearTimeout(closeChildTimer);
+                closeChildTimer = setTimeout(() => {
                     const hoveringAny = popoverStack.some(p => p.el && p.el.matches(':hover'));
                     if (!hoveringAny) closeAllPopovers();
                     else closePopoversFrom(parentLevel + 1);
-                }, 160);
+                }, 260);
 
                 return;
             }
 
-            // Original behavior for sidebar hover leaving
             setTimeout(() => {
                 if (!currentPopover || !currentPopover.matches(':hover')) {
                     closeAllPopovers();
@@ -399,12 +446,11 @@ console.log('✅ sidebar js loaded');
         }
     }
 
-    // Handle popover hover to keep it open
     function handlePopoverHover(e) {
         if (e.type === 'mouseenter') {
             if (popoverTimeout) clearTimeout(popoverTimeout);
+            if (closeChildTimer) clearTimeout(closeChildTimer);
         } else if (e.type === 'mouseleave') {
-            // Close only when leaving ALL popovers
             setTimeout(() => {
                 const hoveringAny = popoverStack.some(p => p.el && p.el.matches(':hover'));
                 if (!hoveringAny) closeAllPopovers();
@@ -412,7 +458,6 @@ console.log('✅ sidebar js loaded');
         }
     }
 
-    // Add event listeners for hover interactions
     document.addEventListener('mouseenter', handleMenuItemHover, true);
     document.addEventListener('mouseleave', handleMenuItemHover, true);
     document.addEventListener('focus', handleMenuItemHover, true);
@@ -420,7 +465,6 @@ console.log('✅ sidebar js loaded');
 
     document.addEventListener('click', handleToggleClick);
 
-    // Close popover when clicking outside
     document.addEventListener('click', (e) => {
         const isClickOnPopover = e.target.closest('.crs-popover');
         const isClickOnToggle = e.target.closest('.crs-toggle');
@@ -430,7 +474,6 @@ console.log('✅ sidebar js loaded');
         }
     });
 
-    // Listen for sidebar collapse/expand changes
     window.addEventListener('DOMContentLoaded', function () {
         indexTrees();
 

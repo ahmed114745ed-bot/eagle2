@@ -127,11 +127,6 @@
     padding-right: 10px;
 }
 
-.rtl .crs-popover::before {
-    left: auto;
-    right: 20px;
-}
-
 .sidebar-mini.sidebar-collapse .crs-submenu .crs-icon.emoji-icon {
     font-size: 16px;
 }
@@ -340,65 +335,118 @@
 /* ============ TOOLTIP & POPOVER STYLES ============ */
 
 /* Tooltip for items without submenu (when sidebar is collapsed) */
-body.sidebar-collapse .crs-leaf::before,
-.main-sidebar.sidebar-collapse .crs-leaf::before,
-.sidebar.sidebar-collapse .crs-leaf::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 1000;
-    pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+/*body.sidebar-collapse .crs-leaf::before,*/
+/*.main-sidebar.sidebar-collapse .crs-leaf::before,*/
+/*.sidebar.sidebar-collapse .crs-leaf::before {*/
+/*    content: attr(data-tooltip);*/
+/*    position: absolute;*/
+/*    bottom: -40px;*/
+/*    left: 50%;*/
+/*    transform: translateX(-50%);*/
+/*    background: var(--primary-color);*/
+/*    color: #fff;*/
+/*    padding: 8px 12px;*/
+/*    border-radius: 6px;*/
+/*    font-size: 13px;*/
+/*    font-weight: 500;*/
+/*    white-space: nowrap;*/
+/*    opacity: 0;*/
+/*    visibility: hidden;*/
+/*    transition: opacity 0.3s ease, visibility 0.3s ease;*/
+/*    z-index: 1000;*/
+/*    pointer-events: none;*/
+/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);*/
+/*}*/
 
-/* Tooltip arrow for leaf items */
-body.sidebar-collapse .crs-leaf::after,
-.main-sidebar.sidebar-collapse .crs-leaf::after,
-.sidebar.sidebar-collapse .crs-leaf::after {
-    content: '';
-    position: absolute;
-    bottom: -32px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid var(--primary-color);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 1000;
-    pointer-events: none;
-}
+/*!* Tooltip arrow for leaf items *!*/
+/*body.sidebar-collapse .crs-leaf::after,*/
+/*.main-sidebar.sidebar-collapse .crs-leaf::after,*/
+/*.sidebar.sidebar-collapse .crs-leaf::after {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    bottom: -32px;*/
+/*    left: 50%;*/
+/*    transform: translateX(-50%);*/
+/*    width: 0;*/
+/*    height: 0;*/
+/*    border-left: 6px solid transparent;*/
+/*    border-right: 6px solid transparent;*/
+/*    border-bottom: 6px solid var(--primary-color);*/
+/*    opacity: 0;*/
+/*    visibility: hidden;*/
+/*    transition: opacity 0.3s ease, visibility 0.3s ease;*/
+/*    z-index: 1000;*/
+/*    pointer-events: none;*/
+/*}*/
 
-.crs-popover .crs-leaf::before,
-.crs-popover .crs-leaf::after {
-    content: none !important;
-    display: none !important;
-}
+/*.crs-popover .crs-leaf::before,*/
+/*.crs-popover .crs-leaf::after {*/
+/*    content: none !important;*/
+/*    display: none !important;*/
+/*}*/
 
 /* Show tooltip on hover when collapsed */
-body.sidebar-collapse .crs-leaf:hover::before,
-body.sidebar-collapse .crs-leaf:hover::after,
-.main-sidebar.sidebar-collapse .crs-leaf:hover::before,
-.main-sidebar.sidebar-collapse .crs-leaf:hover::after,
-.sidebar.sidebar-collapse .crs-leaf:hover::before,
-.sidebar.sidebar-collapse .crs-leaf:hover::after {
+/*body.sidebar-collapse .crs-leaf:hover::before,*/
+/*body.sidebar-collapse .crs-leaf:hover::after,*/
+/*.main-sidebar.sidebar-collapse .crs-leaf:hover::before,*/
+/*.main-sidebar.sidebar-collapse .crs-leaf:hover::after,*/
+/*.sidebar.sidebar-collapse .crs-leaf:hover::before,*/
+/*.sidebar.sidebar-collapse .crs-leaf:hover::after {*/
+/*    opacity: 1;*/
+/*    visibility: visible;*/
+/*}*/
+
+.crs-tooltip {
+    position: fixed;
+    background: var(--gradient-vertical-primary);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    padding: 10px 14px;
+    min-width: 140px;
+    max-width: 260px;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    z-index: 1002;
+    pointer-events: none;
+    color: #fff;
+    font-weight: 600;
+    font-family: var(--crs-font);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.crs-tooltip.show {
     opacity: 1;
     visibility: visible;
+    transform: scale(1);
+}
+
+.crs-tooltip{
+    overflow: visible !important;
+}
+
+.crs-tooltip::before{
+    content:'';
+    position:absolute;
+    width:10px;
+    height:10px;
+    background: var(--primary-color);
+    border-radius:2px;
+    transform: rotate(45deg);
+}
+
+.crs-tooltip.from-left::before{
+    left: -5px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.crs-tooltip.from-right::before{
+    left:auto;
+    right:-5px;
 }
 
 /* Popover container for items with submenu */
@@ -421,6 +469,7 @@ body.sidebar-collapse .crs-leaf:hover::after,
 
 .crs-popover.show {
     opacity: 1;
+    /*left: 85% !important;*/
     visibility: visible;
     transform: scale(1);
     pointer-events: auto;
@@ -479,6 +528,24 @@ body.sidebar-collapse .crs-leaf:hover::after,
     top: -5px;
     left: 20px;
     filter: brightness(1.05);
+}
+
+.crs-popover{
+    overflow: visible; /* allow arrow to stick out */
+}
+
+/* Side arrow default (popover appears to the RIGHT of icon => arrow on LEFT) */
+.crs-popover::before{
+    top: 50% !important;
+    left: -5px !important;
+    right: auto !important;
+    transform: translateY(-50%) rotate(45deg) !important;
+}
+
+/* If popover appears to the LEFT of icon => arrow on RIGHT */
+.crs-popover.from-right::before{
+    left: auto !important;
+    right: -5px !important;
 }
 
 /* small screens tweak */
