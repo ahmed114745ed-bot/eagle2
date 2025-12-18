@@ -171,13 +171,17 @@ class ChangeCountryRequestController extends MainController
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
-        $grid->batchActions(function ($batch) {
-            $batch->disableDelete();
-            $batch->add(new ActionCountryRequest());
-        });
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . url('/admin/country-request-history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
-        });
+        if (Admin::user()->can('all-status-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->batchActions(function ($batch) {
+                $batch->disableDelete();
+                $batch->add(new ActionCountryRequest());
+            });
+        }
+        if (Admin::user()->can('history-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->append('<a href="' . url('/admin/country-request-history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+            });
+        }
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->disableActions();

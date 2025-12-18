@@ -15,7 +15,7 @@ use App\Admin\Controllers\MainController;
 class CountryRequestHistoryController extends MainController
 {
 
-    // public $permission_name = 'country-request-action';
+    public $permission_name = 'country-request-history';
 
     public function index(Content $content)
     {
