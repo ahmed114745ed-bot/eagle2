@@ -58,6 +58,7 @@
     .dark-mode .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,
     .dark-mode .table-striped>tbody>tr:nth-of-type(odd),
     .dark-mode .pagination-wrapper,
+    .dark-mode .box-title,
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
     }
@@ -88,7 +89,7 @@
         border-top-color: rgba(255, 255, 255, 0.05) !important;
     }
 
-    .dark-mode
+    .dark-mode,
     .dark-mode .box-body,
     .dark-mode .table-responsive,
     .dark-mode .box-body.table-responsive,
