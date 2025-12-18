@@ -124,6 +124,14 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+<br>
+             <div class="switch-item">
+                <label for="changeCountryCheckbox" class="switch-label">{{__('accept change country')}}   </label>
+                <label class="switch">
+                    <input type="checkbox" id="changeCountryCheckbox" {{ $change_country == 1 ? 'checked' : '' }}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
     </div>
 
@@ -147,6 +155,17 @@
                     url: '/admin/close-open-gift',
                     method: 'POST',
                     data: { make_rooms_top: isChecked },
+                    success: function(response) { console.log(response); },
+                    error: function(error) { console.error(error); }
+                });
+            });
+
+             $('#changeCountryCheckbox').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                $.ajax({
+                    url: '/admin/accept-change-country',
+                    method: 'POST',
+                    data: { change_country: isChecked },
                     success: function(response) { console.log(response); },
                     error: function(error) { console.error(error); }
                 });
