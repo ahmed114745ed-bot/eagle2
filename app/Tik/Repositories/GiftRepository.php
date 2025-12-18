@@ -53,9 +53,11 @@ class GiftRepository extends AbstractRepository
             $query->where('gift_category_id', $categoryId);
         }
 
-        return $query->orderBy('use_count', 'desc')
-                    ->orderByRaw('ISNULL(`sort`), `sort`')
-                    ->orderBy('price')->get();
+        return $query->orderBy('sort', 'asc')
+        // orderBy('use_count', 'desc')
+        //             ->orderByRaw('ISNULL(`sort`), `sort`')
+        //             ->orderBy('price')
+                    ->get();
     }
 
     
