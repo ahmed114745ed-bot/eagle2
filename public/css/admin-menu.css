@@ -84,6 +84,7 @@
 
 .sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>a>span {
     padding: 0 !important;
+    margin-left: 0 !important;
 }
 
 .sidebar-mini.sidebar-collapse .sidebar-menu>li:hover>a>span:not(.pull-right),
@@ -99,6 +100,36 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     margin-right: -14px;
+}
+
+.rtl .crs-link:hover,
+.rtl .crs-link:focus { transform: translateX(-8px); }
+
+.rtl .crs-link:active { transform: translateX(-4px) scale(0.98); }
+
+.rtl .crs-submenu .crs-link:hover { transform: translateX(-8px); }
+.rtl .crs-popover .crs-link:hover { transform: translateX(-8px); }
+
+.rtl .crs-link:hover .crs-arrow { animation: arrowBounceRtl 0.6s ease infinite; }
+
+@keyframes arrowBounceRtl {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+}
+
+.rtl .crs-arrow {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+.rtl .crs-submenu {
+    padding-left: 0;
+    padding-right: 10px;
+}
+
+.rtl .crs-popover::before {
+    left: auto;
+    right: 20px;
 }
 
 .sidebar-mini.sidebar-collapse .crs-submenu .crs-icon.emoji-icon {
@@ -306,6 +337,150 @@
     opacity: 1;
 }
 
+/* ============ TOOLTIP & POPOVER STYLES ============ */
+
+/* Tooltip for items without submenu (when sidebar is collapsed) */
+body.sidebar-collapse .crs-leaf::before,
+.main-sidebar.sidebar-collapse .crs-leaf::before,
+.sidebar.sidebar-collapse .crs-leaf::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Tooltip arrow for leaf items */
+body.sidebar-collapse .crs-leaf::after,
+.main-sidebar.sidebar-collapse .crs-leaf::after,
+.sidebar.sidebar-collapse .crs-leaf::after {
+    content: '';
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--primary-color);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.crs-popover .crs-leaf::before,
+.crs-popover .crs-leaf::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Show tooltip on hover when collapsed */
+body.sidebar-collapse .crs-leaf:hover::before,
+body.sidebar-collapse .crs-leaf:hover::after,
+.main-sidebar.sidebar-collapse .crs-leaf:hover::before,
+.main-sidebar.sidebar-collapse .crs-leaf:hover::after,
+.sidebar.sidebar-collapse .crs-leaf:hover::before,
+.sidebar.sidebar-collapse .crs-leaf:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Popover container for items with submenu */
+.crs-popover {
+    position: fixed;
+    background: var(--gradient-vertical-primary);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    padding: 12px 0;
+    min-width: 220px;
+    max-width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+    z-index: 1001;
+    pointer-events: none;
+    filter: brightness(1.05);
+}
+
+.crs-popover.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* Popover items styling */
+.crs-popover .crs-item {
+    animation: none;
+    opacity: 1 !important;
+    margin: 0;
+}
+
+.crs-popover .crs-link {
+    padding: 10px 16px;
+    margin: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.crs-popover .crs-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.crs-popover .crs-icon {
+    width: 24px;
+    min-width: 24px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.crs-popover .crs-link:hover .crs-icon {
+    transform: scale(1.15);
+    color: var(--green-color);
+}
+
+.crs-popover .crs-title {
+    font-size: 14px;
+}
+
+/* Arrow pointer for popover */
+.crs-popover::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--primary-color);
+    border-radius: 2px;
+    transform: rotate(45deg);
+    top: -5px;
+    left: 20px;
+    filter: brightness(1.05);
+}
+
 /* small screens tweak */
 @media (max-width: 640px){
     .crs-link { padding: 10px 12px; }
@@ -314,5 +489,15 @@
 
     .crs-link:hover {
         transform: translateX(4px);
+    }
+
+    .crs-popover {
+        max-width: 240px;
+    }
+
+    .crs-popover .crs-link {
+        padding: 9px 14px;
+        margin: 3px 6px;
+        font-size: 13px;
     }
 }
