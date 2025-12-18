@@ -303,7 +303,7 @@ class UserService
         }
         // end update location
 
-        if (!$countryId){
+        if ($countryId){
             $this->userRepository->updateCountry($user, $countryId);
         }
         //        $this->updateCountryAgencyAndBD($user->id, $countryId);
