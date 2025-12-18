@@ -53,17 +53,17 @@ class DailyRankingRewardCommand extends Command
         switch ($rankingType->type) {
 
             case 'wealth':
-           // case 'charm':
+            case 'charm':
                 return $this->giftRanking($rankingType->type);
 
-            // case 'charge':
-            //     return $this->charge();
+            case 'charge':
+                return $this->charge();
 
-            // case 'game':
-            //     return $this->gameRanking();
+            case 'game':
+                return $this->gameRanking();
 
-            // default:
-            //     return collect();
+            default:
+                return collect();
         }
     }
 
