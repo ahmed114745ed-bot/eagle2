@@ -166,7 +166,7 @@ class DailyRankingRewardCommand extends Command
             $count = $max - $min + 1;
 
             $records = $rankingList->slice($startIndex, $count)->values();
-          //   dd($records ,$range);
+            //   dd($records ,$range);
 
             $userIdKey = $this->getUserIdKey($rankingType->type);
             $userIds = $records->pluck($userIdKey)->filter()->values();
@@ -177,7 +177,7 @@ class DailyRankingRewardCommand extends Command
                 $this->giveReward($record, $range, $rankingType->type);
             }
 
-          //  dd($userIds);
+            //  dd($userIds);
             $this->dispatchNotification($userIds->toArray(), $range);
         }
     }
@@ -224,61 +224,61 @@ class DailyRankingRewardCommand extends Command
     // }
 
 
-protected function dispatchNotification($userIds, $range)
-{
-    // Convert to array if it's a Collection
-    $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
+    protected function dispatchNotification($userIds, $range)
+    {
+        // Convert to array if it's a Collection
+        $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
 
-    // Log the user IDs being notified
-    Log::info('Dispatching notifications to user IDs', [
-        'user_ids' => $userIds,
-        'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
-    ]);
-
-    if (empty($userIds)) {
-        Log::warning('No user IDs found for notification');
-        return;
-    }
-
-    $min = $range->min;
-    $max = $range->max ?? $min;
-
-    $tokens = User::whereIn('id', $userIds)
-        ->whereNotNull('notification_id')
-        ->pluck('notification_id')
-        ->toArray();
-
-    // Log the tokens that will receive notifications
-    Log::info('Notification tokens', [
-        'tokens' => $tokens
-    ]);
-
-    $image = $range->generate_image;
-    $icon  = getImagePath($image);
-    $data['image'] = $icon;
-
-    if (!empty($tokens)) {
-        // Log that the job is being dispatched
-        // Log::info('Dispatching SendFirebaseNotificationIndividualUserJob', [
-        //     'tokens_count' => count($tokens),
-        //     'range_min'    => $min,
-        //     'range_max'    => $max,
-        //     'image'        => $image
-        // ]);
-
-        SendFirebaseNotificationIndividualUserJob::dispatch(
-            tokens: $tokens,
-            data: $data,
-            min: $min,
-            max: $max,
-            dataType: $image
-        )->onQueue('notification_heavy');
-    } else {
-        Log::warning('No tokens found to send notification', [
-            'user_ids' => $userIds
+        // Log the user IDs being notified
+        Log::info('Dispatching notifications to user IDs', [
+            'user_ids' => $userIds,
+            'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
         ]);
+
+        if (empty($userIds)) {
+            Log::warning('No user IDs found for notification');
+            return;
+        }
+
+        $min = $range->min;
+        $max = $range->max ?? $min;
+
+        $tokens = User::whereIn('id', $userIds)
+            ->whereNotNull('notification_id')
+            ->pluck('notification_id')
+            ->toArray();
+
+        // Log the tokens that will receive notifications
+        Log::info('Notification tokens', [
+            'tokens' => $tokens
+        ]);
+
+        $image = $range->generate_image;
+        $icon  = getImagePath($image);
+        $data['image'] = $icon;
+
+        if (!empty($tokens)) {
+            // Log that the job is being dispatched
+            // Log::info('Dispatching SendFirebaseNotificationIndividualUserJob', [
+            //     'tokens_count' => count($tokens),
+            //     'range_min'    => $min,
+            //     'range_max'    => $max,
+            //     'image'        => $image
+            // ]);
+
+            SendFirebaseNotificationIndividualUserJob::dispatch(
+                tokens: $tokens,
+                data: $data,
+                min: $min,
+                max: $max,
+                dataType: $image
+            )->onQueue('notification_heavy');
+        } else {
+            Log::warning('No tokens found to send notification', [
+                'user_ids' => $userIds
+            ]);
+        }
     }
-}
 
 
 
