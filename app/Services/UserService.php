@@ -54,6 +54,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -276,8 +277,11 @@ class UserService
         $countryId = $user->country_id;
 
         if (!$countryId){
+            Log::info('no country id for user '.$user->id);
             if ($iso) {
+                Log::info('try to get country id from iso '.$iso);
                 $country = Country::where('iso', strtoupper($iso))->first();
+                Log::info('country found: '.($country ? $country->id : 'not found'));
                 if ($country) {
                     $countryId = $country->id;
                 }
