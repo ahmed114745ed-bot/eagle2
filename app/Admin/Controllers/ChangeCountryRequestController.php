@@ -176,7 +176,7 @@ class ChangeCountryRequestController extends MainController
             $batch->add(new ActionCountryRequest());
         });
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . url('/admin/country-requests-actions') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+            $tools->append('<a href="' . url('/admin/country-request-history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
         $this->extendGrid($grid);
         $grid->disableExport();

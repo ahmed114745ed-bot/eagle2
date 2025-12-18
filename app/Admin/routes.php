@@ -335,7 +335,7 @@ Route::group(
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
-        Route::resource('country-requests-actions', CountryRequestHistoryController::class);
+        Route::get('country-request-history', [CountryRequestHistoryController::class,'index']);
         Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
         Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
          Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
