@@ -1,162 +1,112 @@
 <div class="stats-container">
     <div class="row g-3">
-
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-light-blue">
-                <span class="info-box-icon"><i class="fa fa-users"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Users Count') }}</span>
-                    <span class="info-box-number" data-stat="usersCount"></span>
-                    <a href="{{ admin_url('users') }}" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+                <h3>{{ __('Users Count') }}</h3>
+                <p class="amount" data-stat="usersCount">0</p>
+                <a href="{{ admin_url('users') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="fa fa-user"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Online Users Count') }}</span>
-                    <span class="info-box-number" data-stat="onlineUser"></span>
-                    <a href="{{ admin_url('users') }}?online=1" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+                <h3>{{ __('Online Users Count') }}</h3>
+                <p class="amount" data-stat="onlineUser">0</p>
+                <a href="{{ admin_url('users') }}?online=1"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-gray">
-                <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Peak Hour') }}</span>
-                    <span class="info-box-number" data-stat="peakHour"></span>
-                    <a href="{{ admin_url('users') }}" class="info-box-more text-dark">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
+                <h3>{{ __('Peak Hour') }}</h3>
+                <p class="amount" data-stat="peakHour">0</p>
+                <a href="{{ admin_url('users') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-purple">
-                <span class="info-box-icon"><i class="fa fa-user-plus"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('New Sign Ups Today') }}</span>
-                    <span class="info-box-number" data-stat="newSignUpsToday"></span>
-                    <a href="{{ admin_url('users') }}?signups=today" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-user-plus"></i></div>
+                <h3>{{ __('New Sign Ups Today') }}</h3>
+                <p class="amount" data-stat="newSignUpsToday">0</p>
+                <a href="{{ admin_url('users') }}?signups=today"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-yellow">
-                <span class="info-box-icon"><i class="fa fa-users"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('New Sign Ups This Week') }}</span>
-                    <span class="info-box-number" data-stat="newSignUpsThisWeek"></span>
-                    <a href="{{ admin_url('users') }}?signups=week" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+                <h3>{{ __('New Sign Ups This Week') }}</h3>
+                <p class="amount" data-stat="newSignUpsThisWeek">0</p>
+                <a href="{{ admin_url('users') }}?signups=week"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-orange">
-                <span class="info-box-icon"><i class="fa fa-calendar"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('New Sign Ups This Month') }}</span>
-                    <span class="info-box-number" data-stat="newSignUpsThisMonth"></span>
-                    <a href="{{ admin_url('users') }}?signups=month" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-calendar"></i></div>
+                <h3>{{ __('New Sign Ups This Month') }}</h3>
+                <p class="amount" data-stat="newSignUpsThisMonth">0</p>
+                <a href="{{ admin_url('users') }}?signups=month"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Messages Today') }}</span>
-                    <span class="info-box-number" data-stat="messagesToday"></span>
-                    <a href="{{ admin_url('users') }}?messages=today" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-envelope"></i></div>
+                <h3>{{ __('Messages Today') }}</h3>
+                <p class="amount" data-stat="messagesToday">0</p>
+                <a href="{{ admin_url('users') }}?messages=today"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="fa fa-comments"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Messages This Month') }}</span>
-                    <span class="info-box-number" data-stat="messagesThisMonth"></span>
-                    <a href="{{ admin_url('users') }}?messages=month" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                <h3>{{ __('Messages This Month') }}</h3>
+                <p class="amount" data-stat="messagesThisMonth">0</p>
+                <a href="{{ admin_url('users') }}?messages=month"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-blue">
-                <span class="info-box-icon"><i class="fa fa-user"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Users Who Send Messages') }}</span>
-                    <span class="info-box-number" data-stat="usersWhoSend"></span>
-                    <a href="{{ admin_url('users') }}?sent_messages=1" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+                <h3>{{ __('Users Who Send Messages') }}</h3>
+                <p class="amount" data-stat="usersWhoSend">0</p>
+                <a href="{{ admin_url('users') }}?sent_messages=1"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-gray">
-                <span class="info-box-icon"><i class="fa fa-user-times"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Users Who Never Send') }}</span>
-                    <span class="info-box-number" data-stat="usersWhoNeverSend"></span>
-                    <a href="{{ admin_url('users') }}?never_send=1" class="info-box-more text-dark">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-user-xmark"></i></div>
+                <h3>{{ __('Users Who Never Send') }}</h3>
+                <p class="amount" data-stat="usersWhoNeverSend">0</p>
+                <a href="{{ admin_url('users') }}?never_send=1"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="fa fa-comments-o"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Open Conversations Today') }}</span>
-                    <span class="info-box-number" data-stat="openConversationsToday"></span>
-                    <a href="{{ admin_url('users') }}" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                <h3>{{ __('Open Conversations Today') }}</h3>
+                <p class="amount" data-stat="openConversationsToday">0</p>
+                <a href="{{ admin_url('users') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <div class="info-box bg-yellow">
-                <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">{{ __('Avg Conversation Duration (min)') }}</span>
-                    <span class="info-box-number" data-stat="avgConversationDuration"></span>
-                    <a href="{{ admin_url('users') }}" class="info-box-more text-white">
-                        <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                    </a>
-                </div>
+            <div class="card finance-card">
+                <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
+                <h3>{{ __('Avg Conversation Duration (min)') }}</h3>
+                <p class="amount" data-stat="avgConversationDuration">0</p>
+                <a href="{{ admin_url('users') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
             </div>
         </div>
-
     </div>
 </div>
 

@@ -2,57 +2,41 @@
 
     <!-- BD Count -->
     <div class="col-md-3 col-sm-6">
-        <div class="info-box bg-aqua">
-            <span class="info-box-icon"><i class="fa fa-briefcase"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">{{ __('Bd Count') }}</span>
-                <span class="info-box-number" data-bdstat="bdCount"></span>
-                <a href="{{ admin_url('usersBD') }}" class="info-box-more text-white">
-                    <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                </a>
-            </div>
+        <div class="card finance-card">
+            <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <h3>{{ __('Bd Count') }}</h3>
+            <p class="amount" data-bdstat="bdCount">0</p>
+            <a href="{{ admin_url('usersBD') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
         </div>
     </div>
 
     <!-- Total BD Salary -->
     <div class="col-md-3 col-sm-6">
-        <div class="info-box bg-green">
-            <span class="info-box-icon"><i class="fa fa-wallet"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">{{ __('Total BD Salary') }}</span>
-                <span class="info-box-number" data-bdstat="totalBDSalary"></span>
-                <a href="{{ admin_url('bd-salaries') }}" class="info-box-more text-white">
-                    <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                </a>
-            </div>
+        <div class="card finance-card">
+            <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+            <h3>{{ __('Total BD Salary') }}</h3>
+            <p class="amount" data-bdstat="totalBDSalary">0</p>
+            <a href="{{ admin_url('bd-salaries') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
         </div>
     </div>
 
     <!-- Total Cut Amount -->
     <div class="col-md-3 col-sm-6">
-        <div class="info-box bg-red">
-            <span class="info-box-icon"><i class="fa fa-money-bill-wave"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">{{ __('Total Cut Amount') }}</span>
-                <span class="info-box-number" data-bdstat="totalBDCut"></span>
-                <a href="{{ admin_url('bd-salaries') }}" class="info-box-more text-white">
-                    <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                </a>
-            </div>
+        <div class="card finance-card">
+            <div class="card-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <h3>{{ __('Total Cut Amount') }}</h3>
+            <p class="amount" data-bdstat="totalBDCut">0</p>
+            <a href="{{ admin_url('bd-salaries') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
         </div>
     </div>
 
     <!-- Average Agencies per BD -->
     <div class="col-md-3 col-sm-6">
-        <div class="info-box bg-olive">
-            <span class="info-box-icon"><i class="fa fa-briefcase"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">{{ __('Average Agencies Per BD') }}</span>
-                <span class="info-box-number" data-bdstat="averageAgenciesPerBD"></span>
-                <a href="{{ admin_url('usersBD') }}" class="info-box-more text-white">
-                    <i class="fa fa-arrow-circle-right me-1"></i> {{ __('More') }}
-                </a>
-            </div>
+        <div class="card finance-card">
+            <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <h3>{{ __('Average Agencies Per BD') }}</h3>
+            <p class="amount" data-bdstat="averageAgenciesPerBD">0</p>
+            <a href="{{ admin_url('usersBD') }}"><i class="fa fa-arrow-circle-right"></i> {{ __('More') }}</a>
         </div>
     </div>
 

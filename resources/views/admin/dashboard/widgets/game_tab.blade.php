@@ -1,6 +1,6 @@
 @if (\Encore\Admin\Facades\Admin::user()->can('pay-switch' . 'dashboard') || \Encore\Admin\Facades\Admin::user()->can('*'))
     <div class="filter-form-premium fade-in-up">
-        <form method="GET" action="{{ url()->current() }}" style=" 
+        <form method="GET" action="{{ url()->current() }}" style="
     padding: 4px 17px;
     display: flex;
     border-radius: 15px;
@@ -69,11 +69,12 @@
     @endif
 <div class="row g-3">
     <div class="col-md-3 col-sm-6">
-        <div class="info-box bg-aqua">
-            <span class="info-box-icon"><i class="fa fa-gamepad"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">{{ __('App Profit') }}</span>
-                <span class="info-box-number" id="appProfit"></span>
+        <div class="cards-container mb-4" data-aos="fade-up">
+            <div class="card finance-card" id="app_profit">
+                <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                <h3>{{ __('App Profit') }}</h3>
+                <p class="amount" id="appProfit">0 $</p>
+                <small>{{ __('Total earnings from app') }}</small>
             </div>
         </div>
     </div>
