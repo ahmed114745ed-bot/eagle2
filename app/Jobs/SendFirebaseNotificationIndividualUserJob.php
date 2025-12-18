@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Jobs;
-
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use GuzzleHttp\Client;
 use App\Helpers\Common;
@@ -37,12 +37,7 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
     public function handle()
     {
-
         $title = __('congratulations');
-
-
-
-
         $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
@@ -50,36 +45,47 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         $client = new Client([
             'headers'  => [
                 'Authorization' => 'Bearer ' . $api_access_key,
-                'Content-Type'  => 'application/json',
+                'Content-Type' => 'application/json',
             ]
         ]);
 
-        $promises = [];
+        Log::info('SendFirebaseNotificationIndividualUserJob started', [
+            'tokens_count' => count($this->tokens),
+            'min' => $this->min,
+            'max' => $this->max,
+            'dataType' => $this->dataType,
+        ]);
 
-        $users =  User::select(['id', 'notification_id', 'lan'])->whereIn('notification_id', $this->tokens)
+        $users = User::select(['id', 'notification_id', 'lan'])
+            ->whereIn('notification_id', $this->tokens)
             ->where('is_logout', 0)
-            ->where('notification_id', '!=', null)
+            ->whereNotNull('notification_id')
             ->get();
-        if (!$users->count()) return;
+
+        if (!$users->count()) {
+            Log::warning('No users found for Firebase notification', ['tokens' => $this->tokens]);
+            return;
+        }
 
         $hasInPack = $this->user && Common::hasInPack($this->user->id, 18, true);
         $minLevel = $this->min ?? 1;
         $maxLevel = $this->max ?? $minLevel;
 
-        // Counter for levels
-        $level = $minLevel;
-
-       foreach ($users as $index => $user) {
-
+        foreach ($users as $index => $user) {
             $currentLevel = $minLevel + $index;
-
             if ($currentLevel > $maxLevel) {
                 break;
             }
 
-            $lang = $user?->lan ?? 'en';
+            $lang = $user->lan ?? 'en';
             $body = __('api.rankingRewardLevel', ['level' => $currentLevel], $lang);
 
+            // Log sending official message
+            Log::info('Sending official message', [
+                'user_id' => $user->id,
+                'level' => $currentLevel,
+                'body' => $body
+            ]);
 
             Common::sendOfficialMessage(
                 $user->id,
@@ -90,31 +96,29 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
             $token = $user->notification_id;
 
-
             $notification = [
                 'title' => $title,
-                'body'  => $body,
+                'body' => $body,
             ];
 
             $userData = [];
             if ($this->user) {
-
                 $userData = [
-                    'user_id'        => $this->user->id,
-                    'name'           => $this->user->name,
-                    'uuid'           => $this->user->uuid,
+                    'user_id' => $this->user->id,
+                    'name' => $this->user->name,
+                    'uuid' => $this->user->uuid,
                     'has_color_name' => $hasInPack,
-                    'image'          => $this->user->profile->avatar ?? '',
+                    'image' => $this->user->profile->avatar ?? '',
                 ];
             }
 
             $dataPayload = [
-                'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
-                'message-type'       => (string) ($this->messageType ?? ''),
-                'action'             => $this->action,
-                'type'               => $this->type,
-                'id'                 => $this->id,
-                'notification_type'  => $this->notification_type,
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'message-type' => (string) ($this->messageType ?? ''),
+                'action' => $this->action,
+                'type' => $this->type,
+                'id' => $this->id,
+                'notification_type' => $this->notification_type,
             ];
 
             foreach ($this->data as $key => $value) {
@@ -122,32 +126,38 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
             }
 
             if (!empty($userData)) {
-                $dataPayload['user'] = json_encode($userData); // ✅ user أيضاً لازم يكون نص
+                $dataPayload['user'] = json_encode($userData);
             }
 
             $payload = [
-                'token'        => $token,
+                'token' => $token,
                 'notification' => $notification,
-                'data'         => $dataPayload,
+                'data' => $dataPayload,
             ];
 
             if (isset($this->data['image'])) {
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-            $promises[$token] = $client->postAsync("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
-                'json' => ['message' => $payload]
+            Log::info('Dispatching Firebase async message', [
+                'token' => $token,
+                'payload' => $payload
             ]);
 
-            // $level++;
-            // if ($level > $maxLevel) {
-            //     $level = $minLevel; // Reset if exceeds max
-            // }
+            $promises[$token] = $client->postAsync(
+                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
+                ['json' => ['message' => $payload]]
+            );
         }
 
         try {
             Utils::unwrap($promises);
-        } catch (\Throwable $_) {
+            Log::info('All Firebase notifications sent successfully', ['count' => count($promises)]);
+        } catch (\Throwable $e) {
+            Log::error('Error sending Firebase notifications', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 }

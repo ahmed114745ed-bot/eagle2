@@ -45,6 +45,7 @@ class DailyRankingRewardCommand extends Command
 
             // 2) Apply ranges to give rewards
             $this->applyRanges($rankingList, $rankingType);
+            $this->info("✅ All data aggregated successfully.");
         }
     }
 
