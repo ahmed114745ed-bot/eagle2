@@ -15,7 +15,7 @@ return [
     ],
     "remainingDiamondCoins" => ":coins coins were added from the remaining value from month :month to the current month",
     "remainingDiamonds"     => ":diamonds diamonds were added from the remaining value from month :month to the current month",
-    'rankingRewardLevel' => "Congratulation!: you got reward level :level",
+    'rankingRewardLevel' => "Congratulation!: you got reward ranking level :level",
     "lucky_box" => 'lucky box',
     "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
     "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",
