@@ -103,7 +103,7 @@ class GiftController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Gift);
-
+        $grid->sortable();
         $filterType = request('filter', 'all');
         $category  = [];
         if (request('filter') != 'all') {
@@ -114,10 +114,11 @@ class GiftController extends MainController
             ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
-            ->orderBy('use_count', 'desc')
-            ->orderBy('type')
-            ->orderByRaw('ISNULL(`sort`), `sort`')
-            ->orderBy('price');
+            ->orderBy('sort', 'asc');
+        // ->orderBy('use_count', 'desc')
+        // ->orderBy('type')
+        // ->orderByRaw('ISNULL(`sort`), `sort`')
+        // ->orderBy('price');
 
         $grid->paginate(20);
         $grid->header(function () use ($filterType) {
@@ -222,7 +223,7 @@ class GiftController extends MainController
     }
 
 
-    
+
 
     /**
      * Make a show builder.
