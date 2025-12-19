@@ -18,8 +18,11 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
 use App\Admin\Actions\MoveGiftCategory;
-use Encore\Admin\Controllers\HasResourceActions;
 
+use App\Admin\Actions\Grid\MoveGroupsGifts;
+use App\Models\Setting;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Auth\Permission;
 class GiftController extends MainController
 {
     use HasResourceActions;
@@ -449,5 +452,14 @@ class GiftController extends MainController
 
 
         return $form;
+    }
+
+     public function luckyGiftSettings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'lucky-gift-setting');
+        }
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        return $content->view('lucky_gift', compact('config'));
     }
 }
