@@ -12,4 +12,9 @@ class Emoji extends Model
     protected $table = 'emojis';
 
     protected $guarded = [];
+
+     public $sortable = [
+        'order_column_name' => 'sort',
+        'sort_when_creating' => true,
+    ];
 }

@@ -67,10 +67,32 @@ class CountryService
 
     public function changeRequest($data): true
     {
-        ChangeCountryRequest::updateOrCreate([
-            'user_id' => auth()->id(),
-            'status' => 'pending'
-        ], $data + ['user_id' => auth()->id()]);
+        $user = request()->user();
+        $stop_invite_code = settings()->get('change_country');
+
+        $existRequest =   ChangeCountryRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
+        if ($existRequest) return  throw new \Exception('you sent request before');
+        //  dd($stop_invite_code);
+        if ($stop_invite_code  === '1') {
+            ChangeCountryRequest::updateOrCreate([
+                'user_id' => auth()->id(),
+                'status' => 'accepted'
+            ], $data + ['user_id' => auth()->id()]);
+
+
+            $user->country_id = $data['country_id'];
+            $user->save();
+            $title = __('Change Country Request');
+            $body = __('Your country change request has been accepted');
+            Common::sendOfficialMessage($user->id, $title, $body);
+            Common::send_firebase_notification($user->notification_id, $title, $body);
+        } else {
+            ChangeCountryRequest::updateOrCreate([
+                'user_id' => auth()->id(),
+                'status' => 'pending'
+            ], $data + ['user_id' => auth()->id()]);
+        }
+
 
         return true;
     }

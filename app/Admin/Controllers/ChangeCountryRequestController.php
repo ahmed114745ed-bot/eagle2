@@ -2,10 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\UserService;
-use App\Models\ChangeCountryRequest;
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -13,8 +11,13 @@ use App\Helpers\Common;
 use App\Models\Country;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use App\Models\ChangeCountryRequest;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Admin\Actions\Grid\ActionCountryRequest;
+use Illuminate\Http\Request;
+
 
 
 class ChangeCountryRequestController extends MainController
@@ -52,13 +55,13 @@ class ChangeCountryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user.packs'])->orderByDesc('created_at');
+        $grid->model()->with(['country', 'user.packs'])->where('status', 'pending')->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
             $filter->equal('status', __('Status'))->select([
-                'pending' => 'Pending',
+                // 'pending' => 'Pending',
                 'accepted' => 'Accepted',
                 'rejected' => 'Rejected'
             ]);
@@ -78,17 +81,60 @@ class ChangeCountryRequestController extends MainController
                     return __('No User');
                 }
                 $showUrl = url("admin/users/{$user->id}");
-                return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl:$showUrl);
+                return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
             });
 
-        $grid->column('country.e_name', __('Country'))->display(function () {
-            if ($this->country) {
-                return __("countries.{$this->country->e_name}");
+        $grid->column('country.name', __('country user'))->display(function () {
+
+            $country = $this->user->country;
+
+            if (!$country) {
+                return '-';
             }
-            return '-';
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
         });
 
-        $grid->column('country.flag', trans('flag'))->image('', 30);
+        $grid->column('country.name', __('country'))->display(function () {
+
+            $country = $this->country;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
+
+
 
         $grid->column('status', trans('Status'))->display(function ($value) {
             $colors = [
@@ -125,7 +171,17 @@ class ChangeCountryRequestController extends MainController
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
-
+        if (Admin::user()->can('all-status-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->batchActions(function ($batch) {
+                $batch->disableDelete();
+                $batch->add(new ActionCountryRequest());
+            });
+        }
+        if (Admin::user()->can('history-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->append('<a href="' . url('/admin/country-request-history') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
+            });
+        }
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->disableActions();
@@ -133,6 +189,15 @@ class ChangeCountryRequestController extends MainController
         return $grid;
     }
 
+
+    public function changeCountry(Request $request)
+    {
+        if ($request->change_country == "true") {
+            settings()->set("change_country", "1");
+        } else {
+            settings()->set("change_country", "0");
+        }
+    }
     /**
      * Make a show builder.
      *
@@ -166,9 +231,9 @@ class ChangeCountryRequestController extends MainController
         $request->status = 'accepted';
         $request->save();
 
-         $user = User::find($request->user_id);
-         $user->country_id = $request->country_id;
-         $user->save();
+        $user = User::find($request->user_id);
+        $user->country_id = $request->country_id;
+        $user->save();
 
         $title = __('Change Country Request');
         $body = __('Your country change request has been accepted');

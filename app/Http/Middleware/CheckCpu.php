@@ -23,7 +23,7 @@ class CheckCpu
             $cpuUsage    = $loadAverage[0];
             if ($cpuUsage > 11.5) {
                 // Take appropriate action, e.g., stop the request
-                return response(__('api.try_again'), 503);
+                return response(__('api.try_again'), 400);
             }
         }
 
