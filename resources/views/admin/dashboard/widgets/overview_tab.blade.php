@@ -547,18 +547,23 @@ async function loadFinanceChart() {
 ======================= */
 
 
-let overviewTabLoaded = false;
-
 function initOverviewTab() {
-    if (overviewTabLoaded) return; // Only load once
-    overviewTabLoaded = true;
-
     loadFinanceCards();
     loadFinanceTables();
     loadFinanceChart();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initOverviewTab();
+});
+
+// Listen for PJAX completion to reload data
+$(document).on('pjax:complete', function() {
+    initOverviewTab();
+});
+
+// Also listen for pjax:end as backup
+$(document).on('pjax:end', function() {
     initOverviewTab();
 });
 
