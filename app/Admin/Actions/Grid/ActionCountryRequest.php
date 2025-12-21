@@ -30,7 +30,8 @@ class ActionCountryRequest extends BatchAction
             // Get user and set locale
             $user = User::find($model->user_id);
             App::setLocale($user->lan ?? 'en');
-
+            $user->country_id = $model->country_id;
+            $user->save();
             // Prepare title and body based on status
             $title = __('Change Country Request');
             $body = $status === 'accepted'
