@@ -2,8 +2,11 @@
 
 namespace App\Admin\Actions\Grid;;
 
+use App\Models\User;
+
+use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Models\EmojiCategory;
+use Illuminate\Support\Facades\App;
 use Encore\Admin\Actions\BatchAction;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -24,7 +27,22 @@ class ActionCountryRequest extends BatchAction
             $model->update([
                 'status' => $status,
             ]);
+            App::setLocale($user->lan ?? 'en');
+            $user = User::find($model->user_id);
+            if ($status == 'accepted') {
+                $title = __('Change Country Request');
+                $body = __('Your country change request has been accepted');
+                Common::sendOfficialMessage($user->id, $title, $body);
+                Common::send_firebase_notification($user->notification_id, $title, $body);
+            } else {
+                $title = __('Change Country Request');
+                $body = __('Your country change request has been accepted');
+                Common::sendOfficialMessage($user->id, $title, $body);
+                Common::send_firebase_notification($user->notification_id, $title, $body);
+            }
         }
+
+
 
         return $this->response()->success(__('emoji moved successfully'))->refresh();
     }
