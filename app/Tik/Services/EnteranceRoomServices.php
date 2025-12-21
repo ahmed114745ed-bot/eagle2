@@ -760,9 +760,9 @@ class EnteranceRoomServices
             return Common::apiResponse(0, __('room_closed'));
         }
 
-        if ($this->isUserInTempBlacklist($room, $user->id)) {
-            return Common::apiResponse(false, __('You cannot enter this room temporarily'), null, 403);
-        }
+        // if ($this->isUserInTempBlacklist($room, $user->id)) {
+        //     return Common::apiResponse(false, __('You cannot enter this room temporarily'), null, 403);
+        // }
 
         return null;
     }
