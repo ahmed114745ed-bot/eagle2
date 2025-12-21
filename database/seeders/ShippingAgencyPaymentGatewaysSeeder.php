@@ -118,6 +118,8 @@ class ShippingAgencyPaymentGatewaysSeeder extends Seeder
                     'status' => 1,
                     'type' => $type,
                     'package_type' => 'shipping_agency',
+                    'description' => ucfirst($type) . ' payment method for agencies',
+
                 ]
             );
 

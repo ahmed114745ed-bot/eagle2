@@ -39,4 +39,13 @@ class PaymentCoin extends Model
             )
             ->orderByDesc('status');
     }
+
+    public function coinsV2()
+    {
+        return $this->hasMany(Coin::class, 'payment_gateway_id')
+            ->withCount(['logs as usage_count' => function ($query) {
+                $query->where('status', 1);
+            }]);
+    }
+
 }

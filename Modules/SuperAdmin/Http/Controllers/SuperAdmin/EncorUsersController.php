@@ -179,7 +179,7 @@ class EncorUsersController extends AdminController
             $q->where('parent_id', $authId);
         })
             ->where('is_preview', 0)
-            ->where('country_id', auth()->user()->country_id)
+          //  ->where('country_id', auth()->user()->country_id)
             ->where('type', 'sub_super_admin')
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');

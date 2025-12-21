@@ -62,8 +62,8 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $globalKeys = [
-            'is_multi' => @$request->is_multi ?? false,
-            'notification_id' => @$request->notification_id,
+            'is_multi' => $request->input('is_multi', false),
+            'notification_id' => $request->input('notification_id' , null)
         ];
 
         switch ($request['type']) {
@@ -111,7 +111,11 @@ class AuthController extends Controller
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
         try {
-            event(new DeviceTokenSent($user->id, $user->device_token));
+
+            if ($user->device_token) {
+                event(new DeviceTokenSent($user->id, $user->device_token));
+            }
+            // event(new DeviceTokenSent($user->id, $user->device_token));
         } catch (\Exception $e) {
         }
 
@@ -123,23 +127,21 @@ class AuthController extends Controller
             __('api_responses.logged'),
             [
                 'id'            => $user->id,
-                'is_first'      => @(bool)$user->is_points_first,
+                'is_first'      => (bool) ($user->is_points_first ?? false),  //    @(bool)$user->is_points_first,
                 'auth_token'    => $user->auth_token
             ]
         );
 
-        return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
 
     protected function loginWithGoogle($data)
     {
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
-            if ($resource != null) {
-                Common::apiResponse(false, 'email already taken', $resource, 405);
-            }
+            // if ($resource != null) {
+            //     Common::apiResponse(false, 'email already taken', $resource, 405);
+            // }
         } catch (\Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
@@ -148,9 +150,14 @@ class AuthController extends Controller
         }
         $user->auth_token = $token;
         try {
-            event(new DeviceTokenSent($user->id, $user->device_token));
+
+            if ($user->device_token) {
+                event(new DeviceTokenSent($user->id, $user->device_token));
+            }
+            // event(new DeviceTokenSent($user->id, $user->device_token));
         } catch (\Exception $e) {
         }
+
         AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
 
 
@@ -159,11 +166,10 @@ class AuthController extends Controller
             __('api_responses.logged'),
             [
                 'id'            => $user->id,
-                'is_first'      => @(bool)$user->is_points_first,
+                'is_first'      => (bool) ($user->is_points_first ?? false), //@(bool)$user->is_points_first,  
                 'auth_token'    => $user->auth_token
             ]
         );
-        return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
 
 

@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Helpers\Common;
-use App\Http\Resources\CountrySupportersResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Doctrine\DBAL\Schema\Index;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
-use Doctrine\DBAL\Schema\Index;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use App\Http\Resources\CountrySupportersResource;
 
 class CountryController extends Controller
 {
@@ -90,8 +91,13 @@ class CountryController extends Controller
         $data = $request->validate([
             'country_id' => ['required', 'integer', Rule::exists('countries', 'id')],
         ]);
-        $this->countryService->changeRequest($data);
 
+        if ($request->user()->country_id == $request->country_id) return Common::apiResponse(0, __('this is your country'), 400);
+        try {
+            $this->countryService->changeRequest($data);
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
         return Common::apiResponse(1, __('you request has been sent successfully'), 200);
     }
 }

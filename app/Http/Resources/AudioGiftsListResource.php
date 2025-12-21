@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\Common;
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AudioGiftsListResource extends JsonResource
@@ -14,21 +15,16 @@ class AudioGiftsListResource extends JsonResource
      */
     public function toArray($request): array
     {
+        $roomName = $this->room->room_name ?? '';
+        $giftName = $this->gift->name ?? '';
+        $formattedDate = Carbon::parse($this->created_at)
+            ->translatedFormat('d F Y - h:i A');
 
         return [
-
-            'user' => [
-                'name' => $this->sender->name ?? '',
-                'uuid' => $this->sender->uuid ?? '',
-                'avatar' => $this->sender->profile->avatar ?? '',
-            ],
-            'room' => [
-                'name' => $this->room->room_name ?? '',
-            ],
-            'gift' => [
-                'name' => $this->gift->name ?? '',
-            ],
-            'created_at' => $this->created_at ?? '',
+            'name' => $this->sender->name ?? '',
+            'avatar' => $this->sender->profile->avatar ?? '',
+            'description' => __('source:') . $roomName .' '. __('gift:') . $giftName,
+            'created_at' => $formattedDate,
             'diamond' => $this->total ?? 0,
         ];
     }

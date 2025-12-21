@@ -72,7 +72,7 @@ Route::group(
         Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
-        Route::resource('super-admin-rewards-history', SuperAdminRewardControllerHistory::class);
+        Route::resource('super-admin-rewards-histories', SuperAdminRewardControllerHistory::class);
         Route::resource('super-admin-rewards', Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminRewardController::class);
 
 

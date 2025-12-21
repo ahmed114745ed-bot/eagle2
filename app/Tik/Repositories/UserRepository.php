@@ -288,21 +288,44 @@ class UserRepository extends AbstractRepository
         return true;
     }
 
+    // public function updateIsLogout($user, $isLogout, $is_new = false)
+    // {
+    //     $user->lan = app()->getLocale() ?? 'en';
+    //     $user->is_logout = $isLogout;
+    //     if ($is_new) {
+    //         $user->is_points_first = true;
+    //     } else {
+    //         $user->is_points_first = false;
+    //     }
+    //     $notification_id = @request()->notification_id;
+    //     if ($notification_id) {
+    //         $user->notification_id = $notification_id;
+    //     }
+    //     $this->updateUser($user);
+    // }
     public function updateIsLogout($user, $isLogout, $is_new = false)
     {
+        if (!$user) return;
+
         $user->lan = app()->getLocale() ?? 'en';
-        $user->is_logout = $isLogout;
-        if ($is_new) {
-            $user->is_points_first = true;
-        } else {
-            $user->is_points_first = false;
-        }
-        $notification_id = @request()->notification_id;
+        $user->is_logout = (bool)$isLogout;
+        $user->is_points_first = (bool)$is_new;
+
+        $notification_id = request()->input('notification_id');
         if ($notification_id) {
             $user->notification_id = $notification_id;
         }
-        $this->updateUser($user);
+
+        try {
+            $this->updateUser($user);
+        } catch (\Exception $e) {
+            logger()->error('Failed to update user in updateIsLogout', [
+                'user_id' => $user->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
+
 
     public function findByGoogleId($googleId)
     {
