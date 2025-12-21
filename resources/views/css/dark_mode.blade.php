@@ -59,6 +59,7 @@
     .dark-mode .table-striped>tbody>tr:nth-of-type(odd),
     .dark-mode .pagination-wrapper,
     .dark-mode .box-title,
+    .dark-mode .modal-footer,
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
     }

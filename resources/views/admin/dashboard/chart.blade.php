@@ -349,6 +349,56 @@
         .balance-card .row > div {
             margin-bottom: 15px;
         }
+
+        .tab-content {
+            padding: 15px;
+            margin: 0 -10px;
+        }
+
+        .widget-card {
+            margin-bottom: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-container {
+            padding: 5px;
+        }
+
+        .section-header {
+            font-size: 1.2rem;
+            margin: 15px 0 10px 0;
+        }
+
+        .stats-grid {
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 10px;
+        }
+
+        .card-header {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+
+        .tab-content {
+            padding: 10px;
+            margin: 0 -5px;
+        }
+
+        .widget-card {
+            margin-bottom: 10px;
+        }
+
+        .widget-card-premium {
+            padding: 15px;
+        }
+
+        .row {
+            display: block !important;
+        }
     }
 
     /* Tab Styles */
@@ -763,5 +813,51 @@
             });
         });
         charts.forEach(c => io.observe(c));
+
+        // Tab persistence functionality
+        const tabs = document.querySelectorAll('#statsTabs .nav-link');
+        const tabContent = document.getElementById('statsTabContent');
+
+        // Function to activate a tab
+        function activateTab(tabId) {
+            // Remove active class from all tabs
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+
+            // Hide all tab panes
+            const panes = tabContent.querySelectorAll('.tab-pane');
+            panes.forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+
+            // Activate the selected tab
+            const activeTab = document.querySelector(`[data-bs-target="${tabId}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.setAttribute('aria-selected', 'true');
+            }
+
+            // Show the selected tab pane
+            const activePane = document.querySelector(tabId);
+            if (activePane) {
+                activePane.classList.add('show', 'active');
+            }
+        }
+
+        // Load saved tab on page load
+        const savedTab = localStorage.getItem('activeDashboardTab');
+        if (savedTab) {
+            activateTab(savedTab);
+        }
+
+        // Save active tab when clicked
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const target = this.getAttribute('data-bs-target');
+                localStorage.setItem('activeDashboardTab', target);
+            });
+        });
     });
 </script>
