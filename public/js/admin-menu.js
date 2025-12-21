@@ -481,7 +481,55 @@ console.log('✅ sidebar js loaded');
         }
     });
 
+    function saveSidebarState() {
+        const isCollapsed = isSidebarCollapsed();
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+
+        const contentWrapper = document.querySelector('.content-wrapper');
+        if (contentWrapper) {
+            if (isCollapsed) {
+                contentWrapper.classList.add('content-wrapper-rtl');
+            } else {
+                contentWrapper.classList.remove('content-wrapper-rtl');
+            }
+        }
+    }
+
+    function restoreSidebarState() {
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            document.body.classList.add('sidebar-collapse');
+        } else if (savedState === 'false') {
+            document.body.classList.remove('sidebar-collapse');
+        }
+
+        const contentWrapper = document.querySelector('.content-wrapper');
+        if (contentWrapper) {
+            const isCollapsed = savedState === 'true';
+            if (isCollapsed) {
+                contentWrapper.classList.add('content-wrapper-rtl');
+            } else {
+                contentWrapper.classList.remove('content-wrapper-rtl');
+            }
+        }
+    }
+
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                saveSidebarState();
+            }
+        });
+    });
+
     window.addEventListener('DOMContentLoaded', function () {
+        restoreSidebarState();
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
         indexTrees();
 
         document.querySelectorAll('.crs-submenu').forEach(function (sm) {
@@ -497,7 +545,6 @@ console.log('✅ sidebar js loaded');
 
     (function () {
         function isMobile() {
-            // pick the breakpoint that matches your CSS (Laravel-Admin/AdminLTE usually ~768)
             return window.matchMedia('(max-width: 767px)').matches;
         }
 
@@ -505,10 +552,8 @@ console.log('✅ sidebar js loaded');
             const leaf = e.target.closest('a.crs-link.crs-leaf');
             if (!leaf) return;
 
-            // only force reload on MOBILE
             if (!isMobile()) return;
 
-            // keep normal browser behaviors
             if (e.defaultPrevented) return;
             if (e.button !== 0) return; // left click only
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -516,7 +561,6 @@ console.log('✅ sidebar js loaded');
 
             e.preventDefault();
 
-            // force full navigation (bypass PJAX)
             window.location.href = leaf.href;
         }, true);
     })();
