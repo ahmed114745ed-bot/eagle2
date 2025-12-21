@@ -854,6 +854,8 @@
         const savedTab = localStorage.getItem('activeDashboardTab');
         if (savedTab) {
             activateTab(savedTab);
+            // Trigger custom event for chart loading
+            $(document).trigger('tabActivated', [savedTab]);
         }
 
         // Save active tab when clicked
