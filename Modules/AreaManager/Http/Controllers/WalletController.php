@@ -332,7 +332,7 @@ class WalletController extends MainController
         // if (settings()->get("stop_charge", 0)) {
         //     throw new \Exception(__('api_responses.freez_charge')); 
         // }
-
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
@@ -343,7 +343,7 @@ class WalletController extends MainController
 
         $to = ShippingAgency::find($toId);
 
-        if (!$to ) {
+        if (!$to) {
             throw new \Exception(__('This agency is not found'));
         }
 
@@ -424,7 +424,7 @@ class WalletController extends MainController
         $user = Auth::user();
         $amount = $data['amount'] ?? 0;
         $toId = $data['target_id'] ?? null;
-
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
         if (!$amount || !$toId) {
             throw new \Exception(__('Invalid request data.'));
         }
@@ -469,7 +469,7 @@ class WalletController extends MainController
         $user = Auth::user();
         $amount = $data['amount'] ?? 0;
         $toId = $data['target_id'] ?? null;
-
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
         if (!$amount || !$toId) {
             throw new \Exception(__('Invalid request data.'));
         }
@@ -520,7 +520,7 @@ class WalletController extends MainController
         $charge->agency_id = null;
         $charge->user_type = $receiverType;
         $charge->amount = $coins;
-        $charge->usd = $usdAmount ;
+        $charge->usd = $usdAmount;
         $charge->balance_before =  $receiver->di  - $coins;
         $charge->save();
 
