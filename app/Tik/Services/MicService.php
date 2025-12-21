@@ -406,11 +406,11 @@ class MicService
                     });
             })
             // ->relation()
-            ->whereIn("status", [
-                CpStatus::PENDING->value,
-                CpStatus::ACTIVE->value,
-                CpStatus::RESTORED->value
-            ])
+            // ->whereIn("status", [
+            //     CpStatus::PENDING->value,
+            //     CpStatus::ACTIVE->value,
+            //     CpStatus::RESTORED->value
+            // ])
             ->first();
 
         Log::info("🔍 [CP] Querying CPs...", [
@@ -427,7 +427,7 @@ class MicService
                 });
         })
             /// TODO convert these status to enum
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             // ->where("cp_relation_id",5)
             ->first();
     }
