@@ -70,4 +70,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadWeeklySignups);
+
+    // Listen for PJAX completion to reload data
+    $(document).on('pjax:complete', function() {
+        loadWeeklySignups();
+    });
 </script>

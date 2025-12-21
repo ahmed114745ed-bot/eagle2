@@ -53,33 +53,38 @@
 @endphp
 
 <script>
+function updateBdStats() {
+    $.ajax({
+        url: '{{ url($prefix . "/statistics/bd-stats") }}',
+        type: 'GET',
+        beforeSend: function() {
+            $('#refreshBdStats').html('<i class="fa fa-spinner fa-spin"></i> {{ __("Loading...") }}');
+        },
+        success: function(data) {
+            $('[data-bdstat="bdCount"]').text(data.bdCount);
+            $('[data-bdstat="totalBDSalary"]').text(data.totalBDSalary);
+            $('[data-bdstat="totalBDCut"]').text(data.totalBDCut);
+            $('[data-bdstat="averageAgenciesPerBD"]').text(data.averageAgenciesPerBD);
+
+            $('#refreshBdStats').html('<i class="fa fa-refresh me-1"></i> {{ __("Refresh Stats") }}');
+        },
+        error: function() {
+            alert('{{ __("Error loading BD stats") }}');
+            $('#refreshBdStats').html('<i class="fa fa-refresh me-1"></i> {{ __("Refresh Stats") }}');
+        }
+    });
+}
+
 $(function() {
-    function updateBdStats() {
-        $.ajax({
-            url: '{{ url($prefix . "/statistics/bd-stats") }}',
-            type: 'GET',
-            beforeSend: function() {
-                $('#refreshBdStats').html('<i class="fa fa-spinner fa-spin"></i> {{ __("Loading...") }}');
-            },
-            success: function(data) {
-                $('[data-bdstat="bdCount"]').text(data.bdCount);
-                $('[data-bdstat="totalBDSalary"]').text(data.totalBDSalary);
-                $('[data-bdstat="totalBDCut"]').text(data.totalBDCut);
-                $('[data-bdstat="averageAgenciesPerBD"]').text(data.averageAgenciesPerBD);
-
-                $('#refreshBdStats').html('<i class="fa fa-refresh me-1"></i> {{ __("Refresh Stats") }}');
-            },
-            error: function() {
-                alert('{{ __("Error loading BD stats") }}');
-                $('#refreshBdStats').html('<i class="fa fa-refresh me-1"></i> {{ __("Refresh Stats") }}');
-            }
-        });
-    }
-
     updateBdStats();
 
     $('#refreshBdStats').on('click', function() {
         updateBdStats();
     });
+});
+
+// Listen for PJAX completion to reload data
+$(document).on('pjax:complete', function() {
+    updateBdStats();
 });
 </script>

@@ -69,4 +69,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadTopUsers);
+
+    // Listen for PJAX completion to reload data
+    $(document).on('pjax:complete', function() {
+        loadTopUsers();
+    });
 </script>

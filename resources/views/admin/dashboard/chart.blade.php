@@ -865,5 +865,100 @@
                 localStorage.setItem('activeDashboardTab', target);
             });
         });
+
+        // Function to initialize all widgets for a specific tab
+        function initializeTabWidgets(tabId) {
+            // Use setTimeout to ensure DOM is ready and scripts are loaded
+            setTimeout(() => {
+                if (tabId === '#overview') {
+                    // Initialize overview tab widgets
+                    if (typeof initOverviewTab === 'function') {
+                        initOverviewTab();
+                    }
+                    if (typeof loadWalletLogs === 'function') {
+                        loadWalletLogs();
+                    }
+                } else if (tabId === '#users') {
+                    // Initialize users tab widgets
+                    if (typeof loadTopUsers === 'function') {
+                        loadTopUsers();
+                    }
+                    if (typeof loadWeeklySignups === 'function') {
+                        loadWeeklySignups();
+                    }
+                    if (typeof loadPeakHours === 'function') {
+                        loadPeakHours();
+                    }
+                    if (typeof loadTopFollowers === 'function') {
+                        loadTopFollowers();
+                    }
+                    // Initialize users online chart
+                    if (document.getElementById('usersOnlineChart')) {
+                        // Trigger the existing DOMContentLoaded logic for users online chart
+                        const event = new Event('DOMContentLoaded');
+                        document.dispatchEvent(event);
+                    }
+                } else if (tabId === '#rooms') {
+                    // Initialize rooms tab widgets
+                    if (typeof loadRoomsDistribution === 'function') {
+                        loadRoomsDistribution();
+                    }
+                    if (typeof loadRoomsActivity === 'function') {
+                        loadRoomsActivity();
+                    }
+                    if (typeof loadTopGiftedRooms === 'function') {
+                        loadTopGiftedRooms();
+                    }
+                    if (typeof loadAvgSessionDuration === 'function') {
+                        loadAvgSessionDuration();
+                    }
+                    if (typeof updateRoomStats === 'function') {
+                        updateRoomStats();
+                    }
+                } else if (tabId === '#agencies') {
+                    // Initialize agencies tab widgets
+                    if (typeof loadAgenciesTargets === 'function') {
+                        loadAgenciesTargets();
+                    }
+                    if (typeof loadTopSenders === 'function') {
+                        loadTopSenders();
+                    }
+                    if (typeof loadTopReceivers === 'function') {
+                        loadTopReceivers();
+                    }
+                    if (typeof loadAgenciesCompare === 'function') {
+                        loadAgenciesCompare();
+                    }
+                    if (typeof updateAgencyStats === 'function') {
+                        updateAgencyStats();
+                    }
+                } else if (tabId === '#bd') {
+                    // Initialize BD tab widgets
+                    if (typeof updateBdStats === 'function') {
+                        updateBdStats();
+                    }
+                } else if (tabId === '#game') {
+                    // Initialize game tab widgets
+                    if (typeof updateGameStats === 'function') {
+                        updateGameStats();
+                    }
+                }
+            }, 200); // Increased delay to ensure scripts are loaded
+        }
+
+        // Initialize widgets when tab is shown
+        tabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function() {
+                const target = this.getAttribute('data-bs-target');
+                initializeTabWidgets(target);
+            });
+        });
+
+        // Initialize active tab on page load
+        const activeTab = document.querySelector('#statsTabs .nav-link.active');
+        if (activeTab) {
+            const target = activeTab.getAttribute('data-bs-target');
+            setTimeout(() => initializeTabWidgets(target), 500);
+        }
     });
 </script>

@@ -62,8 +62,11 @@
     .dark-mode .pagination-wrapper,
     .dark-mode .box-title,
     .dark-mode .modal-footer,
+    .dark-mode .box-header > .fa, .dark-mode .box-header > .glyphicon,
+    .dark-mode .box-header > .ion, .dark-mode .box-header .box-title,
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
+        color: unset !important;
     }
 
     .dark-mode .table > thead > tr > th {
