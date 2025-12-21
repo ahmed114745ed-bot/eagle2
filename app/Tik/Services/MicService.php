@@ -396,6 +396,7 @@ class MicService
     }
     public function checkExistingCpLovly($userId, $otherUserId)
     {
+        Log::info("userId: $userId, otherUserId: $otherUserId", []);
         return Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
                 ->where("user_two_id", $otherUserId)
