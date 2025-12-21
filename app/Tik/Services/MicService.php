@@ -355,7 +355,7 @@ class MicService
         })->toArray();
 
         $json = $this->cpMapJson($indices);
-        Log::info("📩 [CP] Sending lovely message in room {$room->id} for user {$user->id}: {$json}", []);
+
         Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
     }
     public function cpMapJson($indices): string|false
@@ -396,28 +396,6 @@ class MicService
     }
     public function checkExistingCpLovly($userId, $otherUserId)
     {
-        Log::info("🔍 [CP] Checking existing CP between user {$userId} and user {$otherUserId}", []);
-        $cp = Cp::where(function ($query) use ($userId, $otherUserId) {
-                    $query->where("user_one_id", $userId)
-                        ->where("user_two_id", $otherUserId)
-                        ->orWhere(function ($query) use ($userId, $otherUserId) {
-                            $query->where("user_two_id", $userId)
-                                    ->where("user_one_id", $otherUserId);
-                        });
-                })
-                ->relation()
-                ->whereIn("status", [
-                    CpStatus::PENDING->value,
-                    CpStatus::ACTIVE->value,
-                    CpStatus::RESTORED->value
-                ])
-                ->first();
-
-            Log::info("🔍 [CP] Querying CPs...", [
-                'cp' => $cp?->toArray()
-            ]);
-
-
         return Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
                 ->where("user_two_id", $otherUserId)
