@@ -396,6 +396,20 @@ class MicService
     }
     public function checkExistingCpLovly($userId, $otherUserId)
     {
+        Log::info("🔍 [CP] Checking existing CP between user {$userId} and user {$otherUserId}", []);
+        Log::info("🔍 [CP] Querying CPs...", Cp::where(function ($query) use ($userId, $otherUserId) {
+            $query->where("user_one_id", $userId)
+                ->where("user_two_id", $otherUserId)
+                ->orWhere(function ($query) use ($userId, $otherUserId) {
+                    $query->where("user_two_id", $userId)
+                        ->where("user_one_id", $otherUserId);
+                });
+        })->relation()
+            /// TODO convert these status to enum
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // ->where("cp_relation_id",5)
+            ->first()->toArray());
+            
         return Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
                 ->where("user_two_id", $otherUserId)
