@@ -63,12 +63,15 @@ class ChangeCountryRequestController extends MainController
 
             $filter->equal('status', __('Status'))->select([
                 // 'pending' => 'Pending',
-                'accepted' => 'Accepted',
-                'rejected' => 'Rejected'
+                'accepted' => __('Accepted'),
+                'rejected' => __('Rejected')
             ]);
 
             $filter->equal('country_id', __('Country'))->select(
-                Country::pluck('e_name', 'id')
+                Country::all()->pluck(
+                    App::getLocale() === 'ar' ? 'name' : 'e_name',
+                    'id'
+                )
             );
 
             $filter->column(1 / 2, function ($filter) {

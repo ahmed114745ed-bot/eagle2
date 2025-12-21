@@ -2,12 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\UserService;
-use App\Models\ChangeCountryRequest;
 use Carbon\Carbon;
 use Encore\Admin\Grid;
 use App\Models\Country;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use Illuminate\Support\Facades\App;
+use App\Models\ChangeCountryRequest;
 use App\Admin\Controllers\MainController;
 
 
@@ -41,13 +42,17 @@ class CountryRequestHistoryController extends MainController
 
             $filter->equal('status', __('Status'))->select([
 
-                'accepted' => 'Accepted',
-                'rejected' => 'Rejected'
+                'accepted' => __('Accepted'),
+                'rejected' => __('Rejected')
             ]);
 
             $filter->equal('country_id', __('Country'))->select(
-                Country::pluck('e_name', 'id')
+                Country::all()->pluck(
+                    App::getLocale() === 'ar' ? 'name' : 'e_name',
+                    'id'
+                )
             );
+
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
