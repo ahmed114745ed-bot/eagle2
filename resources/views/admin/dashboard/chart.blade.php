@@ -399,6 +399,10 @@
         .row {
             display: block !important;
         }
+
+        .widget-card {
+            overflow-x: auto;
+        }
     }
 
     /* Tab Styles */
