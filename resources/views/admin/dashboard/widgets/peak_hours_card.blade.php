@@ -83,8 +83,7 @@
         loadPeakData($(this).val());
     });
 
-    $(document).on('pjax:end', function() {
-    loadPeakData(); 
-});
+    // Execute immediately - this is the key!
+    loadPeakData();
 
 </script>

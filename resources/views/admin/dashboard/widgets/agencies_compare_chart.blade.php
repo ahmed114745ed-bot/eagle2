@@ -168,5 +168,31 @@ $(document).ready(function () {
             setTimeout(loadAgenciesCompareChart, 100);
         }
     });
+
+    // Listen for PJAX completion to reload data
+    $(document).on('pjax:complete', function() {
+        // Reset chart loaded flag and check if agencies tab is active
+        chartLoaded = false;
+        setTimeout(function() {
+            const agenciesTab = document.getElementById('agencies');
+            if (agenciesTab && agenciesTab.classList.contains('active') && agenciesTab.classList.contains('show')) {
+                chartLoaded = true;
+                setTimeout(loadAgenciesCompareChart, 300);
+            }
+        }, 200);
+    });
+
+    // Also listen for pjax:end as backup
+    $(document).on('pjax:end', function() {
+        // Reset chart loaded flag and check if agencies tab is active
+        chartLoaded = false;
+        setTimeout(function() {
+            const agenciesTab = document.getElementById('agencies');
+            if (agenciesTab && agenciesTab.classList.contains('active') && agenciesTab.classList.contains('show')) {
+                chartLoaded = true;
+                setTimeout(loadAgenciesCompareChart, 300);
+            }
+        }, 200);
+    });
 });
 </script>

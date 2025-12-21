@@ -51,13 +51,14 @@
 @endphp
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch('{{ url($prefix . "/statistics/top-followers") }}')
-            .then(response => response.json())
-            .then(data => {
+    function loadTopFollowers() {
+        $.ajax({
+            url: '{{ url($prefix . "/statistics/top-followers") }}',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
                 const tbody = document.getElementById('top-followers-body');
                 const tableWrapper = document.getElementById('top-followers-table-wrapper');
-                const loading = document.getElementById('top-followers-loading');
                 tbody.innerHTML = '';
 
                 data.forEach((user, index) => {
@@ -75,13 +76,16 @@
                     `;
                 });
 
-                loading.classList.add('d-none');
                 tableWrapper.classList.remove('d-none');
-            })
-            .catch(() => {
-                document.getElementById('top-followers-loading').innerHTML = `<p class="text-danger">{{ __('Failed to load data') }}</p>`;
-            });
-    });
+            },
+            error: function() {
+                console.error("Failed to load top followers data");
+            }
+        });
+    }
+
+    // Execute immediately - this is the key!
+    loadTopFollowers();
 </script>
 
 <style>
