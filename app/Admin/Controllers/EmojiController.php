@@ -83,7 +83,7 @@ class EmojiController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Emoji);
-        $grid->sortable();
+      //  $grid->sortable();
 
         // Get the current filter from request or default to first category
         $filterType = request()->get('filter', 'all');
@@ -120,7 +120,7 @@ class EmojiController extends MainController
         // Apply filter to the grid
         $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
             $q->where('emoji_category_id', $filterType);
-        })->orderBy('sort', 'asc');
+        });
 
         // Columns
         $grid->id(__('ID'));
@@ -239,7 +239,7 @@ class EmojiController extends MainController
         )->required();
         $form->number('t_length', __('t_length'));
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-        $form->number('sort', __('sort'))->required();
+       $form->number('sort', __('sort'));
 
         $form->saved(function (Form $form) {
             $model = $form->model();

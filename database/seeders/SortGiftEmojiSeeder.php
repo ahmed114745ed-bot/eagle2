@@ -25,7 +25,7 @@ class SortGiftEmojiSeeder extends Seeder
             // ---------- EMOJIS ----------
             DB::statement('SET @i := 0');
             DB::statement("
-            UPDATE emojis
+            UPDATE emoji_categories
             SET sort = (@i := @i + 1)
             ORDER BY id
         ");
@@ -33,7 +33,7 @@ class SortGiftEmojiSeeder extends Seeder
             // ---------- GIFTS ----------
             DB::statement('SET @i := 0');
             DB::statement("
-            UPDATE gifts
+            UPDATE gift_categories
             SET sort = (@i := @i + 1)
             ORDER BY id
         ");
