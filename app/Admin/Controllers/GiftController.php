@@ -116,7 +116,8 @@ class GiftController extends MainController
             ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
-            ->orderBy('sort', 'asc')->orderByDesc('enable');
+            ->orderByDesc('enable')   // 1️⃣ enabled first
+            ->orderBy('sort', 'asc');
         // ->orderBy('use_count', 'desc')
         // ->orderBy('type')
         // ->orderByRaw('ISNULL(`sort`), `sort`')
