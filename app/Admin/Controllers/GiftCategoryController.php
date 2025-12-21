@@ -74,6 +74,7 @@ class GiftCategoryController extends MainController
     {
         $grid = new Grid(new GiftCategory());
         $grid->sortable();
+        $grid->model()->orderBy('sort', 'asc');
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
