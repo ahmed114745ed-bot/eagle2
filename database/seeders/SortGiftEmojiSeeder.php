@@ -16,29 +16,27 @@ class SortGiftEmojiSeeder extends Seeder
     /**
      * Run the database seeds.
      */
+
+
     public function run(): void
     {
         DB::transaction(function () {
+
+            // ---------- EMOJIS ----------
             DB::statement('SET @i := 0');
+            DB::statement("
+            UPDATE emojis
+            SET sort = (@i := @i + 1)
+            ORDER BY id
+        ");
 
-            Emoji::whereNull('sort')
-                ->orderBy('id')
-                ->get()
-                ->each(function ($emoji) {
-                    DB::table('emojis')
-                        ->where('id', $emoji->id)
-                        ->update(['sort' => DB::raw('@i := @i + 1')]);
-                });
-
-
-            Gift::whereNull('sort')
-                ->orderBy('id')
-                ->get()
-                ->each(function ($emoji) {
-                    DB::table('gifts')
-                        ->where('id', $emoji->id)
-                        ->update(['sort' => DB::raw('@i := @i + 1')]);
-                });
+            // ---------- GIFTS ----------
+            DB::statement('SET @i := 0');
+            DB::statement("
+            UPDATE gifts
+            SET sort = (@i := @i + 1)
+            ORDER BY id
+        ");
         });
     }
 }
