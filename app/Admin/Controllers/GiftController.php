@@ -23,6 +23,7 @@ use App\Admin\Actions\Grid\MoveGroupsGifts;
 use App\Models\Setting;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
+
 class GiftController extends MainController
 {
     use HasResourceActions;
@@ -402,6 +403,7 @@ class GiftController extends MainController
         )->required();
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
+        $form->number('sort', __('sort'))->required();
 
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
@@ -461,7 +463,7 @@ class GiftController extends MainController
         return $form;
     }
 
-     public function luckyGiftSettings(Content $content)
+    public function luckyGiftSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'lucky-gift-setting');

@@ -239,7 +239,7 @@ class EmojiController extends MainController
         )->required();
         $form->number('t_length', __('t_length'));
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-        $form->number('sort', __('sort'));
+        $form->number('sort', __('sort'))->required();
 
         $form->saved(function (Form $form) {
             $model = $form->model();
