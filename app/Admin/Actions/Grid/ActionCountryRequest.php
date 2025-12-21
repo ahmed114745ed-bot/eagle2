@@ -24,23 +24,24 @@ class ActionCountryRequest extends BatchAction
     {
         $status = $request->get('status');
         foreach ($collection as $model) {
-            $model->update([
-                'status' => $status,
-            ]);
-            App::setLocale($user->lan ?? 'en');
+            // Update model status
+            $model->update(['status' => $status]);
+
+            // Get user and set locale
             $user = User::find($model->user_id);
-            if ($status == 'accepted') {
-                $title = __('Change Country Request');
-                $body = __('Your country change request has been accepted');
-                Common::sendOfficialMessage($user->id, $title, $body);
-                Common::send_firebase_notification($user->notification_id, $title, $body);
-            } else {
-                $title = __('Change Country Request');
-                $body = __('Your country change request has been accepted');
-                Common::sendOfficialMessage($user->id, $title, $body);
-                Common::send_firebase_notification($user->notification_id, $title, $body);
-            }
+            App::setLocale($user->lan ?? 'en');
+
+            // Prepare title and body based on status
+            $title = __('Change Country Request');
+            $body = $status === 'accepted'
+                ? __('Your country change request has been accepted')
+                : __('Your country change request has been rejected');
+
+            // Send notifications
+            Common::sendOfficialMessage($user->id, $title, $body);
+            Common::send_firebase_notification($user->notification_id, $title, $body);
         }
+
 
 
 
