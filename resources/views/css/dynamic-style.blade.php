@@ -962,6 +962,22 @@
         box-shadow: var(--shadow-sm) !important;
     }
 
+    .btn-dropbox,
+    .btn-info,
+    .btn-twitter,
+    .btn-instagram,
+    .btn-default ,
+    .btn-danger {
+        background: var(--primary-color) !important;
+        color: var(--text-secondary-color) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        font-weight: 500 !important;
+        transition: var(--transition) !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
     .btn-primary:hover {
         transform: translateY(-1px) !important;
         box-shadow: var(--shadow-md) !important;
@@ -1802,7 +1818,7 @@
         opacity: 0.8;
     }
 
-    button.active {
+    .settings-menu button.active {
         background: var(--gradient-primary) !important;
         color: var(--text-secondary-color) !important;
     }

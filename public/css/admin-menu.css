@@ -548,7 +548,25 @@
     left: auto !important;
     right: -5px !important;
 }
+/* ============ ACTIVE MENU ITEM - DOT INDICATOR ============ */
 
+.crs-item.active > .crs-link .crs-icon,
+.crs-link.active .crs-icon {
+    position: relative;
+}
+
+.crs-item.active > .crs-link .crs-icon::after,
+.crs-link.active .crs-icon::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--green-color);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--green-color);
+}
 /* small screens tweak */
 @media (max-width: 640px){
     .crs-link { padding: 10px 12px; }

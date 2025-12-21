@@ -26,6 +26,8 @@
     .dark-mode .skin-black-light .main-header > .navbar,
     .dark-mode .nav-tabs-custom,
     .dark-mode .form-col,
+    .dark-mode .settings-menu button,
+    .dark-mode .swal2-popup,
     .dark-mode .form-horizontal {
         background-color: var(--dark-secondry-color) !important;
         color: var(--text-primary-color) !important;

@@ -143,10 +143,10 @@ console.log('✅ sidebar js loaded');
 
         if (preferLeft) {
             left = r.left - tr.width - gap;
-            tip.classList.add('from-right'); // arrow on right side
+            tip.classList.add('from-right');
         } else {
             left = r.right + gap;
-            tip.classList.add('from-left');  // arrow on left side
+            tip.classList.add('from-left');
         }
 
         if (left < 10) {
@@ -265,10 +265,10 @@ console.log('✅ sidebar js loaded');
 
         if (preferLeft) {
             left = anchorRect.left - popoverRect.width - gap;
-            popover.classList.add('from-right'); // arrow on right side
+            popover.classList.add('from-right');
         } else {
             left = anchorRect.right + gap;
-            popover.classList.add('from-left');  // arrow on left side
+            popover.classList.add('from-left');
         }
 
         if (left < 10) {
@@ -522,6 +522,108 @@ console.log('✅ sidebar js loaded');
         });
     });
 
+
+    function highlightActiveMenuItem() {
+        const currentPath = window.location.pathname;
+        const currentUrl = window.location.href;
+
+        document.querySelectorAll('.crs-item.active').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelectorAll('.crs-link.active').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        const menuLinks = document.querySelectorAll('.crs-link.crs-leaf');
+
+        let activeLink = null;
+        let bestMatchLength = 0;
+
+        menuLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href || href === '#') return;
+
+            try {
+                const linkUrl = new URL(href, window.location.origin);
+                const linkPath = linkUrl.pathname;
+
+                const normalizedCurrentPath = currentPath.replace(/\/$/, '');
+                const normalizedLinkPath = linkPath.replace(/\/$/, '');
+
+                if (normalizedCurrentPath === normalizedLinkPath) {
+                    if (linkPath.length > bestMatchLength) {
+                        bestMatchLength = linkPath.length;
+                        activeLink = link;
+                    }
+                }
+                else if (normalizedLinkPath !== '' &&
+                    normalizedLinkPath !== '/' &&
+                    normalizedCurrentPath.startsWith(normalizedLinkPath + '/')) {
+                    if (linkPath.length > bestMatchLength) {
+                        bestMatchLength = linkPath.length;
+                        activeLink = link;
+                    }
+                }
+            } catch (e) {
+                if (href && (currentUrl.includes(href) || currentPath.includes(href))) {
+                    if (href.length > bestMatchLength) {
+                        bestMatchLength = href.length;
+                        activeLink = link;
+                    }
+                }
+            }
+        });
+
+        if (activeLink) {
+            const activeItem = activeLink.closest('.crs-item');
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            activeLink.classList.add('active');
+
+            openParentMenus(activeLink);
+
+            setTimeout(() => {
+                activeLink.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 400);
+        }
+    }
+
+    function openParentMenus(element) {
+        let parent = element.closest('.crs-submenu');
+
+        while (parent) {
+            const tree = parent.closest('.crs-tree');
+
+            if (tree) {
+                tree.classList.add('crs-open');
+
+                const toggle = tree.querySelector(':scope > .crs-toggle');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'true');
+                }
+
+                parent.style.maxHeight = 'none';
+
+                // ✅ REMOVE inline styles so CSS animation can work!
+                const items = parent.querySelectorAll(':scope > .crs-item');
+                items.forEach(item => {
+                    item.style.removeProperty('opacity');
+                    item.style.removeProperty('transform');
+                    item.style.removeProperty('transition');
+                });
+            }
+
+            const parentTree = tree ? tree.parentElement : null;
+            parent = parentTree ? parentTree.closest('.crs-submenu') : null;
+        }
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
         restoreSidebarState();
 
@@ -541,6 +643,37 @@ console.log('✅ sidebar js loaded');
                 sm.style.maxHeight = 'none';
             }
         });
+
+        highlightActiveMenuItem();
+    });
+
+
+    window.addEventListener('popstate', function() {
+        setTimeout(highlightActiveMenuItem, 100);
+    });
+
+    $(document).on('pjax:complete', function() {
+        highlightActiveMenuItem();
+    });
+
+    document.addEventListener('turbolinks:load', function() {
+        highlightActiveMenuItem();
+    });
+
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('.crs-link.crs-leaf');
+        if (link && link.href) {
+            document.querySelectorAll('.crs-item.active').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.crs-link.active').forEach(l => {
+                l.classList.remove('active');
+            });
+
+            const item = link.closest('.crs-item');
+            if (item) item.classList.add('active');
+            link.classList.add('active');
+        }
     });
 
     (function () {
@@ -555,7 +688,7 @@ console.log('✅ sidebar js loaded');
             if (!isMobile()) return;
 
             if (e.defaultPrevented) return;
-            if (e.button !== 0) return; // left click only
+            if (e.button !== 0) return;
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (leaf.target && leaf.target !== '_self') return;
 

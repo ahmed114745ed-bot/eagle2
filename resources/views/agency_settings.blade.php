@@ -450,7 +450,7 @@
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
-                <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
+{{--                <button onclick="showSection('Badges')">{{ __('Badges') }}</button>--}}
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
                 {{-- <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button> --}}
 
@@ -566,136 +566,136 @@
                     </div>
 
                 @endif
-            <div id="Badges" class="settings-section">
-                <h3>{{ __('Badges') }}</h3>
+{{--            <div id="Badges" class="settings-section">--}}
+{{--                <h3>{{ __('Badges') }}</h3>--}}
 
-                <!-- Language Tabs Navigation -->
-                <div class="tab-buttons">
-                    {{-- <button class="tab-button active" onclick="openLanguageTab(event, 'defaultInput')">
-                        Default <div>
-                            English
-                        </div>
-                    </button> --}}
-                    @foreach ($languages as $index => $language)
-                        <button class="tab-button" onclick="openLanguageTab(event, '{{ $language->code }}')">
-                            {{ $language->name }}
-                            @if ($language->name == 'English')
-                               <small>(Default)</small>
-                            @endif
-                        </button>
-                    @endforeach
-                </div>
+{{--                <!-- Language Tabs Navigation -->--}}
+{{--                <div class="tab-buttons">--}}
+{{--                    --}}{{-- <button class="tab-button active" onclick="openLanguageTab(event, 'defaultInput')">--}}
+{{--                        Default <div>--}}
+{{--                            English--}}
+{{--                        </div>--}}
+{{--                    </button> --}}
+{{--                    @foreach ($languages as $index => $language)--}}
+{{--                        <button class="tab-button" onclick="openLanguageTab(event, '{{ $language->code }}')">--}}
+{{--                            {{ $language->name }}--}}
+{{--                            @if ($language->name == 'English')--}}
+{{--                               <small>(Default)</small>--}}
+{{--                            @endif--}}
+{{--                        </button>--}}
+{{--                    @endforeach--}}
+{{--                </div>--}}
 
-                <div id="defaultInput" class="tab-content">
-                    <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="language" value="defaultInput">
+{{--                <div id="defaultInput" class="tab-content">--}}
+{{--                    <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">--}}
+{{--                        @csrf--}}
+{{--                        <input type="hidden" name="language" value="defaultInput">--}}
 
-                        <div class="badge-upload-container">
-                            @foreach (['shipping', 'host', 'agency_owner'] as $type)
-                                <div class="badge-upload-item">
-                                    <label for="default_{{ $type }}">
-                                        @if ($type == 'host')
-                                            {{ __('Hosting') }} Default:
-                                        @else
-                                            {{ __(ucfirst($type)) }} Default:
-                                        @endif
-                                    </label>
-                                    <input type="file" id="default_{{ $type }}"
-                                        name="default_{{ $type }}"
-                                        onchange="previewImage(this, 'preview_default_{{ $type }}')">
+{{--                        <div class="badge-upload-container">--}}
+{{--                            @foreach (['shipping', 'host', 'agency_owner'] as $type)--}}
+{{--                                <div class="badge-upload-item">--}}
+{{--                                    <label for="default_{{ $type }}">--}}
+{{--                                        @if ($type == 'host')--}}
+{{--                                            {{ __('Hosting') }} Default:--}}
+{{--                                        @else--}}
+{{--                                            {{ __(ucfirst($type)) }} Default:--}}
+{{--                                        @endif--}}
+{{--                                    </label>--}}
+{{--                                    <input type="file" id="default_{{ $type }}"--}}
+{{--                                        name="default_{{ $type }}"--}}
+{{--                                        onchange="previewImage(this, 'preview_default_{{ $type }}')">--}}
 
-                                    <div class="badge-preview">
-                                        @php
-                                            $row = $configAll->where('name', 'default' . '_' . $type)->first();
-                                        @endphp
-                                        @if ($row)
-                                            <img id="preview_default_{{ $type }}"
-                                                src="{{ getImagePath($row?->value) }}" alt="{{ $type }} badge"
-                                                onclick="openFullScreen(this)">
-                                        @else
-                                            <img id="preview_default_{{ $type }}" src=""
-                                                alt="No image uploaded" style="display: none;">
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+{{--                                    <div class="badge-preview">--}}
+{{--                                        @php--}}
+{{--                                            $row = $configAll->where('name', 'default' . '_' . $type)->first();--}}
+{{--                                        @endphp--}}
+{{--                                        @if ($row)--}}
+{{--                                            <img id="preview_default_{{ $type }}"--}}
+{{--                                                src="{{ getImagePath($row?->value) }}" alt="{{ $type }} badge"--}}
+{{--                                                onclick="openFullScreen(this)">--}}
+{{--                                        @else--}}
+{{--                                            <img id="preview_default_{{ $type }}" src=""--}}
+{{--                                                alt="No image uploaded" style="display: none;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            @endforeach--}}
+{{--                        </div>--}}
 
-                        <button type="submit" class="upload-button">
-                            {{ __('Submit') }}
-                        </button>
-                    </form>
-                </div>
+{{--                        <button type="submit" class="upload-button">--}}
+{{--                            {{ __('Submit') }}--}}
+{{--                        </button>--}}
+{{--                    </form>--}}
+{{--                </div>--}}
 
-                <!-- Language Tab Contents -->
-                @foreach ($languages as $index => $language)
-                    <div id="{{ $language->code }}" class="tab-content">
-                        <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="language" value="{{ $language->code }}">
+{{--                <!-- Language Tab Contents -->--}}
+{{--                @foreach ($languages as $index => $language)--}}
+{{--                    <div id="{{ $language->code }}" class="tab-content">--}}
+{{--                        <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">--}}
+{{--                            @csrf--}}
+{{--                            <input type="hidden" name="language" value="{{ $language->code }}">--}}
 
-                            <div class="badge-upload-container">
-                                @foreach (['shipping', 'host', 'agency_owner', 'bd'] as $type)
-                                    <div class="badge-upload-item" style="padding: 12px; border: 1px solid #444; margin-bottom: 20px; background: #333; color: #ffa500;">
-                                        <label>
-                                            @if ($type == 'host')
-                                                {{ __('Hosting') }} ({{ strtoupper($language->code) }}):
-                                            @else
-                                                {{ __(ucfirst($type)) }} ({{ strtoupper($language->code) }}):
-                                            @endif
-                                        </label>
+{{--                            <div class="badge-upload-container">--}}
+{{--                                @foreach (['shipping', 'host', 'agency_owner', 'bd'] as $type)--}}
+{{--                                    <div class="badge-upload-item" style="padding: 12px; border: 1px solid #444; margin-bottom: 20px; background: #333; color: #ffa500;">--}}
+{{--                                        <label>--}}
+{{--                                            @if ($type == 'host')--}}
+{{--                                                {{ __('Hosting') }} ({{ strtoupper($language->code) }}):--}}
+{{--                                            @else--}}
+{{--                                                {{ __(ucfirst($type)) }} ({{ strtoupper($language->code) }}):--}}
+{{--                                            @endif--}}
+{{--                                        </label>--}}
 
-                                        @php
-                                            $suffixes = ['badge', 'intro', 'frame'];
-                                        @endphp
+{{--                                        @php--}}
+{{--                                            $suffixes = ['badge', 'intro', 'frame'];--}}
+{{--                                        @endphp--}}
 
-                                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
-                                            @foreach ($suffixes as $suffix)
-                                                @php
-                                                if ($suffix == 'badge'){
-                                                    $inputName = $language->code . '_' . $type;
-                                                }else{
-                                                    $inputName = $language->code . '_' . $type . '_' . $suffix;
-                                                }
-                                                    $row = $configAll->where('name', $inputName)->first();
-                                                @endphp
+{{--                                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">--}}
+{{--                                            @foreach ($suffixes as $suffix)--}}
+{{--                                                @php--}}
+{{--                                                if ($suffix == 'badge'){--}}
+{{--                                                    $inputName = $language->code . '_' . $type;--}}
+{{--                                                }else{--}}
+{{--                                                    $inputName = $language->code . '_' . $type . '_' . $suffix;--}}
+{{--                                                }--}}
+{{--                                                    $row = $configAll->where('name', $inputName)->first();--}}
+{{--                                                @endphp--}}
 
-                                                <div>
-                                                    <label> {{ __($suffix) }} </label>
-                                                    <input type="file"
-                                                           id="{{ $inputName }}"
-                                                           name="{{ $inputName }}"
-                                                           onchange="previewImage(this, 'preview_{{ $inputName }}')"
-                                                           style="display: block; width: 100%; max-width: 200px;">
+{{--                                                <div>--}}
+{{--                                                    <label> {{ __($suffix) }} </label>--}}
+{{--                                                    <input type="file"--}}
+{{--                                                           id="{{ $inputName }}"--}}
+{{--                                                           name="{{ $inputName }}"--}}
+{{--                                                           onchange="previewImage(this, 'preview_{{ $inputName }}')"--}}
+{{--                                                           style="display: block; width: 100%; max-width: 200px;">--}}
 
-                                                    <div class="badge-preview" style="margin-top: 5px;">
-                                                        @if ($row)
-                                                            <img id="preview_{{ $inputName }}"
-                                                                 src="{{ getImagePath($row?->value) }}"
-                                                                 alt="{{ $type }} {{ $suffix }}"
-                                                                 style="max-height: 50px; cursor: pointer;"
-                                                                 onclick="openFullScreen(this)">
-                                                        @else
-                                                            <img id="preview_{{ $inputName }}"
-                                                                 src=""
-                                                                 alt="No image uploaded"
-                                                                 style="display: none; max-height: 50px;">
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <button type="submit" class="upload-button">
-                                {{ __('Submit') }}
-                            </button>
-                        </form>
-                    </div>
-                @endforeach
-            </div>
+{{--                                                    <div class="badge-preview" style="margin-top: 5px;">--}}
+{{--                                                        @if ($row)--}}
+{{--                                                            <img id="preview_{{ $inputName }}"--}}
+{{--                                                                 src="{{ getImagePath($row?->value) }}"--}}
+{{--                                                                 alt="{{ $type }} {{ $suffix }}"--}}
+{{--                                                                 style="max-height: 50px; cursor: pointer;"--}}
+{{--                                                                 onclick="openFullScreen(this)">--}}
+{{--                                                        @else--}}
+{{--                                                            <img id="preview_{{ $inputName }}"--}}
+{{--                                                                 src=""--}}
+{{--                                                                 alt="No image uploaded"--}}
+{{--                                                                 style="display: none; max-height: 50px;">--}}
+{{--                                                        @endif--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            @endforeach--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                @endforeach--}}
+{{--                            </div>--}}
+{{--                            <button type="submit" class="upload-button">--}}
+{{--                                {{ __('Submit') }}--}}
+{{--                            </button>--}}
+{{--                        </form>--}}
+{{--                    </div>--}}
+{{--                @endforeach--}}
+{{--            </div>--}}
 
 
 
@@ -775,7 +775,6 @@
             });
 
             function showSection(sectionId) {
-
                 // Remove active class from all sections
                 document.querySelectorAll('.settings-section').forEach(section => {
                     section.classList.remove('active');
@@ -784,39 +783,34 @@
                 // Add active class to the selected section
                 document.getElementById(sectionId).classList.add('active');
 
-                // Reset button styles
+                // ✅ Reset ALL buttons
                 document.querySelectorAll('.settings-menu button').forEach(button => {
+                    button.classList.remove('active');
                     button.style.backgroundColor = '';
                     button.style.color = '';
                 });
 
-                // Highlight the active button
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                if (activeButton) {
-                    activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-secondary-color)';
-                }
-
+                // ✅ Find button by checking onclick content
+                document.querySelectorAll('.settings-menu button').forEach(button => {
+                    const onclick = button.getAttribute('onclick');
+                    if (onclick && onclick.includes(sectionId)) {
+                        button.classList.add('active');
+                        button.style.backgroundColor = 'var(--primary-color)';
+                        button.style.color = 'var(--text-secondary-color)';
+                    }
+                });
 
                 if (sectionId === 'Badges') {
                     const EnglishTabBtn = document.querySelector('.tab-button[onclick*="en"]');
                     if (EnglishTabBtn) {
-                        EnglishTabBtn.click(); // fire real click event
+                        EnglishTabBtn.click();
                     }
                 }
-                // if (sectionId === 'user_days') {
-                //     const EnglishTabBtn = document.querySelector('.tab-button[onclick*="en"]');
-                //     if (EnglishTabBtn) {
-                //         EnglishTabBtn.click();
-                //     }
-                // }
 
-                // Update the URL with the selected tab without reloading
                 const url = new URL(window.location);
                 url.searchParams.set("firsttab", sectionId);
                 window.history.pushState({}, "", url);
             }
-
 
             function openFullScreen(imgElement) {
                 var modal = document.getElementById("imageModal");
