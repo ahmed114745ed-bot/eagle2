@@ -2310,6 +2310,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(RoomVisitor::class, 'user_id');
     }
+
+    public function roomVisitor()
+    {
+        return $this->hasOne(RoomVisitor::class, 'user_id');
+    }
     public function liveTimes()
     {
         return $this->hasMany(LiveTime::class, 'uid');
@@ -2320,18 +2325,18 @@ class User extends Authenticatable
         return $this->hasOne(HostLevelWinner::class, 'user_id', 'id');
     }
 
-    
+
     public function hostLevelWinnerByLevelAndEvent($hostLevelId)
     {
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
         return $this->hostLevelWinner()
             ->where('host_level_id', $hostLevelId)
-            ->filterByEventType($eventType) ->exists();
+            ->filterByEventType($eventType)->exists();
     }
 
     public function lastHostLevelWinner()
     {
-        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at'); 
+        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at');
     }
 
     /**
@@ -2341,7 +2346,7 @@ class User extends Authenticatable
     {
         return $this->lastHostLevelWinner()->filterByEventType($eventType);
     }
-    
+
     public function userWallet()
     {
         return $this->hasOne(UserWallet::class);

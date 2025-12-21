@@ -145,7 +145,7 @@ class SearchRepository implements SearchRepositoryInterface
                 $query->where('type', '!=', 'live')
                     ->orWhere(function ($subQuery) {
                         $subQuery->where('type', 'live')
-                            ->whereHas('EnterRoom');
+                            ->whereHas('owner.roomVisitor');
                     });
             })
             ->orderBy('hot', 'desc')
@@ -370,7 +370,7 @@ class SearchRepository implements SearchRepositoryInterface
                             $q->where('user_id', $userId);
                         })
                             ->orWhere(function ($q) use ($userId) {
-                                $q->whereIn('user_id', [0, $userId])->whereNull('feature') ;
+                                $q->whereIn('user_id', [0, $userId])->whereNull('feature');
                             });
                     });
             })
