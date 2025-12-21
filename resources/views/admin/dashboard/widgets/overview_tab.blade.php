@@ -553,19 +553,8 @@ function initOverviewTab() {
     loadFinanceChart();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    initOverviewTab();
-});
-
-// Listen for PJAX completion to reload data
-$(document).on('pjax:complete', function() {
-    initOverviewTab();
-});
-
-// Also listen for pjax:end as backup
-$(document).on('pjax:end', function() {
-    initOverviewTab();
-});
+// Load immediately - no DOM waiting, no PJAX reloading
+initOverviewTab();
 
 document.getElementById('applyFilter')?.addEventListener('click', () => {
     loadFinanceCards();
