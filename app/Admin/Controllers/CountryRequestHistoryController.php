@@ -34,7 +34,7 @@ class CountryRequestHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user.packs'])->where('status', '!=', 'pending')->orderByDesc('created_at');
+        $grid->model()->with(['country', 'user', 'user.packs'])->where('status', '!=', 'pending')->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -48,6 +48,10 @@ class CountryRequestHistoryController extends MainController
             $filter->equal('country_id', __('Country'))->select(
                 Country::pluck('e_name', 'id')
             );
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
         });
 
         $grid->id(__('ID'));
@@ -62,6 +66,31 @@ class CountryRequestHistoryController extends MainController
                 $showUrl = url("admin/users/{$user->id}");
                 return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
             });
+
+        $grid->column('user_country', __('country user'))->display(function () {
+
+            $country = $this->oldCountry;
+
+            if (!$country) {
+                return '-';
+            }
+
+            // Select correct name based on locale
+            $name = app()->getLocale() === 'ar'
+                ? ($country->name ?: $country->e_name)
+                : ($country->e_name ?: $country->name);
+
+            // Get flag image URL
+            $flag = $country->flag ? getImagePath($country->flag) : null;
+
+
+            return <<<HTML
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="$flag" alt="flag" width="20" height="20" style="border-radius:4px;">
+                        <span>$name</span>
+                    </div>
+                HTML;
+        });
 
         $grid->column('country.name', __('country'))->display(function () {
 
