@@ -172,7 +172,7 @@ class ChangeCountryRequestController extends MainController
             //     return '-';
             // });
 
-            $grid->column('action', trans('Action'))->display(function () {
+            $grid->column('action', __('Action'))->display(function () {
                 if ($this->status === 'pending') {
                     $acceptUrl = admin_url("country-requests/{$this->id}/accept");
                     $rejectUrl = admin_url("country-requests/{$this->id}/reject");
@@ -182,15 +182,14 @@ class ChangeCountryRequestController extends MainController
                     $acceptConfirm = __('Are you sure you want to accept this request?');
                     $rejectConfirm = __('Are you sure you want to reject this request?');
 
-
                     return <<<HTML
-            <a href="javascript:void(0);" onclick="if(confirm($acceptConfirm)) { window.location='{$acceptUrl}'; }" class="btn btn-success btn-xs">
+            <a href="javascript:void(0);" onclick="if(confirm('{$acceptConfirm}')) { window.location='{$acceptUrl}'; }" class="btn btn-success btn-xs">
                 <i class="fa fa-check"></i> {$acceptText}
             </a>
-            <a href="javascript:void(0);" onclick="if(confirm( $rejectConfirm)) { window.location='{$rejectUrl}'; }" class="btn btn-danger btn-xs">
+            <a href="javascript:void(0);" onclick="if(confirm('{$rejectConfirm}')) { window.location='{$rejectUrl}'; }" class="btn btn-danger btn-xs">
                 <i class="fa fa-times"></i> {$rejectText}
             </a>
-        HTML;
+HTML;
                 }
                 return '-';
             });
