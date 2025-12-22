@@ -89,6 +89,7 @@ class RequestBackgroundImageController extends MainController
                 'owner',
                 'owner.ownerRoom',
                 'owner.profile',
+                'owner.country',
                 'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
