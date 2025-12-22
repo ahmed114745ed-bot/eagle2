@@ -2,10 +2,9 @@
 
 namespace App\Traits\User;
 
-
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\Vip;
+use Illuminate\Support\Facades\Log;
 
 trait UserLevel
 {
