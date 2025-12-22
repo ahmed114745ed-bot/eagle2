@@ -457,7 +457,7 @@
             margin-top: -7% !important;
         }
 
-        .dashboard-container .row {
+        .dashboard-container .tab-pane fade show active .col-md-12 mb-4 .stats-container .row {
             display: flex !important;
         }
 
