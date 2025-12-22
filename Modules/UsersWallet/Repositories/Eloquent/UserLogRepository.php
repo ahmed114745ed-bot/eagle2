@@ -19,7 +19,7 @@ class UserLogRepository extends AbstractRepository
     }
 
 
-    public function index($userId, $type = null, $startDate = null, $endDate = null, $page, $perPage)
+    public function index($userId, $type = null, $startDate = null, $endDate = null, $page = 1, $perPage = 10)
     {
         $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
         $end   = $endDate ? Carbon::parse($endDate)->endOfDay() : Carbon::now()->endOfDay();
