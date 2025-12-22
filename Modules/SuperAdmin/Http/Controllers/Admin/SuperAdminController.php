@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
+use Illuminate\Http\Request;
 
 use App\Models\Bd;
 use App\Models\User;
@@ -800,4 +801,16 @@ class SuperAdminController extends MainController
     //        ]);
     //    }
 
+
+    public function searchBySuperAdmin(Request $request)
+    {   $key = $request->q;
+         $page = $request->get('page', 1);
+         $perPage = 10;
+        return SuperAdmin::selectRaw('concat(name, " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
 }

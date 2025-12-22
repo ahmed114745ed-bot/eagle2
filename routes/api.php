@@ -68,6 +68,7 @@ use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -145,6 +146,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
         Route::get('superadmin-agencies', [UserController::class, 'superAdminAgencies'])->name('superadmin-agencies');
         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
+        Route::get('super-admin', [SuperAdminController::class, 'searchBySuperAdmin'])->name('super-admin');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
         Route::get('countries', [CountryController::class, 'searchCountries'])->name('countries');
         Route::get('regions', [CountryController::class, 'searchRegions'])->name('regions');
