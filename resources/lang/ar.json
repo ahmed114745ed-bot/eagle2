@@ -4753,7 +4753,31 @@
     "confirm_title": "هل أنت متأكد؟",
     "confirm_text": "عند تأكيد التعديل، سيتم إغلاق جميع الرواتب الحالية لهذا التارجت، واحتساب الماسات المحققة للمستخدمين، وبدء دورة رواتب جديدة للشهر الحالي بالماسات المتبقية بعد الخصم. لن يمكن التراجع عن هذا الإجراء.",
     "confirm_button": "تأكيد",
-    "cancel_button": "إلغاء"
+    "cancel_button": "إلغاء",
+      "coin_game.win_title": "مكافأة من الألعاب",
+  "coin_game.win_description": "تمت إضافة :amount عملة إلى رصيدك نتيجة الفوز في الألعاب.",
+
+  "coin_game.lose_title": "خصم من الألعاب",
+  "coin_game.lose_description": "تم خصم :amount عملة من رصيدك نتيجة الخسارة في الألعاب.",
+
+  "wallet.payment_title": "شحن الرصيد",
+  "wallet.payment_description": "تم شحن محفظتك بمبلغ :amount عملة بنجاح.",
+
+  "wallet.gift_title": "إرسال هدية",
+  "wallet.gift_description": "قمت بإرسال هدية بنجاح.",
+
+  "wallet.exchange_title": "تحويل العملات",
+  "wallet.exchange_description": "تم تحويل :diamonds ألماسة إلى :coins عملة.",
+
+  "wallet.gift_room_title": "هدية داخل الغرفة",
+  "wallet.gift_room_description": "تم إرسال الهدية إلى المستخدم :user.",
+
+  "wallet.moment_title": "اللحظات",
+  "wallet.moment_description": "عملية متعلقة بنشر أو تفاعل في اللحظات.",
+
+  "wallet.unknown_user": "مستخدم غير معروف",
+  "wallet.general_title": "عملية في المحفظة",
+  "wallet.general_description": "تم تنفيذ عملية على محفظتك."
 
 
 

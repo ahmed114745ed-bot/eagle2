@@ -4199,7 +4199,31 @@
 "wallet.transfer": "Transfer"
 ,
     "gift:": "Hediye:","diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
+,
+  "coin_game.win_title": "Oyun Ödülü",
+  "coin_game.win_description": "Oyun kazancı olarak cüzdanınıza :amount coin eklendi.",
 
+  "coin_game.lose_title": "Oyun Kesintisi",
+  "coin_game.lose_description": "Oyun kaybı nedeniyle cüzdanınızdan :amount coin düşüldü.",
+
+  "wallet.payment_title": "Cüzdan Yükleme",
+  "wallet.payment_description": "Cüzdanınıza başarıyla :amount coin yüklendi.",
+
+  "wallet.gift_title": "Hediye Gönderildi",
+  "wallet.gift_description": "Başarıyla bir hediye gönderdiniz.",
+
+  "wallet.exchange_title": "Para Birimi Dönüşümü",
+  "wallet.exchange_description": ":diamonds elmas, :coins coin’e dönüştürüldü.",
+
+  "wallet.gift_room_title": "Oda Hediyesi",
+  "wallet.gift_room_description": ":user kullanıcısına hediye gönderildi.",
+
+  "wallet.moment_title": "Anlar",
+  "wallet.moment_description": "Anlar özelliğiyle ilgili bir işlem.",
+
+  "wallet.unknown_user": "Bilinmeyen kullanıcı",
+  "wallet.general_title": "Cüzdan İşlemi",
+  "wallet.general_description": "Cüzdanınızda bir işlem gerçekleştirildi."
 
 
 

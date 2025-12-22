@@ -3833,7 +3833,30 @@
 
 ,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
+, "coin_game.win_title": "गेम इनाम",
+  "coin_game.win_description": "गेम जीत के कारण आपके वॉलेट में :amount कॉइन जोड़े गए हैं।",
 
+  "coin_game.lose_title": "गेम कटौती",
+  "coin_game.lose_description": "गेम हार के कारण आपके वॉलेट से :amount कॉइन काटे गए हैं।",
+
+  "wallet.payment_title": "वॉलेट रिचार्ज",
+  "wallet.payment_description": "आपके वॉलेट में सफलतापूर्वक :amount कॉइन जोड़े गए।",
+
+  "wallet.gift_title": "उपहार भेजा गया",
+  "wallet.gift_description": "आपने सफलतापूर्वक एक उपहार भेजा है।",
+
+  "wallet.exchange_title": "मुद्रा विनिमय",
+  "wallet.exchange_description": ":diamonds डायमंड को :coins कॉइन में बदला गया।",
+
+  "wallet.gift_room_title": "रूम गिफ्ट",
+  "wallet.gift_room_description": ":user को उपहार भेजा गया।",
+
+  "wallet.moment_title": "मोमेंट्स",
+  "wallet.moment_description": "मोमेंट्स से संबंधित एक गतिविधि।",
+
+  "wallet.unknown_user": "अज्ञात उपयोगकर्ता",
+  "wallet.general_title": "वॉलेट लेनदेन",
+  "wallet.general_description": "आपके वॉलेट पर एक लेनदेन किया गया।"
 
 
 

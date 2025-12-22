@@ -2,79 +2,94 @@
 
 namespace Modules\UsersWallet\Http\Resources;
 
-
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserCoinLogResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         [$title, $description] = $this->getTitleAndDescription();
 
         return [
-            'feature_type' => $this->feature_type,
-            'type' => $this->type,
-            'amount' => $this->amount,
-            'title' => $title,
-            'description' => $description,
+            'feature_type'  => $this->feature_type,
+            'type'          => $this->type,
+            'amount'        => $this->amount,
+            'title'         => $title,
+            'description'   => $description,
             'negative_sign' => $this->amount < 0,
-            'created_at' => Carbon::parse($this->created_at)
-                ->locale(app()->getLocale()) // Arabic or English
+            'created_at'    => Carbon::parse($this->created_at)
+                ->locale(app()->getLocale())
                 ->translatedFormat('d F Y - h:i A'),
         ];
     }
 
     /**
-     * Build title and description based on the log type.
-     *
-     * @return array{0:string,1:string}
+     * Build professional title & description
      */
     private function getTitleAndDescription(): array
     {
-        $title = '';
-        $description = '';
-
         switch ($this->type) {
+
             case 'payment':
-                $title = __('buy') . '' . $this->amount . ' ' . _('coin');
-                $description = _('through') . ' ' . $this->feature;
-                break;
+                return [
+                    __('wallet.payment_title'),
+                    __('wallet.payment_description', [
+                        'amount' => abs($this->amount)
+                    ]),
+                ];
 
             case 'gift':
-                $title = __('send gift');
-                break;
+                return [
+                    __('wallet.gift_title'),
+                    __('wallet.gift_description'),
+                ];
 
             case 'exchanges_diamonds':
-                $title = __($this->type);
-                $description = __('diamond') . abs($this->amount) . ' ' .
-                    ' ← ' .  __('coin') . abs($this->coin);
-                break;
+                return [
+                    __('wallet.exchange_title'),
+                    __('wallet.exchange_description', [
+                        'diamonds' => abs($this->amount),
+                        'coins'    => abs($this->coin),
+                    ]),
+                ];
 
             case 'gift_room_audio':
             case 'gift_room_live':
-                $title = __($this->type);
-                $userName = $this->user->name ?? '';
-                $description = $userName ? __('from user') . ' ' . $userName : '';
-                break;
+                return [
+                    __('wallet.gift_room_title'),
+                    __('wallet.gift_room_description', [
+                        'user' => $this->user->name ?? __('wallet.unknown_user')
+                    ]),
+                ];
 
             case 'moment':
-                $title = __($this->type);
-                $description = __('your moment');
-                break;
+                return [
+                    __('wallet.moment_title'),
+                    __('wallet.moment_description'),
+                ];
+
+            case 'coin_game':
+                $amount = abs($this->amount);
+
+                if ($this->amount < 0) {
+                    return [
+                        __('coin_game.lose_title'),
+                        __('coin_game.lose_description', ['amount' => $amount]),
+                    ];
+                }
+
+                return [
+                    __('coin_game.win_title'),
+                    __('coin_game.win_description', ['amount' => $amount]),
+                ];
 
             default:
-                $title = __($this->type);
-                $description = __($this->type);
-                break;
+                return [
+                    __('wallet.general_title'),
+                    __('wallet.general_description'),
+                ];
         }
-
-        return [$title, $description];
     }
 }
