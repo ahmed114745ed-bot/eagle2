@@ -213,7 +213,7 @@ class WeeklyRankingCommand extends Command
     }
 
 
-    protected function dispatchNotification($userIds, $range)
+   protected function dispatchNotification($userIds, $range)
     {
         // Convert to array if it's a Collection
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
