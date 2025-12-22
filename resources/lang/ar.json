@@ -4758,7 +4758,7 @@
   "coin_game.win_description": "تمت إضافة :amount عملة إلى رصيدك نتيجة الفوز في الألعاب.",
 
   "coin_game.lose_title": "خصم من الألعاب",
-  "coin_game.lose_description": "تم خصم :amount عملة من رصيدك نتيجة الخسارة في الألعاب.",
+  "coin_game.lose_description": "تم خصم :amount عملة من رصيدك   في الألعاب.",
 
   "wallet.payment_title": "شحن الرصيد",
   "wallet.payment_description": "تم شحن محفظتك بمبلغ :amount عملة بنجاح.",
