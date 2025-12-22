@@ -31,10 +31,8 @@ trait UserLevel
 public function getNextSenderLevelInfoAttribute(): array
 {
     $currentLevel = $this->senderLevel;
-    Log::info("Current sender level for user {$this->id}:", ['level' => $currentLevel?->level]);
 
     if (!$currentLevel) {
-        Log::info("No current sender level found for user {$this->id}");
         return [
             'next_level' => null,
             'remaining_exp' => null,
@@ -47,7 +45,6 @@ public function getNextSenderLevelInfoAttribute(): array
         ->first();
 
     if (!$nextLevel) {
-        Log::info("No next sender level exists for user {$this->id}");
         return [
             'next_level' => null,
             'remaining_exp' => 0,
@@ -55,20 +52,20 @@ public function getNextSenderLevelInfoAttribute(): array
     }
 
     $currentExp = $this->sender_exp ?? 0;
-    $remainingExp = max($nextLevel->exp - $currentExp, 0);
+    $levelStartExp = $currentLevel->exp ?? 0;
+    $levelEndExp = $nextLevel->exp ?? 0;
 
-    Log::info("Next sender level for user {$this->id}:", [
-        'next_level' => $nextLevel->level,
-        'current_exp' => $currentExp,
-        'next_level_exp' => $nextLevel->exp,
-        'remaining_exp' => $remainingExp
-    ]);
+    $totalExpDiff = max($levelEndExp - $levelStartExp, 1); 
+    $remainingExp = max($levelEndExp - $currentExp, 0);
+
+    $remainingPercentage = $remainingExp / $totalExpDiff;
 
     return [
         'next_level' => $nextLevel->level,
-        'remaining_exp' => $remainingExp,
+        'remaining_exp' => $remainingPercentage,
     ];
 }
+
 
 
 
