@@ -75,7 +75,7 @@ class ExchangeService
 
     public function createExchange($user, $diamonds, $exValue)
     {
-        if($user->type_user == 1 ) throw new \Exception(__('you are host you can not exchange diamonds'));
+        if (!in_array($user->type_user, [0, 3])) throw new \Exception(__('you are host you can not exchange diamonds'));
         if ($user->exchange_diamonds < $diamonds) throw new \Exception(__('balance low'));
         //  if (!ctype_digit($exValue)) throw new \Exception(__('you should exchange number of diamond'));
 
