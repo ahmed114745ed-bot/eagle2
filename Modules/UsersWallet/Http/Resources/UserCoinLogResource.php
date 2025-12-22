@@ -40,7 +40,7 @@ class UserCoinLogResource extends JsonResource
                     ]),
                 ];
 
-            case 'gift':
+            case 'gifts':
                 return [
                     __('wallet.gift_title'),
                     __('wallet.gift_description'),
