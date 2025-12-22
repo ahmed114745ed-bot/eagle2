@@ -2,11 +2,12 @@
 
 namespace Modules\Reals\Http\Services;
 
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Encoders\JpegEncoder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\JpegEncoder;
 
 
 class InterventionImage
@@ -58,58 +59,64 @@ class InterventionImage
     //     return 'merged/' . $fileName;
     // }
 
-public function combineImages(array $paths, $maxTileSize = 100)
-{
-    $manager = new ImageManager(new Driver());
-    $images = [];
+    public function combineImages(array $paths, $maxTileSize = 100)
+    {
+        $manager = new ImageManager(new Driver());
+        $images = [];
 
-    // 1️⃣ Read and resize images
-    foreach ($paths as $path) {
-        $img = $this->readImage($path);
-        if ($img) {
-            // Resize to maxTileSize keeping aspect ratio
-            $img->resize($maxTileSize, $maxTileSize, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-            $images[] = $img;
+        // 1️⃣ Read and resize images
+        foreach ($paths as $path) {
+
+            $img = $this->readImage($path);
+            if (!$img) {
+                // Log missing file
+                Log::warning("Image not found: $path");
+                continue; // skip
+            }
+            if ($img) {
+                // Resize to maxTileSize keeping aspect ratio
+                $img->resize($maxTileSize, $maxTileSize, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+                $images[] = $img;
+            }
         }
+
+        if (empty($images)) {
+            return null;
+        }
+
+        $count = count($images);
+        $columns = ceil(sqrt($count));
+        $rows = ceil($count / $columns);
+
+        // 2️⃣ Calculate canvas size based on resized images
+        $tileWidth = max(array_map(fn($img) => $img->width(), $images));
+        $tileHeight = max(array_map(fn($img) => $img->height(), $images));
+
+        $canvasWidth = $columns * $tileWidth;
+        $canvasHeight = $rows * $tileHeight;
+
+        $canvas = $manager->create($canvasWidth, $canvasHeight);
+
+
+        // 3️⃣ Place images
+        foreach ($images as $i => $img) {
+            $x = ($i % $columns) * $tileWidth;
+            $y = floor($i / $columns) * $tileHeight;
+            $canvas->place($img, 'top-left', $x, $y);
+        }
+
+        // 4️⃣ Generate filename and save
+        $fileName = 'merged_' . Str::random(16) . '.jpg';
+        $imageContent = (string) $canvas->encode(new JpegEncoder(quality: 70));
+        // smaller file
+
+        Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
+
+        return 'merged/' . $fileName;
     }
-
-    if (empty($images)) {
-        return null;
-    }
-
-    $count = count($images);
-    $columns = ceil(sqrt($count));
-    $rows = ceil($count / $columns);
-
-    // 2️⃣ Calculate canvas size based on resized images
-    $tileWidth = max(array_map(fn($img) => $img->width(), $images));
-    $tileHeight = max(array_map(fn($img) => $img->height(), $images));
-
-    $canvasWidth = $columns * $tileWidth;
-    $canvasHeight = $rows * $tileHeight;
-
-    $canvas = $manager->create($canvasWidth, $canvasHeight);
-
-
-    // 3️⃣ Place images
-    foreach ($images as $i => $img) {
-        $x = ($i % $columns) * $tileWidth;
-        $y = floor($i / $columns) * $tileHeight;
-        $canvas->place($img, 'top-left', $x, $y);
-    }
-
-    // 4️⃣ Generate filename and save
-    $fileName = 'merged_' . Str::random(16) . '.jpg';
-    $imageContent = (string) $canvas->encode(new JpegEncoder(quality: 70));
- // smaller file
-
-    Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
-
-    return 'merged/' . $fileName;
-}
 
 
 
