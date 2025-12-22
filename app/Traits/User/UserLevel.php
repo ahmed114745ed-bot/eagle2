@@ -29,7 +29,6 @@ trait UserLevel
     }
 
 
-
 public function getNextSenderLevelInfoAttribute(): array
 {
     $currentLevel = $this->senderLevel;
