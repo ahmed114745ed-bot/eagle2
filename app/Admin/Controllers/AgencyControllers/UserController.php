@@ -477,7 +477,7 @@ class UserController extends MainController
                 // 'ownerRoom:id,uid',
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
-                'userSetting',
+               // 'userSetting',
                 'senderLevel:id,level',
                 'receiverLevel:id,level',
                // 'monthlyDiamondReceive',
