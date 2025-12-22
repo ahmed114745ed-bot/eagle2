@@ -582,6 +582,13 @@
             margin: auto;
         }
 
+        .rtl form {
+            padding-right: 40px;
+        }
+
+        .p-3 {
+            padding: 3rem !important;
+        }
         .settings-menu {
             display: flex;
             flex-wrap: nowrap;
