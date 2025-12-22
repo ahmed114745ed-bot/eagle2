@@ -12,4 +12,9 @@ class EmojiCategory extends Model
     protected $casts = [
         'title' => 'array',
     ];
+
+    public $sortable = [
+        'order_column_name' => 'sort',
+        'sort_when_creating' => true,
+    ];
 }

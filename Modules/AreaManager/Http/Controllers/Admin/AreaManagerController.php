@@ -7,6 +7,7 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Country;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -18,15 +19,16 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
-use App\Admin\Controllers\MainController;
+use Illuminate\Support\Facades\Cache;
 use Modules\AreaManager\Entities\Region;
-use Modules\AreaManager\Entities\RegionCountry;
+use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\Milestones\Helpers\MilestoneHelper;
-use App\Helpers\Common;
+use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController
 {
@@ -96,7 +98,7 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs', 'regionArea', 'creator'])->orderByDesc('id');
+        $grid->model()->with(['appUser.packs', 'regionArea:id,name,manager_id', 'appUser', 'creator', 'appUser.profile'])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -161,7 +163,8 @@ class AreaManagerController extends MainController
         $grid->column('regionArea.name', __('Regions'));
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+            $creator = $this->creator;
+            return app(\App\Admin\Services\CreatorService::class)->showV2(creatorInput: $creator);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date)->locale(App::getLocale());
@@ -170,7 +173,9 @@ class AreaManagerController extends MainController
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $milestoneId = Milestone::where('slug', 'area-manager')->first();
+                $milestone = Cache::remember('milestone_area_manager', now()->addHours(1), function () {
+                    return Milestone::where('slug', 'area-manager')->first();
+                });
                 $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
@@ -225,10 +230,15 @@ class AreaManagerController extends MainController
             if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new DeleteAreaManagerAction());
             }
+
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new FrozenWalletSuperAdminAction());
+            }
         });
 
         return $grid;
     }
+
 
 
     /**
@@ -247,7 +257,7 @@ class AreaManagerController extends MainController
         $form = new Form(new AreaManager());
         $this->disableFormTools($form);
 
-        $form->text('name', __('name'));
+        $form->text('name', __('name'))->required();
         $form->text('username', trans('admin.username'))
             ->rules(function ($form) use ($connection, $userTable) {
                 $table = "{$connection}.{$userTable}";
@@ -548,7 +558,7 @@ class AreaManagerController extends MainController
 
     JS;
     }
-    
+
     public function profile($id)
     {
         $tab = request()->query('tab', 'agencies');

@@ -29,6 +29,7 @@ use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
+use Modules\UsersWallet\Entities\WalletLog;
 use Modules\Vip\Entities\UserVip;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
@@ -636,7 +637,27 @@ class UserController extends MainController
                 ", [now()->timestamp])
             ->orderByDesc('expire')
             ->paginate(10, ['*'], 'badges_page');
-        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries');
+        
+        $curantBalance = wallet_available_by_user($id);
+        $availableBalance = wallet_available_by_user($id);
+        
+        $walletLogs = WalletLog::where('user_id', $user->id)
+            ->when(request('year'), function ($q) {
+                $q->whereYear('created_at', request('year'));
+            })
+            ->when(request('month'), function ($q) {
+                $q->whereMonth('created_at', request('month'));
+            })
+            ->orderByDesc('id')
+            ->paginate(20, ['*'], 'wallet_logs_page')
+            ->appends([
+                'tab'   => 'wallet_logs',
+                'year'  => request('year'),
+                'month' => request('month'),
+            ]);
+     
+       
+        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries' ,'availableBalance','curantBalance','walletLogs');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }

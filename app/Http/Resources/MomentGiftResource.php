@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MomentGiftResource extends JsonResource
@@ -13,19 +14,17 @@ class MomentGiftResource extends JsonResource
      */
     public function toArray($request): array
     {
+        $sourceName = $this->user->name ?? '';
+        $giftName = $this->gift->name ?? '';
+        $formattedDate = Carbon::parse($this->created_at)
+            ->translatedFormat('d F Y - h:i A');
 
         return [
-
-            'user' => [
-                'name' => $this->user->name ?? '',
-                'uuid' => $this->user->uuid ?? '',
-                'avatar' => $this->user->profile->avatar ?? '',
-            ],
-            
-            'gift' => [
-                'name' => $this->gift->name ?? '',
-            ],
-            'created_at' => $this->created_at ?? '',
+            'name' => $this->user->name ?? '',
+            'avatar' => $this->user->profile->avatar ?? '',
+            'description' => __('source:') . $sourceName . ' ' . __('gift:') . $giftName,
+            'id_moment' => $this->moment_id,
+            'created_at' => $formattedDate,
             'diamond' => $this->total ?? 0,
         ];
     }

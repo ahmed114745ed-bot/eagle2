@@ -5,6 +5,7 @@ namespace App\Tik\Services;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\WebPHelper;
 use App\Models\Config;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Schema;
@@ -108,7 +109,11 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-            $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+                $room->room_cover = WebPHelper::uploadWebp(
+                        $request->file('room_cover'),
+                        'rooms',
+                        'room_cover'
+                 );
         } else {
             $room->room_cover = $request->room_cover;
         }
@@ -653,7 +658,11 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-            $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+                $room->room_cover = WebPHelper::uploadWebp(
+                        $request->file('room_cover'),
+                        'rooms',
+                        'room_cover'
+                 );
         }
 
         if ($request->free_mic) {

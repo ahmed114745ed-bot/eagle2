@@ -54,6 +54,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -299,7 +300,7 @@ class UserService
         }
         // end update location
 
-        if (!$countryId){
+        if ($countryId){
             $this->userRepository->updateCountry($user, $countryId);
         }
         //        $this->updateCountryAgencyAndBD($user->id, $countryId);
@@ -656,6 +657,12 @@ class UserService
     public function showUser($userId)
     {
         return  $this->userRepository->getUserWithMedals($userId);
+        //        $this->packRepository->deleteAllExpiredPacks();
+    }
+
+    public function showUsers($usersIds)
+    {
+        return  $this->userRepository->getUsersWithMedals($usersIds);
         //        $this->packRepository->deleteAllExpiredPacks();
     }
 

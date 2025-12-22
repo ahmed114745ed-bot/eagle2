@@ -4,6 +4,7 @@ namespace Modules\SuperAdmin\Actions\Admin;
 
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
+use Illuminate\Support\Facades\Cache;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 
@@ -16,7 +17,7 @@ class DedicateSuperAdminRewardAction extends Action
 
     public function __construct($id = 0, $type = '')
     {
-         $this->name = __('dedicate');
+        $this->name = __('dedicate');
         $this->id = $id;
         $this->type = $type;
         parent::__construct();
@@ -53,9 +54,7 @@ class DedicateSuperAdminRewardAction extends Action
         $this->hidden('type', __('id'))->attribute('id', 'type');
 
         $this->multipleSelect('super_admin_id', __('Select Super Admins'))
-            ->options(function () {
-                return SuperAdmin::pluck('name', 'id');
-            });
+            ->options(self::getSuperAdmins());
 
         $this->integer('expire', __('Days'))->default(1);
         $this->integer('no_reward', __('No reward'))->default(1);
@@ -71,5 +70,22 @@ class DedicateSuperAdminRewardAction extends Action
                 $("#type").val(type);
             }
         </script>';
+    }
+
+
+
+    protected static function getSuperAdmins()
+    {
+        static $admins = null;
+
+        if ($admins === null) {
+            $admins = SuperAdmin::query()
+                ->where('type', 'superadmin')
+                ->whereNull('deleted_at')
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
+        return $admins;
     }
 }
