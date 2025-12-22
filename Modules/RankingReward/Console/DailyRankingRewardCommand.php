@@ -124,6 +124,7 @@ class DailyRankingRewardCommand extends Command
                 'users.*',
                 DB::raw('IFNULL(total_charge,0) + IFNULL(total_restore,0) AS total_sum')
             ])
+            ->havingRaw('total_sum > 0')
             ->orderByDesc('total_sum')
             ->get()->values();
     }
