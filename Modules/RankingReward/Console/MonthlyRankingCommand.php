@@ -35,7 +35,7 @@ class MonthlyRankingCommand extends Command
 
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
-            //dd( $rankingList);
+            // dd($rankingList);
 
             if (!$rankingList || $rankingList->isEmpty()) {
                 continue;
@@ -52,6 +52,7 @@ class MonthlyRankingCommand extends Command
         switch ($rankingType->type) {
 
             case 'wealth':
+                return $this->giftRanking($rankingType->type);
             case 'charm':
                 return $this->giftRanking($rankingType->type);
 
@@ -80,8 +81,8 @@ class MonthlyRankingCommand extends Command
 
         $column = $map[$type];
         $withRelation = $type === 'wealth' ? 'sender' : 'receiver';
-
-        return GiftLog::query()
+        //dd($column,$withRelation,$start,$end);
+        $list = GiftLog::query()
             ->selectRaw("$column, SUM(giftNum * giftPrice) AS total")
             ->with($withRelation)
             ->whereBetween('created_at', [$start, $end])
@@ -89,6 +90,8 @@ class MonthlyRankingCommand extends Command
             ->orderByDesc('total')
             ->get()
             ->values();
+        //dd($list);
+        return $list;
     }
 
     public function charge()
@@ -96,6 +99,11 @@ class MonthlyRankingCommand extends Command
         $timezone = getTimezone();
         $start = Carbon::now($timezone)->subMonth()->startOfMonth();
         $end   = Carbon::now($timezone)->subMonth()->endOfMonth();
+        Log::info("GiftRanking date range month", [
+
+            'start' => $start->toDateTimeString(),
+            'end'   => $end->toDateTimeString(),
+        ]);
 
         $query = User::query()
             // Join charges of this week
@@ -128,7 +136,6 @@ class MonthlyRankingCommand extends Command
             ->havingRaw('total_sum > 0') // only users with charge or coins
             ->orderByDesc('total_sum')
             ->get()->values();
-          //  dd($query);
         return  $query;
     }
 
@@ -139,13 +146,14 @@ class MonthlyRankingCommand extends Command
         $start = Carbon::now($timezone)->subMonth()->startOfMonth();
         $end   = Carbon::now($timezone)->subMonth()->endOfMonth();
 
-        return CoinGameUser::query()
+        $list = CoinGameUser::query()
             ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp"))
             ->whereBetween('created_at', [$start, $end])
             ->whereHas('user')
             ->groupBy('user_id')
             ->orderByDesc('exp')
             ->get()->values();
+        return $list;
     }
     protected function getUserIdKey(string $type): string
     {
