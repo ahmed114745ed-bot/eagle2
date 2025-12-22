@@ -4647,6 +4647,8 @@
 "you sent request before": "لقد أرسلت الطلب سابقًا",
 "accept change country": "قبول تغيير الدولة",
 "this is your country": "هذه هي دولتك",
+"you are host you can not exchange diamonds": "أنت مضيف ولا يمكنك استبدال الألماس",
+"calculus not true": "الحساب غير صحيح",
 "Are you sure you want to accept this request?": "هل أنت متأكد من قبول هذا الطلب؟",
 "Are you sure you want to reject this request?": "هل أنت متأكد من رفض هذا الطلب؟",
 "Saved successfully ✅":"تم الحفظ بنجاح ✅",
