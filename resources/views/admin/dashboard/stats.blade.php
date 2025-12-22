@@ -157,6 +157,5 @@
         }
 
         updateStats();
-        setInterval(updateStats, 120000);
     });
 </script>

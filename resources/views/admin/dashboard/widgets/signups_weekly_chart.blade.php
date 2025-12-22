@@ -73,5 +73,8 @@
     }
 
     // Execute immediately - this is the key!
-    loadWeeklySignups();
+    if (!window.weeklySignupsLoaded) {
+        window.weeklySignupsLoaded = true;
+        loadWeeklySignups();
+    }
 </script>

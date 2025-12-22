@@ -85,7 +85,10 @@
     }
 
     // Execute immediately - this is the key!
-    loadTopFollowers();
+    if (!window.topFollowersLoaded) {
+        window.topFollowersLoaded = true;
+        loadTopFollowers();
+    }
 </script>
 
 <style>

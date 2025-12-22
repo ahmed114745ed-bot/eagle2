@@ -72,5 +72,8 @@
     }
 
     // Execute immediately - this is the key!
-    loadTopUsers();
+    if (!window.topUsersLoaded) {
+        window.topUsersLoaded = true;
+        loadTopUsers();
+    }
 </script>

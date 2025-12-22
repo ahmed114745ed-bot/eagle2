@@ -879,17 +879,17 @@
                         loadWalletLogs();
                     }
                 } else if (tabId === '#users') {
-                    // Initialize users tab widgets
-                    if (typeof loadTopUsers === 'function') {
+                    // Initialize users tab widgets - only if not already loaded
+                    if (typeof loadTopUsers === 'function' && !window.topUsersLoaded) {
                         loadTopUsers();
                     }
-                    if (typeof loadWeeklySignups === 'function') {
+                    if (typeof loadWeeklySignups === 'function' && !window.weeklySignupsLoaded) {
                         loadWeeklySignups();
                     }
                     if (typeof loadPeakHours === 'function') {
                         loadPeakHours();
                     }
-                    if (typeof loadTopFollowers === 'function') {
+                    if (typeof loadTopFollowers === 'function' && !window.topFollowersLoaded) {
                         loadTopFollowers();
                     }
                     // Initialize users online chart
