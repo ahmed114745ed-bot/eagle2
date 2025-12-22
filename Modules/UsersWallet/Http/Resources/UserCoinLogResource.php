@@ -120,14 +120,14 @@ class UserCoinLogResource extends JsonResource
         case 'coin_game':
             return $this->amount < 0
                 ? [
-                    __('coin_game.lose_title'),
-                    __('coin_game.lose_description', [
+                    __('lose_title'),
+                    __('lose_description', [
                         'amount' => abs($this->amount),
                     ]),
                 ]
                 : [
-                    __('coin_game.win_title'),
-                    __('coin_game.win_description', [
+                    __('win_title'),
+                    __('win_description', [
                         'amount' => abs($this->amount),
                     ]),
                 ];
