@@ -470,9 +470,11 @@ class RankingTypeController extends MainController
                             break;
 
                         case 'vip':
-                            $path = $reward->vip->image2
-                                ? getImagePath($reward->vip->image2)
-                                : asset('images/ware-image.jpg');
+                            $path = 
+                            // $reward->vip->image2
+                            //     ? getImagePath($reward->vip->image2)
+                            //     :
+                                 asset('images/ware-image.jpg');
                             break;
 
                         case 'badge':
