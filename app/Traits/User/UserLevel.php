@@ -41,7 +41,7 @@ public function getNextSenderLevelInfoAttribute(): array
         ];
     }
 
-    $nextLevel = Vip::where('type', 'sender')
+    $nextLevel = Vip::where('type', 2)
         ->where('level', '>', $currentLevel->level)
         ->orderBy('level')
         ->first();
