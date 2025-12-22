@@ -53,15 +53,22 @@
 @endphp
 
 <script>
+    function updateRoomStats() {
+        if (!window.roomStatsLoaded) {
+            window.roomStatsLoaded = true;
+            fetch('{{ url($prefix . "/statistics/room-stats") }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('audioRooms').innerText = data.audio;
+                    document.getElementById('liveRooms').innerText = data.live;
+                    document.getElementById('activeRooms').innerText = data.active;
+                    document.getElementById('inactiveRooms').innerText = data.inactive;
+                })
+                .catch(err => console.error('Error loading room stats:', err));
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
-        fetch('{{ url($prefix . "/statistics/room-stats") }}')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('audioRooms').innerText = data.audio;
-                document.getElementById('liveRooms').innerText = data.live;
-                document.getElementById('activeRooms').innerText = data.active;
-                document.getElementById('inactiveRooms').innerText = data.inactive;
-            })
-            .catch(err => console.error('Error loading room stats:', err));
+        updateRoomStats();
     });
 </script>
