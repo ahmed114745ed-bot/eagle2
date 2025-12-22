@@ -35,7 +35,7 @@ class WeeklyRankingCommand extends Command
 
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
-            dd( $rankingList);
+          //  dd( $rankingList->toArray());
 
             if (!$rankingList || $rankingList->isEmpty()) {
                 continue;
@@ -52,18 +52,18 @@ class WeeklyRankingCommand extends Command
 
         switch ($rankingType->type) {
 
-            // case 'wealth':
-            // case 'charm':
-            //     return $this->giftRanking($rankingType->type);
+            case 'wealth':
+            case 'charm':
+                return $this->giftRanking($rankingType->type);
 
             case 'charge':
                 return $this->charge();
 
-                // case 'game':
-                //     return $this->gameRanking();
+                case 'game':
+                    return $this->gameRanking();
 
-                // default:
-                //     return collect();
+                default:
+                    return collect();
         }
     }
 
