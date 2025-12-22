@@ -3833,34 +3833,50 @@
 
 ,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
-, "coin_game.win_title": "गेम इनाम",
-  "coin_game.win_description": "गेम जीत के कारण आपके वॉलेट में :amount कॉइन जोड़े गए हैं।",
+,  "payment_title": "बैलेंस रिचार्ज",
+  "payment_description": "आपके बैलेंस में :amount कॉइन्स जोड़े गए",
 
-  "coin_game.lose_title": "गेम कटौती",
-  "coin_game.lose_description": "गेम हार के कारण आपके वॉलेट से :amount कॉइन काटे गए हैं।",
+  "admin_adjustment_title": "एडमिन समायोजन",
+  "admin_adjustment_description": "आपके बैलेंस को :amount कॉइन्स से समायोजित किया गया",
 
-  "wallet.payment_title": "वॉलेट रिचार्ज",
-  "wallet.payment_description": "आपके वॉलेट में सफलतापूर्वक :amount कॉइन जोड़े गए।",
+  "cp_title": "संबंध आय",
+  "cp_description": "आपने अपने संबंध गतिविधि से :amount कॉइन्स कमाए",
 
-  "wallet.gift_title": "उपहार भेजा गया",
-  "wallet.gift_description": "आपने सफलतापूर्वक एक उपहार भेजा है।",
+  "gift_title": "उपहार",
+  "gift_description": "एक उपहार लेनदेन हुआ है",
 
-  "wallet.exchange_title": "मुद्रा विनिमय",
-  "wallet.exchange_description": ":diamonds डायमंड को :coins कॉइन में बदला गया।",
+  "daily_gift_title": "दैनिक उपहार",
+  "daily_gift_description": "आपने अपना दैनिक उपहार प्राप्त किया",
 
-  "wallet.gift_room_title": "रूम गिफ्ट",
-  "wallet.gift_room_description": ":user को उपहार भेजा गया।",
+  "lucky_gift_title": "लकी गिफ्ट",
+  "lucky_gift_description": "आपने लकी सिस्टम से एक उपहार जीता",
 
-  "wallet.moment_title": "मोमेंट्स",
-  "wallet.moment_description": "मोमेंट्स से संबंधित एक गतिविधि।",
+  "lucky_box_title": "लकी बॉक्स",
+  "lucky_box_description": "लकी बॉक्स से पुरस्कार प्राप्त हुआ",
 
-  "wallet.unknown_user": "अज्ञात उपयोगकर्ता",
-  "wallet.general_title": "वॉलेट लेनदेन",
-  "wallet.general_description": "आपके वॉलेट पर एक लेनदेन किया गया।",
-    "packs.purchase_title": "स्टोर से खरीदारी",
-  "packs.purchase_description": "स्टोर से :item खरीदने के लिए :amount कॉइन काटे गए।",
-  "packs.default_item": "आइटम"
+  "exchange_title": "मुद्रा विनिमय",
+  "exchange_description": ":diamonds हीरे को :coins कॉइन्स में बदला गया",
 
+  "cashback_title": "कैशबैक",
+  "cashback_description": "आपको :amount कॉइन्स कैशबैक के रूप में मिले",
+
+  "achievement_title": "उपलब्धि",
+  "achievement_description": "आपने एक उपलब्धि पुरस्कार जीता",
+
+  "comment_title": "इंटरैक्शन इनाम",
+  "comment_description": "इंटरैक्शन या टिप्पणी के लिए इनाम",
+
+  "family_title": "परिवार पुरस्कार",
+  "family_description": "परिवार गतिविधि से संबंधित पुरस्कार",
+
+  "background_title": "कस्टमाइज़ेशन आइटम",
+  "background_description": "कस्टमाइज़ेशन आइटम खरीदा या उपयोग किया गया",
+
+  "invitation_title": "आमंत्रण पुरस्कार",
+  "invitation_description": "आपने एक उपयोगकर्ता को आमंत्रित करने के लिए :amount कॉइन्स कमाए",
+
+  "general_title": "वॉलेट गतिविधि",
+  "general_description": "वॉलेट लेनदेन हुआ"
 
 
 
