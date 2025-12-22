@@ -35,7 +35,7 @@ public function getNextSenderLevelInfoAttribute(): array
     if (!$currentLevel) {
         return [
             'next_level' => null,
-            'remaining_exp' => null,
+            'remaining_exp_percentage' => null,
         ];
     }
 
@@ -47,7 +47,7 @@ public function getNextSenderLevelInfoAttribute(): array
     if (!$nextLevel) {
         return [
             'next_level' => null,
-            'remaining_exp' => 0,
+            'remaining_exp_percentage' => 0,
         ];
     }
 
@@ -58,13 +58,14 @@ public function getNextSenderLevelInfoAttribute(): array
     $totalExpDiff = max($levelEndExp - $levelStartExp, 1); 
     $remainingExp = max($levelEndExp - $currentExp, 0);
 
-    $remainingPercentage = $remainingExp / $totalExpDiff;
+    $remainingPercentage = ($remainingExp / $totalExpDiff) * 100;
 
     return [
         'next_level' => $nextLevel->level,
-        'remaining_exp' => $remainingPercentage,
+        'remaining_exp_percentage' => round($remainingPercentage, 2), 
     ];
 }
+
 
 
 
