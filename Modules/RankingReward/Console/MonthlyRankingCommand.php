@@ -128,7 +128,7 @@ class MonthlyRankingCommand extends Command
             ->havingRaw('total_sum > 0') // only users with charge or coins
             ->orderByDesc('total_sum')
             ->get()->values();
-            dd($query);
+          //  dd($query);
         return  $query;
     }
 
