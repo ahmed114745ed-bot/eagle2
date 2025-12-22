@@ -97,7 +97,8 @@ class MonthlyRankingCommand extends Command
         $start = Carbon::now($timezone)->subMonth()->startOfMonth();
         $end   = Carbon::now($timezone)->subMonth()->endOfMonth();
 
-        return User::query()
+        $query = User::query()
+            // Join charges of this week
             ->leftJoinSub(
                 fn($q) => $q->select('user_id', DB::raw('SUM(amount) AS total_charge'))
                     ->from('charges')
@@ -108,6 +109,7 @@ class MonthlyRankingCommand extends Command
                 'users.id',
                 'charges.user_id'
             )
+            // Join coin_logs of this week
             ->leftJoinSub(
                 fn($q) => $q->select('user_id', DB::raw('SUM(obtained_coins) AS total_restore'))
                     ->from('coin_logs')
@@ -118,12 +120,16 @@ class MonthlyRankingCommand extends Command
                 'users.id',
                 'coin_logs.user_id'
             )
+            // Select sum and filter only users with activity
             ->select([
                 'users.*',
                 DB::raw('IFNULL(total_charge,0) + IFNULL(total_restore,0) AS total_sum')
             ])
+            ->havingRaw('total_sum > 0') // only users with charge or coins
             ->orderByDesc('total_sum')
             ->get()->values();
+            dd($query);
+        return  $query;
     }
 
 

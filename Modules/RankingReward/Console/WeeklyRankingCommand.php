@@ -49,6 +49,7 @@ class WeeklyRankingCommand extends Command
 
     public function getRankingList(RankingType $rankingType)
     {
+
         switch ($rankingType->type) {
 
             case 'wealth':
@@ -58,11 +59,11 @@ class WeeklyRankingCommand extends Command
             case 'charge':
                 return $this->charge();
 
-            case 'game':
-                return $this->gameRanking();
+                case 'game':
+                    return $this->gameRanking();
 
-            default:
-                return collect();
+                default:
+                    return collect();
         }
     }
 
@@ -96,6 +97,7 @@ class WeeklyRankingCommand extends Command
             ->values();
     }
 
+
     public function charge()
     {
         $timezone = getTimezone();
@@ -106,8 +108,15 @@ class WeeklyRankingCommand extends Command
         $end = Carbon::now($timezone)
             ->subWeek()
             ->endOfWeek();
+        //
+        // dd($start);
+        Log::info("Charge calculation week range", [
+            'start' => $start,
+            'end' => $end
+        ]);
 
-        return User::query()
+        $query = User::query()
+            // Join charges of this week
             ->leftJoinSub(
                 fn($q) => $q->select('user_id', DB::raw('SUM(amount) AS total_charge'))
                     ->from('charges')
@@ -118,6 +127,7 @@ class WeeklyRankingCommand extends Command
                 'users.id',
                 'charges.user_id'
             )
+            // Join coin_logs of this week
             ->leftJoinSub(
                 fn($q) => $q->select('user_id', DB::raw('SUM(obtained_coins) AS total_restore'))
                     ->from('coin_logs')
@@ -128,13 +138,24 @@ class WeeklyRankingCommand extends Command
                 'users.id',
                 'coin_logs.user_id'
             )
+            // Select sum and filter only users with activity
             ->select([
                 'users.*',
                 DB::raw('IFNULL(total_charge,0) + IFNULL(total_restore,0) AS total_sum')
             ])
-            ->orderByDesc('total_sum')
-            ->get()->values();
+            ->havingRaw('total_sum > 0') // only users with charge or coins
+            ->orderByDesc('total_sum');
+            
+         $results = $query->get()->values();
+       
+        // Log the results count
+        // Log::info("Charge results count", [
+        //     'count' => $results->count()
+        // ]);
+
+        return $results;
     }
+
 
 
     public function gameRanking()
