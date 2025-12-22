@@ -29,7 +29,6 @@ trait UserLevel
     }
 
 
-use Illuminate\Support\Facades\Log;
 
 public function getNextSenderLevelInfoAttribute(): array
 {
