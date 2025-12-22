@@ -54,7 +54,15 @@ class UserCoinLogResource extends JsonResource
                         'coins'    => abs($this->coin),
                     ]),
                 ];
-
+            case 'exchange':
+                return [
+                    __('wallet.exchange_title'),
+                    __('wallet.exchange_description', [
+                        'diamonds' => abs($this->amount),
+                        'coins'    => abs($this->coin),
+                    ]),
+                ];
+                
             case 'gift_room_audio':
             case 'gift_room_live':
                 return [
