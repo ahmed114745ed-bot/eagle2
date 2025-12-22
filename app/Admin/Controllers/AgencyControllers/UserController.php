@@ -480,7 +480,7 @@ class UserController extends MainController
                 'userSetting',
                 'senderLevel:id,level',
                 'receiverLevel:id,level',
-                'monthlyDiamondReceive',
+               // 'monthlyDiamondReceive',
                 'country',
                 'packs' => fn($q) => $q->where('is_used', true)
                     ->whereIn('type', [25])
