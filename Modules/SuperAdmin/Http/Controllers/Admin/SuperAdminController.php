@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
+use Illuminate\Http\Request;
 
 use App\Models\Bd;
 use App\Models\User;
@@ -201,19 +202,19 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('created_at', __('Created at'))->display(function ($date) {
-            static $formatter = null;
+        // $grid->column('created_at', __('Created at'))->display(function ($date) {
+        //     static $formatter = null;
 
-            if ($formatter === null) {
-                $formatter = new IntlDateFormatter(
-                    App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
-                    IntlDateFormatter::LONG,
-                    IntlDateFormatter::SHORT
-                );
-            }
+        //     if ($formatter === null) {
+        //         $formatter = new IntlDateFormatter(
+        //             App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
+        //             IntlDateFormatter::LONG,
+        //             IntlDateFormatter::SHORT
+        //         );
+        //     }
 
-            return $formatter->format(strtotime($date));
-        });
+        //     return $formatter->format(strtotime($date));
+        // });
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -800,4 +801,16 @@ class SuperAdminController extends MainController
     //        ]);
     //    }
 
+
+    public function searchBySuperAdmin(Request $request)
+    {   $key = $request->q;
+         $page = $request->get('page', 1);
+         $perPage = 10;
+        return SuperAdmin::selectRaw('concat(username, " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('username', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
 }
