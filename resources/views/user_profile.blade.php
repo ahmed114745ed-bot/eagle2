@@ -1203,7 +1203,7 @@
                 </a>
                 @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                    <button type="submit" class="btn btn-success edit_user_item_model_btn">
+                    <button type="submit" class="btn btn-info edit_user_item_model_btn">
                         {{ __('edit') }}
                     </button>
                 @endif

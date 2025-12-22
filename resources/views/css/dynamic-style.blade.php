@@ -1007,7 +1007,10 @@
         background: red !important;
     }
 
-    /*.btn-success {*/
+    .btn-success {
+        background: green !important;
+    }
+        /*.btn-success {*/
     /*    background: var(--success-button) !important;*/
     /*    color: #ffffff !important;*/
     /*    border: none !important;*/
@@ -1037,15 +1040,9 @@
         float: right !important;
     }
 
-    .grid-create-btn > .btn-success {
-        background-color: var(--primary-color) !important;
-        color: var(--inverse-color) !important;
-    }
-
     .btn-dropbox,
     .btn-instagram,
-    .btn-twitter,
-    .btn-success {
+    .btn-twitter {
         background-color: var(--primary-color) !important;
         color: var(--inverse-color) !important;
     }

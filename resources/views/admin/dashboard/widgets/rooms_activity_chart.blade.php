@@ -74,20 +74,25 @@
     }
 
     function loadRoomsActivity(period = 'day') {
-        $.ajax({
-            url: "{{ $fetchUrl }}",
-            data: { period: period },
-            success: function(res) {
-                if (res.success) {
-                    renderRoomsActivity(res.labels, res.newRooms, res.inactiveRooms);
-                } else {
-                    renderRoomsActivity([], [], []);
+        if (!window.roomsActivityLoaded) {
+            window.roomsActivityLoaded = true;
+            $.ajax({
+                url: "{{ $fetchUrl }}",
+                data: { period: period },
+                success: function(res) {
+                    if (res.success) {
+                        renderRoomsActivity(res.labels, res.newRooms, res.inactiveRooms);
+                    } else {
+                        renderRoomsActivity([], [], []);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     $('#rooms-activity-filter').on('change', function () {
+        // Allow filter changes to reload data
+        window.roomsActivityLoaded = false;
         loadRoomsActivity($(this).val());
     });
 
