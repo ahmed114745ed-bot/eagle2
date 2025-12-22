@@ -474,13 +474,11 @@ class UserController extends MainController
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'uuid', 'special_id','country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
-                // 'ownerRoom:id,uid',
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
-               // 'userSetting',
+                'userSetting',
                 'senderLevel:id,level',
                 'receiverLevel:id,level',
-               // 'monthlyDiamondReceive',
                 'country',
                 'packs' => fn($q) => $q->where('is_used', true)
                     ->whereIn('type', [25])
