@@ -475,6 +475,7 @@
 
         .form-horizontal .fields-group > .col-md-12 {
             padding: 0px !important;
+            padding-bottom: 15px !important;
         }
 
         .box-body {
