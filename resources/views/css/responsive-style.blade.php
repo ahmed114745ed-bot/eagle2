@@ -465,8 +465,8 @@
             margin-right: 4% !important;
         }
 
-        .col-md-3, .col-sm-6 {
-            flex: 0 0 96% !important;
+        .col-md-3 .card {
+            margin-left: 4% !important;
         }
 
         .rtl .finance-card {
