@@ -1650,9 +1650,10 @@
         text-align: start;
     }
 
-    .rtl .form-horizontal .row {
+    .rtl .box-header .form-horizontal .row {
         display: block !important;
         direction: rtl !important;
+        margin-bottom: 10px;
     }
 
     .ltr .form-horizontal .row {
