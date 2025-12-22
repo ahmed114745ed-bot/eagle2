@@ -28,7 +28,8 @@
     "Are you sure you want to accept this request?": "Apakah Anda yakin ingin menerima permintaan ini?",
     "Are you sure you want to reject this request?": "Apakah Anda yakin ingin menolak permintaan ini?",
     "done successfully": "Berhasil dilakukan",
-
+    "you are host you can not exchange diamonds": "Anda adalah host, Anda tidak dapat menukarkan berlian",
+"calculus not true": "Perhitungan tidak benar",
     "country user": "Negara pengguna",
     "All status switch change country request": "Semua permintaan ubah negara berdasarkan status",
 "History switch change country request": "Riwayat permintaan ubah negara berdasarkan status",
