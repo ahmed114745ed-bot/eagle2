@@ -923,6 +923,13 @@ class User extends Authenticatable
         return floor($total * 100) / 100;
     }
 
+    public function getSalaryV2Attribute()
+    {
+        $total = wallet_available_by_user($this->id); 
+        return floor($total * 100) / 100;
+    }
+
+
     public function getSalaryByAgencyAttribute()
     {
         $userSalary = UserSallary::query()
