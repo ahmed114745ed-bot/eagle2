@@ -28,156 +28,86 @@ class UserCoinLogResource extends JsonResource
     /**
      * Build professional title & description
      */
-  private function getTitleAndDescription(): array
-{
-    switch ($this->type) {
+    private function getTitleAndDescription(): array
+    {
+        switch ($this->type) {
 
- 
-        case 'payment':
-            return [
-                __('payment_title'),
-                __('payment_description', [
-                    'amount' => abs($this->amount),
-                ]),
-            ];
-
-        case 'admin_charge':
-        case 'bd_charge':
-            return [
-                __('admin_adjustment_title'),
-                __('admin_adjustment_description', [
-                    'amount' => abs($this->amount),
-                ]),
-            ];
-
-
-        case 'cp':
-            return [
-                __('cp_title'),
-                __('cp_description', [
-                    'amount' => abs($this->amount),
-                ]),
-            ];
-
-
-        case 'gifts':
-        case 'gift_logs':
-        case 'gift':
-            return [
-                __('gift_title'),
-                __('gift_description'),
-            ];
-
-        case 'daily_gift':
-            return [
-                __('daily_gift_title'),
-                __('daily_gift_description'),
-            ];
-
-        case 'lucky_gift':
-            return [
-                __('lucky_gift_title'),
-                __('lucky_gift_description'),
-            ];
-
-        case 'lucky_box':
-        case 'box_gift':
-            return [
-                __('lucky_box_title'),
-                __('lucky_box_description'),
-            ];
-
-
-        case 'exchange':
-        case 'exchanges_diamonds':
-            return [
-                __('exchange_title'),
-                __('exchange_description', [
-                    'diamonds' => abs($this->amount),
-                    'coins'    => abs($this->coin),
-                ]),
-            ];
-
-        case 'cashback':
-            return [
-                __('cashback_title'),
-                __('cashback_description', [
-                    'amount' => abs($this->amount),
-                ]),
-            ];
-
-
-        case 'packs':
-            return [
-                __('purchase_title'),
-                __('purchase_description', [
-                    'amount' => abs($this->amount),
-                    'item'   => $this->item_name ?? __('packs.default_item'),
-                ]),
-            ];
-
-
-        case 'coin_game':
-            return $this->amount < 0
-                ? [
-                    __('lose_title'),
-                    __('lose_description', [
-                        'amount' => abs($this->amount),
-                    ]),
-                ]
-                : [
-                    __('win_title'),
-                    __('win_description', [
-                        'amount' => abs($this->amount),
+            case 'payment':
+                return [
+                    __('wallet.payment_title'),
+                    __('wallet.payment_description', [
+                        'amount' => abs($this->amount)
                     ]),
                 ];
 
-  
-        case 'weekly_star':
-        case 'room_cup':
-        case 'room_boom':
-        case 'host_level':
-            return [
-                __('achievement_title'),
-                __('achievement_description'),
-            ];
+            case 'gifts':
+                return [
+                    __('wallet.gift_title'),
+                    __('wallet.gift_description'),
+                ];
 
-   
-        case 'comment':
-            return [
-                __('comment_title'),
-                __('comment_description'),
-            ];
+            case 'exchanges_diamonds':
+                return [
+                    __('wallet.exchange_title'),
+                    __('wallet.exchange_description', [
+                        'diamonds' => abs($this->amount),
+                        'coins'    => abs($this->coin),
+                    ]),
+                ];
+            case 'exchange':
+                return [
+                    __('wallet.exchange_title'),
+                    __('wallet.exchange_description', [
+                        'diamonds' => abs($this->amount),
+                        'coins'    => abs($this->coin),
+                    ]),
+                ];
+                
+            case 'gift_room_audio':
+            case 'gift_room_live':
+                return [
+                    __('wallet.gift_room_title'),
+                    __('wallet.gift_room_description', [
+                        'user' => $this->user->name ?? __('wallet.unknown_user')
+                    ]),
+                ];
 
-        case 'family':
-            return [
-                __('family_title'),
-                __('family_description'),
-            ];
+            case 'moment':
+                return [
+                    __('wallet.moment_title'),
+                    __('wallet.moment_description'),
+                ];
+
+            case 'coin_game':
+                $amount = abs($this->amount);
+
+                if ($this->amount < 0) {
+                    return [
+                        __('coin_game.lose_title'),
+                        __('coin_game.lose_description', ['amount' => $amount]),
+                    ];
+                }
+
+                return [
+                    __('coin_game.win_title'),
+                    __('coin_game.win_description', ['amount' => $amount]),
+                ];
+
+                case 'packs':
+                return [
+                    __('packs.purchase_title'),
+                    __('packs.purchase_description', [
+                        'amount' => abs($this->amount),
+                        'item'   => $this->item_name ?? __('packs.default_item'),
+                    ]),
+                ];
 
 
-        case 'background':
-        case 'background_images':
-            return [
-                __('background_title'),
-                __('background_description'),
-            ];
-
-
-        case 'invitation_charge_earnings':
-            return [
-                __('invitation_title'),
-                __('invitation_description', [
-                    'amount' => abs($this->amount),
-                ]),
-            ];
-
-        default:
-            return [
-                __('general_title'),
-                __('general_description'),
-            ];
+            default:
+                return [
+                    __('wallet.general_title'),
+                    __('wallet.general_description'),
+                ];
+        }
     }
-}
-
 }

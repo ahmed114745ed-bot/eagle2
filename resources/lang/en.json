@@ -1542,51 +1542,33 @@
 "confirm_text": "By confirming, all current salaries for this target will be closed, achieved diamonds will be calculated for users, and a new salary cycle for the current month will begin with the remaining diamonds after deduction. This action cannot be undone.",
 "confirm_button": "Confirm",
 "cancel_button": "Cancel",
- "payment_title": "Balance Recharge",
-  "payment_description": "Your balance was recharged with :amount coins",
+  "coin_game.win_title": "Game Reward",
+  "coin_game.win_description": ":amount coins have been added to your wallet from game winnings.",
 
-  "admin_adjustment_title": "Admin Adjustment",
-  "admin_adjustment_description": "Your balance was adjusted by :amount coins",
+  "coin_game.lose_title": "Game Deduction",
+  "coin_game.lose_description": ":amount coins have been deducted from your wallet due to a game loss.",
 
-  "cp_title": "Relationship Earnings",
-  "cp_description": "You earned :amount coins from your relationship activity",
+  "wallet.payment_title": "Wallet Top-Up",
+  "wallet.payment_description": "Your wallet has been credited with :amount coins successfully.",
 
-  "gift_title": "Gift",
-  "gift_description": "A gift transaction has occurred",
+  "wallet.gift_title": "Gift Sent",
+  "wallet.gift_description": "You have successfully sent a gift.",
 
-  "daily_gift_title": "Daily Gift",
-  "daily_gift_description": "You received your daily gift",
+  "wallet.exchange_title": "Currency Exchange",
+  "wallet.exchange_description": ":diamonds diamonds were converted into :coins coins.",
 
-  "lucky_gift_title": "Lucky Gift",
-  "lucky_gift_description": "You won a lucky gift",
+  "wallet.gift_room_title": "Room Gift",
+  "wallet.gift_room_description": "A gift was sent to user :user.",
 
-  "lucky_box_title": "Lucky Box",
-  "lucky_box_description": "Reward from lucky box",
+  "wallet.moment_title": "Moments",
+  "wallet.moment_description": "An action related to moments activity.",
 
-  "exchange_title": "Currency Exchange",
-  "exchange_description": "Converted :diamonds diamonds into :coins coins",
-
-  "cashback_title": "Cashback",
-  "cashback_description": "You received :amount coins as cashback",
-
-  "achievement_title": "Achievement",
-  "achievement_description": "You earned a reward for an achievement",
-
-  "comment_title": "Interaction Reward",
-  "comment_description": "Reward for interaction or comment",
-
-  "family_title": "Family Reward",
-  "family_description": "Reward related to family activity",
-
-  "background_title": "Customization Item",
-  "background_description": "Customization item purchased or used",
-
-  "invitation_title": "Invitation Reward",
-  "invitation_description": "You earned :amount coins from inviting a user",
-
-  "general_title": "Wallet Activity",
-  "general_description": "A wallet transaction occurred"
-
+  "wallet.unknown_user": "Unknown user",
+  "wallet.general_title": "Wallet Transaction",
+  "wallet.general_description": "A wallet transaction has been completed.",
+    "packs.purchase_title": "Mağaza Satın Alımı",
+  "packs.purchase_description": "Mağazadan :item satın almak için :amount coin düşüldü.",
+  "packs.default_item": "ürün"
 
 
 

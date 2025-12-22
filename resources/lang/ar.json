@@ -4754,50 +4754,33 @@
     "confirm_text": "عند تأكيد التعديل، سيتم إغلاق جميع الرواتب الحالية لهذا التارجت، واحتساب الماسات المحققة للمستخدمين، وبدء دورة رواتب جديدة للشهر الحالي بالماسات المتبقية بعد الخصم. لن يمكن التراجع عن هذا الإجراء.",
     "confirm_button": "تأكيد",
     "cancel_button": "إلغاء",
- "payment_title": "شحن الرصيد",
-  "payment_description": "تم شحن :amount عملة إلى رصيدك",
+      "coin_game.win_title": "مكافأة من الألعاب",
+  "coin_game.win_description": "تمت إضافة :amount عملة إلى رصيدك نتيجة الفوز في الألعاب.",
 
-  "admin_adjustment_title": "تعديل إداري",
-  "admin_adjustment_description": "تم تعديل رصيدك بمقدار :amount عملة",
+  "coin_game.lose_title": "خصم من الألعاب",
+  "coin_game.lose_description": "تم خصم :amount عملة من رصيدك في الألعاب.",
 
-  "cp_title": "مردود العلاقة",
-  "cp_description": "تم إضافة :amount عملة كمردود من علاقتك داخل التطبيق",
+  "wallet.payment_title": "شحن الرصيد",
+  "wallet.payment_description": "تم شحن محفظتك بمبلغ :amount عملة بنجاح.",
 
-  "gift_title": "هدية",
-  "gift_description": "عملية متعلقة بإرسال أو استقبال هدية",
+  "wallet.gift_title": "إرسال هدية",
+  "wallet.gift_description": "قمت بإرسال هدية بنجاح.",
 
-  "daily_gift_title": "هدية يومية",
-  "daily_gift_description": "حصلت على هديتك اليومية",
+  "wallet.exchange_title": "تحويل العملات",
+  "wallet.exchange_description": "تم تحويل :diamonds ألماسة إلى :coins عملة.",
 
-  "lucky_gift_title": "هدية حظ",
-  "lucky_gift_description": "ربحت هدية من نظام الحظ",
+  "wallet.gift_room_title": "هدية داخل الغرفة",
+  "wallet.gift_room_description": "تم إرسال الهدية إلى المستخدم :user.",
 
-  "lucky_box_title": "صندوق الحظ",
-  "lucky_box_description": "مكافأة من صندوق الحظ",
+  "wallet.moment_title": "اللحظات",
+  "wallet.moment_description": "عملية متعلقة بنشر أو تفاعل في اللحظات.",
 
-  "exchange_title": "تحويل العملات",
-  "exchange_description": "تم تحويل :diamonds ماس إلى :coins عملة",
-
-  "cashback_title": "استرداد نقدي",
-  "cashback_description": "تم استرداد :amount عملة إلى رصيدك",
-
-  "achievement_title": "إنجاز جديد",
-  "achievement_description": "تم الحصول على مكافأة إنجاز",
-
-  "comment_title": "تفاعل",
-  "comment_description": "مكافأة مقابل التفاعل أو التعليق",
-
-  "family_title": "العائلة",
-  "family_description": "مكافأة مرتبطة بالعائلة",
-
-  "background_title": "عنصر مخصص",
-  "background_description": "تم شراء أو استخدام عنصر مخصص",
-
-  "invitation_title": "مكافأة دعوة",
-  "invitation_description": "ربحت :amount عملة من دعوة مستخدم جديد",
-
-  "general_title": "عملية رصيد",
-  "general_description": "عملية تمت على رصيدك"
+  "wallet.unknown_user": "مستخدم غير معروف",
+  "wallet.general_title": "عملية في المحفظة",
+  "wallet.general_description": "تم تنفيذ عملية على محفظتك.",
+    "packs.purchase_title": "شراء من المتجر",
+  "packs.purchase_description": "تم خصم :amount عملة مقابل شراء :item من المتجر.",
+  "packs.default_item": "عنصر"
 
 
 

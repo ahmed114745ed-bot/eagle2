@@ -3833,50 +3833,50 @@
 
 ,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
-,  "payment_title": "बैलेंस रिचार्ज",
-  "payment_description": "आपके बैलेंस में :amount कॉइन्स जोड़े गए",
+, "payment_title": "Bakiye Yükleme",
+  "payment_description": "Bakiyenize :amount coin eklendi",
 
-  "admin_adjustment_title": "एडमिन समायोजन",
-  "admin_adjustment_description": "आपके बैलेंस को :amount कॉइन्स से समायोजित किया गया",
+  "admin_adjustment_title": "Yönetici Ayarı",
+  "admin_adjustment_description": "Bakiyeniz :amount coin ile güncellendi",
 
-  "cp_title": "संबंध आय",
-  "cp_description": "आपने अपने संबंध गतिविधि से :amount कॉइन्स कमाए",
+  "cp_title": "İlişki Geliri",
+  "cp_description": ":amount coin ilişki aktivitenizden kazanıldı",
 
-  "gift_title": "उपहार",
-  "gift_description": "एक उपहार लेनदेन हुआ है",
+  "gift_title": "Hediye",
+  "gift_description": "Bir hediye işlemi gerçekleşti",
 
-  "daily_gift_title": "दैनिक उपहार",
-  "daily_gift_description": "आपने अपना दैनिक उपहार प्राप्त किया",
+  "daily_gift_title": "Günlük Hediye",
+  "daily_gift_description": "Günlük hediyenizi aldınız",
 
-  "lucky_gift_title": "लकी गिफ्ट",
-  "lucky_gift_description": "आपने लकी सिस्टम से एक उपहार जीता",
+  "lucky_gift_title": "Şans Hediyesi",
+  "lucky_gift_description": "Şans sisteminden hediye kazandınız",
 
-  "lucky_box_title": "लकी बॉक्स",
-  "lucky_box_description": "लकी बॉक्स से पुरस्कार प्राप्त हुआ",
+  "lucky_box_title": "Şans Kutusu",
+  "lucky_box_description": "Şans kutusundan ödül aldınız",
 
-  "exchange_title": "मुद्रा विनिमय",
-  "exchange_description": ":diamonds हीरे को :coins कॉइन्स में बदला गया",
+  "exchange_title": "Para Birimi Değişimi",
+  "exchange_description": ":diamonds elmas :coins coine dönüştürüldü",
 
-  "cashback_title": "कैशबैक",
-  "cashback_description": "आपको :amount कॉइन्स कैशबैक के रूप में मिले",
+  "cashback_title": "Geri Ödeme",
+  "cashback_description": ":amount coin bakiyenize geri ödendi",
 
-  "achievement_title": "उपलब्धि",
-  "achievement_description": "आपने एक उपलब्धि पुरस्कार जीता",
+  "achievement_title": "Başarı",
+  "achievement_description": "Bir başarı ödülü kazandınız",
 
-  "comment_title": "इंटरैक्शन इनाम",
-  "comment_description": "इंटरैक्शन या टिप्पणी के लिए इनाम",
+  "comment_title": "Etkileşim Ödülü",
+  "comment_description": "Etkileşim veya yorum için ödül",
 
-  "family_title": "परिवार पुरस्कार",
-  "family_description": "परिवार गतिविधि से संबंधित पुरस्कार",
+  "family_title": "Aile Ödülü",
+  "family_description": "Aile aktivitesi ile ilişkili ödül",
 
-  "background_title": "कस्टमाइज़ेशन आइटम",
-  "background_description": "कस्टमाइज़ेशन आइटम खरीदा या उपयोग किया गया",
+  "background_title": "Özelleştirme Ögesi",
+  "background_description": "Özelleştirme ögesi satın alındı veya kullanıldı",
 
-  "invitation_title": "आमंत्रण पुरस्कार",
-  "invitation_description": "आपने एक उपयोगकर्ता को आमंत्रित करने के लिए :amount कॉइन्स कमाए",
+  "invitation_title": "Davet Ödülü",
+  "invitation_description": "Bir kullanıcı davet ettiğiniz için :amount coin kazandınız",
 
-  "general_title": "वॉलेट गतिविधि",
-  "general_description": "वॉलेट लेनदेन हुआ"
+  "general_title": "Cüzdan Aktivitesi",
+  "general_description": "Cüzdan işlemi gerçekleşti"
 
 
 
