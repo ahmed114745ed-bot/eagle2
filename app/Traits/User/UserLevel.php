@@ -4,6 +4,7 @@ namespace App\Traits\User;
 
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\Vip;
 
 trait UserLevel
@@ -28,39 +29,50 @@ trait UserLevel
     }
 
 
-    public function getNextSenderLevelInfoAttribute(): array
-    {
-        $currentLevel = $this->senderLevel;
+use Illuminate\Support\Facades\Log;
 
-        if (!$currentLevel) {
-            return [
-                'next_level' => null,
-                'remaining_exp' => null,
-            ];
-        }
+public function getNextSenderLevelInfoAttribute(): array
+{
+    $currentLevel = $this->senderLevel;
+    Log::info("Current sender level for user {$this->id}:", ['level' => $currentLevel?->level]);
 
-        $nextLevel = Vip::where('type', 'sender')
-            ->where('level', '>', $currentLevel->level)
-            ->orderBy('level')
-            ->first();
-
-        if (!$nextLevel) {
-            return [
-                'next_level' => null,
-                'remaining_exp' => 0,
-            ];
-        }
-
-        $currentExp = $this->sender_exp ?? 0;
-
+    if (!$currentLevel) {
+        Log::info("No current sender level found for user {$this->id}");
         return [
-            'next_level' => $nextLevel->level,
-            'remaining_exp' => max(
-                $nextLevel->exp - $currentExp,
-                0
-            ),
+            'next_level' => null,
+            'remaining_exp' => null,
         ];
     }
+
+    $nextLevel = Vip::where('type', 'sender')
+        ->where('level', '>', $currentLevel->level)
+        ->orderBy('level')
+        ->first();
+
+    if (!$nextLevel) {
+        Log::info("No next sender level exists for user {$this->id}");
+        return [
+            'next_level' => null,
+            'remaining_exp' => 0,
+        ];
+    }
+
+    $currentExp = $this->sender_exp ?? 0;
+    $remainingExp = max($nextLevel->exp - $currentExp, 0);
+
+    Log::info("Next sender level for user {$this->id}:", [
+        'next_level' => $nextLevel->level,
+        'current_exp' => $currentExp,
+        'next_level_exp' => $nextLevel->exp,
+        'remaining_exp' => $remainingExp
+    ]);
+
+    return [
+        'next_level' => $nextLevel->level,
+        'remaining_exp' => $remainingExp,
+    ];
+}
+
 
 
 }
